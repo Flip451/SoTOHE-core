@@ -6,8 +6,10 @@
 
 use std::collections::{BTreeMap, HashMap};
 
+use domain::tddd::catalogue_v2::ItemAction;
 use rustdoc_types::{Id, Item, ItemEnum, ItemSummary};
 
+use super::builder::rewrite_type_ref_ids_in_item;
 use super::state::Phase1State;
 
 // ---------------------------------------------------------------------------
@@ -90,17 +92,16 @@ pub(super) fn collect_all_subtree_ids(item: &Item, source_index: &HashMap<Id, It
 /// Only the intra-item structural links (field lists, variant lists, trait item
 /// lists, and impl-block id lists) are remapped.
 ///
-/// ## Why `Type::ResolvedPath` ids are NOT remapped here
+/// ## What is and is NOT remapped here
 ///
 /// All A-sourced (catalogue-derived) `ResolvedPath` ids use the sentinel
 /// `Id(UNRESOLVED_CRATE_ID)` for local type references (see `type_ref_parser.rs`).
 /// Those markers are resolved to real S-side ids during Phase 1.5 by
-/// `resolve_unresolved_in_item`, not here.  External crate refs also use
-/// `UNRESOLVED_CRATE_ID` with an external path; they are not remapped.
+/// `resolve_unresolved_in_item`, not here.
 ///
-/// B-sourced items keep their original B-side ids for type-field references, which
-/// is correct because `copy_b_children_to_s` inserts all B children under their
-/// original ids, so the references remain valid within S.
+/// B-sourced items' `Type::ResolvedPath` ids (cross-type references in fields,
+/// generics, etc.) are remapped separately via `rewrite_type_ref_ids_in_item`
+/// using `b_id_remap` so that they remain consistent after B-side renumbering (T037).
 ///
 /// The only case where a structural parent id needs rewriting is `impl.for_`
 /// (for struct/enum parents) and `impl.trait_` (for trait parents), handled
@@ -224,10 +225,15 @@ pub(super) fn insert_a_item_tree_into_s(
 /// Recursively inserts all children of `item` into `state.s_index` using the
 /// provided `id_remap` table.
 ///
-/// `parent_action` is propagated to `state.s_actions` for `Impl` children so that
-/// Phase 2 evaluates them with the correct action (e.g. `Add`) rather than
-/// defaulting to `Reference`.  Non-impl children (fields, variants, methods) do
-/// not appear in Phase 2 identity maps and need no action entry.
+/// `parent_action` is propagated to `state.s_actions` for **all** children
+/// (not just impl blocks) so that the Phase 1.45 discriminator can rely on
+/// `s_actions` as the sole authoritative source for every item in S after T037.
+///
+/// Phase 2 only evaluates impl blocks directly (via identity maps), but the
+/// broader action-entry coverage is required by the Phase 1.45 / Phase 1.6 /
+/// Step 6 discriminators, which previously fell back to an id-based heuristic
+/// (`id >= first_fresh_id`) for child items.  After T037, B-side children are
+/// also renumbered to fresh Ids, making the id-based heuristic unreliable.
 pub(super) fn insert_remapped_children(
     state: &mut Phase1State,
     item: &Item,
@@ -242,32 +248,35 @@ pub(super) fn insert_remapped_children(
             let mut stored = remapped_child;
             stored.id = new_child_id;
             state.s_index.entry(new_child_id).or_insert(stored);
-            // Propagate action to impl blocks so Phase 2 uses the correct region.
-            if matches!(child.inner, ItemEnum::Impl(_)) {
-                state.s_actions.insert(new_child_id, parent_action);
-            }
+            // Propagate action to ALL children so Phase 1.45 / 1.6 / Step 6
+            // discriminators can use s_actions as the sole authoritative source.
+            state.s_actions.insert(new_child_id, parent_action);
             // Recurse for nested children.
             insert_remapped_children(state, child, source_index, id_remap, parent_action);
         }
     }
 }
 
-/// Inserts a B-sourced item tree into S, keeping ALL Ids (including the root) as-is.
+/// Inserts a B-sourced item tree into S, renumbering ALL Ids (root + children)
+/// via `state.b_id_remap`.
 ///
-/// B's items already form a consistent Id space, so no remapping is needed.
-/// The top-level item is inserted under its original B-side Id.  This preserves
-/// all intra-B cross-references: when a struct field's `Type::ResolvedPath.id`
-/// points at another top-level B type, that Id is still valid in S because the
-/// target was also inserted under its original B-side Id.  Allocating a fresh
-/// S Id for the root (as was done previously) broke cross-references between
-/// top-level B types, causing Phase 1.6 to report spurious `DanglingId` errors.
+/// Before T037, B items were inserted under their original B-side Ids.  This
+/// caused the A-side and B-side Id spaces to coexist in `s_index`, which meant
+/// a numeric Id value could refer to different items depending on which side
+/// produced it — violating the ADR D3 / D2 mandate that S construction rebuilds
+/// Ids on both sides.
 ///
-/// The `fresh_id_base` invariant established in `phase1_build_s_and_d` ensures
-/// that all B-side Ids are strictly below the fresh-Id counter, so they cannot
-/// clash with A-sourced items allocated later.
+/// After T037 (this function), every B item is remapped to a fresh S Id via the
+/// pre-built `state.b_id_remap` table, exactly mirroring what the A-insertion
+/// path already did.  Intra-item structural references (child-list Ids in
+/// `Struct.impls`, `Enum.variants`, etc.) are rewritten by
+/// `remap_child_ids_in_item`, and all `Type::ResolvedPath.id` type-level
+/// references are rewritten by `rewrite_type_ref_ids_in_item` — so all
+/// cross-type references inside S remain consistent after renumbering.
 ///
-/// Impl blocks' `for_` / `trait_` references already contain the correct B-side
-/// parent Id, so no patching is needed here (unlike the A-insertion path).
+/// `s_actions` is populated for ALL inserted items (root + all descendants) so
+/// that the Phase 1.45 / Phase 1.6 / Step 6 discriminators can rely on
+/// `s_actions` as the sole authoritative source.
 pub(super) fn insert_b_item_tree_into_s(
     state: &mut Phase1State,
     root_item: Item,
@@ -275,38 +284,92 @@ pub(super) fn insert_b_item_tree_into_s(
     path: Option<Vec<String>>,
     source_index: &HashMap<Id, Item>,
 ) -> Id {
-    // Copy child items recursively (keeping original child Ids).
-    copy_b_children_to_s(state, &root_item, source_index);
+    let old_b_id = root_item.id;
+    let new_s_id = match state.b_id_remap.get(&old_b_id).copied() {
+        Some(id) => id,
+        None => {
+            // Fallback: allocate a fresh id if somehow this B item was not in the
+            // pre-built remap (should not happen in normal usage, but be safe).
+            state.alloc_id()
+        }
+    };
+    let is_trait = matches!(root_item.inner, rustdoc_types::ItemEnum::Trait(_));
 
-    // Insert the top-level item under its original B-side Id.
-    let b_id = root_item.id;
-    let name = root_item.name.clone().unwrap_or_default();
-    let kind = super::super::item_kind_from_inner(&root_item.inner);
-    state.s_index.insert(b_id, root_item);
+    // Collect the direct impl-child Ids BEFORE remapping so we can patch
+    // impl.for_ / impl.trait_ to the new root S Id afterwards.
+    let old_impl_ids: Vec<Id> = collect_child_ids(&root_item)
+        .into_iter()
+        .filter(|id| {
+            source_index.get(id).is_some_and(|item| matches!(item.inner, ItemEnum::Impl(_)))
+        })
+        .collect();
+
+    // Insert all descendant items with their remapped Ids.
+    // `insert_remapped_children` now propagates `action` to ALL children.
+    insert_remapped_children_with_type_rewrite(state, &root_item, source_index, action);
+
+    // Remap structural child-list references in the root item.
+    let remapped_root = remap_child_ids_in_item(root_item, &state.b_id_remap.clone());
+    // Rewrite type-level ResolvedPath.id references (cross-type refs).
+    let rewritten_root = rewrite_type_ref_ids_in_item(remapped_root, &state.b_id_remap.clone());
+
+    // Insert the root at its new S Id.
+    let name = rewritten_root.name.clone().unwrap_or_default();
+    let kind = super::super::item_kind_from_inner(&rewritten_root.inner);
+    let mut stored_root = rewritten_root;
+    stored_root.id = new_s_id;
+    state.s_index.entry(new_s_id).or_insert(stored_root);
     if let Some(p) = path {
-        state.s_paths.insert(b_id, ItemSummary { crate_id: 0, path: p, kind });
+        state.s_paths.insert(new_s_id, ItemSummary { crate_id: 0, path: p, kind });
     }
-    state.s_actions.insert(b_id, action);
+    state.s_actions.insert(new_s_id, action);
     if !name.is_empty() {
-        state.s_type_name_to_id.insert(name, b_id);
+        state.s_type_name_to_id.insert(name, new_s_id);
     }
 
-    b_id
+    // Patch impl blocks' for_ / trait_ to the new root S Id.
+    // The old B-side impl Ids have been remapped; use b_id_remap to get the new Ids.
+    let new_impl_ids: Vec<Id> =
+        old_impl_ids.iter().filter_map(|id| state.b_id_remap.get(id).copied()).collect();
+    if is_trait {
+        patch_impl_trait_ids(&mut state.s_index, &new_impl_ids, new_s_id);
+    } else {
+        patch_impl_for_ids(&mut state.s_index, &new_impl_ids, new_s_id);
+    }
+
+    new_s_id
 }
 
-/// Copies B-sourced child items into `state.s_index`, keeping their original Ids.
-pub(super) fn copy_b_children_to_s(
+/// Recursively inserts all children of a B-sourced `item` into `state.s_index`,
+/// remapping all Ids via `state.b_id_remap` and rewriting type-level
+/// `ResolvedPath.id` references via `rewrite_type_ref_ids_in_item`.
+///
+/// `parent_action` is recorded in `state.s_actions` for every inserted child
+/// (not just impl blocks), making `s_actions` the authoritative discriminator
+/// for all items in S after T037.
+fn insert_remapped_children_with_type_rewrite(
     state: &mut Phase1State,
     item: &Item,
     source_index: &HashMap<Id, Item>,
+    parent_action: domain::tddd::catalogue_v2::ItemAction,
 ) {
-    for child_id in collect_child_ids(item) {
-        if let std::collections::hash_map::Entry::Vacant(e) = state.s_index.entry(child_id) {
-            if let Some(child) = source_index.get(&child_id) {
-                e.insert(child.clone());
-                // Recurse for nested items (e.g. variants with payloads).
-                copy_b_children_to_s(state, child, source_index);
-            }
+    // Clone the remap table so we can pass it to the rewrite helpers without
+    // borrow conflicts on `state`.
+    let b_id_remap = state.b_id_remap.clone();
+    for old_child_id in collect_child_ids(item) {
+        if let Some(child) = source_index.get(&old_child_id) {
+            let new_child_id = *b_id_remap.get(&old_child_id).unwrap_or(&old_child_id);
+            // Remap structural child-list references.
+            let remapped_child = remap_child_ids_in_item(child.clone(), &b_id_remap);
+            // Rewrite type-level ResolvedPath.id references.
+            let rewritten_child = rewrite_type_ref_ids_in_item(remapped_child, &b_id_remap);
+            let mut stored = rewritten_child;
+            stored.id = new_child_id;
+            state.s_index.entry(new_child_id).or_insert(stored);
+            // Propagate action to ALL children (authoritative for Phase 1.45 discriminator).
+            state.s_actions.insert(new_child_id, parent_action);
+            // Recurse for nested children (e.g. enum variants with payload fields).
+            insert_remapped_children_with_type_rewrite(state, child, source_index, parent_action);
         }
     }
 }
@@ -346,11 +409,21 @@ pub(super) fn copy_non_impl_children_to_d(
 /// Called when a type/trait is moved from S to D (Delete) to prevent stale child
 /// items (fields, variants, trait methods) from lingering in S and generating
 /// spurious Phase 2 signals.
-pub(super) fn remove_child_items_from_s(s_index: &mut HashMap<Id, Item>, item: &Item) {
+///
+/// After T037, every child item in S also carries an `s_actions` entry.
+/// Removing items from `s_index` without also removing their `s_actions` entries
+/// would violate the `ExtendedCrate` contract ("all `Id` keys in `item_actions`
+/// SHOULD exist in `krate.index`").  `s_actions` is therefore updated in tandem.
+pub(super) fn remove_child_items_from_s(
+    s_index: &mut HashMap<Id, Item>,
+    s_actions: &mut BTreeMap<Id, ItemAction>,
+    item: &Item,
+) {
     for child_id in collect_child_ids(item) {
         if let Some(child) = s_index.remove(&child_id) {
+            s_actions.remove(&child_id);
             // Recurse to remove grandchildren.
-            remove_child_items_from_s(s_index, &child);
+            remove_child_items_from_s(s_index, s_actions, &child);
         }
     }
 }
@@ -364,6 +437,7 @@ pub(super) fn remove_child_items_from_s(s_index: &mut HashMap<Id, Item>, item: &
 /// references.
 pub(super) fn move_impl_children_to_d(
     s_index: &mut HashMap<Id, Item>,
+    s_actions: &mut BTreeMap<Id, ItemAction>,
     d_index: &mut HashMap<Id, Item>,
     parent: &Item,
     _d_type_name_to_id: &mut BTreeMap<String, Id>,
@@ -377,9 +451,10 @@ pub(super) fn move_impl_children_to_d(
                 // before removing the impl itself.  This keeps the returned D
                 // graph internally consistent: impl.items entries all resolve to
                 // items present in d_index.
-                move_subtree_to_d(s_index, d_index, &child_clone);
+                move_subtree_to_d(s_index, s_actions, d_index, &child_clone);
                 // Now transfer the impl node itself.
                 if let Some(impl_item) = s_index.remove(&child_id) {
+                    s_actions.remove(&child_id);
                     d_index.insert(child_id, impl_item);
                 }
             }
@@ -392,23 +467,34 @@ pub(super) fn move_impl_children_to_d(
 ///
 /// Called by `move_impl_children_to_d` to transfer method / assoc-item subtrees
 /// so that D's impl nodes have fully populated `items` lists.
+///
+/// After T037, every item in S also carries an `s_actions` entry.  Items moved
+/// to D are no longer part of S, so their `s_actions` entries are removed to
+/// keep the `ExtendedCrate` contract (all `item_actions` keys exist in `krate.index`).
 fn move_subtree_to_d(
     s_index: &mut HashMap<Id, Item>,
+    s_actions: &mut BTreeMap<Id, ItemAction>,
     d_index: &mut HashMap<Id, Item>,
     item: &Item,
 ) {
     for child_id in collect_child_ids(item) {
         if let Some(child) = s_index.remove(&child_id) {
+            s_actions.remove(&child_id);
             // Recurse before inserting so inner children are moved first.
-            move_subtree_to_d(s_index, d_index, &child);
+            move_subtree_to_d(s_index, s_actions, d_index, &child);
             d_index.insert(child_id, child);
         }
     }
 }
 
-/// Removes all B-side child items of a type being replaced by Modify from `s_index`.
-pub(super) fn remove_b_children_from_s(s_index: &mut HashMap<Id, Item>, b_item: &Item) {
-    remove_child_items_from_s(s_index, b_item);
+/// Removes all B-side child items of a type being replaced by Modify from `s_index`
+/// and their corresponding `s_actions` entries.
+pub(super) fn remove_b_children_from_s(
+    s_index: &mut HashMap<Id, Item>,
+    s_actions: &mut BTreeMap<Id, ItemAction>,
+    b_item: &Item,
+) {
+    remove_child_items_from_s(s_index, s_actions, b_item);
 }
 
 /// Collects the Ids of direct `ItemEnum::Impl` children of `parent` that are

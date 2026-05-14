@@ -37,6 +37,13 @@ pub(super) struct Phase1State {
     pub(super) d_type_name_to_id: BTreeMap<String, Id>,
     /// function_path_string → Id for functions in D.
     pub(super) d_fn_path_to_id: BTreeMap<String, Id>,
+    /// Pre-built remap for every B-side Id → fresh S Id.
+    ///
+    /// Populated once in `phase1_build_s_and_d` before any insertion begins, so
+    /// that every B item (type, function, child, impl block) lands at a fresh S Id
+    /// that is independent from all A-sourced Ids.  Used by
+    /// `insert_b_item_tree_into_s` and the B-function / orphan-impl insertion passes.
+    pub(super) b_id_remap: HashMap<Id, Id>,
 }
 
 impl Phase1State {
@@ -58,6 +65,7 @@ impl Phase1State {
             s_fn_path_to_id: BTreeMap::new(),
             d_type_name_to_id: BTreeMap::new(),
             d_fn_path_to_id: BTreeMap::new(),
+            b_id_remap: HashMap::new(),
         }
     }
 
@@ -124,6 +132,32 @@ impl Phase1State {
         new_id
     }
 
+    /// Inserts a function item into S at a *specific* Id.
+    ///
+    /// Used during B-function insertion (Phase 1 Step 2) to place a B-sourced
+    /// function at the pre-allocated Id from `b_id_remap` rather than allocating
+    /// another fresh Id via `alloc_id`.
+    pub(super) fn insert_s_fn_at(
+        &mut self,
+        specific_id: Id,
+        item: Item,
+        fn_path: String,
+        action: ItemAction,
+        path: Option<Vec<String>>,
+    ) {
+        let mut new_item = item;
+        new_item.id = specific_id;
+        self.s_index.insert(specific_id, new_item);
+        if let Some(p) = path {
+            self.s_paths.insert(
+                specific_id,
+                ItemSummary { crate_id: 0, path: p, kind: ItemKind::Function },
+            );
+        }
+        self.s_actions.insert(specific_id, action);
+        self.s_fn_path_to_id.insert(fn_path, specific_id);
+    }
+
     /// Moves a type/trait from S to D.
     ///
     /// Impl blocks (`ItemEnum::Impl`) that belonged to the type — together with
@@ -148,16 +182,19 @@ impl Phase1State {
             // Collect impl ids that will be moved to D before any removal.
             let impl_ids = collect_impl_child_ids(&item, &self.s_index);
             // Move child impl blocks from S to D before purging other children.
+            // s_actions entries for moved impl subtree items are removed in tandem.
             move_impl_children_to_d(
                 &mut self.s_index,
+                &mut self.s_actions,
                 &mut self.d_index,
                 &item,
                 &mut self.d_type_name_to_id,
             );
             // Copy non-impl children (fields, variants, methods) to D so that D's parent
             // item keeps internally consistent child-id references.  Then purge from S.
+            // s_actions entries for the purged children are removed in tandem.
             copy_non_impl_children_to_d(&self.s_index, &mut self.d_index, &item);
-            remove_child_items_from_s(&mut self.s_index, &item);
+            remove_child_items_from_s(&mut self.s_index, &mut self.s_actions, &item);
             let new_id = self.alloc_id();
             let mut new_item = item;
             new_item.id = new_id;
@@ -209,6 +246,7 @@ impl Phase1State {
                             }
                         }
                         // Move orphan's method children to d_index as well.
+                        // Remove their s_actions entries so no ghost entries remain.
                         let child_ids: Vec<Id> =
                             if let rustdoc_types::ItemEnum::Impl(ref impl_) = orphan.inner {
                                 impl_.items.clone()
@@ -217,6 +255,7 @@ impl Phase1State {
                             };
                         for child_id in child_ids {
                             if let Some(child) = self.s_index.remove(&child_id) {
+                                self.s_actions.remove(&child_id);
                                 self.d_index.entry(child_id).or_insert(child);
                             }
                         }

@@ -1236,31 +1236,33 @@ fn test_normalize_impl_trait_path_preserves_generic_args() {
 // T036 regression: Phase 1.45 rewrite must not touch B-sourced Reference fns
 // -----------------------------------------------------------------------
 
-/// Regression test for T036 — Phase 1.45 rewrite discriminator.
+/// Regression test for T036 (updated for T037 B-side renumbering).
 ///
-/// Before T036, the discriminator was
+/// ## Original T036 problem (still covered)
+///
+/// Before T036, the Phase 1.45 discriminator was
 /// `should_rewrite = a_sourced_top_ids.contains(&item_id) || item_id.0 >= first_fresh_id`.
-/// Because `insert_s_fn` allocates a fresh Id (`>= first_fresh_id`) for every
-/// function, including B-sourced Reference functions, the second clause would
-/// incorrectly select B-sourced Reference functions for rewrite. When A's
-/// `full_remap` happened to contain a key that numerically collided with a
-/// B-sourced function's parameter / return type-ref Id, the function's
-/// signature was corrupted (param Id rewritten to an A-side Id).
+/// Because `insert_s_fn` allocates a fresh Id for every function (including B-sourced
+/// Reference functions), the `>= first_fresh_id` clause would incorrectly select them for
+/// rewrite.  When A's `full_remap` collided numerically with a B-function's type-ref Id,
+/// the signature was corrupted.  T036 fixed this by using `s_actions` as the discriminator.
 ///
-/// This test forces the collision deterministically:
-///   - B: `Bar` at Id(1), `process(x: Bar)` at Id(2). `process`'s param
-///     references Id(1) (= B's Bar).
-///   - A: `Foo` at Id(1), action = Add. After `insert_a_item_tree_into_s`,
-///     A's Id(1) is remapped to a fresh S-Id, so
-///     `a_local_to_s_id[Id(1)] = <fresh S-Id of Foo>` and consequently
-///     `full_remap[Id(1)] = <fresh S-Id of Foo>`.
-///   - `first_fresh_id` = max(B Ids) + 1 = 3, so `process`'s allocated Id is 3
-///     (or higher). Old discriminator → `should_rewrite = true` →
-///     `rewrite_type_ref_ids_in_item` rewrites `process`'s param Id(1) to
-///     `full_remap[Id(1)]` (the fresh S-Id of Foo). Param now points to Foo.
+/// ## T037 extension (B-side Id renumbering)
 ///
-/// With the T036 fix, `s_actions[process.id] = Reference` → `item_is_a_sourced
-/// = false` → no rewrite → param Id(1) is preserved.
+/// After T037, B-sourced items are no longer inserted at their original B-side Ids — all B
+/// items are renumbered to fresh S Ids via `b_id_remap`.  Crucially, B-side type refs
+/// (e.g. `process`'s param type `Id(1)` → B's `Bar`) are also rewritten via `b_id_remap`
+/// during B-item insertion, so `process`'s param will point to Bar's fresh S Id after Phase 1.
+///
+/// The test still verifies structural consistency:
+///   - `process_param_id` = the Id in `process`'s param type after Phase 1.
+///   - `bar_id` = the Id of `Bar` in S after Phase 1 (fresh S Id, NOT Id(1) after T037).
+///   - These must be equal: `process`'s param must still reference `Bar` (not `Foo`).
+///
+/// Setup:
+///   - B: `Bar` at Id(1), `process(x: Bar)` at Id(2). `process`'s param refs Id(1).
+///   - A: `Foo` at Id(1), action = Add.
+///   - After Phase 1, both `Bar` and `process` are renumbered; param must still point to Bar.
 #[test]
 #[allow(clippy::panic, clippy::assertions_on_constants)]
 fn test_t036_phase1_45_does_not_rewrite_b_sourced_reference_function_param_id() {
@@ -1371,7 +1373,7 @@ fn test_t036_phase1_45_does_not_rewrite_b_sourced_reference_function_param_id() 
     let process_param_id = param_path.id;
     let process_param_path = param_path.path.clone();
 
-    // --- Locate `Bar` in S (must still be at Id(1), B-sourced top-level) ---
+    // --- Locate `Bar` in S by name (after T037 renumbering, Bar is no longer at Id(1)) ---
     let bar_item = s
         .krate()
         .index
@@ -1381,13 +1383,15 @@ fn test_t036_phase1_45_does_not_rewrite_b_sourced_reference_function_param_id() 
     let bar_id = bar_item.id;
 
     // --- Assertion: process's param Id must still point to Bar, not to Foo ---
-    // Without the T036 fix, the Phase 1.45 rewrite would have mapped Id(1)
-    // (B's Bar) to the fresh S-Id of A's Foo via `full_remap`.
+    // After T037, both Bar and process are renumbered to fresh S Ids via b_id_remap.
+    // `process`'s param type-ref was also rewritten via b_id_remap, so it now points
+    // to Bar's fresh S Id.  The assertion checks structural consistency: the param
+    // should reference Bar (not Foo or any other spurious id).
     assert_eq!(
         process_param_id, bar_id,
-        "T036 regression: process(x: Bar) param Id must still reference Bar after Phase 1.45 \
-         (got {process_param_id:?}, expected {bar_id:?}). If the discriminator regressed, the \
-         param would have been remapped to A's Foo's fresh S-Id."
+        "T036/T037 regression: process(x: Bar) param Id must reference Bar's S-Id after Phase 1 \
+         (got {process_param_id:?}, expected {bar_id:?}). A regression would map the param to \
+         Foo's fresh S-Id or leave it at a stale original B Id."
     );
 
     // Defense-in-depth: param's path string is preserved (Phase 1.45 rewrites
@@ -1395,5 +1399,187 @@ fn test_t036_phase1_45_does_not_rewrite_b_sourced_reference_function_param_id() 
     assert_eq!(
         process_param_path, "Bar",
         "param path string must be preserved after Phase 1.45 rewrite"
+    );
+}
+
+// -----------------------------------------------------------------------
+// T037 regression: B-side Id renumbering — collision fixture
+// -----------------------------------------------------------------------
+
+/// T037 regression: both A and B have an item at the same numeric Id(1),
+/// but they represent completely different types.  After Phase 1:
+///
+/// - S must contain BOTH `Foo` (from A, Add action) and `Bar` (from B, Reference action).
+/// - They must occupy DISTINCT fresh S Ids (no collision or clobber).
+/// - No spurious Phase 2 signals should result from Id confusion.
+///
+/// Before T037, B items kept their original Ids.  If A also had `Id(1)` (for Foo),
+/// after inserting B's Bar at Id(1) and then Foo at a fresh Id, both would end up in
+/// s_index at different Ids — but B's Bar at Id(1) and A's Foo at, say, Id(3).  The
+/// real ADR mandated issue was that a B-side type ref pointing to Id(1) could be
+/// confused with an A-side type ref pointing to Id(1) if they had the same numeric value.
+///
+/// After T037, all B items are renumbered via b_id_remap, so Id(1) (B's Bar) becomes
+/// a fresh S Id, and Id(1) in A (Foo) also becomes a different fresh S Id.  The two
+/// spaces are fully separated in s_index.
+#[test]
+fn test_t037_b_and_a_overlapping_ids_produce_distinct_s_entries() {
+    use super::phase1::phase1_build_s_and_d;
+
+    let crate_name = "my_crate";
+
+    // --- B: `Bar` at Id(1) ---
+    let b_bar_id = Id(1);
+    let b = simple_crate_with_struct(crate_name, "Bar");
+    // b has root at Id(0), Bar at Id(1).
+
+    // --- A: `Foo` at Id(1), action = Add (same numeric Id as B's Bar) ---
+    let a = extended_crate_with_struct(crate_name, "Foo", ItemAction::Add);
+    // a has root at Id(0), Foo at Id(1) — collides numerically with B's Bar.
+
+    // --- Run Phase 1 ---
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // --- Find Foo and Bar in S by name ---
+    let foo_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Foo"))
+        .expect("`Foo` must be present in S (A-side Add)");
+
+    let bar_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Bar"))
+        .expect("`Bar` must be present in S (B-side Reference)");
+
+    let foo_id = foo_item.id;
+    let bar_id = bar_item.id;
+
+    // Both must be present at DISTINCT fresh S Ids — neither should still be at Id(1)
+    // (the original B-side id) after T037 renumbering.
+    assert_ne!(
+        foo_id, bar_id,
+        "T037: Foo and Bar must occupy distinct S Ids after Phase 1; got same id {foo_id:?}"
+    );
+
+    // Neither should be at the original B-side Id (Id(1)) since b_id_remap
+    // renumbers all B items to fresh Ids.
+    assert_ne!(
+        bar_id, b_bar_id,
+        "T037: Bar must be renumbered to a fresh S Id; still at original B Id {b_bar_id:?}"
+    );
+
+    // Foo must also be at a fresh S Id distinct from the original B-side Id(1).
+    // A regression that places A-side Foo at the colliding original B id (b_bar_id)
+    // would not be caught by the `foo_id != bar_id` assertion alone (both could be wrong).
+    assert_ne!(
+        foo_id, b_bar_id,
+        "T037: Foo must not be placed at the original B-side Id {b_bar_id:?}; A-side Ids must be \
+         renumbered to fresh S Ids independently of B-side renumbering"
+    );
+
+    // Sanity: the s_actions for Foo is Add, Bar is Reference.
+    assert_eq!(
+        s.action_for(&foo_id),
+        Some(ItemAction::Add),
+        "T037: Foo must have Add action in s_actions"
+    );
+    assert_eq!(
+        s.action_for(&bar_id),
+        Some(ItemAction::Reference),
+        "T037: Bar must have Reference action in s_actions"
+    );
+}
+
+/// T037 regression: full evaluate()-level test to ensure no spurious Phase 2
+/// signals arise when A-Add and B-Reference items share the same original numeric Id.
+///
+/// A: `Foo` added (Id(1) in A's index).
+/// B: `Bar` reference (Id(1) in B's index).
+/// C: `Foo` is present (matches A's Add) and `Bar` is present (unchanged from B).
+///
+/// Expected: Foo → SIntersectC_Match_Add (Blue), Bar → SIntersectC_Match_Reference (Red if drift
+/// or Blue if no change).  The critical check is that there are NO errors or panics and
+/// that `Foo` gets the `Add` region (not confused with `Bar`).
+#[test]
+fn test_t037_no_spurious_signals_with_overlapping_a_b_ids() {
+    let crate_name = "my_crate";
+
+    // A: Foo (Add). Uses Id(1) internally, same as B's Bar.
+    let a = extended_crate_with_struct(crate_name, "Foo", ItemAction::Add);
+
+    // B: Bar at Id(1).
+    let b = simple_crate_with_struct(crate_name, "Bar");
+
+    // C: both Foo and Bar present (like the expected final state).
+    let c_root = Id(0);
+    let c_foo_id = Id(1);
+    let c_bar_id = Id(2);
+    let mut c_index = HashMap::new();
+    let mut c_paths = HashMap::new();
+    c_index.insert(c_root, root_module_item(c_root, crate_name, vec![c_foo_id, c_bar_id]));
+    c_index.insert(c_foo_id, struct_item(c_foo_id, "Foo"));
+    c_index.insert(c_bar_id, struct_item(c_bar_id, "Bar"));
+    c_paths.insert(
+        c_foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    c_paths.insert(
+        c_bar_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let c = Crate {
+        root: c_root,
+        crate_version: None,
+        includes_private: false,
+        index: c_index,
+        paths: c_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, b, c).expect("evaluate should not error");
+
+    // Foo must be found in S as Add, and must match C (SIntersectC_Match_Add → Blue).
+    let foo_signal = report.iter().find(|s| s.item_name() == "Foo");
+    assert!(
+        foo_signal.is_some(),
+        "T037: Foo signal must be present in report; all signals: {:?}",
+        report.iter().map(|s| s.item_name()).collect::<Vec<_>>()
+    );
+    assert_eq!(
+        foo_signal.unwrap().region(),
+        SignalRegion::SIntersectC_Match_Add,
+        "T037: Foo must have Add match region (got {:?})",
+        foo_signal.unwrap().region()
+    );
+    assert!(foo_signal.unwrap().signal().is_blue(), "T037: Foo SIntersectC_Match_Add must be Blue");
+
+    // Bar (B-Reference, structurally unchanged in C) must NOT appear in the report.
+    // SIntersectC_Match_Reference maps to ThreeWaySignalKind::Skip, which is filtered
+    // out by ThreeWayEvaluationReport::new — "maintained" items are suppressed to
+    // reduce noise (ADR 3 D3).  A regression that corrupts Bar's structure (producing
+    // Mismatch_Reference → Red) or drops Bar from S (CMinusSUnionD → Red) would cause
+    // Bar to appear in the report unexpectedly.
+    let bar_signal = report.iter().find(|s| s.item_name() == "Bar");
+    assert!(
+        bar_signal.is_none(),
+        "T037: Bar must be Skip (Reference + structural match → filtered from report); \
+         unexpected signal: {:?}; all signals: {:?}",
+        bar_signal.map(|s| (s.item_name(), s.region())),
+        report.iter().map(|s| s.item_name()).collect::<Vec<_>>()
     );
 }

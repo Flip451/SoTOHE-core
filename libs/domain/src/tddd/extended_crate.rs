@@ -14,10 +14,13 @@
 //! | C (Current) | `rustdoc_types::Crate` | Pure rustdoc output |
 //! | D (Delete-set) | `rustdoc_types::Crate` | Implicit action = Delete; no `item_actions` needed |
 //!
-//! `item_actions` maps `rustdoc_types::Id` → `ItemAction`. An `Id` absent
-//! from `item_actions` has no declared action (B-derived Reference entries in S
-//! use implicit Reference semantics; callers should default to `Reference` when
-//! the id is absent).
+//! `item_actions` maps `rustdoc_types::Id` → `ItemAction`. After Phase 1
+//! B-side Id renumbering, ALL items in S — including children (fields, variants,
+//! impl methods) — have an explicit entry in `item_actions` (with the appropriate
+//! action: `Reference` for B-sourced items, `Add`/`Modify` for A-sourced items).
+//! Previously, B-derived Reference entries were absent and callers defaulted to
+//! `Reference`; that default remains correct for any absent key, but in practice
+//! every S-item now has an explicit entry in the map.
 //!
 //! No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
 //! the domain layer is serialization-free.
@@ -34,9 +37,11 @@ use crate::tddd::catalogue_v2::ItemAction;
 /// functions, impls, …). `item_actions` maps each item's `Id` to its declared
 /// `ItemAction` from the originating `CatalogueDocument`.
 ///
-/// Items **absent** from `item_actions` (e.g., B-derived items carried into S
-/// without an explicit catalogue action) should be interpreted by callers as
-/// implicitly `Reference`.
+/// Items **absent** from `item_actions` should be interpreted by callers as
+/// implicitly `Reference`.  After Phase 1 B-side Id renumbering, all items in
+/// TypeGraph S — including B-derived Reference entries and all child items —
+/// have an explicit `item_actions` entry.  The implicit-Reference default is
+/// kept for backward compatibility but is no longer exercised by Phase 1 output.
 ///
 /// ## Invariants
 ///
@@ -80,8 +85,10 @@ impl ExtendedCrate {
 
     /// Looks up the action for a given `Id`.
     ///
-    /// Returns `None` when the id is absent from `item_actions`, which callers
-    /// should interpret as an implicit `Reference` action (B-derived items in S).
+    /// Returns `None` when the id is absent from `item_actions`.  Callers
+    /// should interpret an absent entry as an implicit `Reference` action.
+    /// Note: for TypeGraph S produced by Phase 1, every item has an explicit
+    /// entry, so `None` is not expected in practice for S-graph lookups.
     ///
     /// `Id` implements `Copy` so this method accepts `&Id` for `BTreeMap::get`
     /// compatibility.

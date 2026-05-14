@@ -19,7 +19,8 @@ use super::super::resolution::resolve_unresolved_in_item;
 use super::super::{build_function_identity_map, build_type_trait_identity_map};
 use super::child_items::{
     collect_child_ids, insert_a_item_tree_into_s, insert_b_item_tree_into_s, patch_impl_for_ids,
-    patch_impl_trait_ids, remap_and_copy_a_children_to_s, remove_b_children_from_s,
+    patch_impl_trait_ids, remap_and_copy_a_children_to_s, remap_child_ids_in_item,
+    remove_b_children_from_s,
 };
 use super::state::Phase1State;
 
@@ -36,9 +37,40 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     let crate_name = b.index.get(&b.root).and_then(|item| item.name.clone()).unwrap_or_default();
 
     // Seed the fresh-Id counter above the highest Id already used by B so that
-    // new allocations never clash with B-seeded items in s_index.
+    // initial allocations do not clash with B-side Ids.  After T037 we renumber
+    // ALL B items into fresh S Ids, but we still need the counter to start above
+    // the B range so that the pre-built b_id_remap Ids are all fresh.
     let first_fresh_id = b.index.keys().map(|id| id.0).max().map_or(1, |m| m + 1);
     let mut state = Phase1State::new(first_fresh_id);
+
+    // --- Pre-step: Build B-wide Id remap (T037) ---
+    //
+    // Allocate a fresh S Id for every entry in b.index BEFORE any insertion so
+    // that both A-sourced and B-sourced items occupy the same "fresh" Id space
+    // in s_index, with no overlap.  `insert_b_item_tree_into_s` and the B-function
+    // / orphan-impl insertion passes use this map to place every B item at its
+    // pre-allocated fresh S Id.
+    //
+    // `Id(0)` is excluded from the remap for two reasons:
+    //   1. It is the B-side root module, which is never inserted into S (S gets
+    //      its own fresh root module item at the end of Phase 1).
+    //   2. Rustdoc uses `Id(0)` as a `Self`-type sentinel inside impl blocks
+    //      (`impl_.for_` for primitive / self-referential types).  Phase 1.6's
+    //      dangling-Id check explicitly skips `Id(0)` as a sentinel (Rule 0:
+    //      `if referenced_id.0 == 0 { continue; }`).  Remapping `Id(0)` would
+    //      turn that sentinel into a fresh S id that is never inserted into
+    //      `s_index`, causing Phase 1.6 to report spurious `DanglingId` errors.
+    {
+        // Sort B-side Ids before allocating fresh S Ids so that `b_id_remap` is
+        // deterministic across runs.  `HashMap::keys()` has no guaranteed iteration
+        // order; iterating it directly would assign different fresh Ids to the same
+        // B-side key on each invocation, making Phase 1 output non-reproducible.
+        let mut b_keys: Vec<Id> = b.index.keys().filter(|id| id.0 != 0).copied().collect();
+        b_keys.sort_by_key(|id| id.0);
+        let b_remap: HashMap<Id, Id> =
+            b_keys.into_iter().map(|old_id| (old_id, state.alloc_id())).collect();
+        state.b_id_remap = b_remap;
+    }
 
     // --- Step 1: Build B identity maps ---
     let b_types = build_type_trait_identity_map(b);
@@ -58,11 +90,16 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
             );
         }
     }
-    // For each B function, insert into S.
+    // For each B function, insert into S at the pre-allocated b_id_remap Id.
+    // The function's signature type-refs are rewritten via b_id_remap so that
+    // B-side parameter / return type Ids are consistent with the renumbered
+    // B-side types in s_index.
     for (fn_path_str, b_id) in &b_fns {
         if let Some(b_item) = b.index.get(b_id) {
             let path = b.paths.get(b_id).map(|ps| ps.path.clone());
-            state.insert_s_fn(b_item.clone(), fn_path_str.clone(), ItemAction::Reference, path);
+            let s_id = state.b_id_remap.get(b_id).copied().unwrap_or_else(|| state.alloc_id());
+            let rewritten = rewrite_type_ref_ids_in_item(b_item.clone(), &state.b_id_remap);
+            state.insert_s_fn_at(s_id, rewritten, fn_path_str.clone(), ItemAction::Reference, path);
         }
     }
 
@@ -70,9 +107,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     // so their trait impls are standalone Impl items in B's index that `collect_child_ids`
     // cannot reach.  Phase 2's `build_impl_identity_map` does find them in C (walking the
     // whole index), so omitting them from S would produce spurious `CMinusSUnionD` signals.
-    // Insert any Impl item not already in S.  Their method/assoc-item children are also
-    // inserted (they are found via the impl's own `items` list, which is the only subtree
-    // possible for an orphan impl).
+    //
+    // After T037, all B items are renumbered via b_id_remap, so original B Ids are NEVER in
+    // s_index.  Check whether the REMAPPED id is already present (i.e. was inserted as a
+    // child of a type's `impls` list) rather than the raw B-side id.
     {
         let orphan_impl_ids: Vec<Id> = b
             .index
@@ -80,20 +118,44 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
             .filter(|id| {
                 b.index.get(*id).is_some_and(|item| {
                     item.crate_id == 0 && matches!(item.inner, ItemEnum::Impl(_))
-                }) && !state.s_index.contains_key(*id)
+                }) && {
+                    // The remapped S id is absent from s_index → this impl was not inserted
+                    // as part of any type's child subtree → it is an orphan impl.
+                    let remapped = state.b_id_remap.get(*id).copied().unwrap_or(**id);
+                    !state.s_index.contains_key(&remapped)
+                }
             })
             .copied()
             .collect();
         for impl_id in orphan_impl_ids {
             if let Some(impl_item) = b.index.get(&impl_id) {
-                // Insert the impl itself.
-                state.s_index.insert(impl_id, impl_item.clone());
-                state.s_actions.insert(impl_id, ItemAction::Reference);
-                // Insert the impl's direct children (methods, assoc items).
+                let new_impl_s_id =
+                    state.b_id_remap.get(&impl_id).copied().unwrap_or_else(|| state.alloc_id());
+                // Rewrite the impl's type-level refs via b_id_remap.
+                let rewritten = rewrite_type_ref_ids_in_item(impl_item.clone(), &state.b_id_remap);
+                // Remap structural child-list references (impl.items).
+                let remapped = remap_child_ids_in_item(rewritten, &state.b_id_remap);
+                let mut stored_impl = remapped;
+                stored_impl.id = new_impl_s_id;
+                state.s_index.insert(new_impl_s_id, stored_impl);
+                state.s_actions.insert(new_impl_s_id, ItemAction::Reference);
+                // Insert the impl's direct children (methods, assoc items) with renumbered Ids.
                 if let ItemEnum::Impl(impl_inner) = &impl_item.inner {
                     for &child_id in &impl_inner.items {
                         if let Some(child) = b.index.get(&child_id) {
-                            state.s_index.entry(child_id).or_insert_with(|| child.clone());
+                            let new_child_s_id = state
+                                .b_id_remap
+                                .get(&child_id)
+                                .copied()
+                                .unwrap_or_else(|| state.alloc_id());
+                            let rewritten_child =
+                                rewrite_type_ref_ids_in_item(child.clone(), &state.b_id_remap);
+                            let remapped_child =
+                                remap_child_ids_in_item(rewritten_child, &state.b_id_remap);
+                            let mut stored_child = remapped_child;
+                            stored_child.id = new_child_s_id;
+                            state.s_index.entry(new_child_s_id).or_insert(stored_child);
+                            state.s_actions.insert(new_child_s_id, ItemAction::Reference);
                         }
                     }
                 }
@@ -154,7 +216,11 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                 })?;
                 let is_trait = matches!(a_item.inner, ItemEnum::Trait(_));
                 if let Some(b_item_in_s) = state.s_index.get(&s_id).cloned() {
-                    remove_b_children_from_s(&mut state.s_index, &b_item_in_s);
+                    remove_b_children_from_s(
+                        &mut state.s_index,
+                        &mut state.s_actions,
+                        &b_item_in_s,
+                    );
                 }
                 // Remap A child Ids to fresh S Ids before inserting.
                 // Pass ItemAction::Modify so impl-block children inherit the parent's action.
@@ -359,36 +425,29 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
 
         if !full_remap.is_empty() {
             // Only rewrite A-sourced items (Add / Modify actions) and their child items.
-            // B-sourced Reference items use B-side Ids which are correct and must not be
-            // rewritten: A and B use independent Id spaces and their Ids may collide.
+            // B-sourced Reference items have already had their intra-B type refs rewritten
+            // via b_id_remap during insertion (T037); re-applying the A-side full_remap
+            // would incorrectly remap B-sourced type refs to A-side Ids.
             //
-            // A-sourced top-level items have `Add` or `Modify` in `s_actions`.
-            // B-sourced top-level items have `Reference` or `Delete` in `s_actions`.
-            // Child items (fields, variant payloads, impl methods) have no `s_actions` entry.
+            // After T037, ALL items in S have an entry in s_actions (top-level + children).
+            // The `s_actions` lookup is the sole authoritative discriminator.
+            // After T037, ALL items in S (top-level + children) have an entry in
+            // s_actions because:
+            //   - `insert_remapped_children` now propagates action to every child.
+            //   - `insert_remapped_children_with_type_rewrite` does the same for B children.
+            //   - `insert_s_fn` / `insert_s_fn_at` populate s_actions for functions.
             //
-            // For top-level items, `s_actions` is the authoritative source — using
-            // `id.0 >= first_fresh_id` alone is unsafe because `insert_s_fn` allocates
-            // a fresh Id for ALL functions, including B-sourced Reference functions.
-            // A B-sourced Reference function's id is therefore `>= first_fresh_id`, and
-            // the old `should_rewrite` discriminator (`a_sourced_top_ids || id >= fresh`)
-            // would incorrectly rewrite that function's signature using `full_remap`,
-            // potentially remapping B-side type-ref Ids to unrelated A-side Ids and
-            // producing false structural mismatches (or hiding real drift) in Phase 2.
-            //
-            // The dangling-id check (Step 5 below) uses the same discriminator pattern;
-            // see the matching comment block there for the function-Id caveat.
-            //
-            // For child items (no `s_actions` entry), the id-based heuristic is safe:
-            // A-side children get fresh Ids `>= first_fresh_id` via
-            // `insert_a_item_tree_into_s` / `remap_and_copy_a_children_to_s`, while
-            // B-side children keep their original B-side Ids `< first_fresh_id`.
+            // The old `None => item_id.0 >= first_fresh_id` heuristic was needed when
+            // B-side children had no s_actions entry and were kept at their original B Ids
+            // (< first_fresh_id).  After T037, B-side children are renumbered to fresh Ids
+            // just like A-side children, so the numeric heuristic would wrongly identify
+            // renumbered B children as A-sourced.  s_actions is now the sole discriminator.
             let s_item_ids: Vec<Id> = state.s_index.keys().copied().collect();
             for item_id in s_item_ids {
-                let item_is_a_sourced = match state.s_actions.get(&item_id) {
-                    Some(&ItemAction::Add) | Some(&ItemAction::Modify) => true,
-                    Some(_) => false, // Reference or Delete → B-sourced, must not rewrite
-                    None => item_id.0 >= first_fresh_id, // Child item — id-based heuristic
-                };
+                let item_is_a_sourced = matches!(
+                    state.s_actions.get(&item_id),
+                    Some(&ItemAction::Add) | Some(&ItemAction::Modify),
+                );
                 if item_is_a_sourced {
                     if let Some(item) = state.s_index.remove(&item_id) {
                         let rewritten = rewrite_type_ref_ids_in_item(item, &full_remap);
@@ -432,19 +491,16 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     // After resolution and A-side id remapping (Phase 1.45), check that no local-crate Id
     // referenced in S's items is missing from S.
     //
-    // A- and B-side items use INDEPENDENT Id spaces.  Phase 1.45 remaps A-sourced local type
-    // refs to S-side Ids, but A-side synthetic external Ids (from `ensure_external_type_id`,
-    // e.g. Id for `std::result::Result`) and A-side function Ids are NOT remapped and survive
-    // in A-sourced items.  B-sourced items retain their original B-side Ids.
+    // After T037, both A- and B-sourced items are renumbered into the same fresh S Id space.
+    // A-side type refs (after Phase 1.45) and B-side internal type refs (after b_id_remap
+    // rewriting in `insert_b_item_tree_into_s`) both resolve to fresh S Ids in `s_index`.
+    // B-side external type refs (not in b.index, so not in b_id_remap) keep their original
+    // B-side Id values and are validated against b.paths.
     //
-    // Because the two Id spaces are independent, the same numeric Id can mean different things:
-    // e.g. A-side Id N may be a synthetic external type for `std::result::Result` while B-side
-    // Id N is a local constant like `AGENT_PROFILES_PATH`, or vice-versa.
+    // The item-source discriminator uses `s_actions` exclusively (no id-based heuristic).
     //
-    // To avoid false positives, the rule set is split by item source:
-    //
-    // A-SOURCED items (Add/Modify action, or child with fresh id >= first_fresh_id):
-    //   Their type ref Ids are A-side Ids (possibly remapped to S-side for local types).
+    // A-SOURCED items (Add/Modify in s_actions):
+    //   Type ref Ids are Phase-1.45-remapped S Ids.
     //   A-side paths are consulted first, B-side paths as fallback.
     //   0. Id(0) — sentinel — skip.
     //   1. In S → valid.
@@ -454,12 +510,13 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     //   4. In `b.paths` with crate_id == 0 → deleted local → DanglingId.
     //   5. Not found → stale → DanglingId.
     //
-    // B-SOURCED items (Reference action, id < first_fresh_id):
-    //   Their type ref Ids are B-side Ids.  A-side paths are NOT consulted — doing so
-    //   would produce false positives when A-side happens to map the same numeric Id to a
-    //   local function while B-side maps it to an external crate type.
+    // B-SOURCED items (Reference in s_actions):
+    //   Internal B-to-B type refs have been rewritten to fresh S Ids (Rule 1 covers them).
+    //   External B type refs (not in b.index) keep their original B-side Ids and are
+    //   validated against b.paths.
+    //   A-side paths are NOT consulted to avoid false positives.
     //   0. Id(0) — sentinel — skip.
-    //   1. In S → valid.
+    //   1. In S → valid (covers renumbered internal B refs).
     //   2. In `b.paths` with crate_id != 0 → B-side external → valid.
     //   3. In `b.paths` with crate_id == 0 → deleted local → DanglingId.
     //   4. Not found → stale → DanglingId.
@@ -467,13 +524,6 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     // `collect_referenced_ids` pre-filters the Id list so that `Id(UNRESOLVED_CRATE_ID)` is
     // never yielded (A-side external type refs that were not resolved to a concrete external Id
     // keep `UNRESOLVED_CRATE_ID` after Phase 1.5 and are explicitly skipped by the collector).
-    //
-    // Note: the old Rule 5 (before this change) exempted B-side child items found in `b.index`
-    // but not `b.paths` as unconditionally valid.  That was incorrect: if the child's parent was
-    // deleted in Phase 1, `remove_child_items_from_s` purges the child from S too, so the
-    // reference is genuinely dangling.  Since `insert_b_item_tree_into_s` inserts ALL B child
-    // items into S under their original Ids, every valid B child ref is already in `s_ids`
-    // (Rule 1).  Any id that reaches the terminal rule is therefore stale/dangling.
 
     let s_ids: HashSet<Id> = state.s_index.keys().copied().collect();
 
@@ -482,27 +532,16 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
 
         // Determine whether this item is A-sourced.
         //
-        // Top-level items (types, traits, functions) have entries in `s_actions`.
-        // Use the action as the discriminator: Add / Modify = A-sourced; Reference = B-sourced.
+        // After T037, ALL items in S (top-level + children) have an entry in
+        // `s_actions` — see the Phase 1.45 discriminator comment for details.
+        // The `s_actions` lookup is therefore the sole authoritative discriminator.
         //
-        // Child items (struct fields, enum variants, impl blocks, etc.) are NOT stored in
-        // `s_actions`.  Fall back to the Id-based heuristic: A-side children get fresh Ids
-        // allocated by `insert_a_item_tree_into_s` / `remap_and_copy_a_children_to_s`
-        // (all >= `first_fresh_id`); B-side children keep their original B-side Ids
-        // (all < `first_fresh_id`, by construction).
-        //
-        // Note: ALL functions are inserted via `insert_s_fn`, which allocates a fresh Id
-        // regardless of whether the function is B-sourced (Reference) or A-sourced (Add).
-        // Therefore `id >= first_fresh_id` is NOT a reliable discriminator for functions.
-        // The `s_actions` lookup is the authoritative source for all top-level items.
-        let item_is_a_sourced = match state.s_actions.get(&item.id) {
-            Some(&ItemAction::Add) | Some(&ItemAction::Modify) => true,
-            Some(_) => false, // Reference or Delete → B-sourced (or already handled)
-            None => {
-                // Not in s_actions → child item; use Id-based heuristic.
-                item.id.0 >= first_fresh_id
-            }
-        };
+        // A-sourced: Add / Modify action.
+        // B-sourced: Reference action.
+        let item_is_a_sourced = matches!(
+            state.s_actions.get(&item.id),
+            Some(&ItemAction::Add) | Some(&ItemAction::Modify),
+        );
 
         for referenced_id in collect_referenced_ids(item) {
             // Rule 0: Id(0) is the crate root module / `Self` sentinel — skip unconditionally.
@@ -593,12 +632,8 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     let a_side_path_ids: HashSet<Id> = {
         // Collect all Ids referenced by items in S (types + impls + functions).
         //
-        // Separate A-sourced from B-sourced references:
-        // - A-sourced items: top-level items with Add/Modify action, or child items with
-        //   fresh Ids (>= first_fresh_id) allocated by the A-insertion path.
-        //   After Phase 1.45, all A-sourced type-ref IDs are >= first_fresh_id too.
-        // - B-sourced items: top-level items with Reference/Delete action and original
-        //   B-side Ids (< first_fresh_id).
+        // Separate A-sourced from B-sourced references using s_actions as the sole
+        // discriminator (after T037, all items including children have s_actions entries).
         //
         // This distinction is critical because A and B use independent Id spaces.
         // After Phase 1.45, A-sourced type-ref IDs no longer collide with B-side IDs,
@@ -606,11 +641,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
         let mut a_referenced_ids: HashSet<Id> = HashSet::new();
         let mut b_referenced_ids: HashSet<Id> = HashSet::new();
         for item in state.s_index.values() {
-            let is_a_sourced = match state.s_actions.get(&item.id) {
-                Some(&ItemAction::Add) | Some(&ItemAction::Modify) => true,
-                Some(_) => false,
-                None => item.id.0 >= first_fresh_id,
-            };
+            let is_a_sourced = matches!(
+                state.s_actions.get(&item.id),
+                Some(&ItemAction::Add) | Some(&ItemAction::Modify),
+            );
             let refs = collect_referenced_ids(item);
             if is_a_sourced {
                 for id in refs {
@@ -744,16 +778,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     // moved into `ExtendedCrate::new` — because `alloc_id` takes `&mut self`
     // (borrowing `state`) and cannot be called after a partial move.
     //
-    // Use fresh ids rather than hardcoding Id(0) for the root module.  B's
-    // items are inserted into S under their original B-side Ids (see
-    // `insert_b_item_tree_into_s`), and Id(0) in B may be occupied by a real
-    // data item (e.g. an enum variant at the first alphabetical position in
-    // rustdoc output).  Hardcoding Id(0) as the root would overwrite that
-    // B-seeded data item, causing Phase 2's structural equality check to fail
-    // for any enum whose variant list includes Id(0) —
-    // `build_variant_shape_map` would find a Module item instead of a Variant
-    // and silently drop the variant from the shape map, producing a spurious
-    // `SIntersectC_Mismatch_Reference` 🔴 signal for an otherwise-unchanged type.
+    // Use fresh ids rather than hardcoding Id(0) for the root module.  After
+    // T037, B items are renumbered via `b_id_remap` (excluding `Id(0)`, which
+    // is the sentinel / root).  A fresh root id keeps the S root distinct from
+    // all renumbered B-side items and from all A-side items.
     let s_root_id = state.alloc_id();
     let d_root_id = state.alloc_id();
 
@@ -806,8 +834,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
 /// etc.) within `item` using `id_map`.  Ids not present in the map are left unchanged.
 ///
 /// This is used in Phase 1.45 to replace A-side local type Ids with their S-side
-/// equivalents after all A items have been inserted into S.
-fn rewrite_type_ref_ids_in_item(mut item: Item, id_map: &HashMap<Id, Id>) -> Item {
+/// equivalents after all A items have been inserted into S, and in B-side insertion
+/// (T037) to replace B-side type refs with the corresponding fresh S Ids from
+/// `b_id_remap`.
+pub(super) fn rewrite_type_ref_ids_in_item(mut item: Item, id_map: &HashMap<Id, Id>) -> Item {
     item.inner = match item.inner {
         ItemEnum::StructField(ty) => ItemEnum::StructField(rewrite_type_ids(&ty, id_map)),
         ItemEnum::TypeAlias(mut ta) => {
