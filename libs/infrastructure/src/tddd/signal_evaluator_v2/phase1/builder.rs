@@ -363,35 +363,33 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
             // rewritten: A and B use independent Id spaces and their Ids may collide.
             //
             // A-sourced top-level items have `Add` or `Modify` in `s_actions`.
-            // A-sourced child items (fields, variant payloads, impl methods) got
-            // FRESH ids >= `first_fresh_id` via `insert_a_item_tree_into_s`.
-            // B-sourced items and their children kept their original B-side ids
-            // which are all < `first_fresh_id` (by construction).
+            // B-sourced top-level items have `Reference` or `Delete` in `s_actions`.
+            // Child items (fields, variant payloads, impl methods) have no `s_actions` entry.
             //
-            // So the correct discriminator is: item_id.0 >= first_fresh_id → A-sourced child.
-            // Also include top-level A-sourced items (Add/Modify in s_actions) even if their
-            // ids were assigned by `insert_s_type_at` (Modify keeps the B-side id).
-            let a_sourced_top_ids: std::collections::HashSet<Id> = state
-                .s_actions
-                .iter()
-                .filter_map(|(&id, &action)| {
-                    if action == ItemAction::Add || action == ItemAction::Modify {
-                        Some(id)
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-            // Collect all item Ids in s_index to avoid borrowing state twice.
+            // For top-level items, `s_actions` is the authoritative source — using
+            // `id.0 >= first_fresh_id` alone is unsafe because `insert_s_fn` allocates
+            // a fresh Id for ALL functions, including B-sourced Reference functions.
+            // A B-sourced Reference function's id is therefore `>= first_fresh_id`, and
+            // the old `should_rewrite` discriminator (`a_sourced_top_ids || id >= fresh`)
+            // would incorrectly rewrite that function's signature using `full_remap`,
+            // potentially remapping B-side type-ref Ids to unrelated A-side Ids and
+            // producing false structural mismatches (or hiding real drift) in Phase 2.
+            //
+            // The dangling-id check (Step 5 below) uses the same discriminator pattern;
+            // see the matching comment block there for the function-Id caveat.
+            //
+            // For child items (no `s_actions` entry), the id-based heuristic is safe:
+            // A-side children get fresh Ids `>= first_fresh_id` via
+            // `insert_a_item_tree_into_s` / `remap_and_copy_a_children_to_s`, while
+            // B-side children keep their original B-side Ids `< first_fresh_id`.
             let s_item_ids: Vec<Id> = state.s_index.keys().copied().collect();
             for item_id in s_item_ids {
-                // Rewrite only A-sourced items:
-                // 1. Top-level items with Add/Modify action.
-                // 2. Child items allocated with fresh ids >= first_fresh_id.
-                // Skip B-sourced Reference items (id < first_fresh_id AND not in Add/Modify).
-                let should_rewrite =
-                    a_sourced_top_ids.contains(&item_id) || item_id.0 >= first_fresh_id;
-                if should_rewrite {
+                let item_is_a_sourced = match state.s_actions.get(&item_id) {
+                    Some(&ItemAction::Add) | Some(&ItemAction::Modify) => true,
+                    Some(_) => false, // Reference or Delete → B-sourced, must not rewrite
+                    None => item_id.0 >= first_fresh_id, // Child item — id-based heuristic
+                };
+                if item_is_a_sourced {
                     if let Some(item) = state.s_index.remove(&item_id) {
                         let rewritten = rewrite_type_ref_ids_in_item(item, &full_remap);
                         state.s_index.insert(item_id, rewritten);

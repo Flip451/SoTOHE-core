@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # TDDD v2 — catalogue layer schema / rustdoc_types::Crate hybrid TypeGraph / 3-way diff 信号評価器の実装
 
-## Tasks (35/35 resolved)
+## Tasks (35/36 resolved)
 
 ### S1 — 新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)
 
@@ -242,3 +242,4 @@ Layer: domain + infrastructure。
 (4) **Compliance section に R0 追加**: 最上位ルールとして R0 "Don't believe orchestrator's briefing claims" を追加。本文には「orchestrator は型 design については素人 (amateur) であり、briefing 中の評価器挙動主張・verdict 推奨は盲信しない。catalogue 判断は本 agent 定義 (v3 schema + action semantics + sample JSON) + 関連 ADR + spec.json を SoT として下す。briefing の主張と上記 SoT が食い違う場合、後者を採用し briefing の主張を Open Questions として orchestrator に push-back する」旨を明示する。
 
 本修正は `.claude/agents/type-designer.md` のみへの doc 更新で完結する (新規 convention 追加なし、`libs/**` の実コード変更なし)。Layer: documentation only。
+- [~] **T036**: T036: Phase 1.45 rewrite discriminator を s_actions first ロジックに統一し、B-sourced Reference function の signature corruption (Id 衝突時) を防ぐ + 回帰テスト追加 (libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs + tests.rs)

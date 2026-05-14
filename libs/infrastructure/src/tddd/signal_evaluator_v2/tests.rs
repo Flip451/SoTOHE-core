@@ -1231,3 +1231,169 @@ fn test_normalize_impl_trait_path_preserves_generic_args() {
     // crate:: prefix with generic args — strip prefix, keep args.
     assert_eq!(normalize_impl_trait_path("crate::MyTrait<u32>", "my_crate"), "MyTrait<u32>");
 }
+
+// -----------------------------------------------------------------------
+// T036 regression: Phase 1.45 rewrite must not touch B-sourced Reference fns
+// -----------------------------------------------------------------------
+
+/// Regression test for T036 — Phase 1.45 rewrite discriminator.
+///
+/// Before T036, the discriminator was
+/// `should_rewrite = a_sourced_top_ids.contains(&item_id) || item_id.0 >= first_fresh_id`.
+/// Because `insert_s_fn` allocates a fresh Id (`>= first_fresh_id`) for every
+/// function, including B-sourced Reference functions, the second clause would
+/// incorrectly select B-sourced Reference functions for rewrite. When A's
+/// `full_remap` happened to contain a key that numerically collided with a
+/// B-sourced function's parameter / return type-ref Id, the function's
+/// signature was corrupted (param Id rewritten to an A-side Id).
+///
+/// This test forces the collision deterministically:
+///   - B: `Bar` at Id(1), `process(x: Bar)` at Id(2). `process`'s param
+///     references Id(1) (= B's Bar).
+///   - A: `Foo` at Id(1), action = Add. After `insert_a_item_tree_into_s`,
+///     A's Id(1) is remapped to a fresh S-Id, so
+///     `a_local_to_s_id[Id(1)] = <fresh S-Id of Foo>` and consequently
+///     `full_remap[Id(1)] = <fresh S-Id of Foo>`.
+///   - `first_fresh_id` = max(B Ids) + 1 = 3, so `process`'s allocated Id is 3
+///     (or higher). Old discriminator → `should_rewrite = true` →
+///     `rewrite_type_ref_ids_in_item` rewrites `process`'s param Id(1) to
+///     `full_remap[Id(1)]` (the fresh S-Id of Foo). Param now points to Foo.
+///
+/// With the T036 fix, `s_actions[process.id] = Reference` → `item_is_a_sourced
+/// = false` → no rewrite → param Id(1) is preserved.
+#[test]
+#[allow(clippy::panic, clippy::assertions_on_constants)]
+fn test_t036_phase1_45_does_not_rewrite_b_sourced_reference_function_param_id() {
+    use rustdoc_types::Path as RdPath;
+
+    use super::phase1::phase1_build_s_and_d;
+
+    // --- Construct B: struct `Bar` at Id(1), fn `process(x: Bar)` at Id(2) ---
+    let crate_name = "my_crate";
+    let b_root = Id(0);
+    let b_bar_id = Id(1);
+    let b_process_id = Id(2);
+
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+
+    b_index.insert(b_root, root_module_item(b_root, crate_name, vec![b_bar_id, b_process_id]));
+    b_index.insert(b_bar_id, struct_item(b_bar_id, "Bar"));
+    // `process(x: Bar)` — parameter type is `Type::ResolvedPath` pointing to b_bar_id.
+    b_index.insert(
+        b_process_id,
+        make_item(
+            b_process_id,
+            Some("process"),
+            ItemEnum::Function(rustdoc_types::Function {
+                sig: FunctionSignature {
+                    inputs: vec![(
+                        "x".to_string(),
+                        Type::ResolvedPath(RdPath {
+                            path: "Bar".to_string(),
+                            id: b_bar_id, // references B's Bar (Id(1))
+                            args: None,
+                        }),
+                    )],
+                    output: None,
+                    is_c_variadic: false,
+                },
+                generics: empty_generics(),
+                header: FunctionHeader {
+                    is_unsafe: false,
+                    is_const: false,
+                    is_async: false,
+                    abi: rustdoc_types::Abi::Rust,
+                },
+                has_body: true,
+            }),
+        ),
+    );
+    b_paths.insert(
+        b_bar_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    b_paths.insert(
+        b_process_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "process".to_string()],
+            kind: ItemKind::Function,
+        },
+    );
+    let b = Crate {
+        root: b_root,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // --- Construct A: struct `Foo` at Id(1), action = Add (collides with B's Bar Id) ---
+    let a = extended_crate_with_struct(crate_name, "Foo", ItemAction::Add);
+
+    // --- Run Phase 1 ---
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // --- Locate `process` in S by name ---
+    let process_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("process"))
+        .expect("`process` fn must be present in S");
+
+    // Extract `process`'s parameter type info (Id + path string). These
+    // structural assertions guard against an unexpected rustdoc shape changing
+    // under us; they are not the regression check itself.
+    let process_fn = match &process_item.inner {
+        ItemEnum::Function(f) => f,
+        other => {
+            assert!(false, "expected Function inner, got {other:?}");
+            return;
+        }
+    };
+    let (_, param_ty) = process_fn.sig.inputs.first().expect("`process` has one param");
+    let param_path = match param_ty {
+        Type::ResolvedPath(p) => p,
+        other => {
+            assert!(false, "expected ResolvedPath for param, got {other:?}");
+            return;
+        }
+    };
+    let process_param_id = param_path.id;
+    let process_param_path = param_path.path.clone();
+
+    // --- Locate `Bar` in S (must still be at Id(1), B-sourced top-level) ---
+    let bar_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Bar"))
+        .expect("`Bar` struct must be present in S");
+    let bar_id = bar_item.id;
+
+    // --- Assertion: process's param Id must still point to Bar, not to Foo ---
+    // Without the T036 fix, the Phase 1.45 rewrite would have mapped Id(1)
+    // (B's Bar) to the fresh S-Id of A's Foo via `full_remap`.
+    assert_eq!(
+        process_param_id, bar_id,
+        "T036 regression: process(x: Bar) param Id must still reference Bar after Phase 1.45 \
+         (got {process_param_id:?}, expected {bar_id:?}). If the discriminator regressed, the \
+         param would have been remapped to A's Foo's fresh S-Id."
+    );
+
+    // Defense-in-depth: param's path string is preserved (Phase 1.45 rewrites
+    // Ids only, but a path drift here would indicate deeper corruption).
+    assert_eq!(
+        process_param_path, "Bar",
+        "param path string must be preserved after Phase 1.45 rewrite"
+    );
+}
