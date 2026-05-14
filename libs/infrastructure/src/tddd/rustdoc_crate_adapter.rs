@@ -60,38 +60,21 @@ impl RustdocCratePort for RustdocCrateAdapter {
 
         // Security: fail-closed symlink guard before reading the baseline JSON.
         //
-        // Step 1: guard the parent directory itself — `reject_symlinks_below` does
-        // not inspect the anchor, so a symlinked parent (e.g. symlinked track dir)
-        // must be caught separately, same pattern as in `baseline_capture.rs`.
-        if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
-            match parent.symlink_metadata() {
-                Ok(meta) if meta.file_type().is_symlink() => {
-                    return Err(RustdocCratePortError::Io {
-                        path: path.to_path_buf(),
-                        reason: format!(
-                            "symlink guard: refusing to read under symlinked directory: {}",
-                            parent.display()
-                        ),
-                    });
-                }
-                Ok(_) => {}
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-                Err(e) => {
-                    return Err(RustdocCratePortError::Io {
-                        path: path.to_path_buf(),
-                        reason: format!(
-                            "symlink guard: cannot stat parent directory '{}': {e}",
-                            parent.display()
-                        ),
-                    });
-                }
+        // Use `self.workspace_root` as the trusted root so `reject_symlinks_below`
+        // walks EVERY ancestor between workspace_root and the leaf.  Previously the
+        // caller passed `path.parent()` as the trusted root, which only inspected
+        // the leaf — a redirected grandparent (e.g. `track -> /outside` followed
+        // by `track/items/id/...-baseline.json`) would bypass the guard because
+        // `parent.symlink_metadata()` stats AFTER following the upstream symlink.
+        //
+        // Per the symlink_guard contract, only components STRICTLY BELOW
+        // workspace_root are inspected; the workspace root itself is the caller's
+        // composition-root responsibility to ensure is genuine.
+        reject_symlinks_below(path, &self.workspace_root).map_err(|e| {
+            RustdocCratePortError::Io {
+                path: path.to_path_buf(),
+                reason: format!("symlink guard rejected baseline path: {e}"),
             }
-        }
-        // Step 2: guard the leaf path itself (the baseline JSON file).
-        let trusted_root = path.parent().unwrap_or(path);
-        reject_symlinks_below(path, trusted_root).map_err(|e| RustdocCratePortError::Io {
-            path: path.to_path_buf(),
-            reason: format!("symlink guard rejected baseline path: {e}"),
         })?;
 
         BaselineRustdocCodec::load(path).map_err(|e| match e {

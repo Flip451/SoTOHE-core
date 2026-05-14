@@ -1,6 +1,7 @@
 //! `FsTdddLayerBindingsAdapter` — infrastructure adapter for `TdddLayerBindingsPort`.
 //!
-//! Wraps `infrastructure::verify::tddd_layers::load_tddd_layers_from_path` and
+//! Reads `architecture-rules.json` via `reject_symlinks_below` + `parse_tddd_layers`
+//! (bypasses `load_tddd_layers_from_path`'s legacy synthetic-domain fallback) and
 //! maps the results to domain `TdddLayerBinding` entries so that `libs/usecase`
 //! never calls `std::fs` directly (hexagonal-purity rule).
 //!
@@ -12,7 +13,8 @@ use domain::tddd::catalogue_v2::{
     TdddLayerBinding as DomainTdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
 };
 
-use crate::verify::tddd_layers::load_tddd_layers_from_path;
+use crate::track::symlink_guard::reject_symlinks_below;
+use crate::verify::tddd_layers::parse_tddd_layers;
 
 // ---------------------------------------------------------------------------
 // FsTdddLayerBindingsAdapter
@@ -20,9 +22,8 @@ use crate::verify::tddd_layers::load_tddd_layers_from_path;
 
 /// Stateless filesystem adapter implementing [`TdddLayerBindingsPort`].
 ///
-/// Delegates to [`load_tddd_layers_from_path`] (from
-/// `infrastructure::verify::tddd_layers`) and maps the result to domain
-/// `TdddLayerBinding` entries. Injected into
+/// Reads `architecture-rules.json` directly (via symlink guard + `parse_tddd_layers`)
+/// and maps the result to domain `TdddLayerBinding` entries. Injected into
 /// `CatalogueImplSignalsInteractor` at the `apps/cli` composition root.
 ///
 /// [source: ADR 2026-05-11-2330 D2]
@@ -57,7 +58,39 @@ impl TdddLayerBindingsPort for FsTdddLayerBindingsAdapter {
         layer_filter: Option<&str>,
     ) -> Result<Vec<DomainTdddLayerBinding>, TdddLayerBindingsError> {
         let rules_path = workspace_root.join("architecture-rules.json");
-        let infra_bindings = load_tddd_layers_from_path(&rules_path, workspace_root)
+        // Fail-closed for catalogue-impl-signals: `load_tddd_layers_from_path`
+        // returns a legacy synthetic `domain` binding when `architecture-rules.json`
+        // is absent (pre-multilayer compatibility). For this port we must NOT fall
+        // back to a synthetic binding — running the signal report against an
+        // undeclared layer set would let stale legacy artifacts pass while the
+        // rules file is genuinely missing.
+        //
+        // To avoid a TOCTOU race (exists() → deleted → load sees absent → fallback),
+        // we bypass `load_tddd_layers_from_path` entirely: run the symlink guard
+        // directly, then read the file ourselves. An absent file (Ok(false)) is an
+        // explicit configuration error for this port, not a legacy-compat fallback.
+        let content = match reject_symlinks_below(&rules_path, workspace_root) {
+            Ok(true) => {
+                // File present and not a symlink — read it.
+                std::fs::read_to_string(&rules_path)
+                    .map_err(|e| TdddLayerBindingsError::LoadFailed { reason: e.to_string() })?
+            }
+            Ok(false) => {
+                // File genuinely absent — fail closed (no synthetic fallback).
+                return Err(TdddLayerBindingsError::LoadFailed {
+                    reason: format!(
+                        "architecture-rules.json not found at {}: TDDD layer bindings cannot be \
+                         determined without an explicit rules file (legacy synthetic-domain \
+                         fallback is intentionally disabled for this port)",
+                        rules_path.display()
+                    ),
+                });
+            }
+            Err(e) => {
+                return Err(TdddLayerBindingsError::LoadFailed { reason: e.to_string() });
+            }
+        };
+        let infra_bindings = parse_tddd_layers(&content)
             .map_err(|e| TdddLayerBindingsError::LoadFailed { reason: e.to_string() })?;
 
         // Convert infra TdddLayerBinding → domain TdddLayerBinding.
@@ -98,14 +131,18 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_load_absent_arch_rules_returns_legacy_synthetic_binding() {
-        // When architecture-rules.json is absent, load_tddd_layers_from_path returns a
-        // legacy synthetic domain binding (pre-multilayer fallback) rather than an error.
+    fn test_load_absent_arch_rules_fails_closed() {
+        // For catalogue-impl-signals: when architecture-rules.json is absent, the adapter
+        // must NOT silently fall back to a synthetic `domain` binding (that would let stale
+        // legacy artifacts pass while the rules file is genuinely missing).  Map missing-rules
+        // to LoadFailed so the caller surfaces the configuration error.
         let adapter = FsTdddLayerBindingsAdapter::new();
         let tmp = tempfile::tempdir().unwrap();
-        let bindings = adapter.load(tmp.path(), None).unwrap();
-        assert_eq!(bindings.len(), 1, "expected one legacy synthetic binding");
-        assert_eq!(bindings.first().unwrap().layer_id, "domain");
+        let err = adapter.load(tmp.path(), None).unwrap_err();
+        assert!(
+            matches!(err, TdddLayerBindingsError::LoadFailed { .. }),
+            "expected LoadFailed for absent architecture-rules.json, got: {err}"
+        );
     }
 
     #[test]
