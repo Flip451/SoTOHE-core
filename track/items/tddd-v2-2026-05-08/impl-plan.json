@@ -209,7 +209,7 @@
     {
       "id": "T036",
       "description": "T036: Phase 1.45 rewrite discriminator を s_actions first ロジックに統一し、B-sourced Reference function の signature corruption (Id 衝突時) を防ぐ + 回帰テスト追加 (libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs + tests.rs)",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "plan": {
