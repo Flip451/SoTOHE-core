@@ -1,16 +1,30 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-14T10:14:09Z",
-  "declaration_hash": "75f3581d92afbdb4b3eaeacae4ff0f0b79c0cefdfb47493e115ea459d149c913",
+  "generated_at": "2026-05-14T17:14:15Z",
+  "declaration_hash": "fc0875570cd040aab590d181138eb2f7037d77759a2655779e82ed6594d59630",
   "signals": [
+    {
+      "type_name": "BaselineCaptureIoError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
     {
       "type_name": "CatalogueDocument",
       "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -19,9 +33,11 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -32,6 +48,7 @@
       "found_type": true,
       "found_items": [
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -65,23 +82,31 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::default::Default"
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
       "type_name": "ContractRole",
       "kind_tag": "enum",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::convert::TryFrom",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
+        "core::marker::Copy",
         "core::str::traits::FromStr"
+      ],
+      "missing_items": [
+        "strum::IntoStaticStr"
       ]
     },
     {
@@ -90,11 +115,13 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -103,22 +130,32 @@
     {
       "type_name": "DataRole",
       "kind_tag": "enum",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::convert::TryFrom",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
+        "core::marker::Copy",
         "core::str::traits::FromStr"
+      ],
+      "missing_items": [
+        "strum::IntoStaticStr"
       ]
     },
     {
       "type_name": "ExtendedCrate",
       "kind_tag": "domain_service",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "FieldDecl",
@@ -126,8 +163,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -136,11 +175,13 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -152,8 +193,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -162,11 +205,13 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -178,10 +223,12 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -190,15 +237,21 @@
     {
       "type_name": "FunctionRole",
       "kind_tag": "enum",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::convert::TryFrom",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
+        "core::marker::Copy",
         "core::str::traits::FromStr"
+      ],
+      "missing_items": [
+        "strum::IntoStaticStr"
       ]
     },
     {
@@ -207,9 +260,11 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -219,10 +274,12 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -234,25 +291,33 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
     {
       "type_name": "ItemAction",
       "kind_tag": "enum",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::convert::TryFrom",
         "core::default::Default",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
+        "core::marker::Copy",
         "core::str::traits::FromStr"
+      ],
+      "missing_items": [
+        "strum::IntoStaticStr"
       ]
     },
     {
@@ -261,8 +326,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -271,8 +338,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -281,14 +350,29 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "MissingCataloguePolicy",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
       ]
     },
     {
@@ -297,11 +381,13 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::default::Default",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -313,9 +399,11 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -325,8 +413,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -335,11 +425,13 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -351,11 +443,19 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
+    },
+    {
+      "type_name": "RustdocBaselineCapturePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RustdocCratePort",
@@ -370,21 +470,28 @@
       "found_type": true,
       "found_items": [
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
     {
       "type_name": "SelfReceiver",
       "kind_tag": "enum",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
         "core::convert::TryFrom",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
+        "core::marker::Copy",
         "core::str::traits::FromStr"
+      ],
+      "missing_items": [
+        "strum::IntoStaticStr"
       ]
     },
     {
@@ -399,10 +506,30 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::hash::Hash"
+        "core::fmt::Debug",
+        "core::hash::Hash",
+        "core::marker::Copy"
       ]
+    },
+    {
+      "type_name": "SpecFileLoadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SpecFileLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "SymlinkGuardError",
@@ -411,6 +538,7 @@
       "found_type": true,
       "found_items": [
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -424,7 +552,11 @@
       "type_name": "TdddLayerBinding",
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "TdddLayerBindingsError",
@@ -433,6 +565,7 @@
       "found_type": true,
       "found_items": [
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -448,8 +581,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -458,8 +593,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -468,10 +605,45 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::hash::Hash"
+        "core::fmt::Debug",
+        "core::hash::Hash",
+        "core::marker::Copy"
       ]
+    },
+    {
+      "type_name": "TrackStatus",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "TrackStatusReadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TrackStatusReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TraitEntry",
@@ -479,8 +651,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -489,8 +663,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -500,11 +676,13 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -516,8 +694,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -526,8 +706,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -536,11 +718,13 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -552,15 +736,35 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
       ]
+    },
+    {
+      "type_name": "TypeSignalsExecutionError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypestateMarker",
@@ -568,8 +772,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -579,8 +785,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -590,8 +798,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -600,11 +810,13 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::Ord",
         "core::cmp::PartialEq",
         "core::cmp::PartialOrd",
         "core::convert::AsRef",
+        "core::fmt::Debug",
         "core::fmt::Display",
         "core::hash::Hash",
         "core::str::traits::FromStr"
@@ -616,9 +828,11 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::default::Default"
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -627,8 +841,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {

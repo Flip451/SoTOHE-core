@@ -17,7 +17,9 @@ use domain::tddd::catalogue_v2::{
 use domain::tddd::signal_evaluator::{SignalEvaluatorPort, ThreeWaySignal, ThreeWaySignalKind};
 
 use super::helpers::validate_binding_filename;
-use super::service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
+use super::service::{
+    CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService,
+};
 use super::validate_track_id;
 
 // ---------------------------------------------------------------------------
@@ -109,7 +111,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         track_id: String,
         workspace_root: PathBuf,
         layer: Option<String>,
-    ) -> Result<String, CatalogueImplSignalsError> {
+    ) -> Result<CatalogueImplSignalsReport, CatalogueImplSignalsError> {
         // Validate track_id format (simple slug check, mirroring domain logic).
         validate_track_id(&track_id)?;
 
@@ -177,6 +179,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         }
 
         let mut report = String::new();
+        let mut total_red: usize = 0;
 
         for binding in &bindings {
             let layer_id = &binding.layer_id;
@@ -299,12 +302,13 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
                     eval_report.iter().filter(|s: &&ThreeWaySignal| s.signal().is_yellow()).count();
                 let red =
                     eval_report.iter().filter(|s: &&ThreeWaySignal| s.signal().is_red()).count();
+                total_red = total_red.saturating_add(red);
                 let _ =
                     writeln!(report, "Summary: 🔵 {blue} Blue | 🟡 {yellow} Yellow | 🔴 {red} Red");
             }
         }
 
-        Ok(report)
+        Ok(CatalogueImplSignalsReport { text: report, any_red: total_red > 0 })
     }
 }
 

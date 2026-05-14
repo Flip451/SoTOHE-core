@@ -128,6 +128,24 @@ impl SignalEvaluatorPort for SingleBlueEvaluator {
     }
 }
 
+/// `SignalEvaluatorPort` that always returns a single Red signal
+/// (used by `any_red = true` coverage tests).
+pub(super) struct SingleRedEvaluator;
+
+impl SignalEvaluatorPort for SingleRedEvaluator {
+    fn evaluate(
+        &self,
+        _a: ExtendedCrate,
+        _b: Crate,
+        _c: Crate,
+    ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
+        use domain::tddd::signal_evaluator::region::SignalRegion;
+        // `SMinusC_Reference` is a Red region — see signal_evaluator/region.rs.
+        let signal = ThreeWaySignal::new("RemovedType".to_owned(), SignalRegion::SMinusC_Reference);
+        Ok(ThreeWayEvaluationReport::new(vec![signal]))
+    }
+}
+
 /// `SignalEvaluatorPort` that always returns an Evaluation failure.
 pub(super) struct FailingEvaluator;
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cb9737eea1e0ed47997237f8643852e9b36dc045bc506727762956905f6200ec",
+  "catalogue_declaration_hash": "ce7c26cd41804240eda899f5804abd7ad895118c05a7ee9d8e40748df0bbcbf9",
   "signals": [
     {
       "type_name": "BaselineCodecError",
@@ -67,12 +67,20 @@
       "signal": "blue"
     },
     {
+      "type_name": "FsSpecFileLoader",
+      "signal": "yellow"
+    },
+    {
       "type_name": "FsSymlinkGuard",
       "signal": "blue"
     },
     {
       "type_name": "FsTdddLayerBindingsAdapter",
       "signal": "blue"
+    },
+    {
+      "type_name": "FsTrackStatusReaderAdapter",
+      "signal": "yellow"
     },
     {
       "type_name": "GitShowTrackBlobReader",
@@ -89,6 +97,10 @@
     {
       "type_name": "LoadAllCataloguesNativeError",
       "signal": "blue"
+    },
+    {
+      "type_name": "RustdocBaselineCaptureAdapter",
+      "signal": "yellow"
     },
     {
       "type_name": "RustdocCrateAdapter",
@@ -111,6 +123,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "SpecElementHashError",
+      "signal": "yellow"
+    },
+    {
       "type_name": "TypeCatalogueCodecError",
       "signal": "blue"
     },
@@ -121,6 +137,10 @@
     {
       "type_name": "TypeGraphRenderOptions",
       "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "signal": "yellow"
     },
     {
       "type_name": "infrastructure::code_profile_builder::build_type_graph",
@@ -215,12 +235,20 @@
       "signal": "blue"
     },
     {
+      "type_name": "infrastructure::track::spec_element_hash::compute_spec_element_hashes",
+      "signal": "yellow"
+    },
+    {
       "type_name": "infrastructure::type_catalogue_render::render_type_catalogue",
       "signal": "blue"
     },
     {
       "type_name": "infrastructure::type_catalogue_render::render_type_catalogue_v3",
       "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs",
+      "signal": "yellow"
     },
     {
       "type_name": "infrastructure::verify::spec_code_consistency::consistency_report_to_findings",
@@ -237,6 +265,10 @@
     {
       "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
       "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_strict",
+      "signal": "yellow"
     }
   ]
 }

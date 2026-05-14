@@ -434,6 +434,49 @@ pub fn load_tddd_layers_from_path(
     }
 }
 
+/// Loads TDDD layer bindings from `architecture-rules.json` at `path`,
+/// failing closed when the file is absent (no legacy synthetic fallback).
+///
+/// Unlike [`load_tddd_layers_from_path`], this variant treats an absent
+/// `architecture-rules.json` as a hard configuration error rather than
+/// falling back to a synthetic domain-only binding.  This is appropriate for
+/// verify gates where a missing rules file means the set of catalogues to
+/// check is unknowable — silently passing would be a fail-open regression.
+///
+/// `trusted_root` is passed through to `reject_symlinks_below` — only
+/// components below it are inspected.
+///
+/// # Errors
+///
+/// Returns [`LoadTdddLayersError::Io`] when the file is absent, when the
+/// symlink guard rejects the path, or on any other I/O failure. Returns
+/// [`LoadTdddLayersError::Parse`] when the JSON is invalid or violates any
+/// constraint enforced by [`parse_tddd_layers`].
+pub fn load_tddd_layers_strict(
+    path: &Path,
+    trusted_root: &Path,
+) -> Result<Vec<TdddLayerBinding>, LoadTdddLayersError> {
+    match crate::track::symlink_guard::reject_symlinks_below(path, trusted_root) {
+        Ok(true) => {
+            let content = std::fs::read_to_string(path)
+                .map_err(|e| LoadTdddLayersError::Io { path: path.to_path_buf(), source: e })?;
+            parse_tddd_layers(&content).map_err(LoadTdddLayersError::Parse)
+        }
+        Ok(false) => {
+            // File genuinely absent — fail closed (no synthetic fallback).
+            Err(LoadTdddLayersError::Io {
+                path: path.to_path_buf(),
+                source: std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    "architecture-rules.json not found; TDDD layer bindings cannot be \
+                     determined without an explicit rules file",
+                ),
+            })
+        }
+        Err(e) => Err(LoadTdddLayersError::Io { path: path.to_path_buf(), source: e }),
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {

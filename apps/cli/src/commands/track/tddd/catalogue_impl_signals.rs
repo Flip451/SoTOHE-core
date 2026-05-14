@@ -78,24 +78,10 @@ pub fn execute_catalogue_impl_signals(
         .run(track_id, workspace_root, layer)
         .map_err(|e| CliError::Message(e.to_string()))?;
 
-    // D3: stdout-only output.
-    let any_red = report_has_red_signals(&report);
-    println!("{report}");
+    // D3: stdout-only output.  any_red is computed by the interactor.
+    println!("{}", report.text);
 
-    if any_red { Ok(ExitCode::FAILURE) } else { Ok(ExitCode::SUCCESS) }
-}
-
-/// Returns `true` when the formatted report string contains at least one Red signal.
-///
-/// Scans for the exact table-cell marker `| 🔴 Red |` emitted by the
-/// interactor's formatter (`libs/usecase/src/catalogue_impl_signals.rs`).
-/// This marker only appears in the signal column of a table row; item/region
-/// names (Rust identifiers) cannot contain the 🔴 emoji, so there are no
-/// false positives. Using the full `| 🔴 Red |` cell form (rather than bare
-/// `🔴 Red`) makes the scan independent of the summary-line format
-/// (`🔴 {N} Red` where N may be 0).
-pub(crate) fn report_has_red_signals(report: &str) -> bool {
-    report.contains("| 🔴 Red |")
+    if report.any_red { Ok(ExitCode::FAILURE) } else { Ok(ExitCode::SUCCESS) }
 }
 
 #[cfg(test)]
@@ -173,52 +159,5 @@ mod tests {
         assert!(result.is_err(), "symlinked track/items must return Err");
         let msg = format!("{}", result.unwrap_err());
         assert!(msg.contains("symlink guard"), "error message must mention symlink guard: {msg}");
-    }
-
-    // ── report_has_red_signals unit tests ──────────────────────────────────
-
-    /// A report with no signal table rows must return false.
-    #[test]
-    fn test_report_has_red_signals_empty_report_returns_false() {
-        assert!(!report_has_red_signals(""), "empty report must not indicate red signals");
-    }
-
-    /// A report with only Blue/Yellow table rows must return false.
-    #[test]
-    fn test_report_has_red_signals_blue_yellow_only_returns_false() {
-        let report = "\n## Layer: `domain`\n\n\
-                      | Item | Region | Signal |\n\
-                      |------|--------|--------|\n\
-                      | Foo | SCaptureDCaptureIntersect | 🔵 Blue |\n\
-                      | Bar | SCaptureDCaptureIntersect | 🟡 Yellow |\n\
-                      \nSummary: 🔵 1 Blue | 🟡 1 Yellow | 🔴 0 Red\n";
-        assert!(
-            !report_has_red_signals(report),
-            "report with only Blue/Yellow signals must return false"
-        );
-    }
-
-    /// A report with at least one Red table row must return true.
-    #[test]
-    fn test_report_has_red_signals_with_red_row_returns_true() {
-        let report = "\n## Layer: `domain`\n\n\
-                      | Item | Region | Signal |\n\
-                      |------|--------|--------|\n\
-                      | Foo | SCaptureDCaptureIntersect | 🔵 Blue |\n\
-                      | Baz | SCaptureDCaptureIntersect | 🔴 Red |\n\
-                      \nSummary: 🔵 1 Blue | 🟡 0 Yellow | 🔴 1 Red\n";
-        assert!(report_has_red_signals(report), "report with a Red table row must return true");
-    }
-
-    /// Verify that the summary line `🔴 0 Red` does NOT trigger a false positive.
-    #[test]
-    fn test_report_has_red_signals_summary_zero_red_is_not_false_positive() {
-        // The summary line has `🔴 0 Red` (no space before 0), which must not
-        // match the cell marker `| 🔴 Red |`.
-        let report = "Summary: 🔵 2 Blue | 🟡 1 Yellow | 🔴 0 Red\n";
-        assert!(
-            !report_has_red_signals(report),
-            "summary-only `🔴 0 Red` must not be treated as a red signal"
-        );
     }
 }

@@ -359,6 +359,121 @@ pub fn format_finding(finding: &SpecRefFinding) -> String {
     }
 }
 
+/// Entry point for `sotp verify catalogue-spec-refs`.
+///
+/// Moves all raw I/O (including `symlink_metadata` guards on `items_dir` and
+/// `workspace_root`) into the infrastructure layer so the CLI command is a
+/// thin wrapper that does only wiring plus exit-code mapping.
+///
+/// Returns `Ok(true)` when no findings were detected (exit 0), `Ok(false)`
+/// when one or more findings were detected (exit 1), or `Err(String)` when
+/// a fatal configuration or I/O error prevents the check from running.
+///
+/// The `formatted_findings` parameter is populated with one human-readable
+/// line per finding so the caller can emit them to stderr.
+///
+/// # Errors
+///
+/// Returns a human-readable error string when the track id is invalid, the
+/// `items_dir` or `workspace_root` are symlinks, the track directory is
+/// absent, or `architecture-rules.json` cannot be loaded.
+pub fn execute_verify_catalogue_spec_refs(
+    items_dir: std::path::PathBuf,
+    track_id: String,
+    workspace_root: std::path::PathBuf,
+    skip_stale: bool,
+    formatted_findings: &mut Vec<String>,
+) -> Result<bool, String> {
+    // Security: guard `items_dir` itself before using it as the trusted root.
+    // Mirrors `execute_catalogue_spec_signals` (catalogue_spec_signals.rs).
+    match items_dir.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return Err(format!(
+                "symlink guard: refusing to follow symlink at items_dir: {}",
+                items_dir.display()
+            ));
+        }
+        Ok(_) => {}
+        Err(e) => {
+            return Err(format!(
+                "symlink guard: cannot stat items_dir {}: {e}",
+                items_dir.display()
+            ));
+        }
+    }
+
+    // Security: guard `workspace_root` against symlinks at the leaf.
+    match workspace_root.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return Err(format!(
+                "symlink guard: refusing to follow symlink at workspace_root: {}",
+                workspace_root.display()
+            ));
+        }
+        Ok(_) => {}
+        Err(e) => {
+            return Err(format!(
+                "symlink guard: cannot stat workspace_root {}: {e}",
+                workspace_root.display()
+            ));
+        }
+    }
+
+    // Security: validate track_id via domain::TrackId before joining onto items_dir.
+    // `Path::join` resolves `..`, `/`, and multi-segment paths (`foo/bar`) at the OS
+    // level. Using the domain type enforces the slug rules (single-segment, no `..`,
+    // no path separators) and makes this function safe when called directly without
+    // upstream CLI validation.
+    let valid_track_id = domain::TrackId::try_new(&track_id)
+        .map_err(|e| format!("invalid track_id '{track_id}': {e}"))?;
+
+    // Fail-closed existence guard for the track directory.
+    let track_dir = items_dir.join(valid_track_id.as_ref());
+    if !track_dir.exists() {
+        return Err(format!(
+            "track directory does not exist: {} (check the track_id)",
+            track_dir.display()
+        ));
+    }
+
+    // Binary-gate fail-closed: load TDDD layer bindings from architecture-rules.json.
+    let rules_path = workspace_root.join("architecture-rules.json");
+    let bindings =
+        crate::verify::tddd_layers::load_tddd_layers_strict(&rules_path, &workspace_root).map_err(
+            |e| format!("cannot load architecture-rules.json at '{}': {e}", rules_path.display()),
+        )?;
+    if bindings.is_empty() {
+        return Err("no tddd.enabled layers found in architecture-rules.json".to_owned());
+    }
+
+    // ADR D2.3: silent PASS when no enabled layer's catalogue file exists.
+    if !any_enabled_catalogue_present(&bindings, &track_dir, &items_dir)
+        .map_err(|e| e.to_string())?
+    {
+        return Ok(true);
+    }
+
+    let spec_element_hashes =
+        read_spec_element_hashes(&track_dir, &items_dir).map_err(|e| e.to_string())?;
+
+    for binding in &bindings {
+        if !binding.catalogue_spec_signal_enabled() {
+            continue;
+        }
+        let layer_findings = verify_one_layer_formatted(
+            &track_dir,
+            &items_dir,
+            binding,
+            &spec_element_hashes,
+            skip_stale,
+        )
+        .map_err(|e| e.to_string())?;
+        formatted_findings.extend(layer_findings);
+    }
+
+    Ok(formatted_findings.is_empty())
+}
+
 /// Test utility: check whether a catalogue file is a well-formed v3 catalogue.
 ///
 /// T024: always uses `CatalogueDocumentCodec::decode` (v3-native).

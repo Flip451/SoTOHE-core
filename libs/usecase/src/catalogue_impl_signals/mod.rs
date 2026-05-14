@@ -19,7 +19,9 @@ mod interactor;
 mod service;
 
 pub use interactor::CatalogueImplSignalsInteractor;
-pub use service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
+pub use service::{
+    CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService,
+};
 
 // ---------------------------------------------------------------------------
 // Private helpers (shared across submodules)

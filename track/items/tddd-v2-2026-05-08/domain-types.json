@@ -1533,6 +1533,63 @@
       ],
       "informal_grounds": []
     },
+    "BaselineCaptureIoError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": { "kind": "tuple_struct", "fields": ["String"], "has_stripped_fields": false },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "methods": [],
+      "docs": "Error type returned by RustdocBaselineCapturePort::capture. Wraps any failure from the rustdoc capture pipeline (symlink guard, missing track directory, rustdoc export failure, file write failure). The message is human-readable and suitable for direct display via to_string().",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — error type for RustdocBaselineCapturePort::capture, surfaces underlying I/O failures without leaking internal paths; hexagonal isolation of infrastructure I/O from usecase" }
+      ]
+    },
+    "MissingCataloguePolicy": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FailClosed", "payload": { "kind": "unit" } },
+          { "name": "SkipSilently", "payload": { "kind": "unit" } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "methods": [],
+      "docs": "How to handle a catalogue file that is absent for a layer. FailClosed: absent catalogue is a fatal error (strict mode — user invoked evaluation). SkipSilently: absent catalogue is silently skipped (lenient mode — automated pre-commit).",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — fail-closed / skip-silently policy enum passed to TypeSignalsExecutorPort::evaluate_layer; decouples strict (user-invoked) vs lenient (pre-commit) evaluation modes without leaking this distinction into CLI handler code" }
+      ]
+    },
+    "SpecFileLoadError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": { "kind": "tuple_struct", "fields": ["String"], "has_stripped_fields": false },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "methods": [],
+      "docs": "Error returned by SpecFileLoaderPort::load.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — error type for SpecFileLoaderPort::load; isolates raw filesystem spec.json read failures from CLI handler so the handler never calls std::fs directly" }
+      ]
+    },
     "TdddLayerBinding": {
       "action": "add",
       "role": "ValueObject",
@@ -1549,7 +1606,18 @@
         { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Clone", "origin_crate": "core" }
       ],
-      "docs": "Binding for a single TDDD-enabled layer resolved from architecture-rules.json. Contains layer_id, catalogue_file path, baseline_file path, and schema_export target crate names. Used by CatalogueImplSignalsInteractor without direct file I/O (hexagonal purity). [source: ADR 2026-05-11-2330 D2]",
+      "methods": [
+        {
+          "name": "signal_file",
+          "receiver": "&self",
+          "params": [],
+          "returns": "String",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Binding for a single TDDD-enabled layer resolved from architecture-rules.json. Contains layer_id, catalogue_file path, baseline_file path, and schema_export target crate names. Used by CatalogueImplSignalsInteractor without direct file I/O (hexagonal purity). signal_file() derives the type-signals output filename from catalogue_file. [source: ADR 2026-05-11-2330 D2 + T040 addendum]",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
       ],
@@ -1588,6 +1656,79 @@
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
       ],
       "informal_grounds": []
+    },
+    "TrackStatus": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Planned", "payload": { "kind": "unit" } },
+          { "name": "InProgress", "payload": { "kind": "unit" } },
+          { "name": "Done", "payload": { "kind": "unit" } },
+          { "name": "Blocked", "payload": { "kind": "unit" } },
+          { "name": "Cancelled", "payload": { "kind": "unit" } },
+          { "name": "Archived", "payload": { "kind": "unit" } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" }
+      ],
+      "methods": [
+        {
+          "name": "is_active",
+          "receiver": "self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Derived status of a track, computed from its task states and optional override. is_active() returns true for Planned/InProgress/Blocked/Cancelled; false for Done/Archived. Added in T040 to guard TDDD commands against frozen tracks.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — domain SSoT for derived track lifecycle status (planned/in_progress/done/blocked/cancelled/archived). is_active() guard prevents TDDD evaluation commands from running against frozen (done/archived) tracks. Modified in this track to add the is_active() method used by TypeSignalsInteractor." }
+      ]
+    },
+    "TrackStatusReadError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": { "kind": "tuple_struct", "fields": ["String"], "has_stripped_fields": false },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "methods": [],
+      "docs": "Error type returned by TrackStatusReaderPort::read_status.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — error type for TrackStatusReaderPort::read_status; surfaces track status read failures (metadata.json/impl-plan.json I/O or parse errors) without leaking filesystem details to the usecase layer" }
+      ]
+    },
+    "TypeSignalsExecutionError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": { "kind": "tuple_struct", "fields": ["String"], "has_stripped_fields": false },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "methods": [],
+      "docs": "Error type returned by TypeSignalsExecutorPort::evaluate_layer.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — error type for TypeSignalsExecutorPort::evaluate_layer; surfaces per-layer three-way signal evaluation failures without exposing infrastructure codec or signal evaluator internals to the usecase layer" }
+      ]
     },
     "SymlinkGuardError": {
       "action": "add",
@@ -1815,6 +1956,54 @@
       ],
       "informal_grounds": []
     },
+    "RustdocBaselineCapturePort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "capture",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "rustdoc_workspace", "ty": "&std::path::Path" },
+            { "name": "binding", "ty": "&TdddLayerBinding" },
+            { "name": "force", "ty": "bool" }
+          ],
+          "returns": "Result<(), BaselineCaptureIoError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Secondary port for capturing the rustdoc-format baseline snapshot. Injected into BaselineCaptureInteractor so the usecase layer never calls infrastructure code directly.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — driving port for rustdoc baseline capture (`*-types-baseline.json`); isolates raw filesystem I/O and cargo rustdoc invocation from the usecase layer (BaselineCaptureInteractor); enables port-based dependency injection at the apps/cli composition root" }
+      ]
+    },
+    "SpecFileLoaderPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "load",
+          "receiver": "&self",
+          "params": [{ "name": "spec_path", "ty": "&std::path::Path" }],
+          "returns": "Result<String, SpecFileLoadError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Secondary port for loading the raw text content of a spec.json file. Implementors live in the infrastructure layer (e.g. FsSpecFileLoader). The port is intentionally minimal: it returns the raw String so that callers can perform their own JSON parsing and validation.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — driving port for spec.json raw-text loading; isolates filesystem I/O from the CLI command handler, enabling the CLI to be tested without real files and satisfying the hexagonal-architecture rule that CLI handlers must not call std::fs directly" }
+      ]
+    },
     "SymlinkGuardPort": {
       "action": "add",
       "role": "SecondaryPort",
@@ -1843,6 +2032,57 @@
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
       ],
       "informal_grounds": []
+    },
+    "TrackStatusReaderPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "read_status",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "Result<TrackStatus, TrackStatusReadError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Secondary port for reading the derived TrackStatus of a track. Returns the TrackStatus derived from metadata.json + impl-plan.json without exposing filesystem or codec details to the usecase layer. Injected into TypeSignalsInteractor.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — driving port for track status (impl-plan.json derive) reading; isolates raw filesystem and JSON parse I/O from TypeSignalsInteractor so the active-track guard in the usecase layer is testable and infrastructure-free" }
+      ]
+    },
+    "TypeSignalsExecutorPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "evaluate_layer",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "workspace_root", "ty": "&std::path::Path" },
+            { "name": "binding", "ty": "&TdddLayerBinding" },
+            { "name": "policy", "ty": "MissingCataloguePolicy" }
+          ],
+          "returns": "Result<(), TypeSignalsExecutionError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Secondary port for evaluating type signals for a single TDDD-enabled layer. Implementations run the three-way signal evaluation pipeline (catalogue A, baseline B, live rustdoc C) and write the result to the layer type-signals JSON file. Injected into TypeSignalsInteractor so the usecase layer never calls infrastructure functions directly.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — driving port for the type-signals evaluator + catalogue file existence check; isolates execute_type_signals_for_layer and per-layer I/O from TypeSignalsInteractor, keeping the usecase layer free of direct infrastructure function calls" }
+      ]
     }
   },
   "functions": {

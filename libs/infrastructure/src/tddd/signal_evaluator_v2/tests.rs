@@ -1764,3 +1764,554 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
         "T038: orphan Impl must inherit the parent TypeAlias's action (Add)"
     );
 }
+
+// -----------------------------------------------------------------------
+// T043 regression: generic impl identity normalization
+// -----------------------------------------------------------------------
+
+/// T043 (a): `impl<S> TaskOperationInteractor<S>: TaskOperationService` in C
+/// must produce the same identity key `"TaskOperationInteractor: TaskOperationService"`
+/// as the catalogue A-codec key (which uses the bare type name without impl-block
+/// type parameters).
+///
+/// This test directly checks `build_impl_identity_map` key output.
+/// Before T043, the key was `"TaskOperationInteractor<S>: TaskOperationService"`,
+/// which did not match the A-side key `"TaskOperationInteractor: TaskOperationService"`,
+/// causing a spurious `CMinusSUnionD` Red signal.
+#[test]
+fn test_t043_generic_impl_matches_catalogue_key_without_type_params() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{GenericArg, GenericArgs, GenericParamDef, Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let struct_id = Id(1);
+    let impl_id = Id(2);
+    // trait_id NOT in krate.paths → string-based fallback via normalize_impl_trait_path.
+    // This models the C-side case where rustdoc emits a local-crate trait without
+    // a fully-qualified path entry.
+    let trait_id = Id(9999);
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![struct_id, impl_id]));
+    index.insert(struct_id, struct_item(struct_id, "TaskOperationInteractor"));
+    paths.insert(
+        struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "TaskOperationInteractor".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    // trait_id is a local trait (crate_id == 0) in krate.paths so the normaliser
+    // strips to the last segment "TaskOperationService".
+    paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "TaskOperationService".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // C impl: `generics.params = [S: type param]`, `for_ = TaskOperationInteractor<S>`.
+    let type_param_s = GenericParamDef {
+        name: "S".to_string(),
+        kind: rustdoc_types::GenericParamDefKind::Type {
+            bounds: vec![],
+            default: None,
+            is_synthetic: false,
+        },
+    };
+    let c_impl = Impl {
+        is_unsafe: false,
+        generics: rustdoc_types::Generics { params: vec![type_param_s], where_predicates: vec![] },
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "TaskOperationService".to_string(), id: trait_id, args: None }),
+        // `for_` is `TaskOperationInteractor<S>` — the generic arg is the impl-block type param.
+        for_: Type::ResolvedPath(RdPath {
+            path: "TaskOperationInteractor".to_string(),
+            id: struct_id,
+            args: Some(Box::new(GenericArgs::AngleBracketed {
+                args: vec![GenericArg::Type(Type::Generic("S".to_string()))],
+                constraints: vec![],
+            })),
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(impl_id, make_item(impl_id, None, ItemEnum::Impl(c_impl)));
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    // After T043, the impl-block type param `S` is stripped from `for_`, producing:
+    //   "TaskOperationInteractor: TaskOperationService"
+    // NOT the pre-T043 form:
+    //   "TaskOperationInteractor<S>: TaskOperationService"
+    let expected_key = "TaskOperationInteractor: TaskOperationService";
+    assert!(
+        map.contains_key(expected_key),
+        "T043(a): impl<S> TaskOperationInteractor<S>: TaskOperationService must produce key \
+         '{expected_key}' after type-param stripping; all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+    // Verify the old (pre-T043) key is absent.
+    let old_key = "TaskOperationInteractor<S>: TaskOperationService";
+    assert!(
+        !map.contains_key(old_key),
+        "T043(a): old key with type param '{old_key}' must NOT be present after T043 fix; \
+         all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+}
+
+/// T043 (b): Non-generic struct trait impls (`impl SymlinkGuardPort for Foo`)
+/// must continue to produce the same identity key as before (no stripping occurs
+/// when the impl block has no type params).
+///
+/// This is a regression guard: the T043 type-param stripping must not disturb
+/// impls that have no impl-block generics (the `type_params.is_empty()` fast path).
+#[test]
+fn test_t043_non_generic_impl_still_matches_blue() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let struct_id = Id(1);
+    let impl_id = Id(2);
+    let trait_id = Id(9998);
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![struct_id, impl_id]));
+    index.insert(struct_id, struct_item(struct_id, "Foo"));
+    paths.insert(
+        struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    // Local trait (crate_id == 0) → key uses bare short name "SymlinkGuardPort".
+    paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "SymlinkGuardPort".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // Non-generic impl (no type params on the impl block).
+    let c_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "SymlinkGuardPort".to_string(), id: trait_id, args: None }),
+        for_: Type::ResolvedPath(RdPath { path: "Foo".to_string(), id: struct_id, args: None }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(impl_id, make_item(impl_id, None, ItemEnum::Impl(c_impl)));
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    // Non-generic impl must produce the expected key unchanged.
+    let expected_key = "Foo: SymlinkGuardPort";
+    assert!(
+        map.contains_key(expected_key),
+        "T043(b): non-generic impl must produce key '{expected_key}' unchanged; \
+         all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+}
+
+/// T043 (c): concrete type args on `for_` are preserved — `impl Foo<Vec<u32>>: Bar`
+/// must NOT be normalized (the key retains `<Vec<u32>>`).
+///
+/// The stripping should only remove args whose type is `Type::Generic` with a name
+/// that belongs to the impl-block's type-param set.  Concrete args like `Vec<u32>`
+/// are structurally part of the identity and must be preserved.
+#[test]
+fn test_t043_concrete_type_args_preserved_in_identity_key() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{GenericArg, GenericArgs, Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let struct_id = Id(1);
+    let impl_id = Id(2);
+    let trait_id = Id(9999);
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![struct_id, impl_id]));
+    index.insert(struct_id, struct_item(struct_id, "Foo"));
+    paths.insert(
+        struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    // Trait is external (crate_id != 0) so the key uses its qualified path.
+    paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 1,
+            path: vec!["ext_crate".to_string(), "Bar".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // `impl Foo<Vec<u32>>: Bar` — `Foo` has a CONCRETE arg `Vec<u32>`, not a type param.
+    // The impl block has NO type params.
+    let c_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(), // no type params on the impl block
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "Bar".to_string(), id: trait_id, args: None }),
+        for_: Type::ResolvedPath(RdPath {
+            path: "Foo".to_string(),
+            id: struct_id,
+            args: Some(Box::new(GenericArgs::AngleBracketed {
+                args: vec![GenericArg::Type(Type::ResolvedPath(RdPath {
+                    path: "Vec".to_string(),
+                    id: Id(100),
+                    args: Some(Box::new(GenericArgs::AngleBracketed {
+                        args: vec![GenericArg::Type(Type::Primitive("u32".to_string()))],
+                        constraints: vec![],
+                    })),
+                }))],
+                constraints: vec![],
+            })),
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(impl_id, make_item(impl_id, None, ItemEnum::Impl(c_impl)));
+
+    // Use a dummy external_crates entry so the single-segment expansion logic works.
+    use rustdoc_types::ExternalCrate;
+    let mut external_crates = HashMap::new();
+    external_crates.insert(
+        1u32,
+        ExternalCrate {
+            name: "ext_crate".to_string(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates,
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+    // The key must include the concrete arg `Vec<u32>` — stripping must not occur
+    // because `Vec<u32>` is NOT a type parameter of the impl block.
+    let key_with_vec = map.keys().find(|k| k.contains("Vec<u32>") || k.contains("Vec"));
+    assert!(
+        key_with_vec.is_some(),
+        "T043(c): concrete arg Vec<u32> on for_ must be preserved in the identity key; \
+         all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+}
+
+/// T043 (d): lifetime params on `impl<'a> Foo<'a>: Bar` must be stripped from
+/// the `for_` key, producing `"Foo: Bar"` not `"Foo<'a>: Bar"`.
+///
+/// The catalogue A-codec never emits lifetime args in `for_` because lifetimes
+/// are not part of the structural identity at the catalogue level.  Stripping
+/// lifetime generic args ensures C-side and A-side keys are consistent.
+#[test]
+fn test_t043_lifetime_params_stripped_from_identity_key() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{
+        GenericArg, GenericArgs, GenericParamDef, GenericParamDefKind, Impl, Path as RdPath,
+    };
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let struct_id = Id(1);
+    let impl_id = Id(2);
+    let trait_id = Id(9999);
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![struct_id, impl_id]));
+    index.insert(struct_id, struct_item(struct_id, "Foo"));
+    paths.insert(
+        struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    // Trait is local (crate_id == 0): key uses the bare short name.
+    paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // `impl<'a> Foo<'a>: Bar` — lifetime param `'a` on the impl block.
+    let lifetime_param = GenericParamDef {
+        name: "a".to_string(),
+        kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+    };
+    let c_impl = Impl {
+        is_unsafe: false,
+        generics: rustdoc_types::Generics {
+            params: vec![lifetime_param],
+            where_predicates: vec![],
+        },
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "Bar".to_string(), id: trait_id, args: None }),
+        // `for_` is `Foo<'a>` — the lifetime arg is the impl-block lifetime param.
+        for_: Type::ResolvedPath(RdPath {
+            path: "Foo".to_string(),
+            id: struct_id,
+            args: Some(Box::new(GenericArgs::AngleBracketed {
+                args: vec![GenericArg::Lifetime("'a".to_string())],
+                constraints: vec![],
+            })),
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(impl_id, make_item(impl_id, None, ItemEnum::Impl(c_impl)));
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+    // After stripping the lifetime arg, the key must be `"Foo: Bar"` (no `<'a>`).
+    let expected_key = "Foo: Bar";
+    assert!(
+        map.contains_key(expected_key),
+        "T043(d): lifetime param 'a must be stripped from for_ key; \
+         expected key '{expected_key}'; all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+    // The key with `<'a>` must NOT exist.
+    let key_with_lifetime = map.keys().find(|k| k.contains("'a"));
+    assert!(
+        key_with_lifetime.is_none(),
+        "T043(d): key must not contain the lifetime param; found: {:?}",
+        key_with_lifetime
+    );
+}
+
+/// T043 (e): impl-block type params inside `Fn(S)` / `fn(S)` positions must be stripped.
+///
+/// `format_type_strip_type_params` must handle `Type::Generic` values that appear
+/// directly as inputs of `GenericArgs::Parenthesized` (callable trait args, e.g.
+/// `Fn(S) -> S`) and as parameters of `Type::FunctionPointer` (e.g. `fn(S) -> S`).
+/// Before this fix the `Type::Generic` arm returned `name.clone()` unconditionally,
+/// leaving impl-block params in the rendered string and causing spurious C-vs-A
+/// mismatches in `build_impl_identity_map`.
+#[test]
+fn test_t043_generic_in_parenthesized_and_fn_pointer_positions_stripped() {
+    use std::collections::BTreeSet;
+
+    use rustdoc_types::{
+        FunctionHeader, FunctionPointer, FunctionSignature, GenericArgs, Path as RdPath, Type,
+    };
+
+    use super::format::format_type_strip_type_params;
+
+    let mut type_params = BTreeSet::new();
+    type_params.insert("S".to_string());
+
+    // --- Parenthesized: `Fn(S) -> S` when S is an impl-block type param ---
+    // rustdoc represents `Fn(S) -> S` as
+    //   Type::ResolvedPath { path: "Fn", args: GenericArgs::Parenthesized { inputs: [S], output: Some(S) } }
+    let fn_trait_type = Type::ResolvedPath(RdPath {
+        path: "Fn".to_string(),
+        id: rustdoc_types::Id(9998),
+        args: Some(Box::new(GenericArgs::Parenthesized {
+            inputs: vec![Type::Generic("S".to_string())],
+            output: Some(Type::Generic("S".to_string())),
+        })),
+    });
+    let rendered_fn = format_type_strip_type_params(&fn_trait_type, &type_params);
+    // After stripping: `S` must not appear; inputs should be empty → `Fn()`
+    // and return type also stripped.
+    assert!(
+        !rendered_fn.contains('S'),
+        "T043(e): impl-block param 'S' must be stripped from Fn(S)->S parenthesized args; \
+         got: {rendered_fn:?}"
+    );
+
+    // --- FunctionPointer: `fn(S) -> S` when S is an impl-block type param ---
+    let fn_ptr_type = Type::FunctionPointer(Box::new(FunctionPointer {
+        sig: FunctionSignature {
+            inputs: vec![("_".to_string(), Type::Generic("S".to_string()))],
+            output: Some(Type::Generic("S".to_string())),
+            is_c_variadic: false,
+        },
+        header: FunctionHeader {
+            is_async: false,
+            is_const: false,
+            is_unsafe: false,
+            abi: rustdoc_types::Abi::Rust,
+        },
+        generic_params: vec![],
+    }));
+    let rendered_fp = format_type_strip_type_params(&fn_ptr_type, &type_params);
+    // After stripping: `S` must not appear; fn pointer becomes `fn()->()`.
+    assert!(
+        !rendered_fp.contains('S'),
+        "T043(e): impl-block param 'S' must be stripped from fn(S)->S function pointer; \
+         got: {rendered_fp:?}"
+    );
+
+    // --- Negative: concrete type `u32` must never be stripped ---
+    let fn_ptr_concrete = Type::FunctionPointer(Box::new(FunctionPointer {
+        sig: FunctionSignature {
+            inputs: vec![("_".to_string(), Type::Primitive("u32".to_string()))],
+            output: Some(Type::Primitive("u64".to_string())),
+            is_c_variadic: false,
+        },
+        header: FunctionHeader {
+            is_async: false,
+            is_const: false,
+            is_unsafe: false,
+            abi: rustdoc_types::Abi::Rust,
+        },
+        generic_params: vec![],
+    }));
+    let rendered_concrete = format_type_strip_type_params(&fn_ptr_concrete, &type_params);
+    assert!(
+        rendered_concrete.contains("u32") && rendered_concrete.contains("u64"),
+        "T043(e): concrete params u32/u64 must NOT be stripped; got: {rendered_concrete:?}"
+    );
+}
+
+/// T043 (f): HRTB binders on `FunctionPointer` must be preserved (not collapsed to
+/// `<UNSUPPORTED:FunctionPointer>`).
+///
+/// `format_type_strip_type_params` previously returned `<UNSUPPORTED:FunctionPointer>`
+/// for any `FunctionPointer` with non-empty `generic_params`, which regressed HRTB
+/// function-pointer types such as `for<'a> fn(&'a S)` into an unusable sentinel key.
+/// After the fix the binder is rendered identically to `format_type` while the
+/// sig's arguments are still stripped via `strip()`.
+#[test]
+fn test_t043_hrtb_function_pointer_binders_preserved() {
+    use std::collections::BTreeSet;
+
+    use rustdoc_types::{
+        FunctionHeader, FunctionPointer, FunctionSignature, GenericParamDef, GenericParamDefKind,
+        Type,
+    };
+
+    use super::format::format_type_strip_type_params;
+
+    let mut type_params = BTreeSet::new();
+    type_params.insert("S".to_string());
+
+    // Build `for<'a> fn(&'a S)` — `'a` is a HRTB binder on the fn type,
+    // `S` is an impl-block type param that must be stripped.
+    let hrtb_fn_ptr = Type::FunctionPointer(Box::new(FunctionPointer {
+        sig: FunctionSignature {
+            inputs: vec![(
+                "_".to_string(),
+                Type::BorrowedRef {
+                    lifetime: Some("'a".to_string()),
+                    is_mutable: false,
+                    type_: Box::new(Type::Generic("S".to_string())),
+                },
+            )],
+            output: None,
+            is_c_variadic: false,
+        },
+        header: FunctionHeader {
+            is_async: false,
+            is_const: false,
+            is_unsafe: false,
+            abi: rustdoc_types::Abi::Rust,
+        },
+        generic_params: vec![GenericParamDef {
+            name: "a".to_string(),
+            kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+        }],
+    }));
+
+    let rendered = format_type_strip_type_params(&hrtb_fn_ptr, &type_params);
+
+    // Must NOT regress to the old sentinel.
+    assert_ne!(
+        rendered, "<UNSUPPORTED:FunctionPointer>",
+        "T043(f): HRTB function pointer must not collapse to unsupported sentinel; got: {rendered:?}"
+    );
+    // The HRTB lifetime binder must be present in the output.
+    assert!(
+        rendered.contains("'a"),
+        "T043(f): HRTB binder 'a must be preserved in the rendered key; got: {rendered:?}"
+    );
+    // The impl-block type param 'S' must be stripped.
+    assert!(
+        !rendered.contains('S'),
+        "T043(f): impl-block param 'S' must be stripped inside the HRTB fn pointer; \
+         got: {rendered:?}"
+    );
+}

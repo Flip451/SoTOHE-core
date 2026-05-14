@@ -484,6 +484,29 @@
       ],
       "informal_grounds": []
     },
+    "FsSpecFileLoader": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "SpecFileLoaderPort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [{ "name": "trusted_root", "ty": "std::path::PathBuf" }], "returns": "Self" }
+      ],
+      "docs": "Stateless filesystem adapter implementing SpecFileLoaderPort. Applies the shared symlink guard before reading, then returns the raw text content. Injected at the apps/cli composition root so the CLI command no longer calls std::fs directly.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — filesystem-backed adapter for SpecFileLoaderPort; wraps std::fs::read_to_string with symlink guard, injected at apps/cli composition root so the CLI spec-refs verification command never calls std::fs directly" }
+      ]
+    },
     "FsSymlinkGuard": {
       "action": "add",
       "role": "SecondaryAdapter",
@@ -491,17 +514,91 @@
         "kind": "unit_struct"
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "SymlinkGuardPort", "origin_crate": "domain" },
         { "trait_name": "Default", "origin_crate": "core" }
       ],
       "methods": [
         { "name": "new", "params": [], "returns": "Self" }
       ],
-      "docs": "Filesystem-backed implementation of SymlinkGuardPort. reject_symlinks_from_root walks all ancestors (root to leaf) checking each with symlink_metadata. reject_symlinks_below delegates to infrastructure::track::symlink_guard::reject_symlinks_below and maps the result to SymlinkGuardError variants. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. The proper-layering realization that IN-18 mandates (hexagonal purity: no raw std::fs I/O in the usecase layer); surfaced by a Codex PR-review finding. [source: ADR 2026-05-11-2330 D2]",
+      "docs": "Filesystem-backed implementation of SymlinkGuardPort. reject_symlinks_from_root walks all ancestors (root to leaf) checking each with symlink_metadata. reject_symlinks_below delegates to infrastructure::track::symlink_guard::reject_symlinks_below and maps the result to SymlinkGuardError variants. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. Modified in T040 addendum: added missing Debug derive. [source: ADR 2026-05-11-2330 D2]",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
       ],
       "informal_grounds": []
+    },
+    "FsTrackStatusReaderAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "TrackStatusReaderPort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Filesystem-backed implementation of TrackStatusReaderPort. Reads metadata.json + impl-plan.json for the given track via read_track_status_str, applies the symlink guard, validates the track id, and converts the returned status string to a domain TrackStatus.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — filesystem-backed adapter for TrackStatusReaderPort; reads metadata.json + impl-plan.json to derive TrackStatus, isolating track-status I/O from TypeSignalsInteractor via port injection" }
+      ]
+    },
+    "RustdocBaselineCaptureAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "RustdocBaselineCapturePort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Stateless adapter implementing RustdocBaselineCapturePort. Runs cargo +nightly rustdoc against rustdoc_workspace and writes the result to the baseline file. Accepts the domain-level TdddLayerBinding directly. Injected into BaselineCaptureInteractor at the apps/cli composition root.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — adapter wrapping infrastructure::tddd::baseline_capture for RustdocBaselineCapturePort; converts domain TdddLayerBinding to infrastructure-layer baseline capture functions; injected into BaselineCaptureInteractor at the apps/cli composition root" }
+      ]
+    },
+    "TypeSignalsExecutorAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "TypeSignalsExecutorPort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Stateless adapter implementing TypeSignalsExecutorPort. Converts the domain TdddLayerBinding (public fields) to the infra TdddLayerBinding (private getters) and delegates to execute_type_signals_for_layer. Handles MissingCataloguePolicy::SkipSilently and MissingCataloguePolicy::FailClosed modes.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — adapter wrapping infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer for TypeSignalsExecutorPort; bridges domain TdddLayerBinding to the infra-level layer binding struct; injected into TypeSignalsInteractor at the apps/cli composition root" }
+      ]
+    },
+    "SpecElementHashError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "tuple_struct",
+        "fields": ["String"],
+        "has_stripped_fields": false
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" }
+      ],
+      "docs": "Error returned by compute_spec_element_hashes. Wraps a human-readable error string covering symlink guard failures, invalid track_id, missing or malformed spec.json, and absent anchor lookups.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — error type for compute_spec_element_hashes; surfaces underlying I/O and decode failures without leaking internal paths" }
+      ]
     }
   },
   "traits": {
@@ -853,6 +950,21 @@
       ],
       "informal_grounds": []
     },
+    "infrastructure::verify::tddd_layers::load_tddd_layers_strict": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "path", "ty": "&std::path::Path" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<Vec<infrastructure::verify::tddd_layers::TdddLayerBinding>, infrastructure::verify::tddd_layers::LoadTdddLayersError>",
+      "is_async": false,
+      "docs": "Loads TDDD layer bindings from architecture-rules.json at path, failing closed when the file is absent (no legacy synthetic fallback). Unlike load_tddd_layers_from_path, this variant treats an absent architecture-rules.json as a hard configuration error. Appropriate for verify gates where a missing rules file means the set of catalogues to check is unknowable. Added in T040 CLI thinning refactor.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — strict variant of the TDDD layer-bindings loader; treats absent architecture-rules.json as a hard configuration error (fail-closed per CN-11) so verify gates cannot pass when the set of TDDD-enabled layers is unknowable" }
+      ]
+    },
     "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native": {
       "action": "add",
       "role": "FreeFunction",
@@ -897,6 +1009,40 @@
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
       ],
       "informal_grounds": []
+    },
+    "infrastructure::track::spec_element_hash::compute_spec_element_hashes": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "std::path::PathBuf" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "anchor", "ty": "Option<&str>" }
+      ],
+      "returns": "Result<std::collections::BTreeMap<String, String>, SpecElementHashError>",
+      "is_async": false,
+      "docs": "Compute canonical SHA-256 hashes for every element in spec.json and return a sorted map from element id to 64-char lowercase hex digest. Applies a symlink_metadata guard on items_dir before using it as the trusted root for FsSpecFileLoader. When anchor is Some, only a single entry is returned. When anchor is None, the full map is returned.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — moved from CLI to infrastructure layer (raw filesystem I/O isolation); computes per-element hashes from spec.md using SpecFileLoaderPort" }
+      ]
+    },
+    "infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "std::path::PathBuf" },
+        { "name": "track_id", "ty": "String" },
+        { "name": "workspace_root", "ty": "std::path::PathBuf" },
+        { "name": "skip_stale", "ty": "bool" },
+        { "name": "formatted_findings", "ty": "&mut Vec<String>" }
+      ],
+      "returns": "Result<bool, String>",
+      "is_async": false,
+      "docs": "Entry point for `sotp verify catalogue-spec-refs`. Returns Ok(true) when no findings were detected (exit 0), Ok(false) when one or more findings were detected (exit 1), or Err(String) when a fatal configuration or I/O error prevents the check from running. The formatted_findings parameter is populated with one human-readable line per finding.",
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "user_directive", "summary": "T040 CLI thinning — moved from CLI to infrastructure layer (symlink guards + raw I/O isolation); orchestrates spec-refs verification across tddd-enabled layers" }
+      ]
     }
   }
 }

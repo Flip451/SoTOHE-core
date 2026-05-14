@@ -1,8 +1,44 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-14T10:14:10Z",
-  "declaration_hash": "4533517af11fd0f68141148ca07d3c737888e6c388970c7e59dad218c9f4ef22",
+  "generated_at": "2026-05-14T17:14:16Z",
+  "declaration_hash": "a1696576dba71692ac30f7d3b73845547b3e425c897bf8da124ead66c8d116e9",
   "signals": [
+    {
+      "type_name": "BaselineCaptureError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "BaselineCaptureInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "BaselineCaptureService"
+      ]
+    },
+    {
+      "type_name": "BaselineCaptureRequest",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "BaselineCaptureService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "CatalogueImplSignalsError",
       "kind_tag": "error_type",
@@ -10,6 +46,7 @@
       "found_type": true,
       "found_items": [
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -20,6 +57,16 @@
       "found_type": true,
       "found_items": [
         "CatalogueImplSignalsService"
+      ]
+    },
+    {
+      "type_name": "CatalogueImplSignalsReport",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -34,8 +81,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
+        "core::clone::Clone",
         "core::cmp::Eq",
-        "core::cmp::PartialEq"
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -47,12 +96,63 @@
         "core::convert::From<CatalogueLoaderError>",
         "core::convert::From<ContractMapWriterError>",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckApprovedInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "ReviewCheckApprovedService"
+      ]
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "TaskOperationService"
       ]
     },
     {
       "type_name": "TrackBlobReader",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TypeSignalsService"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsRequest",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsService",
+      "kind_tag": "application_service",
       "signal": "blue",
       "found_type": true
     },
@@ -81,6 +181,12 @@
       "found_type": true
     },
     {
+      "type_name": "ReviewCheckApprovedService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "SchemaExporterPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
@@ -89,6 +195,12 @@
     {
       "type_name": "SpecElementHashReader",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskOperationService",
+      "kind_tag": "application_service",
       "signal": "blue",
       "found_type": true
     }

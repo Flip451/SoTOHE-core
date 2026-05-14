@@ -1,6 +1,9 @@
 pub mod atomic_write;
 pub mod codec;
+pub mod fs_spec_file_loader;
 pub mod fs_store;
 pub mod fs_symlink_guard;
 pub mod render;
+pub mod spec_element_hash;
 pub mod symlink_guard;
+pub mod track_status_reader_adapter;

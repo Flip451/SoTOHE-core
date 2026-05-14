@@ -1,13 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-14T10:14:11Z",
-  "declaration_hash": "cb9737eea1e0ed47997237f8643852e9b36dc045bc506727762956905f6200ec",
+  "generated_at": "2026-05-14T17:17:52Z",
+  "declaration_hash": "ce7c26cd41804240eda899f5804abd7ad895118c05a7ee9d8e40748df0bbcbf9",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "BaselineRustdocCodecError",
@@ -17,6 +21,7 @@
       "found_items": [
         "core::convert::From",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -26,7 +31,9 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::default::Default"
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -37,6 +44,7 @@
       "found_items": [
         "core::convert::From",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -47,7 +55,9 @@
       "found_type": true,
       "found_items": [
         "CatalogueToExtendedCratePort",
-        "core::default::Default"
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -57,6 +67,7 @@
       "found_type": true,
       "found_items": [
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
@@ -67,7 +78,9 @@
       "found_type": true,
       "found_items": [
         "CatalogueDocumentLoaderPort",
-        "core::default::Default"
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -80,23 +93,49 @@
       ]
     },
     {
+      "type_name": "FsSpecFileLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SpecFileLoaderPort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "FsSymlinkGuard",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
       "found_type": true,
       "found_items": [
         "SymlinkGuardPort",
-        "core::default::Default"
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
       "type_name": "FsTdddLayerBindingsAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "TdddLayerBindingsPort",
-        "core::default::Default"
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsTrackStatusReaderAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TrackStatusReaderPort",
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -127,7 +166,20 @@
       "found_items": [
         "core::convert::From",
         "core::error::Error",
+        "core::fmt::Debug",
         "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RustdocBaselineCaptureAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RustdocBaselineCapturePort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -156,7 +208,30 @@
       "found_type": true,
       "found_items": [
         "SignalEvaluatorPort",
-        "core::default::Default"
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "SpecElementHashError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TypeSignalsExecutorPort",
+        "core::default::Default",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -190,13 +265,31 @@
       "found_type": true
     },
     {
+      "type_name": "infrastructure::track::spec_element_hash::compute_spec_element_hashes",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "infrastructure::type_catalogue_render::render_type_catalogue_v3",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },
     {
+      "type_name": "infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_strict",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

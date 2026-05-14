@@ -69,7 +69,7 @@ pub(super) mod structural_eq;
 #[cfg(test)]
 pub(super) mod tests;
 
-use format::{format_generic_args, format_type};
+use format::{format_generic_args, format_type, format_type_strip_type_params};
 use phase1::phase1_build_s_and_d;
 use phase2::phase2_evaluate;
 
@@ -339,7 +339,26 @@ pub(super) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
             // Short name for `for_`, consistent with the ThreeWaySignal contract
             // and with S-side impl construction (B-origin ids in for_.id don't exist
             // in S.paths, so full-path lookup would fall back to format_type anyway).
-            let for_name = format_type(&impl_.for_);
+            //
+            // Generic type parameters declared on the impl block itself (e.g. `impl<S>
+            // TaskOperationInteractor<S>`) are stripped from the `for_` short name so
+            // that the identity key matches the catalogue A-codec key, which uses the
+            // bare type name without impl-block type parameters (per ADR D10 trait
+            // identity normalization).  Concrete type arguments (e.g. `Vec<u32>`) are
+            // preserved because they are part of the structural identity.
+            // Collect all impl-block generic parameter names: type params (`T`),
+            // lifetime params (`'a`, stored without the leading `'` in
+            // `GenericParamDef::name`), and const params (`N`).  All three
+            // contribute to `format_type_strip_type_params`'s strip set so that
+            // `impl<S>`, `impl<'a>`, and `impl<const N: usize>` are all
+            // normalized away from the `for_` key.
+            let type_params: std::collections::BTreeSet<String> =
+                impl_.generics.params.iter().map(|p| p.name.clone()).collect();
+            let for_name = if type_params.is_empty() {
+                format_type(&impl_.for_)
+            } else {
+                format_type_strip_type_params(&impl_.for_, &type_params)
+            };
 
             // Skip impls where `for_` is an external type (belongs to another crate).
             //

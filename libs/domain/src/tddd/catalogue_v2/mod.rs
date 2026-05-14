@@ -60,6 +60,8 @@ pub use traits::{GenericArgsError, TraitImplDeclV2};
 pub use variants::{FieldDecl, VariantDecl, VariantPayload};
 
 pub use catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort, RustdocCratePort,
-    RustdocCratePortError, TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
+    BaselineCaptureIoError, CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
+    MissingCataloguePolicy, RustdocBaselineCapturePort, RustdocCratePort, RustdocCratePortError,
+    TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort, TrackStatusReadError,
+    TrackStatusReaderPort, TypeSignalsExecutionError, TypeSignalsExecutorPort,
 };

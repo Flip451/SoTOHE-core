@@ -34,20 +34,49 @@ impl SymlinkGuardPort for FsSymlinkGuard {
     /// Rejects any symlink component in the full path from the filesystem root
     /// down to (and including) `path`.
     ///
-    /// Ancestors are collected from `path.ancestors()` (leaf → root) and
-    /// reversed so we walk root → leaf. Empty components are skipped.
-    /// Components that cannot be stat'd are silently skipped — only confirmed
-    /// symlinks trigger an error.
+    /// Relative paths are absolutized against `std::env::current_dir()` so
+    /// `path.ancestors()` walks the full filesystem-root → leaf chain instead
+    /// of just the relative components (which would skip every symlink in the
+    /// CWD's actual ancestors). Ancestors are collected from the absolutized
+    /// path (leaf → root) and reversed so we walk root → leaf. Empty
+    /// components are skipped. Components that cannot be stat'd are silently
+    /// skipped — only confirmed symlinks trigger an error.
+    ///
+    /// ## Trust model — accepted deviation
+    ///
+    /// `current_dir()` (POSIX `getcwd()`) returns the *physical* absolute path,
+    /// which resolves symlinks in the CWD chain. A process launched from a
+    /// symlinked workspace will therefore not see the symlink-in-the-CWD
+    /// itself, only its physical target ancestry. This is an accepted
+    /// limitation: this guard is a defensive layer against accidental
+    /// catalogue / baseline redirection, not a hardened mitigation against
+    /// adversaries with shell access. An adversary who can change the process
+    /// CWD can also override `$PWD`, set custom `LD_PRELOAD`, or redirect I/O
+    /// via many other mechanisms — symlink-in-CWD is one of dozens of such
+    /// vectors. A robust CWD-symlink detector would need either (a)
+    /// `O_NOFOLLOW` + inode verification (tracked under `TDDD-BUG-06` in
+    /// `knowledge/strategy/TODO.md`) or (b) a higher-layer trusted-root
+    /// contract (composition root passes a vetted absolute path).
     ///
     /// # Errors
     ///
     /// Returns [`SymlinkGuardError::SymlinkFound`] if any ancestor or the leaf
     /// itself is a symlink.
     /// Returns [`SymlinkGuardError::Io`] if a stat call fails with an
-    /// unexpected I/O error.
+    /// unexpected I/O error or `current_dir()` lookup fails.
     fn reject_symlinks_from_root(&self, path: &Path) -> Result<(), SymlinkGuardError> {
-        // Collect all ancestors from root down to `path` (inclusive).
-        let mut components: Vec<&Path> = path.ancestors().collect();
+        let absolute_path: std::path::PathBuf = if path.is_absolute() {
+            path.to_path_buf()
+        } else {
+            let cwd = std::env::current_dir().map_err(|e| SymlinkGuardError::Io {
+                path: path.display().to_string(),
+                reason: format!("cannot determine current directory to absolutize: {e}"),
+            })?;
+            cwd.join(path)
+        };
+
+        // Collect all ancestors from root down to the absolutized path (inclusive).
+        let mut components: Vec<&Path> = absolute_path.ancestors().collect();
         // `ancestors()` yields leaf → root; reverse to root → leaf.
         components.reverse();
 

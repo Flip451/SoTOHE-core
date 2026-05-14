@@ -30,6 +30,21 @@ impl fmt::Display for TrackStatus {
     }
 }
 
+impl TrackStatus {
+    /// Returns `true` when the track is in an active (non-frozen) state.
+    ///
+    /// Active statuses: `Planned`, `InProgress`, `Blocked`, `Cancelled`.
+    /// Frozen statuses: `Done`, `Archived`.
+    ///
+    /// TDDD commands (`type-signals`, `baseline-capture`) are only allowed on
+    /// active tracks. Frozen tracks must not have their type snapshots mutated
+    /// after the fact.
+    #[must_use]
+    pub fn is_active(self) -> bool {
+        matches!(self, Self::Planned | Self::InProgress | Self::Blocked | Self::Cancelled)
+    }
+}
+
 /// Discriminant-only view of `TaskStatus` for display and error reporting.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskStatusKind {
@@ -636,5 +651,37 @@ mod tests {
         assert_eq!(TrackStatus::Done.to_string(), "done");
         assert_eq!(TrackStatus::Blocked.to_string(), "blocked");
         assert_eq!(TrackStatus::Cancelled.to_string(), "cancelled");
+    }
+
+    // --- TrackStatus::is_active tests (6-variant coverage) ---
+
+    #[test]
+    fn test_track_status_planned_is_active() {
+        assert!(TrackStatus::Planned.is_active(), "Planned must be active");
+    }
+
+    #[test]
+    fn test_track_status_in_progress_is_active() {
+        assert!(TrackStatus::InProgress.is_active(), "InProgress must be active");
+    }
+
+    #[test]
+    fn test_track_status_blocked_is_active() {
+        assert!(TrackStatus::Blocked.is_active(), "Blocked must be active");
+    }
+
+    #[test]
+    fn test_track_status_cancelled_is_active() {
+        assert!(TrackStatus::Cancelled.is_active(), "Cancelled must be active");
+    }
+
+    #[test]
+    fn test_track_status_done_is_not_active() {
+        assert!(!TrackStatus::Done.is_active(), "Done must be frozen (not active)");
+    }
+
+    #[test]
+    fn test_track_status_archived_is_not_active() {
+        assert!(!TrackStatus::Archived.is_active(), "Archived must be frozen (not active)");
     }
 }

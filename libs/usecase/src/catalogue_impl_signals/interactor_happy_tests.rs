@@ -16,8 +16,8 @@ use domain::tddd::extended_crate::ExtendedCrate;
 use super::super::super::service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
 use super::{
     EmptyEvaluator, EmptyRustdocPort, FailingEvaluator, FailingRustdocPort, SingleBlueEvaluator,
-    StubLayerBindings, StubLoader, build_interactor, empty_rustdoc_crate, minimal_catalogue_doc,
-    stub_binding,
+    SingleRedEvaluator, StubLayerBindings, StubLoader, build_interactor, empty_rustdoc_crate,
+    minimal_catalogue_doc, stub_binding,
 };
 
 // -------------------------------------------------------------------------
@@ -55,11 +55,17 @@ fn test_run_with_empty_evaluation_returns_all_items_maintained_report() {
     // Use a real temp dir so the workspace_root symlink guard passes.
     let tmp = tempfile::tempdir().unwrap();
     let report = interactor.run("my-track".to_owned(), tmp.path().to_path_buf(), None).unwrap();
-    assert!(report.contains("## Layer: `domain`"), "report must contain layer header: {report}");
     assert!(
-        report.contains("All items maintained"),
-        "empty evaluation must produce 'All items maintained': {report}"
+        report.text.contains("## Layer: `domain`"),
+        "report must contain layer header: {}",
+        report.text
     );
+    assert!(
+        report.text.contains("All items maintained"),
+        "empty evaluation must produce 'All items maintained': {}",
+        report.text
+    );
+    assert!(!report.any_red, "empty evaluation must have any_red = false");
 }
 
 #[test]
@@ -76,11 +82,35 @@ fn test_run_with_single_blue_signal_report_contains_signal_table() {
     let tmp = tempfile::tempdir().unwrap();
     let report = interactor.run("my-track".to_owned(), tmp.path().to_path_buf(), None).unwrap();
     assert!(
-        report.contains("| Item | Region | Signal |"),
-        "report must contain table header: {report}"
+        report.text.contains("| Item | Region | Signal |"),
+        "report must contain table header: {}",
+        report.text
     );
-    assert!(report.contains("🔵 Blue"), "report must contain Blue signal: {report}");
-    assert!(report.contains("Summary:"), "report must contain Summary line: {report}");
+    assert!(report.text.contains("🔵 Blue"), "report must contain Blue signal: {}", report.text);
+    assert!(report.text.contains("Summary:"), "report must contain Summary line: {}", report.text);
+    assert!(!report.any_red, "single Blue signal must have any_red = false");
+}
+
+#[test]
+fn test_run_with_single_red_signal_sets_any_red_true() {
+    // Regression coverage for the `any_red` flag: a Red signal in the evaluation
+    // must surface as `any_red = true`. This replaces the deleted markdown-scan
+    // tests `test_report_has_red_signals_with_red_row_returns_true` /
+    // `test_report_has_red_signals_summary_zero_red_is_not_false_positive` that
+    // used to live on the CLI side before `report_has_red_signals` was retired.
+    let binding = stub_binding("domain");
+    let doc = minimal_catalogue_doc("domain");
+    let interactor = build_interactor(
+        Arc::new(StubLoader { doc }),
+        Arc::new(EmptyExtendedCrateCodec),
+        Arc::new(SingleRedEvaluator),
+        Arc::new(EmptyRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![binding] }),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+    let report = interactor.run("my-track".to_owned(), tmp.path().to_path_buf(), None).unwrap();
+    assert!(report.text.contains("🔴 Red"), "report must contain Red signal: {}", report.text);
+    assert!(report.any_red, "single Red signal must have any_red = true");
 }
 
 #[test]

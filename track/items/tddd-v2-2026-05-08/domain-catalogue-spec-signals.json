@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "75f3581d92afbdb4b3eaeacae4ff0f0b79c0cefdfb47493e115ea459d149c913",
+  "catalogue_declaration_hash": "fc0875570cd040aab590d181138eb2f7037d77759a2655779e82ed6594d59630",
   "signals": [
     {
       "type_name": "ActionContradiction",
@@ -9,6 +9,10 @@
     {
       "type_name": "ActionContradictionKind",
       "signal": "blue"
+    },
+    {
+      "type_name": "BaselineCaptureIoError",
+      "signal": "yellow"
     },
     {
       "type_name": "CatalogueDocument",
@@ -135,6 +139,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "MissingCataloguePolicy",
+      "signal": "yellow"
+    },
+    {
       "type_name": "ModulePath",
       "signal": "blue"
     },
@@ -167,6 +175,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "SpecFileLoadError",
+      "signal": "yellow"
+    },
+    {
       "type_name": "SymlinkGuardError",
       "signal": "blue"
     },
@@ -189,6 +201,14 @@
     {
       "type_name": "ThreeWaySignalKind",
       "signal": "blue"
+    },
+    {
+      "type_name": "TrackStatus",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "TrackStatusReadError",
+      "signal": "yellow"
     },
     {
       "type_name": "TraitBaselineEntry",
@@ -275,6 +295,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "TypeSignalsExecutionError",
+      "signal": "yellow"
+    },
+    {
       "type_name": "TypestateMarker",
       "signal": "blue"
     },
@@ -319,6 +343,10 @@
       "signal": "blue"
     },
     {
+      "type_name": "RustdocBaselineCapturePort",
+      "signal": "yellow"
+    },
+    {
       "type_name": "RustdocCratePort",
       "signal": "blue"
     },
@@ -331,12 +359,24 @@
       "signal": "blue"
     },
     {
+      "type_name": "SpecFileLoaderPort",
+      "signal": "yellow"
+    },
+    {
       "type_name": "SymlinkGuardPort",
       "signal": "blue"
     },
     {
       "type_name": "TdddLayerBindingsPort",
       "signal": "blue"
+    },
+    {
+      "type_name": "TrackStatusReaderPort",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "signal": "yellow"
     },
     {
       "type_name": "domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity",

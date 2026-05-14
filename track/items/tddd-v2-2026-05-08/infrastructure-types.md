@@ -23,6 +23,7 @@
 | LoadAllCataloguesError | error_type | delete | LayerBindings, ArchRulesParse, Io, CatalogueNotFound, Decode, TopologicalSortFailed, InvalidLayerId | 🔵 | 🔵 |
 | LoadAllCataloguesNativeError | error_type | — | LayerBindings, ArchRulesParse, Io, CatalogueNotFound, Decode, TopologicalSortFailed, InvalidLayerId | 🔵 | 🔵 |
 | SchemaExportCodecError | error_type | reference | Json | 🔵 | 🔵 |
+| SpecElementHashError | error_type | — | — | 🔵 | 🟡 |
 | TypeCatalogueCodecError | error_type | delete | Json, Validation, UnsupportedSchemaVersion, InvalidEntry | 🔵 | 🔵 |
 | TypeGraphExportError | error_type | delete | — | 🔵 | 🔵 |
 
@@ -37,13 +38,17 @@
 | FsCatalogueLoader | secondary_adapter | modify | impl CatalogueLoader | 🔵 | 🔵 |
 | FsCatalogueSpecSignalsStore | secondary_adapter | reference | impl CatalogueSpecSignalsWriter | 🔵 | 🔵 |
 | FsContractMapWriter | secondary_adapter | reference | impl ContractMapWriter | 🔵 | 🔵 |
-| FsSymlinkGuard | secondary_adapter | — | impl SymlinkGuardPort, impl Default | 🔵 | 🔵 |
-| FsTdddLayerBindingsAdapter | secondary_adapter | — | impl Debug, impl Clone, impl TdddLayerBindingsPort, impl Default | 🔵 | 🔵 |
+| FsSpecFileLoader | secondary_adapter | — | impl Debug, impl Clone, impl Default, impl SpecFileLoaderPort | 🔵 | 🟡 |
+| FsSymlinkGuard | secondary_adapter | — | impl Debug, impl SymlinkGuardPort, impl Default | 🔵 | 🔵 |
+| FsTdddLayerBindingsAdapter | secondary_adapter | — | impl Debug, impl Clone, impl TdddLayerBindingsPort, impl Default | 🟡 | 🔵 |
+| FsTrackStatusReaderAdapter | secondary_adapter | — | impl Debug, impl Default, impl TrackStatusReaderPort | 🔵 | 🟡 |
 | GitShowTrackBlobReader | secondary_adapter | modify | impl TrackBlobReader, impl SpecElementHashReader | 🔵 | 🔵 |
 | InMemoryCatalogueLinter | secondary_adapter | modify | impl CatalogueLinter, impl Default | 🔵 | 🔵 |
+| RustdocBaselineCaptureAdapter | secondary_adapter | — | impl Debug, impl Clone, impl Default, impl RustdocBaselineCapturePort | 🔵 | 🟡 |
 | RustdocCrateAdapter | secondary_adapter | — | impl RustdocCratePort | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🔵 | 🔵 |
 | SignalEvaluatorV2 | secondary_adapter | — | impl Debug, impl Clone, impl SignalEvaluatorPort, impl Default | 🔵 | 🔵 |
+| TypeSignalsExecutorAdapter | secondary_adapter | — | impl Debug, impl Default, impl TypeSignalsExecutorPort | 🔵 | 🟡 |
 
 ## Free Functions
 
@@ -72,10 +77,13 @@
 | infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer | free_function | modify | fn(items_dir: &std::path::Path, track_id: &str, workspace_root: &std::path::Path, binding: &TdddLayerBinding) -> Result<std::process::ExitCode, EvaluateSignalsError> | 🔵 | 🔵 |
 | infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics | free_function | delete | fn() -> Result<(), EvaluateSignalsError> | 🔵 | 🔵 |
 | infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue | free_function | delete | fn() -> Result<(), EvaluateSignalsError> | 🔵 | 🔵 |
+| infrastructure::track::spec_element_hash::compute_spec_element_hashes | free_function | — | fn(items_dir: std::path::PathBuf, track_id: &str, anchor: Option<&str>) -> Result<std::collections::BTreeMap<String, String>, SpecElementHashError> | 🔵 | 🟡 |
 | infrastructure::type_catalogue_render::render_type_catalogue | free_function | delete | fn() -> String | 🔵 | 🔵 |
 | infrastructure::type_catalogue_render::render_type_catalogue_v3 | free_function | — | fn(doc: &domain::tddd::catalogue_v2::CatalogueDocument, source_file_name: &str, type_signals: Option<&[domain::TypeSignal]>, catalogue_spec_signals: Option<&domain::CatalogueSpecSignalsDocument>) -> String | 🔵 | 🔵 |
+| infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs | free_function | — | fn(items_dir: std::path::PathBuf, track_id: String, workspace_root: std::path::PathBuf, skip_stale: bool, formatted_findings: &mut Vec<String>) -> Result<bool, String> | 🔵 | 🟡 |
 | infrastructure::verify::spec_code_consistency::consistency_report_to_findings | free_function | delete | fn() -> Vec<VerifyFinding> | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components | free_function | delete | fn() -> ConsistencyReport | 🔵 | 🔵 |
 | infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str | free_function | delete | fn(_track_id_str: &str, _crate_name: &str, _project_root: &std::path::Path) -> VerifyOutcome | 🔵 | 🔵 |
 | infrastructure::verify::spec_states::verify_from_spec_json | free_function | modify | fn(spec_json_path: &std::path::Path, strict: bool, trusted_root: &std::path::Path) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
+| infrastructure::verify::tddd_layers::load_tddd_layers_strict | free_function | — | fn(path: &std::path::Path, trusted_root: &std::path::Path) -> Result<Vec<infrastructure::verify::tddd_layers::TdddLayerBinding>, infrastructure::verify::tddd_layers::LoadTdddLayersError> | 🔵 | 🟡 |
 

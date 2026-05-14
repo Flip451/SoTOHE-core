@@ -10,6 +10,25 @@ use std::path::PathBuf;
 use thiserror::Error;
 
 // ---------------------------------------------------------------------------
+// Report type
+// ---------------------------------------------------------------------------
+
+/// Result of a completed catalogue-impl-signals evaluation run.
+///
+/// Returned by [`CatalogueImplSignalsService::run`] in place of a bare `String`.
+/// Carries the formatted markdown text and a pre-computed `any_red` flag so
+/// callers do not need to re-parse the report string.
+///
+/// [source: CLI thin-composition-root refactor]
+#[derive(Debug, Clone)]
+pub struct CatalogueImplSignalsReport {
+    /// Formatted markdown report text for stdout output (one section per layer).
+    pub text: String,
+    /// `true` when at least one Red signal is present across all evaluated layers.
+    pub any_red: bool,
+}
+
+// ---------------------------------------------------------------------------
 // Error type
 // ---------------------------------------------------------------------------
 
@@ -105,7 +124,9 @@ pub enum CatalogueImplSignalsError {
 pub trait CatalogueImplSignalsService: Send + Sync {
     /// Runs the catalogue-impl-signals evaluation for the given track.
     ///
-    /// Returns a formatted markdown report string (one section per layer).
+    /// Returns a [`CatalogueImplSignalsReport`] containing the formatted markdown
+    /// text and a pre-computed `any_red` flag (true when at least one Red signal
+    /// was found across all evaluated layers).
     ///
     /// # Errors
     ///
@@ -115,7 +136,7 @@ pub trait CatalogueImplSignalsService: Send + Sync {
         track_id: String,
         workspace_root: PathBuf,
         layer: Option<String>,
-    ) -> Result<String, CatalogueImplSignalsError>;
+    ) -> Result<CatalogueImplSignalsReport, CatalogueImplSignalsError>;
 }
 
 // ---------------------------------------------------------------------------
@@ -126,6 +147,21 @@ pub trait CatalogueImplSignalsService: Send + Sync {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_catalogue_impl_signals_report_any_red_reflects_red_signals() {
+        let report_no_red = CatalogueImplSignalsReport {
+            text: "Summary: 🔵 2 Blue | 🟡 1 Yellow | 🔴 0 Red\n".to_owned(),
+            any_red: false,
+        };
+        assert!(!report_no_red.any_red, "any_red must be false when no Red signals");
+
+        let report_with_red = CatalogueImplSignalsReport {
+            text: "| Foo | SCaptureDCaptureIntersect | 🔴 Red |\n".to_owned(),
+            any_red: true,
+        };
+        assert!(report_with_red.any_red, "any_red must be true when Red signals present");
+    }
 
     #[test]
     fn test_catalogue_impl_signals_error_display_covers_all_variants() {

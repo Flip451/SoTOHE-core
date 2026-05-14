@@ -7,6 +7,7 @@ flowchart LR
     subgraph domain [domain]
         %% type: ActionContradiction
         %% type: ActionContradictionKind
+        %% type: BaselineCaptureIoError
         %% type: CatalogueDocument
         %% type: CatalogueDocumentError
         %% type: CatalogueDocumentLoaderError
@@ -38,6 +39,7 @@ flowchart LR
         %% type: MethodDeclaration
         %% type: MethodGenericParam
         %% type: MethodName
+        %% type: MissingCataloguePolicy
         %% type: ModulePath
         %% type: NewTypeGraphCodecError
         %% type: ParamDeclaration
@@ -46,12 +48,15 @@ flowchart LR
         %% type: RustdocCratePortError
         %% type: SelfReceiver
         %% type: SignalRegion
+        %% type: SpecFileLoadError
         %% type: SymlinkGuardError
         %% type: TdddLayerBinding
         %% type: TdddLayerBindingsError
         %% type: ThreeWayEvaluationReport
         %% type: ThreeWaySignal
         %% type: ThreeWaySignalKind
+        %% type: TrackStatus
+        %% type: TrackStatusReadError
         %% type: TraitBaselineEntry
         %% type: TraitEntry
         %% type: TraitImplBaselineEntry
@@ -73,6 +78,7 @@ flowchart LR
         %% type: TypeNode
         %% type: TypeRef
         %% type: TypeSignal
+        %% type: TypeSignalsExecutionError
         %% type: TypestateMarker
         %% type: TypestateTransitions
         %% type: VariantDecl
@@ -84,11 +90,15 @@ flowchart LR
         %% trait: CatalogueLoader
         %% trait: CatalogueToExtendedCratePort
         %% trait: ContractMapWriter
+        %% trait: RustdocBaselineCapturePort
         %% trait: RustdocCratePort
         %% trait: SchemaExporter
         %% trait: SignalEvaluatorPort
+        %% trait: SpecFileLoaderPort
         %% trait: SymlinkGuardPort
         %% trait: TdddLayerBindingsPort
+        %% trait: TrackStatusReaderPort
+        %% trait: TypeSignalsExecutorPort
         %% fn: domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity
         %% fn: domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals
         %% fn: domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal
@@ -100,17 +110,30 @@ flowchart LR
         %% fn: domain::tddd::signals::undeclared_to_signals
     end
     subgraph usecase [usecase]
+        %% type: BaselineCaptureError
+        %% type: BaselineCaptureInteractor
+        %% type: BaselineCaptureRequest
         %% type: CatalogueImplSignalsError
         %% type: CatalogueImplSignalsInteractor
+        %% type: CatalogueImplSignalsReport
         %% type: PreCommitTypeSignalsInteractor
         %% type: RenderContractMapCommand
         %% type: RenderContractMapError
+        %% type: ReviewCheckApprovedInteractor
+        %% type: TaskOperationInteractor
+        %% type: TypeSignalsError
+        %% type: TypeSignalsInteractor
+        %% type: TypeSignalsRequest
+        %% trait: BaselineCaptureService
         %% trait: CatalogueImplSignalsService
         %% trait: CatalogueSpecSignalsWriter
         %% trait: PreCommitTypeSignalsService
+        %% trait: ReviewCheckApprovedService
         %% trait: SchemaExporterPort
         %% trait: SpecElementHashReader
+        %% trait: TaskOperationService
         %% trait: TrackBlobReader
+        %% trait: TypeSignalsService
         %% fn: usecase::merge_gate::check_strict_merge_gate
     end
     subgraph infrastructure [infrastructure]
@@ -130,20 +153,25 @@ flowchart LR
         %% type: FsCatalogueLoader
         %% type: FsCatalogueSpecSignalsStore
         %% type: FsContractMapWriter
+        %% type: FsSpecFileLoader
         %% type: FsSymlinkGuard
         %% type: FsTdddLayerBindingsAdapter
+        %% type: FsTrackStatusReaderAdapter
         %% type: GitShowTrackBlobReader
         %% type: InMemoryCatalogueLinter
         %% type: LoadAllCataloguesError
         %% type: LoadAllCataloguesNativeError
+        %% type: RustdocBaselineCaptureAdapter
         %% type: RustdocCrateAdapter
         %% type: RustdocSchemaExporter
         %% type: SchemaExportCodecError
         %% type: SignalEvaluatorV2
         %% type: SignalSummary
+        %% type: SpecElementHashError
         %% type: TypeCatalogueCodecError
         %% type: TypeGraphExportError
         %% type: TypeGraphRenderOptions
+        %% type: TypeSignalsExecutorAdapter
         %% fn: infrastructure::code_profile_builder::build_type_graph
         %% fn: infrastructure::tddd::baseline_builder::build_baseline
         %% fn: infrastructure::tddd::baseline_capture::capture_baseline_for_layer
@@ -167,11 +195,14 @@ flowchart LR
         %% fn: infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer
         %% fn: infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics
         %% fn: infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue
+        %% fn: infrastructure::track::spec_element_hash::compute_spec_element_hashes
         %% fn: infrastructure::type_catalogue_render::render_type_catalogue
         %% fn: infrastructure::type_catalogue_render::render_type_catalogue_v3
+        %% fn: infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs
         %% fn: infrastructure::verify::spec_code_consistency::consistency_report_to_findings
         %% fn: infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components
         %% fn: infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str
         %% fn: infrastructure::verify::spec_states::verify_from_spec_json
+        %% fn: infrastructure::verify::tddd_layers::load_tddd_layers_strict
     end
 ```

@@ -341,14 +341,13 @@ pub enum TrackCommand {
 
     /// Evaluate domain type signals via rustdoc schema export and store results in domain-types.json.
     TypeSignals {
-        /// Path to the track items root directory (e.g., `track/items`).
-        #[arg(long, default_value = "track/items")]
-        items_dir: PathBuf,
-
-        /// Track ID (directory name under items_dir).
+        /// Track ID (directory name under `workspace_root/track/items`).
         track_id: String,
 
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
+        ///
+        /// The track items directory is always derived as
+        /// `<workspace_root>/track/items` inside the interactor.
         #[arg(long, default_value = ".")]
         workspace_root: PathBuf,
 
@@ -478,11 +477,10 @@ pub enum TrackCommand {
     /// workspace (e.g. a git worktree at `main`) while writing the baseline files
     /// into the current branch's track directory.
     BaselineCapture {
-        /// Path to the track items root directory (e.g., `track/items`).
-        #[arg(long, default_value = "track/items")]
-        items_dir: PathBuf,
-
-        /// Track ID (directory name under items_dir).
+        /// Track ID (directory name under `workspace_root/track/items`).
+        ///
+        /// The track items directory is always derived as
+        /// `<workspace_root>/track/items` inside the interactor.
         track_id: String,
 
         /// Workspace root directory used for architecture-rules.json resolution
@@ -690,8 +688,8 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::Signals { items_dir, track_id } => {
             signals::execute_signals(items_dir, track_id)
         }
-        TrackCommand::TypeSignals { items_dir, track_id, workspace_root, layer } => {
-            tddd::signals::execute_type_signals(items_dir, track_id, workspace_root, layer)
+        TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
+            tddd::signals::execute_type_signals(track_id, workspace_root, layer)
         }
         TrackCommand::TypeGraph {
             items_dir,
@@ -715,14 +713,12 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             tddd::spec_element_hash::execute_spec_element_hash(items_dir, track_id, anchor)
         }
         TrackCommand::BaselineCapture {
-            items_dir,
             track_id,
             workspace_root,
             source_workspace,
             layer,
             force,
         } => tddd::baseline::execute_baseline_capture(
-            items_dir,
             track_id,
             workspace_root,
             source_workspace,

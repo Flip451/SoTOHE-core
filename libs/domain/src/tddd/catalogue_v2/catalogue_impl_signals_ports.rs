@@ -229,6 +229,37 @@ pub struct TdddLayerBinding {
     pub targets: Vec<String>,
 }
 
+impl TdddLayerBinding {
+    /// Derives the type-signals output filename from `catalogue_file`.
+    ///
+    /// Strips the trailing `s` from the catalogue stem before appending
+    /// `-signals.json`, matching the convention in `infrastructure::verify::tddd_layers`:
+    /// `"domain-types.json"` → `"domain-type-signals.json"`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use domain::tddd::catalogue_v2::TdddLayerBinding;
+    /// let b = TdddLayerBinding {
+    ///     layer_id: "domain".to_owned(),
+    ///     catalogue_file: "domain-types.json".to_owned(),
+    ///     baseline_file: "domain-types-baseline.json".to_owned(),
+    ///     targets: vec!["domain".to_owned()],
+    /// };
+    /// assert_eq!(b.signal_file(), "domain-type-signals.json");
+    /// ```
+    #[must_use]
+    pub fn signal_file(&self) -> String {
+        let stem = self.catalogue_file.strip_suffix(".json").unwrap_or(&self.catalogue_file);
+        let signal_stem = if let Some(trimmed) = stem.strip_suffix('s') {
+            format!("{trimmed}-signals")
+        } else {
+            format!("{stem}-signals")
+        };
+        format!("{signal_stem}.json")
+    }
+}
+
 /// Error type for [`TdddLayerBindingsPort::load`].
 #[derive(Debug)]
 pub enum TdddLayerBindingsError {
@@ -289,4 +320,155 @@ pub trait TdddLayerBindingsPort: Send + Sync {
         workspace_root: &Path,
         layer_filter: Option<&str>,
     ) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError>;
+}
+
+// ---------------------------------------------------------------------------
+// RustdocBaselineCapturePort
+// ---------------------------------------------------------------------------
+
+/// Error type returned by [`RustdocBaselineCapturePort::capture`].
+///
+/// Wraps any failure from the rustdoc capture pipeline (symlink guard,
+/// missing track directory, rustdoc export failure, file write failure).
+/// The message is human-readable and suitable for direct display via `to_string()`.
+#[derive(Debug, Clone)]
+pub struct BaselineCaptureIoError(pub String);
+
+impl fmt::Display for BaselineCaptureIoError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl std::error::Error for BaselineCaptureIoError {}
+
+/// Secondary port for capturing the rustdoc-format baseline snapshot.
+///
+/// Implementations run `cargo +nightly rustdoc` against `rustdoc_workspace`,
+/// read the output JSON, validate `format_version`, and write the result to
+/// `<items_dir>/<track_id>/<layer>-types-baseline.json`. The operation is
+/// idempotent by default: if the file already exists and passes format
+/// validation, `capture` returns `Ok(())` immediately. When `force` is `true`,
+/// the existing file is overwritten unconditionally.
+///
+/// Injected into `BaselineCaptureInteractor` so the usecase layer never
+/// calls infrastructure code directly.
+pub trait RustdocBaselineCapturePort: Send + Sync {
+    /// Captures the rustdoc-format baseline for a single layer binding.
+    ///
+    /// # Arguments
+    ///
+    /// * `items_dir` — trusted root directory (`workspace_root/track/items`).
+    /// * `track_id` — validated track ID slug.
+    /// * `rustdoc_workspace` — Cargo workspace from which rustdoc is invoked.
+    ///   May differ from the workspace that contains `items_dir` (git-worktree
+    ///   capture flow).
+    /// * `binding` — the TDDD layer binding resolved from `architecture-rules.json`.
+    /// * `force` — when `true`, overwrite an existing baseline unconditionally.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`BaselineCaptureIoError`] on security guard rejection, missing
+    /// track directory, rustdoc export failure, format validation failure, or
+    /// file write failure.
+    fn capture(
+        &self,
+        items_dir: &std::path::Path,
+        track_id: &str,
+        rustdoc_workspace: &std::path::Path,
+        binding: &TdddLayerBinding,
+        force: bool,
+    ) -> Result<(), BaselineCaptureIoError>;
+}
+
+// ---------------------------------------------------------------------------
+// TrackStatusReaderPort
+// ---------------------------------------------------------------------------
+
+/// Error type returned by [`TrackStatusReaderPort::read_status`].
+#[derive(Debug, Clone)]
+pub struct TrackStatusReadError(pub String);
+
+impl fmt::Display for TrackStatusReadError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl std::error::Error for TrackStatusReadError {}
+
+/// Secondary port for reading the derived [`crate::TrackStatus`] of a track.
+///
+/// Returns the `TrackStatus` derived from `metadata.json` + `impl-plan.json`
+/// without exposing filesystem or codec details to the usecase layer.
+///
+/// The infrastructure adapter (`FsTrackStatusReaderAdapter`) reads the two
+/// files, applies the symlink guard, validates the track id, and calls
+/// `domain::derive_track_status`. Injected into `TypeSignalsInteractor`.
+pub trait TrackStatusReaderPort: Send + Sync {
+    /// Returns the derived [`crate::TrackStatus`] for the given track.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TrackStatusReadError`] when the track id is invalid, any file
+    /// is unreadable, a symlink guard fires, or the metadata cannot be decoded.
+    fn read_status(
+        &self,
+        items_dir: &Path,
+        track_id: &str,
+    ) -> Result<crate::TrackStatus, TrackStatusReadError>;
+}
+
+// ---------------------------------------------------------------------------
+// TypeSignalsExecutorPort
+// ---------------------------------------------------------------------------
+
+/// Error type returned by [`TypeSignalsExecutorPort::evaluate_layer`].
+#[derive(Debug, Clone)]
+pub struct TypeSignalsExecutionError(pub String);
+
+impl fmt::Display for TypeSignalsExecutionError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl std::error::Error for TypeSignalsExecutionError {}
+
+/// How to handle a catalogue file that is absent for a layer.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MissingCataloguePolicy {
+    /// Absent catalogue is a fatal error (strict mode — user invoked evaluation).
+    FailClosed,
+    /// Absent catalogue is silently skipped (lenient mode — automated pre-commit).
+    SkipSilently,
+}
+
+/// Secondary port for evaluating type signals for a single TDDD-enabled layer.
+///
+/// Implementations run the three-way signal evaluation pipeline (catalogue A,
+/// baseline B, live rustdoc C) and write the result to
+/// `<items_dir>/<track_id>/<layer>-type-signals.json`.
+///
+/// The `policy` argument controls how an absent catalogue file is handled:
+/// `FailClosed` causes an error (user-invoked `type-signals`); `SkipSilently`
+/// allows the loop to continue (pre-commit automated path).
+///
+/// Injected into `TypeSignalsInteractor` so the usecase layer never calls
+/// infrastructure functions directly.
+pub trait TypeSignalsExecutorPort: Send + Sync {
+    /// Evaluates type signals for one layer binding and writes the output file.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TypeSignalsExecutionError`] on any pipeline failure except
+    /// `MissingCataloguePolicy::SkipSilently` + absent catalogue (which returns `Ok(())`).
+    fn evaluate_layer(
+        &self,
+        items_dir: &Path,
+        track_id: &str,
+        workspace_root: &Path,
+        binding: &TdddLayerBinding,
+        policy: MissingCataloguePolicy,
+    ) -> Result<(), TypeSignalsExecutionError>;
 }
