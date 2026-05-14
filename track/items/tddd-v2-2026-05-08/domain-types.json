@@ -18,6 +18,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -60,6 +62,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
@@ -76,6 +80,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -117,12 +123,16 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
         { "trait_name": "TryFrom", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
-        { "trait_name": "Hash", "origin_crate": "core" }
+        { "trait_name": "Hash", "origin_crate": "core" },
+        { "trait_name": "IntoStaticStr", "origin_crate": "strum" }
       ],
       "docs": "Role enum for TypeEntry (struct / enum / type alias). 13 values (ADR 1 D2).",
       "spec_refs": [
@@ -142,12 +152,16 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
         { "trait_name": "TryFrom", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
-        { "trait_name": "Hash", "origin_crate": "core" }
+        { "trait_name": "Hash", "origin_crate": "core" },
+        { "trait_name": "IntoStaticStr", "origin_crate": "strum" }
       ],
       "docs": "Role enum for TraitEntry. 3 values (ADR 1 D2).",
       "spec_refs": [
@@ -159,6 +173,10 @@
       "action": "add",
       "role": "DomainService",
       "kind": { "kind": "plain_struct", "has_stripped_fields": true },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" }
+      ],
       "methods": [
         { "name": "new", "params": [{ "name": "krate", "ty": "rustdoc_types::Crate" }, { "name": "item_actions", "ty": "BTreeMap<rustdoc_types::Id, ItemAction>" }], "returns": "Self" },
         { "name": "krate", "receiver": "&self", "params": [], "returns": "&rustdoc_types::Crate", "is_async": false },
@@ -183,6 +201,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -200,6 +220,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -238,6 +260,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -252,6 +276,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -283,6 +309,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
         { "trait_name": "Ord", "origin_crate": "core" },
@@ -313,12 +341,16 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
         { "trait_name": "TryFrom", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
-        { "trait_name": "Hash", "origin_crate": "core" }
+        { "trait_name": "Hash", "origin_crate": "core" },
+        { "trait_name": "IntoStaticStr", "origin_crate": "strum" }
       ],
       "docs": "Role enum for FunctionEntry. 2 values (ADR 1 D2).",
       "spec_refs": [
@@ -338,6 +370,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
@@ -354,6 +388,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
@@ -385,6 +421,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
@@ -409,13 +447,17 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
         { "trait_name": "TryFrom", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
         { "trait_name": "Hash", "origin_crate": "core" },
-        { "trait_name": "Default", "origin_crate": "core" }
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "IntoStaticStr", "origin_crate": "strum" }
       ],
       "docs": "Action for each catalogue entry. 4 values (ADR 1 D4).",
       "spec_refs": [
@@ -434,6 +476,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -461,6 +505,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -480,6 +526,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -504,6 +552,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
@@ -537,6 +587,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
@@ -559,6 +611,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -576,6 +630,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -607,6 +663,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
@@ -630,12 +688,16 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
         { "trait_name": "TryFrom", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
-        { "trait_name": "Hash", "origin_crate": "core" }
+        { "trait_name": "Hash", "origin_crate": "core" },
+        { "trait_name": "IntoStaticStr", "origin_crate": "strum" }
       ],
       "docs": "Enum for MethodDeclaration receiver. 3 values (ADR 1 D8).",
       "spec_refs": [
@@ -664,6 +726,9 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
         { "trait_name": "Hash", "origin_crate": "core" }
@@ -679,6 +744,8 @@
       "role": "ValueObject",
       "kind": { "kind": "plain_struct", "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -701,6 +768,8 @@
       "role": "ValueObject",
       "kind": { "kind": "plain_struct", "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -729,6 +798,9 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
         { "trait_name": "Hash", "origin_crate": "core" }
@@ -762,6 +834,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -783,6 +857,8 @@
         "has_stripped_fields": true
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
@@ -804,6 +880,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -841,6 +919,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -864,6 +944,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -878,6 +960,8 @@
       "role": "ValueObject",
       "kind": { "kind": "plain_struct", "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
@@ -898,6 +982,8 @@
       "role": "ValueObject",
       "kind": { "kind": "plain_struct", "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
@@ -917,6 +1003,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -941,6 +1029,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -972,6 +1062,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -991,6 +1083,8 @@
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": [], "has_stripped_fields": true },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "AsRef", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "FromStr", "origin_crate": "core" },
@@ -1022,6 +1116,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
         { "trait_name": "Default", "origin_crate": "core" }
@@ -1043,6 +1139,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -1119,6 +1217,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" },
         { "trait_name": "Default", "origin_crate": "core" }
@@ -1283,6 +1383,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
@@ -1305,6 +1406,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
@@ -1444,6 +1546,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Clone", "origin_crate": "core" }
       ],
       "docs": "Binding for a single TDDD-enabled layer resolved from architecture-rules.json. Contains layer_id, catalogue_file path, baseline_file path, and schema_export target crate names. Used by CatalogueImplSignalsInteractor without direct file I/O (hexagonal purity). [source: ADR 2026-05-11-2330 D2]",
@@ -1476,6 +1579,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
@@ -1511,6 +1615,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],

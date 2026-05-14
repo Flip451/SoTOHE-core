@@ -28,6 +28,10 @@
         { "name": "load", "params": [{ "name": "path", "ty": "&std::path::Path" }], "returns": "Result<rustdoc_types::Crate, BaselineRustdocCodecError>" },
         { "name": "from_json", "params": [{ "name": "json", "ty": "&str" }], "returns": "Result<rustdoc_types::Crate, BaselineRustdocCodecError>" }
       ],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" }
+      ],
       "docs": "Codec struct that loads rustdoc_types::Crate JSON from the filesystem (Baseline B or Current C).",
       "spec_refs": [
         { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
@@ -46,6 +50,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "From", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
@@ -71,6 +76,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "From", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
@@ -86,6 +92,8 @@
       "role": "SecondaryAdapter",
       "kind": { "kind": "unit_struct" },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Default", "origin_crate": "core" }
       ],
       "methods": [
@@ -105,6 +113,8 @@
       "role": "SecondaryAdapter",
       "kind": { "kind": "unit_struct" },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "CatalogueToExtendedCratePort", "origin_crate": "domain" },
         { "trait_name": "Default", "origin_crate": "core" }
       ],
@@ -128,6 +138,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
@@ -244,6 +255,8 @@
       "role": "SecondaryAdapter",
       "kind": { "kind": "unit_struct" },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "SignalEvaluatorPort", "origin_crate": "domain" },
         { "trait_name": "Default", "origin_crate": "core" }
       ],
@@ -262,6 +275,8 @@
       "role": "SecondaryAdapter",
       "kind": { "kind": "unit_struct" },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "CatalogueDocumentLoaderPort", "origin_crate": "domain" },
         { "trait_name": "Default", "origin_crate": "core" }
       ],
@@ -295,6 +310,8 @@
       "role": "SecondaryAdapter",
       "kind": { "kind": "unit_struct" },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "TdddLayerBindingsPort", "origin_crate": "domain" },
         { "trait_name": "Default", "origin_crate": "core" }
       ],
@@ -456,6 +473,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "From", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }

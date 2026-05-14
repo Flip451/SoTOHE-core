@@ -59,6 +59,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" }
       ],
@@ -79,6 +80,8 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
         { "trait_name": "PartialEq", "origin_crate": "core" }
       ],
@@ -102,6 +105,7 @@
         ]
       },
       "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "From", "origin_crate": "core", "generic_args": "CatalogueLoaderError" },
         { "trait_name": "From", "origin_crate": "core", "generic_args": "ContractMapWriterError" },
         { "trait_name": "Display", "origin_crate": "core" },

@@ -30,20 +30,20 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaselineRustdocCodec | secondary_adapter | — | — | 🔵 | 🔵 |
-| CatalogueDocumentCodec | secondary_adapter | — | impl Default | 🔵 | 🔵 |
-| CatalogueToExtendedCrateCodec | secondary_adapter | — | impl CatalogueToExtendedCratePort, impl Default | 🔵 | 🔵 |
-| FsCatalogueDocumentLoader | secondary_adapter | — | impl CatalogueDocumentLoaderPort, impl Default | 🔵 | 🔵 |
+| BaselineRustdocCodec | secondary_adapter | — | impl Debug, impl Clone | 🔵 | 🔵 |
+| CatalogueDocumentCodec | secondary_adapter | — | impl Debug, impl Clone, impl Default | 🔵 | 🔵 |
+| CatalogueToExtendedCrateCodec | secondary_adapter | — | impl Debug, impl Clone, impl CatalogueToExtendedCratePort, impl Default | 🔵 | 🔵 |
+| FsCatalogueDocumentLoader | secondary_adapter | — | impl Debug, impl Clone, impl CatalogueDocumentLoaderPort, impl Default | 🔵 | 🔵 |
 | FsCatalogueLoader | secondary_adapter | modify | impl CatalogueLoader | 🔵 | 🔵 |
 | FsCatalogueSpecSignalsStore | secondary_adapter | reference | impl CatalogueSpecSignalsWriter | 🔵 | 🔵 |
 | FsContractMapWriter | secondary_adapter | reference | impl ContractMapWriter | 🔵 | 🔵 |
 | FsSymlinkGuard | secondary_adapter | — | impl SymlinkGuardPort, impl Default | 🔵 | 🔵 |
-| FsTdddLayerBindingsAdapter | secondary_adapter | — | impl TdddLayerBindingsPort, impl Default | 🔵 | 🔵 |
+| FsTdddLayerBindingsAdapter | secondary_adapter | — | impl Debug, impl Clone, impl TdddLayerBindingsPort, impl Default | 🔵 | 🔵 |
 | GitShowTrackBlobReader | secondary_adapter | modify | impl TrackBlobReader, impl SpecElementHashReader | 🔵 | 🔵 |
 | InMemoryCatalogueLinter | secondary_adapter | modify | impl CatalogueLinter, impl Default | 🔵 | 🔵 |
 | RustdocCrateAdapter | secondary_adapter | — | impl RustdocCratePort | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🔵 | 🔵 |
-| SignalEvaluatorV2 | secondary_adapter | — | impl SignalEvaluatorPort, impl Default | 🔵 | 🔵 |
+| SignalEvaluatorV2 | secondary_adapter | — | impl Debug, impl Clone, impl SignalEvaluatorPort, impl Default | 🔵 | 🔵 |
 
 ## Free Functions
 

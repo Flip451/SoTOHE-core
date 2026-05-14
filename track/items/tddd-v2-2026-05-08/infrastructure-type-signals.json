@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-14T04:17:35Z",
-  "declaration_hash": "367590e548fe9dd57f9a6aeffe9b7120c647e807b94439a5a610a53bc4a16148",
+  "generated_at": "2026-05-14T08:01:39Z",
+  "declaration_hash": "cb9737eea1e0ed47997237f8643852e9b36dc045bc506727762956905f6200ec",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",

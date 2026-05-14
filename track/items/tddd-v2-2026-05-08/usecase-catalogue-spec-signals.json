@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "2d440af1d945bf5f3103096b6345a26d5f12ed267b35be930ce5aef2ac9a63c8",
+  "catalogue_declaration_hash": "4533517af11fd0f68141148ca07d3c737888e6c388970c7e59dad218c9f4ef22",
   "signals": [
     {
       "type_name": "CatalogueImplSignalsError",

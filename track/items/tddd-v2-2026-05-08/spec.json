@@ -423,6 +423,24 @@
             "anchor": "D14"
           }
         ]
+      },
+      {
+        "id": "IN-31",
+        "text": "TypeAlias 由来の孤立 Impl アイテムを S 構築時に A 側からも組み込む: `rustdoc_types::TypeAlias` は `impls` フィールドを持たないため、A-codec (`encode_type_alias`) が生成する TraitImpl アイテムは TypeAlias アイテムから直接参照されない standalone エントリとして `ExtendedCrate.krate.index` に登録される。Signal Evaluator の Phase 1 S 構築ステップに B 側 `orphan-impl pass` と同等の処理を A 側用に追加する: `a.krate.index` を走査し、`impls` フィールドを持つアイテム種別 (Struct / Enum) から参照される Impl の Id 集合を収集し、その集合に含まれていない Impl アイテムを「孤立 Impl」として検出する (TypeAlias は `impls` フィールドを持たないため孤立 Impl 集合の算出には含めない)。検出した孤立 Impl を catalogue で宣言された action (Add/Modify/Reference のいずれか) に従って S に取り込む。これにより TypeAlias が宣言する trait_impls が S に到達し、Phase 2 の C との突合で正しく評価される。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D8"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md",
+            "anchor": "D10"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+            "anchor": "D2"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -816,6 +834,16 @@
           "anchor": "D2"
         }
       ]
+    },
+    {
+      "id": "AC-14",
+      "text": "`build_impl_identity_map` および Phase 2 の構造一致比較において、トレイト実装の由来 (derive 自動生成か手書き impl か) に基づくフィルタリングが存在しない: `DERIVE_TRAIT_NAMES` のような「由来 (provenance) を理由としてトレイトを除外する」定数・ロジックがコードベースに含まれていない。`Clone` / `Copy` / `Debug` / `IntoStaticStr` のような catalogue-declarable な derive 由来トレイトを含む TraitImplDecl を catalogue が宣言した場合、Phase 2 の `S ∩ C + 構造一致 + action=Add or Modify` で 🔵 と評価される。由来フィルタなしで評価が正しく動作することをユニットテストで確認する。なお `StructuralPartialEq` / `StructuralEq` は rustdoc が生成するコンパイラ内部プロキシであり catalogue で宣言できないトレイトであるため、由来フィルタとは別の機構 (`COMPILER_INTERNAL_TRAIT_NAMES`: 「catalogue に宣言不可能なトレイト」という構造的区分) によって `build_impl_identity_map` 段階でスキップされる。この除外は AC-14 の禁止対象 (由来ベースフィルタ) ではなく、catalogue 非宣言性に基づく独立した概念である。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D9"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -857,7 +885,7 @@
     }
   ],
   "signals": {
-    "blue": 65,
+    "blue": 67,
     "yellow": 0,
     "red": 0
   }
