@@ -1,257 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "INF-24 points readers at a C-side `for_is_external` leak in `mod.rs` and labels the result `Mismatch_Reference Red`, but the linked track artifact documents a different bug: `patch_impl_for_ids` in Phase 1 leaves the impl in S and produces `SMinusC_Reference Red` (`track/items/contract-map-v3-2026-05-15/infrastructure-types.json:40-45`). As written, the TODO entry sends maintainers to the wrong subsystem and the wrong signal polarity.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 285,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b2bbf03c0377e06ccea65dc5f35625702ec1e2a9f8ec2f2eaf1ef3c5ef5ab59b",
-          "at": "2026-05-15T06:37:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "INF-24 describes a `patch_impl_for_ids` bug in `phase1/child_items.rs`, but the briefing for this round says the intended issue is the external-type filter gap in `mod.rs:362-380`. As written, the TODO points maintainers at the wrong subsystem and the wrong red polarity, so the follow-up track will likely fix the wrong code path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/TODO.md",
-              "line": 285,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0b68c1b8ce62ac5225a376f9191075b76eec169ba1562efacd6472f3686bc512",
-          "at": "2026-05-15T06:39:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
-          "at": "2026-05-15T06:43:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
-          "at": "2026-05-15T06:46:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
-          "at": "2026-05-15T09:45:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
-          "at": "2026-05-15T09:47:41Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The regression test no longer pins the actual placeholder payload. It now passes for any `contract-map.md` containing `flowchart LR`, so a broken stub that drops the T001 marker or regresses to a different scaffold would still be treated as correct. Keep an assertion on the placeholder body or the stub comment so this temporary state stays covered.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
-              "line": 2444,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:4515a009e371d3208230fbee8cd094714b7d081e7d8850921cb15a397ddd307c",
-          "at": "2026-05-15T10:11:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The temporary stub no longer satisfies the established `ContractMapContent` scaffold contract: it emits `flowchart LR` but omits the `end` line that the domain wrapper documents as always present. That leaves `contract-map.md` in a nonstandard mermaid shape, and the updated test only checks for `flowchart LR`, so it would not catch this regression.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
-              "line": 1231,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:03c2644c28dbaa1f33483141e620ab85490bdb84fe2a768e2e11497808202cfc",
-          "at": "2026-05-15T10:14:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cmap.contains(\"end\")` is too weak to verify the placeholder contract. This test would still pass if the stub lost the fenced mermaid block or otherwise emitted malformed markdown, so it does not actually protect the `ContractMapContent` scaffold contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
-              "line": 2455,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:11fffbe3e3506a7a6f00c319e474aa0e25d00978f80c7ef1611a54de61f81085",
-          "at": "2026-05-15T10:16:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sync_rendered_views_renders_contract_map_for_done_track` no longer pins the placeholder output exactly: `cmap.contains(EXPECTED_PLACEHOLDER)` will still pass if `contract-map.md` grows extra content before or after the stub. That weakens the regression guard the comment describes and can let a broken renderer slip through unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
-              "line": 2451,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:13bb140d3e3055699f472424948a12c0c3dca9d273e02924d503d4eeb78c14ab",
-          "at": "2026-05-15T10:19:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9c8f893f574b5e954dcb81ac6dce5a0671317aef70e0b4d4cc019a043aee5e97",
-          "at": "2026-05-15T10:22:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9c8f893f574b5e954dcb81ac6dce5a0671317aef70e0b4d4cc019a043aee5e97",
-          "at": "2026-05-15T10:24:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5aa55832f5fb7f6a00d65989881da95fe12903ab0fdd28e9256b5de464e02246",
-          "at": "2026-05-15T10:53:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5aa55832f5fb7f6a00d65989881da95fe12903ab0fdd28e9256b5de464e02246",
-          "at": "2026-05-15T10:54:18Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
-          "at": "2026-05-15T10:10:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
-          "at": "2026-05-15T10:12:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
-          "at": "2026-05-15T10:55:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
-          "at": "2026-05-15T10:58:32Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
-          "at": "2026-05-15T10:10:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
-          "at": "2026-05-15T10:11:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `ContractMapRendererError` does not actually preserve an error chain for the parse/render failures. `StyleConfigParse` and `RenderFailed` store only `String`, so `thiserror` cannot expose an underlying `source()` here, and the current tests only check `to_string()`. That means the new public error type cannot propagate the original failure cause the way the task describes.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_renderer.rs",
-              "line": 66,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:6ab930a16d6d3b410d9dde0ba43e5fadac75eb6de3c69066902bf04d0df72b75",
-          "at": "2026-05-15T10:34:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
-          "at": "2026-05-15T10:37:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
-          "at": "2026-05-15T10:40:08Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
-          "at": "2026-05-15T10:53:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
-          "at": "2026-05-15T10:55:28Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -678,6 +427,300 @@
           "findings": [],
           "hash": "rvw1:sha256:69de7001e726651d3ff40408e7a36e75ec2f24905c8bb0bc9db288cfd831e96c",
           "at": "2026-05-15T10:55:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:11:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is still marked `todo` here, and the generated `plan.md` mirrors it as `[ ]` at line 34, but the plan-artifacts briefing for this round explicitly says T004 is the current `in_progress` task with no commit hash. This leaves the handoff state contradictory: downstream reviewers/operators will see no active task even though T004 is supposed to be in progress. Set T004 to `in_progress` and re-render `plan.md` so it shows `[~]`.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:16:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:17:28Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
+          "at": "2026-05-15T10:53:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
+          "at": "2026-05-15T10:55:28Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:10:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:12:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:55:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:58:32Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression test no longer pins the actual placeholder payload. It now passes for any `contract-map.md` containing `flowchart LR`, so a broken stub that drops the T001 marker or regresses to a different scaffold would still be treated as correct. Keep an assertion on the placeholder body or the stub comment so this temporary state stays covered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 2444,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:4515a009e371d3208230fbee8cd094714b7d081e7d8850921cb15a397ddd307c",
+          "at": "2026-05-15T10:11:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The temporary stub no longer satisfies the established `ContractMapContent` scaffold contract: it emits `flowchart LR` but omits the `end` line that the domain wrapper documents as always present. That leaves `contract-map.md` in a nonstandard mermaid shape, and the updated test only checks for `flowchart LR`, so it would not catch this regression.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 1231,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:03c2644c28dbaa1f33483141e620ab85490bdb84fe2a768e2e11497808202cfc",
+          "at": "2026-05-15T10:14:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cmap.contains(\"end\")` is too weak to verify the placeholder contract. This test would still pass if the stub lost the fenced mermaid block or otherwise emitted malformed markdown, so it does not actually protect the `ContractMapContent` scaffold contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 2455,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:11fffbe3e3506a7a6f00c319e474aa0e25d00978f80c7ef1611a54de61f81085",
+          "at": "2026-05-15T10:16:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sync_rendered_views_renders_contract_map_for_done_track` no longer pins the placeholder output exactly: `cmap.contains(EXPECTED_PLACEHOLDER)` will still pass if `contract-map.md` grows extra content before or after the stub. That weakens the regression guard the comment describes and can let a broken renderer slip through unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 2451,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:13bb140d3e3055699f472424948a12c0c3dca9d273e02924d503d4eeb78c14ab",
+          "at": "2026-05-15T10:19:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c8f893f574b5e954dcb81ac6dce5a0671317aef70e0b4d4cc019a043aee5e97",
+          "at": "2026-05-15T10:22:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c8f893f574b5e954dcb81ac6dce5a0671317aef70e0b4d4cc019a043aee5e97",
+          "at": "2026-05-15T10:24:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aa55832f5fb7f6a00d65989881da95fe12903ab0fdd28e9256b5de464e02246",
+          "at": "2026-05-15T10:53:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aa55832f5fb7f6a00d65989881da95fe12903ab0fdd28e9256b5de464e02246",
+          "at": "2026-05-15T10:54:18Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
+          "at": "2026-05-15T10:10:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
+          "at": "2026-05-15T10:11:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ContractMapRendererError` does not actually preserve an error chain for the parse/render failures. `StyleConfigParse` and `RenderFailed` store only `String`, so `thiserror` cannot expose an underlying `source()` here, and the current tests only check `to_string()`. That means the new public error type cannot propagate the original failure cause the way the task describes.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_renderer.rs",
+              "line": 66,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6ab930a16d6d3b410d9dde0ba43e5fadac75eb6de3c69066902bf04d0df72b75",
+          "at": "2026-05-15T10:34:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
+          "at": "2026-05-15T10:37:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
+          "at": "2026-05-15T10:40:08Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "INF-24 points readers at a C-side `for_is_external` leak in `mod.rs` and labels the result `Mismatch_Reference Red`, but the linked track artifact documents a different bug: `patch_impl_for_ids` in Phase 1 leaves the impl in S and produces `SMinusC_Reference Red` (`track/items/contract-map-v3-2026-05-15/infrastructure-types.json:40-45`). As written, the TODO entry sends maintainers to the wrong subsystem and the wrong signal polarity.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 285,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b2bbf03c0377e06ccea65dc5f35625702ec1e2a9f8ec2f2eaf1ef3c5ef5ab59b",
+          "at": "2026-05-15T06:37:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "INF-24 describes a `patch_impl_for_ids` bug in `phase1/child_items.rs`, but the briefing for this round says the intended issue is the external-type filter gap in `mod.rs:362-380`. As written, the TODO points maintainers at the wrong subsystem and the wrong red polarity, so the follow-up track will likely fix the wrong code path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/TODO.md",
+              "line": 285,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b68c1b8ce62ac5225a376f9191075b76eec169ba1562efacd6472f3686bc512",
+          "at": "2026-05-15T06:39:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
+          "at": "2026-05-15T06:43:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
+          "at": "2026-05-15T06:46:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
+          "at": "2026-05-15T09:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
+          "at": "2026-05-15T09:47:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f1551562ba5677044a0f0445df52b2f8fe05fb9c34dd54b07ead74f41bfa854",
+          "at": "2026-05-15T11:12:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f1551562ba5677044a0f0445df52b2f8fe05fb9c34dd54b07ead74f41bfa854",
+          "at": "2026-05-15T11:16:09Z"
         }
       ]
     }
