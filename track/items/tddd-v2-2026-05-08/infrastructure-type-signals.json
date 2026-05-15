@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-14T17:17:52Z",
-  "declaration_hash": "ce7c26cd41804240eda899f5804abd7ad895118c05a7ee9d8e40748df0bbcbf9",
+  "generated_at": "2026-05-15T01:52:24Z",
+  "declaration_hash": "b7fa2fd1c64434f553f669e5fcc34695103b5dbf4ea2dacf1842ba1b7396a1d3",
   "signals": [
     {
       "type_name": "BaselineRustdocCodec",
@@ -118,7 +118,7 @@
     {
       "type_name": "FsTdddLayerBindingsAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "TdddLayerBindingsPort",
@@ -289,7 +289,7 @@
       "found_type": true
     },
     {
-      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_strict",
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
@@ -476,6 +476,12 @@
     },
     {
       "type_name": "infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_from_path",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": false

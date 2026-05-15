@@ -6,16 +6,16 @@
 |------|------|--------|---------|--------|----------|
 | ActionContradictionKind | enum | delete | AddExistingType, DeleteMissingType | 🔵 | 🔵 |
 | CatalogueLinterRuleKind | enum | reference | FieldEmpty, FieldNonEmpty, KindLayerConstraint | 🔵 | 🔵 |
-| ContractRole | enum | — | SpecificationPort, ApplicationService, SecondaryPort | 🟡 | 🔵 |
-| DataRole | enum | — | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter | 🟡 | 🔵 |
-| FunctionRole | enum | — | FreeFunction, UseCaseFunction | 🟡 | 🔵 |
-| ItemAction | enum | — | Add, Modify, Reference, Delete | 🟡 | 🔵 |
+| ContractRole | enum | — | SpecificationPort, ApplicationService, SecondaryPort | 🔵 | 🔵 |
+| DataRole | enum | — | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter | 🔵 | 🔵 |
+| FunctionRole | enum | — | FreeFunction, UseCaseFunction | 🔵 | 🔵 |
+| ItemAction | enum | — | Add, Modify, Reference, Delete | 🔵 | 🔵 |
 | MemberDeclaration | enum | reference | Variant, Field | 🔵 | 🔵 |
-| MissingCataloguePolicy | enum | — | FailClosed, SkipSilently | 🔵 | 🟡 |
-| SelfReceiver | enum | — | Owned, SharedRef, ExclusiveRef | 🟡 | 🔵 |
+| MissingCataloguePolicy | enum | — | FailClosed, SkipSilently | 🔵 | 🔵 |
+| SelfReceiver | enum | — | Owned, SharedRef, ExclusiveRef | 🔵 | 🔵 |
 | SignalRegion | enum | — | SIntersectC_Match_Add, SIntersectC_Match_Modify, SIntersectC_Match_Reference, SIntersectC_Mismatch_Reference, SIntersectC_Mismatch_Add, SIntersectC_Mismatch_Modify, SMinusC_Reference, SMinusC_Add, SMinusC_Modify, DIntersectC, DMinusC, CMinusSUnionD | 🔵 | 🔵 |
 | ThreeWaySignalKind | enum | — | Skip, Blue, Yellow, Red | 🔵 | 🔵 |
-| TrackStatus | enum | modify | Planned, InProgress, Done, Blocked, Cancelled, Archived | 🔵 | 🟡 |
+| TrackStatus | enum | modify | Planned, InProgress, Done, Blocked, Cancelled, Archived | 🔵 | 🔵 |
 | TypeAction | enum | delete | Add, Modify, Reference, Delete | 🔵 | 🔵 |
 | TypeDefinitionKind | enum | delete | Typestate, Enum, ValueObject, ErrorType, SecondaryPort, ApplicationService, UseCase, Interactor, Dto, Command, Query, Factory, SecondaryAdapter, DomainService, FreeFunction | 🔵 | 🔵 |
 | TypeKindV2 | enum | — | UnitStruct, TupleStruct, PlainStruct, Enum, TypeAlias | 🔵 | 🔵 |
@@ -77,7 +77,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaselineCaptureIoError | error_type | — | — | 🔵 | 🟡 |
+| BaselineCaptureIoError | error_type | — | — | 🔵 | 🔵 |
 | CatalogueDocumentError | error_type | — | CrateNameMismatch, DuplicateTypeName, DuplicateTraitName, DuplicateFunctionPath, InvalidIdentifier | 🔵 | 🔵 |
 | CatalogueDocumentLoaderError | error_type | — | NotFound, Io, Decode | 🔵 | 🔵 |
 | CatalogueLinterError | error_type | reference | InvalidRuleConfig | 🔵 | 🔵 |
@@ -86,11 +86,11 @@
 | NewTypeGraphCodecError | error_type | — | InvalidTypeRef, AmbiguousTypeName | 🔵 | 🔵 |
 | Phase1Error | error_type | — | ActionContradiction, UnresolvedTypeRef, DanglingId | 🔵 | 🔵 |
 | RustdocCratePortError | error_type | — | NotFound, Io, ParseFailed, CaptureFailed | 🔵 | 🔵 |
-| SpecFileLoadError | error_type | — | — | 🔵 | 🟡 |
+| SpecFileLoadError | error_type | — | — | 🔵 | 🔵 |
 | SymlinkGuardError | error_type | — | SymlinkFound, Io | 🔵 | 🔵 |
 | TdddLayerBindingsError | error_type | — | LoadFailed, LayerNotFound, NoLayers | 🔵 | 🔵 |
-| TrackStatusReadError | error_type | — | — | 🔵 | 🟡 |
-| TypeSignalsExecutionError | error_type | — | — | 🔵 | 🟡 |
+| TrackStatusReadError | error_type | — | — | 🔵 | 🔵 |
+| TypeSignalsExecutionError | error_type | — | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -101,15 +101,15 @@
 | CatalogueLoader | secondary_port | modify | fn load_all(&self, track_id: &TrackId) -> Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError> | 🔵 | 🔵 |
 | CatalogueToExtendedCratePort | secondary_port | — | fn encode(&self, doc: CatalogueDocument) -> Result<ExtendedCrate, NewTypeGraphCodecError> | 🔵 | 🔵 |
 | ContractMapWriter | secondary_port | reference | fn write(&self, track_id: &TrackId, content: &ContractMapContent) -> Result<(), ContractMapWriterError> | 🔵 | 🔵 |
-| RustdocBaselineCapturePort | secondary_port | — | fn capture(&self, items_dir: &std::path::Path, track_id: &str, rustdoc_workspace: &std::path::Path, binding: &TdddLayerBinding, force: bool) -> Result<(), BaselineCaptureIoError> | 🔵 | 🟡 |
+| RustdocBaselineCapturePort | secondary_port | — | fn capture(&self, items_dir: &std::path::Path, track_id: &str, rustdoc_workspace: &std::path::Path, binding: &TdddLayerBinding, force: bool) -> Result<(), BaselineCaptureIoError> | 🔵 | 🔵 |
 | RustdocCratePort | secondary_port | — | fn load_from_path(&self, path: &std::path::Path) -> Result<rustdoc_types::Crate, RustdocCratePortError>, fn capture_current(&self, crate_name: &str) -> Result<rustdoc_types::Crate, RustdocCratePortError> | 🔵 | 🔵 |
 | SchemaExporter | secondary_port | reference | fn export(&self, crate_name: &str) -> Result<SchemaExport, SchemaExportError> | 🔵 | 🔵 |
 | SignalEvaluatorPort | secondary_port | — | fn evaluate(&self, a: ExtendedCrate, b: rustdoc_types::Crate, c: rustdoc_types::Crate) -> Result<ThreeWayEvaluationReport, Phase1Error> | 🔵 | 🔵 |
-| SpecFileLoaderPort | secondary_port | — | fn load(&self, spec_path: &std::path::Path) -> Result<String, SpecFileLoadError> | 🔵 | 🟡 |
+| SpecFileLoaderPort | secondary_port | — | fn load(&self, spec_path: &std::path::Path) -> Result<String, SpecFileLoadError> | 🔵 | 🔵 |
 | SymlinkGuardPort | secondary_port | — | fn reject_symlinks_from_root(&self, path: &std::path::Path) -> Result<(), SymlinkGuardError>, fn reject_symlinks_below(&self, path: &std::path::Path, trusted_root: &std::path::Path) -> Result<(), SymlinkGuardError> | 🔵 | 🔵 |
 | TdddLayerBindingsPort | secondary_port | — | fn load(&self, workspace_root: &std::path::Path, layer_filter: Option<&str>) -> Result<Vec<TdddLayerBinding>, TdddLayerBindingsError> | 🔵 | 🔵 |
-| TrackStatusReaderPort | secondary_port | — | fn read_status(&self, items_dir: &std::path::Path, track_id: &str) -> Result<TrackStatus, TrackStatusReadError> | 🔵 | 🟡 |
-| TypeSignalsExecutorPort | secondary_port | — | fn evaluate_layer(&self, items_dir: &std::path::Path, track_id: &str, workspace_root: &std::path::Path, binding: &TdddLayerBinding, policy: MissingCataloguePolicy) -> Result<(), TypeSignalsExecutionError> | 🔵 | 🟡 |
+| TrackStatusReaderPort | secondary_port | — | fn read_status(&self, items_dir: &std::path::Path, track_id: &str) -> Result<TrackStatus, TrackStatusReadError> | 🔵 | 🔵 |
+| TypeSignalsExecutorPort | secondary_port | — | fn evaluate_layer(&self, items_dir: &std::path::Path, track_id: &str, workspace_root: &std::path::Path, binding: &TdddLayerBinding, policy: MissingCataloguePolicy) -> Result<(), TypeSignalsExecutionError> | 🔵 | 🔵 |
 
 ## Domain Services
 

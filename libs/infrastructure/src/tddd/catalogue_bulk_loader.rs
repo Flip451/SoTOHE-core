@@ -34,7 +34,7 @@ use crate::verify::tddd_layers::{self, LoadTdddLayersError, TdddLayerBinding};
 /// All non-v3 catalogues are treated as `Decode` hard errors (CN-11).
 #[derive(Debug, thiserror::Error)]
 pub enum LoadAllCataloguesNativeError {
-    /// `load_tddd_layers_from_path` failed.
+    /// Failed to load TDDD layer bindings from `architecture-rules.json`.
     #[error("failed to load tddd layer bindings: {0}")]
     LayerBindings(#[from] LoadTdddLayersError),
 
@@ -99,7 +99,7 @@ pub fn load_all_catalogues_native(
     rules_path: &Path,
     trusted_root: &Path,
 ) -> Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), LoadAllCataloguesNativeError> {
-    let bindings = tddd_layers::load_tddd_layers_from_path(rules_path, trusted_root)?;
+    let bindings = tddd_layers::load_tddd_layers(rules_path, trusted_root)?;
     let deps = parse_may_depend_on(rules_path, trusted_root)?;
 
     let enabled: Vec<&str> = bindings.iter().map(TdddLayerBinding::layer_id).collect();
@@ -189,12 +189,17 @@ fn parse_may_depend_on(
     match reject_symlinks_below(rules_path, trusted_root) {
         Ok(true) => {} // safe to read
         Ok(false) => {
-            // File is absent — consistent with the legacy fallback in
-            // `load_tddd_layers_from_path` (which synthesises a single
-            // domain binding for pre-multilayer tracks). Return empty deps so
-            // the topological sort treats the lone synthetic layer as having
-            // no dependencies.
-            return Ok(BTreeMap::new());
+            // File is absent — fail-closed: the caller already read this file
+            // via `load_tddd_layers`, so absence here is an unexpected race or
+            // removal.  Report as an I/O error rather than silently treating
+            // the dependency graph as empty.
+            return Err(LoadAllCataloguesNativeError::Io {
+                path: rules_path.to_path_buf(),
+                source: std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    "architecture-rules.json not found during may_depend_on parse",
+                ),
+            });
         }
         Err(source) => {
             return Err(LoadAllCataloguesNativeError::Io {

@@ -203,6 +203,7 @@ flowchart LR
         %% fn: infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components
         %% fn: infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str
         %% fn: infrastructure::verify::spec_states::verify_from_spec_json
-        %% fn: infrastructure::verify::tddd_layers::load_tddd_layers_strict
+        %% fn: infrastructure::verify::tddd_layers::load_tddd_layers
+        %% fn: infrastructure::verify::tddd_layers::load_tddd_layers_from_path
     end
 ```

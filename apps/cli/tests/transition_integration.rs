@@ -55,10 +55,18 @@ fn write_fixture_impl_plan(items_dir: &Path, track_id: &str) {
     std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
 }
 
+/// Writes a minimal architecture-rules.json fixture so render.rs can iterate
+/// TDDD layers (fail-closed after T045 — synthetic fallback removed).
+fn write_fixture_arch_rules(root: &Path) {
+    let arch_rules = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+    std::fs::write(root.join("architecture-rules.json"), arch_rules).unwrap();
+}
+
 fn project_root_with_full_track(root: &Path, track_id: &str) -> PathBuf {
     let items_dir = root.join("track/items");
     write_fixture_metadata(&items_dir, track_id);
     write_fixture_impl_plan(&items_dir, track_id);
+    write_fixture_arch_rules(root);
     items_dir
 }
 

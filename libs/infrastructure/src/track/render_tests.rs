@@ -1382,6 +1382,8 @@ const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
   "functions": {}
 }"#;
 
+const DOMAIN_ARCH_RULES: &str = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+
 #[test]
 fn sync_rendered_views_generates_domain_types_md_from_domain_types_json() {
     let dir = tempfile::tempdir().unwrap();
@@ -1399,6 +1401,7 @@ fn sync_rendered_views_generates_domain_types_md_from_domain_types_json() {
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -1434,6 +1437,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     // Companion signal file with a Blue signal for the declared TrackId.
     let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
@@ -1490,6 +1494,7 @@ fn sync_rendered_views_ignores_stale_signal_file_when_hash_mismatches() {
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     // Stale signal file — `declaration_hash` does NOT match the on-disk
     // declaration bytes.
@@ -1569,6 +1574,9 @@ fn sync_rendered_views_does_not_overwrite_domain_types_md_when_already_up_to_dat
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    // architecture-rules.json is required since T045: render.rs skips per-layer
+    // rendering when arch rules are absent (fail-graceful precondition check).
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     // First sync — generates domain-types.md.
     sync_rendered_views(dir.path(), Some("track-a")).unwrap();

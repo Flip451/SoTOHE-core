@@ -1151,14 +1151,13 @@ pub(super) fn format_where_predicate_with_canon(
 /// like `Into<T>` and `Into<U>` (with `canon["T"] = "#0"`, `canon["U"] = "#0"`)
 /// produce the same string.
 ///
-/// D3 fail-closed: `Outlives`, `Use`, and `TraitBound { generic_params: non_empty }`
-/// (HRTB binder) variants are outside ADR `2026-05-13-1153` D3 scope.  They are
-/// rendered as sentinel strings (`<UNSUPPORTED:Outlives>` / `<UNSUPPORTED:Use>` /
-/// `<UNSUPPORTED:HRTB>`) so that bound-sets containing them produce a unique,
-/// non-matching string rather than silently comparing equal when both sides
-/// happen to be identical text.  This includes HRTB bounds nested inside
-/// associated-type constraints (e.g. `Iterator<Item: for<'a> Foo<&'a str>>`),
-/// where `format_hrtb_type_params` would otherwise silently drop lifetime params.
+/// D3 scope:
+/// - `TraitBound { generic_params: empty }` — fully supported, formatted verbatim.
+/// - `Outlives(lt)` — supported: rendered as the lifetime string (e.g. `"'static"`),
+///   enabling `F: 'static + Fn(...)` to compare correctly on both sides.
+/// - `TraitBound { generic_params: non_empty }` (HRTB binder) — outside D3 scope,
+///   returned as `<UNSUPPORTED:HRTB>`.
+/// - `Use` — outside D3 scope, returned as `<UNSUPPORTED:Use>`.
 pub(super) fn format_generic_bounds_with_canon(
     bounds: &[GenericBound],
     canon: &HashMap<String, String>,
@@ -1194,10 +1193,11 @@ pub(super) fn format_generic_bounds_with_canon(
                 };
                 format!("{modifier_str}{short}{args_str}")
             }
-            // D3 fail-closed: Outlives and Use are outside ADR `2026-05-13-1153` D3 scope.
-            // Return sentinels so bound-sets containing them produce unique non-matching
-            // strings instead of silently comparing equal on both sides.
-            GenericBound::Outlives(_) => "<UNSUPPORTED:Outlives>".to_owned(),
+            // Outlives bounds (e.g. `'static`, `'a`) are formatted verbatim so that
+            // `F: 'static + Fn(...)` produces matching fingerprints on both A-codec
+            // and C-side (rustdoc) paths.
+            GenericBound::Outlives(lt) => lt.clone(),
+            // Use is outside D3 scope.
             GenericBound::Use(_) => "<UNSUPPORTED:Use>".to_owned(),
         })
         .collect();

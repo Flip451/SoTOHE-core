@@ -56,11 +56,14 @@ use super::format::{
 /// The third return value is a non-empty sorted `Vec<String>` when any predicate or
 /// bound falls outside ADR `2026-05-13-1153` D3 scope: `WherePredicate::LifetimePredicate` /
 /// `WherePredicate::EqPredicate` / `WherePredicate::BoundPredicate.generic_params`
-/// non-empty (HRTB binder) / `GenericBound::Outlives` / non-`TraitBound` variants
+/// non-empty (HRTB binder) / non-`TraitBound` variants other than `Outlives`
 /// (e.g. `Use`) / `TraitBound.generic_params` non-empty (HRTB on TraitBound).
+/// `GenericBound::Outlives` is within D3 scope and is compared verbatim by lifetime
+/// string (e.g. `'static`, `'a`) so that `F: 'static + Fn(...)` produces matching
+/// fingerprints on both the A-codec side and the C-side (rustdoc) output.
 /// Each unsupported item contributes a raw string that preserves enough information
-/// to distinguish distinct unsupported clauses (e.g. `T: 'static` vs `T: 'a`) so
-/// that `build_generics_fingerprint_with_combined_canon` does not collide on them.
+/// to distinguish distinct unsupported clauses so that
+/// `build_generics_fingerprint_with_combined_canon` does not collide on them.
 /// `generics_structurally_equal` returns `false` unconditionally when either side
 /// has a non-empty unsupported list (D3 fail-closed) — even when both sides carry
 /// identical unsupported predicates.
@@ -208,24 +211,21 @@ fn build_where_form_view(
     (param_sigs, where_form, unsupported_raw)
 }
 
-/// Returns `true` if every bound in `bounds` is a `GenericBound::TraitBound` with
-/// an empty `generic_params` (no HRTB binder on the trait bound). Per ADR
-/// `2026-05-13-1153` D3, any other bound shape (Outlives, Use, HRTB-on-TraitBound)
-/// triggers fail-closed.
+/// Returns `true` if every bound in `bounds` is either:
+/// - A `GenericBound::TraitBound` with an empty `generic_params` (no HRTB), or
+/// - A `GenericBound::Outlives` (lifetime bound, e.g. `'static` or `'a`).
+///
+/// Outlives bounds are compared verbatim by their lifetime string so that
+/// `F: 'static + Fn(...)` correctly produces the same fingerprint on both the
+/// A-codec side and the C-side rustdoc output.
+///
+/// Any other bound shape (Use, HRTB-on-TraitBound) triggers fail-closed.
 fn bounds_supported(bounds: &[GenericBound]) -> bool {
     bounds.iter().all(|b| match b {
         GenericBound::TraitBound { generic_params, .. } => generic_params.is_empty(),
+        GenericBound::Outlives(_) => true,
         _ => false,
     })
-}
-
-/// Returns `true` if `bound` is a `GenericBound::Outlives` (lifetime-bound) entry.
-/// Reserved for future filtering inside the bound-set normalization. Outlives bounds
-/// in supertrait positions are rejected up-front by `bounds_supported` before
-/// `format_generic_bounds` is called, so they do not reach the string-format path.
-#[allow(dead_code)]
-fn is_outlives(bound: &GenericBound) -> bool {
-    matches!(bound, GenericBound::Outlives(_))
 }
 
 // ---------------------------------------------------------------------------
@@ -580,8 +580,10 @@ fn build_generics_fingerprint_with_combined_canon(
 ///
 /// **Fail-closed** (ADR `2026-05-13-1153` D3): if either side carries a predicate or
 /// bound outside the supported scope (`LifetimePredicate`, `EqPredicate`, HRTB binder,
-/// `Outlives`, non-`TraitBound`), equality returns `false` unconditionally — even
-/// when both sides carry identical unsupported predicates.
+/// non-`TraitBound` other than `Outlives`), equality returns `false` unconditionally —
+/// even when both sides carry identical unsupported predicates.
+/// `GenericBound::Outlives` is within D3 scope and is compared verbatim by lifetime
+/// string so that `F: 'static + Fn(...)` compares correctly across A-codec and C-side.
 pub(super) fn generics_structurally_equal(a: &Generics, b: &Generics) -> bool {
     let (param_sigs_a, where_a, unsupported_a) = build_where_form_view(a, None);
     let (param_sigs_b, where_b, unsupported_b) = build_where_form_view(b, None);
@@ -796,17 +798,57 @@ mod tests {
 
     // --- Fail-closed: unsupported predicates / bounds → false even when identical ---
 
-    /// Two identical `Outlives` bounds (e.g. `T: 'static`) must compare unequal
-    /// (D3 fail-closed: Outlives is outside the supported comparison scope).
+    /// Two identical `Outlives` bounds (e.g. `T: 'static`) must compare equal.
+    /// `Outlives` is within D3 scope and compared verbatim by lifetime string so that
+    /// `F: 'static + Fn(...)` produces matching fingerprints on both sides.
     #[test]
-    fn test_outlives_bound_is_fail_closed() {
+    fn test_outlives_bound_same_lifetime_compares_equal() {
         let make = || Generics {
             params: vec![type_param("T", vec![GenericBound::Outlives("'static".to_string())])],
             where_predicates: vec![],
         };
         assert!(
-            !generics_structurally_equal(&make(), &make()),
-            "identical Outlives bounds must still return false (D3 fail-closed)"
+            generics_structurally_equal(&make(), &make()),
+            "identical Outlives bounds with same lifetime must compare equal"
+        );
+    }
+
+    /// Two `Outlives` bounds with DIFFERENT lifetime strings must compare unequal
+    /// (e.g. `T: 'static` vs `T: 'a`).
+    #[test]
+    fn test_outlives_bound_different_lifetimes_compare_unequal() {
+        let static_bound = Generics {
+            params: vec![type_param("T", vec![GenericBound::Outlives("'static".to_string())])],
+            where_predicates: vec![],
+        };
+        let a_bound = Generics {
+            params: vec![type_param("T", vec![GenericBound::Outlives("'a".to_string())])],
+            where_predicates: vec![],
+        };
+        assert!(
+            !generics_structurally_equal(&static_bound, &a_bound),
+            "`T: 'static` must NOT equal `T: 'a`"
+        );
+    }
+
+    /// `<F: 'static + Send>` and `<F: 'static + Send>` must compare equal —
+    /// regression test for `ReviewCheckApprovedInteractor::new<F>` Yellow signal fix.
+    #[test]
+    fn test_outlives_mixed_with_trait_bounds_compares_equal() {
+        let make = || Generics {
+            params: vec![type_param(
+                "F",
+                vec![
+                    GenericBound::Outlives("'static".to_string()),
+                    trait_bound("Send"),
+                    trait_bound("Sync"),
+                ],
+            )],
+            where_predicates: vec![],
+        };
+        assert!(
+            generics_structurally_equal(&make(), &make()),
+            "`F: 'static + Send + Sync` must compare equal to itself"
         );
     }
 
@@ -884,19 +926,41 @@ mod tests {
         );
     }
 
-    /// Two identical inline `Outlives` lifetime bounds (`<T: 'a>`) must compare
-    /// unequal (D3 fail-closed: inline param bounds with Outlives).
+    /// Two identical inline `Outlives` lifetime bounds (`<T: 'a>`) must compare equal.
+    /// `Outlives` is within D3 scope and compared verbatim by lifetime string.
+    /// Both the inline-param path and the where-predicate path go through
+    /// different code branches in `build_where_form_view`, so both are tested.
     #[test]
-    fn test_inline_outlives_bound_is_fail_closed() {
-        // Test both the inline-param path AND the where-predicate path explicitly
-        // because they go through different code branches in `build_where_form_view`.
+    fn test_inline_outlives_bound_compares_equal() {
         let inline_only = || Generics {
             params: vec![type_param("T", vec![GenericBound::Outlives("'a".to_string())])],
             where_predicates: vec![],
         };
         assert!(
-            !generics_structurally_equal(&inline_only(), &inline_only()),
-            "identical inline `<T: 'a>` must still return false (D3 fail-closed)"
+            generics_structurally_equal(&inline_only(), &inline_only()),
+            "identical inline `<T: 'a>` must compare equal"
+        );
+    }
+
+    /// Inline `<T: 'static>` and where-predicate `<T> where T: 'static` must compare equal
+    /// (normalization: inline Outlives is lifted to where-form just like trait bounds).
+    #[test]
+    fn test_inline_outlives_equals_where_form_outlives() {
+        let inline = Generics {
+            params: vec![type_param("T", vec![GenericBound::Outlives("'static".to_string())])],
+            where_predicates: vec![],
+        };
+        let where_form = Generics {
+            params: vec![type_param("T", vec![])],
+            where_predicates: vec![WherePredicate::BoundPredicate {
+                type_: Type::Generic("T".to_string()),
+                bounds: vec![GenericBound::Outlives("'static".to_string())],
+                generic_params: vec![],
+            }],
+        };
+        assert!(
+            generics_structurally_equal(&inline, &where_form),
+            "`<T: 'static>` must equal `<T> where T: 'static`"
         );
     }
 

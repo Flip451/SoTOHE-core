@@ -12,7 +12,7 @@ use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDoc
 use crate::tddd::contract_map_adapter::FsCatalogueLoader;
 use crate::tddd::type_signals_codec;
 use crate::type_catalogue_render;
-use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers_from_path};
+use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
 
 /// Loads `impl-plan.json` from a track directory, returning `None` when the file
 /// does not exist. Propagates I/O and decode errors as `RenderError::Io`.
@@ -931,23 +931,28 @@ pub fn sync_rendered_views(
         //     failures on frozen tracks where type-catalogue rendering is a no-op)
         //   - rendered_matches drift check (no-op if content unchanged)
         //   - CatalogueDocumentCodecError::Json (syntax/EOF) warn-and-continue (file may be mid-edit)
-        // Legacy fallback: when architecture-rules.json is absent, a synthetic
-        // domain-only binding is used so pre-multilayer tracks continue to work.
         if !is_done_or_archived {
             let arch_rules_path = root.join("architecture-rules.json");
-            // Symlink handling + legacy-fallback policy is centralized in
-            // `load_tddd_layers_from_path` (which delegates to
-            // `symlink_guard::reject_symlinks_below`). A dangling or
-            // unexpectedly-linked `architecture-rules.json` fails closed here
-            // instead of silently degrading to the synthetic domain-only
-            // binding.
-            let bindings =
-                load_tddd_layers_from_path(&arch_rules_path, root).map_err(|e| match e {
-                    LoadTdddLayersError::Io { source, .. } => RenderError::Io(source),
-                    LoadTdddLayersError::Parse(err) => RenderError::Io(std::io::Error::other(
-                        format!("architecture-rules.json: {err}"),
-                    )),
-                })?;
+            // `load_tddd_layers` is fail-closed (no synthetic fallback). Here we
+            // distinguish three cases:
+            //   - absent file (NotFound): no TDDD layers configured, render no
+            //     per-layer catalogues; plan.md / registry.md still rendered above
+            //   - other Io error (e.g. rejected symlink, permission denied): hard fail
+            //   - parse error: hard fail (malformed rules file is a configuration error)
+            let bindings = match load_tddd_layers(&arch_rules_path, root) {
+                Ok(b) => b,
+                Err(LoadTdddLayersError::Io { source, .. })
+                    if source.kind() == std::io::ErrorKind::NotFound =>
+                {
+                    Vec::new()
+                }
+                Err(LoadTdddLayersError::Io { source, .. }) => return Err(RenderError::Io(source)),
+                Err(LoadTdddLayersError::Parse(err)) => {
+                    return Err(RenderError::Io(std::io::Error::other(format!(
+                        "architecture-rules.json: {err}"
+                    ))));
+                }
+            };
 
             // Guard against duplicate rendered paths: `parse_tddd_layers` rejects
             // duplicate `catalogue_file` values (exact string match), but two names

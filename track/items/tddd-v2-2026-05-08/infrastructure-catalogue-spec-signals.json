@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ce7c26cd41804240eda899f5804abd7ad895118c05a7ee9d8e40748df0bbcbf9",
+  "catalogue_declaration_hash": "b7fa2fd1c64434f553f669e5fcc34695103b5dbf4ea2dacf1842ba1b7396a1d3",
   "signals": [
     {
       "type_name": "BaselineCodecError",
@@ -68,7 +68,7 @@
     },
     {
       "type_name": "FsSpecFileLoader",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "FsSymlinkGuard",
@@ -80,7 +80,7 @@
     },
     {
       "type_name": "FsTrackStatusReaderAdapter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "GitShowTrackBlobReader",
@@ -100,7 +100,7 @@
     },
     {
       "type_name": "RustdocBaselineCaptureAdapter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "RustdocCrateAdapter",
@@ -124,7 +124,7 @@
     },
     {
       "type_name": "SpecElementHashError",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "TypeCatalogueCodecError",
@@ -140,7 +140,7 @@
     },
     {
       "type_name": "TypeSignalsExecutorAdapter",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "infrastructure::code_profile_builder::build_type_graph",
@@ -236,7 +236,7 @@
     },
     {
       "type_name": "infrastructure::track::spec_element_hash::compute_spec_element_hashes",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "infrastructure::type_catalogue_render::render_type_catalogue",
@@ -248,7 +248,7 @@
     },
     {
       "type_name": "infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs",
-      "signal": "yellow"
+      "signal": "blue"
     },
     {
       "type_name": "infrastructure::verify::spec_code_consistency::consistency_report_to_findings",
@@ -267,8 +267,12 @@
       "signal": "blue"
     },
     {
-      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_strict",
-      "signal": "yellow"
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_from_path",
+      "signal": "blue"
     }
   ]
 }

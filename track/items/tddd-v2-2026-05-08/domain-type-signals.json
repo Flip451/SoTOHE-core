@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-14T17:14:15Z",
-  "declaration_hash": "fc0875570cd040aab590d181138eb2f7037d77759a2655779e82ed6594d59630",
+  "generated_at": "2026-05-15T01:52:22Z",
+  "declaration_hash": "caaa8ef98b69d8505daf8d9fdc83129b2a4711d838c176da8c88c8aab62c497f",
   "signals": [
     {
       "type_name": "BaselineCaptureIoError",
@@ -92,7 +92,7 @@
     {
       "type_name": "ContractRole",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -104,9 +104,6 @@
         "core::hash::Hash",
         "core::marker::Copy",
         "core::str::traits::FromStr"
-      ],
-      "missing_items": [
-        "strum::IntoStaticStr"
       ]
     },
     {
@@ -130,7 +127,7 @@
     {
       "type_name": "DataRole",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -142,9 +139,6 @@
         "core::hash::Hash",
         "core::marker::Copy",
         "core::str::traits::FromStr"
-      ],
-      "missing_items": [
-        "strum::IntoStaticStr"
       ]
     },
     {
@@ -237,7 +231,7 @@
     {
       "type_name": "FunctionRole",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -249,9 +243,6 @@
         "core::hash::Hash",
         "core::marker::Copy",
         "core::str::traits::FromStr"
-      ],
-      "missing_items": [
-        "strum::IntoStaticStr"
       ]
     },
     {
@@ -302,7 +293,7 @@
     {
       "type_name": "ItemAction",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -315,9 +306,6 @@
         "core::hash::Hash",
         "core::marker::Copy",
         "core::str::traits::FromStr"
-      ],
-      "missing_items": [
-        "strum::IntoStaticStr"
       ]
     },
     {
@@ -477,7 +465,7 @@
     {
       "type_name": "SelfReceiver",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -489,9 +477,6 @@
         "core::hash::Hash",
         "core::marker::Copy",
         "core::str::traits::FromStr"
-      ],
-      "missing_items": [
-        "strum::IntoStaticStr"
       ]
     },
     {

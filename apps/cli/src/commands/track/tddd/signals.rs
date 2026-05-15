@@ -23,7 +23,7 @@ use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdap
 use infrastructure::track::fs_store::read_track_status_str;
 use infrastructure::track::track_status_reader_adapter::FsTrackStatusReaderAdapter;
 use infrastructure::verify::tddd_layers::{
-    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path,
+    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers,
 };
 use usecase::type_signals::{TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService};
 
@@ -36,26 +36,23 @@ use crate::CliError;
 ///   `layers[]` order.
 /// - When `layer_filter` is `Some(id)`, returns only the matching enabled
 ///   binding. An unknown or disabled layer id is fail-closed.
-/// - When `architecture-rules.json` is absent, falls back to a single
-///   synthetic `domain` binding so legacy tracks continue to work.
+/// - When `architecture-rules.json` is absent, returns an error (fail-closed).
 pub(crate) fn resolve_layers(
     workspace_root: &Path,
     layer_filter: Option<&str>,
 ) -> Result<Vec<TdddLayerBinding>, CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
-    // Delegate symlink handling + legacy-fallback policy to the shared
-    // infrastructure helper. CLI stays a thin composition layer; it only
-    // maps the infra error variants into `CliError` and applies the
-    // CLI-level layer filter.
-    let bindings =
-        load_tddd_layers_from_path(&rules_path, workspace_root).map_err(|e| match e {
-            LoadTdddLayersError::Io { path, source } => {
-                CliError::Message(format!("{}: {source}", path.display()))
-            }
-            LoadTdddLayersError::Parse(err) => {
-                CliError::Message(format!("{}: {err}", rules_path.display()))
-            }
-        })?;
+    // Delegate symlink handling to the shared infrastructure helper (fail-closed).
+    // CLI stays a thin composition layer; it only maps the infra error variants
+    // into `CliError` and applies the CLI-level layer filter.
+    let bindings = load_tddd_layers(&rules_path, workspace_root).map_err(|e| match e {
+        LoadTdddLayersError::Io { path, source } => {
+            CliError::Message(format!("{}: {source}", path.display()))
+        }
+        LoadTdddLayersError::Parse(err) => {
+            CliError::Message(format!("{}: {err}", rules_path.display()))
+        }
+    })?;
 
     if let Some(filter) = layer_filter {
         let Some(binding) = bindings.iter().find(|b| b.layer_id() == filter) else {
@@ -133,9 +130,7 @@ pub fn execute_type_signals(
     let items_dir = workspace_root.join("track").join("items");
 
     let status_reader = Arc::new(FsTrackStatusReaderAdapter::new());
-    // Use legacy-fallback mode so that legacy tracks without architecture-rules.json
-    // continue to work (synthetic domain binding, same as load_tddd_layers_from_path).
-    let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new_with_legacy_fallback());
+    let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
     let executor = Arc::new(TypeSignalsExecutorAdapter::new());
 
     let interactor = TypeSignalsInteractor::new(status_reader, layer_bindings, executor);
@@ -299,8 +294,10 @@ mod tests {
     }
 
     /// Sets up a minimal track directory with the given `domain-types.json` content,
-    /// a valid `metadata.json` (activated, branch set), and a minimal `impl-plan.json`
-    /// so the activated-track guard in `execute_type_signals` passes.
+    /// a valid `metadata.json` (activated, branch set), a minimal `impl-plan.json`,
+    /// and a minimal `architecture-rules.json` so the fail-closed
+    /// `FsTdddLayerBindingsAdapter::new()` resolves layer bindings before reaching
+    /// the catalogue/evaluator path.
     ///
     /// Returns `(workspace_root, track_id)` so callers can pass `workspace_root` directly
     /// to `execute_type_signals` (which derives `items_dir` internally).
@@ -314,6 +311,11 @@ mod tests {
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json(track_id))
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        // architecture-rules.json is required by FsTdddLayerBindingsAdapter::new()
+        // (fail-closed). Without it the interactor fails before reaching the
+        // catalogue/evaluator path that each caller test is asserting on.
+        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+        std::fs::write(workspace_root.join("architecture-rules.json"), rules_json).unwrap();
         (workspace_root, track_id.to_owned())
     }
 
@@ -340,6 +342,11 @@ mod tests {
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        // architecture-rules.json is required by FsTdddLayerBindingsAdapter::new()
+        // (fail-closed). Without it the interactor fails on layer-bindings load
+        // rather than on the missing catalogue path this test exercises.
+        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
         let result = execute_type_signals("test-track".to_owned(), workspace_root, None);

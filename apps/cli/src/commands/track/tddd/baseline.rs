@@ -45,9 +45,7 @@ pub fn execute_baseline_capture(
     force: bool,
 ) -> Result<ExitCode, CliError> {
     let symlink_guard = Arc::new(FsSymlinkGuard::new());
-    // Use legacy-fallback mode so that legacy tracks without architecture-rules.json
-    // continue to work (synthetic domain binding, same as load_tddd_layers_from_path).
-    let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new_with_legacy_fallback());
+    let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
     let capture = Arc::new(RustdocBaselineCaptureAdapter::new());
 
     let interactor = BaselineCaptureInteractor::new(symlink_guard, layer_bindings, capture);

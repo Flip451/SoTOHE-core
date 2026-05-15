@@ -230,6 +230,18 @@
       "id": "T043",
       "description": "Symptom D 修正 (PR #132 review 中に T040 CLI thinning + T042 catalogue 更新で発覚した evaluator 限界): `build_impl_identity_map` (libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs) が generic 型パラメータを保持したままで impl identity キーを構築する問題を修正する。具体的には、rustdoc から得た Impl の `for_` フィールドが `TaskOperationInteractor<S>` のような generic struct を指す場合、`format_type` がそのまま `<S>` 込みの文字列 `TaskOperationInteractor<S>: TaskOperationService` を生成するため、catalogue 側の A-codec が生成する非ジェネリックキー `TaskOperationInteractor: TaskOperationService` と一致せず CMinusSUnionD Red を発火する。修正: `build_impl_identity_map` (および同等の impl key 構築箇所) で `for_` 型の `format_type` 結果から impl の `generics` セクションで宣言された type parameter (impl block の `<S>` 等) のみを normalize/strip する。具体的には Impl item の `generics.params: Vec<GenericParamDef>` を読み、`GenericParamDefKind::Type` の name 集合を構築してから、`format_type` 経由で得た文字列を解析して該当 name の generic args を取り除く (concrete 型引数 `Vec<u32>` 等は保持する。あくまで type parameter 由来の args のみ strip)。回帰テスト: (a) 既存の non-generic struct + trait_impls の Blue 評価が壊れないことを確認 (`SymlinkGuardPort` 等)。(b) generic struct `TaskOperationInteractor<S>: TaskOperationService` impl が catalogue 側 `TaskOperationInteractor: TaskOperationService` 宣言と Blue マッチすることをアサート (catalogue-impl-signals で usecase layer 0 Red)。(c) 具体型引数 `impl Foo<Vec<u32>>` のような type-parameter ではない args は normalize 対象外であることをアサート。Layer: infrastructure。",
       "status": "done"
+    },
+    {
+      "id": "T044",
+      "description": "signal_evaluator_v2 extension — Outlives bound 対応 + Mismatch_Modify region での generic struct impl identity 正規化: (1) `generics_eq.rs::bounds_supported()` に `GenericBound::Outlives(_) => true` を追加して lifetime bound を verbatim 比較対象に含める。回帰テスト: Outlives 同一性 (両辺ともに `T: 'static` 等) は equal、Outlives 不一致 (片方のみ `T: 'static`) は not-equal をアサート。(2) `Mismatch_Modify` region における generic struct impl identity のキー正規化を実装する: T043 の `format_type_strip_type_params` ロジック (Match region で適用済み) を Mismatch_Modify region の identity 照合経路にも適用し、`TaskOperationInteractor<S>: TaskOperationService` と catalogue 側 `TaskOperationInteractor: TaskOperationService` 宣言の一致を Mismatch_Modify 経路でも正しく解決する。回帰テスト: generic struct `TaskOperationInteractor<S>: TaskOperationService` の Mismatch_Modify 経路が CMinusSUnionD (Red) ではなく Mismatch_Modify 信号として正しく評価されることをアサート。根拠 ADR: `2026-05-08-0258` D10 (trait identity normalization) + `2026-05-08-0305` D9 (provenance-blind structural equality)。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T045",
+      "description": "fail-open synthetic-domain fallback 削除 (CN-11 フェイルクローズド保守): `FsTdddLayerBindingsAdapter::new_with_legacy_fallback()` と関連する `legacy_fallback: bool` field / `LEGACY_FALLBACK_JSON` 定数、および `load_tddd_layers_from_path` 関数 (infrastructure/src/verify/tddd_layers.rs) を完全削除し、`load_tddd_layers_strict` を `load_tddd_layers` にリネームする。callers (`apps/cli/src/commands/track/tddd/signals.rs` / `baseline.rs`、`libs/infrastructure/src/tddd/catalogue_bulk_loader.rs`、`libs/infrastructure/src/track/render.rs`) を新 API に切り替える。完了後: catalogue (`*-types.json`) 側の `FsTdddLayerBindingsAdapter` エントリを削除済み API を反映した状態に更新し、stale doc comment (`catalogue_bulk_loader.rs` の fallback 参照コメント) を現状記述に書き換える。type-signals / catalogue-spec-signals を再生成して信号機を再評価する。根拠: `feedback_no_backward_compat.md` (no backward compat across tracks) および `feedback_sot_chain_disable_disguised_as_blue.md` (fail-open patterns disguised as Blue)。Layer: infrastructure + apps/cli。",
+      "status": "done",
+      "commit_hash": null
     }
   ],
   "plan": {
@@ -479,14 +491,29 @@
       },
       {
         "id": "S18",
-        "title": "Phase 2 generic impl identity normalization — `build_impl_identity_map` で type parameter を strip",
+        "title": "Phase 2 generic impl identity normalization — `build_impl_identity_map` で type parameter を strip + Outlives bound + Mismatch_Modify 経路",
         "description": [
           "T043 は PR #132 review 中に発覚した evaluator 限界の修正: 既存 `build_impl_identity_map` (libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs) が rustdoc Impl の `for_` フィールドに含まれる generic 型パラメータ (impl block 宣言の `<S>` 等) をそのまま impl identity キーに含めるため、catalogue 側の非ジェネリックキーと一致せず `CMinusSUnionD` を発火する問題を本修正する。",
+          "T044 は T043 で未対応だった 2 つの残余課題を解消する: (1) `bounds_supported()` への `GenericBound::Outlives` 対応 (lifetime bound を verbatim 比較対象に含める)。(2) `Mismatch_Modify` region における generic struct impl identity 正規化 — T043 の type parameter strip が Match region にのみ適用されていたため Mismatch_Modify 経路では未適用だった点を修正する。",
           "T042 (catalogue 更新) で T040 由来の 20 Red のうち 19 を Blue 化したが、`TaskOperationInteractor<S>: TaskOperationService` の 1 件は catalogue schema 内では解決不能であることが明らかになった。catalogue key は valid Rust identifier 必須 (`<S>` 含めない) のため、evaluator 側で normalize して両者を一致させるのが正しい修正方向。",
-          "S17 (T037-T039) 完了後に着手する。本修正は ADR 既決事項 (2026-05-08-0258 D10 trait identity normalization) の更なる実装であり、新規 ADR は不要。"
+          "S17 (T037-T039) 完了後に着手する。本修正群は ADR 既決事項 (2026-05-08-0258 D10 trait identity normalization + 2026-05-08-0305 D9 provenance-blind structural equality) の更なる実装であり、新規 ADR は不要。"
         ],
         "task_ids": [
-          "T043"
+          "T043",
+          "T044"
+        ]
+      },
+      {
+        "id": "S19",
+        "title": "fail-open synthetic-domain fallback 削除 — CN-11 フェイルクローズド保守",
+        "description": [
+          "T045 は `architecture-rules.json` 不在時に合成 single-domain binding を silently 返す fail-open switch (`FsTdddLayerBindingsAdapter::new_with_legacy_fallback()` / `LEGACY_FALLBACK_JSON` / `load_tddd_layers_from_path`) を完全削除する。",
+          "この fail-open 機構は `feedback_no_backward_compat.md` (no backward compat across tracks) および `feedback_sot_chain_disable_disguised_as_blue.md` (fail-open patterns disguised as Blue) に反するため防御的コーディング上の修正として除去する。CN-11 のフェイルクローズド保証を維持するための corrective action。",
+          "削除後に catalogue (`*-types.json`) の `FsTdddLayerBindingsAdapter` エントリを削除済み API に追従させ、stale doc comment を現状記述に更新し、type-signals / catalogue-spec-signals を再生成して信号機状態を確認する。",
+          "S18 (T043) の完了後に着手する。新規 ADR は不要。"
+        ],
+        "task_ids": [
+          "T045"
         ]
       }
     ]

@@ -438,10 +438,10 @@ pub fn execute_verify_catalogue_spec_refs(
 
     // Binary-gate fail-closed: load TDDD layer bindings from architecture-rules.json.
     let rules_path = workspace_root.join("architecture-rules.json");
-    let bindings =
-        crate::verify::tddd_layers::load_tddd_layers_strict(&rules_path, &workspace_root).map_err(
-            |e| format!("cannot load architecture-rules.json at '{}': {e}", rules_path.display()),
-        )?;
+    let bindings = crate::verify::tddd_layers::load_tddd_layers(&rules_path, &workspace_root)
+        .map_err(|e| {
+            format!("cannot load architecture-rules.json at '{}': {e}", rules_path.display())
+        })?;
     if bindings.is_empty() {
         return Err("no tddd.enabled layers found in architecture-rules.json".to_owned());
     }

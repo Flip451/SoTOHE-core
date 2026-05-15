@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-14T17:14:16Z",
-  "declaration_hash": "a1696576dba71692ac30f7d3b73845547b3e425c897bf8da124ead66c8d116e9",
+  "generated_at": "2026-05-15T01:52:23Z",
+  "declaration_hash": "b11681f75c595def97b35ff36056afad4ec27a4d453a21c3b18b39488876fdc1",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
@@ -103,7 +103,7 @@
     {
       "type_name": "ReviewCheckApprovedInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ReviewCheckApprovedService"
@@ -112,9 +112,9 @@
     {
       "type_name": "TaskOperationInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
-      "missing_items": [
+      "found_items": [
         "TaskOperationService"
       ]
     },
@@ -127,7 +127,7 @@
     {
       "type_name": "TypeSignalsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::error::Error",

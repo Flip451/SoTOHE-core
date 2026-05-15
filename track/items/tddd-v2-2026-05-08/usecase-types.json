@@ -22,10 +22,10 @@
         { "trait_name": "Error", "origin_crate": "core" }
       ],
       "docs": "Error type for BaselineCaptureService::run.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — error type for BaselineCaptureService::run; aggregates port-level failures (symlink rejection, invalid track-id, layer-bindings load failure, capture failure) surfaced to the CLI without leaking internal infrastructure details" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "BaselineCaptureInteractor": {
       "action": "add",
@@ -49,10 +49,10 @@
         }
       ],
       "docs": "Interactor implementing BaselineCaptureService. Orchestrates symlink guards, track-id validation, layer-bindings resolution, and per-layer rustdoc baseline capture. All I/O is performed via injected ports (no direct infrastructure calls).",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — usecase application-service interactor for `sotp track baseline-capture`; moves baseline-capture orchestration out of the CLI handler into the usecase layer so the CLI becomes a thin adapter over port-based dependency injection" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "BaselineCaptureRequest": {
       "action": "add",
@@ -74,10 +74,10 @@
       ],
       "methods": [],
       "docs": "Input parameters for BaselineCaptureService::run.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — CQRS Command carrying all input parameters for BaselineCaptureService::run; enables the CLI handler to validate and forward CLI flags as a typed command without embedding orchestration logic" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "CatalogueImplSignalsReport": {
       "action": "add",
@@ -96,10 +96,10 @@
       ],
       "methods": [],
       "docs": "Result of a completed catalogue-impl-signals evaluation run. Carries the formatted markdown text and a pre-computed any_red flag so callers do not need to re-parse the report string.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning addendum — structured return value (markdown text + any_red boolean) replacing previous String-only return from CatalogueImplSignalsService::run; eliminates CLI-side markdown string re-parsing to detect failure" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "PreCommitTypeSignalsInteractor": {
       "action": "reference",
@@ -120,12 +120,25 @@
       "trait_impls": [
         { "trait_name": "ReviewCheckApprovedService", "origin_crate": "usecase" }
       ],
-      "methods": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "build_fn", "ty": "F" }],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [
+            { "name": "F", "bounds": ["Fn(&str, &std::path::Path) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>", "Send", "Sync"] }
+          ],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
       "docs": "Concrete struct implementing ReviewCheckApprovedService. Modified in T040 thinning: build_fn field (CheckApprovedBuildFn type alias) replaces earlier direct domain imports at the CLI boundary.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — ReviewCheckApprovedInteractor is a pre-existing interactor modified to accept a build_fn closure replacing earlier direct domain imports at the CLI boundary; modification removes the CLI-to-domain direct dependency while preserving the review check-approved use case" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "TaskOperationInteractor": {
       "action": "modify",
@@ -139,10 +152,10 @@
       ],
       "methods": [],
       "docs": "Concrete generic struct implementing TaskOperationService. Modified in T040 thinning: generic over S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync with injected branch_reader closure and schema_version_reader for branchless-activation guard. Generic trait impl TaskOperationInteractor<S>: TaskOperationService normalizes to bare type name after T043 type-param stripping.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — TaskOperationInteractor is a pre-existing generic interactor modified to accept injected branch_reader and schema_version_reader closures instead of direct infrastructure imports, completing the CLI-to-usecase dependency isolation for task mutation operations" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "TypeSignalsError": {
       "action": "add",
@@ -155,7 +168,8 @@
           { "name": "TrackFrozen", "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }, { "name": "status", "ty": "String" }] } },
           { "name": "LayerBindingsLoad", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
           { "name": "NoLayers", "payload": { "kind": "unit" } },
-          { "name": "EvaluationFailed", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } }
+          { "name": "EvaluationFailed", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "InconsistentRequest", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } }
         ]
       },
       "trait_impls": [
@@ -164,10 +178,10 @@
         { "trait_name": "Error", "origin_crate": "core" }
       ],
       "docs": "Error variants for TypeSignalsService::run.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — error type for TypeSignalsService::run; aggregates port-level failures (invalid track-id, status read failure, frozen-track guard, layer-bindings load failure, per-layer evaluation failure) surfaced to the CLI without leaking infrastructure details" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "TypeSignalsInteractor": {
       "action": "add",
@@ -191,10 +205,10 @@
         }
       ],
       "docs": "Interactor implementing TypeSignalsService. Orchestrates track-status guard, layer-bindings resolution, and per-layer signal evaluation. All I/O is performed via injected ports (no direct infrastructure calls).",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — usecase application-service interactor for `sotp track type-signals`; moves track-status guard, layer-bindings resolution, and per-layer signal evaluation orchestration out of the CLI handler into the usecase layer so the CLI becomes a thin adapter" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "TypeSignalsRequest": {
       "action": "add",
@@ -213,10 +227,10 @@
       "trait_impls": [],
       "methods": [],
       "docs": "Request DTO for TypeSignalsService::run.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — CQRS Command carrying all input parameters for TypeSignalsService::run including lenient flag; enables the CLI handler to forward flags without embedding orchestration logic" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "CatalogueImplSignalsInteractor": {
       "action": "add",
@@ -343,10 +357,10 @@
         }
       ],
       "docs": "Application service (driving port) for the bin/sotp track baseline-capture use case. Orchestrates symlink guards, track-id validation, layer-bindings resolution, and per-layer rustdoc baseline capture.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — ApplicationService driving port for the baseline-capture use case; makes orchestration logic testable via the interactor pattern and separates it from the CLI handler" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "CatalogueImplSignalsService": {
       "action": "add",
@@ -393,10 +407,10 @@
         }
       ],
       "docs": "Application service trait for the sotp track type-signals use case. Orchestrates track-ID validation, track-status guard (active-track check), layer-bindings resolution, and per-layer signal evaluation.",
-      "spec_refs": [],
-      "informal_grounds": [
-        { "kind": "user_directive", "summary": "T040 CLI thinning — ApplicationService driving port for the type-signals use case; enables the TypeSignalsInteractor to be injected and tested independently of the CLI handler; active-track guard is enforced inside the interactor via TrackStatusReaderPort" }
-      ]
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
     },
     "TrackBlobReader": {
       "action": "modify",

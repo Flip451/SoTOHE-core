@@ -4,10 +4,10 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaselineCaptureError | error_type | — | InvalidTrackId, SymlinkRejected, LayerBindingsLoad, NoLayers, CaptureFailed | 🔵 | 🟡 |
+| BaselineCaptureError | error_type | — | InvalidTrackId, SymlinkRejected, LayerBindingsLoad, NoLayers, CaptureFailed | 🔵 | 🔵 |
 | CatalogueImplSignalsError | error_type | — | InvalidTrackId, LayerBindingsLoad, CatalogueLoad, BaselineLoad, ExtendedCrateConversion, SchemaExport, Evaluation, SymlinkRejected, NoLayers | 🔵 | 🔵 |
 | RenderContractMapError | error_type | modify | CatalogueLoaderFailed, ContractMapWriterFailed, EmptyCatalogue, LayerNotFound, InvalidTrackId | 🔵 | 🔵 |
-| TypeSignalsError | error_type | — | InvalidTrackId, StatusReadFailed, TrackFrozen, LayerBindingsLoad, NoLayers, EvaluationFailed | 🟡 | 🟡 |
+| TypeSignalsError | error_type | — | InvalidTrackId, StatusReadFailed, TrackFrozen, LayerBindingsLoad, NoLayers, EvaluationFailed, InconsistentRequest | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -22,37 +22,37 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaselineCaptureService | application_service | — | fn run(&self, request: BaselineCaptureRequest) -> Result<(), BaselineCaptureError> | 🔵 | 🟡 |
+| BaselineCaptureService | application_service | — | fn run(&self, request: BaselineCaptureRequest) -> Result<(), BaselineCaptureError> | 🔵 | 🔵 |
 | CatalogueImplSignalsService | application_service | — | fn run(&self, track_id: String, workspace_root: std::path::PathBuf, layer: Option<String>) -> Result<CatalogueImplSignalsReport, CatalogueImplSignalsError> | 🔵 | 🔵 |
 | PreCommitTypeSignalsService | application_service | reference | fn run(&self, track_id: String, workspace_root: PathBuf) -> Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError> | 🔵 | 🔵 |
 | ReviewCheckApprovedService | application_service | reference | fn check_approved(&self, track_id: String, items_dir: std::path::PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError> | 🔵 | 🔵 |
 | TaskOperationService | application_service | reference | fn transition_task(&self, cmd: TaskTransitionCommand) -> Result<TaskOperationOutput, TaskOperationError>, fn add_task(&self, cmd: AddTaskCommand) -> Result<TaskOperationOutput, TaskOperationError>, fn set_override(&self, cmd: SetOverrideCommand) -> Result<TaskOperationOutput, TaskOperationError>, fn clear_override(&self, cmd: ClearOverrideCommand) -> Result<TaskOperationOutput, TaskOperationError> | 🔵 | 🔵 |
-| TypeSignalsService | application_service | — | fn run(&self, request: TypeSignalsRequest) -> Result<(), TypeSignalsError> | 🔵 | 🟡 |
+| TypeSignalsService | application_service | — | fn run(&self, request: TypeSignalsRequest) -> Result<(), TypeSignalsError> | 🔵 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaselineCaptureInteractor | interactor | — | — | 🔵 | 🟡 |
+| BaselineCaptureInteractor | interactor | — | — | 🔵 | 🔵 |
 | CatalogueImplSignalsInteractor | interactor | — | — | 🔵 | 🔵 |
 | PreCommitTypeSignalsInteractor | interactor | reference | — | 🔵 | 🔵 |
-| ReviewCheckApprovedInteractor | interactor | modify | — | 🟡 | 🟡 |
-| TaskOperationInteractor | interactor | modify | — | 🟡 | 🟡 |
-| TypeSignalsInteractor | interactor | — | — | 🔵 | 🟡 |
+| ReviewCheckApprovedInteractor | interactor | modify | — | 🔵 | 🔵 |
+| TaskOperationInteractor | interactor | modify | — | 🔵 | 🔵 |
+| TypeSignalsInteractor | interactor | — | — | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueImplSignalsReport | dto | — | — | 🔵 | 🟡 |
+| CatalogueImplSignalsReport | dto | — | — | 🔵 | 🔵 |
 
 ## Commands
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaselineCaptureRequest | command | — | — | 🔵 | 🟡 |
+| BaselineCaptureRequest | command | — | — | 🔵 | 🔵 |
 | RenderContractMapCommand | command | modify | — | 🔵 | 🔵 |
-| TypeSignalsRequest | command | — | — | 🔵 | 🟡 |
+| TypeSignalsRequest | command | — | — | 🔵 | 🔵 |
 
 ## Use Case Functions
 
