@@ -116,7 +116,7 @@ pub trait RenderContractMap {
 pub struct RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
-    R: ContractMapRenderer + Send + Sync,
+    R: ContractMapRenderer,
     W: ContractMapWriter,
 {
     loader: L,
@@ -127,7 +127,7 @@ where
 impl<L, R, W> RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
-    R: ContractMapRenderer + Send + Sync,
+    R: ContractMapRenderer,
     W: ContractMapWriter,
 {
     /// Creates a new interactor wrapping the supplied secondary ports.
@@ -140,7 +140,7 @@ where
 impl<L, R, W> RenderContractMap for RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
-    R: ContractMapRenderer + Send + Sync,
+    R: ContractMapRenderer,
     W: ContractMapWriter,
 {
     fn execute(

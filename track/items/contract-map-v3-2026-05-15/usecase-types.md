@@ -18,7 +18,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RenderContractMapInteractor | interactor | modify | — | 🟡 | 🔵 |
+| RenderContractMapInteractor | interactor | modify | — | 🔵 | 🟡 |
 | ReviewCheckApprovedInteractor | interactor | modify | — | 🔵 | 🟡 |
 | TaskOperationInteractor | interactor | modify | — | 🔵 | 🟡 |
 

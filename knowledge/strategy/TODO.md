@@ -275,9 +275,9 @@
 
 - [ ] **INF-23** (MEDIUM): signal_evaluator_v2 — Outlives stripping asymmetry (false-positive Red)
   - **課題**: `libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs:333-335` で `strip_outlives_from_index` が C 側 (`b_index`) のみに適用され、S 側 (`a_index`) には未適用。`action: reference` で `methods` を declare している struct entry が method generic param に `'static` Outlives bound を持つと structural mismatch (false-positive Red) を生む
-  - **影響**: `usecase::ReviewCheckApprovedInteractor` の `new<F: ... + 'static>` declare で発火を確認 (contract-map-v3-2026-05-15 track Phase 2)
-  - **提案**: `a_index` 側にも `strip_outlives_from_index` を適用して symmetric 化、または両側に適用しない方向で揃える。Fix 後に下記 Workaround を撤去する別 track が必要
-  - **Workaround 残存箇所**: `track/items/contract-map-v3-2026-05-15/usecase-types.json` の `ReviewCheckApprovedInteractor` / `TaskOperationInteractor` entry に `informal_grounds` 経由で Workaround を残置 (catalogue-spec-signals では Yellow)
+  - **影響**: `usecase::ReviewCheckApprovedInteractor` の `new<F: ... + 'static>` declare で発火を確認 (contract-map-v3-2026-05-15 track Phase 2)。T011 final 状態確認時に同根の対称 case として `usecase::RenderContractMapInteractor` の `new` (struct-level generic L/R/W に対し catalogue が method-level generic を declare) も Yellow を生むことを確認
+  - **提案**: `a_index` 側にも `strip_outlives_from_index` を適用して symmetric 化、または両側に適用しない方向で揃える。同時に method-level vs struct-level generic 宣言位置の structural 比較も対称化する必要あり。Fix 後に下記 Workaround を撤去する別 track が必要
+  - **Workaround 残存箇所**: `track/items/contract-map-v3-2026-05-15/usecase-types.json` の `ReviewCheckApprovedInteractor` / `TaskOperationInteractor` / `RenderContractMapInteractor` entry に `informal_grounds` 経由で Workaround を残置 (catalogue-spec-signals では Yellow、計 3 件)
   - **関連 memory**: `project_signal_evaluator_v2_fp_deferred.md`
   - **追加日**: 2026-05-15
 
