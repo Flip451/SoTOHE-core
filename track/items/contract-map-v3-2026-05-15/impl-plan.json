@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "設定ファイル追加: .harness/config/contract-map-style.toml を新設する。section 構造 [role.<RoleName>] / [node.<NodeCategory>] / [pattern.<PatternName>] / [class.<ClassName>] / [edge.<EdgeKind>] / [filter] を持つ default 設定を commit する。DataRole 13 値 / ContractRole 3 値 / FunctionRole 2 値 の class 参照、NodeCategory {Method, Variant, Function} の shape + class (Field は node 化しないため NodeCategory には含まない — IN-12 / T006 の field は edge のみで表現)、Pattern {Typestate} の overlay_class、class {fill, stroke, stroke_width, stroke_dasharray}、edge {method_param, method_returns, transition, trait_impl, variant_payload, field, alias} の arrow + optional label を記述する。設定ファイル不在の fail-closed 挙動 (CN-03) を T005 adapter で実装するための reference として本 task で config を確定する。",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "a0170c313d627b211d45432621dd4a386b249279"
     },
     {
       "id": "T005",
       "description": "infrastructure 層: ContractMapRendererAdapter の scaffold + style config 読み込み + CatalogueNode enum。前提: T004 で .harness/config/contract-map-style.toml が commit 済みであること。libs/infrastructure/src/tddd/ に contract_map_renderer_adapter.rs を新設する。ContractMapRendererAdapter { style_config_path: PathBuf } struct + new(style_config_path: PathBuf) -> Self を実装する。ContractMapRenderer port (domain) の render(&self, ...) を impl する骨格を追加する。render 呼び出し時に .harness/config/contract-map-style.toml を load し、不在なら ContractMapRendererError::StyleConfigNotFound を返す (fail-closed, CN-03)。TOML parse 失敗は ContractMapRendererError::StyleConfigParse を返す。renderer 内部で使用する CatalogueNode<'a> enum (Type / Trait / Function の 3 variant, B-1 決定) を同モジュールに実装し、入力 catalogues を CatalogueNode 列に変換する段階を実装する。node_id 生成関数 (Decision D-2: Type=T<len>_<sanitized_layer>_<sanitized_name> / Trait=R<len>_<sanitized_layer>_<sanitized_name> / Function=F<len>_<sanitized_layer>_<sanitized_full_path>) を実装する。infrastructure-types.json の ContractMapRendererAdapter (action: add) を実装する。unit test: 設定ファイル不在 → StyleConfigNotFound / TOML parse 失敗 → StyleConfigParse / node_id scheme の衝突なし (同名 Type と Trait)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",

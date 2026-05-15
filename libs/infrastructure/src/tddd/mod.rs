@@ -27,6 +27,8 @@ pub mod catalogue_spec_signals_refresher;
 pub mod catalogue_to_extended_crate_codec;
 pub mod catalogue_to_extended_crate_codec_error;
 pub mod contract_map_adapter;
+pub mod contract_map_renderer_adapter;
+pub use contract_map_renderer_adapter::ContractMapRendererAdapter;
 pub mod fs_catalogue_spec_signals_store;
 pub mod in_memory_catalogue_linter;
 pub mod rustdoc_baseline_capture_adapter;

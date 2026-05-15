@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-15T11:19:34Z",
+  "generated_at": "2026-05-15T12:19:16Z",
   "declaration_hash": "b5e8f6fe97cde55e5c8c1d6a2b1fb10016d8f327b2ed40d7df8c74ec08cf967b",
   "signals": [
     {
@@ -17,9 +17,9 @@
     {
       "type_name": "ContractMapRendererAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ContractMapRenderer"
       ]
     },
