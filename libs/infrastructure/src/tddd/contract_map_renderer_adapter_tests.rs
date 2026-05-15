@@ -1,11 +1,13 @@
 use std::io::Write;
 
-use domain::tddd::catalogue_v2::composite::TypeKindV2;
+use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker, TypestateTransitions};
 use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
-use domain::tddd::catalogue_v2::identifiers::{FieldName, MethodName, ParamName, TypeRef};
+use domain::tddd::catalogue_v2::identifiers::{
+    FieldName, MethodName, ParamName, TypeRef, VariantName,
+};
 use domain::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
-use domain::tddd::catalogue_v2::variants::FieldDecl;
+use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, CrateName, FunctionName, FunctionPath, ModulePath, TraitName, TypeName,
 };
@@ -103,7 +105,7 @@ include_function_roles = []
 "#
 }
 
-/// Full style config with the edge sections needed for T006 edge rendering tests.
+/// Full style config with the edge sections needed for T006/T007 edge rendering tests.
 fn full_toml_content() -> &'static str {
     r#"
 [edge.method_param]
@@ -114,6 +116,17 @@ arrow = "-->"
 
 [edge.field]
 arrow = "--o"
+
+[edge.variant_payload]
+arrow = "--o"
+
+[edge.alias]
+arrow = "---"
+label = "alias_of"
+
+[edge.transition]
+arrow = "==>"
+label = "transitions_to"
 
 [role.ValueObject]
 class = "valueObject"
@@ -128,9 +141,16 @@ class = "freeFunction"
 shape = "round"
 class = "methodNode"
 
+[node.Variant]
+shape = "stadium"
+class = "variantNode"
+
 [node.Function]
 shape = "subroutine"
 class = "functionNode"
+
+[pattern.Typestate]
+overlay_class = "typestate"
 
 [filter]
 include_function_roles = []
@@ -277,18 +297,19 @@ fn test_function_node_id_format_matches_spec() {
 }
 
 // ---------------------------------------------------------------------------
-// Test 6: sanitize replaces non-alphanumeric chars with '_'
+// Test 6: layer component uses injective escape_id_component (not lossy sanitize)
 // ---------------------------------------------------------------------------
 
 #[test]
-fn test_type_node_id_sanitizes_hyphens_in_layer_name() {
-    // layer names can contain hyphens (e.g. "my-layer")
-    // sanitize("my-layer"): 'my' kept; '-' → '_'; 'layer' kept → "my_layer"
+fn test_type_node_id_escapes_hyphens_in_layer_name_injectivly() {
+    // layer names can contain hyphens (e.g. "my-layer").
+    // escape_id_component("my-layer"): 'my' kept; '-' → '_d_'; 'layer' kept → "my_d_layer"
+    // sanitize("mylib") = "mylib", sanitize("FooBar") = "FooBar"
     // len = unsanitized name char count = len("FooBar") = 6
-    // body = "my_layer_mylib_FooBar"
-    // expected: "T6_my_layer_mylib_FooBar"
+    // body = "my_d_layer_mylib_FooBar"
+    // expected: "T6_my_d_layer_mylib_FooBar"
     let id = type_node_id(&layer("my-layer"), &crate_name("mylib"), &type_name("FooBar"));
-    assert_eq!(id, "T6_my_layer_mylib_FooBar");
+    assert_eq!(id, "T6_my_d_layer_mylib_FooBar");
 }
 
 // ---------------------------------------------------------------------------
@@ -915,5 +936,554 @@ fn test_render_hyphen_layer_and_underscore_layer_produce_distinct_subgraph_ids()
     assert_ne!(
         pos_hyphen, pos_under,
         "hyphen-layer and underscore-layer must produce distinct subgraph ids, got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// T007 tests: Enum variant nodes, TypeAlias edge, typestate transition edges
+// ---------------------------------------------------------------------------
+
+// Test 28: Enum with VariantPayload::Unit → variant node emitted, no payload edges
+#[test]
+fn test_render_enum_unit_variant_emits_variant_node_without_payload_edges() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    let variant_name = VariantName::new("None").unwrap();
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::Enum { variants: vec![VariantDecl::unit(variant_name.clone())] },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("MyOption"), entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("MyOption"));
+    let variant_id = format!("{entry_id}_v_0");
+
+    // Variant node should be present with stadium shape: ([None])
+    assert!(
+        mermaid.contains(&format!("{variant_id}([None])")),
+        "unit variant must be rendered as stadium node, got:\n{mermaid}"
+    );
+    // Unit variant must not produce any edge from variant_id
+    assert!(
+        !mermaid.contains(&format!("{variant_id} --o")),
+        "unit variant must not produce payload edges, got:\n{mermaid}"
+    );
+}
+
+// Test 29: Enum with VariantPayload::Tuple → unlabelled --o edges per TypeRef (AC-04)
+#[test]
+fn test_render_enum_tuple_variant_emits_unlabelled_payload_edges() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    // Target type
+    doc.types.insert(type_name("UserId"), make_type_entry());
+
+    let variant_name = VariantName::new("Some").unwrap();
+    let enum_entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::Enum {
+            variants: vec![VariantDecl::tuple(variant_name, vec![TypeRef::new("UserId").unwrap()])],
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("MyOption"), enum_entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("MyOption"));
+    let variant_id = format!("{entry_id}_v_0");
+    let user_id_id = type_node_id(&layer_id, &cn, &type_name("UserId"));
+
+    // Tuple variant: unlabelled --o edge to each TypeRef
+    assert!(
+        mermaid.contains(&format!("{variant_id} --o {user_id_id}")),
+        "tuple variant must produce unlabelled --o edge to each TypeRef, got:\n{mermaid}"
+    );
+    // Must NOT produce a labelled edge
+    assert!(
+        !mermaid.contains(&format!("{variant_id} --o|")),
+        "tuple variant must not produce labelled edges, got:\n{mermaid}"
+    );
+}
+
+// Test 30: Enum with VariantPayload::Struct → labelled --o|field_name| edges per FieldDecl (AC-04)
+#[test]
+fn test_render_enum_struct_variant_emits_labelled_payload_edges() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    // Target type
+    doc.types.insert(type_name("ErrorCode"), make_type_entry());
+
+    let variant_name = VariantName::new("Fail").unwrap();
+    let field_decl =
+        FieldDecl::new(FieldName::new("code").unwrap(), TypeRef::new("ErrorCode").unwrap());
+    let enum_entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ErrorType,
+        kind: TypeKindV2::Enum {
+            variants: vec![VariantDecl::struct_variant(variant_name, vec![field_decl])],
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("AppError"), enum_entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("AppError"));
+    let variant_id = format!("{entry_id}_v_0");
+    let error_code_id = type_node_id(&layer_id, &cn, &type_name("ErrorCode"));
+
+    // Struct variant: labelled --o|field_name| edge per FieldDecl
+    assert!(
+        mermaid.contains(&format!("{variant_id} --o|code| {error_code_id}")),
+        "struct variant must produce labelled --o|code| edge, got:\n{mermaid}"
+    );
+}
+
+// Test 31: Enum with multiple variants → multiple variant nodes in index order (AC-04)
+#[test]
+fn test_render_enum_multiple_variants_emits_all_nodes_in_declaration_order() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    let v0 = VariantDecl::unit(VariantName::new("A").unwrap());
+    let v1 = VariantDecl::unit(VariantName::new("B").unwrap());
+    let v2 = VariantDecl::unit(VariantName::new("C").unwrap());
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::Enum { variants: vec![v0, v1, v2] },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("Abc"), entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("Abc"));
+    // All three variant nodes must be present
+    assert!(
+        mermaid.contains(&format!("{entry_id}_v_0([A])")),
+        "variant A must be present as _v_0, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("{entry_id}_v_1([B])")),
+        "variant B must be present as _v_1, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("{entry_id}_v_2([C])")),
+        "variant C must be present as _v_2, got:\n{mermaid}"
+    );
+    // Declaration order: A before B before C
+    let pos_a = mermaid.find(&format!("{entry_id}_v_0([A])")).unwrap();
+    let pos_b = mermaid.find(&format!("{entry_id}_v_1([B])")).unwrap();
+    let pos_c = mermaid.find(&format!("{entry_id}_v_2([C])")).unwrap();
+    assert!(pos_a < pos_b && pos_b < pos_c, "variants must appear in declaration order");
+}
+
+// Test 32: TypeAlias → empty subgraph + ---|alias_of| undirected edge to target (AC-09)
+#[test]
+fn test_render_type_alias_emits_empty_subgraph_and_undirected_edge() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    // Target type
+    doc.types.insert(type_name("String"), make_type_entry());
+
+    let alias_entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap() },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("Name"), alias_entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let alias_id = type_node_id(&layer_id, &cn, &type_name("Name"));
+    let target_id = type_node_id(&layer_id, &cn, &type_name("String"));
+
+    // Alias entry must be rendered as a subgraph (empty — no methods/variants)
+    assert!(
+        mermaid.contains(&format!("subgraph {alias_id}[\"Name\"]")),
+        "alias must be rendered as a subgraph, got:\n{mermaid}"
+    );
+    // Undirected edge: alias_id ---|alias_of| target_id
+    assert!(
+        mermaid.contains(&format!("{alias_id} ---|alias_of| {target_id}")),
+        "alias must produce ---|alias_of| undirected edge to target, got:\n{mermaid}"
+    );
+}
+
+// Test 33: TypeAlias with unresolvable target → no edge (AC-09 silent skip)
+#[test]
+fn test_render_type_alias_with_unresolvable_target_produces_no_edge() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    // "ExternalTarget" is NOT in the catalogue
+    let alias_entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::TypeAlias { target: TypeRef::new("ExternalTarget").unwrap() },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("MyAlias"), alias_entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let alias_id = type_node_id(&layer_id, &cn, &type_name("MyAlias"));
+
+    // Subgraph still rendered
+    assert!(
+        mermaid.contains(&format!("subgraph {alias_id}[\"MyAlias\"]")),
+        "alias subgraph must still be rendered even with unresolvable target, got:\n{mermaid}"
+    );
+    // But no alias edge
+    assert!(
+        !mermaid.contains("---|alias_of|"),
+        "unresolvable alias target must produce no alias edge, got:\n{mermaid}"
+    );
+}
+
+// Test 34: Typestate transition method → ==>|transitions_to| edge (AC-03)
+#[test]
+fn test_render_typestate_transition_method_uses_transition_edge_style() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    // Return type for the transition method
+    doc.types.insert(type_name("NextState"), make_type_entry());
+    // Return type for the non-transition method
+    doc.types.insert(type_name("UserId"), make_type_entry());
+
+    let transition_method_name = MethodName::new("approve").unwrap();
+    let normal_method_name = MethodName::new("get_id").unwrap();
+
+    let transition_method = MethodDeclaration::new(
+        transition_method_name.clone(),
+        None,
+        vec![],
+        TypeRef::new("NextState").unwrap(),
+        false,
+        None,
+    );
+    let normal_method = MethodDeclaration::new(
+        normal_method_name.clone(),
+        None,
+        vec![],
+        TypeRef::new("UserId").unwrap(),
+        false,
+        None,
+    );
+
+    // PlainStruct with typestate: "approve" is a transition method
+    let ts_marker = TypestateMarker::new(
+        TypeName::new("ReviewMachine").unwrap(),
+        TypestateTransitions::new(vec![transition_method_name.clone()]),
+    );
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: Some(ts_marker),
+        },
+        methods: vec![transition_method, normal_method],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("PendingReview"), entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("PendingReview"));
+    // m_0 = transition method (approve), m_1 = normal method (get_id)
+    let transition_method_id = format!("{entry_id}_m_0");
+    let normal_method_id = format!("{entry_id}_m_1");
+    let next_state_id = type_node_id(&layer_id, &cn, &type_name("NextState"));
+    let user_id_id = type_node_id(&layer_id, &cn, &type_name("UserId"));
+
+    // Transition method returns edge must use ==>|transitions_to|
+    assert!(
+        mermaid.contains(&format!("{transition_method_id} ==>|transitions_to| {next_state_id}")),
+        "transition method returns must use ==>|transitions_to|, got:\n{mermaid}"
+    );
+    // Normal method returns edge must use --> (unchanged)
+    assert!(
+        mermaid.contains(&format!("{normal_method_id} --> {user_id_id}")),
+        "non-transition method returns must still use -->, got:\n{mermaid}"
+    );
+    // Transition method must NOT have a normal --> returns edge
+    assert!(
+        !mermaid.contains(&format!("{transition_method_id} --> {next_state_id}")),
+        "transition method must not produce normal --> returns edge, got:\n{mermaid}"
+    );
+}
+
+// Test 35: Typestate PlainStruct → overlay class attached (pattern.Typestate, AC-03)
+#[test]
+fn test_render_typestate_entry_gets_overlay_class_attached() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    let ts_marker = TypestateMarker::new(
+        TypeName::new("MyMachine").unwrap(),
+        TypestateTransitions::new(vec![]),
+    );
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: Some(ts_marker),
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("StateFoo"), entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("StateFoo"));
+    // Overlay class attach line must be present
+    assert!(
+        mermaid.contains(&format!("class {entry_id} typestate")),
+        "typestate entry must have overlay class 'typestate' attached, got:\n{mermaid}"
+    );
+}
+
+// Test 36: PlainStruct without typestate → no overlay class (AC-03 control)
+#[test]
+fn test_render_non_typestate_plain_struct_has_no_overlay_class() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None, // no typestate
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("NormalStruct"), entry);
+    let layer_id = layer("domain");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    // No typestate overlay class should appear
+    assert!(
+        !mermaid.contains("typestate"),
+        "non-typestate struct must not have typestate overlay class, got:\n{mermaid}"
+    );
+}
+
+// Test 37: Typestate param edges remain --o (unchanged by typestate, AC-03)
+#[test]
+fn test_render_typestate_transition_method_param_edge_uses_standard_arrow() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    doc.types.insert(type_name("ParamType"), make_type_entry());
+    doc.types.insert(type_name("NextState"), make_type_entry());
+
+    let method_name = MethodName::new("go").unwrap();
+    let method = MethodDeclaration::new(
+        method_name.clone(),
+        None,
+        vec![ParamDeclaration::new(
+            ParamName::new("x").unwrap(),
+            TypeRef::new("ParamType").unwrap(),
+        )],
+        TypeRef::new("NextState").unwrap(),
+        false,
+        None,
+    );
+
+    let ts_marker = TypestateMarker::new(
+        TypeName::new("Machine").unwrap(),
+        TypestateTransitions::new(vec![method_name.clone()]),
+    );
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: Some(ts_marker),
+        },
+        methods: vec![method],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("StateA"), entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("StateA"));
+    let method_id = format!("{entry_id}_m_0");
+    let param_id = type_node_id(&layer_id, &cn, &type_name("ParamType"));
+    let next_id = type_node_id(&layer_id, &cn, &type_name("NextState"));
+
+    // Param edge: still --o (unchanged)
+    assert!(
+        mermaid.contains(&format!("{method_id} --o {param_id}")),
+        "transition method param edge must still use --o, got:\n{mermaid}"
+    );
+    // Returns edge: transition ==>|transitions_to|
+    assert!(
+        mermaid.contains(&format!("{method_id} ==>|transitions_to| {next_id}")),
+        "transition method returns must use ==>|transitions_to|, got:\n{mermaid}"
+    );
+}
+
+// Test 38: Enum variant nodes are placed inside the entry subgraph (Decision H-3)
+#[test]
+fn test_render_enum_variant_nodes_placed_inside_entry_subgraph() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::Enum {
+            variants: vec![VariantDecl::unit(VariantName::new("VarA").unwrap())],
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("MyEnum"), entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("MyEnum"));
+    let variant_id = format!("{entry_id}_v_0");
+
+    // Variant must appear after the entry subgraph open line (inside the subgraph)
+    let entry_open_pos = mermaid.find(&format!("subgraph {entry_id}")).unwrap();
+    let variant_pos = mermaid.find(&format!("{variant_id}([VarA])")).unwrap();
+    let entry_end_pos = {
+        // Find the "end" that closes this subgraph — appears after entry_open_pos
+        let after_open = &mermaid[entry_open_pos..];
+        entry_open_pos + after_open.find("end").unwrap()
+    };
+    assert!(
+        variant_pos > entry_open_pos && variant_pos < entry_end_pos,
+        "variant node must appear inside the entry subgraph (between open and end), \
+         open={entry_open_pos}, variant={variant_pos}, end={entry_end_pos}, mermaid:\n{mermaid}"
+    );
+}
+
+// Test 39: Enum with Tuple variant and multiple TypeRefs → one edge per TypeRef (AC-04)
+#[test]
+fn test_render_enum_tuple_variant_with_multiple_type_refs_emits_one_edge_per_ref() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+
+    doc.types.insert(type_name("ErrorCode"), make_type_entry());
+    doc.types.insert(type_name("ErrorMsg"), make_type_entry());
+
+    let variant = VariantDecl::tuple(
+        VariantName::new("Failure").unwrap(),
+        vec![TypeRef::new("ErrorCode").unwrap(), TypeRef::new("ErrorMsg").unwrap()],
+    );
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ErrorType,
+        kind: TypeKindV2::Enum { variants: vec![variant] },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("MyError"), entry);
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("MyError"));
+    let variant_id = format!("{entry_id}_v_0");
+    let code_id = type_node_id(&layer_id, &cn, &type_name("ErrorCode"));
+    let msg_id = type_node_id(&layer_id, &cn, &type_name("ErrorMsg"));
+
+    assert!(
+        mermaid.contains(&format!("{variant_id} --o {code_id}")),
+        "tuple variant must have edge to ErrorCode, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("{variant_id} --o {msg_id}")),
+        "tuple variant must have edge to ErrorMsg, got:\n{mermaid}"
     );
 }

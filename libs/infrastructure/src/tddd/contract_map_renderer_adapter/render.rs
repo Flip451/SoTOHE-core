@@ -1,4 +1,4 @@
-//! Mermaid rendering logic for [`super::super::ContractMapRendererAdapter`].
+//! Mermaid rendering logic for `super::super::ContractMapRendererAdapter`.
 //!
 //! Implements T006 scope:
 //! - 4-level subgraph nesting: layer → top-module → entry → method (Decision U-6d-iii)
@@ -10,15 +10,20 @@
 //! - module_path = [] entries placed directly in layer subgraph (AC-11)
 //! - Same-catalogue TypeRef resolution; unresolved / cross-crate refs silently skipped
 //!
-//! Out of scope for T006 (deferred to T007 / T008):
-//! - Enum variant nodes and payload edges (T007)
-//! - TypeAlias undirected edge (T007)
-//! - Typestate transition edges (T007)
+//! Additional T007 scope (this module):
+//! - Enum variant nodes and payload edges (Decision H-3, AC-04)
+//! - TypeAlias undirected `---|alias_of|` edge (Decision N-1', AC-09)
+//! - Typestate transition `==>|transitions_to|` returns edge (Decision G-2'b, AC-03)
+//!
+//! Out of scope for T006/T007 (deferred to T008):
 //! - Cross-catalogue trait_impl edges (T008)
 //! - classDef alphabetical ordering + `class <id> <className>` attach lines (T008)
 
 mod builder;
+mod enum_variants;
+mod style_helpers;
 mod type_index;
+mod typestate;
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -29,9 +34,12 @@ use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeRef};
 use domain::tddd::catalogue_v2::{CatalogueDocument, FunctionPath, TraitName, TypeName};
 use domain::tddd::{ContractMapRenderOptions, LayerId};
 
-use super::{EdgeStyle, NodeStyle, StyleConfig, function_node_id, trait_node_id, type_node_id};
+use super::{EdgeStyle, StyleConfig, function_node_id, trait_node_id, type_node_id};
 use builder::MermaidBuilder;
+use enum_variants::{emit_enum_variant_nodes, emit_type_alias_edge};
+use style_helpers::{collect_classdefs, node_class_name, node_shape, role_class_name};
 use type_index::TypeIndex;
+use typestate::{emit_methods_with_typestate, maybe_emit_typestate_overlay};
 
 // ---------------------------------------------------------------------------
 // Public render entry point
@@ -118,7 +126,10 @@ pub(super) fn render_mermaid(
 ///
 /// Top-module segments come from `ModulePath`, which only allows valid Rust identifiers
 /// (`[a-zA-Z0-9_]`), so `_` is the only special character they can contain.
-fn escape_id_component(s: &str) -> String {
+///
+/// Exposed as `pub(super)` so that node-id helpers in the parent module can use
+/// the same injective encoding for layer components.
+pub(super) fn escape_id_component(s: &str) -> String {
     let mut out = String::with_capacity(s.len() + 4);
     for ch in s.chars() {
         if ch.is_ascii_alphanumeric() {
@@ -228,12 +239,41 @@ enum LayerEntry<'a> {
     },
 }
 
+impl LayerEntry<'_> {
+    /// Returns `(primary, secondary)` sort keys for deterministic cross-kind ordering.
+    ///
+    /// Primary key: short name (type/trait name, or function `name` field).
+    /// Secondary key: full disambiguator — for functions, the complete `FunctionPath`
+    /// display string (`crate::module::name`) breaks ties when two functions share the
+    /// same short name in different modules. For types/traits the name is unique within
+    /// a document, so secondary equals primary.
+    fn sort_keys(&self) -> (String, String) {
+        match self {
+            LayerEntry::Type { name, .. } => {
+                let s = name.as_str().to_owned();
+                (s.clone(), s)
+            }
+            LayerEntry::Trait { name, .. } => {
+                let s = name.as_str().to_owned();
+                (s.clone(), s)
+            }
+            LayerEntry::Function { path, .. } => (path.name.as_str().to_owned(), path.to_string()),
+        }
+    }
+}
+
 /// Partitions a document's entries into root entries and top-module buckets.
 ///
 /// For `TypeEntry` and `TraitEntry`, `module_path` is stored on the entry itself.
 /// For `FunctionEntry`, `module_path` is stored in the `FunctionPath` key (the
 /// map key in `CatalogueDocument::functions`). The document's `crate_name` is
 /// threaded into every `LayerEntry` for same-catalogue TypeRef resolution.
+///
+/// Entries from all three kinds (types, traits, functions) are collected together
+/// and sorted cross-kind alphabetically by a (primary, secondary) key pair. This
+/// avoids kind-batching (all types before all traits before all functions) and
+/// produces a fully deterministic ordering that is independent of entry kind.
+/// See `LayerEntry::sort_keys` for the key definition.
 fn collect_layer_entries<'a>(
     doc: &'a CatalogueDocument,
     _layer_id: &LayerId,
@@ -241,20 +281,38 @@ fn collect_layer_entries<'a>(
     root_entries: &mut Vec<LayerEntry<'a>>,
 ) {
     let crate_name = &doc.crate_name;
+
+    // Collect all entries from the three BTreeMaps into a single Vec, then sort
+    // cross-kind alphabetically to avoid kind-batching artefacts.
+    let mut all_entries: Vec<LayerEntry<'a>> =
+        Vec::with_capacity(doc.types.len() + doc.traits.len() + doc.functions.len());
+
     for (name, entry) in &doc.types {
         let module_path = &entry.module_path;
-        let le = LayerEntry::Type { name, entry, module_path, crate_name };
-        push_entry(le, module_path, top_module_map, root_entries);
+        all_entries.push(LayerEntry::Type { name, entry, module_path, crate_name });
     }
     for (name, entry) in &doc.traits {
         let module_path = &entry.module_path;
-        let le = LayerEntry::Trait { name, entry, module_path, crate_name };
-        push_entry(le, module_path, top_module_map, root_entries);
+        all_entries.push(LayerEntry::Trait { name, entry, module_path, crate_name });
     }
     for (path, entry) in &doc.functions {
         // FunctionEntry has no module_path field; use the FunctionPath key's module_path.
         let module_path = &path.module_path;
-        let le = LayerEntry::Function { path, entry, module_path, crate_name };
+        all_entries.push(LayerEntry::Function { path, entry, module_path, crate_name });
+    }
+
+    // Sort cross-kind alphabetically. Primary key = short name, secondary key = full
+    // disambiguator (full FunctionPath string for functions, same as primary for types/traits).
+    // The secondary key ensures a deterministic total order when two functions share the
+    // same short name but differ in module or crate.
+    all_entries.sort_by_key(|e| e.sort_keys());
+
+    for le in all_entries {
+        let module_path = match &le {
+            LayerEntry::Type { module_path, .. } => *module_path,
+            LayerEntry::Trait { module_path, .. } => *module_path,
+            LayerEntry::Function { module_path, .. } => *module_path,
+        };
         push_entry(le, module_path, top_module_map, root_entries);
     }
 }
@@ -333,12 +391,20 @@ fn emit_layer_entry(
 // TypeEntry subgraph rendering
 // ---------------------------------------------------------------------------
 
-/// Emits a TypeEntry as a mermaid subgraph with method nodes inside.
+/// Emits a TypeEntry as a mermaid subgraph with method nodes (and variant nodes
+/// for Enum entries) inside.
 ///
 /// Subgraph id: `T<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>` (Decision D-2).
 /// Label: sub-module path + name (e.g. `team::manager::TeamManager` when
 /// `module_path = ["team", "manager"]` and `name = "TeamManager"`).
 /// When module_path is root, label = `name`.
+///
+/// T007 additions:
+/// - For `Enum` entries, variant nodes are placed inside the entry subgraph
+///   (Decision H-3, AC-04).
+/// - For `PlainStruct` entries with typestate, transition method returns edges
+///   use `==>|transitions_to|` (Decision G-2'b, AC-03).
+/// - Typestate overlay class is attached additively after the role class (T007).
 #[allow(clippy::too_many_arguments)]
 fn emit_type_subgraph(
     builder: &mut MermaidBuilder,
@@ -355,34 +421,62 @@ fn emit_type_subgraph(
 
     builder.open_subgraph(&entry_id, &label);
 
-    // Emit method nodes inside the entry subgraph.
-    let method_shape = node_shape("Method", style);
-    for (i, method) in entry.methods.iter().enumerate() {
-        let method_id = format!("{entry_id}_m_{i}");
-        builder.push_method_node(&method_id, method.name.as_str(), &method_shape);
+    // TypeAlias entries are empty subgraphs (no method nodes, no variant nodes).
+    // Only non-alias entries emit method and variant content (Decision N-1', AC-09).
+    let is_type_alias = matches!(&entry.kind, TypeKindV2::TypeAlias { .. });
 
-        // Collect method param edges.
-        for param in &method.params {
-            collect_param_edge(builder, &method_id, &param.ty, crate_name, type_index, style);
+    // For PlainStruct with typestate, extract the marker for transition-aware edge style.
+    // For TypeAlias, typestate_marker is always None (TypeAlias cannot carry typestate).
+    let typestate_marker = if is_type_alias {
+        None
+    } else {
+        match &entry.kind {
+            TypeKindV2::PlainStruct { typestate, .. } => typestate.as_ref(),
+            _ => None,
         }
-        // Collect method returns edge.
-        collect_returns_edge(builder, &method_id, &method.returns, crate_name, type_index, style);
+    };
+
+    if !is_type_alias {
+        let method_shape = node_shape("Method", style);
+        emit_methods_with_typestate(
+            builder,
+            &entry_id,
+            &entry.methods,
+            typestate_marker,
+            crate_name,
+            type_index,
+            style,
+            &method_shape,
+        );
+
+        // For Enum entries, emit variant nodes inside the entry subgraph (Decision H-3, AC-04).
+        if let TypeKindV2::Enum { variants } = &entry.kind {
+            emit_enum_variant_nodes(builder, &entry_id, variants, crate_name, type_index, style);
+        }
     }
 
     builder.close_subgraph();
 
     // Emit field edges for PlainStruct / TupleStruct (Decision K-2+(d), K-2).
+    // For TypeAlias, emit the undirected alias edge (Decision N-1', AC-09).
     emit_field_edges(builder, &entry_id, &entry.kind, crate_name, type_index, style);
 
     // Emit class attach for entry subgraph.
     let class_name = role_class_name(&entry.role.to_string(), style);
     builder.push_class(&entry_id, &class_name);
 
+    // Emit typestate overlay class (additive, T007 AC-03).
+    // Skipped for TypeAlias since typestate_marker is always None for aliases.
+    maybe_emit_typestate_overlay(builder, &entry_id, typestate_marker, style);
+
     // Emit class attach for each method node.
-    for (i, _method) in entry.methods.iter().enumerate() {
-        let method_id = format!("{entry_id}_m_{i}");
+    // Skipped for TypeAlias (no method nodes emitted).
+    if !is_type_alias {
         let method_class = node_class_name("Method", style);
-        builder.push_class(&method_id, &method_class);
+        for (i, _method) in entry.methods.iter().enumerate() {
+            let method_id = format!("{entry_id}_m_{i}");
+            builder.push_class(&method_id, &method_class);
+        }
     }
 }
 
@@ -481,13 +575,18 @@ fn emit_function_node(
 // Field edges (Decision K-2+(d) + Decision K-2 for TupleStruct)
 // ---------------------------------------------------------------------------
 
-/// Emits field edges from a TypeEntry subgraph to field type subgraphs.
+/// Emits field edges from a TypeEntry subgraph to field type subgraphs, and
+/// for `TypeAlias` emits the undirected `---|alias_of|` edge (T007, Decision N-1').
 ///
 /// - `PlainStruct { has_stripped_fields: false, fields }`: one `--o|field_name|` edge per field.
 /// - `PlainStruct { has_stripped_fields: true }`: no edges emitted (AC-08).
 /// - `TupleStruct { has_stripped_fields: false, fields }`: `--o|.0|`, `--o|.1|` etc.
 /// - `TupleStruct { has_stripped_fields: true }`: no edges emitted (AC-08).
-/// - `UnitStruct`, `Enum`, `TypeAlias`: no field edges (deferred to T007 for Enum/TypeAlias).
+/// - `UnitStruct`: no edges.
+/// - `Enum`: variant payload edges are emitted by `emit_enum_variant_nodes` (T007); no
+///   additional edges here.
+/// - `TypeAlias { target }`: emits `---|alias_of|` undirected edge to target type (T007,
+///   Decision N-1', AC-09).
 ///
 /// `caller_crate` scopes TypeRef resolution to the same catalogue document (same-catalogue).
 fn emit_field_edges(
@@ -518,13 +617,18 @@ fn emit_field_edges(
                 }
             }
         }
+        TypeKindV2::TypeAlias { target } => {
+            // Undirected alias edge: alias entry subgraph --- alias_of --- target subgraph
+            // (Decision N-1', AC-09). Delegated to enum_variants module.
+            emit_type_alias_edge(builder, entry_id, target, caller_crate, type_index, style);
+        }
         // has_stripped_fields: true → skip all field edges (AC-08).
         TypeKindV2::PlainStruct { has_stripped_fields: true, .. }
         | TypeKindV2::TupleStruct { has_stripped_fields: true, .. }
-        // UnitStruct, Enum, TypeAlias: no field edges for T006.
+        // UnitStruct: no field edges.
         | TypeKindV2::UnitStruct
-        | TypeKindV2::Enum { .. }
-        | TypeKindV2::TypeAlias { .. } => {}
+        // Enum: variant payload edges handled by emit_enum_variant_nodes (T007).
+        | TypeKindV2::Enum { .. } => {}
     }
 }
 
@@ -586,60 +690,4 @@ fn collect_returns_edge(
 /// `"team::manager::TeamManager"`.
 fn entry_label(module_path: &ModulePath, name: &str) -> String {
     if module_path.is_root() { name.to_owned() } else { format!("{}::{name}", module_path) }
-}
-
-// ---------------------------------------------------------------------------
-// Style helpers
-// ---------------------------------------------------------------------------
-
-/// Returns the classDef class name for a role string (e.g. `"ValueObject"`).
-///
-/// Looks up `style.role[role_str].class`. Falls back to the lowercase role
-/// string if the role is not configured (should not happen with a well-formed
-/// config file).
-fn role_class_name(role_str: &str, style: &StyleConfig) -> String {
-    style.role.get(role_str).map(|r| r.class.clone()).unwrap_or_else(|| role_str.to_lowercase())
-}
-
-/// Returns the classDef class name for a node category (e.g. `"Method"`, `"Function"`).
-///
-/// Looks up `style.node[category].class`. Falls back to the lowercase category
-/// if not configured.
-fn node_class_name(category: &str, style: &StyleConfig) -> String {
-    style
-        .node
-        .get(category)
-        .map(|n: &NodeStyle| n.class.clone())
-        .unwrap_or_else(|| category.to_lowercase())
-}
-
-/// Returns the mermaid shape string for a node category (e.g. `"Method"`, `"Function"`).
-///
-/// Looks up `style.node[category].shape`. Falls back to `"round"` if the category
-/// is not configured, so that unconfigured nodes still produce valid Mermaid output.
-fn node_shape(category: &str, style: &StyleConfig) -> String {
-    style
-        .node
-        .get(category)
-        .map(|n: &NodeStyle| n.shape.clone())
-        .unwrap_or_else(|| "round".to_owned())
-}
-
-/// Collects `classDef` lines from the style config in alphabetical order by class name.
-///
-/// Alphabetical ordering is used so that the renderer output is deterministic
-/// across runs regardless of `HashMap` iteration order. T008 may enforce a
-/// different canonical ordering; for T006 alphabetical is a stable baseline.
-fn collect_classdefs(style: &StyleConfig) -> Vec<String> {
-    let mut entries: Vec<(&String, _)> = style.class.iter().collect();
-    entries.sort_by_key(|(name, _)| name.as_str());
-    entries
-        .into_iter()
-        .map(|(name, cs)| {
-            format!(
-                "classDef {name} fill:{},stroke:{},stroke-width:{},stroke-dasharray:{}",
-                cs.fill, cs.stroke, cs.stroke_width, cs.stroke_dasharray
-            )
-        })
-        .collect()
 }

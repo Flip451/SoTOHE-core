@@ -1,6 +1,103 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
+          "at": "2026-05-15T10:10:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
+          "at": "2026-05-15T10:11:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ContractMapRendererError` does not actually preserve an error chain for the parse/render failures. `StyleConfigParse` and `RenderFailed` store only `String`, so `thiserror` cannot expose an underlying `source()` here, and the current tests only check `to_string()`. That means the new public error type cannot propagate the original failure cause the way the task describes.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_renderer.rs",
+              "line": 66,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6ab930a16d6d3b410d9dde0ba43e5fadac75eb6de3c69066902bf04d0df72b75",
+          "at": "2026-05-15T10:34:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
+          "at": "2026-05-15T10:37:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
+          "at": "2026-05-15T10:40:08Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
+          "at": "2026-05-15T10:53:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
+          "at": "2026-05-15T10:55:28Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:10:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:12:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:55:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:58:32Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -490,103 +587,116 @@
           "findings": [],
           "hash": "rvw1:sha256:0a8fb3e637682c05336e657ca424dbfc5c3e2ecf33b907639139627796e67137",
           "at": "2026-05-15T13:51:10Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
-          "at": "2026-05-15T10:10:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
-          "at": "2026-05-15T10:12:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
-          "at": "2026-05-15T10:55:01Z"
+          "hash": "rvw1:sha256:93bad4fad26578228c61a997aeb944cb2db8d4abbdf658a54b6dd7a3b0158ebf",
+          "at": "2026-05-15T13:59:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rustdoc private intra-doc-link fix is incomplete: this comment still links to the private `render` submodule as [`render`]. The rustdoc-export hook that runs with `-D warnings` can still fail on this remaining private intra-doc link; make it plain code formatting (`render`) like the other fixed references.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 51,
+              "category": "rustdoc"
+            }
+          ],
+          "hash": "rvw1:sha256:93bad4fad26578228c61a997aeb944cb2db8d4abbdf658a54b6dd7a3b0158ebf",
+          "at": "2026-05-15T14:05:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The entry node id helpers still use the lossy `sanitize(layer.as_ref())` for the layer component. `LayerId` permits both `-` and `_`, so valid layers such as `my-layer` and `my_layer` collapse to the same entry IDs for the same crate/name/path, even though the new layer subgraph IDs are injective. Mermaid IDs are global, so those entries and their edges can merge or attach to the wrong node. Use the same injective escaping scheme for layer components in `type_node_id`, `trait_node_id`, and `function_node_id`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 238,
+              "category": "correctness"
+            },
+            {
+              "message": "The renderer does not preserve declaration order for entries as required by the review brief. `collect_layer_entries` iterates `CatalogueDocument` BTreeMaps and emits all types before traits before functions, so output order becomes key/kind order rather than source declaration order whenever those differ. This affects the rendered graph layout and makes the implementation miss the stated iteration contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 244,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9bee83f335513e43269e2ba05c8e114521e1c08c1bbce24a4fa0e2e870d14798",
+          "at": "2026-05-15T14:09:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
-          "at": "2026-05-15T10:58:32Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
-          "at": "2026-05-15T10:53:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
-          "at": "2026-05-15T10:55:28Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
-          "at": "2026-05-15T10:10:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
-          "at": "2026-05-15T10:11:55Z"
+          "hash": "rvw1:sha256:867ba1c8653de9871da772d9ba5fbc2675655d09eff241d0d3dc804c9f6a07a9",
+          "at": "2026-05-15T14:15:35Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `ContractMapRendererError` does not actually preserve an error chain for the parse/render failures. `StyleConfigParse` and `RenderFailed` store only `String`, so `thiserror` cannot expose an underlying `source()` here, and the current tests only check `to_string()`. That means the new public error type cannot propagate the original failure cause the way the task describes.",
+              "message": "`TypeAlias` entries are still passed through the shared method-rendering path, so any non-empty `entry.methods` will emit method nodes and return edges inside the alias subgraph. That breaks the T007 contract that aliases render as empty subgraphs and means the new alias handling is only partial.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_renderer.rs",
-              "line": 66,
-              "category": "missing error handling"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 415,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:6ab930a16d6d3b410d9dde0ba43e5fadac75eb6de3c69066902bf04d0df72b75",
-          "at": "2026-05-15T10:34:53Z"
+          "hash": "rvw1:sha256:a82b039d52429eb5466099dc8514621bc45355b85de49cd73ad2b56ff008f9ed",
+          "at": "2026-05-15T14:33:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_layer_entries()` now sorts entries by `LayerEntry::sort_key()`, but functions use only `path.name` as the key. For any catalogue that contains two same-named functions in different modules, `sort_by` receives equal keys and may reorder them nondeterministically across runs. That regresses deterministic rendering for valid input; use a full tie-breaker such as the complete `FunctionPath` string.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 251,
+              "category": "determinism"
+            }
+          ],
+          "hash": "rvw1:sha256:1ef85b028fba657d45e03a09e4a0dbcf38175b570f5f6bef5a46dfb8575d94af",
+          "at": "2026-05-15T14:35:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render.rs` is now 707 lines long, which exceeds the 700-line maximum in `AGENTS.md`. The refactor extracted helpers, but the module still violates the size cap and will be harder to maintain/review.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 1,
+              "category": "module size"
+            }
+          ],
+          "hash": "rvw1:sha256:132c40f7906d42ae398fc348d8013758b8352afca36b8ada0f4c4edd123b196a",
+          "at": "2026-05-15T14:39:30Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
-          "at": "2026-05-15T10:37:48Z"
+          "hash": "rvw1:sha256:30594f27acc44e952f22eebcb51c1c62b34fefb4d49cb1657e6067c6d5908165",
+          "at": "2026-05-15T14:43:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
-          "at": "2026-05-15T10:40:08Z"
+          "hash": "rvw1:sha256:30594f27acc44e952f22eebcb51c1c62b34fefb4d49cb1657e6067c6d5908165",
+          "at": "2026-05-15T14:47:05Z"
         }
       ]
     },
@@ -1087,6 +1197,20 @@
           "findings": [],
           "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
           "at": "2026-05-15T12:40:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1763555a5ac515d07106740727818277efd07ffcd632d096b37bb89f1e3e1ea4",
+          "at": "2026-05-15T14:30:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1763555a5ac515d07106740727818277efd07ffcd632d096b37bb89f1e3e1ea4",
+          "at": "2026-05-15T14:31:56Z"
         }
       ]
     }

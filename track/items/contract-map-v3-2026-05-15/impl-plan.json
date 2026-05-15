@@ -34,12 +34,13 @@
     {
       "id": "T006",
       "description": "infrastructure 層: ContractMapRendererAdapter の render ロジック part 1 — subgraph 構造・method nodes・struct fields。layer → top-module → entry → method の 4 重 nesting (Decision U-6d-iii, CN-10) を実装する。TypeEntry / TraitEntry を methods 0 個でも subgraph 化する (Decision F-2+b2-ii)。method node を entry subgraph 内に配置し、method → param type へ `--o`、method → returns type へ `-->` の edge を生成する。PlainStruct.fields は entry subgraph → field type subgraph へ `--o|field_name|` edge (node 化なし)。TupleStruct.fields は `.0` / `.1` label 付き edge。has_stripped_fields: true なら field render なし (AC-08)。FunctionEntry は standalone callable node (subgraph 化なし, Decision F-2+d1)。module_path = [] の entry は layer subgraph 直下配置 (AC-11)。iter 順: BTreeMap は alphabetical、Vec は declaration order (Decision U-6d-iii)。unit test: 各 struct kind の field edge / has_stripped_fields の render 出力 (snapshot test)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9716dfd835d42877514f0898fcd4c1e3af84eaee"
     },
     {
       "id": "T007",
       "description": "infrastructure 層: ContractMapRendererAdapter の render ロジック part 2 — Enum variant nodes + TypeAlias + typestate transition edge。TypeKindV2::Enum.variants を node 化し entry subgraph 内に配置する。VariantPayload::Tuple → 各 TypeRef へ無 label edge `--o`、VariantPayload::Struct → FieldDecl.name を label に `--o|field_name|`、VariantPayload::Unit → edge なし (Decision H-3, AC-04)。TypeAlias を空 subgraph + target type subgraph への無向 edge `---|alias_of|` で描画する (Decision N-1', AC-09)。TypeKindV2::PlainStruct.typestate: Some(TypestateMarker) のとき、transitions.transition_methods() 由来の method の returns edge を `==>|transitions_to|` style で描画する (Decision G-2'b, AC-03)。unit test: Enum 各 VariantPayload の edge / TypeAlias undirected edge / typestate transition edge vs 通常 returns edge の区別 (snapshot test)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T008",

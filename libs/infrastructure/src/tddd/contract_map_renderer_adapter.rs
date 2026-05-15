@@ -4,7 +4,7 @@
 //! defined in `domain::tddd::contract_map_renderer`. It loads the style
 //! configuration from `.harness/config/contract-map-style.toml` on each
 //! `render()` call (fail-closed per CN-03) and delegates actual rendering to
-//! the [`render`] sub-module added in T006.
+//! the `render` sub-module added in T006.
 //!
 //! ## Key decisions implemented here
 //!
@@ -16,7 +16,7 @@
 //! - **Decision D-2**: `node_id` generation with prefix + length-prefix + sanitized parts.
 //! - **Decision E-3c**: this adapter is in infrastructure; the port is in domain.
 //! - **Decision F-2+b2-ii + F-2+d1**: TypeEntry/TraitEntry → subgraphs; FunctionEntry →
-//!   standalone callable node. Implemented in T006 via [`render`] sub-module.
+//!   standalone callable node. Implemented in T006 via `render` sub-module.
 //! - **Decision K-2+(d) + K-2**: PlainStruct/TupleStruct field edges. T006.
 //! - **Decision U-6d-iii**: 4-level nesting: layer → top-module → entry → method. T006.
 //! - **Decision L-1 + L-8 + L-10**: TOML schema with `[role.*]`, `[node.*]`,
@@ -48,7 +48,7 @@ mod render;
 /// T008 per the task scope. A parse failure (missing required field, wrong type)
 /// results in `ContractMapRendererError::StyleConfigParse`.
 ///
-/// Exposed as `pub(super)` so that the [`render`] sub-module can access style
+/// Exposed as `pub(super)` so that the `render` sub-module can access style
 /// fields for edge arrows, role class names, and classDef generation (T006).
 #[derive(Debug, Deserialize)]
 pub(super) struct StyleConfig {
@@ -61,9 +61,8 @@ pub(super) struct StyleConfig {
     pub(super) node: HashMap<String, NodeStyle>,
 
     /// `[pattern.<PatternName>]` sections — maps pattern name to `PatternStyle`.
-    /// Used by T007 (typestate overlay). `dead_code` allow covers T006.
+    /// Used by `typestate::maybe_emit_typestate_overlay` (T007).
     #[serde(default)]
-    #[allow(dead_code)]
     pub(super) pattern: HashMap<String, PatternStyle>,
 
     /// `[class.<ClassName>]` sections — maps class name to mermaid classDef fields.
@@ -102,8 +101,8 @@ pub(super) struct NodeStyle {
 
 /// `[pattern.<PatternName>]` section: overlay class appended additively.
 ///
-/// Used by T007 (typestate overlay). `dead_code` allow covers T005/T006.
-#[allow(dead_code)]
+/// Used by `typestate::maybe_emit_typestate_overlay` (T007) to attach the
+/// typestate overlay class to PlainStruct entries that carry a typestate marker.
 #[derive(Debug, Deserialize)]
 pub(super) struct PatternStyle {
     pub(super) overlay_class: String,
@@ -122,12 +121,12 @@ pub(super) struct ClassStyle {
 
 /// `[edge.<EdgeKind>]` section: mermaid arrow syntax and optional label.
 ///
-/// `arrow` consumed by T006 edge emission. `label` used by T007 (transition edges).
+/// `arrow` consumed by field/method/param edge emission (T006+).
+/// `label` consumed by T007 typestate transition edges and alias edges.
 #[derive(Debug, Deserialize)]
 pub(super) struct EdgeStyle {
     pub(super) arrow: String,
     #[serde(default)]
-    #[allow(dead_code)]
     pub(super) label: Option<String>,
 }
 
@@ -234,8 +233,12 @@ pub(super) fn sanitize(s: &str) -> String {
 ///
 /// `layer = "domain"`, `crate_name = "mylib"`, `name = "UserEmail"` →
 /// `T9_domain_mylib_UserEmail` (len("UserEmail") == 9)
+///
+/// The layer component uses the same injective encoding as the layer subgraph id
+/// (`render::escape_id_component`), so `"my-layer"` and `"my_layer"` produce
+/// distinct node ids even though both collapse to `"my_layer"` under `sanitize`.
 pub(crate) fn type_node_id(layer: &LayerId, crate_name: &CrateName, name: &TypeName) -> String {
-    let sl = sanitize(layer.as_ref());
+    let sl = render::escape_id_component(layer.as_ref());
     let sc = sanitize(crate_name.as_str());
     let sn = sanitize(name.as_str());
     let len = name.as_str().chars().count();
@@ -253,7 +256,7 @@ pub(crate) fn type_node_id(layer: &LayerId, crate_name: &CrateName, name: &TypeN
 /// prevents collision when two crates in the same layer declare a trait with the
 /// same name (Decision D-2).
 pub(crate) fn trait_node_id(layer: &LayerId, crate_name: &CrateName, name: &TraitName) -> String {
-    let sl = sanitize(layer.as_ref());
+    let sl = render::escape_id_component(layer.as_ref());
     let sc = sanitize(crate_name.as_str());
     let sn = sanitize(name.as_str());
     let len = name.as_str().chars().count();
@@ -279,7 +282,7 @@ pub(crate) fn trait_node_id(layer: &LayerId, crate_name: &CrateName, name: &Trai
 ///   - `sl = "domain"`
 ///   - Result: `F22_domain_domain__tddd__register`
 pub(crate) fn function_node_id(layer: &LayerId, path: &FunctionPath) -> String {
-    let sl = sanitize(layer.as_ref());
+    let sl = render::escape_id_component(layer.as_ref());
     // Use the Display form of FunctionPath (`crate::module::name`) as the full_path_raw.
     // Including crate_name prevents collisions when two catalogues in the same layer
     // expose the same module path and function name in different crates.
@@ -350,7 +353,7 @@ impl ContractMapRenderer for ContractMapRendererAdapter {
     /// Render the contract map from the given catalogues and layer order.
     ///
     /// Loads the style config (fail-closed per CN-03), then delegates to
-    /// [`render::render_mermaid`] which generates the mermaid flowchart string
+    /// `render::render_mermaid` which generates the mermaid flowchart string
     /// implementing Decisions U-6d-iii, F-2+b2-ii, F-2+d1, K-2+(d), and K-2.
     ///
     /// # Errors
