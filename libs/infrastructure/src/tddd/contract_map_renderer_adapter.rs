@@ -3,9 +3,8 @@
 //! [`ContractMapRendererAdapter`] implements the [`ContractMapRenderer`] trait
 //! defined in `domain::tddd::contract_map_renderer`. It loads the style
 //! configuration from `.harness/config/contract-map-style.toml` on each
-//! `render()` call (fail-closed per CN-03) and returns a scaffold placeholder
-//! `ContractMapContent` for T005. Actual rendering logic will be added in
-//! T006–T008.
+//! `render()` call (fail-closed per CN-03) and delegates actual rendering to
+//! the [`render`] sub-module added in T006.
 //!
 //! ## Key decisions implemented here
 //!
@@ -16,6 +15,10 @@
 //!   `.harness/config/contract-map-style.toml`; absent file is a fail-closed error.
 //! - **Decision D-2**: `node_id` generation with prefix + length-prefix + sanitized parts.
 //! - **Decision E-3c**: this adapter is in infrastructure; the port is in domain.
+//! - **Decision F-2+b2-ii + F-2+d1**: TypeEntry/TraitEntry → subgraphs; FunctionEntry →
+//!   standalone callable node. Implemented in T006 via [`render`] sub-module.
+//! - **Decision K-2+(d) + K-2**: PlainStruct/TupleStruct field edges. T006.
+//! - **Decision U-6d-iii**: 4-level nesting: layer → top-module → entry → method. T006.
 //! - **Decision L-1 + L-8 + L-10**: TOML schema with `[role.*]`, `[node.*]`,
 //!   `[pattern.*]`, `[class.*]`, `[edge.*]`, `[filter]` sections.
 
@@ -23,13 +26,17 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, FunctionEntry, FunctionPath, TraitEntry, TraitName, TypeEntry, TypeName,
+    CatalogueDocument, CrateName, FunctionEntry, FunctionPath, TraitEntry, TraitName, TypeEntry,
+    TypeName,
 };
 use domain::tddd::{
     ContractMapContent, ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError,
     LayerId,
 };
 use serde::Deserialize;
+
+// Sub-module: mermaid rendering logic (T006+).
+mod render;
 
 // ---------------------------------------------------------------------------
 // StyleConfig — TOML schema structs (Decision L-1 + L-8 + L-10)
@@ -41,98 +48,98 @@ use serde::Deserialize;
 /// T008 per the task scope. A parse failure (missing required field, wrong type)
 /// results in `ContractMapRendererError::StyleConfigParse`.
 ///
-/// The `dead_code` allow covers the T005 scaffold phase; individual fields will be
-/// consumed by T006–T008 rendering logic. Fields are accessed via `load_style_config`
-/// whose return value is bound to `_style` in the scaffold `render` method; actual
-/// field reads happen in T006–T008.
-#[allow(dead_code)]
+/// Exposed as `pub(super)` so that the [`render`] sub-module can access style
+/// fields for edge arrows, role class names, and classDef generation (T006).
 #[derive(Debug, Deserialize)]
-struct StyleConfig {
+pub(super) struct StyleConfig {
     /// `[role.<RoleName>]` sections — maps role name to `RoleStyle`.
     #[serde(default)]
-    role: HashMap<String, RoleStyle>,
+    pub(super) role: HashMap<String, RoleStyle>,
 
     /// `[node.<NodeCategory>]` sections — maps node category to `NodeStyle`.
     #[serde(default)]
-    node: HashMap<String, NodeStyle>,
+    pub(super) node: HashMap<String, NodeStyle>,
 
     /// `[pattern.<PatternName>]` sections — maps pattern name to `PatternStyle`.
+    /// Used by T007 (typestate overlay). `dead_code` allow covers T006.
     #[serde(default)]
-    pattern: HashMap<String, PatternStyle>,
+    #[allow(dead_code)]
+    pub(super) pattern: HashMap<String, PatternStyle>,
 
     /// `[class.<ClassName>]` sections — maps class name to mermaid classDef fields.
     #[serde(default)]
-    class: HashMap<String, ClassStyle>,
+    pub(super) class: HashMap<String, ClassStyle>,
 
     /// `[edge.<EdgeKind>]` sections — maps edge kind to arrow and optional label.
     #[serde(default)]
-    edge: HashMap<String, EdgeStyle>,
+    pub(super) edge: HashMap<String, EdgeStyle>,
 
     /// `[filter]` section — render filter configuration.
+    /// Used by T008 filter enforcement. `dead_code` allow covers T006.
     #[serde(default)]
-    filter: FilterConfig,
+    #[allow(dead_code)]
+    pub(super) filter: FilterConfig,
 }
 
 /// `[role.<RoleName>]` section: maps a role to a mermaid class name.
-///
-/// Fields are used by T006–T008. `dead_code` allow covers the T005 scaffold.
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
-struct RoleStyle {
-    class: String,
+pub(super) struct RoleStyle {
+    pub(super) class: String,
 }
 
 /// `[node.<NodeCategory>]` section: shape identifier and mermaid class name.
 ///
-/// Fields are used by T006–T008. `dead_code` allow covers the T005 scaffold.
-#[allow(dead_code)]
+/// `shape` drives the mermaid node syntax for Method and Function nodes in T006.
+/// `class` is used for class-attach lines on method and function nodes.
 #[derive(Debug, Deserialize)]
-struct NodeStyle {
-    shape: String,
-    class: String,
+pub(super) struct NodeStyle {
+    /// Shape identifier (e.g. `"round"`, `"subroutine"`). Consumed by T006
+    /// `node_shape()` helper to format method and function nodes with the correct
+    /// mermaid syntax.
+    pub(super) shape: String,
+    pub(super) class: String,
 }
 
 /// `[pattern.<PatternName>]` section: overlay class appended additively.
 ///
-/// Fields are used by T007. `dead_code` allow covers the T005 scaffold.
+/// Used by T007 (typestate overlay). `dead_code` allow covers T005/T006.
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
-struct PatternStyle {
-    overlay_class: String,
+pub(super) struct PatternStyle {
+    pub(super) overlay_class: String,
 }
 
 /// `[class.<ClassName>]` section: mermaid classDef fill / stroke / width / dasharray.
 ///
-/// Fields are used by T008. `dead_code` allow covers the T005 scaffold.
-#[allow(dead_code)]
+/// All fields consumed by T006 `collect_classdefs`. No dead_code allow needed.
 #[derive(Debug, Deserialize)]
-struct ClassStyle {
-    fill: String,
-    stroke: String,
-    stroke_width: String,
-    stroke_dasharray: String,
+pub(super) struct ClassStyle {
+    pub(super) fill: String,
+    pub(super) stroke: String,
+    pub(super) stroke_width: String,
+    pub(super) stroke_dasharray: String,
 }
 
 /// `[edge.<EdgeKind>]` section: mermaid arrow syntax and optional label.
 ///
-/// Fields are used by T006–T008. `dead_code` allow covers the T005 scaffold.
-#[allow(dead_code)]
+/// `arrow` consumed by T006 edge emission. `label` used by T007 (transition edges).
 #[derive(Debug, Deserialize)]
-struct EdgeStyle {
-    arrow: String,
+pub(super) struct EdgeStyle {
+    pub(super) arrow: String,
     #[serde(default)]
-    label: Option<String>,
+    #[allow(dead_code)]
+    pub(super) label: Option<String>,
 }
 
 /// `[filter]` section: render filter configuration.
 ///
 /// Default produces "render everything" behaviour (Decision I-1).
-/// Fields are used by T008. `dead_code` allow covers the T005 scaffold.
+/// `include_function_roles` used by T008 filter enforcement.
 #[allow(dead_code)]
 #[derive(Debug, Default, Deserialize)]
-struct FilterConfig {
+pub(super) struct FilterConfig {
     #[serde(default)]
-    include_function_roles: Vec<String>,
+    pub(super) include_function_roles: Vec<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -180,7 +187,10 @@ pub(crate) enum CatalogueNode<'a> {
 /// traits (BTreeMap alphabetical), then functions (BTreeMap alphabetical).
 /// Document order preserves the slice order of the input.
 ///
-/// T006–T008 will consume this list for subgraph / edge generation.
+/// The T006 render sub-module uses direct BTreeMap iteration grouped by layer
+/// rather than this flat list. This helper is retained for potential use by
+/// T008+ analysis passes. `dead_code` allow covers the gap.
+#[allow(dead_code)]
 pub(crate) fn catalogues_to_nodes<'a>(
     catalogues: &'a [CatalogueDocument],
 ) -> Vec<CatalogueNode<'a>> {
@@ -206,51 +216,48 @@ pub(crate) fn catalogues_to_nodes<'a>(
 
 /// Replaces every character in `s` that is not ASCII alphanumeric with `_`.
 ///
-/// Used by the `*_node_id` functions. The resulting string contains only
-/// `[a-zA-Z0-9_]` characters and is safe for use as a Mermaid node-id component.
-///
-/// The `dead_code` allow covers the T005 scaffold phase; it will be removed when
-/// T006 consumes these helpers.
-#[allow(dead_code)]
-fn sanitize(s: &str) -> String {
+/// Used by the `*_node_id` functions and the `render` sub-module. The resulting
+/// string contains only `[a-zA-Z0-9_]` characters and is safe for use as a
+/// Mermaid node-id component.
+pub(super) fn sanitize(s: &str) -> String {
     s.chars().map(|c| if c.is_ascii_alphanumeric() { c } else { '_' }).collect()
 }
 
 /// Generates a mermaid node id for a `TypeEntry`.
 ///
-/// Format: `T<len>_<sanitized_layer>_<sanitized_name>`
+/// Format: `T<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>`
 /// where `<len>` = char count of the **unsanitized** `name` (Decision D-2).
+/// Including `crate_name` prevents id collision when two crates in the same
+/// layer declare a type with the same name (Decision D-2).
 ///
 /// # Examples
 ///
-/// `layer = "domain"`, `name = "UserEmail"` →
-/// `T9_domain_UserEmail` (len("UserEmail") == 9)
-///
-/// The `dead_code` allow covers the T005 scaffold phase; removed when T006 lands.
-#[allow(dead_code)]
-pub(crate) fn type_node_id(layer: &LayerId, name: &TypeName) -> String {
+/// `layer = "domain"`, `crate_name = "mylib"`, `name = "UserEmail"` →
+/// `T9_domain_mylib_UserEmail` (len("UserEmail") == 9)
+pub(crate) fn type_node_id(layer: &LayerId, crate_name: &CrateName, name: &TypeName) -> String {
     let sl = sanitize(layer.as_ref());
+    let sc = sanitize(crate_name.as_str());
     let sn = sanitize(name.as_str());
     let len = name.as_str().chars().count();
-    let body = format!("{sl}_{sn}");
+    let body = format!("{sl}_{sc}_{sn}");
     format!("T{len}_{body}")
 }
 
 /// Generates a mermaid node id for a `TraitEntry`.
 ///
-/// Format: `R<len>_<sanitized_layer>_<sanitized_name>`
+/// Format: `R<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>`
 /// where `<len>` = char count of the **unsanitized** `name` (Decision D-2).
 ///
-/// Using prefix `R` (tRait) ensures no collision with `TypeEntry` ids even when
-/// the type and trait share the same name in the same layer (Decision D-2).
-///
-/// The `dead_code` allow covers the T005 scaffold phase; removed when T006 lands.
-#[allow(dead_code)]
-pub(crate) fn trait_node_id(layer: &LayerId, name: &TraitName) -> String {
+/// Prefix `R` (tRait) ensures no collision with `TypeEntry` ids when the type
+/// and trait share the same name in the same layer. Including `crate_name`
+/// prevents collision when two crates in the same layer declare a trait with the
+/// same name (Decision D-2).
+pub(crate) fn trait_node_id(layer: &LayerId, crate_name: &CrateName, name: &TraitName) -> String {
     let sl = sanitize(layer.as_ref());
+    let sc = sanitize(crate_name.as_str());
     let sn = sanitize(name.as_str());
     let len = name.as_str().chars().count();
-    let body = format!("{sl}_{sn}");
+    let body = format!("{sl}_{sc}_{sn}");
     format!("R{len}_{body}")
 }
 
@@ -271,9 +278,6 @@ pub(crate) fn trait_node_id(layer: &LayerId, name: &TraitName) -> String {
 ///   - `sfp = sanitize("domain::tddd::register") = "domain__tddd__register"`
 ///   - `sl = "domain"`
 ///   - Result: `F22_domain_domain__tddd__register`
-///
-/// The `dead_code` allow covers the T005 scaffold phase; removed when T006 lands.
-#[allow(dead_code)]
 pub(crate) fn function_node_id(layer: &LayerId, path: &FunctionPath) -> String {
     let sl = sanitize(layer.as_ref());
     // Use the Display form of FunctionPath (`crate::module::name`) as the full_path_raw.
@@ -345,12 +349,9 @@ impl ContractMapRendererAdapter {
 impl ContractMapRenderer for ContractMapRendererAdapter {
     /// Render the contract map from the given catalogues and layer order.
     ///
-    /// # Current state (T005 scaffold)
-    ///
-    /// Loads and parses the style config (fail-closed). If loading succeeds,
-    /// flattens the catalogues to a `Vec<CatalogueNode>` (unused until T006)
-    /// and returns a placeholder `ContractMapContent`. The actual mermaid
-    /// rendering logic will be implemented in T006–T008.
+    /// Loads the style config (fail-closed per CN-03), then delegates to
+    /// [`render::render_mermaid`] which generates the mermaid flowchart string
+    /// implementing Decisions U-6d-iii, F-2+b2-ii, F-2+d1, K-2+(d), and K-2.
     ///
     /// # Errors
     ///
@@ -362,18 +363,15 @@ impl ContractMapRenderer for ContractMapRendererAdapter {
     fn render(
         &self,
         catalogues: &[CatalogueDocument],
-        _layer_order: &[LayerId],
-        _opts: &ContractMapRenderOptions,
+        layer_order: &[LayerId],
+        opts: &ContractMapRenderOptions,
     ) -> Result<ContractMapContent, ContractMapRendererError> {
         // Fail-closed: load style config first (CN-03).
-        let _style = self.load_style_config()?;
+        let style = self.load_style_config()?;
 
-        // Flatten catalogue entries into CatalogueNode list.
-        // T006–T008 will consume this to emit subgraph / edge / class lines.
-        let _nodes = catalogues_to_nodes(catalogues);
-
-        // T005 scaffold: return empty placeholder until rendering logic lands.
-        Ok(ContractMapContent::new(String::new()))
+        // Delegate actual mermaid generation to the render sub-module (T006).
+        let mermaid = render::render_mermaid(catalogues, layer_order, opts, &style);
+        Ok(ContractMapContent::new(mermaid))
     }
 }
 

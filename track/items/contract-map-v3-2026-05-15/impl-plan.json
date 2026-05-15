@@ -28,12 +28,13 @@
     {
       "id": "T005",
       "description": "infrastructure 層: ContractMapRendererAdapter の scaffold + style config 読み込み + CatalogueNode enum。前提: T004 で .harness/config/contract-map-style.toml が commit 済みであること。libs/infrastructure/src/tddd/ に contract_map_renderer_adapter.rs を新設する。ContractMapRendererAdapter { style_config_path: PathBuf } struct + new(style_config_path: PathBuf) -> Self を実装する。ContractMapRenderer port (domain) の render(&self, ...) を impl する骨格を追加する。render 呼び出し時に .harness/config/contract-map-style.toml を load し、不在なら ContractMapRendererError::StyleConfigNotFound を返す (fail-closed, CN-03)。TOML parse 失敗は ContractMapRendererError::StyleConfigParse を返す。renderer 内部で使用する CatalogueNode<'a> enum (Type / Trait / Function の 3 variant, B-1 決定) を同モジュールに実装し、入力 catalogues を CatalogueNode 列に変換する段階を実装する。node_id 生成関数 (Decision D-2: Type=T<len>_<sanitized_layer>_<sanitized_name> / Trait=R<len>_<sanitized_layer>_<sanitized_name> / Function=F<len>_<sanitized_layer>_<sanitized_full_path>) を実装する。infrastructure-types.json の ContractMapRendererAdapter (action: add) を実装する。unit test: 設定ファイル不在 → StyleConfigNotFound / TOML parse 失敗 → StyleConfigParse / node_id scheme の衝突なし (同名 Type と Trait)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d7dea937f4ac25d195852a0daedd8d8f2cf316e6"
     },
     {
       "id": "T006",
       "description": "infrastructure 層: ContractMapRendererAdapter の render ロジック part 1 — subgraph 構造・method nodes・struct fields。layer → top-module → entry → method の 4 重 nesting (Decision U-6d-iii, CN-10) を実装する。TypeEntry / TraitEntry を methods 0 個でも subgraph 化する (Decision F-2+b2-ii)。method node を entry subgraph 内に配置し、method → param type へ `--o`、method → returns type へ `-->` の edge を生成する。PlainStruct.fields は entry subgraph → field type subgraph へ `--o|field_name|` edge (node 化なし)。TupleStruct.fields は `.0` / `.1` label 付き edge。has_stripped_fields: true なら field render なし (AC-08)。FunctionEntry は standalone callable node (subgraph 化なし, Decision F-2+d1)。module_path = [] の entry は layer subgraph 直下配置 (AC-11)。iter 順: BTreeMap は alphabetical、Vec は declaration order (Decision U-6d-iii)。unit test: 各 struct kind の field edge / has_stripped_fields の render 出力 (snapshot test)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T007",

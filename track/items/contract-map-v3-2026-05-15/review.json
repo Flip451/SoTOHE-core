@@ -77,24 +77,6 @@
         }
       ]
     },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
-          "at": "2026-05-15T10:53:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
-          "at": "2026-05-15T10:55:28Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -332,6 +314,232 @@
           "findings": [],
           "hash": "rvw1:sha256:0bf3141939e199a4aaf52a8b545bc34e0081436a75d380ab8e97f18bcd719867",
           "at": "2026-05-15T12:13:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeIndex::build` indexes every `CatalogueDocument` by bare type/trait name only, so a `TypeRef` in crate A can resolve to the identically named entry in crate B when both crates live in the same layer. That violates the documented same-catalogue-only behavior and emits wrong edges instead of silently skipping cross-catalogue refs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 57,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_base_name` only takes the substring before the first `<`, so wrapped references like `Vec<UserId>` or `Option<UserId>` resolve to `Vec` / `Option` rather than the contained type. Common generic params and field types will therefore lose their edges unless the wrapper itself happens to be catalogued.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 94,
+              "category": "correctness"
+            },
+            {
+              "message": "`type_node_id` and `trait_node_id` are still keyed only by `layer + name`, so two crates in the same layer that declare the same type or trait produce identical Mermaid ids. Since the new renderer emits all crates in a layer together, this collapses distinct entries into one node and corrupts the graph.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 229,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8e6411eb1bb3127dd962bb2d0b82b4cfbd3fca553170c8d20e7ae01b0c59c78",
+          "at": "2026-05-15T12:40:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeIndex::build` stores `TypeEntry` and `TraitEntry` under the same `(crate_name, bare_type_name)` key. If a crate defines a type and a trait with the same name, the later trait insert overwrites the type entry, so a plain `TypeRef(\"Foo\")` edge is rendered against the trait node instead of the type node. That silently misroutes edges in mixed-name catalogues.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 64,
+              "category": "logic"
+            },
+            {
+              "message": "The base-name extraction path does not actually resolve common wrapped signatures such as `Result<UserId, DomainError>` or nested wrappers like `Option<Arc<Foo>>`. `unwrap_generic_wrappers` peels only one trailing `>` run and `extract_base_name` then stops at the first `<`, so these refs collapse to strings that never match the index and the corresponding method/field edges disappear.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 106,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:784857cb95db6870da62987eed23bb74c279d99d10c33a2e9917cc8f8465adbc",
+          "at": "2026-05-15T12:52:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `extract_base_name` only removes `&` / `&mut` before unwrapping generic wrappers, so valid refs like `Option<&Foo>` or `Box<&mut Foo>` end up as `&Foo` / `&mut Foo` and are then silently skipped. That drops legitimate method/field edges for borrowed types. See [`render.rs`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs:116).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 116,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: the new renderer module is 823 lines long, which exceeds the repo's 700-line ceiling for a production module. This is already out of policy and will get harder to manage as the remaining render work lands. See [`render.rs`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs:1).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:25d91612578ce3519faa4a1b57ab46e5531725d105f5626336a95c6cbc41580a",
+          "at": "2026-05-15T12:57:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_base_name` cannot resolve nested wrapped type refs when the inner generic has commas. For example `Option<Result<UserId, Error>>` or `Vec<Result<UserId, Error>>` loses the inner closing `>` because `trim_end_matches('>')` strips all trailing brackets, so the wrapper loop never reaches `UserId`. That silently drops valid same-catalogue method/field edges for common Rust types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 151,
+              "category": "correctness"
+            },
+            {
+              "message": "`collect_classdefs` iterates `style.class` directly from a `HashMap`, so the emitted `classDef` block order is nondeterministic across runs. That makes the renderer output unstable for identical inputs whenever class styles are present, which is likely to cause flaky snapshots/diffs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 562,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:246b574341df88ec987d2dd66a57374a6c6bf7918e93b7568af206bb42249f93",
+          "at": "2026-05-15T13:11:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d549898f1b8c9ca21d84bd17b9dd6d3f726ff6eaecac25a4004ce7656045fb2d",
+          "at": "2026-05-15T13:17:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The renderer ignores the configured node shapes: `push_method_node` and `push_function_node` always emit `(<name>)` and `[[<name>]]`, while `NodeStyle.shape` is left unused. The task/spec require Method and Function shapes to come from `[node.Method]` / `[node.Function]`, so any valid style config change will silently render the wrong Mermaid shape. Use `style.node[...].shape` when emitting these nodes, or reject unsupported shape values explicitly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/builder.rs",
+              "line": 62,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d549898f1b8c9ca21d84bd17b9dd6d3f726ff6eaecac25a4004ce7656045fb2d",
+          "at": "2026-05-15T13:20:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ContractMapRenderOptions::layers` is ignored, and `render_mermaid` also appends layers that are absent from the supplied `layer_order`. The workflow passes a non-empty `opts.layers` for CLI layer filters, but this adapter always passes the full `layer_order` through and then renders every catalogue anyway, so filtered renders still include excluded layer subgraphs. Filter the effective layer order from `opts.layers` and do not emit `remaining` layers when they are not in that effective order.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 367,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:30e32142fd293d7e54296366a6999a23c04db7e7438f68a4f7fabbd2d37b3fba",
+          "at": "2026-05-15T13:29:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Layer ids are not encoded injectively before being used as Mermaid ids. `LayerId` accepts both `my-layer` and `my_layer`, but both become `my_layer` here, and the same sanitized layer component is reused by top-module and entry node ids. Rendering both valid layers will create duplicate subgraph/node ids and can merge unrelated graph content. Use an injective escaping scheme or length-prefix each component before concatenation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 136,
+              "category": "correctness"
+            },
+            {
+              "message": "When `opts.layers` is empty, `render_mermaid` emits every catalogue layer that was absent from `layer_order` in alphabetical `BTreeMap` order. The task contract says layer emission is controlled by the caller-supplied `layer_order`; appending extra layers makes partial/canonical layer orders render unwanted subgraphs and breaks deterministic caller control. Drop the `remaining` emission or require callers to include all layers explicitly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 109,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fbcd349b38101652bed9eb6866ef836d342b3c88ded4cbf1705deca32268db2c",
+          "at": "2026-05-15T13:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_sg_id` is not actually injective for valid `LayerId`s: `my-layer` and `my_layer` both have length 8 and both sanitize to `my_layer`, so both render as `L8_my_layer`. The same sanitized layer component is also embedded in type/trait/function IDs, so distinct valid layers can produce duplicate Mermaid IDs and edges/classes can attach to the wrong subgraph. Use an injective escape for raw components or add a raw-value hash, and cover the hyphen-vs-underscore case in tests.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 115,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:93e2284074645cf9a375790203e4239e798c4ff7ac6c3910f84ce19683209c55",
+          "at": "2026-05-15T13:45:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a8fb3e637682c05336e657ca424dbfc5c3e2ecf33b907639139627796e67137",
+          "at": "2026-05-15T13:51:10Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:10:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:12:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:55:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:58:32Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
+          "at": "2026-05-15T10:53:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
+          "at": "2026-05-15T10:55:28Z"
         }
       ]
     },
@@ -851,38 +1059,34 @@
           "findings": [],
           "hash": "rvw1:sha256:0ffaf870aaa113da3c0db71ae2c008da75aa4a464fb921f5881e75af2ea59acd",
           "at": "2026-05-15T11:36:01Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
-          "at": "2026-05-15T10:10:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
-          "at": "2026-05-15T10:12:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
-          "at": "2026-05-15T10:55:01Z"
+          "hash": "rvw1:sha256:e527d4bc808fbd3a9699e5d8ea4db07124e581648959eae61f217fd936bdbd12",
+          "at": "2026-05-15T12:16:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
-          "at": "2026-05-15T10:58:32Z"
+          "hash": "rvw1:sha256:e527d4bc808fbd3a9699e5d8ea4db07124e581648959eae61f217fd936bdbd12",
+          "at": "2026-05-15T12:18:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
+          "at": "2026-05-15T12:39:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
+          "at": "2026-05-15T12:40:33Z"
         }
       ]
     }
