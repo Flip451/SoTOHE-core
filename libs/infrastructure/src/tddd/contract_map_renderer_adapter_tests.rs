@@ -2025,3 +2025,1126 @@ include_function_roles = ["FreeFunctionn"]
         "expected StyleConfigParse for unknown role 'FreeFunctionn', got: {result:?}"
     );
 }
+
+// ===========================================================================
+// T010 ACCEPTANCE TESTS (AC-01 through AC-12)
+//
+// These tests use a rich, layer-agnostic multi-crate fixture to exercise all
+// acceptance criteria in an integrated manner. Each test targets a specific AC
+// or a group of closely-related ACs, using fixtures that cross crate and layer
+// boundaries to validate the full rendering pipeline.
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Fixture builder helpers for T010 acceptance tests
+// ---------------------------------------------------------------------------
+
+/// Helper: build a TraitEntry with the given ContractRole.
+fn make_trait_entry_with_role(role: ContractRole) -> TraitEntry {
+    TraitEntry {
+        action: ItemAction::Add,
+        role,
+        methods: vec![],
+        supertrait_bounds: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    }
+}
+
+/// Helper: build a TraitEntry with one method, at crate root, with the given ContractRole.
+fn make_trait_entry_with_role_and_module(role: ContractRole, module: ModulePath) -> TraitEntry {
+    TraitEntry {
+        action: ItemAction::Add,
+        role,
+        methods: vec![],
+        supertrait_bounds: vec![],
+        module_path: module,
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    }
+}
+
+/// Helper: build a TypeEntry (PlainStruct, no fields, no methods, no typestate) in the given module.
+fn make_plain_struct_in_module(module: ModulePath) -> TypeEntry {
+    TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: module,
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    }
+}
+
+/// Helper: render using the full style config and return the mermaid string.
+/// Same as `render_with_full_style` but accepts the layer_order as a slice reference.
+fn render_acceptance(catalogues: &[CatalogueDocument], layer_order: &[LayerId]) -> String {
+    render_with_full_style(catalogues, layer_order)
+}
+
+// ---------------------------------------------------------------------------
+// Test 49 (AC-01): Two CatalogueDocuments in the same layer are aggregated into
+// one layer subgraph (1 layer N crate scenario).
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac01_two_catalogues_same_layer_aggregated_into_one_layer_subgraph() {
+    // Two crates in the same "my-domain" layer:
+    // - crate_a declares TypeA
+    // - crate_b declares TypeB
+    let layer_id = layer("my-domain");
+    let cn_a = crate_name("crate_a");
+    let cn_b = crate_name("crate_b");
+
+    let mut doc_a = make_minimal_catalogue("my-domain", "crate_a");
+    let mut doc_b = make_minimal_catalogue("my-domain", "crate_b");
+
+    doc_a.types.insert(type_name("TypeA"), make_type_entry());
+    doc_b.types.insert(type_name("TypeB"), make_type_entry());
+
+    let mermaid = render_acceptance(&[doc_a, doc_b], std::slice::from_ref(&layer_id));
+
+    // There must be exactly one layer subgraph for "my-domain" (injective escaped id).
+    // "my-domain" → escape_id_component → "my_d_domain" → subgraph id: "L_my_d_domain"
+    let count = mermaid.matches("subgraph L_my_d_domain[\"my-domain\"]").count();
+    assert_eq!(
+        count, 1,
+        "exactly one layer subgraph must be emitted for 'my-domain' (1 layer N crate), \
+         got {count} occurrences in:\n{mermaid}"
+    );
+
+    // Both TypeA and TypeB must appear inside that single layer subgraph.
+    let type_a_id = type_node_id(&layer_id, &cn_a, &type_name("TypeA"));
+    let type_b_id = type_node_id(&layer_id, &cn_b, &type_name("TypeB"));
+
+    assert!(
+        mermaid.contains(&format!("subgraph {type_a_id}[\"TypeA\"]")),
+        "TypeA from crate_a must appear in mermaid, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("subgraph {type_b_id}[\"TypeB\"]")),
+        "TypeB from crate_b must appear in mermaid, got:\n{mermaid}"
+    );
+
+    // The two type node ids must be distinct (no collision between crates).
+    assert_ne!(
+        type_a_id, type_b_id,
+        "node ids for same-name types in different crates of the same layer must be distinct"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 50 (AC-02): TypeEntry and TraitEntry with zero methods produce empty
+// subgraphs. FunctionEntry produces a standalone node.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac02_zero_method_entries_produce_empty_subgraphs_function_produces_standalone_node() {
+    let layer_id = layer("app-layer");
+    let cn = crate_name("my_crate");
+
+    let mut doc = make_minimal_catalogue("app-layer", "my_crate");
+    doc.types.insert(type_name("EmptyStruct"), make_type_entry());
+    doc.traits.insert(trait_name("EmptyTrait"), make_trait_entry());
+    let fn_path = FunctionPath::at_root(
+        CrateName::new("my_crate").unwrap(),
+        FunctionName::new("lone_fn").unwrap(),
+    );
+    doc.functions.insert(fn_path.clone(), make_function_entry());
+
+    let mermaid = render_acceptance(&[doc], std::slice::from_ref(&layer_id));
+
+    // EmptyStruct → subgraph (even with zero methods)
+    let struct_id = type_node_id(&layer_id, &cn, &type_name("EmptyStruct"));
+    assert!(
+        mermaid.contains(&format!("subgraph {struct_id}[\"EmptyStruct\"]")),
+        "AC-02: EmptyStruct must be rendered as subgraph even with zero methods, got:\n{mermaid}"
+    );
+
+    // EmptyTrait → subgraph (even with zero methods)
+    let trait_id = trait_node_id(&layer_id, &cn, &trait_name("EmptyTrait"));
+    assert!(
+        mermaid.contains(&format!("subgraph {trait_id}[\"EmptyTrait\"]")),
+        "AC-02: EmptyTrait must be rendered as subgraph even with zero methods, got:\n{mermaid}"
+    );
+
+    // FunctionEntry → standalone subroutine node (NOT a subgraph)
+    let fn_id = function_node_id(&layer_id, &fn_path);
+    assert!(
+        mermaid.contains(&format!("{fn_id}[[lone_fn]]")),
+        "AC-02: FunctionEntry must produce a standalone subroutine node, got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains(&format!("subgraph {fn_id}")),
+        "AC-02: FunctionEntry must NOT be a subgraph, got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 51 (AC-03 + AC-02): Typestate transition edge uses ==>|transitions_to|
+// while normal returns edge uses -->. Both appear in same entry.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac03_typestate_transition_edge_distinguished_from_normal_returns_edge() {
+    let layer_id = layer("state-layer");
+    let cn = crate_name("state_crate");
+
+    let mut doc = make_minimal_catalogue("state-layer", "state_crate");
+
+    // Return types for the two methods.
+    doc.types.insert(type_name("NextState"), make_type_entry());
+    doc.types.insert(type_name("InfoValue"), make_type_entry());
+
+    let transition_method_name = MethodName::new("advance").unwrap();
+    let normal_method_name = MethodName::new("get_info").unwrap();
+
+    let transition_method = MethodDeclaration::new(
+        transition_method_name.clone(),
+        None,
+        vec![],
+        TypeRef::new("NextState").unwrap(),
+        false,
+        None,
+    );
+    let normal_method = MethodDeclaration::new(
+        normal_method_name.clone(),
+        None,
+        vec![],
+        TypeRef::new("InfoValue").unwrap(),
+        false,
+        None,
+    );
+
+    let ts_marker = TypestateMarker::new(
+        TypeName::new("StateMachine").unwrap(),
+        TypestateTransitions::new(vec![transition_method_name]),
+    );
+
+    let entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::Entity,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: Some(ts_marker),
+        },
+        methods: vec![transition_method, normal_method],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("StateNode"), entry);
+
+    let mermaid = render_acceptance(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("StateNode"));
+    let m0_id = format!("{entry_id}_m_0"); // advance (transition)
+    let m1_id = format!("{entry_id}_m_1"); // get_info (normal)
+    let next_state_id = type_node_id(&layer_id, &cn, &type_name("NextState"));
+    let info_id = type_node_id(&layer_id, &cn, &type_name("InfoValue"));
+
+    // AC-03: transition method returns uses ==>|transitions_to|
+    assert!(
+        mermaid.contains(&format!("{m0_id} ==>|transitions_to| {next_state_id}")),
+        "AC-03: transition method must use ==>|transitions_to|, got:\n{mermaid}"
+    );
+    // AC-03: normal method returns uses --> (not transition style)
+    assert!(
+        mermaid.contains(&format!("{m1_id} --> {info_id}")),
+        "AC-03: normal method returns must use -->, got:\n{mermaid}"
+    );
+    // AC-03: transition method must NOT produce normal --> returns edge
+    assert!(
+        !mermaid.contains(&format!("{m0_id} --> {next_state_id}")),
+        "AC-03: transition method must not produce normal --> edge, got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 52 (AC-04): Enum VariantPayload::Tuple, Struct, and Unit all render
+// correctly with distinct edge behaviour.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac04_enum_all_three_variant_payload_kinds_render_correctly() {
+    let layer_id = layer("enum-layer");
+    let cn = crate_name("enum_crate");
+
+    let mut doc = make_minimal_catalogue("enum-layer", "enum_crate");
+
+    // Target types for Tuple and Struct variants.
+    doc.types.insert(type_name("PayloadA"), make_type_entry());
+    doc.types.insert(type_name("PayloadB"), make_type_entry());
+
+    // Enum with three variants:
+    // - UnitV: Unit → no edge
+    // - TupleV: Tuple(PayloadA) → unlabelled --o
+    // - StructV: Struct { field_x: PayloadB } → labelled --o|field_x|
+    let v_unit = VariantDecl::unit(VariantName::new("UnitV").unwrap());
+    let v_tuple = VariantDecl::tuple(
+        VariantName::new("TupleV").unwrap(),
+        vec![TypeRef::new("PayloadA").unwrap()],
+    );
+    let v_struct = VariantDecl::struct_variant(
+        VariantName::new("StructV").unwrap(),
+        vec![FieldDecl::new(FieldName::new("field_x").unwrap(), TypeRef::new("PayloadB").unwrap())],
+    );
+
+    let enum_entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ErrorType,
+        kind: TypeKindV2::Enum { variants: vec![v_unit, v_tuple, v_struct] },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("MyEnum"), enum_entry);
+
+    let mermaid = render_acceptance(&[doc], std::slice::from_ref(&layer_id));
+
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("MyEnum"));
+    let v0_id = format!("{entry_id}_v_0"); // UnitV
+    let v1_id = format!("{entry_id}_v_1"); // TupleV
+    let v2_id = format!("{entry_id}_v_2"); // StructV
+    let payload_a_id = type_node_id(&layer_id, &cn, &type_name("PayloadA"));
+    let payload_b_id = type_node_id(&layer_id, &cn, &type_name("PayloadB"));
+
+    // UnitV: node present, no payload edge
+    assert!(
+        mermaid.contains(&format!("{v0_id}([UnitV])")),
+        "AC-04: UnitV must be rendered as stadium node, got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains(&format!("{v0_id} --o")),
+        "AC-04: UnitV must not produce any payload edge, got:\n{mermaid}"
+    );
+
+    // TupleV: node present, unlabelled --o edge to PayloadA
+    assert!(
+        mermaid.contains(&format!("{v1_id}([TupleV])")),
+        "AC-04: TupleV must be rendered as stadium node, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("{v1_id} --o {payload_a_id}")),
+        "AC-04: TupleV must produce unlabelled --o edge, got:\n{mermaid}"
+    );
+    // Must NOT produce a labelled edge for TupleV
+    assert!(
+        !mermaid.contains(&format!("{v1_id} --o|")),
+        "AC-04: TupleV must not produce labelled edge, got:\n{mermaid}"
+    );
+
+    // StructV: node present, labelled --o|field_x| edge to PayloadB
+    assert!(
+        mermaid.contains(&format!("{v2_id}([StructV])")),
+        "AC-04: StructV must be rendered as stadium node, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("{v2_id} --o|field_x| {payload_b_id}")),
+        "AC-04: StructV must produce labelled --o|field_x| edge, got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 53 (AC-05): node_id collision-free across Types, Traits, and Functions
+// in a multi-crate, multi-layer fixture.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac05_node_id_collision_free_across_types_traits_functions_and_layers() {
+    // Two layers, two crates each. Each crate has a type, a trait, and a function
+    // with the same name "Entity" / "Port" / "helper". Node ids must all be distinct.
+    let layer_a = layer("layer-a");
+    let layer_b = layer("layer-b");
+    let cn1 = crate_name("crate_one");
+    let cn2 = crate_name("crate_two");
+
+    let mut doc_a1 = make_minimal_catalogue("layer-a", "crate_one");
+    let mut doc_a2 = make_minimal_catalogue("layer-a", "crate_two");
+    let mut doc_b1 = make_minimal_catalogue("layer-b", "crate_one");
+
+    doc_a1.types.insert(type_name("Entity"), make_type_entry());
+    doc_a1.traits.insert(trait_name("Entity"), make_trait_entry()); // same name as type!
+    doc_a2.types.insert(type_name("Entity"), make_type_entry());
+    doc_b1.types.insert(type_name("Entity"), make_type_entry());
+
+    let fn_path_a1 = FunctionPath::at_root(
+        CrateName::new("crate_one").unwrap(),
+        FunctionName::new("helper").unwrap(),
+    );
+    doc_a1.functions.insert(fn_path_a1.clone(), make_function_entry());
+
+    // A second "helper" function in crate_two (same name, different crate) — this exercises
+    // the crate-dimension of collision avoidance that the node_id scheme must handle.
+    let fn_path_a2 = FunctionPath::at_root(
+        CrateName::new("crate_two").unwrap(),
+        FunctionName::new("helper").unwrap(),
+    );
+    doc_a2.functions.insert(fn_path_a2.clone(), make_function_entry());
+
+    let mermaid = render_acceptance(&[doc_a1, doc_a2, doc_b1], &[layer_a.clone(), layer_b.clone()]);
+
+    // Collect the node ids we expect.
+    let type_a1_id = type_node_id(&layer_a, &cn1, &type_name("Entity"));
+    let trait_a1_id = trait_node_id(&layer_a, &cn1, &trait_name("Entity"));
+    let type_a2_id = type_node_id(&layer_a, &cn2, &type_name("Entity"));
+    let type_b1_id = type_node_id(&layer_b, &cn1, &type_name("Entity"));
+    let fn_a1_id = function_node_id(&layer_a, &fn_path_a1);
+    let fn_a2_id = function_node_id(&layer_a, &fn_path_a2);
+
+    // fn_a1_id and fn_a2_id share the same function name but different crates — they must
+    // be distinct, which would fail if the node_id scheme omitted the crate component.
+    assert_ne!(
+        fn_a1_id, fn_a2_id,
+        "AC-05: same function name in different crates must produce distinct node ids"
+    );
+
+    // All ids must be distinct.
+    let ids = vec![
+        type_a1_id.clone(),
+        trait_a1_id.clone(),
+        type_a2_id.clone(),
+        type_b1_id.clone(),
+        fn_a1_id.clone(),
+        fn_a2_id.clone(),
+    ];
+    let mut unique_ids = ids.clone();
+    unique_ids.sort();
+    unique_ids.dedup();
+    assert_eq!(
+        ids.len(),
+        unique_ids.len(),
+        "AC-05: all node ids must be distinct; found duplicates among: {ids:?}"
+    );
+
+    // Type prefix T vs Trait prefix R ensures no collision for same name + same layer + same crate.
+    assert!(type_a1_id.starts_with('T'), "type id must start with T: {type_a1_id}");
+    assert!(trait_a1_id.starts_with('R'), "trait id must start with R: {trait_a1_id}");
+
+    // All ids must appear in the output.
+    assert!(mermaid.contains(&type_a1_id), "AC-05: {type_a1_id} must appear in output");
+    assert!(mermaid.contains(&trait_a1_id), "AC-05: {trait_a1_id} must appear in output");
+    assert!(mermaid.contains(&type_a2_id), "AC-05: {type_a2_id} must appear in output");
+    assert!(mermaid.contains(&type_b1_id), "AC-05: {type_b1_id} must appear in output");
+    assert!(mermaid.contains(&fn_a1_id), "AC-05: {fn_a1_id} must appear in output");
+    assert!(mermaid.contains(&fn_a2_id), "AC-05: {fn_a2_id} must appear in output");
+}
+
+// ---------------------------------------------------------------------------
+// Test 54 (AC-06): config absent → fail-closed StyleConfigNotFound.
+// This integrated test verifies the fail-closed behaviour in the context of a
+// rich fixture (not just an empty catalogue).
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac06_config_absent_fail_closed_with_rich_fixture() {
+    let dir = TempDir::new().unwrap();
+    let nonexistent = dir.path().join("missing-style.toml");
+    let adapter = ContractMapRendererAdapter::new(nonexistent.clone());
+
+    // Rich fixture with multiple crates and types.
+    let mut doc = make_minimal_catalogue("rich-layer", "rich_crate");
+    doc.types.insert(type_name("RichType"), make_type_entry());
+    doc.traits.insert(trait_name("RichTrait"), make_trait_entry());
+
+    let opts = ContractMapRenderOptions::empty();
+    let result = adapter.render(&[doc], &[layer("rich-layer")], &opts);
+
+    assert!(
+        matches!(
+            result,
+            Err(ContractMapRendererError::StyleConfigNotFound { ref path })
+            if path == &nonexistent
+        ),
+        "AC-06: must return StyleConfigNotFound when config is absent, got: {result:?}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 55 (AC-07): All three ContractRole values on TraitEntry produce the same
+// -.->|impl| edge style (no role-dependent variation).
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac07_all_contract_roles_produce_unified_trait_impl_edge_style() {
+    let layer_id = layer("arch-layer");
+    let cn = crate_name("impl_crate");
+
+    let mut doc = make_minimal_catalogue("arch-layer", "impl_crate");
+
+    // Three trait entries, one per ContractRole.
+    doc.traits.insert(
+        trait_name("SpecPort"),
+        make_trait_entry_with_role(ContractRole::SpecificationPort),
+    );
+    doc.traits.insert(
+        trait_name("AppService"),
+        make_trait_entry_with_role(ContractRole::ApplicationService),
+    );
+    doc.traits
+        .insert(trait_name("SecPort"), make_trait_entry_with_role(ContractRole::SecondaryPort));
+
+    // One type that implements all three traits.
+    let impl_type = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::SecondaryAdapter,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![
+            TraitImplDeclV2::new(TraitName::new("SpecPort").unwrap(), cn.clone()),
+            TraitImplDeclV2::new(TraitName::new("AppService").unwrap(), cn.clone()),
+            TraitImplDeclV2::new(TraitName::new("SecPort").unwrap(), cn.clone()),
+        ],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("Adapter"), impl_type);
+
+    let mermaid = render_acceptance(&[doc], std::slice::from_ref(&layer_id));
+
+    let type_id = type_node_id(&layer_id, &cn, &type_name("Adapter"));
+    let spec_port_id = trait_node_id(&layer_id, &cn, &trait_name("SpecPort"));
+    let app_service_id = trait_node_id(&layer_id, &cn, &trait_name("AppService"));
+    let sec_port_id = trait_node_id(&layer_id, &cn, &trait_name("SecPort"));
+
+    // AC-07: all three impl edges must use -.->|impl| (unified style regardless of ContractRole)
+    assert!(
+        mermaid.contains(&format!("{type_id} -.->|impl| {spec_port_id}")),
+        "AC-07: SpecificationPort trait impl must use -.->|impl|, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("{type_id} -.->|impl| {app_service_id}")),
+        "AC-07: ApplicationService trait impl must use -.->|impl|, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("{type_id} -.->|impl| {sec_port_id}")),
+        "AC-07: SecondaryPort trait impl must use -.->|impl|, got:\n{mermaid}"
+    );
+
+    // AC-07: must NOT have role-specific edge variations (e.g. different arrow for different roles).
+    // All three edges use the same `-.->` arrow — count occurrences.
+    let impl_edge_count = mermaid.matches("-.->|impl|").count();
+    assert_eq!(
+        impl_edge_count, 3,
+        "AC-07: exactly 3 -.->|impl| edges must be emitted (one per impl), got {impl_edge_count}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 56 (AC-08): has_stripped_fields suppresses all field edges for both
+// PlainStruct and TupleStruct. Stripped type still gets a subgraph.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac08_has_stripped_fields_true_suppresses_all_field_edges_for_both_struct_kinds() {
+    let layer_id = layer("strip-layer");
+    let cn = crate_name("stripped_crate");
+
+    let mut doc = make_minimal_catalogue("strip-layer", "stripped_crate");
+    doc.types.insert(type_name("FieldTarget"), make_type_entry());
+    doc.types.insert(type_name("TupleTarget"), make_type_entry());
+
+    // PlainStruct with has_stripped_fields: true
+    let plain_stripped = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![FieldDecl::new(
+                FieldName::new("secret").unwrap(),
+                TypeRef::new("FieldTarget").unwrap(),
+            )],
+            has_stripped_fields: true,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("StrippedPlain"), plain_stripped);
+
+    // TupleStruct with has_stripped_fields: true
+    let tuple_stripped = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::TupleStruct {
+            fields: vec![TypeRef::new("TupleTarget").unwrap()],
+            has_stripped_fields: true,
+        },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("StrippedTuple"), tuple_stripped);
+
+    let mermaid = render_acceptance(&[doc], std::slice::from_ref(&layer_id));
+
+    let plain_id = type_node_id(&layer_id, &cn, &type_name("StrippedPlain"));
+    let tuple_id = type_node_id(&layer_id, &cn, &type_name("StrippedTuple"));
+    let field_target_id = type_node_id(&layer_id, &cn, &type_name("FieldTarget"));
+    let tuple_target_id = type_node_id(&layer_id, &cn, &type_name("TupleTarget"));
+
+    // AC-08: both stripped types must still appear as subgraphs (just no field edges).
+    assert!(
+        mermaid.contains(&format!("subgraph {plain_id}[\"StrippedPlain\"]")),
+        "AC-08: StrippedPlain must appear as subgraph, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("subgraph {tuple_id}[\"StrippedTuple\"]")),
+        "AC-08: StrippedTuple must appear as subgraph, got:\n{mermaid}"
+    );
+
+    // AC-08: no field edges must be emitted for stripped types.
+    assert!(
+        !mermaid.contains(&format!("{plain_id} --o|secret| {field_target_id}")),
+        "AC-08: StrippedPlain must not produce field edges (has_stripped_fields=true), got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains(&format!("{tuple_id} --o|.0| {tuple_target_id}")),
+        "AC-08: StrippedTuple must not produce field edges (has_stripped_fields=true), got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 57 (AC-09): TypeAlias renders as empty subgraph + ---|alias_of| undirected
+// edge to the target type subgraph.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac09_type_alias_renders_as_empty_subgraph_with_undirected_alias_of_edge() {
+    let layer_id = layer("alias-layer");
+    let cn = crate_name("alias_crate");
+
+    let mut doc = make_minimal_catalogue("alias-layer", "alias_crate");
+    doc.types.insert(type_name("OriginalType"), make_type_entry());
+
+    let alias_entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::Dto,
+        kind: TypeKindV2::TypeAlias { target: TypeRef::new("OriginalType").unwrap() },
+        methods: vec![],
+        trait_impls: vec![],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("AliasType"), alias_entry);
+
+    let mermaid = render_acceptance(&[doc], std::slice::from_ref(&layer_id));
+
+    let alias_id = type_node_id(&layer_id, &cn, &type_name("AliasType"));
+    let original_id = type_node_id(&layer_id, &cn, &type_name("OriginalType"));
+
+    // AC-09: alias renders as a subgraph (empty — no methods, no variants)
+    assert!(
+        mermaid.contains(&format!("subgraph {alias_id}[\"AliasType\"]")),
+        "AC-09: TypeAlias must be rendered as a subgraph, got:\n{mermaid}"
+    );
+
+    // AC-09: undirected ---|alias_of| edge to target
+    assert!(
+        mermaid.contains(&format!("{alias_id} ---|alias_of| {original_id}")),
+        "AC-09: TypeAlias must produce ---|alias_of| undirected edge to target, got:\n{mermaid}"
+    );
+
+    // AC-09: must NOT produce a directed edge to the target
+    assert!(
+        !mermaid.contains(&format!("{alias_id} --> {original_id}")),
+        "AC-09: TypeAlias must not produce a directed --> edge, got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains(&format!("{alias_id} --o {original_id}")),
+        "AC-09: TypeAlias must not produce a directed --o edge, got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 58 (AC-10): workspace-external traits are silently skipped; workspace-
+// internal traits produce -.->|impl| edges via cross-catalogue index.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac10_workspace_external_traits_silently_skipped_workspace_internal_traits_produce_edges() {
+    let layer_id = layer("ws-layer");
+    let cn_impl = crate_name("impl_crate");
+    let cn_port = crate_name("port_crate");
+
+    // port_crate: declares WorkspaceTrait
+    let mut doc_port = make_minimal_catalogue("ws-layer", "port_crate");
+    doc_port.traits.insert(trait_name("WorkspaceTrait"), make_trait_entry());
+
+    // impl_crate: type implements WorkspaceTrait (workspace-internal) AND
+    // std::fmt::Debug (workspace-external, origin_crate="std") AND
+    // some_ext::Serialize (workspace-external, origin_crate="serde")
+    let mut doc_impl = make_minimal_catalogue("ws-layer", "impl_crate");
+    let impl_type = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![
+            // workspace-internal: must produce edge
+            TraitImplDeclV2::new(TraitName::new("WorkspaceTrait").unwrap(), cn_port.clone()),
+            // workspace-external (std): must be silently skipped
+            TraitImplDeclV2::new(TraitName::new("Debug").unwrap(), CrateName::new("std").unwrap()),
+            // workspace-external (core): must be silently skipped
+            TraitImplDeclV2::new(TraitName::new("Clone").unwrap(), CrateName::new("core").unwrap()),
+            // workspace-external (third-party): must be silently skipped
+            TraitImplDeclV2::new(
+                TraitName::new("Serialize").unwrap(),
+                CrateName::new("serde").unwrap(),
+            ),
+        ],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc_impl.types.insert(type_name("ImplType"), impl_type);
+
+    let mermaid = render_acceptance(&[doc_impl, doc_port], std::slice::from_ref(&layer_id));
+
+    let impl_type_id = type_node_id(&layer_id, &cn_impl, &type_name("ImplType"));
+    let workspace_trait_id = trait_node_id(&layer_id, &cn_port, &trait_name("WorkspaceTrait"));
+
+    // AC-10: workspace-internal WorkspaceTrait → edge emitted
+    assert!(
+        mermaid.contains(&format!("{impl_type_id} -.->|impl| {workspace_trait_id}")),
+        "AC-10: workspace-internal WorkspaceTrait must produce -.->|impl| edge, got:\n{mermaid}"
+    );
+
+    // AC-10: workspace-external traits must NOT produce edges or appear in output.
+    assert!(
+        !mermaid.contains("Debug"),
+        "AC-10: workspace-external trait 'Debug' must not appear in output, got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains("Clone"),
+        "AC-10: workspace-external trait 'Clone' must not appear in output, got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains("Serialize"),
+        "AC-10: workspace-external trait 'Serialize' must not appear in output, got:\n{mermaid}"
+    );
+
+    // AC-10: exactly one -.-> edge (only the workspace-internal one).
+    let edge_count = mermaid.matches("-.->").count();
+    assert_eq!(
+        edge_count, 1,
+        "AC-10: exactly 1 -.-> edge (only the workspace-internal trait), got {edge_count}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 59 (AC-11): crate-root entries (module_path=[]) appear directly in the
+// layer subgraph; entries with module_path=["some_module"] are placed inside a
+// top-module subgraph.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac11_crate_root_entries_in_layer_subgraph_and_module_entries_in_top_module_subgraph() {
+    let layer_id = layer("mod-layer");
+    let cn = crate_name("module_crate");
+
+    let mut doc = make_minimal_catalogue("mod-layer", "module_crate");
+
+    // crate-root entry (module_path = [])
+    let root_entry = make_plain_struct_in_module(ModulePath::root());
+    doc.types.insert(type_name("RootEntry"), root_entry);
+
+    // module entry (module_path = ["some_module"])
+    let module_entry = make_plain_struct_in_module(
+        ModulePath::from_segments(vec!["some_module".to_string()]).unwrap(),
+    );
+    doc.types.insert(type_name("ModuleEntry"), module_entry);
+
+    let mermaid = render_acceptance(&[doc], std::slice::from_ref(&layer_id));
+
+    // Layer subgraph id: "mod-layer" → escape_id_component → '-' becomes "_d_" → "mod_d_layer"
+    // Subgraph id: "L_mod_d_layer"
+    let layer_sg = "L_mod_d_layer";
+    // Top-module subgraph id: layer_sg + "_M_" + escape_id_component("some_module").
+    // escape_id_component: '_' → "__", so "some_module" → "some__module"
+    // Full id: "L_mod_d_layer_M_some__module"
+    let module_sg = "L_mod_d_layer_M_some__module";
+
+    // AC-11: top-module subgraph label must be "<layer>::<top_module>" (raw label, not escaped)
+    assert!(
+        mermaid.contains(&format!("subgraph {module_sg}[\"mod-layer::some_module\"]")),
+        "AC-11: top-module subgraph must have label 'mod-layer::some_module', got:\n{mermaid}"
+    );
+
+    let root_id = type_node_id(&layer_id, &cn, &type_name("RootEntry"));
+    let module_id = type_node_id(&layer_id, &cn, &type_name("ModuleEntry"));
+
+    // RootEntry must appear directly in the layer subgraph (no module prefix in label).
+    assert!(
+        mermaid.contains(&format!("subgraph {root_id}[\"RootEntry\"]")),
+        "AC-11: RootEntry must have label 'RootEntry' (no module prefix), got:\n{mermaid}"
+    );
+
+    // ModuleEntry label must include the module path.
+    assert!(
+        mermaid.contains(&format!("subgraph {module_id}[\"some_module::ModuleEntry\"]")),
+        "AC-11: ModuleEntry must have label 'some_module::ModuleEntry', got:\n{mermaid}"
+    );
+
+    // Structural ordering: layer subgraph open → module subgraph → module entry subgraph.
+    let layer_open = mermaid.find(&format!("subgraph {layer_sg}[")).unwrap();
+    let module_open = mermaid.find(&format!("subgraph {module_sg}")).unwrap();
+    let module_entry_open = mermaid.find(&format!("subgraph {module_id}")).unwrap();
+    let root_open = mermaid.find(&format!("subgraph {root_id}")).unwrap();
+
+    // Layer subgraph must precede all entries.
+    assert!(
+        layer_open < module_open,
+        "AC-11: layer subgraph must precede module subgraph, got:\n{mermaid}"
+    );
+    assert!(
+        layer_open < root_open,
+        "AC-11: layer subgraph must precede root entry subgraph, got:\n{mermaid}"
+    );
+
+    // Find the "end" that closes the module subgraph — it is the first "end" token
+    // appearing after module_open in the output.
+    let module_end = {
+        let after_module_open = &mermaid[module_open..];
+        module_open + after_module_open.find("end").unwrap()
+    };
+
+    // Module entry must be inside the module subgraph: after open AND before close.
+    assert!(
+        module_entry_open > module_open && module_entry_open < module_end,
+        "AC-11: ModuleEntry must be inside the top-module subgraph (between open and end), \
+         module_open={module_open}, module_entry_open={module_entry_open}, module_end={module_end}, \
+         got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 60 (AC-12): mermaid output ordering: classDef → layer subgraphs →
+// edge definitions → class attach lines. No inline ::: syntax (CN-05).
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ac12_mermaid_output_ordering_classdef_subgraphs_edges_class_attach() {
+    // Build a fixture that generates at least one entry of each section:
+    // - classDef (from [class.*] in style config)
+    // - layer subgraph
+    // - trait_impl edge
+    // - class attach line
+    let layer_id = layer("ordered-layer");
+    let cn = crate_name("order_crate");
+
+    let mut doc_types = make_minimal_catalogue("ordered-layer", "order_crate");
+    let mut doc_traits = make_minimal_catalogue("ordered-layer", "order_crate");
+
+    // A trait that will be implemented.
+    doc_traits.traits.insert(trait_name("OrderTrait"), make_trait_entry());
+
+    // A type that implements OrderTrait → produces a -.->|impl| edge.
+    let impl_type = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![TraitImplDeclV2::new(TraitName::new("OrderTrait").unwrap(), cn.clone())],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc_types.types.insert(type_name("ImplType"), impl_type);
+
+    // Use a style config that includes a classDef so we can detect the ordering.
+    let dir = TempDir::new().unwrap();
+    let style_content = r##"
+[edge.trait_impl]
+arrow = '-.->'
+label = "impl"
+
+[edge.method_param]
+arrow = "--o"
+
+[edge.method_returns]
+arrow = "-->"
+
+[edge.field]
+arrow = "--o"
+
+[edge.variant_payload]
+arrow = "--o"
+
+[edge.alias]
+arrow = "---"
+label = "alias_of"
+
+[edge.transition]
+arrow = "==>"
+label = "transitions_to"
+
+[role.ValueObject]
+class = "valueObject"
+
+[role.SecondaryPort]
+class = "secondaryPort"
+
+[node.Method]
+shape = "round"
+class = "methodNode"
+
+[node.Variant]
+shape = "stadium"
+class = "variantNode"
+
+[node.Function]
+shape = "subroutine"
+class = "functionNode"
+
+[class.valueObject]
+fill = "#fff"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.secondaryPort]
+fill = "#eef"
+stroke = "#009"
+stroke_width = "2px"
+stroke_dasharray = "5"
+
+[pattern.Typestate]
+overlay_class = "typestate"
+
+[filter]
+include_function_roles = []
+"##;
+    let path = write_style_config(&dir, style_content);
+    let adapter = ContractMapRendererAdapter::new(path);
+    let opts = ContractMapRenderOptions::empty();
+    let result =
+        adapter.render(&[doc_types, doc_traits], std::slice::from_ref(&layer_id), &opts).unwrap();
+    let mermaid = result.into_string();
+
+    // AC-12: classDef lines must come first.
+    let classdef_pos = mermaid.find("classDef ").unwrap();
+    // AC-12: layer subgraph lines must follow classDef.
+    let subgraph_pos = mermaid.find("subgraph ").unwrap();
+    // AC-12: edge lines must follow subgraphs.
+    let edge_pos = mermaid.find("-.->").unwrap();
+    // AC-12: class attach lines must come after edges.
+    // class attach pattern: "class <id> " (followed by class name)
+    let class_attach_pos = {
+        // Find the first "class T" or "class R" after the edges section.
+        let after_subgraphs = &mermaid[subgraph_pos..];
+        let rel = after_subgraphs
+            .find("class T")
+            .or_else(|| after_subgraphs.find("class R"))
+            .expect("at least one class attach line must exist");
+        subgraph_pos + rel
+    };
+
+    assert!(
+        classdef_pos < subgraph_pos,
+        "AC-12: classDef lines must precede subgraph lines, got:\n{mermaid}"
+    );
+    assert!(
+        subgraph_pos < edge_pos,
+        "AC-12: subgraph lines must precede edge lines, got:\n{mermaid}"
+    );
+    assert!(
+        edge_pos < class_attach_pos,
+        "AC-12: edge lines must precede class attach lines, got:\n{mermaid}"
+    );
+
+    // AC-12 / CN-05: no inline ::: syntax must appear in the subgraph declarations.
+    assert!(
+        !mermaid.contains(":::"),
+        "AC-12 / CN-05: inline ::: class syntax must not appear in output, got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 61 (AC-01 + AC-05 + AC-10 + AC-11 integrated): rich multi-crate,
+// multi-layer fixture combining all of AC-01, AC-05, AC-10, AC-11 together.
+// Two arbitrary layers (layer-a + layer-b), two crates in layer-a, one crate in layer-b.
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_integrated_ac01_ac05_ac10_ac11_rich_multi_crate_fixture() {
+    // Layers: arbitrary names to verify layer-agnostic rendering (AC-14).
+    let layer_a = layer("layer-a");
+    let layer_b = layer("layer-b");
+
+    // layer-a: two crates — "core_crate" and "ports_crate"
+    let cn_core = crate_name("core_crate");
+    let cn_ports = crate_name("ports_crate");
+    // layer-b: one crate — "uc_crate"
+    let cn_uc = crate_name("uc_crate");
+
+    // ports_crate: declares a SpecificationPort trait (crate root)
+    let mut doc_ports = make_minimal_catalogue("layer-a", "ports_crate");
+    doc_ports.traits.insert(
+        trait_name("LayerPort"),
+        make_trait_entry_with_role_and_module(ContractRole::SpecificationPort, ModulePath::root()),
+    );
+
+    // core_crate: has two entries
+    // (a) crate-root TypeA implementing LayerPort (workspace-internal) and Debug (external)
+    // (b) module-path entry TypeB in "events" module
+    let mut doc_core = make_minimal_catalogue("layer-a", "core_crate");
+
+    // AC-11: crate-root entry (module_path=[])
+    let type_a = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::AggregateRoot,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![
+            // AC-10: workspace-internal → edge
+            TraitImplDeclV2::new(TraitName::new("LayerPort").unwrap(), cn_ports.clone()),
+            // AC-10: workspace-external → silent skip
+            TraitImplDeclV2::new(TraitName::new("Debug").unwrap(), CrateName::new("std").unwrap()),
+        ],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc_core.types.insert(type_name("TypeA"), type_a);
+
+    // AC-11: module-path entry (module_path=["events"])
+    let type_b =
+        make_plain_struct_in_module(ModulePath::from_segments(vec!["events".to_string()]).unwrap());
+    doc_core.types.insert(type_name("TypeB"), type_b);
+
+    // uc_crate: a type in layer-b also implementing LayerPort cross-layer
+    // (trait in layer-a, type in layer-b — cross-layer impl resolution)
+    let mut doc_uc = make_minimal_catalogue("layer-b", "uc_crate");
+    let uc_type = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::UseCase,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        // AC-10: LayerPort is in layer-a's ports_crate — workspace-internal, cross-layer
+        trait_impls: vec![TraitImplDeclV2::new(
+            TraitName::new("LayerPort").unwrap(),
+            cn_ports.clone(),
+        )],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc_uc.types.insert(type_name("UseCaseType"), uc_type);
+
+    let catalogues = vec![doc_core, doc_ports, doc_uc];
+    let layer_order = vec![layer_a.clone(), layer_b.clone()];
+    let mermaid = render_acceptance(&catalogues, &layer_order);
+
+    // AC-01: exactly one layer-a layer subgraph (two crates → same subgraph).
+    // "layer-a" → escape_id_component → '-' becomes "_d_" → "layer_d_a"
+    // Subgraph id: "L_layer_d_a"
+    let layer_a_sg_count = mermaid.matches("subgraph L_layer_d_a[\"layer-a\"]").count();
+    assert_eq!(
+        layer_a_sg_count, 1,
+        "AC-01: exactly one 'layer-a' layer subgraph must be emitted, got {layer_a_sg_count}:\n{mermaid}"
+    );
+
+    // AC-11: top-module subgraph for "events" must appear under layer-a.
+    // Module sg id: "L_layer_d_a_M_events"; label: "layer-a::events"
+    assert!(
+        mermaid.contains("subgraph L_layer_d_a_M_events[\"layer-a::events\"]"),
+        "AC-11: events top-module subgraph must appear, got:\n{mermaid}"
+    );
+
+    // AC-11: TypeA (crate-root) must appear directly in layer-a (no module subgraph).
+    let type_a_id = type_node_id(&layer_a, &cn_core, &type_name("TypeA"));
+    assert!(
+        mermaid.contains(&format!("subgraph {type_a_id}[\"TypeA\"]")),
+        "AC-11: TypeA (crate-root) must appear, got:\n{mermaid}"
+    );
+
+    // AC-11: TypeB (events module) must appear inside the events top-module subgraph.
+    let type_b_id = type_node_id(&layer_a, &cn_core, &type_name("TypeB"));
+    assert!(
+        mermaid.contains(&format!("subgraph {type_b_id}[\"events::TypeB\"]")),
+        "AC-11: TypeB must have label 'events::TypeB', got:\n{mermaid}"
+    );
+
+    // AC-10: workspace-internal LayerPort impl from TypeA → -.->|impl| edge
+    let layer_port_id = trait_node_id(&layer_a, &cn_ports, &trait_name("LayerPort"));
+    assert!(
+        mermaid.contains(&format!("{type_a_id} -.->|impl| {layer_port_id}")),
+        "AC-10: TypeA must produce -.->|impl| edge to LayerPort, got:\n{mermaid}"
+    );
+
+    // AC-10: workspace-external Debug must NOT appear
+    assert!(
+        !mermaid.contains("Debug"),
+        "AC-10: external trait 'Debug' must not appear in output, got:\n{mermaid}"
+    );
+
+    // AC-10: UseCaseType also implements LayerPort cross-layer → edge emitted
+    let uc_type_id = type_node_id(&layer_b, &cn_uc, &type_name("UseCaseType"));
+    assert!(
+        mermaid.contains(&format!("{uc_type_id} -.->|impl| {layer_port_id}")),
+        "AC-10: UseCaseType must produce -.->|impl| edge to LayerPort (cross-layer), got:\n{mermaid}"
+    );
+
+    // AC-05: all node ids must be distinct
+    let ids_in_output =
+        vec![type_a_id.clone(), type_b_id.clone(), layer_port_id.clone(), uc_type_id.clone()];
+    let mut unique = ids_in_output.clone();
+    unique.sort();
+    unique.dedup();
+    assert_eq!(
+        ids_in_output.len(),
+        unique.len(),
+        "AC-05: all node ids must be distinct: {ids_in_output:?}"
+    );
+}
