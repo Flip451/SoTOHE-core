@@ -2392,20 +2392,99 @@ const DOMAIN_TYPES_WITH_ENUM_VARIANTS: &str = r#"{
       "functions": {}
     }"#;
 
+/// Minimal `.harness/config/contract-map-style.toml` for the sync-views
+/// contract-map render path. The renderer requires every role/node/edge
+/// referenced by the fixture; the production config carries more entries
+/// but only the ValueObject role plus the seven `[edge.*]` entries are
+/// touched by `DOMAIN_TYPES_WITH_ENUM_VARIANTS`.
+const MINIMAL_CONTRACT_MAP_STYLE_TOML: &str = r##"
+[role.ValueObject]
+class = "valueObject"
+
+[node.Method]
+shape = "round"
+class = "methodNode"
+
+[node.Variant]
+shape = "stadium"
+class = "variantNode"
+
+[node.Function]
+shape = "subroutine"
+class = "functionNode"
+
+[pattern.Typestate]
+overlay_class = "typestate"
+
+[class.valueObject]
+fill = "#fff"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.methodNode]
+fill = "#fff"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.variantNode]
+fill = "#fff"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.functionNode]
+fill = "#fff"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.typestate]
+fill = "#fff"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[edge.method_param]
+arrow = "--o"
+
+[edge.method_returns]
+arrow = "-->"
+
+[edge.transition]
+arrow = "==>"
+label = "transitions_to"
+
+[edge.trait_impl]
+arrow = "-.->"
+label = "impl"
+
+[edge.variant_payload]
+arrow = "--o"
+
+[edge.field]
+arrow = "--o"
+
+[edge.alias]
+arrow = "---"
+label = "alias_of"
+
+[filter]
+include_function_roles = ["FreeFunction", "UseCaseFunction"]
+"##;
+
 #[test]
 fn sync_rendered_views_renders_contract_map_for_done_track() {
-    // Regression guard for the "0-edge orphan" bug:
-    // `render_contract_map_view` was inside the `!is_done_or_archived`
-    // block, so a track that reached `done` status never had its
-    // contract-map regenerated after the fix that moved the call outside
-    // the guard.
-    //
-    // This test proves that:
-    // 1. `sync_rendered_views` produces a `contract-map.md` even when the
-    //    track status is `done` (all tasks in impl-plan.json are done).
-    // 2. The rendered contract-map contains the IN-24 / OS-07 placeholder
-    //    scaffold (deferment comment + domain subgraph). Full v3 rendering
-    //    is deferred per IN-24 / OS-07.
+    // Regression guard for two bugs:
+    // 1. The "0-edge orphan" bug: `render_contract_map_view` was inside the
+    //    `!is_done_or_archived` block, so a track that reached `done` status
+    //    never had its contract-map regenerated after the fix that moved the
+    //    call outside the guard.
+    // 2. The PR #133 stub bug: T009 wired the CLI path to
+    //    `ContractMapRendererAdapter` but left this sync-views path emitting
+    //    a static placeholder. This test pins that `sync_rendered_views`
+    //    drives the adapter end-to-end and emits actual mermaid content.
     let dir = tempfile::tempdir().unwrap();
     let track_dir = dir.path().join("track/items/track-done-cmap");
     std::fs::create_dir_all(&track_dir).unwrap();
@@ -2413,6 +2492,13 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
     // architecture-rules.json — required by FsCatalogueLoader inside
     // `render_contract_map_view`.
     std::fs::write(dir.path().join("architecture-rules.json"), ARCH_RULES_DOMAIN_ONLY).unwrap();
+
+    // .harness/config/contract-map-style.toml — required by
+    // ContractMapRendererAdapter (fail-closed per CN-03).
+    let style_dir = dir.path().join(".harness/config");
+    std::fs::create_dir_all(&style_dir).unwrap();
+    std::fs::write(style_dir.join("contract-map-style.toml"), MINIMAL_CONTRACT_MAP_STYLE_TOML)
+        .unwrap();
 
     // v5 metadata (no status field — status derived from impl-plan.json).
     std::fs::write(
@@ -2439,15 +2525,21 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
         "contract-map.md must be rendered for done tracks; changed: {changed:?}"
     );
 
-    // T001 stub: render_contract_map free function removed; ContractMapRendererAdapter
-    // will be wired in T009. The placeholder produces a minimal flowchart scaffold.
+    // ContractMapRendererAdapter wired: rendered output must be a real
+    // mermaid flowchart that references the fixture's types — the static
+    // placeholder is gone.
     let cmap = std::fs::read_to_string(track_dir.join("contract-map.md")).unwrap();
-    // Pin the exact placeholder payload — equality check so extra content or a
-    // changed scaffold also fails (regression guard for T009 wiring).
-    const EXPECTED_PLACEHOLDER: &str = "<!-- contract-map renderer not yet wired (T009) -->\n\
-         ```mermaid\nflowchart LR\nend\n```\n";
-    assert_eq!(
-        cmap, EXPECTED_PLACEHOLDER,
-        "contract-map.md must match the T009 placeholder exactly"
+    assert!(cmap.contains("flowchart TD"), "contract-map.md must declare a flowchart: {cmap}");
+    assert!(
+        cmap.contains("EnumVariantDeclaration"),
+        "contract-map.md must reference fixture type EnumVariantDeclaration: {cmap}"
+    );
+    assert!(
+        cmap.contains("MemberDeclaration"),
+        "contract-map.md must reference fixture type MemberDeclaration: {cmap}"
+    );
+    assert!(
+        !cmap.contains("not yet wired"),
+        "contract-map.md must not contain the legacy stub placeholder: {cmap}"
     );
 }

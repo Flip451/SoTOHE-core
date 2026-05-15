@@ -64,7 +64,8 @@
     {
       "id": "T011",
       "description": "CI full pass 確認。前提: T001-T010 (すべての実装 task) が完了していること。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) を実行し、全ゲートが pass することを確認する。旧 renderer 由来の dead code warning が存在しないこと (AC-15)。cargo make check-layers が pass すること (AC-13: ContractMapRenderer port が domain 層、ContractMapRendererAdapter が infrastructure 層)。verify-catalogue-spec-refs / check-catalogue-spec-signals で contract-map-v3-2026-05-15 track の impl phase 由来 Yellow (T002/T003/T005 対象の action:add/modify) がすべて Blue に解消されていることを確認する。ただし workaround 登録済み INF-23 / INF-24 由来の 3 件 (usecase::ReviewCheckApprovedInteractor / usecase::TaskOperationInteractor / infrastructure::CatalogueToExtendedCrateCodecError) は Yellow のまま残存することが許容された最終状態であり、Blue 化を要求しない。また T010 commit (7f0d551) にて追加された informal_grounds Workaround 登録により usecase::RenderContractMapInteractor の catalogue-spec-signal も Yellow のまま残存することが許容された最終状態であり、Blue 化を要求しない (structural_eq.rs の generic-parameterised Interactor 型に対する evaluator の非対称性は INF-23/INF-24 と同一バグクラス)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0dc564740279e179902a78fd897c0d291d6b5488"
     }
   ],
   "plan": {

@@ -2,7 +2,10 @@
 
 use std::path::{Path, PathBuf};
 
-use domain::tddd::{CatalogueLoader, CatalogueLoaderError, ContractMapContent};
+use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::{
+    CatalogueLoader, CatalogueLoaderError, ContractMapRenderOptions, ContractMapRenderer,
+};
 use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, derive_track_status};
 
 use super::atomic_write::atomic_write_file;
@@ -10,6 +13,7 @@ use super::codec::{self, DocumentMeta};
 use crate::spec;
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::tddd::contract_map_adapter::FsCatalogueLoader;
+use crate::tddd::contract_map_renderer_adapter::ContractMapRendererAdapter;
 use crate::tddd::type_signals_codec;
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
@@ -1225,13 +1229,17 @@ fn render_contract_map_view(
         return Ok(());
     }
 
-    // T001: render_contract_map free function removed.
-    // T009 will wire ContractMapRendererAdapter here. Placeholder until then.
-    let _ = (catalogues, layer_order);
-    let content = ContractMapContent::new(
-        "<!-- contract-map renderer not yet wired (T009) -->\n\
-         ```mermaid\nflowchart LR\nend\n```\n",
-    );
+    let style_config_path = root.join(".harness/config/contract-map-style.toml");
+    let adapter = ContractMapRendererAdapter::new(style_config_path);
+    let docs: Vec<CatalogueDocument> = catalogues.values().cloned().collect();
+    let opts = ContractMapRenderOptions::empty();
+    let content = match adapter.render(&docs, &layer_order, &opts) {
+        Ok(content) => content,
+        Err(e) => {
+            eprintln!("warning: skipping contract-map.md render for {}: {e}", track_dir.display());
+            return Ok(());
+        }
+    };
     let contract_map_path = track_dir.join("contract-map.md");
     let old = match std::fs::read_to_string(&contract_map_path) {
         Ok(existing) => Some(existing),
