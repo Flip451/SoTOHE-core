@@ -1,6 +1,68 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "INF-24 points readers at a C-side `for_is_external` leak in `mod.rs` and labels the result `Mismatch_Reference Red`, but the linked track artifact documents a different bug: `patch_impl_for_ids` in Phase 1 leaves the impl in S and produces `SMinusC_Reference Red` (`track/items/contract-map-v3-2026-05-15/infrastructure-types.json:40-45`). As written, the TODO entry sends maintainers to the wrong subsystem and the wrong signal polarity.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 285,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b2bbf03c0377e06ccea65dc5f35625702ec1e2a9f8ec2f2eaf1ef3c5ef5ab59b",
+          "at": "2026-05-15T06:37:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "INF-24 describes a `patch_impl_for_ids` bug in `phase1/child_items.rs`, but the briefing for this round says the intended issue is the external-type filter gap in `mod.rs:362-380`. As written, the TODO points maintainers at the wrong subsystem and the wrong red polarity, so the follow-up track will likely fix the wrong code path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/TODO.md",
+              "line": 285,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b68c1b8ce62ac5225a376f9191075b76eec169ba1562efacd6472f3686bc512",
+          "at": "2026-05-15T06:39:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
+          "at": "2026-05-15T06:43:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
+          "at": "2026-05-15T06:46:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
+          "at": "2026-05-15T09:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
+          "at": "2026-05-15T09:47:41Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -112,6 +174,242 @@
           "findings": [],
           "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
           "at": "2026-05-15T04:43:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file says `From<ContractMapRendererError>` is omitted, but `impl-plan.json` T003 and `plan.md` S3 require that conversion to be implemented. The artifact set describes two different target states for `RenderContractMapError`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/usecase-types.json",
+              "line": 59,
+              "category": "contradiction"
+            },
+            {
+              "message": "`IN-24` is referenced as the deferred placeholder target, but the spec only defines `IN-01` through `IN-18`. That anchor is not part of this track's spec, so the comment should point at the actual deferred scope instead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/contract-map.md",
+              "line": 2,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:77f3506630b403856e5d777d0391ba9a99105cf82cb51727b83c2f84cdfeba2d",
+          "at": "2026-05-15T06:34:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ContractMapRendererError` introduces a public `RenderFailed` variant here, but the plan never assigns a task that actually exercises or asserts that path. T002 only covers `Display`/`Error` formatting, T005 only covers config-missing/parse failures, and T010 is limited to AC-01..14 acceptance behavior. As written, the generic renderer-failure branch can be implemented incorrectly without any planned test catching it. Add an explicit unit or integration test that forces `render` to return `RenderFailed` and verifies propagation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 19,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:2cb51e61db1ebea0cbb2a2ec8bd146fef216ac592c38c964b1a53350a1763786",
+          "at": "2026-05-15T06:42:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011 says to confirm that all Yellow signals are Blue, but the briefing's accepted deviations explicitly allow the `<layer>-catalogue-spec-signals.json` Yellow items to remain Yellow. As written, this completion criterion contradicts the allowed end state and could push the gate toward an unachievable target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c013e0ef61e6aae8e21a7bff78e71c5da29594373e2a443912a2fac02dd51723",
+          "at": "2026-05-15T06:45:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The machine-readable plan has no dependency graph: every task object in this file omits `depends_on`, so prerequisite ordering is not enforced. That leaves tasks like T003, T009, and T011 schedulable before the artifacts they require, which makes the plan infeasible as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 5,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T005 describes Function node IDs as `F<len>_<layer_path>`, but the spec requires `F<len>_<sanitized_full_path>` for functions (`spec.md:64`). As written, the plan would generate the wrong identifier shape for function nodes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 42,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8c78b35ef07d508c175305b45d798966ede71edaef6936d2eabc74a07f323011",
+          "at": "2026-05-15T06:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[plan.md:L54] T010 claims to cover AC-01 and AC-11, but the task only specifies a two-layer fixture plus TypeKindV2 variant coverage. It never says the fixture includes multiple `CatalogueDocument`s in the same layer or any `module_path = []` / nested-module cases, so the layer-aggregation behaviors required by those acceptance criteria are not actually specified by this task.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 54,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:75e7f25341e733a276eab6c4917b994a43966e4e972914fe0aabda35315cd992",
+          "at": "2026-05-15T06:53:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-01` still specifies `render_contract_map(...)->ContractMapContent`, but this track deletes `domain::tddd::contract_map_render::render_contract_map` and replaces it with the fallible `ContractMapRenderer::render(...)->Result<ContractMapContent, ContractMapRendererError>`. `T010` repeats the same stale API name. As written, the acceptance criteria and test plan point at an API that the rest of the plan explicitly removes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/spec.md",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a4b112bc0e27364466788455491a7cc4f73de6f8493a3a08f859390694b2f7e7",
+          "at": "2026-05-15T06:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0333ca40752e65319bfa3b6a2710857c0b54a9fb22d8b4c6c0b10d132bd0c617",
+          "at": "2026-05-15T07:04:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan still leaves the workflow unable to feed the new renderer's v3 input shape. IN-01/AC-01 require `ContractMapRenderer::render` to consume `&[CatalogueDocument]` and correctly handle multiple `CatalogueDocument`s with the same `LayerId`, but `CatalogueLoader` is kept as a reference returning `BTreeMap<LayerId, CatalogueDocument>`. T003/T009 only inject and call the renderer; no task changes the loader contract or adds an equivalent collection step that can preserve 1-layer-N-crate catalogues. Because a `BTreeMap<LayerId, ...>` cannot represent two documents for the same layer, the CLI/usecase path cannot satisfy the stated v3 design outside isolated adapter tests.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/domain-types.json",
+              "line": 111,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T010 is described as an acceptance test spanning AC-01 through AC-14, and task coverage assigns T010 to AC-07 and AC-10, but the task's explicit fixture/test targets never require any `trait_impls`, all three `ContractRole` cases, or a workspace-external trait to exercise silent-skip behavior. As written, the acceptance task can be completed while missing the trait-impl edge behaviors that AC-07/AC-10 require, contradicting the coverage claims.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0333ca40752e65319bfa3b6a2710857c0b54a9fb22d8b4c6c0b10d132bd0c617",
+          "at": "2026-05-15T07:09:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-01 says the ContractMapRenderer method signature, adapter struct definition, and RenderContractMapInteractor coordination API are out of scope for this track's behavioral spec, but IN-01/IN-05 and the implementation plan make those exact API details in-scope and required. This leaves the plan artifacts with conflicting target-state guidance for T002/T003/T005.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+              "line": 259,
+              "category": "contradiction"
+            },
+            {
+              "message": "T010 is described as an acceptance test spanning AC-01 through AC-14, but the explicit test targets only list AC-01/02/05/06/07/10/11/12, while task-coverage assigns AC-13 to T002/T009/T011 and AC-14 only to T008. Either T010 needs explicit checks for the remaining ACs or the \"AC-01〜AC-14\" claim should be narrowed to match the coverage map.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:504ea4db0bf8bd81d7f13ec4ac00410795758c7a31fa5402bca3b84b17434380",
+          "at": "2026-05-15T07:14:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010's coverage is internally inconsistent. The S6 section says T010 adds an AC-01 through AC-14 acceptance test, and task-coverage assigns T010 to AC-03, AC-04, AC-08, and AC-09, but the T010 task text explicitly limits its integration targets to AC-01/02/05/06/07/10/11/12 and says AC-03/04/08/09 are handled elsewhere. It also says AC-08 is covered by T007 even though the plan assigns has_stripped_fields rendering to T006. As written, implementers cannot tell whether T010 must actually test AC-03/04/08/09, and the coverage artifact overstates T010's acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/task-coverage.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb622638c2a9a3a0ebc8c4e205dd194292f92e230bc7f0eb3c30df7cc913b5b6",
+          "at": "2026-05-15T07:19:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-14 requires both no hardcoded layer names and successful rendering in a workspace with arbitrary layer names, and task-coverage assigns AC-14 only to T008 while T010 explicitly defers AC-14 to T008. However T008's listed unit tests cover trait impl resolution, external-trait skipping, and output ordering only; they do not require an arbitrary-layer fixture or assertion. An implementer can complete every listed T008/T010 test without verifying the second half of AC-14, so the coverage claim is incomplete.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9f3a5eb11ed6da9036abbda2ccbfe553df83e201c6b2d402ebabb0219ae0b66c",
+          "at": "2026-05-15T07:25:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 requires the default style config to define `NodeCategory {Method, Variant, Field, Function}` with shape/class settings, which makes `Field` a node category. That conflicts with the same plan/spec stating PlainStruct and TupleStruct fields are not node-ized and are rendered only as edges/labels (`IN-12`, T006). An implementer following T004 could add `[node.Field]` semantics that T006 explicitly forbids, so the config contract needs to remove or clarify `Field` as a non-node edge label/style concern.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e445d7b51cbba61aef03da39384917d9ed02f56cb2c3b6f585a226566e3c6648",
+          "at": "2026-05-15T07:30:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca08b935fe8872756a97bfc1aeafe9462559fb832f4289744264c4c02f7ec5a5",
+          "at": "2026-05-15T07:32:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c2b9012cd0b98974c68e8588c42e0027ba9bad60f079ef6ba8e5b387b1138dc",
+          "at": "2026-05-15T09:44:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008/T010 tell implementers to build trait-impl edges from `TraitEntry.trait_impls`, but the catalogue v3 artifacts model implementations on concrete type entries (`types[*].trait_impls`), while trait entries only define the target trait/role. Following this plan would either look at a non-existent field or build fixtures that cannot express workspace-internal/external impls, so AC-07/AC-10 coverage is not actually implementable as written. The plan should say to iterate type entries' `trait_impls` and resolve those references against the trait index, using TraitEntry only as the target node/role source.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 48,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:2c2b9012cd0b98974c68e8588c42e0027ba9bad60f079ef6ba8e5b387b1138dc",
+          "at": "2026-05-15T09:48:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ef286a9ec1430fcec7f3d272261e13bbc61f9b497e7b4d07c25c6e5975b312b",
+          "at": "2026-05-15T09:53:06Z"
         }
       ]
     }

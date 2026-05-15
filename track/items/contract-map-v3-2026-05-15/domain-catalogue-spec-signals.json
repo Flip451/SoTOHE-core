@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "a9e25cee65369248545002562315f6e47a445ca1b964f153677b2ca4d346076d",
+  "signals": [
+    {
+      "type_name": "ContractMapRenderOptions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractMapRendererError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueLoader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractMapRenderer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ContractMapWriter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::tddd::contract_map_render::render_contract_map",
+      "signal": "blue"
+    }
+  ]
+}

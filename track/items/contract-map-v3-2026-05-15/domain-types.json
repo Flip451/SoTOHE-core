@@ -1,0 +1,209 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ContractMapRendererError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "StyleConfigNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "path", "ty": "std::path::PathBuf" }]
+            }
+          },
+          {
+            "name": "StyleConfigParse",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "RenderFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "reason", "ty": "String" }]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "module_path": "tddd",
+      "docs": "Error variants returned by ContractMapRenderer implementations. StyleConfigNotFound: the style TOML is absent (fail-closed per CN-03). StyleConfigParse: the TOML could not be parsed. RenderFailed: a generic rendering failure.",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-05",
+          "hash": "0eeeb2a7ce79df051840dbcf9439a1c8f26e3067daef108e5341a20d5bf42a66"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-03",
+          "hash": "b4cb6231a03a50d50158444ebadd23092d44db1cb6b5f1d1cffc11c95595001b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ContractMapRenderOptions": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "layers", "ty": "Vec<LayerId>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "empty",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "module_path": "tddd",
+      "docs": "Render-configuration value object for the Contract Map. Modified in this track: signal_overlay, action_overlay, and include_spec_source_edges stubs are removed (ADR Decision M — YAGNI). Only the layers filter field remains. Setting layers to an empty Vec renders all layers from layer_order.",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-18",
+          "hash": "16dee4798b4b9e15fcc42d46367c88158990241b96e3030d8632394e6f39b383"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "CatalogueLoader": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "load_all",
+          "receiver": "&self",
+          "params": [{ "name": "track_id", "ty": "&TrackId" }],
+          "returns": "Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd",
+      "docs": "Secondary port that loads every tddd.enabled layer's catalogue for a given track. Carried for contract-map edge visibility (CatalogueLoader -.impl.-> FsCatalogueLoader).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ContractMapRenderer": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "render",
+          "receiver": "&self",
+          "params": [
+            { "name": "catalogues", "ty": "&[CatalogueDocument]" },
+            { "name": "layer_order", "ty": "&[LayerId]" },
+            { "name": "opts", "ty": "&ContractMapRenderOptions" }
+          ],
+          "returns": "Result<ContractMapContent, ContractMapRendererError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd",
+      "docs": "Secondary port for rendering the contract map from catalogue v3 documents (Decision E-3c). The Adapter in the infrastructure layer uses syn to parse TypeRef strings and emits a mermaid flowchart. The port accepts &[CatalogueDocument] (self-descriptive: each doc carries crate_name + layer) and layer_order for stable left-to-right subgraph layout. Settings (style config) are opaque to the port — the Adapter loads them internally (fail-closed per CN-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-05",
+          "hash": "0eeeb2a7ce79df051840dbcf9439a1c8f26e3067daef108e5341a20d5bf42a66"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-01",
+          "hash": "eeb8ecb7102d52f493f10fc9b7d3bfd8aebdd33ee6601730dc1d58605cc535ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ContractMapWriter": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&TrackId" },
+            { "name": "content", "ty": "&ContractMapContent" }
+          ],
+          "returns": "Result<(), ContractMapWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd",
+      "docs": "Secondary port that persists a rendered ContractMapContent to the track directory. Carried for contract-map edge visibility.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "domain::tddd::contract_map_render::render_contract_map": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "catalogues", "ty": "&BTreeMap<LayerId, CatalogueDocument>" },
+        { "name": "layer_order", "ty": "&[LayerId]" },
+        { "name": "opts", "ty": "&ContractMapRenderOptions" }
+      ],
+      "returns": "ContractMapContent",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted in this track. The rendering responsibility moves to ContractMapRenderer port (domain) + ContractMapRendererAdapter (infrastructure). The old BTreeMap-keyed signature is replaced by the port method receiving &[CatalogueDocument] (ADR Decision A-3' + Decision E-3c).",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-05",
+          "hash": "0eeeb2a7ce79df051840dbcf9439a1c8f26e3067daef108e5341a20d5bf42a66"
+        }
+      ],
+      "informal_grounds": []
+    }
+  }
+}

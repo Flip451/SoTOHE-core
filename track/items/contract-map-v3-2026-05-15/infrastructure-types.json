@@ -1,0 +1,243 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "CatalogueToExtendedCrateCodecError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTypeRef",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "type_ref", "ty": "String" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "AmbiguousIdentifier",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "name", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "module_path": "tddd",
+      "docs": "Infrastructure-level error for CatalogueToExtendedCrateCodec. action:modify with trait_impls [Debug, Display, Error] declared so that B-side children (including the From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError orphan impl) are removed from S and replaced by A-codec content — workaround for evaluator bug: patch_impl_for_ids causes the external-for_ From impl to incorrectly pass for_is_external=false in S while C correctly filters it (for_is_external=true), generating spurious SMinusC_Reference Red.",
+      "spec_refs": [],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "action:modify required to remove B-seeded From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError impl from S. patch_impl_for_ids in Phase 1 child_items.rs replaces the impl for_.id with the parent type id (CatalogueToExtendedCrateCodecError), causing for_is_external=false in S while C correctly identifies NewTypeGraphCodecError as external (for_is_external=true via paths entry crate_id!=0). This produces SMinusC_Reference Red for the impl key. Declaring modify+remove_b_children eliminates the key from S and resolves the Red."
+        }
+      ]
+    },
+    "ContractMapRendererAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "style_config_path", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "style_config_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "trait_impls": [
+        { "trait_name": "ContractMapRenderer", "origin_crate": "domain" }
+      ],
+      "module_path": "tddd",
+      "docs": "Infrastructure adapter that implements the ContractMapRenderer port using syn for precise TypeRef parsing. Holds the path to the style configuration TOML (.harness/config/contract-map-style.toml). Loads the config on each render() call (fail-closed if absent — CN-03). Emits the full mermaid flowchart per ADR Decisions A-3', B-1, C, D-2, E-3c, F-2+b2-ii, F-2+d1, G-2'b, H-3, H'-1, I-1, J-2, K-2+(d)+Newtype-1, L-1+L-8+L-10, N-1', O-2+O-3+O-a, U-6d-iii.",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-05",
+          "hash": "0eeeb2a7ce79df051840dbcf9439a1c8f26e3067daef108e5341a20d5bf42a66"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-01",
+          "hash": "eeb8ecb7102d52f493f10fc9b7d3bfd8aebdd33ee6601730dc1d58605cc535ea"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-02",
+          "hash": "e1b7079438896d4578202ab6fd3d062ff6dc51db5860ce8195e6add7c0a167fa"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-03",
+          "hash": "b4cb6231a03a50d50158444ebadd23092d44db1cb6b5f1d1cffc11c95595001b"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-04",
+          "hash": "e46e3add5ed81fa75506f8a219e0e1775474981038c7f1dc78968cc16e3c1e90"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-06",
+          "hash": "cfc586b83c2ec4f1f74e2d8a069c5b879f8d86d52e09769edb3d11b1cca47e48"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-07",
+          "hash": "6d2117783296ba2e532d08473a5d68c6b77b820bf14a340c5f93886e77cd9460"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-08",
+          "hash": "429084d25f3217b3e8373cdb66892e3a73adb5f91464aef643b803ba77507125"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-09",
+          "hash": "da91d035a1235ccd9a7f826d65064903e799cf9d66b25c20937599e7b840e435"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-10",
+          "hash": "30dbac4382d12c2ce8862db408f36294b3feb031114ee2552f600c42d0d301d6"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-11",
+          "hash": "8b67986fcaee08b790d06b9a749247df5e8b2050a023d62c26c11f4df9526ae9"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-12",
+          "hash": "b132e28dbd4d4b2141bba842256203f33a6dd1b2a4971652da9d2e9951c2a6aa"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-13",
+          "hash": "c9fdf0de91f90df20a5a578140566afa24b41321c9084dc9313a7d9f65af8633"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-14",
+          "hash": "e1fe760f976825e386af3a5997b413dae9633a497ccb0d2c87e5fd5f1e9c8cda"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-15",
+          "hash": "c571ce482e083c032939474b2776c62a3a9ca3556e7c15b1ab9d959a5c779c08"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-16",
+          "hash": "4f47da1eba28f3280c32e88dbeafbd87103cd3fa35fde666526b3b7a042ce65d"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+          "anchor": "IN-17",
+          "hash": "314c1bae0ee9a322899d376507af724cff5fc9efced35cd4de1a64654943a036"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FsCatalogueLoader": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_root", "ty": "std::path::PathBuf" },
+          { "name": "rules_path", "ty": "std::path::PathBuf" },
+          { "name": "trusted_root", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "track_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_path", "ty": "std::path::PathBuf" },
+            { "name": "trusted_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "trait_impls": [
+        { "trait_name": "CatalogueLoader", "origin_crate": "domain" }
+      ],
+      "module_path": "tddd",
+      "docs": "Filesystem-backed CatalogueLoader implementation. Carried for contract-map edge visibility (FsCatalogueLoader -.impl.-> CatalogueLoader).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FsContractMapWriter": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_root", "ty": "std::path::PathBuf" },
+          { "name": "trusted_root", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "track_root", "ty": "std::path::PathBuf" },
+            { "name": "trusted_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "trait_impls": [
+        { "trait_name": "ContractMapWriter", "origin_crate": "domain" }
+      ],
+      "module_path": "tddd",
+      "docs": "Filesystem-backed ContractMapWriter implementation. Carried for contract-map edge visibility (FsContractMapWriter -.impl.-> ContractMapWriter).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}
