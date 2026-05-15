@@ -5,7 +5,6 @@ use std::path::{Path, PathBuf};
 use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::{
     CatalogueLoader, CatalogueLoaderError, ContractMapRenderOptions, ContractMapRenderer,
-    ContractMapRendererError,
 };
 use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, derive_track_status};
 
@@ -1234,34 +1233,17 @@ fn render_contract_map_view(
     let adapter = ContractMapRendererAdapter::new(style_config_path);
     let docs: Vec<CatalogueDocument> = catalogues.values().cloned().collect();
     let opts = ContractMapRenderOptions::empty();
-    // Adapter failures split by category (PR #133 round 3 review fix):
-    //  * `StyleConfigNotFound` → non-fatal warn + skip. The repo commits
-    //    `.harness/config/contract-map-style.toml` (T004), but standalone
-    //    sync-views invocations (e.g. dev environments before a fresh checkout
-    //    is fully populated, or scratch fixtures in unrelated `sync_rendered_views`
-    //    tests) may legitimately run without the config — silently leaving the
-    //    existing contract-map untouched is the right behaviour there.
-    //  * Any other `ContractMapRendererError` (TOML parse failure, render-time
-    //    bug) → propagate as `RenderError::Io`. The renderer is fail-closed
-    //    (CN-03) and these signal real bugs that must surface from the
-    //    pre-commit hook rather than be swallowed.
-    let content = match adapter.render(&docs, &layer_order, &opts) {
-        Ok(content) => content,
-        Err(ContractMapRendererError::StyleConfigNotFound { path }) => {
-            eprintln!(
-                "warning: skipping contract-map.md render for {} (style config absent at {})",
-                track_dir.display(),
-                path.display()
-            );
-            return Ok(());
-        }
-        Err(e) => {
-            return Err(RenderError::Io(std::io::Error::other(format!(
-                "contract-map render failed for {}: {e}",
-                track_dir.display()
-            ))));
-        }
-    };
+    // All adapter failures are fatal (IN-03 fail-closed): a missing or
+    // malformed style config, a render-time bug, or any other renderer
+    // error must surface from the pre-commit hook rather than be swallowed.
+    // Tests that reach this path must provide
+    // `.harness/config/contract-map-style.toml` in their fixture directory.
+    let content = adapter.render(&docs, &layer_order, &opts).map_err(|e| {
+        RenderError::Io(std::io::Error::other(format!(
+            "contract-map render failed for {}: {e}",
+            track_dir.display()
+        )))
+    })?;
     let contract_map_path = track_dir.join("contract-map.md");
     let old = match std::fs::read_to_string(&contract_map_path) {
         Ok(existing) => Some(existing),

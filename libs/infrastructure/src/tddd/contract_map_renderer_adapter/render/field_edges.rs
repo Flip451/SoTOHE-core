@@ -8,6 +8,7 @@
 //!   `render.rs` for both TraitEntry methods and FunctionEntry edges.
 //! - `entry_label`: entry subgraph label from sub-module path + short name.
 
+use domain::tddd::ContractMapRendererError;
 use domain::tddd::catalogue_v2::composite::TypeKindV2;
 use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeRef};
 
@@ -34,6 +35,11 @@ use super::type_index::TypeIndex;
 ///   Decision N-1', AC-09).
 ///
 /// `caller_crate` scopes TypeRef resolution to the same catalogue document (same-catalogue).
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when a `TypeRef` has mismatched angle
+/// brackets (fail-closed, CN-03).
 pub(super) fn emit_field_edges(
     builder: &mut MermaidBuilder,
     entry_id: &str,
@@ -41,13 +47,13 @@ pub(super) fn emit_field_edges(
     caller_crate: &CrateName,
     type_index: &TypeIndex,
     style: &StyleConfig,
-) {
+) -> Result<(), ContractMapRendererError> {
     let arrow = style.edge.get("field").map(|e| e.arrow.as_str()).unwrap_or("--o");
 
     match kind {
         TypeKindV2::PlainStruct { fields, has_stripped_fields: false, .. } => {
             for field in fields {
-                if let Some(target_id) = type_index.resolve(&field.ty, caller_crate) {
+                if let Some(target_id) = type_index.resolve(&field.ty, caller_crate)? {
                     builder.push_edge(format!(
                         "{entry_id} {arrow}|{}| {target_id}",
                         field.name.as_str()
@@ -57,7 +63,7 @@ pub(super) fn emit_field_edges(
         }
         TypeKindV2::TupleStruct { fields, has_stripped_fields: false } => {
             for (i, field_ty) in fields.iter().enumerate() {
-                if let Some(target_id) = type_index.resolve(field_ty, caller_crate) {
+                if let Some(target_id) = type_index.resolve(field_ty, caller_crate)? {
                     builder.push_edge(format!("{entry_id} {arrow}|.{i}| {target_id}"));
                 }
             }
@@ -65,7 +71,7 @@ pub(super) fn emit_field_edges(
         TypeKindV2::TypeAlias { target } => {
             // Undirected alias edge: alias entry subgraph --- alias_of --- target subgraph
             // (Decision N-1', AC-09). Delegated to enum_variants module.
-            emit_type_alias_edge(builder, entry_id, target, caller_crate, type_index, style);
+            emit_type_alias_edge(builder, entry_id, target, caller_crate, type_index, style)?;
         }
         // has_stripped_fields: true → skip all field edges (AC-08).
         TypeKindV2::PlainStruct { has_stripped_fields: true, .. }
@@ -75,6 +81,7 @@ pub(super) fn emit_field_edges(
         // Enum: variant payload edges handled by emit_enum_variant_nodes (T007).
         | TypeKindV2::Enum { .. } => {}
     }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -86,6 +93,11 @@ pub(super) fn emit_field_edges(
 /// The edge style is read from `style.edge["method_param"].arrow`. If the
 /// TypeRef is unresolvable (not in the same catalogue), the edge is silently skipped.
 /// `caller_crate` scopes TypeRef resolution to the same catalogue document.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when the `TypeRef` has mismatched
+/// angle brackets (fail-closed, CN-03).
 pub(super) fn collect_param_edge(
     builder: &mut MermaidBuilder,
     src_id: &str,
@@ -93,12 +105,13 @@ pub(super) fn collect_param_edge(
     caller_crate: &CrateName,
     type_index: &TypeIndex,
     style: &StyleConfig,
-) {
-    if let Some(target_id) = type_index.resolve(param_ty, caller_crate) {
+) -> Result<(), ContractMapRendererError> {
+    if let Some(target_id) = type_index.resolve(param_ty, caller_crate)? {
         let arrow =
             style.edge.get("method_param").map(|e: &EdgeStyle| e.arrow.as_str()).unwrap_or("--o");
         builder.push_edge(format!("{src_id} {arrow} {target_id}"));
     }
+    Ok(())
 }
 
 /// Emits a `-->` edge from `src_id` to the resolved return type subgraph.
@@ -106,6 +119,11 @@ pub(super) fn collect_param_edge(
 /// The edge style is read from `style.edge["method_returns"].arrow`. If the
 /// TypeRef is unresolvable (not in the same catalogue), the edge is silently skipped.
 /// `caller_crate` scopes TypeRef resolution to the same catalogue document.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when the `TypeRef` has mismatched
+/// angle brackets (fail-closed, CN-03).
 pub(super) fn collect_returns_edge(
     builder: &mut MermaidBuilder,
     src_id: &str,
@@ -113,12 +131,13 @@ pub(super) fn collect_returns_edge(
     caller_crate: &CrateName,
     type_index: &TypeIndex,
     style: &StyleConfig,
-) {
-    if let Some(target_id) = type_index.resolve(returns_ty, caller_crate) {
+) -> Result<(), ContractMapRendererError> {
+    if let Some(target_id) = type_index.resolve(returns_ty, caller_crate)? {
         let arrow =
             style.edge.get("method_returns").map(|e: &EdgeStyle| e.arrow.as_str()).unwrap_or("-->");
         builder.push_edge(format!("{src_id} {arrow} {target_id}"));
     }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------

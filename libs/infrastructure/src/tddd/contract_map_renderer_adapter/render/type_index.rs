@@ -7,9 +7,11 @@
 
 use std::collections::HashMap;
 
+use domain::tddd::ContractMapRendererError;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::catalogue_v2::identifiers::{CrateName, TypeRef};
+use domain::tddd::catalogue_v2::roles::ItemAction;
 
 use super::super::{trait_node_id, type_node_id};
 
@@ -47,6 +49,11 @@ impl TypeIndex {
     /// maps under the owning document's `crate_name` to preserve same-catalogue
     /// semantics (T006) and prevent same-name type/trait id collisions.
     ///
+    /// Entries with `action: Delete` are excluded from the index so that deleted
+    /// types cannot be resolved: a live entry that references a deleted type/trait
+    /// by `TypeRef` must not produce a node id pointing to a deleted (and unrendered)
+    /// subgraph node, which would create a dangling Mermaid edge.
+    ///
     /// `render_mermaid` restricts the input to rendered layers so that TypeRef
     /// resolution never produces node ids for entries that were not emitted, avoiding
     /// dangling Mermaid edges.
@@ -57,11 +64,20 @@ impl TypeIndex {
             let layer: &LayerId = &doc.layer;
             let crate_name: &CrateName = &doc.crate_name;
             let crate_key = crate_name.as_str().to_owned();
-            for name in doc.types.keys() {
+            for (name, entry) in &doc.types {
+                // Skip deletion records — deleted types must not resolve to a node id
+                // because they are not rendered in the contract map. Resolving them
+                // would produce a dangling Mermaid edge pointing to an absent subgraph.
+                if entry.action == ItemAction::Delete {
+                    continue;
+                }
                 let id = type_node_id(layer, crate_name, name);
                 types.insert((crate_key.clone(), name.as_str().to_owned()), id);
             }
-            for name in doc.traits.keys() {
+            for (name, entry) in &doc.traits {
+                if entry.action == ItemAction::Delete {
+                    continue;
+                }
                 let id = trait_node_id(layer, crate_name, name);
                 traits.insert((crate_key.clone(), name.as_str().to_owned()), id);
             }
@@ -80,16 +96,246 @@ impl TypeIndex {
     /// base name before lookup. Cross-crate refs (containing `::`) are also skipped.
     ///
     /// Type entries take precedence over trait entries when both share the same name.
-    pub(super) fn resolve(&self, type_ref: &TypeRef, caller_crate: &CrateName) -> Option<&str> {
-        let base = extract_base_name(type_ref.as_str())?;
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ContractMapRendererError::RenderFailed`] when the `TypeRef` string has
+    /// mismatched generic angle brackets (e.g. `Result<UserId` with no closing `>`). Such
+    /// inputs indicate a malformed catalogue entry and are fail-closed per CN-03.
+    /// Well-formed-but-unresolvable refs (e.g. a type not in any catalogue) return `Ok(None)`.
+    pub(super) fn resolve(
+        &self,
+        type_ref: &TypeRef,
+        caller_crate: &CrateName,
+    ) -> Result<Option<&str>, ContractMapRendererError> {
+        // Fail-closed: validate bracket balance before extraction (CN-03).
+        validate_type_ref(type_ref.as_str())?;
+
+        let Some(base) = extract_base_name(type_ref.as_str()) else {
+            return Ok(None);
+        };
         // Cross-crate refs (contain "::") are silently skipped (T008).
         if base.contains("::") {
-            return None;
+            return Ok(None);
         }
         let key = (caller_crate.as_str().to_owned(), base.to_owned());
         // Type entries take precedence; fall back to trait entries.
-        self.types.get(&key).or_else(|| self.traits.get(&key)).map(|s| s.as_str())
+        Ok(self.types.get(&key).or_else(|| self.traits.get(&key)).map(|s| s.as_str()))
     }
+}
+
+// ---------------------------------------------------------------------------
+// TypeRef validation helper
+// ---------------------------------------------------------------------------
+
+/// Checks that a `TypeRef` string has properly nested and well-formed generic angle
+/// brackets.
+///
+/// The following conditions are checked (any failure returns `RenderFailed`, CN-03):
+///
+/// 1. **No premature close**: a `>` must never appear when the generic depth is zero,
+///    unless it is part of a `->` return-type arrow. A string like `Foo>Bar<` (equal
+///    counts, but `>` comes before any `<`) is rejected. `->` arrows (common in function-
+///    pointer TypeRefs such as `for<'a> fn(&'a T) -> T` or `Vec<fn(u32) -> u32>`) are
+///    recognised at any depth by checking that the immediately preceding non-whitespace
+///    character is `-`; such `>` is skipped without closing a generic block.
+///
+/// 2. **Count balance**: all opened `<` must be closed by the end of the string. A
+///    string like `Result<UserId` (one `<`, zero `>`) fails here.
+///
+/// 3. **No mismatched or unmatched parentheses / square brackets**: a `(`/`[` must be
+///    closed by the matching `)` / `]` before the surrounding `>` is reached (inside a
+///    `<...>` block) or before end-of-string (at top level). Kind-mismatched closes
+///    (`Foo<[T)>`) and stray closers without an opener (`Vec<T>)`) are both rejected.
+///    Well-formed complex refs such as `for<'a> fn(&'a T) -> T` pass: their `()` is
+///    balanced at top level, and `Vec<fn(u32) -> u32>` passes because the `->` `>` is
+///    recognised as an arrow, not a generic close.
+///
+/// `TypeRef::new` only rejects empty strings, so all checks must live here as
+/// part of the fail-closed render pipeline.
+///
+/// Well-formed-but-unresolvable refs (e.g. a type not present in any catalogue)
+/// are not flagged by this check and continue to produce `Ok(None)` from `resolve`.
+///
+/// # Errors
+///
+/// Returns `RenderFailed` when any of the above conditions is violated.
+pub(super) fn validate_type_ref(s: &str) -> Result<(), ContractMapRendererError> {
+    let s = s.trim();
+
+    // Stack of per-generic-block state. Each element corresponds to one open `<...>`.
+    // `inner_brackets` is a stack of open `(`/`[` seen inside this `<...>` block;
+    // each closing bracket must match the most-recently pushed opener.
+    // `prev_nonws` is the last non-whitespace character seen inside this block.
+    struct BlockState {
+        inner_brackets: Vec<char>, // stack of unmatched `(`/`[` inside this `<...>`
+        prev_char: Option<char>,   // immediately preceding character (for `->` detection)
+    }
+    // Immediately preceding character at top level (outside any `<...>`).
+    // Used to detect `->` return-type arrows: `>` is an arrow only when preceded
+    // by `-` with no intervening whitespace (i.e. `prev_char == Some('-')`).
+    let mut top_prev_char: Option<char> = None;
+    // Top-level bracket stack: tracks `(`/`[` opened outside any `<...>` block.
+    // A stray `)` or `]` at top level (no matching opener) is a malformed TypeRef.
+    // `Vec<T>)` is rejected because the `)` has no opening `(` at top level.
+    // `for<'a> fn(&'a T) -> T` passes because the `(` and `)` are balanced at top level.
+    let mut top_brackets: Vec<char> = Vec::new();
+    let mut stack: Vec<BlockState> = Vec::new();
+
+    for ch in s.chars() {
+        match ch {
+            '<' => {
+                // Update the enclosing context's prev_char to '<' before pushing the new block.
+                if let Some(outer) = stack.last_mut() {
+                    outer.prev_char = Some('<');
+                } else {
+                    top_prev_char = Some('<');
+                }
+                stack.push(BlockState { inner_brackets: Vec::new(), prev_char: None });
+            }
+            '>' if !stack.is_empty() => {
+                // `->` arrows (e.g. `Vec<fn(u32) -> u32>`) can appear inside a generic
+                // block. Detect them by checking the block's `prev_char`: `>` is treated
+                // as a `->` arrow only when the immediately preceding character is `-`
+                // (no intervening whitespace). `Foo<Bar - > Baz>` is rejected because
+                // the space before `>` means `prev_char` is ` `, not `-`.
+                let is_arrow = stack.last().is_some_and(|b| b.prev_char == Some('-'));
+                if is_arrow {
+                    // Treat as part of `->`: update prev_char of the enclosing block.
+                    if let Some(block) = stack.last_mut() {
+                        block.prev_char = Some('>');
+                    }
+                } else {
+                    if let Some(block) = stack.last() {
+                        if !block.inner_brackets.is_empty() {
+                            // Open `(`/`[` not closed before this `>`.
+                            return Err(ContractMapRendererError::RenderFailed {
+                                reason: format!(
+                                    "malformed TypeRef \"{s}\": unmatched inner bracket before '>'"
+                                ),
+                            });
+                        }
+                    }
+                    stack.pop();
+                    // After closing a nested block, update the enclosing block's prev_char.
+                    if let Some(outer) = stack.last_mut() {
+                        outer.prev_char = Some('>');
+                    } else {
+                        top_prev_char = Some('>');
+                    }
+                }
+            }
+            '>' => {
+                // `>` at depth 0 (stack is empty). Accept `->` arrows (immediately preceded
+                // by `-`); reject all other bare `>` as unbalanced angle brackets.
+                if top_prev_char == Some('-') {
+                    top_prev_char = Some('>');
+                } else {
+                    return Err(ContractMapRendererError::RenderFailed {
+                        reason: format!(
+                            "malformed TypeRef \"{s}\": unbalanced angle brackets \
+                             ('>' at depth < 0)"
+                        ),
+                    });
+                }
+            }
+            '(' | '[' if !stack.is_empty() => {
+                if let Some(block) = stack.last_mut() {
+                    block.inner_brackets.push(ch);
+                    block.prev_char = Some(ch);
+                }
+            }
+            ')' | ']' if !stack.is_empty() => {
+                if let Some(block) = stack.last_mut() {
+                    let expected_open = if ch == ')' { '(' } else { '[' };
+                    match block.inner_brackets.last() {
+                        Some(&open) if open == expected_open => {
+                            block.inner_brackets.pop();
+                            block.prev_char = Some(ch);
+                        }
+                        Some(_) => {
+                            // Mismatched bracket kind: e.g. `[` closed by `)`.
+                            return Err(ContractMapRendererError::RenderFailed {
+                                reason: format!(
+                                    "malformed TypeRef \"{s}\": mismatched bracket inside generic \
+                                     (expected closing for previous opener)"
+                                ),
+                            });
+                        }
+                        None => {
+                            // Unmatched closing bracket with no opener inside this block.
+                            return Err(ContractMapRendererError::RenderFailed {
+                                reason: format!(
+                                    "malformed TypeRef \"{s}\": unmatched closing bracket inside \
+                                     generic"
+                                ),
+                            });
+                        }
+                    }
+                }
+            }
+            '(' | '[' if stack.is_empty() => {
+                // Top-level opener: track it so we can detect stray closers.
+                top_brackets.push(ch);
+                top_prev_char = Some(ch);
+            }
+            ')' | ']' if stack.is_empty() => {
+                // Top-level closer: must match the most-recently opened top-level bracket.
+                let expected_open = if ch == ')' { '(' } else { '[' };
+                match top_brackets.last() {
+                    Some(&open) if open == expected_open => {
+                        top_brackets.pop();
+                        top_prev_char = Some(ch);
+                    }
+                    Some(_) => {
+                        return Err(ContractMapRendererError::RenderFailed {
+                            reason: format!(
+                                "malformed TypeRef \"{s}\": mismatched bracket outside generic \
+                                 (expected closing for previous opener)"
+                            ),
+                        });
+                    }
+                    None => {
+                        // Stray closing bracket at top level with no opener.
+                        return Err(ContractMapRendererError::RenderFailed {
+                            reason: format!(
+                                "malformed TypeRef \"{s}\": unmatched closing bracket outside \
+                                 generic (e.g. stray ')' or ']')"
+                            ),
+                        });
+                    }
+                }
+            }
+            c if !stack.is_empty() => {
+                if let Some(block) = stack.last_mut() {
+                    block.prev_char = Some(c);
+                }
+            }
+            c => {
+                // Top-level character (outside any generic block).
+                top_prev_char = Some(c);
+            }
+        }
+    }
+    if !stack.is_empty() {
+        return Err(ContractMapRendererError::RenderFailed {
+            reason: format!(
+                "malformed TypeRef \"{s}\": unbalanced angle brackets \
+                 ({} unclosed '<')",
+                stack.len()
+            ),
+        });
+    }
+    if !top_brackets.is_empty() {
+        return Err(ContractMapRendererError::RenderFailed {
+            reason: format!(
+                "malformed TypeRef \"{s}\": unclosed bracket outside generic \
+                 ({} unclosed '(' or '[')",
+                top_brackets.len()
+            ),
+        });
+    }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------

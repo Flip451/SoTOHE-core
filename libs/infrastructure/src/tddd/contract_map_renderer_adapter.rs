@@ -403,7 +403,7 @@ impl ContractMapRenderer for ContractMapRendererAdapter {
         let style = self.load_style_config()?;
 
         // Delegate actual mermaid generation to the render sub-module (T006+).
-        let mermaid = render::render_mermaid(catalogues, layer_order, opts, &style);
+        let mermaid = render::render_mermaid(catalogues, layer_order, opts, &style)?;
         // Wrap the bare mermaid flowchart inside a Markdown fenced-code-block plus
         // a generated marker so Markdown/GitHub viewers render the diagram instead
         // of showing plain text (Codex Cloud review on PR #133 finding).

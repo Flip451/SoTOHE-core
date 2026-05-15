@@ -528,6 +528,9 @@ fn sync_rendered_views_writes_plan_and_registry() {
     )
     .unwrap();
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    // Provide the style config so that `render_contract_map_view` does not fail
+    // if a catalogue happens to be present (fail-closed, IN-03).
+    write_minimal_style_config(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -615,6 +618,9 @@ fn sync_rendered_views_omits_unchanged_registry_from_changed_set() {
     )
     .unwrap();
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    // Provide the style config so that `render_contract_map_view` does not fail
+    // if a catalogue happens to be present (fail-closed, IN-03).
+    write_minimal_style_config(dir.path());
 
     // First call populates plan.md and registry.md.
     let first_changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
@@ -1390,6 +1396,18 @@ const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
 
 const DOMAIN_ARCH_RULES: &str = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
 
+/// Writes the minimal `.harness/config/contract-map-style.toml` fixture to `root`.
+///
+/// Required for any test that writes a valid catalogue JSON alongside an arch-rules file
+/// with `tddd.enabled: true`, because `render_contract_map_view` is now fully fail-closed:
+/// a missing style config propagates as `RenderError::Io` (IN-03 / PR #133 round 4 fix).
+fn write_minimal_style_config(root: &std::path::Path) {
+    let style_dir = root.join(".harness/config");
+    std::fs::create_dir_all(&style_dir).unwrap();
+    std::fs::write(style_dir.join("contract-map-style.toml"), MINIMAL_CONTRACT_MAP_STYLE_TOML)
+        .unwrap();
+}
+
 #[test]
 fn sync_rendered_views_generates_domain_types_md_from_domain_types_json() {
     let dir = tempfile::tempdir().unwrap();
@@ -1408,6 +1426,7 @@ fn sync_rendered_views_generates_domain_types_md_from_domain_types_json() {
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -1444,6 +1463,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config(dir.path());
 
     // Companion signal file with a Blue signal for the declared TrackId.
     let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
@@ -1501,6 +1521,7 @@ fn sync_rendered_views_ignores_stale_signal_file_when_hash_mismatches() {
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config(dir.path());
 
     // Stale signal file — `declaration_hash` does NOT match the on-disk
     // declaration bytes.
@@ -1584,6 +1605,7 @@ fn sync_rendered_views_does_not_overwrite_domain_types_md_when_already_up_to_dat
     // architecture-rules.json is required since T045: render.rs skips per-layer
     // rendering when arch rules are absent (fail-graceful precondition check).
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config(dir.path());
 
     // First sync — generates domain-types.md.
     sync_rendered_views(dir.path(), Some("track-a")).unwrap();
@@ -1812,6 +1834,8 @@ fn sync_rendered_views_single_track_skips_domain_types_md_for_done_track() {
         .unwrap();
     // architecture-rules.json is required by render_contract_map_view (fail-closed).
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    // Style config required: render_contract_map_view is fully fail-closed (IN-03).
+    write_minimal_style_config(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-done-domain")).unwrap();
 
@@ -1889,6 +1913,7 @@ fn sync_rendered_views_generates_usecase_types_md_from_usecase_types_json() {
     )
     .unwrap();
     std::fs::write(track_dir.join("usecase-types.json"), USECASE_TYPES_JSON_MINIMAL).unwrap();
+    write_minimal_style_config(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -1925,6 +1950,7 @@ fn sync_rendered_views_generates_infrastructure_types_md_from_infrastructure_typ
     .unwrap();
     std::fs::write(track_dir.join("infrastructure-types.json"), INFRASTRUCTURE_TYPES_JSON_MINIMAL)
         .unwrap();
+    write_minimal_style_config(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -1966,6 +1992,7 @@ fn sync_rendered_views_generates_multiple_layer_types_md_independently() {
     std::fs::write(track_dir.join("usecase-types.json"), USECASE_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(track_dir.join("infrastructure-types.json"), INFRASTRUCTURE_TYPES_JSON_MINIMAL)
         .unwrap();
+    write_minimal_style_config(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -2031,6 +2058,7 @@ fn sync_rendered_views_malformed_layer_json_does_not_block_other_layers() {
     std::fs::write(track_dir.join("usecase-types.json"), "{ not valid json }").unwrap();
     std::fs::write(track_dir.join("infrastructure-types.json"), INFRASTRUCTURE_TYPES_JSON_MINIMAL)
         .unwrap();
+    write_minimal_style_config(dir.path());
 
     // Must succeed — malformed usecase JSON must not abort the sync
     let result = sync_rendered_views(dir.path(), Some("track-a"));
@@ -2138,6 +2166,7 @@ fn sync_rendered_views_renders_cat_spec_column_when_signals_fresh_and_opt_in_ena
         serde_json::to_string_pretty(&spec_signals_json).unwrap(),
     )
     .unwrap();
+    write_minimal_style_config(dir.path());
 
     let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -2196,6 +2225,7 @@ fn sync_rendered_views_skips_cat_spec_column_when_opt_in_disabled() {
         serde_json::to_string_pretty(&spec_signals_json).unwrap(),
     )
     .unwrap();
+    write_minimal_style_config(dir.path());
 
     let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -2250,6 +2280,7 @@ fn sync_rendered_views_errors_on_stale_cat_spec_signals() {
         serde_json::to_string_pretty(&stale_json).unwrap(),
     )
     .unwrap();
+    write_minimal_style_config(dir.path());
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
     let msg = err.to_string();
@@ -2292,6 +2323,7 @@ fn sync_rendered_views_errors_on_malformed_cat_spec_signals() {
         "{ this is not valid json ",
     )
     .unwrap();
+    write_minimal_style_config(dir.path());
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
     let msg = err.to_string();
@@ -2323,6 +2355,7 @@ fn sync_rendered_views_errors_on_missing_cat_spec_signals_when_opt_in() {
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    write_minimal_style_config(dir.path());
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
     let msg = err.to_string();

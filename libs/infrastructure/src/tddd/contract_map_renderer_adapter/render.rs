@@ -34,8 +34,9 @@ use std::collections::BTreeSet;
 use domain::tddd::catalogue_v2::composite::TypeKindV2;
 use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath};
+use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::catalogue_v2::{CatalogueDocument, FunctionPath, TraitName, TypeName};
-use domain::tddd::{ContractMapRenderOptions, LayerId};
+use domain::tddd::{ContractMapRenderOptions, ContractMapRendererError, LayerId};
 
 use super::{StyleConfig, function_node_id, trait_node_id, type_node_id};
 use builder::MermaidBuilder;
@@ -84,7 +85,7 @@ pub(super) fn render_mermaid(
     layer_order: &[LayerId],
     opts: &ContractMapRenderOptions,
     style: &StyleConfig,
-) -> String {
+) -> Result<String, ContractMapRendererError> {
     // Group documents by layer.
     let mut by_layer: BTreeMap<&str, Vec<&CatalogueDocument>> = BTreeMap::new();
     for doc in catalogues {
@@ -136,11 +137,11 @@ pub(super) fn render_mermaid(
             continue;
         }
         if let Some(docs) = by_layer.get(layer_str) {
-            emit_layer(&mut builder, layer_id, docs, &type_index, &trait_index, style);
+            emit_layer(&mut builder, layer_id, docs, &type_index, &trait_index, style)?;
         }
     }
 
-    builder.build(&classdefs)
+    Ok(builder.build(&classdefs))
 }
 
 // ---------------------------------------------------------------------------
@@ -202,6 +203,11 @@ fn top_module_sg_id(layer_str: &str, top_seg: &str) -> String {
 }
 
 /// Emits one layer subgraph with all its top-module subgraphs and entries.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when any entry contains a `TypeRef`
+/// with mismatched angle brackets (fail-closed, CN-03).
 fn emit_layer(
     builder: &mut MermaidBuilder,
     layer_id: &LayerId,
@@ -209,7 +215,7 @@ fn emit_layer(
     type_index: &TypeIndex,
     trait_index: &TraitIndex,
     style: &StyleConfig,
-) {
+) -> Result<(), ContractMapRendererError> {
     let layer_str = layer_id.as_ref();
     let sg_id = layer_sg_id(layer_str);
 
@@ -226,7 +232,7 @@ fn emit_layer(
 
     // Emit crate-root entries directly in the layer subgraph (AC-11).
     for entry in &root_entries {
-        emit_layer_entry(builder, entry, layer_id, type_index, trait_index, style);
+        emit_layer_entry(builder, entry, layer_id, type_index, trait_index, style)?;
     }
 
     // Emit top-module subgraphs in alphabetical order (BTreeMap iter is sorted).
@@ -237,13 +243,14 @@ fn emit_layer(
         builder.open_subgraph(&top_module_id, &top_module_label);
 
         for entry in entries {
-            emit_layer_entry(builder, entry, layer_id, type_index, trait_index, style);
+            emit_layer_entry(builder, entry, layer_id, type_index, trait_index, style)?;
         }
 
         builder.close_subgraph();
     }
 
     builder.close_subgraph();
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -324,14 +331,25 @@ fn collect_layer_entries<'a>(
         Vec::with_capacity(doc.types.len() + doc.traits.len() + doc.functions.len());
 
     for (name, entry) in &doc.types {
+        // Skip deletion records — contract map shows current surface, not historical records
+        // (ADR `knowledge/adr/2026-04-11-0003-type-action-declarations.md`).
+        if entry.action == ItemAction::Delete {
+            continue;
+        }
         let module_path = &entry.module_path;
         all_entries.push(LayerEntry::Type { name, entry, module_path, crate_name });
     }
     for (name, entry) in &doc.traits {
+        if entry.action == ItemAction::Delete {
+            continue;
+        }
         let module_path = &entry.module_path;
         all_entries.push(LayerEntry::Trait { name, entry, module_path, crate_name });
     }
     for (path, entry) in &doc.functions {
+        if entry.action == ItemAction::Delete {
+            continue;
+        }
         // FunctionEntry has no module_path field; use the FunctionPath key's module_path.
         let module_path = &path.module_path;
         all_entries.push(LayerEntry::Function { path, entry, module_path, crate_name });
@@ -376,6 +394,11 @@ fn push_entry<'a>(
 // ---------------------------------------------------------------------------
 
 /// Emits a single catalogue entry (Type subgraph / Trait subgraph / Function node).
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when a `TypeRef` in the entry
+/// has mismatched angle brackets (fail-closed, CN-03).
 fn emit_layer_entry(
     builder: &mut MermaidBuilder,
     entry: &LayerEntry<'_>,
@@ -383,7 +406,7 @@ fn emit_layer_entry(
     type_index: &TypeIndex,
     trait_index: &TraitIndex,
     style: &StyleConfig,
-) {
+) -> Result<(), ContractMapRendererError> {
     match entry {
         LayerEntry::Type { name, entry, module_path, crate_name } => {
             emit_type_subgraph(
@@ -396,7 +419,7 @@ fn emit_layer_entry(
                 type_index,
                 trait_index,
                 style,
-            );
+            )?;
         }
         LayerEntry::Trait { name, entry, module_path, crate_name } => {
             emit_trait_subgraph(
@@ -408,7 +431,7 @@ fn emit_layer_entry(
                 module_path,
                 type_index,
                 style,
-            );
+            )?;
         }
         LayerEntry::Function { path, entry, module_path, crate_name } => {
             emit_function_node_filtered(
@@ -420,9 +443,10 @@ fn emit_layer_entry(
                 module_path,
                 type_index,
                 style,
-            );
+            )?;
         }
     }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -447,6 +471,11 @@ fn emit_layer_entry(
 /// T008 additions:
 /// - After field edges, emit cross-catalogue trait_impl edges (Decision O-2 + O-3 + O-a).
 ///   Workspace-external traits silently produce no edge (Decision J-2 + CN-08).
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when a `TypeRef` in the entry
+/// has mismatched angle brackets (fail-closed, CN-03).
 #[allow(clippy::too_many_arguments)]
 fn emit_type_subgraph(
     builder: &mut MermaidBuilder,
@@ -458,7 +487,7 @@ fn emit_type_subgraph(
     type_index: &TypeIndex,
     trait_index: &TraitIndex,
     style: &StyleConfig,
-) {
+) -> Result<(), ContractMapRendererError> {
     let entry_id = type_node_id(layer_id, crate_name, name);
     let label = entry_label(module_path, name.as_str());
 
@@ -490,11 +519,11 @@ fn emit_type_subgraph(
             type_index,
             style,
             &method_shape,
-        );
+        )?;
 
         // For Enum entries, emit variant nodes inside the entry subgraph (Decision H-3, AC-04).
         if let TypeKindV2::Enum { variants } = &entry.kind {
-            emit_enum_variant_nodes(builder, &entry_id, variants, crate_name, type_index, style);
+            emit_enum_variant_nodes(builder, &entry_id, variants, crate_name, type_index, style)?;
         }
     }
 
@@ -502,7 +531,7 @@ fn emit_type_subgraph(
 
     // Emit field edges for PlainStruct / TupleStruct (Decision K-2+(d), K-2).
     // For TypeAlias, emit the undirected alias edge (Decision N-1', AC-09).
-    emit_field_edges(builder, &entry_id, &entry.kind, crate_name, type_index, style);
+    emit_field_edges(builder, &entry_id, &entry.kind, crate_name, type_index, style)?;
 
     // T008: emit cross-catalogue trait_impl edges (Decision O-2 + O-3 + O-a).
     emit_trait_impl_edges(builder, &entry_id, entry, trait_index, style);
@@ -524,6 +553,7 @@ fn emit_type_subgraph(
             builder.push_class(&method_id, &method_class);
         }
     }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -534,6 +564,11 @@ fn emit_type_subgraph(
 ///
 /// Subgraph id: `R<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>` (Decision D-2).
 /// Label: sub-module path + name.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when a method param or returns `TypeRef`
+/// has mismatched angle brackets (fail-closed, CN-03).
 #[allow(clippy::too_many_arguments)]
 fn emit_trait_subgraph(
     builder: &mut MermaidBuilder,
@@ -544,7 +579,7 @@ fn emit_trait_subgraph(
     module_path: &ModulePath,
     type_index: &TypeIndex,
     style: &StyleConfig,
-) {
+) -> Result<(), ContractMapRendererError> {
     let entry_id = trait_node_id(layer_id, crate_name, name);
     let label = entry_label(module_path, name.as_str());
 
@@ -558,10 +593,10 @@ fn emit_trait_subgraph(
 
         // Collect method param edges.
         for param in &method.params {
-            collect_param_edge(builder, &method_id, &param.ty, crate_name, type_index, style);
+            collect_param_edge(builder, &method_id, &param.ty, crate_name, type_index, style)?;
         }
         // Collect method returns edge.
-        collect_returns_edge(builder, &method_id, &method.returns, crate_name, type_index, style);
+        collect_returns_edge(builder, &method_id, &method.returns, crate_name, type_index, style)?;
     }
 
     builder.close_subgraph();
@@ -576,6 +611,7 @@ fn emit_trait_subgraph(
         let method_class = node_class_name("Method", style);
         builder.push_class(&method_id, &method_class);
     }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -592,6 +628,11 @@ fn emit_trait_subgraph(
 /// Node shape is driven by `[node.Function].shape` in the style config (e.g. `"subroutine"`
 /// → `[[name]]`). Node id: `F<len>_<sanitized_layer>_<sanitized_full_path>` (Decision D-2).
 /// `crate_name` scopes TypeRef resolution to the same catalogue document.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when a param or returns `TypeRef`
+/// has mismatched angle brackets (fail-closed, CN-03).
 #[allow(clippy::too_many_arguments)]
 fn emit_function_node_filtered(
     builder: &mut MermaidBuilder,
@@ -602,13 +643,13 @@ fn emit_function_node_filtered(
     _module_path: &ModulePath,
     type_index: &TypeIndex,
     style: &StyleConfig,
-) {
+) -> Result<(), ContractMapRendererError> {
     // T008 function role filter (Decision I-1, IN-10).
     // Empty include_function_roles → render all (no filter).
     if !style.filter.include_function_roles.is_empty() {
         let role_str = entry.role.to_string();
         if !style.filter.include_function_roles.iter().any(|r| r == &role_str) {
-            return; // Silently skip this function.
+            return Ok(()); // Silently skip this function.
         }
     }
 
@@ -618,9 +659,9 @@ fn emit_function_node_filtered(
 
     // Emit param and returns edges for the function node.
     for param in &entry.params {
-        collect_param_edge(builder, &fn_id, &param.ty, crate_name, type_index, style);
+        collect_param_edge(builder, &fn_id, &param.ty, crate_name, type_index, style)?;
     }
-    collect_returns_edge(builder, &fn_id, &entry.returns, crate_name, type_index, style);
+    collect_returns_edge(builder, &fn_id, &entry.returns, crate_name, type_index, style)?;
 
     // Emit class attach for function node.
     let class_name = role_class_name(&entry.role.to_string(), style);
@@ -628,4 +669,5 @@ fn emit_function_node_filtered(
     // Both role class and node class are attached (role for color, Function for shape).
     builder.push_class(&fn_id, &class_name);
     builder.push_class(&fn_id, &fn_node_class);
+    Ok(())
 }

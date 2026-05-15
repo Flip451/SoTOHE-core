@@ -6,6 +6,7 @@
 //! - Decision N-1' / AC-09: `TypeKindV2::TypeAlias.target` → undirected
 //!   `---|alias_of|` edge from the alias entry subgraph to the target type subgraph.
 
+use domain::tddd::ContractMapRendererError;
 use domain::tddd::catalogue_v2::identifiers::CrateName;
 use domain::tddd::catalogue_v2::variants::{VariantDecl, VariantPayload};
 
@@ -30,6 +31,11 @@ use super::type_index::TypeIndex;
 /// Variant node id: `<entry_id>_v_<index>` (index = declaration order).
 ///
 /// `caller_crate` scopes TypeRef resolution to the same catalogue document.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when a variant payload `TypeRef`
+/// has mismatched angle brackets (fail-closed, CN-03).
 pub(super) fn emit_enum_variant_nodes(
     builder: &mut MermaidBuilder,
     entry_id: &str,
@@ -37,7 +43,7 @@ pub(super) fn emit_enum_variant_nodes(
     caller_crate: &CrateName,
     type_index: &TypeIndex,
     style: &StyleConfig,
-) {
+) -> Result<(), ContractMapRendererError> {
     let variant_shape =
         style.node.get("Variant").map(|n| n.shape.as_str()).unwrap_or("stadium").to_owned();
 
@@ -59,7 +65,7 @@ pub(super) fn emit_enum_variant_nodes(
             caller_crate,
             type_index,
             &variant_payload_arrow,
-        );
+        )?;
     }
 
     // Emit class attach for each variant node (after subgraph declarations).
@@ -67,9 +73,15 @@ pub(super) fn emit_enum_variant_nodes(
         let variant_id = format!("{entry_id}_v_{i}");
         builder.push_class(&variant_id, &variant_class);
     }
+    Ok(())
 }
 
 /// Emits payload edges for one variant.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when a `TypeRef` has mismatched
+/// angle brackets (fail-closed, CN-03).
 fn emit_variant_payload_edges(
     builder: &mut MermaidBuilder,
     variant_id: &str,
@@ -77,7 +89,7 @@ fn emit_variant_payload_edges(
     caller_crate: &CrateName,
     type_index: &TypeIndex,
     arrow: &str,
-) {
+) -> Result<(), ContractMapRendererError> {
     match payload {
         VariantPayload::Unit => {
             // No edges for unit variants (AC-04).
@@ -85,7 +97,7 @@ fn emit_variant_payload_edges(
         VariantPayload::Tuple(fields) => {
             // One unlabelled edge per positional TypeRef.
             for field_ty in fields {
-                if let Some(target_id) = type_index.resolve(field_ty, caller_crate) {
+                if let Some(target_id) = type_index.resolve(field_ty, caller_crate)? {
                     builder.push_edge(format!("{variant_id} {arrow} {target_id}"));
                 }
             }
@@ -93,7 +105,7 @@ fn emit_variant_payload_edges(
         VariantPayload::Struct(fields) => {
             // One labelled edge per named field.
             for field in fields {
-                if let Some(target_id) = type_index.resolve(&field.ty, caller_crate) {
+                if let Some(target_id) = type_index.resolve(&field.ty, caller_crate)? {
                     builder.push_edge(format!(
                         "{variant_id} {arrow}|{}| {target_id}",
                         field.name.as_str()
@@ -102,6 +114,7 @@ fn emit_variant_payload_edges(
             }
         }
     }
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -118,6 +131,11 @@ fn emit_variant_payload_edges(
 /// (from `[edge.alias].label`, default `"alias_of"`).
 ///
 /// `caller_crate` scopes TypeRef resolution to the same catalogue document.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when the alias `TypeRef` has
+/// mismatched angle brackets (fail-closed, CN-03).
 pub(super) fn emit_type_alias_edge(
     builder: &mut MermaidBuilder,
     alias_id: &str,
@@ -125,11 +143,12 @@ pub(super) fn emit_type_alias_edge(
     caller_crate: &CrateName,
     type_index: &TypeIndex,
     style: &StyleConfig,
-) {
+) -> Result<(), ContractMapRendererError> {
     let arrow = style.edge.get("alias").map(|e| e.arrow.as_str()).unwrap_or("---");
     let label = style.edge.get("alias").and_then(|e| e.label.as_deref()).unwrap_or("alias_of");
 
-    if let Some(target_id) = type_index.resolve(target, caller_crate) {
+    if let Some(target_id) = type_index.resolve(target, caller_crate)? {
         builder.push_edge(format!("{alias_id} {arrow}|{label}| {target_id}"));
     }
+    Ok(())
 }

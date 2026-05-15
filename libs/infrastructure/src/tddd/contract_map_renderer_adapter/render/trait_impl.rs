@@ -15,6 +15,7 @@ use std::collections::BTreeMap;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::entries::TypeEntry;
 use domain::tddd::catalogue_v2::identifiers::CrateName;
+use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::catalogue_v2::{CatalogueDocument, TraitName};
 
 use super::super::{StyleConfig, trait_node_id};
@@ -44,6 +45,10 @@ impl TraitIndex {
     /// allocation. For each document, iterates over `doc.traits` and inserts a
     /// `(doc.crate_name, trait_name)` → `trait_node_id(...)` mapping.
     ///
+    /// Entries with `action: Delete` are excluded from the index so that a live type's
+    /// `trait_impls` declaration referencing a deleted trait resolves to `None` (no
+    /// edge) rather than a dangling `-.->|impl|` edge pointing to an absent subgraph.
+    ///
     /// `render_mermaid` restricts the input to the rendered-layer subset so that
     /// trait_impl edges never point to trait nodes absent from the rendered output
     /// (dangling edge prevention, Decision O-a, CN-08).
@@ -53,7 +58,12 @@ impl TraitIndex {
             let layer: &LayerId = &doc.layer;
             let crate_name: &CrateName = &doc.crate_name;
             let crate_key = crate_name.as_str().to_owned();
-            for trait_name in doc.traits.keys() {
+            for (trait_name, entry) in &doc.traits {
+                // Skip deletion records — deleted traits must not resolve to a node id
+                // because they are not rendered in the contract map.
+                if entry.action == ItemAction::Delete {
+                    continue;
+                }
                 let id = trait_node_id(layer, crate_name, trait_name);
                 traits.insert((crate_key.clone(), trait_name.as_str().to_owned()), id);
             }

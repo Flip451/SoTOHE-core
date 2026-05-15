@@ -9,6 +9,7 @@
 //!
 //! `param` edges remain unchanged (`--o`) regardless of typestate membership.
 
+use domain::tddd::ContractMapRendererError;
 use domain::tddd::catalogue_v2::composite::TypestateMarker;
 use domain::tddd::catalogue_v2::identifiers::{CrateName, MethodName, TypeRef};
 use domain::tddd::catalogue_v2::methods::MethodDeclaration;
@@ -33,6 +34,11 @@ use super::type_index::TypeIndex;
 /// is silently skipped.
 ///
 /// `caller_crate` scopes TypeRef resolution to the same catalogue document.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when the `TypeRef` has mismatched
+/// angle brackets (fail-closed, CN-03).
 #[allow(clippy::too_many_arguments)]
 pub(super) fn emit_returns_edge_maybe_transition(
     builder: &mut MermaidBuilder,
@@ -43,9 +49,9 @@ pub(super) fn emit_returns_edge_maybe_transition(
     caller_crate: &CrateName,
     type_index: &TypeIndex,
     style: &StyleConfig,
-) {
-    let Some(target_id) = type_index.resolve(returns_ty, caller_crate) else {
-        return;
+) -> Result<(), ContractMapRendererError> {
+    let Some(target_id) = type_index.resolve(returns_ty, caller_crate)? else {
+        return Ok(());
     };
 
     if is_transition_method(method_name, typestate_marker) {
@@ -62,6 +68,7 @@ pub(super) fn emit_returns_edge_maybe_transition(
         let arrow = style.edge.get("method_returns").map(|e| e.arrow.as_str()).unwrap_or("-->");
         builder.push_edge(format!("{method_id} {arrow} {target_id}"));
     }
+    Ok(())
 }
 
 /// Returns `true` if `method_name` is listed in the typestate transition set.
@@ -112,6 +119,11 @@ pub(super) fn maybe_emit_typestate_overlay(
 ///
 /// Param edges are always `--o` (unchanged by typestate membership).
 /// Returns edges use `==>|transitions_to|` for transition methods and `-->` for all others.
+///
+/// # Errors
+///
+/// Returns `ContractMapRendererError::RenderFailed` when any param or returns `TypeRef`
+/// has mismatched angle brackets (fail-closed, CN-03).
 #[allow(clippy::too_many_arguments)]
 pub(super) fn emit_methods_with_typestate(
     builder: &mut MermaidBuilder,
@@ -122,7 +134,7 @@ pub(super) fn emit_methods_with_typestate(
     type_index: &TypeIndex,
     style: &StyleConfig,
     method_shape: &str,
-) {
+) -> Result<(), ContractMapRendererError> {
     let param_arrow = style
         .edge
         .get("method_param")
@@ -136,7 +148,7 @@ pub(super) fn emit_methods_with_typestate(
 
         // Param edges (unchanged by typestate).
         for param in &method.params {
-            if let Some(target_id) = type_index.resolve(&param.ty, caller_crate) {
+            if let Some(target_id) = type_index.resolve(&param.ty, caller_crate)? {
                 builder.push_edge(format!("{method_id} {param_arrow} {target_id}"));
             }
         }
@@ -151,6 +163,7 @@ pub(super) fn emit_methods_with_typestate(
             caller_crate,
             type_index,
             style,
-        );
+        )?;
     }
+    Ok(())
 }

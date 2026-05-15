@@ -43,7 +43,6 @@ subgraph L_domain["domain"]
     subgraph R17_domain_domain_ContractMapWriter["tddd::ContractMapWriter"]
       R17_domain_domain_ContractMapWriter_m_0(write)
     end
-    F54_domain_domain_S_tddd_S_contract__map__render_S_render__contract__map[[render_contract_map]]
   end
 end
 subgraph L_usecase["usecase"]
@@ -98,7 +97,6 @@ subgraph L_infrastructure["infrastructure"]
 end
 
 R19_domain_domain_ContractMapRenderer_m_0 --o T24_domain_domain_ContractMapRenderOptions
-F54_domain_domain_S_tddd_S_contract__map__render_S_render__contract__map --o T24_domain_domain_ContractMapRenderOptions
 R17_usecase_usecase_RenderContractMap_m_0 --o T24_usecase_usecase_RenderContractMapCommand
 R17_usecase_usecase_RenderContractMap_m_0 --> T23_usecase_usecase_RenderContractMapOutput
 T27_usecase_usecase_RenderContractMapInteractor -.->|impl| R17_usecase_usecase_RenderContractMap
@@ -120,8 +118,6 @@ class T24_domain_domain_ContractMapRendererError_v_2 variantNode
 class T24_domain_domain_ContractMapRendererError errorType
 class R17_domain_domain_ContractMapWriter secondaryPort
 class R17_domain_domain_ContractMapWriter_m_0 methodNode
-class F54_domain_domain_S_tddd_S_contract__map__render_S_render__contract__map freeFunction
-class F54_domain_domain_S_tddd_S_contract__map__render_S_render__contract__map functionNode
 class R17_usecase_usecase_RenderContractMap applicationService
 class R17_usecase_usecase_RenderContractMap_m_0 methodNode
 class T24_usecase_usecase_RenderContractMapCommand command

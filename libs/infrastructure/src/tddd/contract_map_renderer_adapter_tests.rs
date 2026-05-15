@@ -3227,3 +3227,553 @@ fn test_integrated_ac01_ac05_ac10_ac11_rich_multi_crate_fixture() {
         "AC-05: all node ids must be distinct: {ids_in_output:?}"
     );
 }
+
+// Test 62 (PR #133 round 4 — Finding 2): entries with action=Delete are filtered
+// from the rendered contract map. The contract map shows current contract surface,
+// not historical deletion records (ADR 2026-04-11-0003).
+#[test]
+fn render_skips_entries_with_action_delete() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let cn = crate_name("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    // Add entry: retained (action = Add).
+    let keep_name = TypeName::new("Keeper").unwrap();
+    doc.types.insert(
+        keep_name.clone(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    // Delete entry: must NOT appear in output.
+    let del_name = TypeName::new("Deleted").unwrap();
+    doc.types.insert(
+        del_name.clone(),
+        TypeEntry {
+            action: ItemAction::Delete,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    // FunctionEntry with action=Delete must also be filtered.
+    let del_fn_path = FunctionPath::new(
+        CrateName::new("domain").unwrap(),
+        ModulePath::root(),
+        FunctionName::new("deleted_fn").unwrap(),
+    );
+    doc.functions.insert(
+        del_fn_path,
+        FunctionEntry {
+            action: ItemAction::Delete,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = adapter.render(&[doc], std::slice::from_ref(&layer_id), &opts);
+    assert!(result.is_ok(), "render must succeed with Delete entries, got: {result:?}");
+    let content = result.unwrap();
+    let mermaid: &str = content.as_ref();
+
+    let keeper_id = type_node_id(&layer_id, &cn, &keep_name);
+    assert!(
+        mermaid.contains(&keeper_id),
+        "Keeper (action=Add) must appear in output, got:\n{mermaid}"
+    );
+
+    let deleted_id = type_node_id(&layer_id, &cn, &del_name);
+    assert!(
+        !mermaid.contains(&deleted_id),
+        "Deleted (action=Delete) must NOT appear in output, got:\n{mermaid}"
+    );
+
+    assert!(
+        !mermaid.contains("deleted_fn"),
+        "deleted_fn (action=Delete function) must NOT appear in output, got:\n{mermaid}"
+    );
+}
+
+// Test 62b (PR #133 round 5 — Finding 1 refinement): `TypeIndex::build()` must not
+// index action=Delete entries so that a live entry whose TypeRef points to a deleted
+// type resolves to `None` (no edge) rather than a dangling node id.
+#[test]
+fn type_index_does_not_resolve_deleted_type() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let cn = crate_name("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    // LiveEntry has a field whose TypeRef points to the deleted type.
+    let del_type_name = TypeName::new("DeletedTarget").unwrap();
+    doc.types.insert(
+        del_type_name.clone(),
+        TypeEntry {
+            action: ItemAction::Delete,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    // Live entry that has a field referencing the deleted type.
+    doc.types.insert(
+        TypeName::new("LiveHolder").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![FieldDecl::new(
+                    FieldName::new("inner").unwrap(),
+                    TypeRef::new("DeletedTarget").unwrap(),
+                )],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = adapter.render(&[doc], std::slice::from_ref(&layer_id), &opts);
+    assert!(result.is_ok(), "render must succeed, got: {result:?}");
+    let content = result.unwrap();
+    let mermaid: &str = content.as_ref();
+
+    // The deleted type's node id must NOT appear in the mermaid output.
+    let deleted_node_id = type_node_id(&layer_id, &cn, &del_type_name);
+    assert!(
+        !mermaid.contains(&deleted_node_id),
+        "deleted type node id must not appear (no dangling edge), got:\n{mermaid}"
+    );
+}
+
+// Test 62c (PR #133 round 5 — Finding 2 refinement): `TraitIndex::build()` must not
+// index action=Delete trait entries so that a live type's trait_impl pointing to a
+// deleted trait resolves to `None` (no edge) instead of a dangling `-.->|impl|` edge.
+#[test]
+fn trait_index_does_not_emit_edge_for_deleted_trait() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let cn = crate_name("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    // Deleted trait: must not appear in output and must not produce edges.
+    let del_trait_name = TraitName::new("DeletedTrait").unwrap();
+    doc.traits.insert(
+        del_trait_name.clone(),
+        TraitEntry {
+            action: ItemAction::Delete,
+            role: domain::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    // Live type that declares an impl for the deleted trait.
+    doc.types.insert(
+        TypeName::new("LiveImpl").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![TraitImplDeclV2::new(del_trait_name.clone(), cn.clone())],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = adapter.render(&[doc], std::slice::from_ref(&layer_id), &opts);
+    assert!(result.is_ok(), "render must succeed, got: {result:?}");
+    let content = result.unwrap();
+    let mermaid: &str = content.as_ref();
+
+    // The deleted trait's node id must NOT appear anywhere in the mermaid output.
+    let deleted_trait_node_id = trait_node_id(&layer_id, &cn, &del_trait_name);
+    assert!(
+        !mermaid.contains(&deleted_trait_node_id),
+        "deleted trait node id must not appear (no dangling edge), got:\n{mermaid}"
+    );
+}
+
+// Test 63 (PR #133 round 4 — Finding 3): malformed TypeRef with bracket imbalance
+// propagates as RenderFailed (fail-closed, CN-03).
+#[test]
+fn render_returns_render_failed_for_malformed_type_ref_in_param() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    // A TypeEntry whose method carries a param TypeRef with mismatched angle brackets.
+    let method_with_bad_param = MethodDeclaration::new(
+        MethodName::new("process").unwrap(),
+        Some(domain::tddd::catalogue_v2::roles::SelfReceiver::SharedRef),
+        vec![ParamDeclaration::new(
+            ParamName::new("cmd").unwrap(),
+            // Mismatched: 1 '<' with 0 '>'
+            TypeRef::new("Result<UserId").unwrap(),
+        )],
+        TypeRef::new("()").unwrap(),
+        false,
+        None,
+    );
+    doc.types.insert(
+        TypeName::new("BadEntry").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![method_with_bad_param],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = adapter.render(&[doc], &[layer_id], &opts);
+    assert!(
+        matches!(result, Err(ContractMapRendererError::RenderFailed { .. })),
+        "malformed TypeRef must produce RenderFailed, got: {result:?}"
+    );
+}
+
+// Test 64 (PR #133 round 5 — Finding 2): balanced-but-missequenced TypeRef such as
+// `Foo>Bar<` (equal counts of '<' and '>' but '>' precedes '<') propagates as
+// RenderFailed (fail-closed, CN-03).
+#[test]
+fn render_returns_render_failed_for_missequenced_type_ref_in_param() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    // A TypeEntry whose method carries a param TypeRef that is bracket-balanced (one '<'
+    // and one '>') but sequentially invalid: '>' appears before '<'.
+    let method_with_missequenced_param = MethodDeclaration::new(
+        MethodName::new("process").unwrap(),
+        Some(domain::tddd::catalogue_v2::roles::SelfReceiver::SharedRef),
+        vec![ParamDeclaration::new(
+            ParamName::new("cmd").unwrap(),
+            // Balanced (one '<', one '>') but '>' comes first — syntactically invalid.
+            TypeRef::new("Foo>Bar<").unwrap(),
+        )],
+        TypeRef::new("()").unwrap(),
+        false,
+        None,
+    );
+    doc.types.insert(
+        TypeName::new("BadEntry2").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![method_with_missequenced_param],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = adapter.render(&[doc], &[layer_id], &opts);
+    assert!(
+        matches!(result, Err(ContractMapRendererError::RenderFailed { .. })),
+        "missequenced TypeRef must produce RenderFailed, got: {result:?}"
+    );
+}
+
+// Test 66 (PR #133 round 5 — Finding 1 arrow): function-pointer TypeRefs that include a
+// `->` return-type arrow must not fail validation at any generic depth:
+// - depth 0: `for<'a> fn(&'a T) -> T` (the `->` `>` is at depth 0 after `<'a>` closes)
+// - depth 1: `Vec<fn(u32) -> u32>` (the `->` `>` is at depth 1 inside `Vec<...>`)
+// Neither must produce RenderFailed.
+#[test]
+fn render_does_not_reject_function_pointer_type_ref_with_arrow() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    // A TypeEntry whose method carries a HRTB function-pointer TypeRef.
+    // `for<'a> fn(&'a MyType) -> MyType` is a valid Rust type; validation must not
+    // reject it — the `->` arrow's `>` is not a generic close.
+    let method_with_fn_ptr_param = MethodDeclaration::new(
+        MethodName::new("run").unwrap(),
+        None,
+        vec![ParamDeclaration::new(
+            ParamName::new("callback").unwrap(),
+            TypeRef::new("for<'a> fn(&'a MyType) -> MyType").unwrap(),
+        )],
+        TypeRef::new("()").unwrap(),
+        false,
+        None,
+    );
+    doc.types.insert(
+        TypeName::new("FnPtrEntry").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![method_with_fn_ptr_param],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    // Validation must succeed (Ok) — the render itself may produce empty mermaid
+    // output because `for<'a> fn(&'a MyType) -> MyType` doesn't resolve to a catalogue
+    // entry, but there must be no RenderFailed error.
+    let result = adapter.render(&[doc], &[layer_id], &opts);
+    assert!(
+        result.is_ok(),
+        "HRTB function-pointer TypeRef must not produce RenderFailed, got: {result:?}"
+    );
+}
+
+// Test 66b: nested `->` inside a generic wrapper (`Vec<fn(u32) -> u32>`) must also pass.
+// The `->` `>` appears at generic depth 1 (inside `Vec<...>`) and must not be treated
+// as the closing `>` of the `Vec<` block.
+#[test]
+fn render_does_not_reject_nested_function_pointer_type_ref_with_arrow() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    let method_with_nested_fn_ptr = MethodDeclaration::new(
+        MethodName::new("run").unwrap(),
+        None,
+        vec![ParamDeclaration::new(
+            ParamName::new("f").unwrap(),
+            TypeRef::new("Vec<fn(u32) -> u32>").unwrap(),
+        )],
+        TypeRef::new("()").unwrap(),
+        false,
+        None,
+    );
+    doc.types.insert(
+        TypeName::new("FnPtrEntry2").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![method_with_nested_fn_ptr],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = adapter.render(&[doc], &[layer_id], &opts);
+    assert!(
+        result.is_ok(),
+        "nested function-pointer TypeRef `Vec<fn(u32) -> u32>` must not produce RenderFailed, \
+         got: {result:?}"
+    );
+}
+
+// Test 67 (PR #133 round 5 — Finding 2 kind-mismatch): a TypeRef with mismatched
+// bracket kinds inside a generic block (`Foo<[T)>`) must produce RenderFailed.
+// Net-depth-only tracking would pass this; kind-aware matching catches it.
+#[test]
+fn render_returns_render_failed_for_mismatched_inner_bracket_kind() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    // `Foo<[T)>` — `[` opened inside `<...>`, but closed by `)` (wrong kind).
+    let method_with_kind_mismatch = MethodDeclaration::new(
+        MethodName::new("process").unwrap(),
+        None,
+        vec![ParamDeclaration::new(
+            ParamName::new("cmd").unwrap(),
+            TypeRef::new("Foo<[T)>").unwrap(),
+        )],
+        TypeRef::new("()").unwrap(),
+        false,
+        None,
+    );
+    doc.types.insert(
+        TypeName::new("BadEntry4").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![method_with_kind_mismatch],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = adapter.render(&[doc], &[layer_id], &opts);
+    assert!(
+        matches!(result, Err(ContractMapRendererError::RenderFailed { .. })),
+        "mismatched-kind inner bracket must produce RenderFailed, got: {result:?}"
+    );
+}
+
+// Test 68 (PR #133 round 5 — Finding 3 stray-closer): a TypeRef with a stray closing
+// delimiter outside any generic block (`Vec<T>)`) must produce RenderFailed.
+// The `)` has no matching `(` opener at the top level.
+#[test]
+fn render_returns_render_failed_for_stray_closing_bracket_outside_generic() {
+    let dir = tempfile::tempdir().unwrap();
+    let style_path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(style_path);
+    let layer_id = layer("domain");
+    let opts = ContractMapRenderOptions::empty();
+
+    let mut doc = make_minimal_catalogue("domain", "domain");
+
+    // `Vec<T>)` — valid `Vec<T>` followed by a stray `)` with no matching `(`.
+    let method_with_stray_closer = MethodDeclaration::new(
+        MethodName::new("process").unwrap(),
+        None,
+        vec![ParamDeclaration::new(
+            ParamName::new("cmd").unwrap(),
+            TypeRef::new("Vec<T>)").unwrap(),
+        )],
+        TypeRef::new("()").unwrap(),
+        false,
+        None,
+    );
+    doc.types.insert(
+        TypeName::new("BadEntry5").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![method_with_stray_closer],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let result = adapter.render(&[doc], &[layer_id], &opts);
+    assert!(
+        matches!(result, Err(ContractMapRendererError::RenderFailed { .. })),
+        "stray closing bracket outside generic must produce RenderFailed, got: {result:?}"
+    );
+}
