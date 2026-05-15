@@ -3,18 +3,15 @@
 //!
 //! Composition root that wires the usecase interactor
 //! (`usecase::contract_map_workflow::RenderContractMapInteractor`) to its
-//! two secondary-port adapters (`FsCatalogueLoader` / `FsContractMapWriter`)
-//! and dispatches through the `RenderContractMap` primary port so the CLI
-//! stays substitutable for tests and future adapters.
+//! three secondary-port adapters (`FsCatalogueLoader` / `ContractMapRendererAdapter` /
+//! `FsContractMapWriter`) and dispatches through the `RenderContractMap` primary port
+//! so the CLI stays substitutable for tests and future adapters.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use infrastructure::tddd::ContractMapRendererAdapter;
 use infrastructure::tddd::contract_map_adapter::{FsCatalogueLoader, FsContractMapWriter};
-use infrastructure::tddd::{
-    CatalogueDocument, ContractMapContent, ContractMapRenderOptions, ContractMapRenderer,
-    ContractMapRendererError, LayerId,
-};
 use infrastructure::track::fs_store::read_track_status_str;
 use usecase::contract_map_workflow::{
     RenderContractMap, RenderContractMapCommand, RenderContractMapInteractor,
@@ -23,27 +20,6 @@ use usecase::contract_map_workflow::{
 use crate::CliError;
 
 use super::signals::ensure_active_track;
-
-/// Placeholder renderer for the `contract-map` CLI command.
-///
-/// T009 will replace this with the real `ContractMapRendererAdapter` (infrastructure adapter).
-/// Until then, this stub emits a placeholder mermaid diagram so that the interactor's
-/// `render` call compiles and the `ContractMapWriter` path is exercised.
-struct PlaceholderRenderer;
-
-impl ContractMapRenderer for PlaceholderRenderer {
-    fn render(
-        &self,
-        _catalogues: &[CatalogueDocument],
-        _layer_order: &[LayerId],
-        _opts: &ContractMapRenderOptions,
-    ) -> Result<ContractMapContent, ContractMapRendererError> {
-        Ok(ContractMapContent::new(
-            "<!-- contract-map renderer not yet wired (T009) -->\n\
-             ```mermaid\nflowchart LR\n```\n",
-        ))
-    }
-}
 
 /// Render the Contract Map for a single track.
 ///
@@ -68,8 +44,8 @@ pub fn execute_contract_map(
 
     let rules_path = workspace_root.join("architecture-rules.json");
     let loader = FsCatalogueLoader::new(items_dir.clone(), rules_path, workspace_root.clone());
-    // T009: replace PlaceholderRenderer with ContractMapRendererAdapter (infrastructure adapter).
-    let renderer = PlaceholderRenderer;
+    let style_config_path = workspace_root.join(".harness/config/contract-map-style.toml");
+    let renderer = ContractMapRendererAdapter::new(style_config_path);
     let writer = FsContractMapWriter::new(items_dir.clone(), workspace_root);
     let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
 
@@ -161,5 +137,78 @@ mod tests {
         let err = result.unwrap_err();
         let msg = format!("{err}");
         assert!(msg.contains("Completed tracks are frozen"), "must reject done track: {msg}");
+    }
+
+    /// Smoke test verifying that `execute_contract_map` exercises the
+    /// `ContractMapRendererAdapter` code path rather than a placeholder.
+    ///
+    /// The fixture wires a valid in-progress track with a single TDDD-enabled
+    /// layer and an empty catalogue, but omits the style config. The adapter
+    /// is fail-closed (CN-03): a missing style config returns
+    /// `ContractMapRendererError::StyleConfigNotFound`, which propagates via
+    /// `RenderContractMapError::RendererFailed` and surfaces in the CLI error
+    /// message.  A placeholder renderer would return `Ok(...)` unconditionally
+    /// — observing the `StyleConfigNotFound` error proves the adapter is wired.
+    #[test]
+    fn test_execute_contract_map_wires_adapter_not_placeholder() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().to_path_buf();
+
+        // Set up track/items/<track-id>/ with in-progress status.
+        let items_dir = workspace_root.join("track/items");
+        let track_id = "test-adapter-wire";
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        let metadata = r#"{
+  "schema_version": 5, "id": "test-adapter-wire", "branch": "track/test-adapter-wire",
+  "title": "Adapter wire smoke test",
+  "created_at": "2026-05-15T00:00:00Z", "updated_at": "2026-05-15T00:00:00Z"
+}"#;
+        std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+        // One task in_progress → derive_track_status → InProgress (active).
+        let impl_plan = r#"{"schema_version":1,"tasks":[{"id":"T001","description":"t","status":"in_progress"}],"plan":{"summary":[],"sections":[{"id":"S001","title":"t","description":[],"task_ids":["T001"]}]}}"#;
+        std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
+
+        // Minimal architecture-rules.json: one TDDD-enabled layer ("domain").
+        let rules_json = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["domain"]}
+      }
+    }
+  ]
+}"#;
+        std::fs::write(workspace_root.join("architecture-rules.json"), rules_json).unwrap();
+
+        // Minimal v3 catalogue (empty entries).
+        let catalogue_v3 = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {}
+}"#;
+        std::fs::write(track_dir.join("domain-types.json"), catalogue_v3).unwrap();
+
+        // Intentionally omit .harness/config/contract-map-style.toml so the
+        // ContractMapRendererAdapter returns StyleConfigNotFound (fail-closed, CN-03).
+        // A placeholder renderer would succeed → observing the error proves adapter is wired.
+        let result = execute_contract_map(items_dir, track_id.to_owned(), workspace_root, None);
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(
+            msg.contains("contract-map-style.toml") || msg.contains("style config"),
+            "expected StyleConfigNotFound error proving adapter is wired; got: {msg}"
+        );
     }
 }
