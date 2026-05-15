@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-15T17:14:19Z",
+  "declaration_hash": "66ac147aec08de790f74da02ea241c384ef14b3e913b7f20ee2f964047886a4f",
+  "signals": [
+    {
+      "type_name": "RenderContractMapError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<CatalogueLoaderError>",
+        "core::convert::From<ContractMapRendererError>",
+        "core::convert::From<ContractMapWriterError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RenderContractMap"
+      ]
+    },
+    {
+      "type_name": "ReviewCheckApprovedInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ReviewCheckApprovedService"
+      ]
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TaskOperationService"
+      ]
+    },
+    {
+      "type_name": "RenderContractMap",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RenderContractMapOutput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewCheckApprovedService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskOperationService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -1,0 +1,1857 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "INF-24 points readers at a C-side `for_is_external` leak in `mod.rs` and labels the result `Mismatch_Reference Red`, but the linked track artifact documents a different bug: `patch_impl_for_ids` in Phase 1 leaves the impl in S and produces `SMinusC_Reference Red` (`track/items/contract-map-v3-2026-05-15/infrastructure-types.json:40-45`). As written, the TODO entry sends maintainers to the wrong subsystem and the wrong signal polarity.",
+              "severity": "P1",
+              "file": "knowledge/strategy/TODO.md",
+              "line": 285,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b2bbf03c0377e06ccea65dc5f35625702ec1e2a9f8ec2f2eaf1ef3c5ef5ab59b",
+          "at": "2026-05-15T06:37:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "INF-24 describes a `patch_impl_for_ids` bug in `phase1/child_items.rs`, but the briefing for this round says the intended issue is the external-type filter gap in `mod.rs:362-380`. As written, the TODO points maintainers at the wrong subsystem and the wrong red polarity, so the follow-up track will likely fix the wrong code path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/TODO.md",
+              "line": 285,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b68c1b8ce62ac5225a376f9191075b76eec169ba1562efacd6472f3686bc512",
+          "at": "2026-05-15T06:39:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
+          "at": "2026-05-15T06:43:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
+          "at": "2026-05-15T06:46:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
+          "at": "2026-05-15T09:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
+          "at": "2026-05-15T09:47:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f1551562ba5677044a0f0445df52b2f8fe05fb9c34dd54b07ead74f41bfa854",
+          "at": "2026-05-15T11:12:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f1551562ba5677044a0f0445df52b2f8fe05fb9c34dd54b07ead74f41bfa854",
+          "at": "2026-05-15T11:16:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b616889c4e53b6e7004d1ae1d359e129e2b2388315d4042570d382d150d45a04",
+          "at": "2026-05-15T17:08:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b616889c4e53b6e7004d1ae1d359e129e2b2388315d4042570d382d150d45a04",
+          "at": "2026-05-15T17:09:22Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:10:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:12:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:55:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:58:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:040ceacdaef093d522bbe2f999bf6af54371541fb9bf8760e2b05f040c954e20",
+          "at": "2026-05-15T17:07:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:040ceacdaef093d522bbe2f999bf6af54371541fb9bf8760e2b05f040c954e20",
+          "at": "2026-05-15T17:09:29Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
+          "at": "2026-05-15T10:53:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
+          "at": "2026-05-15T10:55:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cea1f637c735c55c279e3041a34e059fcf06c7c9786f526044e9c9975f7ab8b",
+          "at": "2026-05-15T16:22:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cea1f637c735c55c279e3041a34e059fcf06c7c9786f526044e9c9975f7ab8b",
+          "at": "2026-05-15T16:25:29Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
+          "at": "2026-05-15T10:10:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
+          "at": "2026-05-15T10:11:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ContractMapRendererError` does not actually preserve an error chain for the parse/render failures. `StyleConfigParse` and `RenderFailed` store only `String`, so `thiserror` cannot expose an underlying `source()` here, and the current tests only check `to_string()`. That means the new public error type cannot propagate the original failure cause the way the task describes.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_renderer.rs",
+              "line": 66,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6ab930a16d6d3b410d9dde0ba43e5fadac75eb6de3c69066902bf04d0df72b75",
+          "at": "2026-05-15T10:34:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
+          "at": "2026-05-15T10:37:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
+          "at": "2026-05-15T10:40:08Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Follow-up` claims that old ADR D4 (including `spec_source edge`) is fully superseded by the new ADR, but the new ADR still leaves `spec_source edge` as an open question (`Q`) and explicitly says its adoption is undecided. That makes the supersession map internally inconsistent: one part of D4 is still unresolved, so it cannot be described as wholly rewritten yet.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 411,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision C says entry shapes are fixed to subgraph rectangles because entries are subgraphized, but Decision F explicitly exempts `FunctionEntry` from subgraphization and places it as a standalone callable node. The shape rule therefore does not apply uniformly to all entries, so the renderer model is inconsistent for functions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 155,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:477514eabfbce85e27f9e7762ebcfe94ec3e40af1448b7feb45c3f0ec6ef8a47",
+          "at": "2026-05-15T04:18:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The FunctionEntry clause claims standalone function nodes can inherit 'Decision F's shape choice', but Decision F only defines Type/Trait entry subgraph behavior and method/variant nodes. As written, the styling rule for FunctionEntry is unsupported and leaves the function-node shape semantics ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 155,
+              "category": "factual error"
+            },
+            {
+              "message": "`ADR 2026-05-08-0248 D5` is the wrong source for the alleged 'syn-free principle'. In that ADR, D5 is about identifier/newtype wrappers, not parser placement or syn usage, so the rejection rationale points at an unrelated decision.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 321,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:4ebd3f4c61d67749c75f73d0876bf4d7e13a7bc543bbdb21c9840dfd1f40fa33",
+          "at": "2026-05-15T04:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [`knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md:246-249`](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md#L246-L249) treats `TypeAlias` as a symmetric relation and renders it with an undirected edge. `TypeAlias.target` is directional in the schema, so this loses which symbol is the alias and which is the canonical target, which is semantically misleading for the rendered contract map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 248,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:334a9f008a4c4d8e788d01b22306e8df8efb8769ae649aed0fbb201b382870c2",
+          "at": "2026-05-15T04:28:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The render-order section is not exhaustive: it enumerates classDefs, layer/module/entry subgraphs, method/variant nodes, crate-root entries, edges, and class attachments, but it never assigns a placement/order for `FunctionEntry` nodes. That conflicts with Decision C, F, and I, which require standalone function nodes to be styled and rendered by default, so the implementation still lacks a deterministic rendering rule for functions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 277,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:79cd39833684c166bf4e2e8e7d6e68a9f2a05a19f848bef301bf77afc3237a9e",
+          "at": "2026-05-15T04:33:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Decision C` makes `FunctionEntry` styling depend on `[node.Function]`, but `Decision L` only defines node buckets as `Method`, `Variant`, and `Field`. As written, the config schema never actually allocates a `Function` node section, so the function-node styling path is left undefined in the document itself.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 234,
+              "category": "contradiction"
+            },
+            {
+              "message": "The render-order summary says the first block contains classDef definitions derived from `[class.*] + [edge.*]`, but the `[edge.*]` section is defined as arrow/label styling, not classDef data. That misclassifies edge configuration as class styling and makes the output-structure description semantically wrong.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 280,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:22f574f74101bca04775f7c9883891dab3736b39b420d5636f6167d0daa55897",
+          "at": "2026-05-15T04:36:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
+          "at": "2026-05-15T04:38:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
+          "at": "2026-05-15T04:43:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file says `From<ContractMapRendererError>` is omitted, but `impl-plan.json` T003 and `plan.md` S3 require that conversion to be implemented. The artifact set describes two different target states for `RenderContractMapError`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/usecase-types.json",
+              "line": 59,
+              "category": "contradiction"
+            },
+            {
+              "message": "`IN-24` is referenced as the deferred placeholder target, but the spec only defines `IN-01` through `IN-18`. That anchor is not part of this track's spec, so the comment should point at the actual deferred scope instead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/contract-map.md",
+              "line": 2,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:77f3506630b403856e5d777d0391ba9a99105cf82cb51727b83c2f84cdfeba2d",
+          "at": "2026-05-15T06:34:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ContractMapRendererError` introduces a public `RenderFailed` variant here, but the plan never assigns a task that actually exercises or asserts that path. T002 only covers `Display`/`Error` formatting, T005 only covers config-missing/parse failures, and T010 is limited to AC-01..14 acceptance behavior. As written, the generic renderer-failure branch can be implemented incorrectly without any planned test catching it. Add an explicit unit or integration test that forces `render` to return `RenderFailed` and verifies propagation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 19,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:2cb51e61db1ebea0cbb2a2ec8bd146fef216ac592c38c964b1a53350a1763786",
+          "at": "2026-05-15T06:42:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011 says to confirm that all Yellow signals are Blue, but the briefing's accepted deviations explicitly allow the `<layer>-catalogue-spec-signals.json` Yellow items to remain Yellow. As written, this completion criterion contradicts the allowed end state and could push the gate toward an unachievable target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c013e0ef61e6aae8e21a7bff78e71c5da29594373e2a443912a2fac02dd51723",
+          "at": "2026-05-15T06:45:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The machine-readable plan has no dependency graph: every task object in this file omits `depends_on`, so prerequisite ordering is not enforced. That leaves tasks like T003, T009, and T011 schedulable before the artifacts they require, which makes the plan infeasible as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 5,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T005 describes Function node IDs as `F<len>_<layer_path>`, but the spec requires `F<len>_<sanitized_full_path>` for functions (`spec.md:64`). As written, the plan would generate the wrong identifier shape for function nodes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 42,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8c78b35ef07d508c175305b45d798966ede71edaef6936d2eabc74a07f323011",
+          "at": "2026-05-15T06:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[plan.md:L54] T010 claims to cover AC-01 and AC-11, but the task only specifies a two-layer fixture plus TypeKindV2 variant coverage. It never says the fixture includes multiple `CatalogueDocument`s in the same layer or any `module_path = []` / nested-module cases, so the layer-aggregation behaviors required by those acceptance criteria are not actually specified by this task.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 54,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:75e7f25341e733a276eab6c4917b994a43966e4e972914fe0aabda35315cd992",
+          "at": "2026-05-15T06:53:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-01` still specifies `render_contract_map(...)->ContractMapContent`, but this track deletes `domain::tddd::contract_map_render::render_contract_map` and replaces it with the fallible `ContractMapRenderer::render(...)->Result<ContractMapContent, ContractMapRendererError>`. `T010` repeats the same stale API name. As written, the acceptance criteria and test plan point at an API that the rest of the plan explicitly removes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/spec.md",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a4b112bc0e27364466788455491a7cc4f73de6f8493a3a08f859390694b2f7e7",
+          "at": "2026-05-15T06:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0333ca40752e65319bfa3b6a2710857c0b54a9fb22d8b4c6c0b10d132bd0c617",
+          "at": "2026-05-15T07:04:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan still leaves the workflow unable to feed the new renderer's v3 input shape. IN-01/AC-01 require `ContractMapRenderer::render` to consume `&[CatalogueDocument]` and correctly handle multiple `CatalogueDocument`s with the same `LayerId`, but `CatalogueLoader` is kept as a reference returning `BTreeMap<LayerId, CatalogueDocument>`. T003/T009 only inject and call the renderer; no task changes the loader contract or adds an equivalent collection step that can preserve 1-layer-N-crate catalogues. Because a `BTreeMap<LayerId, ...>` cannot represent two documents for the same layer, the CLI/usecase path cannot satisfy the stated v3 design outside isolated adapter tests.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/domain-types.json",
+              "line": 111,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T010 is described as an acceptance test spanning AC-01 through AC-14, and task coverage assigns T010 to AC-07 and AC-10, but the task's explicit fixture/test targets never require any `trait_impls`, all three `ContractRole` cases, or a workspace-external trait to exercise silent-skip behavior. As written, the acceptance task can be completed while missing the trait-impl edge behaviors that AC-07/AC-10 require, contradicting the coverage claims.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0333ca40752e65319bfa3b6a2710857c0b54a9fb22d8b4c6c0b10d132bd0c617",
+          "at": "2026-05-15T07:09:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-01 says the ContractMapRenderer method signature, adapter struct definition, and RenderContractMapInteractor coordination API are out of scope for this track's behavioral spec, but IN-01/IN-05 and the implementation plan make those exact API details in-scope and required. This leaves the plan artifacts with conflicting target-state guidance for T002/T003/T005.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+              "line": 259,
+              "category": "contradiction"
+            },
+            {
+              "message": "T010 is described as an acceptance test spanning AC-01 through AC-14, but the explicit test targets only list AC-01/02/05/06/07/10/11/12, while task-coverage assigns AC-13 to T002/T009/T011 and AC-14 only to T008. Either T010 needs explicit checks for the remaining ACs or the \"AC-01〜AC-14\" claim should be narrowed to match the coverage map.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:504ea4db0bf8bd81d7f13ec4ac00410795758c7a31fa5402bca3b84b17434380",
+          "at": "2026-05-15T07:14:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010's coverage is internally inconsistent. The S6 section says T010 adds an AC-01 through AC-14 acceptance test, and task-coverage assigns T010 to AC-03, AC-04, AC-08, and AC-09, but the T010 task text explicitly limits its integration targets to AC-01/02/05/06/07/10/11/12 and says AC-03/04/08/09 are handled elsewhere. It also says AC-08 is covered by T007 even though the plan assigns has_stripped_fields rendering to T006. As written, implementers cannot tell whether T010 must actually test AC-03/04/08/09, and the coverage artifact overstates T010's acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/task-coverage.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb622638c2a9a3a0ebc8c4e205dd194292f92e230bc7f0eb3c30df7cc913b5b6",
+          "at": "2026-05-15T07:19:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-14 requires both no hardcoded layer names and successful rendering in a workspace with arbitrary layer names, and task-coverage assigns AC-14 only to T008 while T010 explicitly defers AC-14 to T008. However T008's listed unit tests cover trait impl resolution, external-trait skipping, and output ordering only; they do not require an arbitrary-layer fixture or assertion. An implementer can complete every listed T008/T010 test without verifying the second half of AC-14, so the coverage claim is incomplete.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9f3a5eb11ed6da9036abbda2ccbfe553df83e201c6b2d402ebabb0219ae0b66c",
+          "at": "2026-05-15T07:25:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 requires the default style config to define `NodeCategory {Method, Variant, Field, Function}` with shape/class settings, which makes `Field` a node category. That conflicts with the same plan/spec stating PlainStruct and TupleStruct fields are not node-ized and are rendered only as edges/labels (`IN-12`, T006). An implementer following T004 could add `[node.Field]` semantics that T006 explicitly forbids, so the config contract needs to remove or clarify `Field` as a non-node edge label/style concern.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e445d7b51cbba61aef03da39384917d9ed02f56cb2c3b6f585a226566e3c6648",
+          "at": "2026-05-15T07:30:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca08b935fe8872756a97bfc1aeafe9462559fb832f4289744264c4c02f7ec5a5",
+          "at": "2026-05-15T07:32:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c2b9012cd0b98974c68e8588c42e0027ba9bad60f079ef6ba8e5b387b1138dc",
+          "at": "2026-05-15T09:44:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008/T010 tell implementers to build trait-impl edges from `TraitEntry.trait_impls`, but the catalogue v3 artifacts model implementations on concrete type entries (`types[*].trait_impls`), while trait entries only define the target trait/role. Following this plan would either look at a non-existent field or build fixtures that cannot express workspace-internal/external impls, so AC-07/AC-10 coverage is not actually implementable as written. The plan should say to iterate type entries' `trait_impls` and resolve those references against the trait index, using TraitEntry only as the target node/role source.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 48,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:2c2b9012cd0b98974c68e8588c42e0027ba9bad60f079ef6ba8e5b387b1138dc",
+          "at": "2026-05-15T09:48:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ef286a9ec1430fcec7f3d272261e13bbc61f9b497e7b4d07c25c6e5975b312b",
+          "at": "2026-05-15T09:53:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` now drops `commit_hash` from the task objects, so T001 is no longer represented as the briefing-required `commit_hash: null` pending state. That is a metadata-shape drift from the intended in-progress transition.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "`domain-types.md` also changed the generated signal for `domain::tddd::contract_map_render::render_contract_map` from 🟡 to 🔵. The briefing for this round says only T001 status should move to `in_progress` and `plan.md` should rerender, so this is an extra semantic drift in a layer-types artifact.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/domain-types.md",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
+          "at": "2026-05-15T10:11:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
+          "at": "2026-05-15T10:15:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
+          "at": "2026-05-15T10:16:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
+          "at": "2026-05-15T10:33:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.md` was re-rendered to mark T002-owned declarations (`ContractMapRenderOptions`, `ContractMapRendererError`, and `ContractMapRenderer`) as fully Blue, while the same plan artifacts still declare T002 only `in_progress` with no commit hash. This makes the plan-artifact snapshot no longer a pure T001 done / T002 start transition and presents T002 implementation signals as completed before the task is resolved.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/domain-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
+          "at": "2026-05-15T10:36:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
+          "at": "2026-05-15T10:38:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69de7001e726651d3ff40408e7a36e75ec2f24905c8bb0bc9db288cfd831e96c",
+          "at": "2026-05-15T10:53:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69de7001e726651d3ff40408e7a36e75ec2f24905c8bb0bc9db288cfd831e96c",
+          "at": "2026-05-15T10:55:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:11:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is still marked `todo` here, and the generated `plan.md` mirrors it as `[ ]` at line 34, but the plan-artifacts briefing for this round explicitly says T004 is the current `in_progress` task with no commit hash. This leaves the handoff state contradictory: downstream reviewers/operators will see no active task even though T004 is supposed to be in progress. Set T004 to `in_progress` and re-render `plan.md` so it shows `[~]`.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:16:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:17:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ffaf870aaa113da3c0db71ae2c008da75aa4a464fb921f5881e75af2ea59acd",
+          "at": "2026-05-15T11:34:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ffaf870aaa113da3c0db71ae2c008da75aa4a464fb921f5881e75af2ea59acd",
+          "at": "2026-05-15T11:36:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e527d4bc808fbd3a9699e5d8ea4db07124e581648959eae61f217fd936bdbd12",
+          "at": "2026-05-15T12:16:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e527d4bc808fbd3a9699e5d8ea4db07124e581648959eae61f217fd936bdbd12",
+          "at": "2026-05-15T12:18:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
+          "at": "2026-05-15T12:39:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
+          "at": "2026-05-15T12:40:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1763555a5ac515d07106740727818277efd07ffcd632d096b37bb89f1e3e1ea4",
+          "at": "2026-05-15T14:30:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1763555a5ac515d07106740727818277efd07ffcd632d096b37bb89f1e3e1ea4",
+          "at": "2026-05-15T14:31:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e9b614091bc6735b47514c780eca8a8ffdbd9fbb5cdf095052d3613ef3e9aa9",
+          "at": "2026-05-15T15:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e9b614091bc6735b47514c780eca8a8ffdbd9fbb5cdf095052d3613ef3e9aa9",
+          "at": "2026-05-15T15:47:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d73bff892dfbead069da72723a1976a5366f366db69181a7762d0366c6d3eda1",
+          "at": "2026-05-15T16:22:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d73bff892dfbead069da72723a1976a5366f366db69181a7762d0366c6d3eda1",
+          "at": "2026-05-15T16:23:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3551a4294175a26c7daf46d7a186d36738cdb11233209dddd9b66f56ffc27978",
+          "at": "2026-05-15T16:40:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3551a4294175a26c7daf46d7a186d36738cdb11233209dddd9b66f56ffc27978",
+          "at": "2026-05-15T16:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:266cda39c532a0f2cf28fe2d1bc27fbd44b04ec3068d6793edf059a65c1439f4",
+          "at": "2026-05-15T17:08:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011's success criteria still require all catalogue-spec Yellow states from T002/T003/T005 to become Blue, with only the three INF-23/INF-24 workaround items allowed to remain Yellow. But this same change set now documents `RenderContractMapInteractor` as Cat-Spec Yellow in `usecase-types.md` and adds informal grounds for that accepted workaround in `usecase-types.json`, so T011 is internally inconsistent with the current accepted final state and cannot be satisfied as written. Update the T011 exception list/criteria to include the new `RenderContractMapInteractor` Cat-Spec Yellow, or make the signal Blue again.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:266cda39c532a0f2cf28fe2d1bc27fbd44b04ec3068d6793edf059a65c1439f4",
+          "at": "2026-05-15T17:10:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:405eac4fabb3c7554e8aa8f005903bde732ab3156ccd134d0f2ccfdd096b1fbf",
+          "at": "2026-05-15T17:12:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62deb692598da59f7e49e84f84f3859f0d33e6529da475afd0bf9cb104d60bff",
+          "at": "2026-05-15T17:26:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62deb692598da59f7e49e84f84f3859f0d33e6529da475afd0bf9cb104d60bff",
+          "at": "2026-05-15T17:27:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c67d34fcc7ed5307510f635a3c9ecbfb0691d1c3ee7daa1dd2ea72346f8b2be3",
+          "at": "2026-05-15T18:06:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regenerated map still carries the deleted `domain::tddd::contract_map_render::render_contract_map` entry: the Mermaid node id encodes `tddd_S_contract__map__render_S_render__contract__map` and the visible node is `render_contract_map`, with edges/classes repeated later. That contradicts the round intent that this stale renderer module reference be removed from the contract map.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/contract-map.md",
+              "line": 46,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:c67d34fcc7ed5307510f635a3c9ecbfb0691d1c3ee7daa1dd2ea72346f8b2be3",
+          "at": "2026-05-15T18:08:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regenerated map still includes the deleted old renderer entry: this domain section contains a standalone `render_contract_map` node whose id encodes `tddd::contract_map_render::render_contract_map`. That contradicts the track plan/briefing that T001 removed `domain::tddd::contract_map_render::render_contract_map` and that the contract map should no longer carry this stale module reference.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/contract-map.md",
+              "line": 46,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c67d34fcc7ed5307510f635a3c9ecbfb0691d1c3ee7daa1dd2ea72346f8b2be3",
+          "at": "2026-05-15T18:11:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c67d34fcc7ed5307510f635a3c9ecbfb0691d1c3ee7daa1dd2ea72346f8b2be3",
+          "at": "2026-05-15T18:18:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c67d34fcc7ed5307510f635a3c9ecbfb0691d1c3ee7daa1dd2ea72346f8b2be3",
+          "at": "2026-05-15T18:20:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c178f956ba11fa165782b598d635b2b8964f50f12f50201c0d1b412ef62ee9d",
+          "at": "2026-05-15T18:50:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c178f956ba11fa165782b598d635b2b8964f50f12f50201c0d1b412ef62ee9d",
+          "at": "2026-05-15T18:52:00Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression test no longer pins the actual placeholder payload. It now passes for any `contract-map.md` containing `flowchart LR`, so a broken stub that drops the T001 marker or regresses to a different scaffold would still be treated as correct. Keep an assertion on the placeholder body or the stub comment so this temporary state stays covered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 2444,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:4515a009e371d3208230fbee8cd094714b7d081e7d8850921cb15a397ddd307c",
+          "at": "2026-05-15T10:11:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The temporary stub no longer satisfies the established `ContractMapContent` scaffold contract: it emits `flowchart LR` but omits the `end` line that the domain wrapper documents as always present. That leaves `contract-map.md` in a nonstandard mermaid shape, and the updated test only checks for `flowchart LR`, so it would not catch this regression.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 1231,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:03c2644c28dbaa1f33483141e620ab85490bdb84fe2a768e2e11497808202cfc",
+          "at": "2026-05-15T10:14:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cmap.contains(\"end\")` is too weak to verify the placeholder contract. This test would still pass if the stub lost the fenced mermaid block or otherwise emitted malformed markdown, so it does not actually protect the `ContractMapContent` scaffold contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 2455,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:11fffbe3e3506a7a6f00c319e474aa0e25d00978f80c7ef1611a54de61f81085",
+          "at": "2026-05-15T10:16:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sync_rendered_views_renders_contract_map_for_done_track` no longer pins the placeholder output exactly: `cmap.contains(EXPECTED_PLACEHOLDER)` will still pass if `contract-map.md` grows extra content before or after the stub. That weakens the regression guard the comment describes and can let a broken renderer slip through unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 2451,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:13bb140d3e3055699f472424948a12c0c3dca9d273e02924d503d4eeb78c14ab",
+          "at": "2026-05-15T10:19:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c8f893f574b5e954dcb81ac6dce5a0671317aef70e0b4d4cc019a043aee5e97",
+          "at": "2026-05-15T10:22:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c8f893f574b5e954dcb81ac6dce5a0671317aef70e0b4d4cc019a043aee5e97",
+          "at": "2026-05-15T10:24:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aa55832f5fb7f6a00d65989881da95fe12903ab0fdd28e9256b5de464e02246",
+          "at": "2026-05-15T10:53:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aa55832f5fb7f6a00d65989881da95fe12903ab0fdd28e9256b5de464e02246",
+          "at": "2026-05-15T10:54:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b2fea1c5d441c7eaa0c2790ca0372e6b7ba15724111a95f41771d7789ab53ab",
+          "at": "2026-05-15T11:35:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision D-2 in the briefing requires the `<len>` component to be the unsanitized entry name's character count, but `type_node_id` computes it from the sanitized `layer_name` body. This yields IDs such as `T16_domain_UserEmail` instead of the specified `T9_domain_UserEmail`; the trait and function helpers repeat the same pattern, and the tests currently assert the incorrect values, so downstream render output will not match the declared node-id contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 232,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b2fea1c5d441c7eaa0c2790ca0372e6b7ba15724111a95f41771d7789ab53ab",
+          "at": "2026-05-15T11:37:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_node_id` builds `full_path_raw` from only `module_path` plus function name, dropping `path.crate_name`. The task calls for `F<len>_<sanitized_layer>_<sanitized_full_path>`, and `FunctionPath`'s full path includes the crate name, so two catalogues in the same layer with the same module/function in different crates will get identical node ids once rendering starts using this helper. Use the full `FunctionPath` value, or include `path.crate_name` before sanitizing, and add a cross-crate collision test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 265,
+              "category": "correctness"
+            },
+            {
+              "message": "The length prefix is computed from the sanitized `layer_name` body, but the briefing requires `len` to be the unsanitized item name char count for Type/Trait and the unsanitized full path char count for Function. Current tests also lock in the wrong values such as `T16_domain_UserEmail` instead of using `UserEmail`'s raw char count. This violates the node id contract and misses the UTF-8 char-count case called out in the review checklist.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 232,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b2fea1c5d441c7eaa0c2790ca0372e6b7ba15724111a95f41771d7789ab53ab",
+          "at": "2026-05-15T11:40:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_node_id` does not actually sanitize the full `FunctionPath`; it first joins crate/module/function components with single underscores. Because underscores are valid inside identifiers, distinct valid paths can collapse before sanitization, e.g. `a::b::c_d` and `a::b_c::d` both become `a_b_c_d` with the same length and therefore the same Mermaid node id. Once rendering starts using this helper, those function nodes and their edges can merge incorrectly. Build the raw value from the `FunctionPath` display form or otherwise encode component boundaries unambiguously, and add a collision test for this case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 270,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6dd570500e71ca52cdb1879a7c6c5f274a85353a0be02d6c86aff4103b5a5de6",
+          "at": "2026-05-15T11:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The node-id sanitizer is not injective for valid catalogue values, so distinct nodes can collapse to the same Mermaid id. For example, `LayerId` accepts both `my-layer` and `my_layer`, and `type_node_id` will produce the same `T3_my_layer_Foo` for `Foo` in both layers because only the entry name length is included. Function paths have the same issue with valid identifiers such as `crate::a__b::f` and `crate::a::b::f`, which both sanitize to `crate__a__b__f` with the same raw length. This violates the collision-avoidance requirement and can merge unrelated nodes in rendered output; the id scheme needs an injective encoding or length prefixes for each sanitized component.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 212,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:027425effcec5ebf363347494839bb08e54d0306f91b44847a40cc359cb03939",
+          "at": "2026-05-15T11:49:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sanitize` hex-escapes every non-alphanumeric byte, but the task contract for Decision D-2 says non-alphanumeric characters are replaced with `_` for `T<len>_<sanitized_layer>_<sanitized_name>` / `R...` / `F...`. This changes externally consumed node IDs, e.g. `my-layer` becomes `my_2dlayer` instead of `my_layer`, so downstream renderer output and tests written against the declared scheme will not match the catalogue/ADR contract. Please either implement the declared replacement scheme here or update the contract before relying on these IDs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 218,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:1a1557f4934ee3e4eab01811163b4b2b1edae16ed6112a3a58ae265bd0229872",
+          "at": "2026-05-15T11:54:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_node_id` is not injective for valid `FunctionPath`s because it sanitizes the display string after component boundaries are flattened. For example, in the same layer, `crate::a::b` and the root function `crate::a__b` both have 11 chars and both sanitize to `crate__a__b`, producing the same `F11_<layer>_crate__a__b` id. Mermaid will merge those nodes and attach future edges to the wrong function; encode components/boundaries unambiguously or length-prefix components before sanitizing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 282,
+              "category": "correctness"
+            },
+            {
+              "message": "The catalogue declaration for `ContractMapRendererAdapter` requires a non-stripped plain struct field `style_config_path: std::path::PathBuf`, but this public struct declares the field privately. Rustdoc/schema export strips private fields, so the source shape will not match the declared `has_stripped_fields: false` field list and the type signal will remain mismatched. Make the field visible to the catalogue surface or change the declaration to a stripped-field struct if privacy is intended.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 303,
+              "category": "catalogue-declare"
+            }
+          ],
+          "hash": "rvw1:sha256:a609619854f55146ed3236a564bde52545a2d4d23f4aea3e622b158c83921bf7",
+          "at": "2026-05-15T11:58:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_node_id` no longer implements the declared `F<len>_<sanitized_layer>_<sanitized_full_path>` scheme: it first rewrites the `FunctionPath` into a custom component-length encoding like `6_domain_4_tddd_8_register` and then uses that as the \"full path\". The task contract calls for sanitizing the actual full path, so future renderer output will produce node IDs that do not match the ADR/catalogue contract or tests written against `sanitized_full_path` such as `domain__tddd__register`. Keep collision prevention separate from the externally declared ID format, or update the contract before locking this into rendering.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 301,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:01bb325879e24479737e26f53b07d6a2ae6da178eb7b144d43ae926aaca9685a",
+          "at": "2026-05-15T12:04:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract_map_renderer_adapter.rs` is 736 lines, which exceeds the repository's 700-line maximum per module. Since this is only the T005 scaffold, split the test module into a separate `contract_map_renderer_adapter_tests.rs` or trim/move the large explanatory blocks before merging.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:81042768214d561d2e631e74544773c4fd31521882d42de9644b266996924e3a",
+          "at": "2026-05-15T12:07:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bf3141939e199a4aaf52a8b545bc34e0081436a75d380ab8e97f18bcd719867",
+          "at": "2026-05-15T12:13:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeIndex::build` indexes every `CatalogueDocument` by bare type/trait name only, so a `TypeRef` in crate A can resolve to the identically named entry in crate B when both crates live in the same layer. That violates the documented same-catalogue-only behavior and emits wrong edges instead of silently skipping cross-catalogue refs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 57,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_base_name` only takes the substring before the first `<`, so wrapped references like `Vec<UserId>` or `Option<UserId>` resolve to `Vec` / `Option` rather than the contained type. Common generic params and field types will therefore lose their edges unless the wrapper itself happens to be catalogued.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 94,
+              "category": "correctness"
+            },
+            {
+              "message": "`type_node_id` and `trait_node_id` are still keyed only by `layer + name`, so two crates in the same layer that declare the same type or trait produce identical Mermaid ids. Since the new renderer emits all crates in a layer together, this collapses distinct entries into one node and corrupts the graph.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 229,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8e6411eb1bb3127dd962bb2d0b82b4cfbd3fca553170c8d20e7ae01b0c59c78",
+          "at": "2026-05-15T12:40:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeIndex::build` stores `TypeEntry` and `TraitEntry` under the same `(crate_name, bare_type_name)` key. If a crate defines a type and a trait with the same name, the later trait insert overwrites the type entry, so a plain `TypeRef(\"Foo\")` edge is rendered against the trait node instead of the type node. That silently misroutes edges in mixed-name catalogues.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 64,
+              "category": "logic"
+            },
+            {
+              "message": "The base-name extraction path does not actually resolve common wrapped signatures such as `Result<UserId, DomainError>` or nested wrappers like `Option<Arc<Foo>>`. `unwrap_generic_wrappers` peels only one trailing `>` run and `extract_base_name` then stops at the first `<`, so these refs collapse to strings that never match the index and the corresponding method/field edges disappear.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 106,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:784857cb95db6870da62987eed23bb74c279d99d10c33a2e9917cc8f8465adbc",
+          "at": "2026-05-15T12:52:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `extract_base_name` only removes `&` / `&mut` before unwrapping generic wrappers, so valid refs like `Option<&Foo>` or `Box<&mut Foo>` end up as `&Foo` / `&mut Foo` and are then silently skipped. That drops legitimate method/field edges for borrowed types. See [`render.rs`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs:116).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 116,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: the new renderer module is 823 lines long, which exceeds the repo's 700-line ceiling for a production module. This is already out of policy and will get harder to manage as the remaining render work lands. See [`render.rs`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs:1).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:25d91612578ce3519faa4a1b57ab46e5531725d105f5626336a95c6cbc41580a",
+          "at": "2026-05-15T12:57:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_base_name` cannot resolve nested wrapped type refs when the inner generic has commas. For example `Option<Result<UserId, Error>>` or `Vec<Result<UserId, Error>>` loses the inner closing `>` because `trim_end_matches('>')` strips all trailing brackets, so the wrapper loop never reaches `UserId`. That silently drops valid same-catalogue method/field edges for common Rust types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 151,
+              "category": "correctness"
+            },
+            {
+              "message": "`collect_classdefs` iterates `style.class` directly from a `HashMap`, so the emitted `classDef` block order is nondeterministic across runs. That makes the renderer output unstable for identical inputs whenever class styles are present, which is likely to cause flaky snapshots/diffs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 562,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:246b574341df88ec987d2dd66a57374a6c6bf7918e93b7568af206bb42249f93",
+          "at": "2026-05-15T13:11:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d549898f1b8c9ca21d84bd17b9dd6d3f726ff6eaecac25a4004ce7656045fb2d",
+          "at": "2026-05-15T13:17:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The renderer ignores the configured node shapes: `push_method_node` and `push_function_node` always emit `(<name>)` and `[[<name>]]`, while `NodeStyle.shape` is left unused. The task/spec require Method and Function shapes to come from `[node.Method]` / `[node.Function]`, so any valid style config change will silently render the wrong Mermaid shape. Use `style.node[...].shape` when emitting these nodes, or reject unsupported shape values explicitly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/builder.rs",
+              "line": 62,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d549898f1b8c9ca21d84bd17b9dd6d3f726ff6eaecac25a4004ce7656045fb2d",
+          "at": "2026-05-15T13:20:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ContractMapRenderOptions::layers` is ignored, and `render_mermaid` also appends layers that are absent from the supplied `layer_order`. The workflow passes a non-empty `opts.layers` for CLI layer filters, but this adapter always passes the full `layer_order` through and then renders every catalogue anyway, so filtered renders still include excluded layer subgraphs. Filter the effective layer order from `opts.layers` and do not emit `remaining` layers when they are not in that effective order.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 367,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:30e32142fd293d7e54296366a6999a23c04db7e7438f68a4f7fabbd2d37b3fba",
+          "at": "2026-05-15T13:29:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Layer ids are not encoded injectively before being used as Mermaid ids. `LayerId` accepts both `my-layer` and `my_layer`, but both become `my_layer` here, and the same sanitized layer component is reused by top-module and entry node ids. Rendering both valid layers will create duplicate subgraph/node ids and can merge unrelated graph content. Use an injective escaping scheme or length-prefix each component before concatenation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 136,
+              "category": "correctness"
+            },
+            {
+              "message": "When `opts.layers` is empty, `render_mermaid` emits every catalogue layer that was absent from `layer_order` in alphabetical `BTreeMap` order. The task contract says layer emission is controlled by the caller-supplied `layer_order`; appending extra layers makes partial/canonical layer orders render unwanted subgraphs and breaks deterministic caller control. Drop the `remaining` emission or require callers to include all layers explicitly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 109,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fbcd349b38101652bed9eb6866ef836d342b3c88ded4cbf1705deca32268db2c",
+          "at": "2026-05-15T13:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_sg_id` is not actually injective for valid `LayerId`s: `my-layer` and `my_layer` both have length 8 and both sanitize to `my_layer`, so both render as `L8_my_layer`. The same sanitized layer component is also embedded in type/trait/function IDs, so distinct valid layers can produce duplicate Mermaid IDs and edges/classes can attach to the wrong subgraph. Use an injective escape for raw components or add a raw-value hash, and cover the hyphen-vs-underscore case in tests.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 115,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:93e2284074645cf9a375790203e4239e798c4ff7ac6c3910f84ce19683209c55",
+          "at": "2026-05-15T13:45:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a8fb3e637682c05336e657ca424dbfc5c3e2ecf33b907639139627796e67137",
+          "at": "2026-05-15T13:51:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93bad4fad26578228c61a997aeb944cb2db8d4abbdf658a54b6dd7a3b0158ebf",
+          "at": "2026-05-15T13:59:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rustdoc private intra-doc-link fix is incomplete: this comment still links to the private `render` submodule as [`render`]. The rustdoc-export hook that runs with `-D warnings` can still fail on this remaining private intra-doc link; make it plain code formatting (`render`) like the other fixed references.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 51,
+              "category": "rustdoc"
+            }
+          ],
+          "hash": "rvw1:sha256:93bad4fad26578228c61a997aeb944cb2db8d4abbdf658a54b6dd7a3b0158ebf",
+          "at": "2026-05-15T14:05:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The entry node id helpers still use the lossy `sanitize(layer.as_ref())` for the layer component. `LayerId` permits both `-` and `_`, so valid layers such as `my-layer` and `my_layer` collapse to the same entry IDs for the same crate/name/path, even though the new layer subgraph IDs are injective. Mermaid IDs are global, so those entries and their edges can merge or attach to the wrong node. Use the same injective escaping scheme for layer components in `type_node_id`, `trait_node_id`, and `function_node_id`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 238,
+              "category": "correctness"
+            },
+            {
+              "message": "The renderer does not preserve declaration order for entries as required by the review brief. `collect_layer_entries` iterates `CatalogueDocument` BTreeMaps and emits all types before traits before functions, so output order becomes key/kind order rather than source declaration order whenever those differ. This affects the rendered graph layout and makes the implementation miss the stated iteration contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 244,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9bee83f335513e43269e2ba05c8e114521e1c08c1bbce24a4fa0e2e870d14798",
+          "at": "2026-05-15T14:09:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:867ba1c8653de9871da772d9ba5fbc2675655d09eff241d0d3dc804c9f6a07a9",
+          "at": "2026-05-15T14:15:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeAlias` entries are still passed through the shared method-rendering path, so any non-empty `entry.methods` will emit method nodes and return edges inside the alias subgraph. That breaks the T007 contract that aliases render as empty subgraphs and means the new alias handling is only partial.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 415,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a82b039d52429eb5466099dc8514621bc45355b85de49cd73ad2b56ff008f9ed",
+          "at": "2026-05-15T14:33:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_layer_entries()` now sorts entries by `LayerEntry::sort_key()`, but functions use only `path.name` as the key. For any catalogue that contains two same-named functions in different modules, `sort_by` receives equal keys and may reorder them nondeterministically across runs. That regresses deterministic rendering for valid input; use a full tie-breaker such as the complete `FunctionPath` string.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 251,
+              "category": "determinism"
+            }
+          ],
+          "hash": "rvw1:sha256:1ef85b028fba657d45e03a09e4a0dbcf38175b570f5f6bef5a46dfb8575d94af",
+          "at": "2026-05-15T14:35:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render.rs` is now 707 lines long, which exceeds the 700-line maximum in `AGENTS.md`. The refactor extracted helpers, but the module still violates the size cap and will be harder to maintain/review.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 1,
+              "category": "module size"
+            }
+          ],
+          "hash": "rvw1:sha256:132c40f7906d42ae398fc348d8013758b8352afca36b8ada0f4c4edd123b196a",
+          "at": "2026-05-15T14:39:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30594f27acc44e952f22eebcb51c1c62b34fefb4d49cb1657e6067c6d5908165",
+          "at": "2026-05-15T14:43:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30594f27acc44e952f22eebcb51c1c62b34fefb4d49cb1657e6067c6d5908165",
+          "at": "2026-05-15T14:47:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitIndex` is built from every catalogue before the layer allowlist is applied, and `emit_trait_impl_edges()` never checks whether the resolved trait layer will actually be rendered. When `opts.layers` or `layer_order` excludes the trait’s layer, the renderer still emits an `impl` edge to a node that never gets declared, which produces a dangling/implicit node and breaks the layer-filter contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 86,
+              "category": "correctness"
+            },
+            {
+              "message": "`include_function_roles` is stored as raw `Vec<String>` and compared as strings at render time, so TOML typos or unsupported role names are accepted silently and can suppress function rendering without surfacing a config error. This should validate against `FunctionRole` during config load, or at least reject unknown values instead of treating them as an empty match set.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 137,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:7f4637d37d3dfd92d68a94c8aec178e458656bb19d13701002550d7a68dc7cd2",
+          "at": "2026-05-15T15:47:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitIndex` is built from every catalogue before `opts.layers`/`layer_order` filtering is applied, so a type in a rendered layer can now emit `-.->|impl|` to a trait node in a layer that is never rendered. That leaves dangling Mermaid edges whenever the target trait lives on an excluded layer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 87,
+              "category": "correctness"
+            },
+            {
+              "message": "The regression test for forbidding inline `:::class` syntax does not actually match Mermaid's inline form. Searching for `subgraph {entry_id}:::{` will never catch a reintroduction of `:::className[...]`, so this test would pass even if the forbidden syntax comes back.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter_tests.rs",
+              "line": 1828,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7f4637d37d3dfd92d68a94c8aec178e458656bb19d13701002550d7a68dc7cd2",
+          "at": "2026-05-15T15:49:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `include_function_roles` filters out every function in a module, `emit_layer()` still opens that top-module subgraph before the filter runs, so the output contains empty `subgraph ... end` blocks. That is a user-visible regression because the diagram reports modules that contain no rendered entries.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 230,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9235ec3cfdc415f023f0afbdb0f842010b16a7bf04bb007d02298a5da70598ee",
+          "at": "2026-05-15T15:57:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9235ec3cfdc415f023f0afbdb0f842010b16a7bf04bb007d02298a5da70598ee",
+          "at": "2026-05-15T15:59:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`include_function_roles` is deserialized as raw strings and compared with `FunctionRole::to_string()` at render time, so unknown role names in the style TOML are accepted silently and can filter out functions without any config error. T008 explicitly relies on `FunctionRole`/`EnumString` alignment; this should deserialize or validate against `FunctionRole` during config load so typos fail closed instead of producing incomplete diagrams.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 139,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:9235ec3cfdc415f023f0afbdb0f842010b16a7bf04bb007d02298a5da70598ee",
+          "at": "2026-05-15T16:01:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render.rs` is now 750 lines, exceeding the repository's 700-line production-module max. The T008 additions should be split into a focused submodule before this grows further.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:31ed8ba820c8ba3caf64afafe28ff6a1ba5230c078893aca743a6d537960c3e2",
+          "at": "2026-05-15T16:06:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d848bb97646dc1f076b1795f8549507ae91326ce6e4eff0dac047642191b9c6d",
+          "at": "2026-05-15T16:12:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e668b6fa14dca6729fb99786b1ec4ee1c2f826a469aff4bc960ac5dacf89b4d",
+          "at": "2026-05-15T16:41:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 coverage is incomplete: the test description requires same-name functions with different full paths, but the fixture only inserts one `helper` function. A renderer regression that omits the crate/module path from `function_node_id` would still pass. Add at least one second `helper` in another crate or module and assert both function IDs are present and distinct.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter_tests.rs",
+              "line": 2387,
+              "category": "test coverage"
+            },
+            {
+              "message": "The AC-11 containment assertion only checks that `ModuleEntry` appears after the module subgraph opens. If the renderer emitted `ModuleEntry` after the module subgraph's closing `end`, this test would still pass even though the entry is not inside the top-module subgraph. Bound the assertion by the module subgraph's closing `end` or inspect the module block slice.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter_tests.rs",
+              "line": 2822,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5e668b6fa14dca6729fb99786b1ec4ee1c2f826a469aff4bc960ac5dacf89b4d",
+          "at": "2026-05-15T16:44:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new T010 acceptance block is supposed to reinforce the layer-agnostic invariant with arbitrary `LayerId` values, but several added AC fixtures still use fixed architecture names like `domain`/`usecase`/`core` and hard-code the corresponding expected subgraph IDs. A renderer regression that only works for those canonical layers but mishandles arbitrary layer names for enum, stripped-field, alias, trait-impl, or module placement behavior would still pass these acceptance tests. Please convert the new AC fixtures and expected IDs to arbitrary layer names such as `my-layer`/`other-layer` and derive IDs from those values.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter_tests.rs",
+              "line": 2283,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:4a2c38663c3f62168d14ee773d8387df4bf70666c97d8d2084a13fe05bd6595a",
+          "at": "2026-05-15T16:48:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03e5b0f4902be4240d1fc70b76902c5b6e5efd4e68e841e759b30e0e78464a77",
+          "at": "2026-05-15T16:56:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a288a609dac236c805a0e4798514d08dd3b2288bb49348c10a035c4c4711ed6",
+          "at": "2026-05-15T17:27:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a288a609dac236c805a0e4798514d08dd3b2288bb49348c10a035c4c4711ed6",
+          "at": "2026-05-15T17:30:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff17ceb89d70f62bb9645f764ea2a0d1f6138e078d8c129095de67baf0be9eff",
+          "at": "2026-05-15T17:48:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff17ceb89d70f62bb9645f764ea2a0d1f6138e078d8c129095de67baf0be9eff",
+          "at": "2026-05-15T17:54:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1002e98cde44ee6af10918d5eb266f44ab230a441a67c924e076dcde628bbb33",
+          "at": "2026-05-15T18:07:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_contract_map_view` still swallows local `contract-map.md` read/write failures after a successful adapter render. If `read_to_string` fails for anything other than NotFound, or `atomic_write_file` fails, the function logs a warning and returns `Ok(())`, so `sync_rendered_views` can pass while leaving a stale or missing contract-map artifact. That undermines the fail-closed behavior this change is trying to enforce for renderer errors; these I/O failures should propagate as `RenderError::Io` like the other hard contract-map render failures.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 1279,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:1002e98cde44ee6af10918d5eb266f44ab230a441a67c924e076dcde628bbb33",
+          "at": "2026-05-15T18:09:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc7fa48c086df112028c1248c8bd69e2267fa0c10847f489d132f09e5e743a92",
+          "at": "2026-05-15T18:11:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deletion filtering is only applied when assembling `LayerEntry`s. `TypeIndex::build()` still indexes every `doc.types`/`doc.traits` key, including `action: Delete` records, so any live entry that references a deleted type/trait will still resolve to that node id and Mermaid can render a deleted node or dangling edge. Deleted records need to be excluded from the lookup index as well.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 61,
+              "category": "correctness"
+            },
+            {
+              "message": "`validate_type_ref()` only compares the counts of `<` and `>`, which lets malformed but balanced strings through. For example, `Foo>Bar<` passes validation and is then treated as an unresolved ref (`Ok(None)`) instead of failing closed with `RenderFailed`. That leaves the new malformed-`TypeRef` handling incomplete.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 129,
+              "category": "correctness"
+            },
+            {
+              "message": "The new fail-closed contract-map render path requires `.harness/config/contract-map-style.toml`, but several existing `sync_rendered_views` tests here still only write `architecture-rules.json` before calling `sync_rendered_views(...)`. For example, `sync_rendered_views_writes_plan_and_registry` and `sync_rendered_views_omits_unchanged_registry_from_changed_set` will now error out before their assertions run because `render_contract_map_view()` is unconditional.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 510,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:b5b7bcf3cc6b29c7c1fda824a687046cedfab7eaf9b8e29ab925bcaa90c50daf",
+          "at": "2026-05-15T18:51:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeIndex` now fails closed on bracket imbalance, but it still accepts malformed refs that have balanced brackets and then ignores the trailing junk during `extract_base_name()`. For example `Foo<Bar><Baz>` or `Foo<Bar> junk` passes `validate_type_ref()` and resolves as `Foo`, so a malformed catalogue entry can still render the wrong edge instead of returning `RenderFailed`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 111,
+              "category": "correctness"
+            },
+            {
+              "message": "The delete-entry fix is incomplete for trait implementations: `collect_layer_entries()` skips deleted `TraitEntry`s, but the new `TraitIndex` path still indexes them, so a live type that `trait_impl`s a deleted trait can emit a dangling `-.->|impl|` edge to a node that was never rendered.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 121,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4b93db725547a71244afbc213144927e7216fbfcb34cbce4dba63aad2e5b9f06",
+          "at": "2026-05-15T19:00:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_type_ref()` only checks `<`/`>` balance, so balanced-but-invalid inputs like `Foo<>` or `Vec<>` still pass and are then collapsed by `extract_base_name()` into a seemingly valid node name. That means malformed catalogue data can still render a bogus edge instead of failing closed, which defeats the new error-propagation path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 159,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:34789b58ae497bcc0813621aa838742a65654ef538d92af4c87a85888924a22a",
+          "at": "2026-05-15T19:07:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_type_ref()` only enforces bracket balance, so malformed generic argument lists such as `Foo<,Bar>` or `Foo<Bar,>` still pass and then collapse to `Foo` via `extract_base_name()`. That means a bad catalogue entry can still render the wrong edge instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 159,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8a5dcdd9d8557d86492648a8a2cc704a15f840fe0baede41383e3b1bee471ab8",
+          "at": "2026-05-15T19:12:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_type_ref` now treats any non-whitespace suffix after a balanced `<...>` block as malformed. That will fail render on valid `TypeRef`s such as `for<'a> fn(&'a S)` or `<T as Trait>::Assoc` instead of leaving them unresolved, so a single legitimate edge can now abort contract-map generation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 250,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0fe645a8c86b9e7c443de75a20168ab0b2c12606f5ae8a61c3f5c6534d246d3d",
+          "at": "2026-05-15T19:18:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_type_ref()` only checks angle-bracket balance and comma placement, so balanced-but-invalid strings can still slip through and be resolved as a valid base type. For example, `Foo<Bar> Baz` or `Foo<(Bar>` will pass validation, `extract_base_name()` will truncate them to `Foo`, and the renderer can emit edges instead of failing closed. This leaves the new `RenderFailed` path incomplete for malformed `TypeRef` input.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 166,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:44e650319685801e676126adfbbc238d16593220e4be4eb50a05610d4fd9fa2d",
+          "at": "2026-05-15T19:24:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_type_ref` now treats any non-whitespace after the first top-level `>` as fatal. That rejects well-formed but unresolvable refs such as `Foo<Bar>::Baz` or `for<'a> fn(...)`, so a catalogue containing these inputs will abort contract-map rendering instead of skipping the edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 252,
+              "category": "correctness"
+            },
+            {
+              "message": "The new validator still lets malformed refs with balanced angle brackets but broken inner syntax through. A string like `Foo<(Bar>` reaches `extract_base_name()` and is truncated to `Foo`, which can emit a wrong edge instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 314,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:250c2a24fc414352d6b08273c088bca4b491365cf14185ef5b63498095131032",
+          "at": "2026-05-15T19:30:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [type_index.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs#L185-L228) rejects any `>` seen outside an open `<...>` block, so valid function-pointer TypeRefs such as `for<'a> fn(&'a T) -> T` now fail on the `->` arrow. That turns legitimate catalogue entries into hard render failures.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 185,
+              "category": "missing error handling"
+            },
+            {
+              "message": "P1: [type_index.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs#L230-L247) only tracks net depth for `(`/`[` and `)`/`]`, not bracket kind or order, so malformed refs like `Foo<[T)>` pass validation and can be resolved as `Foo` instead of failing closed. That can emit an edge to the wrong node rather than surfacing `RenderFailed`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 230,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:6509fbcbd00c2408c7ea0a3ab5c60e65f24845d9a1003018b9dfed2247f7a86d",
+          "at": "2026-05-15T19:38:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_type_ref` rejects valid function-pointer `TypeRef`s when they appear inside another generic wrapper, e.g. `Vec<fn(u32) -> u32>` or `Option<extern \"C\" fn() -> ()>`. The `>` in `->` is only treated as an arrow in the depth-0 branch, so when `stack` is non-empty it is consumed as a generic closer and the render later fails with `RenderFailed` on legitimate catalogue input.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 190,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:d8061df6d86e591a395fad7d8135b9f289cdbc2aa2bdc5308a45506a32b28eab",
+          "at": "2026-05-15T19:42:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`validate_type_ref()` still lets malformed refs like `Vec<T>)` or `Foo)` through: `)`/`]` are only rejected when the parser is already inside a `<...>` block, so a stray closing delimiter outside any generic scope is ignored and later degrades to a silent lookup miss instead of `RenderFailed`. That leaves the new fail-closed path incomplete for malformed catalogue data.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 309,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:0d17e26400c12778821ec3af1e6a2f752f23224f3f76d02013e91f5916e85325",
+          "at": "2026-05-15T19:46:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `validate_type_ref` now rejects syntax-valid Rust generic argument lists by treating empty `<>` and trailing commas as malformed. Rust's path grammar allows both `GenericArgs → < >` and a trailing comma (`< ... ,?>`), so refs like `Vec<>` or `Result<T,>` will now surface as `RenderFailed` and abort the whole render path instead of being handled as ordinary input. This is a correctness regression in the new fail-closed gate. See [`type_index.rs:146`](./home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs:146) and [`type_index.rs:218`](./home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs:218); Rust Reference: https://doc.rust-lang.org/reference/paths.html",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 150,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:34de514604289d788cb300b28900f763177d1353b28615feb607aa07907c9d26",
+          "at": "2026-05-15T19:51:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: These three cat-spec sync tests now write valid TDDD catalogues, but they never provision `.harness/config/contract-map-style.toml`, so `render_contract_map_view` will fail with `StyleConfigNotFound` before the stale/malformed/missing-signals assertions run. The adjacent tests already needed `write_minimal_style_config`; these ones need the same fixture setup.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 2244,
+              "category": "testing"
+            },
+            {
+              "message": "P1: `validate_type_ref` treats any `>` preceded by a non-whitespace `-` as an arrow, so malformed inputs like `Foo<Bar - > Baz>` are accepted instead of raising `RenderFailed`. That leaves a hole in the new fail-closed path for malformed `TypeRef`s.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_index.rs",
+              "line": 190,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9cd5c341ea4b9921e92879d3e2ef36766bf1ec8afc4f82e129e5e788ef7efa30",
+          "at": "2026-05-15T19:55:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045a35829f7125d5811581a5e676468030e3a1afbae41f0392a3315d2f6eeb46",
+          "at": "2026-05-15T20:01:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:045a35829f7125d5811581a5e676468030e3a1afbae41f0392a3315d2f6eeb46",
+          "at": "2026-05-15T20:06:25Z"
+        }
+      ]
+    }
+  }
+}

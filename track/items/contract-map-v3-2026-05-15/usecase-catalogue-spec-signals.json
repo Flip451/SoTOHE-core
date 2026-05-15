@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "66ac147aec08de790f74da02ea241c384ef14b3e913b7f20ee2f964047886a4f",
+  "signals": [
+    {
+      "type_name": "RenderContractMapCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapInteractor",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "RenderContractMapOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewCheckApprovedInteractor",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "signal": "yellow"
+    },
+    {
+      "type_name": "RenderContractMap",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewCheckApprovedService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationService",
+      "signal": "blue"
+    }
+  ]
+}

@@ -202,7 +202,7 @@ pub fn contract_map_path(track_root: &Path, track_id: &TrackId) -> PathBuf {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
-    use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
+    use domain::tddd::CatalogueLoader;
 
     const RULES_JSON: &str = r#"{
       "version": 2,
@@ -227,32 +227,6 @@ mod tests {
       "crate_name": "domain",
       "layer": "domain",
       "types": {},
-      "traits": {},
-      "functions": {}
-    }"#;
-
-    // Minimal v3 catalogue with two types for the E2E test.
-    const CATALOGUE_V3_TWO_TYPES: &str = r#"{
-      "schema_version": 3,
-      "crate_name": "domain",
-      "layer": "domain",
-      "types": {
-        "UserId": {
-          "action": "add",
-          "role": "ValueObject",
-          "kind": {
-            "kind": "tuple_struct",
-            "fields": ["u64"]
-          },
-          "module_path": "domain::user"
-        },
-        "User": {
-          "action": "add",
-          "role": "Entity",
-          "kind": { "kind": "plain_struct" },
-          "module_path": "domain::user"
-        }
-      },
       "traits": {},
       "functions": {}
     }"#;
@@ -455,52 +429,5 @@ mod tests {
             matches!(err, ContractMapWriterError::IoError { .. }),
             "expected IoError, got {err:?}"
         );
-    }
-
-    /// E2E: load a v3 catalogue with two types and verify the IN-24 placeholder
-    /// renderer emits entry names as comments in the subgraph.
-    ///
-    /// T025: The renderer is now v3-native (no v3→v2 stub conversion).
-    /// The output contains the flowchart scaffold and an IN-24 / OS-07 deferral
-    /// comment, with entry names listed as mermaid comments.
-    #[test]
-    fn test_e2e_v3_catalogue_renders_in24_placeholder() {
-        let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path();
-        let rules_path = root.join("architecture-rules.json");
-        write(&rules_path, RULES_JSON);
-
-        let track_root = root.join("track-items");
-        let id = track_id("t-e2e");
-        let track_dir = track_root.join(id.as_ref());
-        write(&track_dir.join("domain-types.json"), CATALOGUE_V3_TWO_TYPES);
-
-        let loader = FsCatalogueLoader::new(track_root, rules_path, root.to_path_buf());
-        let (layer_order, catalogues) = loader.load_all(&id).unwrap();
-
-        assert_eq!(layer_order.len(), 1, "expected 1 layer");
-        let domain_doc = catalogues.get(&layer_order[0]).unwrap();
-        // v3-native: 2 types loaded directly from CatalogueDocument.
-        assert_eq!(domain_doc.types.len(), 2, "expected 2 type entries from v3 doc");
-
-        // Render: IN-24 placeholder must emit deferral comment + domain subgraph.
-        let opts = ContractMapRenderOptions::default();
-        let content = render_contract_map(&catalogues, &layer_order, &opts);
-        let text = content.as_ref();
-        assert!(text.contains("flowchart LR"), "render must contain flowchart LR; got:\n{text}");
-        assert!(text.contains("IN-24"), "render must contain IN-24 deferral comment; got:\n{text}");
-        assert!(
-            text.contains("OS-07"),
-            "render must contain OS-07 deferral reference; got:\n{text}"
-        );
-        assert!(
-            text.contains("subgraph domain [domain]"),
-            "render must contain domain subgraph; got:\n{text}"
-        );
-        // Placeholder: no mermaid edge arrows emitted.
-        assert!(!text.contains("-->|"), "placeholder must not emit edges");
-        // Old stale references must be gone.
-        assert!(!text.contains("OS-06"), "render must NOT reference OS-06; got:\n{text}");
-        assert!(!text.contains("T012"), "render must NOT reference T012; got:\n{text}");
     }
 }

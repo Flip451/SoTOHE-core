@@ -1,0 +1,296 @@
+# Style configuration for `sotp track contract-map` mermaid renderer.
+#
+# Section structure (ADR 2026-05-13-0000 Decision L):
+#   [role.<RoleName>]      DataRole 13 / ContractRole 3 / FunctionRole 2 -> class
+#   [node.<NodeCategory>]  Method / Variant / Function shape + class
+#                          (Field is edge-only per IN-12, not a NodeCategory)
+#   [pattern.<PatternName>] Typestate overlay (additive on top of role class)
+#   [class.<ClassName>]    mermaid classDef (fill / stroke / stroke_width / stroke_dasharray)
+#   [edge.<EdgeKind>]      arrow + optional label
+#   [filter]               render filter (include_function_roles, kind_filter, include_fields)
+#
+# Renderer behaviour: file absence / parse failure is fail-closed
+# (ContractMapRendererError::StyleConfigNotFound / StyleConfigParse, CN-03).
+
+# ---------------------------------------------------------------------------
+# Role -> class mapping
+# ---------------------------------------------------------------------------
+
+# DataRole (13 values, libs/domain/src/tddd/catalogue_v2/roles.rs::DataRole)
+[role.ValueObject]
+class = "valueObject"
+
+[role.Entity]
+class = "entity"
+
+[role.AggregateRoot]
+class = "aggregateRoot"
+
+[role.DomainService]
+class = "domainService"
+
+[role.Specification]
+class = "specification"
+
+[role.Factory]
+class = "factory"
+
+[role.UseCase]
+class = "useCase"
+
+[role.Interactor]
+class = "interactor"
+
+[role.Command]
+class = "command"
+
+[role.Query]
+class = "query"
+
+[role.Dto]
+class = "dto"
+
+[role.ErrorType]
+class = "errorType"
+
+[role.SecondaryAdapter]
+class = "secondaryAdapter"
+
+# ContractRole (3 values, libs/domain/src/tddd/catalogue_v2/roles.rs::ContractRole)
+[role.SpecificationPort]
+class = "specificationPort"
+
+[role.ApplicationService]
+class = "applicationService"
+
+[role.SecondaryPort]
+class = "secondaryPort"
+
+# FunctionRole (2 values, libs/domain/src/tddd/catalogue_v2/roles.rs::FunctionRole)
+[role.FreeFunction]
+class = "freeFunction"
+
+[role.UseCaseFunction]
+class = "useCaseFunction"
+
+# ---------------------------------------------------------------------------
+# Node category -> shape + class
+# ---------------------------------------------------------------------------
+#
+# shape values map to mermaid node syntax:
+#   "round"      -> ( text )
+#   "stadium"    -> ([ text ])
+#   "subroutine" -> [[ text ]]
+#
+# Field is intentionally absent: PlainStruct / TupleStruct fields are rendered
+# as edges only (entry subgraph -> field type subgraph), per IN-12 / T006.
+
+[node.Method]
+shape = "round"
+class = "methodNode"
+
+[node.Variant]
+shape = "stadium"
+class = "variantNode"
+
+[node.Function]
+shape = "subroutine"
+class = "functionNode"
+
+# ---------------------------------------------------------------------------
+# Pattern overlay (additive on top of role class, attached via separate
+# `class <id> <overlay_class>` line)
+# ---------------------------------------------------------------------------
+
+[pattern.Typestate]
+overlay_class = "typestate"
+
+# ---------------------------------------------------------------------------
+# classDef (mermaid fill / stroke / stroke_width / stroke_dasharray)
+# ---------------------------------------------------------------------------
+#
+# Palette grouping:
+#   - DataRole domain-side (ValueObject..Factory)         -> green family
+#   - DataRole application-side (UseCase..Dto)            -> warm yellow / orange
+#   - DataRole error / adapter (ErrorType, SecondaryAdapter) -> red / purple
+#   - ContractRole (port classes)                         -> dashed border to signal "contract"
+#   - FunctionRole                                        -> grey / yellow
+#   - Node classes (Method / Variant / Function callable) -> low-saturation neutrals
+#   - Pattern Typestate overlay                           -> bold orange border
+
+# DataRole -- domain layer (cool greens / blues)
+[class.valueObject]
+fill = "#e8f5e9"
+stroke = "#2e7d32"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.entity]
+fill = "#c8e6c9"
+stroke = "#1b5e20"
+stroke_width = "2px"
+stroke_dasharray = "0"
+
+[class.aggregateRoot]
+fill = "#a5d6a7"
+stroke = "#1b5e20"
+stroke_width = "3px"
+stroke_dasharray = "0"
+
+[class.domainService]
+fill = "#b3e5fc"
+stroke = "#01579b"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.specification]
+fill = "#dcedc8"
+stroke = "#33691e"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.factory]
+fill = "#f0f4c3"
+stroke = "#827717"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+# DataRole -- application layer (warm yellow / orange)
+[class.useCase]
+fill = "#fff9c4"
+stroke = "#f57f17"
+stroke_width = "2px"
+stroke_dasharray = "0"
+
+[class.interactor]
+fill = "#fff59d"
+stroke = "#f57f17"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.command]
+fill = "#ffe0b2"
+stroke = "#e65100"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.query]
+fill = "#ffccbc"
+stroke = "#bf360c"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.dto]
+fill = "#f5f5f5"
+stroke = "#616161"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+# DataRole -- error / adapter
+[class.errorType]
+fill = "#ffcdd2"
+stroke = "#b71c1c"
+stroke_width = "2px"
+stroke_dasharray = "0"
+
+[class.secondaryAdapter]
+fill = "#d1c4e9"
+stroke = "#311b92"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+# ContractRole -- port classes (dashed border for contract semantics)
+[class.specificationPort]
+fill = "#bbdefb"
+stroke = "#0d47a1"
+stroke_width = "2px"
+stroke_dasharray = "5 3"
+
+[class.applicationService]
+fill = "#fff9c4"
+stroke = "#f57f17"
+stroke_width = "2px"
+stroke_dasharray = "5 3"
+
+[class.secondaryPort]
+fill = "#d1c4e9"
+stroke = "#311b92"
+stroke_width = "2px"
+stroke_dasharray = "5 3"
+
+# FunctionRole
+[class.freeFunction]
+fill = "#eceff1"
+stroke = "#37474f"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.useCaseFunction]
+fill = "#fff9c4"
+stroke = "#f57f17"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+# Node classes (Method / Variant / standalone Function callable)
+[class.methodNode]
+fill = "#ffffff"
+stroke = "#424242"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.variantNode]
+fill = "#fafafa"
+stroke = "#616161"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.functionNode]
+fill = "#f3e5f5"
+stroke = "#4a148c"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+# Pattern overlay -- typestate (bold orange border, attached as overlay class)
+[class.typestate]
+fill = "#fff3e0"
+stroke = "#e65100"
+stroke_width = "3px"
+stroke_dasharray = "0"
+
+# ---------------------------------------------------------------------------
+# Edge styles (arrow + optional label)
+# ---------------------------------------------------------------------------
+#
+# arrow + label compose via mermaid pipe syntax: `<src> <arrow>|<label>| <dst>`
+# (e.g. `A -.->|impl| B`). When label is omitted, only `<arrow>` is emitted.
+
+[edge.method_param]
+arrow = "--o"
+
+[edge.method_returns]
+arrow = "-->"
+
+[edge.transition]
+arrow = "==>"
+label = "transitions_to"
+
+[edge.trait_impl]
+arrow = "-.->"
+label = "impl"
+
+[edge.variant_payload]
+arrow = "--o"
+
+[edge.field]
+arrow = "--o"
+
+[edge.alias]
+arrow = "---"
+label = "alias_of"
+
+# ---------------------------------------------------------------------------
+# Filter (default = render everything)
+# ---------------------------------------------------------------------------
+
+[filter]
+include_function_roles = ["FreeFunction", "UseCaseFunction"]

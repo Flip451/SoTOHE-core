@@ -2,8 +2,9 @@
 
 use std::path::{Path, PathBuf};
 
+use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::{
-    CatalogueLoader, CatalogueLoaderError, ContractMapRenderOptions, render_contract_map,
+    CatalogueLoader, CatalogueLoaderError, ContractMapRenderOptions, ContractMapRenderer,
 };
 use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, derive_track_status};
 
@@ -12,6 +13,7 @@ use super::codec::{self, DocumentMeta};
 use crate::spec;
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::tddd::contract_map_adapter::FsCatalogueLoader;
+use crate::tddd::contract_map_renderer_adapter::ContractMapRendererAdapter;
 use crate::tddd::type_signals_codec;
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
@@ -1227,26 +1229,40 @@ fn render_contract_map_view(
         return Ok(());
     }
 
-    let opts = ContractMapRenderOptions::default();
-    let content = render_contract_map(&catalogues, &layer_order, &opts);
+    let style_config_path = root.join(".harness/config/contract-map-style.toml");
+    let adapter = ContractMapRendererAdapter::new(style_config_path);
+    let docs: Vec<CatalogueDocument> = catalogues.values().cloned().collect();
+    let opts = ContractMapRenderOptions::empty();
+    // All adapter failures are fatal (IN-03 fail-closed): a missing or
+    // malformed style config, a render-time bug, or any other renderer
+    // error must surface from the pre-commit hook rather than be swallowed.
+    // Tests that reach this path must provide
+    // `.harness/config/contract-map-style.toml` in their fixture directory.
+    let content = adapter.render(&docs, &layer_order, &opts).map_err(|e| {
+        RenderError::Io(std::io::Error::other(format!(
+            "contract-map render failed for {}: {e}",
+            track_dir.display()
+        )))
+    })?;
     let contract_map_path = track_dir.join("contract-map.md");
     let old = match std::fs::read_to_string(&contract_map_path) {
         Ok(existing) => Some(existing),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
         Err(e) => {
-            eprintln!(
-                "warning: cannot read existing contract-map.md for {}: {e}",
+            return Err(RenderError::Io(std::io::Error::other(format!(
+                "cannot read existing contract-map.md for {}: {e}",
                 track_dir.display()
-            );
-            return Ok(());
+            ))));
         }
     };
     let rendered_str: &str = content.as_ref();
     if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered_str)) {
-        if let Err(e) = atomic_write_file(&contract_map_path, rendered_str.as_bytes()) {
-            eprintln!("warning: cannot write contract-map.md for {}: {e}", track_dir.display());
-            return Ok(());
-        }
+        atomic_write_file(&contract_map_path, rendered_str.as_bytes()).map_err(|e| {
+            RenderError::Io(std::io::Error::other(format!(
+                "cannot write contract-map.md for {}: {e}",
+                track_dir.display()
+            )))
+        })?;
         changed.push(contract_map_path);
     }
     Ok(())

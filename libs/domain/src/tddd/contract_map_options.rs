@@ -1,32 +1,26 @@
-//! Render-configuration value object for the Contract Map (ADR
-//! 2026-04-17-1528 §D1).
+//! Render-configuration value object for the Contract Map.
 //!
-//! The 4 fields are part of the Phase 1 public API so that Phase 2 and
-//! Phase 3 extensions can be wired in without breaking callers. Three of
-//! them (`signal_overlay`, `action_overlay`, `include_spec_source_edges`)
-//! are **stubs in Phase 1** — the render function ignores their value and
-//! the output is identical regardless of how they are set. This keeps the
-//! type's shape stable across phases.
+//! The three stub fields that existed in the previous version
+//! (`signal_overlay`, `action_overlay`, `include_spec_source_edges`) have
+//! been removed per ADR 2026-05-13-0000 Decision M (YAGNI). Only the
+//! `layers` filter field remains.
 
 use crate::tddd::LayerId;
 
-/// Options that drive `render_contract_map`.
+/// Options that drive `ContractMapRenderer::render`.
 ///
 /// * `layers` — if non-empty, restricts the rendered subgraphs to this
 ///   layer subset (preserving `layer_order` ordering). An empty `layers`
 ///   list means "render every entry in `layer_order`".
-/// * `signal_overlay` (Phase 2 stub) — will paint nodes by
-///   Blue/Yellow/Red signal.
-/// * `action_overlay` (Phase 2 stub) — will visualise add / modify /
-///   delete / reference actions via stroke styles.
-/// * `include_spec_source_edges` (Phase 3 stub) — will emit outbound edges
-///   to spec sections once `spec_source` becomes a catalogue-level field.
+///
+/// The three overlay / edge stubs that appeared in the previous version of
+/// this struct (`signal_overlay`, `action_overlay`,
+/// `include_spec_source_edges`) were removed by ADR 2026-05-13-0000
+/// Decision M (YAGNI). They will be re-introduced under a separate ADR if
+/// the need becomes concrete.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct ContractMapRenderOptions {
     pub layers: Vec<LayerId>,
-    pub signal_overlay: bool,
-    pub action_overlay: bool,
-    pub include_spec_source_edges: bool,
 }
 
 impl ContractMapRenderOptions {
@@ -43,12 +37,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_contract_map_render_options_default_is_empty_unfiltered() {
+    fn test_contract_map_render_options_default_has_empty_layers() {
         let opts = ContractMapRenderOptions::default();
         assert!(opts.layers.is_empty());
-        assert!(!opts.signal_overlay);
-        assert!(!opts.action_overlay);
-        assert!(!opts.include_spec_source_edges);
     }
 
     #[test]

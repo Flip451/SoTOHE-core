@@ -273,6 +273,32 @@
   - **提案**: `config/agent-profiles.json` に移動し、参照箇所（`_agent_profiles.py`, `CLAUDE.md`, `.claude/rules/` 等）を一括更新
   - **追加日**: 2026-04-09
 
+- [ ] **INF-23** (MEDIUM): signal_evaluator_v2 — Outlives stripping asymmetry (false-positive Red)
+  - **課題**: `libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs:333-335` で `strip_outlives_from_index` が C 側 (`b_index`) のみに適用され、S 側 (`a_index`) には未適用。`action: reference` で `methods` を declare している struct entry が method generic param に `'static` Outlives bound を持つと structural mismatch (false-positive Red) を生む
+  - **影響**: `usecase::ReviewCheckApprovedInteractor` の `new<F: ... + 'static>` declare で発火を確認 (contract-map-v3-2026-05-15 track Phase 2)。T011 final 状態確認時に同根の対称 case として `usecase::RenderContractMapInteractor` の `new` (struct-level generic L/R/W に対し catalogue が method-level generic を declare) も Yellow を生むことを確認
+  - **提案**: `a_index` 側にも `strip_outlives_from_index` を適用して symmetric 化、または両側に適用しない方向で揃える。同時に method-level vs struct-level generic 宣言位置の structural 比較も対称化する必要あり。Fix 後に下記 Workaround を撤去する別 track が必要
+  - **Workaround 残存箇所**: `track/items/contract-map-v3-2026-05-15/usecase-types.json` の `ReviewCheckApprovedInteractor` / `TaskOperationInteractor` / `RenderContractMapInteractor` entry に `informal_grounds` 経由で Workaround を残置 (catalogue-spec-signals では Yellow、計 3 件)
+  - **関連 memory**: `project_signal_evaluator_v2_fp_deferred.md`
+  - **追加日**: 2026-05-15
+
+- [ ] **INF-24** (MEDIUM): signal_evaluator_v2 — foreign impl filter gap: patch_impl_for_ids corrupts for_ id in S, causing for_is_external to return false (false-positive Red)
+  - **課題**: `libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs` の `patch_impl_for_ids` が orphan impl (外部型を `for_` とする impl) の `for_.id` を parent type の id で上書きする。これにより `mod.rs:362-380` の `for_is_external` チェック (`krate.paths.get(&p.id).is_some_and(|ps| ps.crate_id != 0)`) が S 側で `false` を返す (parent type は local, `crate_id==0`)。C 側は元の id で正しく external (`crate_id!=0`) と判定してフィルタアウトするため、S にだけ impl が残り SMinusC_Reference Red を生む
+  - **影響**: `infrastructure` 側の `impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError` (NewTypeGraphCodecError は domain owned) で発火を確認 (contract-map-v3-2026-05-15 track Phase 2)
+  - **提案**: `patch_impl_for_ids` を外部型 `for_` を持つ orphan impl に適用しない、または `mod.rs` の `for_is_external` 判定を `paths` lookup の代わりに元の id から引き直す形に補強する。Fix 後に下記 Workaround を撤去する別 track が必要
+  - **Workaround 残存箇所**: `track/items/contract-map-v3-2026-05-15/infrastructure-types.json` の `CatalogueToExtendedCrateCodecError` entry に `informal_grounds` 経由で Workaround を残置 (catalogue-spec-signals では Yellow)
+  - **関連 memory**: `project_signal_evaluator_v2_fp_deferred.md`
+  - **追加日**: 2026-05-15
+
+- [ ] **INF-25** (MEDIUM): TraitImplDeclV2 schema gap — per-impl `action` field 欠如 (catalogue schema 設計不足、INF-23/24 とは別 class)
+  - **課題**: `libs/domain/src/tddd/catalogue_v2/traits.rs` の `TraitImplDeclV2` に `action: Option<ItemAction>` field が存在せず、parent type の action を必然的に継承する設計。結果、`action: modify` の type に「新 impl 追加」を declare する場合、impl-level は親 modify を継承し、ADR `2026-05-08-0305` D3 table で `SMinusC_Modify` → 🔴 Red と categorize される。本来 semantic は「modify type 内の add impl 進行中」で Yellow (SMinusC_Add) が natural
+  - **INF-23/24 との違い**: INF-23/24 は evaluator 実装の bug (正常 source → false-positive Red)、INF-25 は catalogue schema 設計不足 (新 impl declare の semantic を表現できない)。evaluator は ADR D3 table 通りに動作しており bug ではないが、catalogue が impl-level action を declare できないため Red が natural な Yellow に降格できない
+  - **影響**: `usecase::RenderContractMapError` (`action: modify`) に `From<ContractMapRendererError>` を新規 trait_impl 追加すると evaluator が SMinusC_Modify Red 評価 (contract-map-v3-2026-05-15 track plan-artifacts review fix の副作用として顕在化)。planning artifacts commit が CI `verify-spec-states` でブロックされる
+  - **提案**: `TraitImplDeclV2` に `pub action: Option<ItemAction>` field を追加 (None = parent 継承、Some = 独立 action)。ADR `2026-05-08-0258` D8/D10 (TraitImplDecl identity-only 設計) を refine する新 ADR で「impl-level の add は親 modify と独立に SMinusC_Add → Yellow と categorize」する semantic 拡張を決定する
+  - **本 track での Workaround**: `From<ContractMapRendererError>` の catalogue declare を見送り (`RenderContractMapError.trait_impls` に追加しない)、impl-plan T003 で「source impl 実装 + catalogue 同期更新」を同 task commit に含める per-task TDDD discipline で Red を回避。catalogue `docs` field に「INF-25 Workaround: From<ContractMapRendererError> impl は T003 commit で source + catalogue を同時更新する」を明記
+  - **発見元**: contract-map-v3-2026-05-15 track plan-artifacts review final round 後の CI `verify-spec-states` failure (2026-05-15)
+  - **関連 memory**: `project_signal_evaluator_v2_fp_deferred.md` (但し INF-25 は catalogue schema 設計不足であり evaluator bug ではない — memory 側にも明記要)
+  - **追加日**: 2026-05-15
+
 ---
 
 ## G. ワークフロー・TDD (WF)
