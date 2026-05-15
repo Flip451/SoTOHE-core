@@ -1,14 +1,14 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Contract Map Renderer: catalogue schema v3 対応設計の実装
 
-## Tasks (0/11 resolved)
+## Tasks (1/11 resolved)
 
 ### S1 — 旧 renderer 削除 (domain)
 
 > 旧 catalogue schema (TypeDefinitionKind / per-layer catalogue) を前提とした contract_map_render.rs および関連コードを domain 層から削除する。
 > 旧 shape mapping table / action overlay / signal overlay / SecondaryAdapter.trait_impl_methods 経由 edge 生成コードをすべて除去し、後続 task の新規実装の土台を整える。
 
-- [~] **T001**: 旧 renderer artifact の削除: libs/domain/src/tddd/contract_map_render.rs (旧 render_contract_map 自由関数) を削除し、同ファイルから参照される旧 shape mapping table (13 kind × shape) / action overlay / signal overlay コードを除去する。旧 SecondaryAdapter.trait_impl_methods 経由の edge 生成コードも除去する。削除後に cargo make ci-rust (fmt-check + clippy + nextest) が pass することを確認する。domain-types.json の `domain::tddd::contract_map_render::render_contract_map` (action: delete) を実装する。
+- [x] **T001**: 旧 renderer artifact の削除: libs/domain/src/tddd/contract_map_render.rs (旧 render_contract_map 自由関数) を削除し、同ファイルから参照される旧 shape mapping table (13 kind × shape) / action overlay / signal overlay コードを除去する。旧 SecondaryAdapter.trait_impl_methods 経由の edge 生成コードも除去する。削除後に cargo make ci-rust (fmt-check + clippy + nextest) が pass することを確認する。domain-types.json の `domain::tddd::contract_map_render::render_contract_map` (action: delete) を実装する。 (`d183e5acd12fd666b40890cd93f34a65b1afd959`)
 
 ### S2 — domain 層: ContractMapRenderer port + error type の新設
 
@@ -16,7 +16,7 @@
 > hexagonal port + adapter pattern (Decision E-3c) の port 側を確立し、usecase 層が port 経由で renderer に依存できるようにする。
 > ContractMapRenderOptions から YAGNI 判断 (Decision M) により不要になったフィールドを除去する。
 
-- [ ] **T002**: domain 層: ContractMapRenderer port 追加。libs/domain/src/tddd/ に contract_map_renderer.rs (または同等モジュール) を新設し、ContractMapRenderer trait (secondary port: Send + Sync bound, render(&self, catalogues: &[CatalogueDocument], layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> Result<ContractMapContent, ContractMapRendererError>) を実装する。ContractMapRendererError enum (StyleConfigNotFound { path } / StyleConfigParse { path, reason } / RenderFailed { reason } の 3 variant, Debug + Display + Error impl) を同モジュールまたは隣接モジュールに実装する。ContractMapRenderOptions の signal_overlay / action_overlay / include_spec_source_edges スタブフィールドを除去する (Decision M: YAGNI、IN-18 対応)。domain-types.json の ContractMapRenderer (action: add) と ContractMapRendererError (action: add) を実装する。unit test: ContractMapRendererError の Display / Error chain が意図通りであることを確認する。
+- [~] **T002**: domain 層: ContractMapRenderer port 追加。libs/domain/src/tddd/ に contract_map_renderer.rs (または同等モジュール) を新設し、ContractMapRenderer trait (secondary port: Send + Sync bound, render(&self, catalogues: &[CatalogueDocument], layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> Result<ContractMapContent, ContractMapRendererError>) を実装する。ContractMapRendererError enum (StyleConfigNotFound { path } / StyleConfigParse { path, reason } / RenderFailed { reason } の 3 variant, Debug + Display + Error impl) を同モジュールまたは隣接モジュールに実装する。ContractMapRenderOptions の signal_overlay / action_overlay / include_spec_source_edges スタブフィールドを除去する (Decision M: YAGNI、IN-18 対応)。domain-types.json の ContractMapRenderer (action: add) と ContractMapRendererError (action: add) を実装する。unit test: ContractMapRendererError の Display / Error chain が意図通りであることを確認する。
 
 ### S3 — usecase 層: RenderContractMapInteractor の修正
 
