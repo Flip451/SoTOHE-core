@@ -7,6 +7,13 @@
 pub use domain::tddd::CatalogueToExtendedCratePort;
 pub use domain::tddd::SignalEvaluatorPort;
 pub use domain::tddd::signal_evaluator::region::{ThreeWaySignal, ThreeWaySignalKind};
+// Re-export ContractMapRenderer port types so the CLI composition root can wire
+// the `RenderContractMapInteractor` without depending on the `domain` crate directly.
+pub use domain::tddd::LayerId;
+pub use domain::tddd::catalogue_v2::document::CatalogueDocument;
+pub use domain::tddd::{
+    ContractMapContent, ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError,
+};
 
 // T008: baseline_builder stubbed (TypeGraph removed).
 pub mod baseline_builder;

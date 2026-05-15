@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RenderContractMapError | error_type | modify | CatalogueLoaderFailed, ContractMapWriterFailed, RendererFailed, EmptyCatalogue, LayerNotFound, InvalidTrackId | 🟡 | 🔵 |
+| RenderContractMapError | error_type | modify | CatalogueLoaderFailed, ContractMapWriterFailed, RendererFailed, EmptyCatalogue, LayerNotFound, InvalidTrackId | 🔵 | 🔵 |
 
 ## Application Services
 

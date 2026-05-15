@@ -53,10 +53,11 @@
         { "trait_name": "Display", "origin_crate": "core" },
         { "trait_name": "Error", "origin_crate": "core" },
         { "trait_name": "From", "origin_crate": "core", "generic_args": "CatalogueLoaderError" },
-        { "trait_name": "From", "origin_crate": "core", "generic_args": "ContractMapWriterError" }
+        { "trait_name": "From", "origin_crate": "core", "generic_args": "ContractMapWriterError" },
+        { "trait_name": "From", "origin_crate": "core", "generic_args": "ContractMapRendererError" }
       ],
       "module_path": "contract_map_workflow",
-      "docs": "Error variants for RenderContractMap::execute. Modified in this track: RendererFailed variant added (wrapping ContractMapRendererError from the new ContractMapRenderer port). CatalogueLoaderFailed and ContractMapWriterFailed variants and their From impls are preserved unchanged. From<ContractMapRendererError> impl declaration is deferred to impl phase T003, where the source implementation and catalogue sync update will be committed together as a single per-task commit (per-task TDDD discipline). INF-25 workaround: TraitImplDeclV2 schema lacks an action field, so a new From impl inside an action:modify type cannot be expressed as SMinusC_Add (Yellow); declaring it now would produce SMinusC_Modify (Red) and fail CI.",
+      "docs": "Error variants for RenderContractMap::execute. Modified in this track: RendererFailed variant added (wrapping ContractMapRendererError from the new ContractMapRenderer port); From<ContractMapRendererError> impl added. CatalogueLoaderFailed and ContractMapWriterFailed variants and their From impls are preserved unchanged. INF-25 workaround resolved in T003: source implementation and catalogue declare (From<ContractMapRendererError>) are committed together in the same task commit (per-task TDDD discipline), bypassing the TraitImplDeclV2 schema gap (no per-impl action field) that would otherwise produce SMinusC_Modify Red.",
       "spec_refs": [
         {
           "file": "track/items/contract-map-v3-2026-05-15/spec.json",

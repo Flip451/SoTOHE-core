@@ -11,6 +11,10 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use infrastructure::tddd::contract_map_adapter::{FsCatalogueLoader, FsContractMapWriter};
+use infrastructure::tddd::{
+    CatalogueDocument, ContractMapContent, ContractMapRenderOptions, ContractMapRenderer,
+    ContractMapRendererError, LayerId,
+};
 use infrastructure::track::fs_store::read_track_status_str;
 use usecase::contract_map_workflow::{
     RenderContractMap, RenderContractMapCommand, RenderContractMapInteractor,
@@ -19,6 +23,27 @@ use usecase::contract_map_workflow::{
 use crate::CliError;
 
 use super::signals::ensure_active_track;
+
+/// Placeholder renderer for the `contract-map` CLI command.
+///
+/// T009 will replace this with the real `ContractMapRendererAdapter` (infrastructure adapter).
+/// Until then, this stub emits a placeholder mermaid diagram so that the interactor's
+/// `render` call compiles and the `ContractMapWriter` path is exercised.
+struct PlaceholderRenderer;
+
+impl ContractMapRenderer for PlaceholderRenderer {
+    fn render(
+        &self,
+        _catalogues: &[CatalogueDocument],
+        _layer_order: &[LayerId],
+        _opts: &ContractMapRenderOptions,
+    ) -> Result<ContractMapContent, ContractMapRendererError> {
+        Ok(ContractMapContent::new(
+            "<!-- contract-map renderer not yet wired (T009) -->\n\
+             ```mermaid\nflowchart LR\n```\n",
+        ))
+    }
+}
 
 /// Render the Contract Map for a single track.
 ///
@@ -43,8 +68,10 @@ pub fn execute_contract_map(
 
     let rules_path = workspace_root.join("architecture-rules.json");
     let loader = FsCatalogueLoader::new(items_dir.clone(), rules_path, workspace_root.clone());
+    // T009: replace PlaceholderRenderer with ContractMapRendererAdapter (infrastructure adapter).
+    let renderer = PlaceholderRenderer;
     let writer = FsContractMapWriter::new(items_dir.clone(), workspace_root);
-    let interactor = RenderContractMapInteractor::new(loader, writer);
+    let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
 
     // Dispatch through the primary port — CLI does not depend on the
     // concrete `RenderContractMapInteractor` type.

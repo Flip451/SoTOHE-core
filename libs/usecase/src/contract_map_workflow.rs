@@ -6,9 +6,9 @@
 //!   CLI and future adapters depend on this trait, not on the concrete
 //!   interactor below, so composition roots stay substitutable.
 //! * [`RenderContractMapInteractor`] — the interactor that orchestrates
-//!   the secondary ports (`CatalogueLoader`, `ContractMapWriter`) and the
-//!   pure domain render function (`render_contract_map`). It implements
-//!   [`RenderContractMap`].
+//!   the secondary ports (`CatalogueLoader`, `ContractMapRenderer`,
+//!   `ContractMapWriter`) and dispatches rendering through the domain port.
+//!   It implements [`RenderContractMap`].
 //!
 //! The usecase layer stays pure-orchestrator per
 //! `knowledge/conventions/hexagonal-architecture.md` §Usecase Purity:
@@ -19,7 +19,9 @@ use domain::TrackId;
 use domain::tddd::catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
 };
-use domain::tddd::{ContractMapContent, LayerId};
+use domain::tddd::{
+    ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError, LayerId,
+};
 
 /// Command input for [`RenderContractMap::execute`].
 ///
@@ -54,7 +56,7 @@ pub struct RenderContractMapOutput {
 /// Error variants surfaced by [`RenderContractMap::execute`].
 ///
 /// Variant inventory matches the `usecase-types.json` declaration for the
-/// `tddd-contract-map-phase1-2026-04-17` track.
+/// `contract-map-v3-2026-05-15` track.
 #[derive(Debug, thiserror::Error)]
 pub enum RenderContractMapError {
     /// Failure inside a [`CatalogueLoader`] implementation.
@@ -64,6 +66,10 @@ pub enum RenderContractMapError {
     /// Failure inside a [`ContractMapWriter`] implementation.
     #[error(transparent)]
     ContractMapWriterFailed(#[from] ContractMapWriterError),
+
+    /// Failure inside a [`ContractMapRenderer`] implementation.
+    #[error(transparent)]
+    RendererFailed(#[from] ContractMapRendererError),
 
     /// The loader returned an empty layer set — no `tddd.enabled` layers
     /// exist for this track. Rendering an empty Contract Map is not a
@@ -105,32 +111,36 @@ pub trait RenderContractMap {
 }
 
 /// Default [`RenderContractMap`] implementation that composes a
-/// [`CatalogueLoader`], the pure domain renderer, and a
+/// [`CatalogueLoader`], a [`ContractMapRenderer`], and a
 /// [`ContractMapWriter`].
-pub struct RenderContractMapInteractor<L, W>
+pub struct RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
+    R: ContractMapRenderer + Send + Sync,
     W: ContractMapWriter,
 {
     loader: L,
+    renderer: R,
     writer: W,
 }
 
-impl<L, W> RenderContractMapInteractor<L, W>
+impl<L, R, W> RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
+    R: ContractMapRenderer + Send + Sync,
     W: ContractMapWriter,
 {
     /// Creates a new interactor wrapping the supplied secondary ports.
     #[must_use]
-    pub fn new(loader: L, writer: W) -> Self {
-        Self { loader, writer }
+    pub fn new(loader: L, renderer: R, writer: W) -> Self {
+        Self { loader, renderer, writer }
     }
 }
 
-impl<L, W> RenderContractMap for RenderContractMapInteractor<L, W>
+impl<L, R, W> RenderContractMap for RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
+    R: ContractMapRenderer + Send + Sync,
     W: ContractMapWriter,
 {
     fn execute(
@@ -172,13 +182,16 @@ where
             })
             .transpose()?;
 
-        // T001: render_contract_map free function removed. Placeholder emits empty scaffold.
-        // T003 will inject ContractMapRenderer port and replace this stub.
-        // ContractMapRenderOptions construction is deferred to T003.
-        let content = ContractMapContent::new(
-            "<!-- contract-map renderer not yet wired (T003) -->\n\
-             ```mermaid\nflowchart LR\n```\n",
-        );
+        // Collect catalogues from BTreeMap into a Vec<CatalogueDocument> for the renderer port.
+        // CatalogueLoader.load_all() returns BTreeMap<LayerId, CatalogueDocument> (1 layer 1 crate).
+        // The renderer port accepts &[CatalogueDocument] to allow 1 layer N crate in the future
+        // (T010 acceptance test). In the production path, slice length equals the number of layers.
+        let docs = catalogues.values().cloned().collect::<Vec<_>>();
+
+        // Build render options: pass the active layer filter (or empty for all layers).
+        let opts = ContractMapRenderOptions { layers: layer_filter.clone().unwrap_or_default() };
+
+        let content = self.renderer.render(&docs, &layer_order, &opts)?;
 
         self.writer.write(&track_id, &content)?;
 
@@ -235,6 +248,18 @@ mod tests {
                 track_id: &TrackId,
                 content: &ContractMapContent,
             ) -> Result<(), ContractMapWriterError>;
+        }
+    }
+
+    mock! {
+        pub Renderer {}
+        impl ContractMapRenderer for Renderer {
+            fn render(
+                &self,
+                catalogues: &[domain::tddd::catalogue_v2::document::CatalogueDocument],
+                layer_order: &[LayerId],
+                opts: &ContractMapRenderOptions,
+            ) -> Result<ContractMapContent, ContractMapRendererError>;
         }
     }
 
@@ -340,13 +365,18 @@ mod tests {
             .times(1)
             .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
 
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().times(1).returning(|_catalogues, _layer_order, _opts| {
+            Ok(ContractMapContent::new("```mermaid\nflowchart LR\n```\n"))
+        });
+
         let mut writer = MockWriter::new();
         writer.expect_write().times(1).returning(|_: &TrackId, content: &ContractMapContent| {
             assert!(content.as_ref().contains("flowchart LR"));
             Ok(())
         });
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand { track_id: "t001".to_owned(), layer_filter: None };
         let out = interactor.execute(&cmd).unwrap();
         assert_eq!(out.rendered_layer_count, 3);
@@ -359,14 +389,47 @@ mod tests {
         loader.expect_load_all().returning(|_: &TrackId| {
             Err(CatalogueLoaderError::LayerDiscoveryFailed { reason: "boom".to_owned() })
         });
-        // Writer must NOT run when the loader fails — enforce via mockall.
+        // Renderer and Writer must NOT run when the loader fails — enforce via mockall.
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().times(0);
         let mut writer = MockWriter::new();
         writer.expect_write().times(0);
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand { track_id: "t002".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(matches!(err, RenderContractMapError::CatalogueLoaderFailed(_)));
+    }
+
+    #[test]
+    fn test_execute_propagates_renderer_error_as_renderer_failed() {
+        let (order, catalogues) = three_layer_catalogues();
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
+
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().returning(|_catalogues, _layer_order, _opts| {
+            Err(ContractMapRendererError::RenderFailed { reason: "malformed TypeRef".to_owned() })
+        });
+
+        // Writer must NOT run when the renderer fails — enforce via mockall.
+        let mut writer = MockWriter::new();
+        writer.expect_write().times(0);
+
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
+        let cmd = RenderContractMapCommand { track_id: "t006".to_owned(), layer_filter: None };
+        let err = interactor.execute(&cmd).unwrap_err();
+        assert!(
+            matches!(
+                err,
+                RenderContractMapError::RendererFailed(
+                    ContractMapRendererError::RenderFailed { .. }
+                )
+            ),
+            "expected RendererFailed(RenderFailed {{ .. }}), got {err:?}"
+        );
     }
 
     #[test]
@@ -377,6 +440,11 @@ mod tests {
             .expect_load_all()
             .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
 
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().returning(|_catalogues, _layer_order, _opts| {
+            Ok(ContractMapContent::new("```mermaid\nflowchart LR\n```\n"))
+        });
+
         let mut writer = MockWriter::new();
         writer.expect_write().returning(|_: &TrackId, _: &ContractMapContent| {
             Err(ContractMapWriterError::IoError {
@@ -385,7 +453,7 @@ mod tests {
             })
         });
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand { track_id: "t003".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(matches!(err, RenderContractMapError::ContractMapWriterFailed(_)));
@@ -395,11 +463,13 @@ mod tests {
     fn test_execute_empty_catalogue_returns_empty_catalogue_error() {
         let mut loader = MockLoader::new();
         loader.expect_load_all().returning(|_: &TrackId| Ok((Vec::new(), BTreeMap::new())));
-        // Writer must NOT run on the empty-catalogue path.
+        // Renderer and Writer must NOT run on the empty-catalogue path.
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().times(0);
         let mut writer = MockWriter::new();
         writer.expect_write().times(0);
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand { track_id: "t004".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         match err {
@@ -417,10 +487,13 @@ mod tests {
         loader
             .expect_load_all()
             .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
+        // Renderer and Writer must NOT run when layer validation fails.
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().times(0);
         let mut writer = MockWriter::new();
         writer.expect_write().times(0);
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand {
             track_id: "t005".to_owned(),
             layer_filter: Some(vec!["typo-layer".to_owned()]),
