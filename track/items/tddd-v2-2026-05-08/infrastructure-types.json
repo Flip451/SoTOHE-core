@@ -1,0 +1,1063 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "BaselineCodecError": {
+      "action": "delete",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Json" },
+          { "name": "UnsupportedSchemaVersion" },
+          { "name": "MissingField" }
+        ]
+      },
+      "docs": "T008: deleted. Old baseline codec error for the TypeBaseline-based evaluator. Replaced by BaselineRustdocCodecError.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineRustdocCodec": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "methods": [
+        { "name": "load", "params": [{ "name": "path", "ty": "&std::path::Path" }], "returns": "Result<rustdoc_types::Crate, BaselineRustdocCodecError>" },
+        { "name": "from_json", "params": [{ "name": "json", "ty": "&str" }], "returns": "Result<rustdoc_types::Crate, BaselineRustdocCodecError>" }
+      ],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" }
+      ],
+      "docs": "Codec struct that loads rustdoc_types::Crate JSON from the filesystem (Baseline B or Current C).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineRustdocCodecError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Json", "payload": { "kind": "tuple", "fields": ["serde_json::Error"] } },
+          { "name": "IoError", "payload": { "kind": "tuple", "fields": ["std::io::Error"] } },
+          { "name": "UnsupportedFormatVersion", "payload": { "kind": "struct", "fields": [{ "name": "actual", "ty": "u32" }, { "name": "expected", "ty": "u32" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "From", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for loading rustdoc_types::Crate JSON as Baseline (B) or Current (C). thiserror #[from] generates From<serde_json::Error> and From<io::Error>; declared here without generic args (core::convert::From) so the signal evaluator covers them via generic-args-stripped fallback.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueDocumentCodecError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Json", "payload": { "kind": "tuple", "fields": ["serde_json::Error"] } },
+          { "name": "Io", "payload": { "kind": "tuple", "fields": ["std::io::Error"] } },
+          { "name": "UnsupportedSchemaVersion", "payload": { "kind": "struct", "fields": [{ "name": "actual", "ty": "u32" }, { "name": "expected", "ty": "u32" }] } },
+          { "name": "InvalidEntry", "payload": { "kind": "struct", "fields": [{ "name": "entry_name", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "CrateNameMismatch", "payload": { "kind": "struct", "fields": [{ "name": "expected", "ty": "String" }, { "name": "actual", "ty": "String" }] } },
+          { "name": "CrossCrateFunctionPath", "payload": { "kind": "struct", "fields": [{ "name": "key", "ty": "String" }, { "name": "expected_crate", "ty": "String" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "From", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for the new CatalogueDocument serde codec. Replaces TypeCatalogueCodecError. thiserror #[from] generates From<serde_json::Error> and From<io::Error>; declared here without generic args (core::convert::From) so the signal evaluator covers them via generic-args-stripped fallback.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-15", "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueDocumentCodec": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" },
+        { "name": "decode", "params": [{ "name": "json", "ty": "&str" }, { "name": "filename_stem", "ty": "&str" }], "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>" },
+        { "name": "load", "params": [{ "name": "path", "ty": "&std::path::Path" }], "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>" },
+        { "name": "encode", "params": [{ "name": "doc", "ty": "&domain::tddd::catalogue_v2::CatalogueDocument" }], "returns": "Result<String, CatalogueDocumentCodecError>" }
+      ],
+      "docs": "Stateless codec struct that encodes/decodes CatalogueDocument to/from JSON (schema_version=3). Methods: new (constructor), decode (json+stem → CatalogueDocument), load (path → CatalogueDocument), encode (CatalogueDocument → JSON). All methods are static (no receiver).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-15", "hash": "6c498a6366ec5bd43289db1af2e12d17cbdc751904788992259182accd637f95" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueToExtendedCrateCodec": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "CatalogueToExtendedCratePort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Codec struct that converts CatalogueDocument into ExtendedCrate (TypeGraph A).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-08", "hash": "92379bdca00d2b52bef4c81dbfb9a1095f99e5ddf88ca234bf8cd55398fd0d96" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueToExtendedCrateCodecError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidTypeRef", "payload": { "kind": "struct", "fields": [{ "name": "type_ref", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "AmbiguousIdentifier", "payload": { "kind": "struct", "fields": [{ "name": "name", "ty": "String" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for the Catalogue -> ExtendedCrate (TypeGraph A) codec.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-08", "hash": "92379bdca00d2b52bef4c81dbfb9a1095f99e5ddf88ca234bf8cd55398fd0d96" }
+      ],
+      "informal_grounds": []
+    },
+    "EvaluateSignalsError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": { "kind": "tuple_struct", "fields": ["String"] },
+      "docs": "Existing error type for the execute_type_signals_for_layer infrastructure function (the new T008 entry point replacing the deleted evaluate_and_write_signals). The old evaluate_and_write_signals/validate_action_diagnostics/validate_and_write_catalogue functions are deleted; execute_type_signals_for_layer is the active caller.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
+    },
+    "FsCatalogueLoader": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "plain_struct", "has_stripped_fields": true },
+      "trait_impls": [{ "trait_name": "CatalogueLoader", "origin_crate": "domain" }],
+      "methods": [
+        { "name": "new", "params": [{ "name": "track_root", "ty": "std::path::PathBuf" }, { "name": "rules_path", "ty": "std::path::PathBuf" }, { "name": "trusted_root", "ty": "std::path::PathBuf" }], "returns": "Self" }
+      ],
+      "docs": "IN-21/IN-22: modified. FsCatalogueLoader now loads v3 CatalogueDocument natively via CatalogueDocumentCodec (v3-native). The previous v3_doc_to_stub conversion step (infrastructure::tddd::v3_stub) is deleted per IN-21. The CatalogueLoader port return type is updated to BTreeMap<LayerId, CatalogueDocument> per IN-22. Non-v3 catalogues are treated as fail-closed errors.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "FsCatalogueSpecSignalsStore": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "plain_struct" },
+      "trait_impls": [{ "trait_name": "CatalogueSpecSignalsWriter", "origin_crate": "usecase" }],
+      "docs": "Existing FsCatalogueSpecSignalsStore. Referenced — not modified in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FsContractMapWriter": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "plain_struct" },
+      "trait_impls": [{ "trait_name": "ContractMapWriter", "origin_crate": "domain" }],
+      "docs": "Existing FsContractMapWriter (implements ContractMapWriter). Referenced.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "InMemoryCatalogueLinter": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "plain_struct", "has_stripped_fields": true },
+      "trait_impls": [
+        { "trait_name": "CatalogueLinter", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" },
+        { "name": "with_disabled_rules", "params": [{ "name": "disabled_rules", "ty": "Vec<String>" }], "returns": "Self" }
+      ],
+      "docs": "IN-22 (T025): modified. T025 changes the domain CatalogueLinter::run port signature from catalogue: &TypeCatalogueDocument to catalogue: &CatalogueDocument (v3-native). This adapter's run() implementation must be updated in the same T025 commit to accept &CatalogueDocument and traverse v3 CatalogueDocument entries instead of TypeCatalogueDocument entries. The inherent new() and with_disabled_rules() constructors are unchanged.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
+    "EdgeSet": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted (previously a stub). Was an edge set for type_graph_render which was removed when TypeGraph was deleted.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "RustdocSchemaExporter": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "plain_struct", "has_stripped_fields": true },
+      "trait_impls": [
+        { "trait_name": "SchemaExporter", "origin_crate": "domain" },
+        { "trait_name": "SchemaExporterPort", "origin_crate": "usecase" }
+      ],
+      "methods": [
+        { "name": "new", "params": [{ "name": "workspace_root", "ty": "std::path::PathBuf" }], "returns": "Self" },
+        { "name": "export_rustdoc_json_path", "receiver": "&self", "params": [{ "name": "crate_name", "ty": "&str" }], "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>", "is_async": false }
+      ],
+      "docs": "T008: modified. RustdocSchemaExporter is now also the 'C' producer for the new 3-way evaluator. Trait impl surface changed from baseline snapshot.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-09", "hash": "902aa97f479c896ffa808c03ba711895d2d8443620cb8ae409679a074df5ffed" }
+      ],
+      "informal_grounds": []
+    },
+    "SchemaExportCodecError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Json", "payload": { "kind": "tuple", "fields": ["serde_json::Error"] } }
+        ]
+      },
+      "docs": "Existing error type for the SchemaExport -> TypeGraph codec. Referenced for continuity.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalEvaluatorV2": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "SignalEvaluatorPort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Phase 1 + Phase 2 signal evaluator struct. Stateless struct driving the 2-phase algorithm.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-11", "hash": "d0ea1d981961bf5ada665db6672d594033744de132e7c3ea93d978efa80801f0" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-12", "hash": "2f41ed9b66d67d4781df4d78f37573d88a7a57ebff3509833b9f336727cfc588" }
+      ],
+      "informal_grounds": []
+    },
+    "FsCatalogueDocumentLoader": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "CatalogueDocumentLoaderPort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Stateless filesystem adapter implementing CatalogueDocumentLoaderPort. Delegates to CatalogueDocumentCodec::load and maps codec errors to CatalogueDocumentLoaderError variants. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "RustdocCrateAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "plain_struct", "has_stripped_fields": true },
+      "trait_impls": [
+        { "trait_name": "RustdocCratePort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [{ "name": "workspace_root", "ty": "std::path::PathBuf" }], "returns": "Self" }
+      ],
+      "docs": "Adapter implementing RustdocCratePort. load_from_path wraps BaselineRustdocCodec::load (B-side baseline). capture_current wraps RustdocSchemaExporter::export_rustdoc_json_path + BaselineRustdocCodec::from_json (C-side live capture). workspace_root is passed to RustdocSchemaExporter::new. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "FsTdddLayerBindingsAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "TdddLayerBindingsPort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Filesystem adapter implementing TdddLayerBindingsPort. Reads architecture-rules.json via symlink guard + parse_tddd_layers and maps infra TdddLayerBinding to domain TdddLayerBinding entries. Absent architecture-rules.json is always a hard LoadFailed error (fail-closed). Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "ClusterPlan": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was a clustering plan struct in type_graph_cluster, removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "CrossEdge": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was a cross-cluster edge in type_graph_cluster, removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "SignalSummary": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was a summary type produced by the old TypeBaseline-based signal evaluator.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeGraphExportError": {
+      "action": "delete",
+      "role": "ErrorType",
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was the error type for type_graph_export functions. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeGraphRenderOptions": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "T008: deleted. Was the options struct for type_graph_render functions. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "CaptureBaselineError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": { "kind": "tuple_struct", "fields": ["String"] },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" }
+      ],
+      "docs": "Newtype error returned by capture_rustdoc_baseline_for_layer and force_capture_rustdoc_baseline_for_layer so the CLI can map to CliError::Message. Pre-existing type, referenced for free-function return type resolution.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeCatalogueCodecError": {
+      "action": "delete",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Json" },
+          { "name": "Validation" },
+          { "name": "UnsupportedSchemaVersion" },
+          { "name": "InvalidEntry" }
+        ]
+      },
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy codec error for TypeCatalogueDocument (infrastructure::tddd::catalogue_codec). The entire catalogue_codec module was deleted per IN-21. Replaced by CatalogueDocumentCodecError.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "GitShowTrackBlobReader": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "has_stripped_fields": true
+      },
+      "trait_impls": [
+        { "trait_name": "TrackBlobReader", "origin_crate": "usecase" },
+        { "trait_name": "SpecElementHashReader", "origin_crate": "usecase" }
+      ],
+      "methods": [
+        {
+          "name": "new",
+          "params": [{ "name": "repo_root", "ty": "std::path::PathBuf" }],
+          "returns": "Self"
+        }
+      ],
+      "docs": "T021 DONE / T022 DONE / T024 DONE. Adapter implementing TrackBlobReader and SpecElementHashReader via git-show on the local repository. Only the inherent new() constructor is declared in methods; TrackBlobReader and SpecElementHashReader trait methods are not listed here because the structural equality check for impl blocks (ItemEnum::Impl) only compares the for_, trait_, and generics fields — not the method bodies. The signal evaluator's items_structurally_equal for Impl items intentionally omits method comparison per ADR D9. Adding trait impl methods here would be treated as inherent methods and cause structural mismatches against the C-side. T021: read_type_signals implemented. T022: read_type_catalogue returns (Vec<u8>, String). T024: read_catalogue_for_spec_ref_check returns (CatalogueDocument, String) via CatalogueDocumentCodec::decode.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" }
+      ],
+      "informal_grounds": []
+    },
+    "LoadAllCataloguesError": {
+      "action": "delete",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "LayerBindings", "payload": { "kind": "tuple", "fields": ["infrastructure::verify::tddd_layers::LoadTdddLayersError"] } },
+          { "name": "ArchRulesParse", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "Io", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "std::io::Error" }] } },
+          { "name": "CatalogueNotFound", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "Decode", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "CatalogueDocumentCodecError" }] } },
+          { "name": "TopologicalSortFailed", "payload": { "kind": "struct", "fields": [{ "name": "cycle", "ty": "Vec<String>" }] } },
+          { "name": "InvalidLayerId", "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "String" }, { "name": "source", "ty": "domain::error::ValidationError" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "From", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Deleted in T027/IN-21 — the v1/v2 load_all_catalogues path was removed entirely; FsCatalogueLoader now uses load_all_catalogues_native / LoadAllCataloguesNativeError instead. The V3StubConversion variant was never added (deleted before implementation).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
+    "LoadAllCataloguesNativeError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "LayerBindings", "payload": { "kind": "tuple", "fields": ["infrastructure::verify::tddd_layers::LoadTdddLayersError"] } },
+          { "name": "ArchRulesParse", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "Io", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "std::io::Error" }] } },
+          { "name": "CatalogueNotFound", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "Decode", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }, { "name": "source", "ty": "CatalogueDocumentCodecError" }] } },
+          { "name": "TopologicalSortFailed", "payload": { "kind": "struct", "fields": [{ "name": "cycle", "ty": "Vec<String>" }] } },
+          { "name": "InvalidLayerId", "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "String" }, { "name": "source", "ty": "domain::error::ValidationError" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "From", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "T025: added. v3-native counterpart to LoadAllCataloguesError. No V3StubConversion variant (fail-closed per CN-11). thiserror #[from] generates From<LoadTdddLayersError>.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
+    "FsSpecFileLoader": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "SpecFileLoaderPort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [{ "name": "trusted_root", "ty": "std::path::PathBuf" }], "returns": "Self" }
+      ],
+      "docs": "Stateless filesystem adapter implementing SpecFileLoaderPort. Applies the shared symlink guard before reading, then returns the raw text content. Injected at the apps/cli composition root so the CLI command no longer calls std::fs directly.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "FsSymlinkGuard": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "unit_struct"
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "SymlinkGuardPort", "origin_crate": "domain" },
+        { "trait_name": "Default", "origin_crate": "core" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Filesystem-backed implementation of SymlinkGuardPort. reject_symlinks_from_root walks all ancestors (root to leaf) checking each with symlink_metadata. reject_symlinks_below delegates to infrastructure::track::symlink_guard::reject_symlinks_below and maps the result to SymlinkGuardError variants. Injected into CatalogueImplSignalsInteractor at the apps/cli composition root. Modified in T040 addendum: added missing Debug derive. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "FsTrackStatusReaderAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "TrackStatusReaderPort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Filesystem-backed implementation of TrackStatusReaderPort. Reads metadata.json + impl-plan.json for the given track via read_track_status_str, applies the symlink guard, validates the track id, and converts the returned status string to a domain TrackStatus.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "RustdocBaselineCaptureAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "RustdocBaselineCapturePort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Stateless adapter implementing RustdocBaselineCapturePort. Runs cargo +nightly rustdoc against rustdoc_workspace and writes the result to the baseline file. Accepts the domain-level TdddLayerBinding directly. Injected into BaselineCaptureInteractor at the apps/cli composition root.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsExecutorAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Default", "origin_crate": "core" },
+        { "trait_name": "TypeSignalsExecutorPort", "origin_crate": "domain" }
+      ],
+      "methods": [
+        { "name": "new", "params": [], "returns": "Self" }
+      ],
+      "docs": "Stateless adapter implementing TypeSignalsExecutorPort. Converts the domain TdddLayerBinding (public fields) to the infra TdddLayerBinding (private getters) and delegates to execute_type_signals_for_layer. Handles MissingCataloguePolicy::SkipSilently and MissingCataloguePolicy::FailClosed modes.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "SpecElementHashError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "tuple_struct",
+        "fields": ["String"],
+        "has_stripped_fields": false
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" }
+      ],
+      "docs": "Error returned by compute_spec_element_hashes. Wraps a human-readable error string covering symlink guard failures, invalid track_id, missing or malformed spec.json, and absent anchor lookups.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+  },
+  "functions": {
+    "infrastructure::tddd::catalogue_codec::decode": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [{ "name": "json", "ty": "&str" }],
+      "returns": "Result<TypeCatalogueDocument, TypeCatalogueCodecError>",
+      "is_async": false,
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy free function decoding a JSON string into TypeCatalogueDocument (schema_version=2). The entire infrastructure::tddd::catalogue_codec module was deleted per IN-21. Replaced by CatalogueDocumentCodec::decode.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::catalogue_codec::encode": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [{ "name": "doc", "ty": "&TypeCatalogueDocument" }],
+      "returns": "Result<String, TypeCatalogueCodecError>",
+      "is_async": false,
+      "docs": "Deleted in T027/IN-21 — v1/v2 legacy free function encoding a TypeCatalogueDocument to a JSON string (schema_version=2). The entire infrastructure::tddd::catalogue_codec module was deleted per IN-21. Replaced by CatalogueDocumentCodec::encode.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "binding", "ty": "&TdddLayerBinding" },
+        { "name": "writer", "ty": "&FsCatalogueSpecSignalsStore" }
+      ],
+      "returns": "Result<(), String>",
+      "is_async": false,
+      "docs": "T026/IN-26: modified. v3-only, fail-closed (CN-11): the UnsupportedSchemaVersion arm and v2 catalogue_codec fallback are removed. Any CatalogueDocumentCodec decode error — including a non-v3 schema_version — propagates immediately as an error string. No v2 fallback attempted.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-26", "hash": "040819b93eea9b179e432488b41d6bf7f94fd1a55e2a28776cb4ece1dfebb425" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "binding", "ty": "&infrastructure::verify::tddd_layers::TdddLayerBinding" }
+      ],
+      "returns": "Result<(), CaptureBaselineError>",
+      "is_async": false,
+      "docs": "Captures the current rustdoc_types::Crate JSON as the baseline (B) for a layer. New in T008 replacing the old capture_baseline_for_layer.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "binding", "ty": "&infrastructure::verify::tddd_layers::TdddLayerBinding" }
+      ],
+      "returns": "Result<(), CaptureBaselineError>",
+      "is_async": false,
+      "docs": "Force-captures the current rustdoc_types::Crate JSON as the baseline, overwriting any existing baseline. New in T008.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-07", "hash": "a874b670f9950ee256966672d94b81310240700ebd82f213396a6bd85a84dbaf" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::code_profile_builder::build_type_graph": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "TypeGraph",
+      "is_async": false,
+      "docs": "T008: deleted. Built a TypeGraph from SchemaExport. Replaced by SignalEvaluatorV2 which operates on rustdoc_types::Crate directly.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::baseline_builder::build_baseline": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "TypeBaseline",
+      "is_async": false,
+      "docs": "T008: deleted. Built a TypeBaseline from TypeGraph. Replaced by capture_rustdoc_baseline_for_layer.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::baseline_capture::capture_baseline_for_layer": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), BaselineCodecError>",
+      "is_async": false,
+      "docs": "T008: deleted. Old capture function using TypeBaseline. Replaced by capture_rustdoc_baseline_for_layer.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::baseline_codec::decode": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<TypeBaseline, BaselineCodecError>",
+      "is_async": false,
+      "docs": "T008: deleted. Decoded JSON to TypeBaseline. Replaced by BaselineRustdocCodec::load.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::baseline_codec::encode": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<String, BaselineCodecError>",
+      "is_async": false,
+      "docs": "T008: deleted. Encoded TypeBaseline to JSON. Replaced by BaselineRustdocCodec (which uses serde directly on rustdoc_types::Crate).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_graph_cluster::classify_types": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "ClusterPlan",
+      "is_async": false,
+      "docs": "T008: deleted. Classified types in a TypeGraph into clusters. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_graph_export::execute_type_graph_for_layer": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), TypeGraphExportError>",
+      "is_async": false,
+      "docs": "T008: deleted. Exported TypeGraph for a layer. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_graph_render::render_type_graph_clustered": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "docs": "T008: deleted. Rendered TypeGraph as clustered Mermaid diagram. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_graph_render::render_type_graph_flat": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "docs": "T008: deleted. Rendered TypeGraph as flat Mermaid diagram. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_graph_render::render_type_graph_overview": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "docs": "T008: deleted. Rendered TypeGraph overview as Mermaid. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_graph_render::write_type_graph_dir": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), TypeGraphExportError>",
+      "is_async": false,
+      "docs": "T008: deleted. Wrote TypeGraph render output to a directory. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_graph_render::write_type_graph_file": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), TypeGraphExportError>",
+      "is_async": false,
+      "docs": "T008: deleted. Wrote TypeGraph render output to a file. Removed with TypeGraph.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_signals_evaluator::evaluate_and_write_signals": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), EvaluateSignalsError>",
+      "is_async": false,
+      "docs": "T008: deleted. Old signal evaluation entry point using TypeBaseline + TypeGraph. Replaced by the new bin/sotp track catalogue-impl-signals pipeline via SignalEvaluatorV2.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), EvaluateSignalsError>",
+      "is_async": false,
+      "docs": "T008: deleted. Old validation helper for action diagnostics in the TypeBaseline-based evaluator.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), EvaluateSignalsError>",
+      "is_async": false,
+      "docs": "T008: deleted. Old validation-and-write helper in the TypeBaseline-based evaluator.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-14", "hash": "2680e5d6835464eb6569f9b9a2337d4b3d7dfab766ef490c35cbbd5c77010790" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_states::verify_from_spec_json": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "spec_json_path", "ty": "&std::path::Path" },
+        { "name": "strict", "ty": "bool" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "docs": "T022 DONE / T023 DONE: modified. Verifies spec.json Stage 1 signals and per-layer Stage 2 domain type signals. Actual signature: pub fn verify_from_spec_json(spec_json_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutcome. Stage 2 was rewired from catalogue_codec::decode + v3_doc_to_stub (TypeCatalogueDocument path) to type_signals_codec::decode + check_type_signals(&TypeSignalsDocument, strict) + catalogue byte-hash freshness check. Path is std::path::Path (L1 short-name: Path). VerifyOutcome is domain::verify::VerifyOutcome (L1 short-name: VerifyOutcome). Both are external types; the signal evaluator uses format_type_with_canon (rsplit on '::' → last segment) so 'Path' and 'VerifyOutcome' will match the C-side rustdoc representation directly.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "binding", "ty": "&TdddLayerBinding" }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "is_async": false,
+      "docs": "T026/IN-25: modified. The kind_tag derivation is now self-contained: data_role_kind_tag / contract_role_kind_tag / function_role_kind_tag derive kind_tag strings directly from v3 entry role and kind fields. No reference to v3_doc_to_stub remains. Function signature is unchanged.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-25", "hash": "12ea9c3fde06c5f4eba226173e3e86159d2258fe40fe93766db73280c9c47404" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "_track_id_str", "ty": "&str" },
+        { "name": "_crate_name", "ty": "&str" },
+        { "name": "_project_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "VerifyOutcome",
+      "is_async": false,
+      "docs": "IN-17 / D1: retire the stub for `bin/sotp verify spec-code-consistency`. The stub was a T008 placeholder that always returned an error explaining the command was removed. The command itself (and this stub) are deleted as part of the catalogue-impl-signals introduction. The module libs/infrastructure/src/verify/spec_code_consistency.rs will be removed entirely. [source: ADR 2026-05-11-2330 D1]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-17", "hash": "f3302fe868e8c61ed23817d97159e9696aa2224a3942e534a4d5e94f62851127" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_code_consistency::consistency_report_to_findings": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Vec<VerifyFinding>",
+      "is_async": false,
+      "docs": "T008: deleted. Converted ConsistencyReport to VerifyFinding list. Removed with check_consistency.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "ConsistencyReport",
+      "is_async": false,
+      "docs": "T008: deleted. Ran check_consistency from component inputs. Removed with TypeGraph/TypeBaseline.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-13", "hash": "c7904beadb4b2872431b00dcd73ba5afc250fd453c7711577a88cbc8aa2cf031" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_dir", "ty": "&std::path::Path" },
+        { "name": "rules_path", "ty": "&std::path::Path" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<(Vec<domain::tddd::LayerId>, std::collections::BTreeMap<domain::tddd::LayerId, domain::tddd::TypeCatalogueDocument>), LoadAllCataloguesError>",
+      "is_async": false,
+      "docs": "Deleted in T027/IN-21 — the v1/v2 bulk-loader free function that loaded TypeCatalogueDocument per layer. Replaced by load_all_catalogues_native (v3-native, uses CatalogueDocumentCodec). The LoadAllCataloguesError type was deleted together with this function.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::tddd_layers::load_tddd_layers_from_path": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "path", "ty": "&std::path::Path" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<Vec<infrastructure::verify::tddd_layers::TdddLayerBinding>, infrastructure::verify::tddd_layers::LoadTdddLayersError>",
+      "is_async": false,
+      "docs": "T045: deleted. Legacy fail-open loader that returned a synthetic domain binding when architecture-rules.json was absent. Replaced by load_tddd_layers (fail-closed). All callers (signals.rs, baseline.rs, catalogue_bulk_loader.rs, render.rs) switched to load_tddd_layers.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::tddd_layers::load_tddd_layers": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "path", "ty": "&std::path::Path" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<Vec<infrastructure::verify::tddd_layers::TdddLayerBinding>, infrastructure::verify::tddd_layers::LoadTdddLayersError>",
+      "is_async": false,
+      "docs": "Loads TDDD layer bindings from architecture-rules.json at path, failing closed when the file is absent (no synthetic fallback). An absent architecture-rules.json is treated as a hard configuration error. Appropriate for verify gates where a missing rules file means the set of catalogues to check is unknowable. Added in T040 CLI thinning refactor; renamed from load_tddd_layers_strict in T045 fail-open removal.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_dir", "ty": "&std::path::Path" },
+        { "name": "rules_path", "ty": "&std::path::Path" },
+        { "name": "trusted_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<(Vec<domain::tddd::LayerId>, std::collections::BTreeMap<domain::tddd::LayerId, domain::tddd::catalogue_v2::CatalogueDocument>), LoadAllCataloguesNativeError>",
+      "is_async": false,
+      "docs": "T025: added. v3-native counterpart to load_all_catalogues. Uses CatalogueDocumentCodec::decode directly; rejects non-v3 catalogues fail-closed (CN-11). Used by FsCatalogueLoader after T025.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::type_catalogue_render::render_type_catalogue": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "docs": "Deleted in T027/IN-21 — the v1/v2 render_type_catalogue function was removed when the v2 catalogue path was eliminated. Replaced by render_type_catalogue_v3 for v3 CatalogueDocument rendering.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-21", "hash": "c26f3d46ee8af8c432248abfea51559f853eed72d23cf44993fefc1427294b29" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::type_catalogue_render::render_type_catalogue_v3": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "doc", "ty": "&domain::tddd::catalogue_v2::CatalogueDocument" },
+        { "name": "source_file_name", "ty": "&str" },
+        { "name": "type_signals", "ty": "Option<&[domain::TypeSignal]>" },
+        { "name": "catalogue_spec_signals", "ty": "Option<&domain::CatalogueSpecSignalsDocument>" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "docs": "T025: added. v3-native renderer that converts CatalogueDocument into a Markdown table for <layer>-types.md. Groups entries by their v3 role using V3_EXTRA_SECTIONS (Entity, AggregateRoot, Specification, SpecificationPort, UseCaseFunction) in addition to the standard sections. Replaces the v2 render_type_catalogue path for v3 catalogues. Both the Signal column (via type_signals) and the Cat-Spec column (via catalogue_spec_signals, positional with type_name cross-check) are active.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::spec_element_hash::compute_spec_element_hashes": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "std::path::PathBuf" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "anchor", "ty": "Option<&str>" }
+      ],
+      "returns": "Result<std::collections::BTreeMap<String, String>, SpecElementHashError>",
+      "is_async": false,
+      "docs": "Compute canonical SHA-256 hashes for every element in spec.json and return a sorted map from element id to 64-char lowercase hex digest. Applies a symlink_metadata guard on items_dir before using it as the trusted root for FsSpecFileLoader. When anchor is Some, only a single entry is returned. When anchor is None, the full map is returned.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "std::path::PathBuf" },
+        { "name": "track_id", "ty": "String" },
+        { "name": "workspace_root", "ty": "std::path::PathBuf" },
+        { "name": "skip_stale", "ty": "bool" },
+        { "name": "formatted_findings", "ty": "&mut Vec<String>" }
+      ],
+      "returns": "Result<bool, String>",
+      "is_async": false,
+      "docs": "Entry point for `sotp verify catalogue-spec-refs`. Returns Ok(true) when no findings were detected (exit 0), Ok(false) when one or more findings were detected (exit 1), or Err(String) when a fatal configuration or I/O error prevents the check from running. The formatted_findings parameter is populated with one human-readable line per finding.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "b11681f75c595def97b35ff36056afad4ec27a4d453a21c3b18b39488876fdc1",
+  "signals": [
+    {
+      "type_name": "BaselineCaptureError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineCaptureInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineCaptureRequest",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueImplSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueImplSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueImplSignalsReport",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PreCommitTypeSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewCheckApprovedInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsRequest",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineCaptureService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueImplSignalsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueSpecSignalsWriter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PreCommitTypeSignalsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewCheckApprovedService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SpecElementHashReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::merge_gate::check_strict_merge_gate",
+      "signal": "blue"
+    }
+  ]
+}

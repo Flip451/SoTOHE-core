@@ -6,9 +6,10 @@
 
 use std::path::PathBuf;
 
-use domain::check_catalogue_spec_signals;
+use domain::ConfidenceSignal;
 use domain::verify::{Severity, VerifyFinding, VerifyOutcome};
 
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::catalogue_spec_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers;
@@ -258,20 +259,105 @@ pub fn execute_catalogue_spec_signals(
                 continue;
             }
         };
-        let catalogue_doc = match crate::tddd::catalogue_codec::decode(&catalogue_text) {
+        // T024: v3-native decode via `CatalogueDocumentCodec::decode`.
+        // Non-v3 catalogues surface as an error finding (CN-11 fail-closed).
+        let stem = catalogue_path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("")
+            .strip_suffix("-types.json")
+            .unwrap_or_else(|| {
+                catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown")
+            })
+            .to_owned();
+        let catalogue_doc = match CatalogueDocumentCodec::decode(&catalogue_text, &stem) {
             Ok(d) => d,
             Err(e) => {
                 outcome.add(VerifyFinding::error(format!(
-                    "{}: decode error: {e}",
+                    "{}: decode error: {e:?}",
                     catalogue_path.display()
                 )));
                 continue;
             }
         };
-        let layer_outcome =
-            check_catalogue_spec_signals(&catalogue_doc, &doc, strict, catalogue_file);
-        for finding in layer_outcome.findings() {
-            outcome.add(finding.clone());
+
+        // T024: inline equivalent of `check_catalogue_spec_signals` over v3 `CatalogueDocument`.
+        // Entry ordering: types (BTreeMap sorted) → traits → functions.
+        let total_entries =
+            catalogue_doc.types.len() + catalogue_doc.traits.len() + catalogue_doc.functions.len();
+        if total_entries != doc.signals.len() {
+            outcome.add(VerifyFinding::error(format!(
+                "{catalogue_file}: catalogue-spec signals coverage mismatch — catalogue has \
+                 {total_entries} entry/entries, signals document has {} signal(s). Regenerate \
+                 the signals file with `sotp track catalogue-spec-signals` so every catalogue \
+                 entry is covered.",
+                doc.signals.len()
+            )));
+            continue;
+        }
+
+        let catalogue_names: Vec<String> = catalogue_doc
+            .types
+            .keys()
+            .map(|k| k.as_str().to_owned())
+            .chain(catalogue_doc.traits.keys().map(|k| k.as_str().to_owned()))
+            .chain(catalogue_doc.functions.keys().map(|k| k.to_string()))
+            .collect();
+        if let Some((i, cat_name, sig)) = catalogue_names
+            .iter()
+            .zip(doc.signals.iter())
+            .enumerate()
+            .find(|(_, (cat_name, sig))| cat_name.as_str() != sig.type_name.as_str())
+            .map(|(i, (cat_name, sig))| (i, cat_name, sig))
+        {
+            outcome.add(VerifyFinding::error(format!(
+                "{catalogue_file}: catalogue-spec signals positional mismatch at index {i} \
+                 (catalogue entry '{cat_name}' vs signal '{}'). Regenerate the signals file.",
+                sig.type_name
+            )));
+            continue;
+        }
+
+        if doc.signals.is_empty() {
+            continue;
+        }
+
+        let reds: Vec<&str> = doc
+            .signals
+            .iter()
+            .filter(|s| s.signal == ConfidenceSignal::Red)
+            .map(|s| s.type_name.as_str())
+            .collect();
+        if !reds.is_empty() {
+            outcome.add(VerifyFinding::error(format!(
+                "{catalogue_file}: {} catalogue entry/entries have Red catalogue-spec signal \
+                 (missing both spec_refs[] and informal_grounds[] — every entry must carry \
+                 at least one grounding ref): {}",
+                reds.len(),
+                reds.join(", ")
+            )));
+            continue;
+        }
+
+        let yellows: Vec<&str> = doc
+            .signals
+            .iter()
+            .filter(|s| s.signal == ConfidenceSignal::Yellow)
+            .map(|s| s.type_name.as_str())
+            .collect();
+        if !yellows.is_empty() {
+            let message = format!(
+                "{catalogue_file}: {} catalogue entry/entries have Yellow catalogue-spec signal \
+                 — merge gate will block these until upgraded to Blue. Upgrade by promoting \
+                 informal_grounds[] to spec_refs[] with anchor + canonical SHA-256 hash: {}",
+                yellows.len(),
+                yellows.join(", ")
+            );
+            if strict {
+                outcome.add(VerifyFinding::error(message));
+            } else {
+                outcome.add(VerifyFinding::warning(message));
+            }
         }
     }
     outcome
@@ -332,4 +418,175 @@ pub fn execute_catalogue_spec_signals_check(
     let resolved_workspace_root = resolve_repo_path(repo.root(), &workspace_root);
 
     execute_catalogue_spec_signals(resolved_items_dir, track_id, resolved_workspace_root, strict)
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
+mod tests {
+    use std::path::PathBuf;
+
+    use super::*;
+
+    // -----------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------
+
+    /// Minimal `architecture-rules.json` enabling the `domain` layer with
+    /// `catalogue_spec_signal` activated.
+    ///
+    /// Uses `"crate"` (not `"id"`) as the layer key, matching the serde rename in
+    /// `parse_tddd_layers`.  `catalogue_spec_signal` is an object (`{ "enabled": true }`)
+    /// because the parser deserialises it as `CatalogueSpecSignalBlock`, not a bool.
+    const ARCH_RULES_WITH_DOMAIN: &str = r#"{
+  "layers": [
+    {
+      "crate": "domain",
+      "tddd": {
+        "enabled": true,
+        "catalogue_spec_signal": { "enabled": true }
+      }
+    }
+  ]
+}"#;
+
+    /// Minimal valid v3 domain catalogue with a single type `MyType`.
+    const V3_CATALOGUE_ONE_TYPE: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "A simple value object."
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+    /// Minimal valid v3 domain catalogue with no types.
+    const V3_CATALOGUE_EMPTY: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {}
+}"#;
+
+    /// A `domain-catalogue-spec-signals.json` referencing `MyType` with a Blue signal.
+    ///
+    /// Uses the production codec shape: `catalogue_declaration_hash` + `signals` array.
+    fn signals_referencing_existing_type() -> String {
+        r#"{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "signals": [
+    {"type_name": "MyType", "signal": "blue"}
+  ]
+}"#
+        .to_owned()
+    }
+
+    /// A `domain-catalogue-spec-signals.json` referencing a type `NonExistentType`
+    /// that does NOT appear in the v3 catalogue.
+    ///
+    /// Uses the production codec shape: `catalogue_declaration_hash` + `signals` array.
+    fn signals_referencing_nonexistent_type() -> String {
+        r#"{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "signals": [
+    {"type_name": "NonExistentType", "signal": "blue"}
+  ]
+}"#
+        .to_owned()
+    }
+
+    fn write_file(dir: &std::path::Path, relative: &str, content: &str) {
+        let path = dir.join(relative);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).unwrap();
+        }
+        std::fs::write(&path, content).unwrap();
+    }
+
+    /// Set up a minimal workspace with:
+    ///   tmp/
+    ///     architecture-rules.json
+    ///     track/items/<track_id>/
+    ///       domain-types.json        (catalogue_content)
+    ///       domain-catalogue-spec-signals.json  (signals_content)
+    fn setup_workspace(
+        tmp: &std::path::Path,
+        track_id: &str,
+        catalogue_content: &str,
+        signals_content: &str,
+    ) -> (PathBuf, String) {
+        write_file(tmp, "architecture-rules.json", ARCH_RULES_WITH_DOMAIN);
+        let items_dir = tmp.join("track").join("items");
+        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+        write_file(tmp, &format!("track/items/{track_id}/domain-types.json"), catalogue_content);
+        write_file(
+            tmp,
+            &format!("track/items/{track_id}/domain-catalogue-spec-signals.json"),
+            signals_content,
+        );
+        (items_dir, track_id.to_owned())
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: v3 catalogue + valid signals → no UnsupportedSchemaVersion error
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_v3_catalogue_with_valid_signals_passes_without_unsupported_schema_error() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let (items_dir, track_id) = setup_workspace(
+            tmp.path(),
+            "my-track-2026-01-01",
+            V3_CATALOGUE_ONE_TYPE,
+            &signals_referencing_existing_type(),
+        );
+
+        let outcome =
+            execute_catalogue_spec_signals(items_dir, track_id, tmp.path().to_path_buf(), false);
+
+        // The outcome must NOT contain any error finding with "UnsupportedSchemaVersion".
+        let has_unsupported =
+            outcome.findings().iter().any(|f| f.message().contains("UnsupportedSchemaVersion"));
+        assert!(
+            !has_unsupported,
+            "v3 catalogue must not produce UnsupportedSchemaVersion; findings: {:?}",
+            outcome.findings()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: v3 catalogue + signals referencing NON-EXISTENT type → real finding
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_v3_catalogue_signals_referencing_nonexistent_type_produces_finding() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let (items_dir, track_id) = setup_workspace(
+            tmp.path(),
+            "my-track-2026-01-01",
+            V3_CATALOGUE_EMPTY,
+            &signals_referencing_nonexistent_type(),
+        );
+
+        let outcome =
+            execute_catalogue_spec_signals(items_dir, track_id, tmp.path().to_path_buf(), false);
+
+        // The outcome must have at least one finding (signals reference a type that
+        // does not exist in the catalogue — proves the validation is real, not pass-through).
+        assert!(
+            !outcome.is_ok() || !outcome.findings().is_empty(),
+            "signals referencing a non-existent type must produce findings; outcome: {:?}",
+            outcome.findings()
+        );
+    }
 }

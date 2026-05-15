@@ -118,10 +118,7 @@ mod tests {
     use std::cell::RefCell;
 
     use domain::spec::SpecDocument;
-    use domain::{
-        ImplPlanDocument, PlanSection, PlanView, TaskId, TaskStatus, TrackTask,
-        TypeCatalogueDocument,
-    };
+    use domain::{ImplPlanDocument, PlanSection, PlanView, TaskId, TaskStatus, TrackTask};
 
     use super::*;
 
@@ -154,7 +151,7 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(TypeCatalogueDocument, String)> {
+        ) -> BlobFetchResult<(Vec<u8>, String)> {
             panic!("read_type_catalogue must not be called by task_completion tests")
         }
 

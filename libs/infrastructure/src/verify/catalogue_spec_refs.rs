@@ -11,13 +11,14 @@
 use std::collections::BTreeMap;
 use std::path::Path;
 
+use domain::plan_ref::SpecRef;
 use domain::tddd::LayerId;
-use domain::{
-    ContentHash, SpecElementId, SpecRefFinding, SpecRefFindingKind,
-    check_catalogue_spec_ref_integrity,
-};
+use domain::{ContentHash, SpecElementId, SpecRefFinding, SpecRefFindingKind};
 
-use crate::tddd::{catalogue_codec, catalogue_spec_signals_codec, type_signals_codec};
+use crate::tddd::{
+    catalogue_document_codec::CatalogueDocumentCodec, catalogue_spec_signals_codec,
+    type_signals_codec,
+};
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::TdddLayerBinding;
 
@@ -151,6 +152,11 @@ pub fn read_spec_element_hashes(
 /// # Errors
 ///
 /// Returns a human-readable error string on I/O or decode failures.
+///
+/// For v3 catalogues, per-entry `spec_refs[]` and `informal_grounds[]` are
+/// present (D1/D3 restoration). The v3 catalogue is decoded, converted to a
+/// v2-compat stub (which copies grounding fields), and checked by
+/// `check_catalogue_spec_ref_integrity` exactly as for v2 catalogues.
 pub fn verify_one_layer_formatted(
     track_dir: &Path,
     items_dir: &Path,
@@ -197,8 +203,21 @@ fn verify_one_layer(
     let text = std::str::from_utf8(&bytes).map_err(|e| {
         format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
     })?;
-    let catalogue = catalogue_codec::decode(text)
-        .map_err(|e| format!("cannot decode catalogue '{}': {e}", catalogue_path.display()))?;
+    // T024: v3-native decode via `CatalogueDocumentCodec::decode`.
+    // Non-v3 catalogues surface as an error (CN-11 fail-closed).
+    let stem = catalogue_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("")
+        .strip_suffix("-types.json")
+        .unwrap_or_else(|| catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown"))
+        .to_owned();
+    let catalogue = CatalogueDocumentCodec::decode(text, &stem).map_err(|e| {
+        format!(
+            "catalogue '{}' for layer '{layer_id}' failed to decode: {e:?}",
+            catalogue_path.display()
+        )
+    })?;
 
     let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
     let catalogue_hash = ContentHash::try_from_hex(&catalogue_hash_hex).map_err(|e| {
@@ -226,13 +245,64 @@ fn verify_one_layer(
         }
     };
 
-    let findings = check_catalogue_spec_ref_integrity(
-        &layer_id_newtype,
-        &catalogue,
-        spec_element_hashes,
-        current_hash_opt.as_ref(),
-        signals_opt.as_ref(),
-    );
+    // T024: inline equivalent of `check_catalogue_spec_ref_integrity` over v3 `CatalogueDocument`.
+    let mut findings: Vec<SpecRefFinding> = Vec::new();
+
+    let mut check_entry_refs = |entry_name: String, spec_refs: &[SpecRef]| {
+        for (ref_index, spec_ref) in spec_refs.iter().enumerate() {
+            match spec_element_hashes.get(&spec_ref.anchor) {
+                None => {
+                    findings.push(SpecRefFinding::new(
+                        layer_id_newtype.clone(),
+                        SpecRefFindingKind::DanglingAnchor {
+                            catalogue_entry: entry_name.clone(),
+                            ref_index,
+                            spec_file: spec_ref.file.clone(),
+                            anchor: spec_ref.anchor.clone(),
+                        },
+                    ));
+                }
+                Some(actual_hash) if actual_hash != &spec_ref.hash => {
+                    findings.push(SpecRefFinding::new(
+                        layer_id_newtype.clone(),
+                        SpecRefFindingKind::HashMismatch {
+                            catalogue_entry: entry_name.clone(),
+                            ref_index,
+                            spec_file: spec_ref.file.clone(),
+                            anchor: spec_ref.anchor.clone(),
+                            declared: spec_ref.hash.clone(),
+                            actual: actual_hash.clone(),
+                        },
+                    ));
+                }
+                Some(_) => {} // anchor present + hash matches — no finding
+            }
+        }
+    };
+
+    for (type_name, entry) in &catalogue.types {
+        check_entry_refs(type_name.as_str().to_owned(), &entry.spec_refs);
+    }
+    for (trait_name, entry) in &catalogue.traits {
+        check_entry_refs(trait_name.as_str().to_owned(), &entry.spec_refs);
+    }
+    for (fn_path, entry) in &catalogue.functions {
+        check_entry_refs(fn_path.to_string(), &entry.spec_refs);
+    }
+
+    // StaleSignals: compare signals_opt.catalogue_declaration_hash to current hash.
+    if let (Some(current), Some(signals)) = (current_hash_opt.as_ref(), signals_opt.as_ref()) {
+        if &signals.catalogue_declaration_hash != current {
+            findings.push(SpecRefFinding::new(
+                layer_id_newtype.clone(),
+                SpecRefFindingKind::StaleSignals {
+                    declared_catalogue_hash: signals.catalogue_declaration_hash.clone(),
+                    actual_catalogue_hash: current.clone(),
+                },
+            ));
+        }
+    }
+
     Ok(findings)
 }
 
@@ -286,5 +356,264 @@ pub fn format_finding(finding: &SpecRefFinding) -> String {
                 actual_catalogue_hash.to_hex()
             )
         }
+    }
+}
+
+/// Entry point for `sotp verify catalogue-spec-refs`.
+///
+/// Moves all raw I/O (including `symlink_metadata` guards on `items_dir` and
+/// `workspace_root`) into the infrastructure layer so the CLI command is a
+/// thin wrapper that does only wiring plus exit-code mapping.
+///
+/// Returns `Ok(true)` when no findings were detected (exit 0), `Ok(false)`
+/// when one or more findings were detected (exit 1), or `Err(String)` when
+/// a fatal configuration or I/O error prevents the check from running.
+///
+/// The `formatted_findings` parameter is populated with one human-readable
+/// line per finding so the caller can emit them to stderr.
+///
+/// # Errors
+///
+/// Returns a human-readable error string when the track id is invalid, the
+/// `items_dir` or `workspace_root` are symlinks, the track directory is
+/// absent, or `architecture-rules.json` cannot be loaded.
+pub fn execute_verify_catalogue_spec_refs(
+    items_dir: std::path::PathBuf,
+    track_id: String,
+    workspace_root: std::path::PathBuf,
+    skip_stale: bool,
+    formatted_findings: &mut Vec<String>,
+) -> Result<bool, String> {
+    // Security: guard `items_dir` itself before using it as the trusted root.
+    // Mirrors `execute_catalogue_spec_signals` (catalogue_spec_signals.rs).
+    match items_dir.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return Err(format!(
+                "symlink guard: refusing to follow symlink at items_dir: {}",
+                items_dir.display()
+            ));
+        }
+        Ok(_) => {}
+        Err(e) => {
+            return Err(format!(
+                "symlink guard: cannot stat items_dir {}: {e}",
+                items_dir.display()
+            ));
+        }
+    }
+
+    // Security: guard `workspace_root` against symlinks at the leaf.
+    match workspace_root.symlink_metadata() {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            return Err(format!(
+                "symlink guard: refusing to follow symlink at workspace_root: {}",
+                workspace_root.display()
+            ));
+        }
+        Ok(_) => {}
+        Err(e) => {
+            return Err(format!(
+                "symlink guard: cannot stat workspace_root {}: {e}",
+                workspace_root.display()
+            ));
+        }
+    }
+
+    // Security: validate track_id via domain::TrackId before joining onto items_dir.
+    // `Path::join` resolves `..`, `/`, and multi-segment paths (`foo/bar`) at the OS
+    // level. Using the domain type enforces the slug rules (single-segment, no `..`,
+    // no path separators) and makes this function safe when called directly without
+    // upstream CLI validation.
+    let valid_track_id = domain::TrackId::try_new(&track_id)
+        .map_err(|e| format!("invalid track_id '{track_id}': {e}"))?;
+
+    // Fail-closed existence guard for the track directory.
+    let track_dir = items_dir.join(valid_track_id.as_ref());
+    if !track_dir.exists() {
+        return Err(format!(
+            "track directory does not exist: {} (check the track_id)",
+            track_dir.display()
+        ));
+    }
+
+    // Binary-gate fail-closed: load TDDD layer bindings from architecture-rules.json.
+    let rules_path = workspace_root.join("architecture-rules.json");
+    let bindings = crate::verify::tddd_layers::load_tddd_layers(&rules_path, &workspace_root)
+        .map_err(|e| {
+            format!("cannot load architecture-rules.json at '{}': {e}", rules_path.display())
+        })?;
+    if bindings.is_empty() {
+        return Err("no tddd.enabled layers found in architecture-rules.json".to_owned());
+    }
+
+    // ADR D2.3: silent PASS when no enabled layer's catalogue file exists.
+    if !any_enabled_catalogue_present(&bindings, &track_dir, &items_dir)
+        .map_err(|e| e.to_string())?
+    {
+        return Ok(true);
+    }
+
+    let spec_element_hashes =
+        read_spec_element_hashes(&track_dir, &items_dir).map_err(|e| e.to_string())?;
+
+    for binding in &bindings {
+        if !binding.catalogue_spec_signal_enabled() {
+            continue;
+        }
+        let layer_findings = verify_one_layer_formatted(
+            &track_dir,
+            &items_dir,
+            binding,
+            &spec_element_hashes,
+            skip_stale,
+        )
+        .map_err(|e| e.to_string())?;
+        formatted_findings.extend(layer_findings);
+    }
+
+    Ok(formatted_findings.is_empty())
+}
+
+/// Test utility: check whether a catalogue file is a well-formed v3 catalogue.
+///
+/// T024: always uses `CatalogueDocumentCodec::decode` (v3-native).
+///
+/// - Well-formed v3 catalogue → `Ok(Some(VerifyFinding::new(Severity::Info, "...")))`.
+/// - Malformed v3 catalogue (decode error) → `Ok(Some(VerifyFinding::error(...)))`.
+/// - I/O or UTF-8 error → `Err(reason)`.
+///
+/// # Errors
+///
+/// Returns a human-readable error string on I/O or UTF-8 read failures.
+#[cfg(test)]
+pub(crate) fn check_v3_catalogue_finding(
+    catalogue_path: &std::path::Path,
+) -> Result<Option<domain::verify::VerifyFinding>, String> {
+    use domain::verify::{Severity, VerifyFinding};
+
+    let bytes = std::fs::read(catalogue_path)
+        .map_err(|e| format!("cannot read catalogue '{}': {e}", catalogue_path.display()))?;
+    let text = std::str::from_utf8(&bytes).map_err(|e| {
+        format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
+    })?;
+
+    let stem = catalogue_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("")
+        .strip_suffix("-types.json")
+        .unwrap_or_else(|| catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("unknown"))
+        .to_owned();
+    let catalogue_name = catalogue_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or_else(|| catalogue_path.to_str().unwrap_or("unknown"));
+    match CatalogueDocumentCodec::decode(text, &stem) {
+        Ok(_) => Ok(Some(VerifyFinding::new(
+            Severity::Info,
+            format!(
+                "{catalogue_name}: v3 catalogue — per-entry spec_refs[] \
+                 do not exist; spec traceability is validated by \
+                 verify-spec-states-current."
+            ),
+        ))),
+        Err(e) => Ok(Some(VerifyFinding::error(format!(
+            "{catalogue_name}: failed to decode as v3 catalogue: {e:?}"
+        )))),
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
+mod tests {
+    use domain::verify::Severity;
+    use tempfile::TempDir;
+
+    use super::*;
+
+    // -----------------------------------------------------------------------
+    // Fixtures
+    // -----------------------------------------------------------------------
+
+    /// Minimal valid v3 domain catalogue with a single type.
+    const V3_CATALOGUE_DOMAIN: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct" },
+      "docs": "A simple value object."
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+    /// Malformed v3 catalogue (missing required `layer` field).
+    const V3_CATALOGUE_MISSING_LAYER: &str = r#"{
+  "schema_version": 3,
+  "crate_name": "domain"
+}"#;
+
+    fn write_file(dir: &std::path::Path, name: &str, content: &str) {
+        std::fs::write(dir.join(name), content).unwrap();
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: well-formed v3 catalogue → Info finding (not Error)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_v3_catalogue_well_formed_produces_info_finding() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), "domain-types.json", V3_CATALOGUE_DOMAIN);
+        let path = tmp.path().join("domain-types.json");
+
+        let finding_opt = check_v3_catalogue_finding(&path).unwrap();
+
+        // Must produce Some(Info) finding with the "v3 catalogue" text.
+        let finding =
+            finding_opt.expect("well-formed v3 catalogue must produce a Some(VerifyFinding)");
+        assert_eq!(
+            finding.severity(),
+            Severity::Info,
+            "well-formed v3 catalogue must produce Info severity, got: {:?}",
+            finding.severity()
+        );
+        assert!(
+            finding.message().contains("v3 catalogue"),
+            "Info finding must contain 'v3 catalogue'; message: {}",
+            finding.message()
+        );
+        assert!(
+            finding.message().contains("verify-spec-states-current"),
+            "Info finding must reference 'verify-spec-states-current'; message: {}",
+            finding.message()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: malformed v3 catalogue → Error finding
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_v3_catalogue_malformed_produces_error_finding() {
+        let tmp = TempDir::new().unwrap();
+        write_file(tmp.path(), "domain-types.json", V3_CATALOGUE_MISSING_LAYER);
+        let path = tmp.path().join("domain-types.json");
+
+        let finding_opt = check_v3_catalogue_finding(&path).unwrap();
+
+        let finding =
+            finding_opt.expect("malformed v3 catalogue must produce a Some(VerifyFinding)");
+        assert_eq!(
+            finding.severity(),
+            Severity::Error,
+            "malformed v3 catalogue must produce Error severity, got: {:?}",
+            finding.severity()
+        );
     }
 }

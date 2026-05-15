@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "b7fa2fd1c64434f553f669e5fcc34695103b5dbf4ea2dacf1842ba1b7396a1d3",
+  "signals": [
+    {
+      "type_name": "BaselineCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineRustdocCodec",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineRustdocCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CaptureBaselineError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueDocumentCodec",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueDocumentCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueToExtendedCrateCodec",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueToExtendedCrateCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ClusterPlan",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CrossEdge",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EdgeSet",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EvaluateSignalsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsCatalogueDocumentLoader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsCatalogueLoader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsCatalogueSpecSignalsStore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsContractMapWriter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsSpecFileLoader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsSymlinkGuard",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsTdddLayerBindingsAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsTrackStatusReaderAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GitShowTrackBlobReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LoadAllCataloguesError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LoadAllCataloguesNativeError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RustdocBaselineCaptureAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RustdocCrateAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SchemaExportCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SignalEvaluatorV2",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SignalSummary",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SpecElementHashError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeGraphExportError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeGraphRenderOptions",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::code_profile_builder::build_type_graph",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_builder::build_baseline",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::capture_baseline_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_codec::decode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_codec::encode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_codec::decode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_codec::encode",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_cluster::classify_types",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_export::execute_type_graph_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_clustered",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_flat",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_overview",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::write_type_graph_dir",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::write_type_graph_file",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::evaluate_and_write_signals",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::spec_element_hash::compute_spec_element_hashes",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::type_catalogue_render::render_type_catalogue",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::type_catalogue_render::render_type_catalogue_v3",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::consistency_report_to_findings",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_from_path",
+      "signal": "blue"
+    }
+  ]
+}

@@ -1,89 +1,35 @@
-//! `sotp track type-graph` — render a mermaid type graph from rustdoc schema export.
+//! T008: `sotp track type-graph` is deleted.
 //!
-//! Reads the target crate's public API via rustdoc JSON, builds a `TypeGraph`,
-//! and renders a mermaid flowchart to the track directory.
+//! The command depended on `TypeGraph` (now deleted) for its rendering pipeline.
+//! Callers should use `sotp track catalogue-impl-signals` for type signal evaluation.
 //!
-//! When `--cluster-depth N` is 0 (or omitted and the default is 0), writes a
-//! single flat file `<layer>-graph.md`. When N ≥ 1 (default 2), writes a
-//! cluster directory `<layer>-graph-d<depth>/` with `index.md` + per-cluster
-//! files. The depth-suffix on the directory name lets depth=1 and depth=2
-//! outputs coexist in independent paths (per ADR
-//! `knowledge/adr/2026-04-25-0530-type-designer-recon-options-defaults.md` D2).
+//! This stub keeps the CLI compile surface intact while the command is phased out.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use infrastructure::tddd::type_graph_render::EdgeSet;
-use infrastructure::track::fs_store::read_track_status_str;
-
 use crate::CliError;
 
-use super::signals::{ensure_active_track, resolve_layers};
-
-/// Parses the `--edges` CLI flag value into an `EdgeSet`.
+/// Stub — always returns an error explaining the command is removed.
 ///
-/// Accepted values: `"methods"`, `"fields"`, `"impls"`, `"all"` (case-insensitive).
+/// T008: The real implementation is removed with `TypeGraph`.
 ///
 /// # Errors
 ///
-/// Returns `CliError::Message` when the value is not one of the accepted tokens.
-fn parse_edge_set(value: &str) -> Result<EdgeSet, CliError> {
-    match value.to_lowercase().as_str() {
-        "methods" => Ok(EdgeSet::Methods),
-        "fields" => Ok(EdgeSet::Fields),
-        "impls" => Ok(EdgeSet::Impls),
-        "all" => Ok(EdgeSet::All),
-        other => Err(CliError::Message(format!(
-            "unknown --edges value '{other}'; expected one of: methods, fields, impls, all"
-        ))),
-    }
-}
-
-/// Render a mermaid type graph for each TDDD-enabled layer.
-///
-/// When `cluster_depth` is 0 writes `<layer>-graph.md` (flat mode).
-/// When `cluster_depth` ≥ 1 writes `<layer>-graph-d<depth>/` directory layout.
-///
-/// # Errors
-///
-/// Returns `CliError` when the track ID is invalid, rustdoc export fails,
-/// or the write fails.
+/// Always returns `CliError::Message` pointing to the replacement command.
 pub fn execute_type_graph(
-    items_dir: PathBuf,
-    track_id: String,
-    workspace_root: PathBuf,
-    layer: Option<String>,
-    cluster_depth: usize,
-    edges: String,
+    _items_dir: PathBuf,
+    _track_id: String,
+    _workspace_root: PathBuf,
+    _layer: Option<String>,
+    _cluster_depth: usize,
+    _edges: String,
 ) -> Result<ExitCode, CliError> {
-    // Validate track_id and derive status without importing domain types (CN-01 / AC-03).
-    let status_str = read_track_status_str(&items_dir, &track_id).map_err(|e| {
-        CliError::Message(format!("cannot load track status for '{track_id}': {e}"))
-    })?;
-    ensure_active_track(&status_str, &track_id)?;
-
-    let edge_set = parse_edge_set(&edges)?;
-    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
-
-    if bindings.is_empty() {
-        return Err(CliError::Message(
-            "no tddd.enabled layers found in architecture-rules.json; nothing to render".to_owned(),
-        ));
-    }
-
-    for binding in &bindings {
-        infrastructure::tddd::type_graph_export::execute_type_graph_for_layer(
-            &items_dir,
-            &track_id,
-            &workspace_root,
-            binding,
-            cluster_depth,
-            edge_set,
-        )
-        .map_err(|e| CliError::Message(e.0))?;
-    }
-
-    Ok(ExitCode::SUCCESS)
+    Err(CliError::Message(
+        "sotp track type-graph is removed in T008. \
+         Use `sotp track catalogue-impl-signals` instead."
+            .to_owned(),
+    ))
 }
 
 #[cfg(test)]
@@ -91,210 +37,19 @@ pub fn execute_type_graph(
 mod tests {
     use super::*;
 
-    // Default cluster_depth for CLI unit tests: use 0 (flat mode) to avoid
-    // touching architecture-rules.json or nightly rustdoc in unit test context.
-    const TEST_CLUSTER_DEPTH: usize = 0;
-    // Default edges value for CLI unit tests: "methods" (the default).
-    const TEST_EDGES: &str = "methods";
-
     #[test]
-    fn test_execute_type_graph_with_invalid_track_id_returns_error() {
+    fn test_execute_type_graph_stub_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        std::fs::create_dir_all(&items_dir).unwrap();
-
         let result = execute_type_graph(
-            items_dir,
-            "../evil".to_owned(),
-            dir.path().into(),
-            None,
-            TEST_CLUSTER_DEPTH,
-            TEST_EDGES.to_owned(),
-        );
-        assert!(result.is_err(), "path traversal track_id must be rejected");
-    }
-
-    #[test]
-    fn test_execute_type_graph_with_unknown_layer_returns_error() {
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-
-        // v5 format, no status field
-        let metadata = r#"{
-  "schema_version": 5, "id": "test-track", "branch": "track/test-track",
-  "title": "Test",
-  "created_at": "2026-04-16T00:00:00Z", "updated_at": "2026-04-16T00:00:00Z"
-}"#;
-        std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
-        // Provide a minimal impl-plan.json so the activated-track guard passes
-        // and the test reaches the layer-name validation step.
-        let impl_plan = r#"{
-  "schema_version": 1,
-  "tasks": [],
-  "plan": { "summary": [], "sections": [] }
-}"#;
-        std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
-
-        let result = execute_type_graph(
-            items_dir,
+            dir.path().join("track/items"),
             "test-track".to_owned(),
             dir.path().into(),
-            Some("nonexistent".to_owned()),
-            TEST_CLUSTER_DEPTH,
-            TEST_EDGES.to_owned(),
-        );
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(msg.contains("nonexistent"), "error must mention the unknown layer: {msg}");
-    }
-
-    /// Integration test for the cluster_depth dispatch (flat vs directory mode).
-    ///
-    /// Requires nightly toolchain for `cargo +nightly rustdoc`. Run with:
-    /// `cargo test --package cli -- --ignored`
-    ///
-    /// Exercises both dispatch branches of `execute_type_graph_for_layer`:
-    /// 1. `cluster_depth = 2` (default) writes `<layer>-graph-d2/` directory with `index.md` + cluster files
-    /// 2. `cluster_depth = 0` writes flat `<layer>-graph.md` (the `<layer>-graph-d2/` from
-    ///    branch 1 is left intact — depth outputs coexist independently per ADR
-    ///    `knowledge/adr/2026-04-25-0530-...` D2)
-    ///
-    /// Guards against regressions in the dispatch branch and the depth-suffix path.
-    #[test]
-    #[ignore]
-    fn test_execute_type_graph_cluster_depth_dispatch() {
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_id = "test-dispatch";
-        let track_dir = items_dir.join(track_id);
-        std::fs::create_dir_all(&track_dir).unwrap();
-
-        let metadata = format!(
-            r#"{{
-  "schema_version": 3, "id": "{track_id}", "branch": "track/{track_id}",
-  "title": "Test dispatch", "status": "in_progress",
-  "created_at": "2026-04-17T00:00:00Z", "updated_at": "2026-04-17T00:00:00Z",
-  "tasks": [{{"id":"T001","description":"t","status":"in_progress","commit_hash":null}}],
-  "plan": {{"summary":["t"],"sections":[{{"id":"S001","title":"t","description":["t"],"task_ids":["T001"]}}]}}
-}}"#
-        );
-        std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
-
-        // workspace_root must point to the real workspace so rustdoc can find the domain crate.
-        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(|p| p.parent())
-            .expect("workspace root")
-            .to_path_buf();
-
-        // Branch 1: cluster_depth = 2 → directory layout written under depth-suffixed path
-        let result = execute_type_graph(
-            items_dir.clone(),
-            track_id.to_owned(),
-            workspace_root.clone(),
-            Some("domain".to_owned()),
-            2,
-            TEST_EDGES.to_owned(),
-        );
-        assert!(result.is_ok(), "cluster_depth=2 must succeed: {result:?}");
-        let cluster_dir = track_dir.join("domain-graph-d2");
-        assert!(cluster_dir.is_dir(), "cluster_depth=2 must create <layer>-graph-d2/ directory");
-        assert!(cluster_dir.join("index.md").is_file(), "cluster mode must write index.md");
-        assert!(
-            !track_dir.join("domain-graph").exists(),
-            "legacy suffix-less directory must not be created in cluster mode"
-        );
-
-        // Branch 2: cluster_depth = 0 → flat file written; depth=2 dir from branch 1 remains
-        let result = execute_type_graph(
-            items_dir.clone(),
-            track_id.to_owned(),
-            workspace_root,
-            Some("domain".to_owned()),
-            0,
-            TEST_EDGES.to_owned(),
-        );
-        assert!(result.is_ok(), "cluster_depth=0 must succeed: {result:?}");
-        assert!(track_dir.join("domain-graph.md").is_file(), "flat mode must write .md file");
-        assert!(
-            cluster_dir.exists(),
-            "depth=2 cluster dir must remain after flat-mode run (depth outputs coexist)"
-        );
-    }
-
-    #[test]
-    fn test_execute_type_graph_rejects_done_track() {
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-done");
-        std::fs::create_dir_all(&track_dir).unwrap();
-
-        // v5 format, no status field. All tasks done → derive_track_status → Done.
-        let metadata = r#"{
-  "schema_version": 5, "id": "test-done", "branch": "track/test-done",
-  "title": "Done",
-  "created_at": "2026-04-16T00:00:00Z", "updated_at": "2026-04-16T00:00:00Z"
-}"#;
-        std::fs::write(track_dir.join("metadata.json"), metadata).unwrap();
-        let impl_plan = r#"{"schema_version":1,"tasks":[{"id":"T001","description":"t","status":"done","commit_hash":"abc1234"}],"plan":{"summary":[],"sections":[{"id":"S001","title":"t","description":[],"task_ids":["T001"]}]}}"#;
-        std::fs::write(track_dir.join("impl-plan.json"), impl_plan).unwrap();
-
-        let result = execute_type_graph(
-            items_dir,
-            "test-done".to_owned(),
-            dir.path().into(),
             None,
-            TEST_CLUSTER_DEPTH,
-            TEST_EDGES.to_owned(),
+            0,
+            "methods".to_owned(),
         );
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(msg.contains("Completed tracks are frozen"), "must reject done track: {msg}");
-    }
-
-    // --- parse_edge_set ---
-
-    #[test]
-    fn test_parse_edge_set_methods_succeeds() {
-        assert_eq!(parse_edge_set("methods").unwrap(), EdgeSet::Methods);
-    }
-
-    #[test]
-    fn test_parse_edge_set_fields_succeeds() {
-        assert_eq!(parse_edge_set("fields").unwrap(), EdgeSet::Fields);
-    }
-
-    #[test]
-    fn test_parse_edge_set_impls_succeeds() {
-        assert_eq!(parse_edge_set("impls").unwrap(), EdgeSet::Impls);
-    }
-
-    #[test]
-    fn test_parse_edge_set_all_succeeds() {
-        assert_eq!(parse_edge_set("all").unwrap(), EdgeSet::All);
-    }
-
-    #[test]
-    fn test_parse_edge_set_case_insensitive() {
-        assert_eq!(parse_edge_set("METHODS").unwrap(), EdgeSet::Methods);
-        assert_eq!(parse_edge_set("Fields").unwrap(), EdgeSet::Fields);
-        assert_eq!(parse_edge_set("ALL").unwrap(), EdgeSet::All);
-    }
-
-    #[test]
-    fn test_parse_edge_set_unknown_value_returns_error() {
-        let result = parse_edge_set("unknown");
-        assert!(result.is_err(), "unknown value must return error");
+        assert!(result.is_err(), "stub must always return an error");
         let msg = format!("{}", result.unwrap_err());
-        assert!(msg.contains("unknown"), "error must mention the bad value: {msg}");
-        // Regression guard: error must list every accepted option so users know the full set.
-        for expected in ["methods", "fields", "impls", "all"] {
-            assert!(
-                msg.contains(expected),
-                "error must list '{expected}' as a valid option: {msg}"
-            );
-        }
+        assert!(msg.contains("T008"), "error must mention T008: {msg}");
     }
 }

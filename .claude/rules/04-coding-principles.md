@@ -177,6 +177,7 @@ impl UserRepository for PostgresUserRepository {
 
 - 1モジュールに1つの責務
 - 目安: 200–400行（最大700行）
+- 行数の目安・上限は**プロダクションコードのみ**が対象。テストコード（`#[cfg(test)] mod tests` ブロック、`*_tests.rs` 等のテスト専用ファイル、`tests/` 統合テスト）はファイルサイズ判定の対象外（200–400 目安も 700 行上限も適用しない）。関連テストは 1 ファイルにまとめてよい。
 
 ## Documentation
 

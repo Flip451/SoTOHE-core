@@ -18,11 +18,12 @@
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
+use domain::SpecRef;
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use thiserror::Error;
 
 use crate::spec::codec as spec_codec;
-use crate::tddd::catalogue_codec;
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::track::symlink_guard;
 
 /// Errors specific to the `plan-artifact-refs` verifier.
@@ -228,25 +229,39 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
             }
         };
 
-        // The catalogue codec already validates SpecRef newtypes (SpecElementId, ContentHash)
-        // and InformalGroundRef (kind variant + non-empty summary).
-        let catalogue_doc = match catalogue_codec::decode(&catalogue_content) {
+        // T024: v3-native decode via `CatalogueDocumentCodec::decode`.
+        // Non-v3 catalogues surface as an error finding (CN-11 fail-closed).
+        let stem = std::path::Path::new(catalogue_name)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("")
+            .strip_suffix("-types.json")
+            .unwrap_or_else(|| {
+                std::path::Path::new(catalogue_name)
+                    .file_stem()
+                    .and_then(|s| s.to_str())
+                    .unwrap_or("unknown")
+            })
+            .to_owned();
+        let catalogue_doc = match CatalogueDocumentCodec::decode(&catalogue_content, &stem) {
             Ok(d) => d,
             Err(e) => {
-                findings.push(VerifyFinding::error(format!("Cannot parse {catalogue_name}: {e}")));
+                findings
+                    .push(VerifyFinding::error(format!("Cannot parse {catalogue_name}: {e:?}")));
                 continue;
             }
         };
 
-        for entry in catalogue_doc.entries() {
-            for spec_ref in entry.spec_refs() {
+        // Iterate types → traits → functions (BTreeMap order).
+        // Helper: process spec_refs for one entry name + slice.
+        let mut process_entry_refs = |entry_name: &str, spec_refs: &[SpecRef]| {
+            for spec_ref in spec_refs {
                 // Path-traversal guard: resolve the ref path and verify containment.
                 let resolved = match resolve_path(&trusted_root, &spec_ref.file) {
                     None => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': spec_ref has invalid path \
+                            "{catalogue_name} entry '{entry_name}': spec_ref has invalid path \
                              (absolute or path-traversal): {}",
-                            entry.name(),
                             spec_ref.file.display()
                         )));
                         continue;
@@ -258,8 +273,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                 match symlink_guard::reject_symlinks_below(&resolved, &trusted_root) {
                     Ok(false) => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': spec_ref file not found: {}",
-                            entry.name(),
+                            "{catalogue_name} entry '{entry_name}': spec_ref file not found: {}",
                             spec_ref.file.display()
                         )));
                         continue;
@@ -267,8 +281,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                     Ok(true) => {}
                     Err(e) => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': spec_ref symlink guard for '{}': {e}",
-                            entry.name(),
+                            "{catalogue_name} entry '{entry_name}': spec_ref symlink guard for '{}': {e}",
                             spec_ref.file.display()
                         )));
                         continue;
@@ -284,8 +297,7 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                     Ok(m) => m,
                     Err(e) => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': cannot load spec file '{}': {e}",
-                            entry.name(),
+                            "{catalogue_name} entry '{entry_name}': cannot load spec file '{}': {e}",
                             spec_ref.file.display()
                         )));
                         continue;
@@ -297,9 +309,8 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                 match element_map.get(anchor_str) {
                     None => {
                         findings.push(VerifyFinding::error(format!(
-                            "{catalogue_name} entry '{}': unresolved SpecRef anchor '{}' in '{}'",
-                            entry.name(),
-                            anchor_str,
+                            "{catalogue_name} entry '{entry_name}': unresolved SpecRef anchor \
+                             '{anchor_str}' in '{}'",
                             spec_ref.file.display()
                         )));
                     }
@@ -309,10 +320,9 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                         let expected_hash = spec_ref.hash.to_hex();
                         if actual_hash != expected_hash {
                             findings.push(VerifyFinding::error(format!(
-                                "{catalogue_name} entry '{}': SpecRef hash mismatch for anchor '{}' \
-                                 in '{}': expected {expected_hash}, actual {actual_hash}",
-                                entry.name(),
-                                anchor_str,
+                                "{catalogue_name} entry '{entry_name}': SpecRef hash mismatch for \
+                                 anchor '{anchor_str}' in '{}': expected {expected_hash}, actual \
+                                 {actual_hash}",
                                 spec_ref.file.display()
                             )));
                         }
@@ -320,6 +330,16 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
                 }
             }
             // InformalGroundRef: kind+summary already validated by codec
+        };
+
+        for (type_name, entry) in &catalogue_doc.types {
+            process_entry_refs(type_name.as_str(), &entry.spec_refs);
+        }
+        for (trait_name, entry) in &catalogue_doc.traits {
+            process_entry_refs(trait_name.as_str(), &entry.spec_refs);
+        }
+        for (fn_path, entry) in &catalogue_doc.functions {
+            process_entry_refs(&fn_path.to_string(), &entry.spec_refs);
         }
     }
 
@@ -1112,799 +1132,7 @@ fn fence_info_has_example(line: &str) -> bool {
     false
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
-mod tests {
-    use tempfile::TempDir;
-
-    use super::*;
-
-    // -----------------------------------------------------------------------
-    // Fixtures
-    // -----------------------------------------------------------------------
-
-    /// Minimal spec.json (v2) with no ref fields → all refs are empty.
-    const MINIMAL_SPEC: &str = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "Test Track",
-  "scope": {
-    "in_scope": [
-      {"id": "IN-01", "text": "requirement one"}
-    ],
-    "out_of_scope": []
-  }
-}"#;
-
-    /// Writes a file at `dir / relative_path`, creating parent dirs as needed.
-    fn write_file(dir: &Path, relative: &str, content: &str) {
-        let path = dir.join(relative);
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent).unwrap();
-        }
-        std::fs::write(&path, content).unwrap();
-    }
-
-    /// Build a fake repo layout rooted at `tmp`:
-    ///   tmp/.git/               ← git root marker (makes `fallback_trusted_root` return `tmp`)
-    ///   tmp/track/items/<id>/   ← track_dir
-    ///   tmp/knowledge/adr/      ← referenced by adr_refs
-    fn setup_repo(tmp: &Path, track_id: &str) -> PathBuf {
-        // Create a `.git` directory at the repo root so that `fallback_trusted_root`
-        // (called inside `resolve_trusted_root` when the spec path is outside the
-        // current working tree) returns `tmp` as the trusted_root.  This matches the
-        // layout assumed by `resolve_path`, which now uses `trusted_root` directly as
-        // the repo root instead of a hard-coded 3-parent walk.
-        std::fs::create_dir_all(tmp.join(".git")).unwrap();
-        let track_dir = tmp.join("track").join("items").join(track_id);
-        std::fs::create_dir_all(&track_dir).unwrap();
-        track_dir
-    }
-
-    // -----------------------------------------------------------------------
-    // Happy-path: all refs valid
-    // -----------------------------------------------------------------------
-
-    #[test]
-    fn test_no_spec_json_passes() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        // No spec.json at all → pass immediately.
-        let outcome = verify(&track_dir);
-        assert!(outcome.is_ok(), "absent spec.json must pass: {:?}", outcome);
-    }
-
-    #[test]
-    fn test_minimal_spec_with_no_refs_passes() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-        let outcome = verify(&track_dir);
-        assert!(outcome.is_ok(), "spec with no refs must pass: {:?}", outcome);
-    }
-
-    #[test]
-    fn test_spec_with_valid_adr_ref_passes() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-
-        // Create the ADR file that will be referenced.
-        write_file(tmp.path(), "knowledge/adr/2026-04-19-1242.md", "# ADR\n## D2.1 Section\n");
-
-        let spec = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "T",
-  "scope": {
-    "in_scope": [
-      {
-        "id": "IN-01",
-        "text": "req",
-        "adr_refs": [{"file": "knowledge/adr/2026-04-19-1242.md", "anchor": "D2.1"}]
-      }
-    ],
-    "out_of_scope": []
-  }
-}"#;
-        write_file(&track_dir, "spec.json", spec);
-        let outcome = verify(&track_dir);
-        assert!(outcome.is_ok(), "valid adr_ref must pass: {:?}", outcome);
-    }
-
-    #[test]
-    fn test_spec_with_missing_adr_file_reports_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-
-        let spec = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "T",
-  "scope": {
-    "in_scope": [
-      {
-        "id": "IN-01",
-        "text": "req",
-        "adr_refs": [{"file": "knowledge/adr/missing.md", "anchor": "D2.1"}]
-      }
-    ],
-    "out_of_scope": []
-  }
-}"#;
-        write_file(&track_dir, "spec.json", spec);
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "missing ADR file must produce error: {:?}", outcome);
-        assert!(
-            outcome.findings()[0].message().contains("missing.md"),
-            "error must mention the missing file"
-        );
-    }
-
-    #[test]
-    fn test_spec_with_missing_convention_file_reports_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-
-        let spec = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "T",
-  "scope": {
-    "in_scope": [
-      {
-        "id": "IN-01",
-        "text": "req",
-        "convention_refs": [{"file": "knowledge/conventions/missing.md", "anchor": "intro"}]
-      }
-    ],
-    "out_of_scope": []
-  }
-}"#;
-        write_file(&track_dir, "spec.json", spec);
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "missing convention file must produce error");
-    }
-
-    #[test]
-    fn test_spec_with_informal_grounds_only_passes() {
-        // informal_grounds have no file path — no file existence check needed.
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-
-        let spec = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "T",
-  "scope": {
-    "in_scope": [
-      {
-        "id": "IN-01",
-        "text": "req",
-        "informal_grounds": [{"kind": "feedback", "summary": "user directive to defer"}]
-      }
-    ],
-    "out_of_scope": []
-  }
-}"#;
-        write_file(&track_dir, "spec.json", spec);
-        let outcome = verify(&track_dir);
-        assert!(outcome.is_ok(), "informal_grounds only must pass: {:?}", outcome);
-    }
-
-    #[test]
-    fn test_malformed_spec_json_reports_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", "not valid json");
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "malformed spec.json must produce error");
-    }
-
-    // -----------------------------------------------------------------------
-    // SpecRef anchor resolution
-    // -----------------------------------------------------------------------
-
-    #[test]
-    fn test_spec_ref_with_valid_anchor_passes() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-
-        // Write spec.json with one in_scope element.
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // Compute the expected hash for IN-01 element.
-        let spec_value: serde_json::Value = serde_json::from_str(MINIMAL_SPEC).unwrap();
-        let element = &spec_value["scope"]["in_scope"][0];
-        let canonical = canonical_json(element);
-        let hash = canonical_json_sha256(&canonical);
-
-        // Write a domain-types.json with a SpecRef pointing at IN-01.
-        let catalogue = format!(
-            r#"{{
-  "schema_version": 2,
-  "type_definitions": [
-    {{
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {{
-          "file": "track/items/test-track/spec.json",
-          "anchor": "IN-01",
-          "hash": "{hash}"
-        }}
-      ]
-    }}
-  ]
-}}"#
-        );
-        write_file(&track_dir, "domain-types.json", &catalogue);
-
-        let outcome = verify(&track_dir);
-        assert!(outcome.is_ok(), "valid SpecRef must pass: {:?}", outcome);
-    }
-
-    #[test]
-    fn test_spec_ref_with_missing_spec_file_reports_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        let catalogue = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/nonexistent/spec.json",
-          "anchor": "IN-01",
-          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      ]
-    }
-  ]
-}"#;
-        write_file(&track_dir, "domain-types.json", catalogue);
-
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "missing spec file must produce error: {:?}", outcome);
-    }
-
-    #[test]
-    fn test_spec_ref_with_unresolved_anchor_reports_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        let catalogue = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {
-          "file": "track/items/test-track/spec.json",
-          "anchor": "IN-99",
-          "hash": "0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      ]
-    }
-  ]
-}"#;
-        write_file(&track_dir, "domain-types.json", catalogue);
-
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "unresolved anchor must produce error: {:?}", outcome);
-        assert!(
-            outcome.findings()[0].message().contains("IN-99"),
-            "error must mention the missing anchor"
-        );
-    }
-
-    #[test]
-    fn test_spec_ref_with_hash_mismatch_reports_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // Use a deliberately wrong hash.
-        let wrong_hash = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef";
-        let catalogue = format!(
-            r#"{{
-  "schema_version": 2,
-  "type_definitions": [
-    {{
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": [],
-      "spec_refs": [
-        {{
-          "file": "track/items/test-track/spec.json",
-          "anchor": "IN-01",
-          "hash": "{wrong_hash}"
-        }}
-      ]
-    }}
-  ]
-}}"#
-        );
-        write_file(&track_dir, "domain-types.json", &catalogue);
-
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "hash mismatch must produce error: {:?}", outcome);
-        assert!(
-            outcome.findings()[0].message().contains("mismatch"),
-            "error must mention 'mismatch': {}",
-            outcome.findings()[0].message()
-        );
-    }
-
-    #[test]
-    fn test_empty_spec_refs_on_catalogue_entry_passes() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // Catalogue entry with no spec_refs → nothing to validate.
-        let catalogue = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "MyType",
-      "description": "desc",
-      "kind": "value_object",
-      "approved": true,
-      "expected_members": [],
-      "expected_methods": []
-    }
-  ]
-}"#;
-        write_file(&track_dir, "domain-types.json", catalogue);
-
-        let outcome = verify(&track_dir);
-        assert!(outcome.is_ok(), "empty spec_refs must pass: {:?}", outcome);
-    }
-
-    #[test]
-    fn test_malformed_catalogue_json_reports_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-        write_file(&track_dir, "domain-types.json", "not valid json");
-
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "malformed catalogue must produce error: {:?}", outcome);
-    }
-
-    // -----------------------------------------------------------------------
-    // canonical_json helper
-    // -----------------------------------------------------------------------
-
-    #[test]
-    fn test_canonical_json_sorts_object_keys() {
-        let v: serde_json::Value = serde_json::from_str(r#"{"z": 1, "a": 2, "m": 3}"#).unwrap();
-        let canonical = canonical_json(&v);
-        // Keys must appear in alphabetical order: a, m, z
-        let pos_a = canonical.find("\"a\"").unwrap();
-        let pos_m = canonical.find("\"m\"").unwrap();
-        let pos_z = canonical.find("\"z\"").unwrap();
-        assert!(pos_a < pos_m, "a must come before m");
-        assert!(pos_m < pos_z, "m must come before z");
-    }
-
-    #[test]
-    fn test_canonical_json_is_compact() {
-        let v: serde_json::Value = serde_json::from_str(r#"{"key": "value"}"#).unwrap();
-        let canonical = canonical_json(&v);
-        assert!(!canonical.contains('\n'), "canonical form must not contain newlines");
-        assert!(!canonical.contains("  "), "canonical form must not contain extra spaces");
-    }
-
-    #[test]
-    fn test_canonical_json_sha256_is_stable() {
-        // Same input must produce the same hash every time.
-        let json = r#"{"id":"IN-01","text":"requirement one"}"#;
-        let h1 = canonical_json_sha256(json);
-        let h2 = canonical_json_sha256(json);
-        assert_eq!(h1, h2);
-        assert_eq!(h1.len(), 64);
-    }
-
-    #[test]
-    fn test_canonical_json_sha256_differs_for_different_input() {
-        let h1 = canonical_json_sha256(r#"{"id":"IN-01"}"#);
-        let h2 = canonical_json_sha256(r#"{"id":"IN-02"}"#);
-        assert_ne!(h1, h2);
-    }
-
-    // -----------------------------------------------------------------------
-    // Security: symlink guard and path-traversal rejection
-    // -----------------------------------------------------------------------
-
-    /// A ref path containing a `..` component must be rejected even when the
-    /// normalized result would remain inside the repo root.
-    ///
-    /// Rationale: lexical normalization collapses `..` before the symlink guard
-    /// runs. A crafted ref like `dir/symlink/../target.md` normalizes to
-    /// `dir/target.md`, hiding the symlink component from `reject_symlinks_below`.
-    /// Rejecting `..` components in the input prevents this bypass.
-    #[test]
-    fn test_spec_with_adr_ref_containing_parent_dir_reports_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-
-        // Create a real ADR file so the ref would pass if `..` were accepted.
-        write_file(tmp.path(), "knowledge/adr/2026-04-19-1242.md", "# ADR\n");
-
-        let spec = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "T",
-  "scope": {
-    "in_scope": [
-      {
-        "id": "IN-01",
-        "text": "req",
-        "adr_refs": [{"file": "knowledge/../knowledge/adr/2026-04-19-1242.md", "anchor": "D2.1"}]
-      }
-    ],
-    "out_of_scope": []
-  }
-}"#;
-        write_file(&track_dir, "spec.json", spec);
-        let outcome = verify(&track_dir);
-        assert!(!outcome.is_ok(), "ref path with `..` must be rejected as invalid: {:?}", outcome);
-    }
-
-    /// A symlinked spec.json (symlink to a regular file) must be rejected by
-    /// the symlink guard rather than silently passing because `is_file()` returns
-    /// true for symlinks.
-    ///
-    /// A symlink-to-directory would cause `is_file()` to return `false`, which
-    /// (before the fix) triggered an early `pass()` return, skipping all checks.
-    #[cfg(unix)]
-    #[test]
-    fn test_symlinked_spec_json_is_rejected() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-
-        // Write a real spec.json somewhere outside the track dir.
-        let real_spec = tmp.path().join("real_spec.json");
-        std::fs::write(&real_spec, MINIMAL_SPEC).unwrap();
-
-        // Create spec.json as a symlink pointing to the real file.
-        let symlink_path = track_dir.join("spec.json");
-        std::os::unix::fs::symlink(&real_spec, &symlink_path).unwrap();
-
-        let outcome = verify(&track_dir);
-        assert!(!outcome.is_ok(), "symlinked spec.json must be rejected: {:?}", outcome);
-    }
-
-    /// A symlinked spec.json pointing to a directory must also be rejected
-    /// (before the fix, `is_file()` → false would silently return `pass()`).
-    #[cfg(unix)]
-    #[test]
-    fn test_symlinked_spec_json_pointing_to_dir_is_rejected() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-
-        // Create a directory target for the symlink.
-        let dir_target = tmp.path().join("some_dir");
-        std::fs::create_dir_all(&dir_target).unwrap();
-
-        // spec.json → directory: `is_file()` returns false here, but the
-        // symlink guard must still catch it.
-        let symlink_path = track_dir.join("spec.json");
-        std::os::unix::fs::symlink(&dir_target, &symlink_path).unwrap();
-
-        let outcome = verify(&track_dir);
-        assert!(!outcome.is_ok(), "symlink-to-directory spec.json must be rejected: {:?}", outcome);
-    }
-
-    // -----------------------------------------------------------------------
-    // T011: task-coverage enforcement tests
-    // -----------------------------------------------------------------------
-
-    /// When task-coverage.json is absent, emit a warning (not an error).
-    /// The outcome is still ok() because warnings don't fail CI in T011.
-    #[test]
-    fn test_absent_task_coverage_emits_warning_not_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-        // No task-coverage.json
-        let outcome = verify(&track_dir);
-        assert!(outcome.is_ok(), "absent task-coverage.json must not fail CI: {:?}", outcome);
-        let has_warning =
-            outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Warning);
-        assert!(has_warning, "absent task-coverage.json must emit a warning: {:?}", outcome);
-    }
-
-    /// in_scope requirement without a task_ref entry in task-coverage.json → error.
-    #[test]
-    fn test_in_scope_missing_task_ref_reports_coverage_violation() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-        // task-coverage.json with empty in_scope section
-        write_file(
-            &track_dir,
-            "task-coverage.json",
-            r#"{"schema_version": 1, "in_scope": {}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
-        );
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "uncovered in_scope must produce error: {:?}", outcome);
-        let has_coverage_error = outcome
-            .findings()
-            .iter()
-            .any(|f| f.message().contains("coverage violation") && f.message().contains("IN-01"));
-        assert!(has_coverage_error, "error must mention IN-01: {:?}", outcome);
-    }
-
-    /// Stale element id in task-coverage (not in spec.json) → referential integrity error.
-    #[test]
-    fn test_stale_element_id_in_task_coverage_reports_integrity_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-        // task-coverage.json references IN-99 which doesn't exist in spec.json
-        write_file(
-            &track_dir,
-            "task-coverage.json",
-            r#"{"schema_version": 1, "in_scope": {"IN-01": ["T001"], "IN-99": ["T001"]}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
-        );
-        // impl-plan.json with T001
-        write_file(
-            &track_dir,
-            "impl-plan.json",
-            r#"{"schema_version": 1, "tasks": [{"id": "T001", "description": "task", "status": "todo"}], "plan": {"summary": [], "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T001"]}]}}"#,
-        );
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "stale element id must produce error: {:?}", outcome);
-        let has_integrity_error = outcome.findings().iter().any(|f| f.message().contains("IN-99"));
-        assert!(has_integrity_error, "error must mention IN-99: {:?}", outcome);
-    }
-
-    /// Stale TaskId in task-coverage (not in impl-plan.json) → impl-plan integrity error.
-    #[test]
-    fn test_stale_task_id_in_task_coverage_reports_implplan_integrity_error() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-        // task-coverage.json references T999 which doesn't exist in impl-plan.json
-        write_file(
-            &track_dir,
-            "task-coverage.json",
-            r#"{"schema_version": 1, "in_scope": {"IN-01": ["T999"]}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
-        );
-        // impl-plan.json with T001 only (T999 absent)
-        write_file(
-            &track_dir,
-            "impl-plan.json",
-            r#"{"schema_version": 1, "tasks": [{"id": "T001", "description": "task", "status": "todo"}], "plan": {"summary": [], "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T001"]}]}}"#,
-        );
-        let outcome = verify(&track_dir);
-        assert!(outcome.has_errors(), "stale TaskId must produce error: {:?}", outcome);
-        let has_task_error = outcome
-            .findings()
-            .iter()
-            .any(|f| f.message().contains("T999") && f.message().contains("impl-plan.json"));
-        assert!(has_task_error, "error must mention T999 and impl-plan.json: {:?}", outcome);
-    }
-
-    /// task-coverage.json present but impl-plan.json absent → fail-closed error.
-    ///
-    /// The verifier must not silently skip task_ref integrity when impl-plan.json is
-    /// missing. Dangling task references would otherwise pass undetected (e.g. after
-    /// an accidental delete or partial commit).
-    #[test]
-    fn test_task_coverage_present_impl_plan_absent_fails_closed() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-        // task-coverage.json is present with a task ref
-        write_file(
-            &track_dir,
-            "task-coverage.json",
-            r#"{"schema_version": 1, "in_scope": {"IN-01": ["T001"]}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
-        );
-        // impl-plan.json is intentionally absent
-        let outcome = verify(&track_dir);
-        assert!(
-            outcome.has_errors(),
-            "task-coverage present + impl-plan absent must produce error: {:?}",
-            outcome
-        );
-        let has_fail_closed_error = outcome.findings().iter().any(|f| {
-            f.message().contains("impl-plan.json is missing")
-                || f.message().contains("impl-plan.json")
-                    && f.message().contains("task-coverage.json is present")
-        });
-        assert!(
-            has_fail_closed_error,
-            "error must mention both task-coverage.json and impl-plan.json absence: {:?}",
-            outcome
-        );
-    }
-
-    /// Fully covered track (IN-01 → T001 in both coverage and impl-plan) passes.
-    #[test]
-    fn test_fully_covered_track_passes() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-        write_file(
-            &track_dir,
-            "task-coverage.json",
-            r#"{"schema_version": 1, "in_scope": {"IN-01": ["T001"]}, "out_of_scope": {}, "constraints": {}, "acceptance_criteria": {}}"#,
-        );
-        write_file(
-            &track_dir,
-            "impl-plan.json",
-            r#"{"schema_version": 1, "tasks": [{"id": "T001", "description": "task", "status": "todo"}], "plan": {"summary": [], "sections": [{"id": "S1", "title": "S", "description": [], "task_ids": ["T001"]}]}}"#,
-        );
-        let outcome = verify(&track_dir);
-        assert!(outcome.is_ok(), "fully covered track must pass: {:?}", outcome);
-    }
-
-    // -----------------------------------------------------------------------
-    // T011: canonical-block suspicion detection tests
-    // -----------------------------------------------------------------------
-
-    /// A fenced code block with >10 lines and no example marker → warning.
-    #[test]
-    fn test_canonical_block_over_10_lines_emits_warning() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // Create a plan.md with a long fenced code block (12 lines inside).
-        let plan_md = "# Plan\n\n```rust\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\nline12\n```\n";
-        write_file(&track_dir, "plan.md", plan_md);
-
-        let outcome = verify(&track_dir);
-        let has_block_warning = outcome.findings().iter().any(|f| {
-            f.severity() == domain::verify::Severity::Warning
-                && f.message().contains("canonical-block suspicion")
-        });
-        assert!(
-            has_block_warning,
-            "long code block must emit canonical-block warning: {:?}",
-            outcome
-        );
-        // Must NOT be an error (warning only).
-        assert!(outcome.is_ok(), "canonical-block warning must not fail CI: {:?}", outcome);
-    }
-
-    /// A fenced code block with an example marker in the preceding line → no warning.
-    #[test]
-    fn test_canonical_block_with_preceding_example_marker_no_warning() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // plan.md with example marker on the line before the fence
-        let plan_md = "# Plan\n\n<!-- example: long block -->\n```rust\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\nline12\n```\n";
-        write_file(&track_dir, "plan.md", plan_md);
-
-        let outcome = verify(&track_dir);
-        let has_block_warning =
-            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
-        assert!(
-            !has_block_warning,
-            "example-marked block must not emit canonical-block warning: {:?}",
-            outcome
-        );
-    }
-
-    /// A fenced code block with an example marker only inside the body (no preceding-line or
-    /// fence-open marker) → warning IS emitted. Inner-line scanning is intentionally excluded
-    /// to avoid false negatives from block content that happens to contain `example:` text.
-    #[test]
-    fn test_canonical_block_with_inner_only_example_marker_still_warns() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // plan.md with example: marker inside the fence but NOT in preceding line or info string.
-        // Inner markers alone do not suppress the canonical-block warning.
-        let plan_md = "# Plan\n\n```rust\n// example\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\n```\n";
-        write_file(&track_dir, "plan.md", plan_md);
-
-        let outcome = verify(&track_dir);
-        let has_block_warning =
-            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
-        assert!(
-            has_block_warning,
-            "inner-only example marker must not suppress canonical-block warning: {:?}",
-            outcome
-        );
-    }
-
-    /// A fenced code block with an example marker in the opening fence info string → no warning.
-    ///
-    /// Example: "```example" or "```example my-block" — the info string contains "example".
-    #[test]
-    fn test_canonical_block_with_fence_open_example_marker_no_warning() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // plan.md with example marker inline on the opening fence line (info string)
-        let plan_md = "# Plan\n\n```example\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\nline12\n```\n";
-        write_file(&track_dir, "plan.md", plan_md);
-
-        let outcome = verify(&track_dir);
-        let has_block_warning =
-            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
-        assert!(
-            !has_block_warning,
-            "block with fence-open example marker must not emit warning: {:?}",
-            outcome
-        );
-    }
-
-    /// A fenced code block preceded by the canonical ADR Q3 marker
-    /// `<!-- illustrative, non-canonical -->` → no warning.
-    #[test]
-    fn test_canonical_block_with_adr_illustrative_marker_no_warning() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // plan.md with the canonical ADR Q3 marker on the line before the fence.
-        let plan_md = "# Plan\n\n<!-- illustrative, non-canonical -->\n```rust\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\nline11\nline12\n```\n";
-        write_file(&track_dir, "plan.md", plan_md);
-
-        let outcome = verify(&track_dir);
-        let has_block_warning =
-            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
-        assert!(
-            !has_block_warning,
-            "ADR Q3 illustrative marker must suppress canonical-block warning: {:?}",
-            outcome
-        );
-    }
-
-    /// A fenced code block with exactly 10 lines (not >10) → no warning.
-    #[test]
-    fn test_canonical_block_exactly_10_lines_no_warning() {
-        let tmp = TempDir::new().unwrap();
-        let track_dir = setup_repo(tmp.path(), "test-track");
-        write_file(&track_dir, "spec.json", MINIMAL_SPEC);
-
-        // plan.md with exactly 10 lines inside the fence (boundary: not >10)
-        let plan_md = "# Plan\n\n```\nline1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\n```\n";
-        write_file(&track_dir, "plan.md", plan_md);
-
-        let outcome = verify(&track_dir);
-        let has_block_warning =
-            outcome.findings().iter().any(|f| f.message().contains("canonical-block suspicion"));
-        assert!(
-            !has_block_warning,
-            "block with exactly 10 lines must not emit warning: {:?}",
-            outcome
-        );
-    }
-}
+#[path = "plan_artifact_refs_tests.rs"]
+mod tests;

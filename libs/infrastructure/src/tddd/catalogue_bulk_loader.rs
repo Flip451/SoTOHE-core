@@ -12,23 +12,29 @@
 //! All reads are guarded by `reject_symlinks_below` (see
 //! `knowledge/conventions/security.md`): a missing catalogue is reported as
 //! `CatalogueNotFound` rather than being silently skipped.
+//!
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use domain::ValidationError;
 use domain::tddd::LayerId;
-use domain::tddd::catalogue::TypeCatalogueDocument;
+use domain::tddd::catalogue_v2::CatalogueDocument;
 
-use crate::tddd::catalogue_codec::{self, TypeCatalogueCodecError};
+use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::{self, LoadTdddLayersError, TdddLayerBinding};
 
-/// Errors surfaced by [`load_all_catalogues`].
+// ---------------------------------------------------------------------------
+// v3-native errors
+// ---------------------------------------------------------------------------
+
+/// Errors surfaced by [`load_all_catalogues_native`] (v3-native, fail-closed).
+///
+/// All non-v3 catalogues are treated as `Decode` hard errors (CN-11).
 #[derive(Debug, thiserror::Error)]
-pub enum LoadAllCataloguesError {
-    /// `load_tddd_layers_from_path` failed (architecture-rules.json read /
-    /// parse / symlink rejection for the rules file itself).
+pub enum LoadAllCataloguesNativeError {
+    /// Failed to load TDDD layer bindings from `architecture-rules.json`.
     #[error("failed to load tddd layer bindings: {0}")]
     LayerBindings(#[from] LoadTdddLayersError),
 
@@ -44,17 +50,17 @@ pub enum LoadAllCataloguesError {
         source: std::io::Error,
     },
 
-    /// Catalogue file is missing on disk (fail-closed — we do not skip).
+    /// Catalogue file is missing on disk (fail-closed).
     #[error("catalogue file '{}' does not exist for layer '{layer_id}'", .path.display())]
     CatalogueNotFound { layer_id: String, path: PathBuf },
 
-    /// Catalogue file failed to decode.
+    /// Catalogue file failed to decode (CN-11: non-v3 is a hard error).
     #[error("failed to decode catalogue for layer '{layer_id}' at {}: {source}", .path.display())]
     Decode {
         layer_id: String,
         path: PathBuf,
         #[source]
-        source: TypeCatalogueCodecError,
+        source: CatalogueDocumentCodecError,
     },
 
     /// `may_depend_on` forms a cycle among `tddd.enabled` layers.
@@ -70,56 +76,40 @@ pub enum LoadAllCataloguesError {
     },
 }
 
-/// Load every `tddd.enabled` layer's catalogue from `track_dir` and return
-/// them in topological `may_depend_on` order.
+/// Load every `tddd.enabled` layer's catalogue from `track_dir` using the
+/// v3-native `CatalogueDocumentCodec` and return `CatalogueDocument` values.
 ///
-/// The first element of the returned tuple is a `Vec<LayerId>` sorted so
-/// that layers with zero dependencies (inside the enabled set) come first;
-/// the second element maps each layer to its decoded
-/// [`TypeCatalogueDocument`].
+/// **Fail-closed (CN-11)**: any catalogue that is not `schema_version: 3` is
+/// rejected as a hard decode error — there is no v2 fallback. This function
+/// is the sole remaining catalogue loader since T027 removed the v2
+/// `load_all_catalogues`.
 ///
 /// # Arguments
 ///
-/// * `track_dir` — directory that holds each layer's catalogue file, e.g.
-///   `track/items/<id>/`.
-/// * `rules_path` — path to `architecture-rules.json` (typically at the
-///   workspace root). Both `layers[].tddd.enabled` and `layers[].may_depend_on`
-///   are read from this file.
-/// * `trusted_root` — directory below which symlinks are rejected
-///   (fail-closed). Should match the workspace root or the track root
-///   depending on the caller's trust boundary.
+/// * `track_dir` — directory that holds each layer's catalogue file.
+/// * `rules_path` — path to `architecture-rules.json`.
+/// * `trusted_root` — directory below which symlinks are rejected fail-closed.
 ///
 /// # Errors
 ///
-/// Returns [`LoadAllCataloguesError`] if:
-/// * `architecture-rules.json` cannot be read, parsed, or is reached through
-///   a symlink below `trusted_root`.
-/// * Any enabled layer's catalogue file does not exist or is a symlink.
-/// * Any catalogue file fails to decode via [`catalogue_codec::decode`].
-/// * `may_depend_on` forms a cycle among the `tddd.enabled` layers (deps
-///   pointing to disabled or absent layers are silently ignored so that
-///   `tddd.enabled = false` layers do not force ordering decisions).
-/// * A layer crate name fails [`LayerId`] validation.
-pub fn load_all_catalogues(
+/// Returns [`LoadAllCataloguesNativeError`] for any I/O, decode, or topology
+/// failure. Non-v3 catalogues surface as `Decode` (CN-11).
+pub fn load_all_catalogues_native(
     track_dir: &Path,
     rules_path: &Path,
     trusted_root: &Path,
-) -> Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), LoadAllCataloguesError> {
-    let bindings = tddd_layers::load_tddd_layers_from_path(rules_path, trusted_root)?;
+) -> Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), LoadAllCataloguesNativeError> {
+    let bindings = tddd_layers::load_tddd_layers(rules_path, trusted_root)?;
     let deps = parse_may_depend_on(rules_path, trusted_root)?;
 
     let enabled: Vec<&str> = bindings.iter().map(TdddLayerBinding::layer_id).collect();
 
-    // Validate that every `may_depend_on` entry for an enabled layer names a
-    // crate that appears in `architecture-rules.json`. A dep that is present
-    // but `tddd.enabled = false` is acceptable (ordering will ignore it); a
-    // dep that is entirely absent is a typo and should fail closed.
     let all_known: BTreeSet<&str> = deps.keys().map(String::as_str).collect();
     for &layer_id in &enabled {
         let layer_deps = deps.get(layer_id).map_or(&[] as &[String], Vec::as_slice);
         for dep in layer_deps {
             if !all_known.contains(dep.as_str()) {
-                return Err(LoadAllCataloguesError::ArchRulesParse {
+                return Err(LoadAllCataloguesNativeError::ArchRulesParse {
                     path: rules_path.to_path_buf(),
                     reason: format!(
                         "layer '{layer_id}' lists unknown dependency '{dep}' \
@@ -136,15 +126,11 @@ pub fn load_all_catalogues(
         bindings.iter().map(|b| (b.layer_id(), b)).collect();
 
     let mut ordered_ids: Vec<LayerId> = Vec::with_capacity(ordered_names.len());
-    let mut catalogues: BTreeMap<LayerId, TypeCatalogueDocument> = BTreeMap::new();
+    let mut catalogues: BTreeMap<LayerId, CatalogueDocument> = BTreeMap::new();
 
     for name in &ordered_names {
         let Some(binding) = binding_map.get(name.as_str()).copied() else {
-            // Unreachable in normal execution: `ordered_names` is the
-            // topological sort of `enabled`, which is the set of binding
-            // layer ids. Guard with a Result rather than panic to comply
-            // with the "no panic in library code" rule.
-            return Err(LoadAllCataloguesError::ArchRulesParse {
+            return Err(LoadAllCataloguesNativeError::ArchRulesParse {
                 path: rules_path.to_path_buf(),
                 reason: format!(
                     "internal invariant violation: ordered layer '{name}' not found in bindings"
@@ -153,16 +139,20 @@ pub fn load_all_catalogues(
         };
 
         let layer_id = LayerId::try_new(name.clone()).map_err(|source| {
-            LoadAllCataloguesError::InvalidLayerId { value: name.clone(), source }
+            LoadAllCataloguesNativeError::InvalidLayerId { value: name.clone(), source }
         })?;
         let catalogue_path = track_dir.join(binding.catalogue_file());
         match reject_symlinks_below(&catalogue_path, trusted_root) {
             Ok(true) => {
                 let json = std::fs::read_to_string(&catalogue_path).map_err(|source| {
-                    LoadAllCataloguesError::Io { path: catalogue_path.clone(), source }
+                    LoadAllCataloguesNativeError::Io { path: catalogue_path.clone(), source }
                 })?;
-                let doc = catalogue_codec::decode(&json).map_err(|source| {
-                    LoadAllCataloguesError::Decode {
+                let stem = derive_filename_stem(&catalogue_path).unwrap_or_else(|| {
+                    catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_owned()
+                });
+                // CN-11: fail-closed — non-v3 catalogues are a hard error.
+                let doc = CatalogueDocumentCodec::decode(&json, &stem).map_err(|source| {
+                    LoadAllCataloguesNativeError::Decode {
                         layer_id: layer_id.as_ref().to_owned(),
                         path: catalogue_path.clone(),
                         source,
@@ -172,13 +162,13 @@ pub fn load_all_catalogues(
                 ordered_ids.push(layer_id);
             }
             Ok(false) => {
-                return Err(LoadAllCataloguesError::CatalogueNotFound {
+                return Err(LoadAllCataloguesNativeError::CatalogueNotFound {
                     layer_id: layer_id.as_ref().to_owned(),
                     path: catalogue_path,
                 });
             }
             Err(source) => {
-                return Err(LoadAllCataloguesError::Io { path: catalogue_path, source });
+                return Err(LoadAllCataloguesNativeError::Io { path: catalogue_path, source });
             }
         }
     }
@@ -195,30 +185,40 @@ pub fn load_all_catalogues(
 fn parse_may_depend_on(
     rules_path: &Path,
     trusted_root: &Path,
-) -> Result<BTreeMap<String, Vec<String>>, LoadAllCataloguesError> {
+) -> Result<BTreeMap<String, Vec<String>>, LoadAllCataloguesNativeError> {
     match reject_symlinks_below(rules_path, trusted_root) {
         Ok(true) => {} // safe to read
         Ok(false) => {
-            // File is absent — consistent with the legacy fallback in
-            // `load_tddd_layers_from_path` (which synthesises a single
-            // domain binding for pre-multilayer tracks). Return empty deps so
-            // the topological sort treats the lone synthetic layer as having
-            // no dependencies.
-            return Ok(BTreeMap::new());
+            // File is absent — fail-closed: the caller already read this file
+            // via `load_tddd_layers`, so absence here is an unexpected race or
+            // removal.  Report as an I/O error rather than silently treating
+            // the dependency graph as empty.
+            return Err(LoadAllCataloguesNativeError::Io {
+                path: rules_path.to_path_buf(),
+                source: std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    "architecture-rules.json not found during may_depend_on parse",
+                ),
+            });
         }
         Err(source) => {
-            return Err(LoadAllCataloguesError::Io { path: rules_path.to_path_buf(), source });
+            return Err(LoadAllCataloguesNativeError::Io {
+                path: rules_path.to_path_buf(),
+                source,
+            });
         }
     }
-    let content = std::fs::read_to_string(rules_path)
-        .map_err(|source| LoadAllCataloguesError::Io { path: rules_path.to_path_buf(), source })?;
-    let value: serde_json::Value =
-        serde_json::from_str(&content).map_err(|e| LoadAllCataloguesError::ArchRulesParse {
+    let content = std::fs::read_to_string(rules_path).map_err(|source| {
+        LoadAllCataloguesNativeError::Io { path: rules_path.to_path_buf(), source }
+    })?;
+    let value: serde_json::Value = serde_json::from_str(&content).map_err(|e| {
+        LoadAllCataloguesNativeError::ArchRulesParse {
             path: rules_path.to_path_buf(),
             reason: format!("JSON parse error: {e}"),
-        })?;
+        }
+    })?;
     let layers = value.get("layers").and_then(|v| v.as_array()).ok_or_else(|| {
-        LoadAllCataloguesError::ArchRulesParse {
+        LoadAllCataloguesNativeError::ArchRulesParse {
             path: rules_path.to_path_buf(),
             reason: "missing 'layers' array".to_owned(),
         }
@@ -227,44 +227,42 @@ fn parse_may_depend_on(
     let mut result: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for layer in layers {
         let crate_name = layer.get("crate").and_then(|v| v.as_str()).ok_or_else(|| {
-            LoadAllCataloguesError::ArchRulesParse {
+            LoadAllCataloguesNativeError::ArchRulesParse {
                 path: rules_path.to_path_buf(),
                 reason: "layer entry missing 'crate' string".to_owned(),
             }
         })?;
-        // Reject empty crate names — consistent with `is_safe_path_component`
-        // enforced by `parse_tddd_layers`.
         if crate_name.is_empty() {
-            return Err(LoadAllCataloguesError::ArchRulesParse {
+            return Err(LoadAllCataloguesNativeError::ArchRulesParse {
                 path: rules_path.to_path_buf(),
                 reason: "layer entry has empty 'crate' string".to_owned(),
             });
         }
-        // Reject duplicate crate names — consistent with the strict validation
-        // enforced by `parse_tddd_layers` (which also rejects duplicate layer ids).
         if result.contains_key(crate_name) {
-            return Err(LoadAllCataloguesError::ArchRulesParse {
+            return Err(LoadAllCataloguesNativeError::ArchRulesParse {
                 path: rules_path.to_path_buf(),
                 reason: format!("duplicate 'crate' entry '{crate_name}' in layers array"),
             });
         }
         let deps = match layer.get("may_depend_on") {
             Some(arr) => {
-                let arr = arr.as_array().ok_or_else(|| LoadAllCataloguesError::ArchRulesParse {
-                    path: rules_path.to_path_buf(),
-                    reason: format!("'may_depend_on' for '{crate_name}' is not an array"),
-                })?;
+                let arr =
+                    arr.as_array().ok_or_else(|| LoadAllCataloguesNativeError::ArchRulesParse {
+                        path: rules_path.to_path_buf(),
+                        reason: format!("'may_depend_on' for '{crate_name}' is not an array"),
+                    })?;
                 let mut parsed = Vec::with_capacity(arr.len());
                 for entry in arr {
-                    let dep =
-                        entry.as_str().ok_or_else(|| LoadAllCataloguesError::ArchRulesParse {
+                    let dep = entry.as_str().ok_or_else(|| {
+                        LoadAllCataloguesNativeError::ArchRulesParse {
                             path: rules_path.to_path_buf(),
                             reason: format!(
                                 "'may_depend_on' entry for '{crate_name}' is not a string"
                             ),
-                        })?;
+                        }
+                    })?;
                     if dep.is_empty() {
-                        return Err(LoadAllCataloguesError::ArchRulesParse {
+                        return Err(LoadAllCataloguesNativeError::ArchRulesParse {
                             path: rules_path.to_path_buf(),
                             reason: format!(
                                 "'may_depend_on' entry for '{crate_name}' is an empty string"
@@ -292,7 +290,7 @@ fn parse_may_depend_on(
 fn topological_sort(
     enabled_ids: &[&str],
     deps: &BTreeMap<String, Vec<String>>,
-) -> Result<Vec<String>, LoadAllCataloguesError> {
+) -> Result<Vec<String>, LoadAllCataloguesNativeError> {
     let enabled_set: BTreeSet<&str> = enabled_ids.iter().copied().collect();
 
     let mut in_degree: BTreeMap<&str, usize> = enabled_ids.iter().map(|&id| (id, 0)).collect();
@@ -301,18 +299,13 @@ fn topological_sort(
 
     for &id in enabled_ids {
         let id_deps = deps.get(id).map_or(&[] as &[String], Vec::as_slice);
-        // Deduplicate deps for this layer so that a repeated entry in
-        // `may_depend_on` does not inflate `in_degree` and cause a false
-        // cycle detection.
         let mut seen_deps: BTreeSet<&str> = BTreeSet::new();
         for dep in id_deps {
             let dep_str = dep.as_str();
             if !enabled_set.contains(dep_str) {
-                // Known crate but not tddd.enabled — silently ignore for ordering.
                 continue;
             }
             if !seen_deps.insert(dep_str) {
-                // Already counted this dep for `id`; skip to avoid double-counting.
                 continue;
             }
             if let Some(list) = adj.get_mut(dep_str) {
@@ -324,18 +317,10 @@ fn topological_sort(
         }
     }
 
-    // Preserve the input ordering for all ties by scanning `enabled_ids` at
-    // each step and picking the first unprocessed node with in_degree == 0.
-    // A simple FIFO queue is insufficient here: when two nodes become ready
-    // at different processing steps, FIFO emits them in processing order
-    // rather than in their original input order. Scanning from the front of
-    // `enabled_ids` each time guarantees stable input-order tie-breaking
-    // across all scheduling points.
     let mut processed: BTreeSet<&str> = BTreeSet::new();
     let mut result: Vec<String> = Vec::with_capacity(enabled_ids.len());
 
     loop {
-        // Find the first unprocessed node in input order that is ready.
         let next = enabled_ids
             .iter()
             .copied()
@@ -359,9 +344,24 @@ fn topological_sort(
             .iter()
             .filter_map(|(id, &d)| if d > 0 { Some((*id).to_owned()) } else { None })
             .collect();
-        return Err(LoadAllCataloguesError::TopologicalSortFailed { cycle });
+        return Err(LoadAllCataloguesNativeError::TopologicalSortFailed { cycle });
     }
     Ok(result)
+}
+
+/// Derives the crate name from a catalogue file path by stripping the
+/// `-types.json` suffix.
+///
+/// For `domain-types.json`, returns `Some("domain")`.
+/// For files not matching the `<crate>-types.json` pattern, falls back to
+/// `file_stem()` (strips only the last extension).
+/// Returns `None` if the path has no file name or the name is not valid UTF-8.
+pub(crate) fn derive_filename_stem(path: &Path) -> Option<String> {
+    let name = path.file_name().and_then(|n| n.to_str())?;
+    if let Some(crate_name) = name.strip_suffix("-types.json") {
+        return Some(crate_name.to_owned());
+    }
+    path.file_stem().and_then(|s| s.to_str()).map(|s| s.to_owned())
 }
 
 #[cfg(test)]
@@ -411,9 +411,34 @@ mod tests {
       ]
     }"#;
 
-    const EMPTY_CATALOGUE_JSON: &str = r#"{
-      "schema_version": 2,
-      "type_definitions": []
+    /// Minimal valid v3 catalogues (schema_version=3) for each layer, for use
+    /// with `load_all_catalogues_native`.  The codec validates `crate_name` and
+    /// `layer` against the file stem, so each layer needs its own constant.
+    const V3_DOMAIN_JSON: &str = r#"{
+      "schema_version": 3,
+      "crate_name": "domain",
+      "layer": "domain",
+      "types": {},
+      "traits": {},
+      "functions": {}
+    }"#;
+
+    const V3_USECASE_JSON: &str = r#"{
+      "schema_version": 3,
+      "crate_name": "usecase",
+      "layer": "usecase",
+      "types": {},
+      "traits": {},
+      "functions": {}
+    }"#;
+
+    const V3_INFRASTRUCTURE_JSON: &str = r#"{
+      "schema_version": 3,
+      "crate_name": "infrastructure",
+      "layer": "infrastructure",
+      "types": {},
+      "traits": {},
+      "functions": {}
     }"#;
 
     fn write(path: &Path, content: &str) {
@@ -423,19 +448,60 @@ mod tests {
         std::fs::write(path, content).unwrap();
     }
 
+    // -----------------------------------------------------------------------
+    // load_all_catalogues_native tests
+    // -----------------------------------------------------------------------
+
+    /// CN-11 regression: a v2-format catalogue must be a hard error, not a
+    /// silent skip or fallback.  `load_all_catalogues_native` must return
+    /// `LoadAllCataloguesNativeError::Decode` for any non-v3 catalogue.
     #[test]
-    fn test_load_all_catalogues_happy_path_sorts_topologically() {
+    fn test_load_all_catalogues_native_rejects_v2_catalogue_fail_closed() {
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let rules = root.join("architecture-rules.json");
         write(&rules, RULES_REVERSED_ORDER);
 
         let track_dir = root.join("track-item");
-        write(&track_dir.join("domain-types.json"), EMPTY_CATALOGUE_JSON);
-        write(&track_dir.join("usecase-types.json"), EMPTY_CATALOGUE_JSON);
-        write(&track_dir.join("infrastructure-types.json"), EMPTY_CATALOGUE_JSON);
+        // domain and usecase are v3; infrastructure is v2 — must be rejected.
+        write(&track_dir.join("domain-types.json"), V3_DOMAIN_JSON);
+        write(&track_dir.join("usecase-types.json"), V3_USECASE_JSON);
+        // v2 catalogue (schema_version=2) must be a hard decode error (CN-11).
+        write(
+            &track_dir.join("infrastructure-types.json"),
+            r#"{"schema_version": 2, "type_definitions": []}"#,
+        );
 
-        let (order, catalogues) = load_all_catalogues(&track_dir, &rules, root).unwrap();
+        let err = load_all_catalogues_native(&track_dir, &rules, root).unwrap_err();
+        match err {
+            LoadAllCataloguesNativeError::Decode { layer_id, path, .. } => {
+                assert_eq!(layer_id, "infrastructure", "v2 catalogue must be rejected at decode");
+                assert!(
+                    path.ends_with("infrastructure-types.json"),
+                    "error path must point to the v2 file"
+                );
+            }
+            other => panic!(
+                "expected LoadAllCataloguesNativeError::Decode for v2 catalogue, got {other:?}"
+            ),
+        }
+    }
+
+    /// Happy path: `load_all_catalogues_native` accepts all-v3 catalogues and
+    /// returns them in topological order.
+    #[test]
+    fn test_load_all_catalogues_native_happy_path_sorts_topologically() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let rules = root.join("architecture-rules.json");
+        write(&rules, RULES_REVERSED_ORDER);
+
+        let track_dir = root.join("track-item");
+        write(&track_dir.join("domain-types.json"), V3_DOMAIN_JSON);
+        write(&track_dir.join("usecase-types.json"), V3_USECASE_JSON);
+        write(&track_dir.join("infrastructure-types.json"), V3_INFRASTRUCTURE_JSON);
+
+        let (order, catalogues) = load_all_catalogues_native(&track_dir, &rules, root).unwrap();
 
         let order_names: Vec<&str> = order.iter().map(LayerId::as_ref).collect();
         assert_eq!(
@@ -444,14 +510,10 @@ mod tests {
             "topological order must place dependency-less layers first"
         );
         assert_eq!(catalogues.len(), 3);
-        for layer in &order {
-            let doc = catalogues.get(layer).unwrap();
-            assert_eq!(doc.entries().len(), 0);
-        }
     }
 
     #[test]
-    fn test_load_all_catalogues_missing_catalogue_returns_error_not_skip() {
+    fn test_load_all_catalogues_native_missing_catalogue_returns_error_not_skip() {
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let rules = root.join("architecture-rules.json");
@@ -459,12 +521,12 @@ mod tests {
 
         let track_dir = root.join("track-item");
         // Write only 2 of 3 catalogues — `infrastructure-types.json` missing.
-        write(&track_dir.join("domain-types.json"), EMPTY_CATALOGUE_JSON);
-        write(&track_dir.join("usecase-types.json"), EMPTY_CATALOGUE_JSON);
+        write(&track_dir.join("domain-types.json"), V3_DOMAIN_JSON);
+        write(&track_dir.join("usecase-types.json"), V3_USECASE_JSON);
 
-        let err = load_all_catalogues(&track_dir, &rules, root).unwrap_err();
+        let err = load_all_catalogues_native(&track_dir, &rules, root).unwrap_err();
         match err {
-            LoadAllCataloguesError::CatalogueNotFound { layer_id, path } => {
+            LoadAllCataloguesNativeError::CatalogueNotFound { layer_id, path } => {
                 assert_eq!(layer_id, "infrastructure");
                 assert!(path.ends_with("infrastructure-types.json"));
             }
@@ -474,7 +536,7 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_load_all_catalogues_rejects_symlink_catalogue() {
+    fn test_load_all_catalogues_native_rejects_symlink_catalogue() {
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let rules = root.join("architecture-rules.json");
@@ -482,18 +544,18 @@ mod tests {
 
         let track_dir = root.join("track-item");
         std::fs::create_dir_all(&track_dir).unwrap();
-        write(&track_dir.join("domain-types.json"), EMPTY_CATALOGUE_JSON);
-        write(&track_dir.join("usecase-types.json"), EMPTY_CATALOGUE_JSON);
+        write(&track_dir.join("domain-types.json"), V3_DOMAIN_JSON);
+        write(&track_dir.join("usecase-types.json"), V3_USECASE_JSON);
 
         // infrastructure-types.json is a symlink pointing to a real file elsewhere.
         let real_target = root.join("elsewhere.json");
-        write(&real_target, EMPTY_CATALOGUE_JSON);
+        write(&real_target, V3_INFRASTRUCTURE_JSON);
         let symlink = track_dir.join("infrastructure-types.json");
         std::os::unix::fs::symlink(&real_target, &symlink).unwrap();
 
-        let err = load_all_catalogues(&track_dir, &rules, root).unwrap_err();
+        let err = load_all_catalogues_native(&track_dir, &rules, root).unwrap_err();
         assert!(
-            matches!(err, LoadAllCataloguesError::Io { .. }),
+            matches!(err, LoadAllCataloguesNativeError::Io { .. }),
             "symlink catalogue must be rejected via Io error, got {err:?}"
         );
     }
@@ -506,7 +568,7 @@ mod tests {
 
         let err = topological_sort(&["a", "b"], &deps).unwrap_err();
         match err {
-            LoadAllCataloguesError::TopologicalSortFailed { cycle } => {
+            LoadAllCataloguesNativeError::TopologicalSortFailed { cycle } => {
                 let mut sorted = cycle.clone();
                 sorted.sort();
                 assert_eq!(sorted, vec!["a".to_owned(), "b".to_owned()]);
@@ -532,14 +594,5 @@ mod tests {
         let deps: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let ordered = topological_sort(&["b", "a"], &deps).unwrap();
         assert_eq!(ordered, vec!["b".to_owned(), "a".to_owned()]);
-    }
-
-    #[test]
-    fn test_extract_type_names_is_reusable_from_this_module() {
-        // Visibility test: the pub(crate) promotion of extract_type_names
-        // allows `catalogue_bulk_loader` tests to import and call it.
-        use crate::tddd::type_graph_render::extract_type_names;
-        let names = extract_type_names("Result<Option<User>, DomainError>");
-        assert_eq!(names, vec!["Result", "Option", "User", "DomainError"]);
     }
 }

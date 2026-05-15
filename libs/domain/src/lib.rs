@@ -18,6 +18,8 @@ pub mod schema;
 mod signal;
 pub mod skill_compliance;
 pub mod spec;
+pub mod spec_file_loader_port;
+pub mod symlink_guard_port;
 pub mod task_coverage;
 pub mod tddd;
 mod timestamp;
@@ -46,7 +48,7 @@ pub use plan_ref::{
 };
 pub use repository::{ImplPlanReader, ImplPlanWriter, TrackReader, TrackWriter, WorktreeReader};
 pub use review_v2::RoundType;
-pub use schema::{FunctionNode, TraitImplEntry, TraitNode, TypeGraph, TypeNode};
+// T008: TypeGraph, TypeNode, TraitNode, TraitImplEntry, FunctionNode removed.
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
 };
@@ -55,15 +57,11 @@ pub use spec::{
     SpecRequirement, SpecScope, SpecSection, SpecValidationError, check_spec_doc_signals,
     evaluate_requirement_signal,
 };
+pub use spec_file_loader_port::{SpecFileLoadError, SpecFileLoaderPort};
+pub use symlink_guard_port::{SymlinkGuardError, SymlinkGuardPort};
 pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
-pub use tddd::baseline::{
-    FunctionBaselineEntry, TraitBaselineEntry, TraitImplBaselineEntry, TypeBaseline,
-    TypeBaselineEntry,
-};
 pub use tddd::catalogue::{
-    EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeAction,
-    TypeCatalogueDocument, TypeCatalogueEntry, TypeDefinitionKind, TypeSignal,
-    TypestateTransitions,
+    EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeSignal,
 };
 pub use tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,
@@ -71,16 +69,9 @@ pub use tddd::catalogue_linter::{
 };
 pub use tddd::catalogue_spec_signal::{
     CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION, CatalogueSpecSignal, CatalogueSpecSignalsDocument,
-    SpecRefFinding, SpecRefFindingKind, check_catalogue_spec_ref_integrity,
-    check_catalogue_spec_signals, evaluate_catalogue_entry_signal,
+    SpecRefFinding, SpecRefFindingKind, evaluate_catalogue_entry_signal,
 };
-pub use tddd::consistency::{
-    ActionContradiction, ActionContradictionKind, ConsistencyReport, check_consistency,
-    check_type_signals,
-};
-pub use tddd::signals::{
-    evaluate_type_signals, undeclared_functions_to_signals, undeclared_to_signals,
-};
+pub use tddd::consistency::check_type_signals;
 pub use tddd::type_signals_doc::{
     TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsDocument, TypeSignalsLoadResult,
 };

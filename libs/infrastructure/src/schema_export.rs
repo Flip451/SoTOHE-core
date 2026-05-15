@@ -19,6 +19,7 @@ use domain::schema::{
     TypeKind,
 };
 use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
+use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
 use rustdoc_types::{GenericArg, GenericArgs, ItemEnum, Type, Variant, VariantKind, Visibility};
 
 /// Adapter implementing `SchemaExporter` via rustdoc JSON.
@@ -30,6 +31,30 @@ impl RustdocSchemaExporter {
     /// Creates a new exporter for the given workspace root.
     pub fn new(workspace_root: PathBuf) -> Self {
         Self { workspace_root }
+    }
+
+    /// Runs `cargo +nightly rustdoc --output-format json` for `crate_name` and
+    /// returns the path to the generated JSON file.
+    ///
+    /// The file is written inside the workspace's `target/doc/` directory.
+    /// The caller is responsible for reading or copying the file before the
+    /// next rustdoc run overwrites it.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SchemaExportError::NightlyNotFound`] if the nightly toolchain
+    /// is not installed.
+    ///
+    /// Returns [`SchemaExportError::RustdocFailed`] if `cargo rustdoc` fails.
+    ///
+    /// Returns [`SchemaExportError::CrateNotFound`] if the crate is not in the
+    /// workspace.
+    pub fn export_rustdoc_json_path(
+        &self,
+        crate_name: &str,
+    ) -> Result<std::path::PathBuf, SchemaExportError> {
+        check_nightly_available()?;
+        run_rustdoc(&self.workspace_root, crate_name)
     }
 }
 
@@ -190,7 +215,7 @@ fn build_schema_export(
                 }
                 None => (None, None),
             };
-            let methods = extract_methods(&i.items, krate);
+            let methods = extract_methods(&i.items, krate)?;
             if !methods.is_empty() || trait_name.is_some() {
                 impls.push(ImplInfo::with_trait_def_path(
                     target,
@@ -264,7 +289,7 @@ fn build_schema_export(
             }
             ItemEnum::Function(f) if !method_ids.contains(&item.id) => {
                 let return_type_names = extract_return_type_names(&f.sig);
-                let params = extract_params(&f.sig);
+                let params = extract_params(&f.sig)?;
                 let returns = format_return(&f.sig);
                 // Free functions: populate module_path from rustdoc paths table.
                 let fn_module_path = extract_module_path(&item.id, krate);
@@ -281,7 +306,7 @@ fn build_schema_export(
                 ));
             }
             ItemEnum::Trait(t) => {
-                let methods = extract_methods(&t.items, krate);
+                let methods = extract_methods(&t.items, krate)?;
                 traits.push(TraitInfo::new(name, item.docs.clone(), methods));
             }
             _ => {}
@@ -565,12 +590,31 @@ fn has_self_param(sig: &rustdoc_types::FunctionSignature) -> bool {
 
 /// Extract the ordered parameter list from a function signature, excluding
 /// the self receiver if present.
-fn extract_params(sig: &rustdoc_types::FunctionSignature) -> Vec<ParamDeclaration> {
-    sig.inputs
-        .iter()
-        .filter(|(name, _)| name != "self")
-        .map(|(name, ty)| ParamDeclaration::new(name.clone(), format_type(ty)))
-        .collect()
+///
+/// # Errors
+/// Returns `SchemaExportError::ParseFailed` when a parameter name or type cannot be
+/// converted to the V2 newtype (e.g. empty name or type string).
+fn extract_params(
+    sig: &rustdoc_types::FunctionSignature,
+) -> Result<Vec<ParamDeclaration>, SchemaExportError> {
+    let mut out = Vec::new();
+    for (name, ty) in sig.inputs.iter().filter(|(n, _)| n != "self") {
+        let param_name = ParamName::new(name.as_str()).map_err(|e| {
+            SchemaExportError::ParseFailed(format!(
+                "param name '{}' is not a valid identifier: {e}",
+                name
+            ))
+        })?;
+        let ty_str = format_type(ty);
+        let ty_ref = TypeRef::new(&ty_str).map_err(|e| {
+            SchemaExportError::ParseFailed(format!(
+                "param '{}' type '{}' is not valid: {e}",
+                name, ty_str
+            ))
+        })?;
+        out.push(ParamDeclaration::new(param_name, ty_ref));
+    }
+    Ok(out)
 }
 
 /// Format the return type. `Option<Type>::None` is rendered as `"()"`.
@@ -580,33 +624,45 @@ fn format_return(sig: &rustdoc_types::FunctionSignature) -> String {
 
 /// Extract method `FunctionInfo`s from a list of item Ids.
 /// Accepts both `Public` and `Default` visibility (trait associated items use `Default`).
-fn extract_methods(ids: &[rustdoc_types::Id], krate: &rustdoc_types::Crate) -> Vec<FunctionInfo> {
-    ids.iter()
-        .filter_map(|id| krate.index.get(id))
-        .filter(|item| matches!(item.visibility, Visibility::Public | Visibility::Default))
-        .filter_map(|item| {
-            let name = item.name.as_ref()?;
-            if let ItemEnum::Function(f) = &item.inner {
-                let return_type_names = extract_return_type_names(&f.sig);
-                let has_self = has_self_param(&f.sig);
-                let receiver = extract_receiver(&f.sig);
-                let params = extract_params(&f.sig);
-                let returns = format_return(&f.sig);
-                Some(FunctionInfo::new(
-                    name.clone(),
-                    item.docs.clone(),
-                    return_type_names,
-                    has_self,
-                    params,
-                    returns,
-                    receiver,
-                    f.header.is_async,
-                ))
-            } else {
-                None
-            }
-        })
-        .collect()
+///
+/// # Errors
+/// Returns `SchemaExportError::ParseFailed` when `extract_params` fails for any method.
+fn extract_methods(
+    ids: &[rustdoc_types::Id],
+    krate: &rustdoc_types::Crate,
+) -> Result<Vec<FunctionInfo>, SchemaExportError> {
+    let mut out = Vec::new();
+    for id in ids {
+        let item = match krate.index.get(id) {
+            Some(i) => i,
+            None => continue,
+        };
+        if !matches!(item.visibility, Visibility::Public | Visibility::Default) {
+            continue;
+        }
+        let name = match &item.name {
+            Some(n) => n,
+            None => continue,
+        };
+        if let ItemEnum::Function(f) = &item.inner {
+            let return_type_names = extract_return_type_names(&f.sig);
+            let has_self = has_self_param(&f.sig);
+            let receiver = extract_receiver(&f.sig);
+            let params = extract_params(&f.sig)?;
+            let returns = format_return(&f.sig);
+            out.push(FunctionInfo::new(
+                name.clone(),
+                item.docs.clone(),
+                return_type_names,
+                has_self,
+                params,
+                returns,
+                receiver,
+                f.header.is_async,
+            ));
+        }
+    }
+    Ok(out)
 }
 
 /// Extract the list of type names from the return type of a function signature.
@@ -943,12 +999,12 @@ mod tests {
             output: None,
             is_c_variadic: false,
         };
-        let params = extract_params(&sig);
+        let params = extract_params(&sig).unwrap();
         assert_eq!(params.len(), 2);
-        assert_eq!(params[0].name(), "id");
-        assert_eq!(params[0].ty(), "UserId");
-        assert_eq!(params[1].name(), "name");
-        assert_eq!(params[1].ty(), "String");
+        assert_eq!(params[0].name.as_str(), "id");
+        assert_eq!(params[0].ty.as_str(), "UserId");
+        assert_eq!(params[1].name.as_str(), "name");
+        assert_eq!(params[1].ty.as_str(), "String");
     }
 
     // --- T006 (S4): build_trait_origins / resolve_trait_origin unit tests ---

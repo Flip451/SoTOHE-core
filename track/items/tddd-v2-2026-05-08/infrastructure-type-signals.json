@@ -1,0 +1,520 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-15T01:52:24Z",
+  "declaration_hash": "b7fa2fd1c64434f553f669e5fcc34695103b5dbf4ea2dacf1842ba1b7396a1d3",
+  "signals": [
+    {
+      "type_name": "BaselineRustdocCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "BaselineRustdocCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CatalogueDocumentCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CatalogueDocumentCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CatalogueToExtendedCrateCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueToExtendedCratePort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CatalogueToExtendedCrateCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "FsCatalogueDocumentLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueDocumentLoaderPort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsCatalogueLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLoader"
+      ]
+    },
+    {
+      "type_name": "FsSpecFileLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SpecFileLoaderPort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsSymlinkGuard",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SymlinkGuardPort",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsTdddLayerBindingsAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TdddLayerBindingsPort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsTrackStatusReaderAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TrackStatusReaderPort",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "GitShowTrackBlobReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SpecElementHashReader",
+        "TrackBlobReader"
+      ]
+    },
+    {
+      "type_name": "InMemoryCatalogueLinter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueLinter",
+        "core::default::Default"
+      ]
+    },
+    {
+      "type_name": "LoadAllCataloguesNativeError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RustdocBaselineCaptureAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RustdocBaselineCapturePort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RustdocCrateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RustdocCratePort"
+      ]
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SchemaExporter",
+        "SchemaExporterPort"
+      ]
+    },
+    {
+      "type_name": "SignalEvaluatorV2",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SignalEvaluatorPort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "SpecElementHashError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TypeSignalsExecutorPort",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::capture_rustdoc_baseline_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues_native",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::track::spec_element_hash::compute_spec_element_hashes",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::type_catalogue_render::render_type_catalogue_v3",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::spec_states::verify_from_spec_json",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "BaselineCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ClusterPlan",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "CrossEdge",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "EdgeSet",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "LoadAllCataloguesError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "SignalSummary",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeCatalogueCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeGraphExportError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeGraphRenderOptions",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::code_profile_builder::build_type_graph",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_builder::build_baseline",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::capture_baseline_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_codec::decode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_codec::encode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_bulk_loader::load_all_catalogues",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_codec::decode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::catalogue_codec::encode",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_cluster::classify_types",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_export::execute_type_graph_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_clustered",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_flat",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::render_type_graph_overview",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::write_type_graph_dir",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_graph_render::write_type_graph_file",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::evaluate_and_write_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::validate_action_diagnostics",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::validate_and_write_catalogue",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::type_catalogue_render::render_type_catalogue",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::consistency_report_to_findings",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::evaluate_consistency_from_components",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::tddd_layers::load_tddd_layers_from_path",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "CaptureBaselineError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "EvaluateSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsCatalogueSpecSignalsStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsContractMapWriter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SchemaExportCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -61,8 +61,6 @@ pub enum VerifyCommand {
     SpecSignals(SpecVerifyArgs),
     /// Check spec.md contains a ## Domain States section with table data rows.
     SpecStates(SpecStatesArgs),
-    /// Check bidirectional spec ↔ code consistency (domain-types.json vs rustdoc TypeGraph).
-    SpecCodeConsistency(SpecCodeConsistencyArgs),
     /// Validate structured-ref fields (adr_refs, convention_refs, spec_refs, informal_grounds)
     /// per ADR 2026-04-19-1242 §D2.3.
     PlanArtifactRefs(PlanArtifactRefsArgs),
@@ -131,20 +129,6 @@ pub struct PlanArtifactRefsArgs {
     /// When omitted, the active track is resolved from the current branch name.
     #[arg(long)]
     track_dir: Option<PathBuf>,
-}
-
-/// Arguments for spec-code-consistency verify subcommand.
-#[derive(Args)]
-pub struct SpecCodeConsistencyArgs {
-    /// Track ID (e.g., `spec-code-consistency-2026-04-08`).
-    #[arg(long)]
-    track_id: String,
-    /// Crate name to export schema from (e.g., `domain`).
-    #[arg(long = "crate", default_value = "domain")]
-    crate_name: String,
-    /// Project root directory.
-    #[arg(long, default_value = ".")]
-    project_root: PathBuf,
 }
 
 /// Common arguments for all verify subcommands.
@@ -232,9 +216,6 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
                 };
             ("verify spec states", outcome)
         }
-        VerifyCommand::SpecCodeConsistency(args) => {
-            ("verify spec-code consistency", execute_spec_code_consistency(args))
-        }
         VerifyCommand::PlanArtifactRefs(args) => {
             ("verify plan artifact refs", execute_plan_artifact_refs(args))
         }
@@ -266,27 +247,7 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
     print_outcome(label, &outcome)
 }
 
-/// Execute bidirectional spec ↔ code consistency check.
-fn execute_spec_code_consistency(args: SpecCodeConsistencyArgs) -> VerifyOutcome {
-    infrastructure::verify::spec_code_consistency::execute_spec_code_consistency_str(
-        &args.track_id,
-        &args.crate_name,
-        &args.project_root,
-    )
-}
-
-// Thin delegation aliases and type re-exports so that CLI test code can call these
-// helpers and construct domain types via `super::*` without importing `domain::` directly
-// (AC-03 compliance in test code).
-#[cfg(test)]
-use infrastructure::verify::spec_code_consistency::{
-    consistency_report_to_findings, evaluate_consistency_from_components,
-};
-#[cfg(test)]
-use infrastructure::verify::{
-    Severity, Timestamp, TypeAction, TypeBaseline, TypeBaselineEntry, TypeCatalogueDocument,
-    TypeCatalogueEntry, TypeDefinitionKind, TypeGraph, TypeKind, check_consistency,
-};
+// T008: type re-exports for consistency_report_to_findings / check_consistency / TypeGraph removed.
 
 /// Execute plan-artifact-refs verification.
 ///
@@ -753,8 +714,8 @@ mod tests {
     /// Writes `<dir>/<signal_name>` with a matching `declaration_hash` so the
     /// ADR 2026-04-18-1400 §D5 signal-file evaluation path accepts it.
     /// `signals` is copied verbatim from the declaration file's legacy
-    /// inline `signals` array (raw JSON). This bypasses `catalogue_codec`,
-    /// which drops inline signals during decode.
+    /// inline `signals` array (raw JSON), bypassing the catalogue decode path
+    /// that ignores that field.
     fn write_matching_signal_file(dir: &std::path::Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
@@ -821,245 +782,8 @@ mod tests {
         assert_eq!(exit, ExitCode::FAILURE, "yellow signal must fail in strict (merge-gate) mode");
     }
 
-    // --- consistency_report_to_findings tests ---
-
-    fn make_entry_for_test(name: &str, action: TypeAction) -> TypeCatalogueEntry {
-        TypeCatalogueEntry::new(
-            name,
-            "desc",
-            TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: Vec::new(),
-            },
-            action,
-            true,
-        )
-        .unwrap()
-    }
-
-    fn empty_graph_for_test() -> TypeGraph {
-        TypeGraph::new(std::collections::HashMap::new(), std::collections::HashMap::new())
-    }
-
-    fn empty_baseline_for_test() -> TypeBaseline {
-        TypeBaseline::new(
-            1,
-            Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
-            std::collections::HashMap::new(),
-            std::collections::HashMap::new(),
-        )
-    }
-
-    #[test]
-    fn test_consistency_report_to_findings_with_delete_not_in_baseline_produces_single_error() {
-        // action=delete for a type not in baseline → delete_errors fires.
-        // The domain layer also patches the forward signal to Red.
-        // consistency_report_to_findings must emit exactly ONE finding (the specific
-        // delete diagnostic) and suppress the duplicate generic Red finding.
-        let entry = make_entry_for_test("Ghost", TypeAction::Delete);
-        let report = check_consistency(
-            &[entry],
-            &empty_graph_for_test(),
-            &empty_baseline_for_test(),
-            &std::collections::HashSet::new(),
-        );
-
-        assert!(!report.delete_errors().is_empty(), "delete_errors must be non-empty");
-
-        let findings = consistency_report_to_findings(&report);
-        // Exactly one finding: the specific delete_errors message (no duplicate generic Red).
-        assert_eq!(findings.len(), 1, "expected exactly 1 finding, got: {findings:?}");
-        let msg = findings[0].message();
-        assert!(
-            msg.contains("action=delete") && msg.contains("Ghost"),
-            "finding must be the specific delete diagnostic, got: {msg}"
-        );
-        assert_eq!(
-            findings[0].severity(),
-            Severity::Error,
-            "delete error must be reported as error severity"
-        );
-    }
-
-    #[test]
-    fn test_consistency_report_to_findings_with_empty_report_produces_no_findings() {
-        // No entries at all — empty report must produce no findings.
-        let report = check_consistency(
-            &[],
-            &empty_graph_for_test(),
-            &empty_baseline_for_test(),
-            &std::collections::HashSet::new(),
-        );
-        let findings = consistency_report_to_findings(&report);
-        assert!(findings.is_empty(), "clean report must produce no findings: {findings:?}");
-    }
-
-    #[test]
-    fn test_consistency_report_to_findings_with_add_in_baseline_produces_warning() {
-        // action=add (default) when type is already in baseline → contradiction warning, not error.
-        // This tests that contradiction findings are emitted as warnings (advisory).
-        use std::collections::HashMap;
-        let entry = make_entry_for_test("Existing", TypeAction::Add);
-        let baseline = TypeBaseline::new(
-            1,
-            Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
-            HashMap::from([(
-                "Existing".to_string(),
-                TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
-            )]),
-            HashMap::new(),
-        );
-        let report = check_consistency(
-            &[entry],
-            &empty_graph_for_test(),
-            &baseline,
-            &std::collections::HashSet::new(),
-        );
-
-        let findings = consistency_report_to_findings(&report);
-        // Contradiction should produce exactly one warning finding.
-        let warnings: Vec<_> =
-            findings.iter().filter(|f| f.severity() == Severity::Warning).collect();
-        assert!(!warnings.is_empty(), "contradiction must produce at least one warning");
-        // Must not produce any errors for a contradiction-only report.
-        let errors: Vec<_> = findings.iter().filter(|f| f.severity() == Severity::Error).collect();
-        assert!(errors.is_empty(), "contradiction must not produce errors: {errors:?}");
-    }
-
-    #[test]
-    fn test_contradiction_only_report_produces_exit_success_via_print_outcome() {
-        // End-to-end contract test: contradiction warnings must not fail the CI gate.
-        // This bridges consistency_report_to_findings (warning) → VerifyOutcome → print_outcome
-        // → ExitCode::SUCCESS, proving the full chain executed by SpecCodeConsistency.
-        use std::collections::HashMap;
-        let entry = make_entry_for_test("Existing", TypeAction::Add);
-        let baseline = TypeBaseline::new(
-            1,
-            Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
-            HashMap::from([(
-                "Existing".to_string(),
-                TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
-            )]),
-            HashMap::new(),
-        );
-        let report = check_consistency(
-            &[entry],
-            &empty_graph_for_test(),
-            &baseline,
-            &std::collections::HashSet::new(),
-        );
-        assert!(
-            !report.contradictions().is_empty(),
-            "precondition: must have at least one contradiction"
-        );
-
-        let findings = consistency_report_to_findings(&report);
-        let outcome = if findings.is_empty() {
-            VerifyOutcome::pass()
-        } else {
-            VerifyOutcome::from_findings(findings)
-        };
-        // Contradiction-only report must NOT fail the CI gate (exit code 0).
-        let exit = print_outcome("test", &outcome);
-        assert_eq!(
-            exit,
-            ExitCode::SUCCESS,
-            "contradiction-only report must exit 0 (advisory, not CI-blocking)"
-        );
-    }
-
-    #[test]
-    fn test_delete_error_report_produces_exit_failure_via_print_outcome() {
-        // End-to-end contract test: delete errors must fail the CI gate.
-        // This bridges consistency_report_to_findings (error) → VerifyOutcome → print_outcome
-        // → ExitCode::FAILURE, proving the full chain executed by SpecCodeConsistency.
-        let entry = make_entry_for_test("Ghost", TypeAction::Delete);
-        let report = check_consistency(
-            &[entry],
-            &empty_graph_for_test(),
-            &empty_baseline_for_test(),
-            &std::collections::HashSet::new(),
-        );
-        assert!(!report.delete_errors().is_empty(), "precondition: must have delete errors");
-
-        let findings = consistency_report_to_findings(&report);
-        let outcome = VerifyOutcome::from_findings(findings);
-        // Delete errors must fail the CI gate (exit code 1).
-        let exit = print_outcome("test", &outcome);
-        assert_eq!(exit, ExitCode::FAILURE, "delete error report must exit 1 (CI-blocking)");
-    }
-
-    // --- evaluate_consistency_from_components tests (core CLI wiring, no nightly needed) ---
-
-    fn make_doc_with_entry(entry: TypeCatalogueEntry) -> TypeCatalogueDocument {
-        TypeCatalogueDocument::new(1, vec![entry])
-    }
-
-    fn empty_doc_for_test() -> TypeCatalogueDocument {
-        TypeCatalogueDocument::new(1, vec![])
-    }
-
-    #[test]
-    fn test_evaluate_consistency_from_components_with_delete_error_returns_failure_outcome() {
-        // Proves the wiring inside execute_spec_code_consistency: delete errors must
-        // produce a VerifyOutcome with Error severity findings (which exits 1 via print_outcome).
-        let entry = make_entry_for_test("Ghost", TypeAction::Delete);
-        let doc = make_doc_with_entry(entry);
-        let outcome = evaluate_consistency_from_components(
-            &doc,
-            &empty_graph_for_test(),
-            &empty_baseline_for_test(),
-            &std::collections::HashSet::new(),
-        );
-        // Must have error-severity findings so the CLI exits 1.
-        let has_errors = outcome.findings().iter().any(|f| f.severity() == Severity::Error);
-        assert!(has_errors, "delete error must produce error-severity findings in VerifyOutcome");
-        let exit = print_outcome("test", &outcome);
-        assert_eq!(exit, ExitCode::FAILURE, "delete error must cause exit 1");
-    }
-
-    #[test]
-    fn test_evaluate_consistency_from_components_with_contradiction_only_returns_success_outcome() {
-        // Proves the wiring inside execute_spec_code_consistency: contradiction warnings
-        // must produce a VerifyOutcome that exits 0 (advisory, not CI-blocking).
-        use std::collections::HashMap;
-        let entry = make_entry_for_test("Existing", TypeAction::Add);
-        let baseline = TypeBaseline::new(
-            1,
-            Timestamp::new("2026-01-01T00:00:00Z").unwrap(),
-            HashMap::from([(
-                "Existing".to_string(),
-                TypeBaselineEntry::new(TypeKind::Struct, vec![], vec![]),
-            )]),
-            HashMap::new(),
-        );
-        let doc = make_doc_with_entry(entry);
-        let outcome = evaluate_consistency_from_components(
-            &doc,
-            &empty_graph_for_test(),
-            &baseline,
-            &std::collections::HashSet::new(),
-        );
-        // Must have only warning-severity findings (no errors) — exit code 0.
-        let has_errors = outcome.findings().iter().any(|f| f.severity() == Severity::Error);
-        assert!(!has_errors, "contradiction must not produce error-severity findings");
-        let exit = print_outcome("test", &outcome);
-        assert_eq!(exit, ExitCode::SUCCESS, "contradiction-only must exit 0");
-    }
-
-    #[test]
-    fn test_evaluate_consistency_from_components_with_empty_report_returns_pass_outcome() {
-        // Empty report (no entries, no errors) must produce VerifyOutcome::pass() → exit 0.
-        let outcome = evaluate_consistency_from_components(
-            &empty_doc_for_test(),
-            &empty_graph_for_test(),
-            &empty_baseline_for_test(),
-            &std::collections::HashSet::new(),
-        );
-        assert!(outcome.findings().is_empty(), "empty report must produce zero findings");
-        let exit = print_outcome("test", &outcome);
-        assert_eq!(exit, ExitCode::SUCCESS, "empty report must exit 0");
-    }
+    // T008: consistency_report_to_findings / check_consistency / evaluate_consistency_from_components
+    // tests removed. These functions and their TypeGraph / TypeBaseline dependencies are deleted.
 
     // --- plan-artifact-refs CLI wiring ---
 
@@ -1192,18 +916,20 @@ mod tests {
         track_dir: &std::path::Path,
         entry_name: &str,
     ) {
+        // v3-native format required by CatalogueDocumentCodec::decode.
         let catalogue = serde_json::json!({
-            "schema_version": 2,
-            "type_definitions": [
-                {
-                    "name": entry_name,
-                    "description": "test fixture",
-                    "kind": "value_object",
+            "schema_version": 3,
+            "crate_name": "domain",
+            "layer": "domain",
+            "types": {
+                entry_name: {
                     "action": "add",
-                    "approved": true,
-                    "expected_methods": []
+                    "role": "ValueObject",
+                    "kind": { "kind": "unit_struct" }
                 }
-            ]
+            },
+            "traits": {},
+            "functions": {}
         });
         std::fs::write(
             track_dir.join("domain-types.json"),

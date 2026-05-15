@@ -39,41 +39,52 @@ const RULES_JSON: &str = r#"{
   ]
 }"#;
 
-/// A minimal domain-types.json with one `value_object` entry whose
-/// `expected_methods` is empty — satisfies the demo `FieldEmpty` rule
+/// A minimal domain-types.json (v3) with one `value_object` entry whose
+/// `methods` list is empty — satisfies the demo `FieldEmpty` rule
 /// (no violation expected).
 const CATALOGUE_EMPTY_METHODS: &str = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "MyValueObject",
-      "description": "A value object with no methods",
-      "approved": true,
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyValueObject": {
       "action": "add",
-      "kind": "value_object",
-      "expected_members": [],
-      "expected_methods": []
+      "role": "ValueObject",
+      "kind": {"kind": "plain_struct", "fields": [], "has_stripped_fields": false},
+      "methods": [],
+      "trait_impls": [],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
     }
-  ]
+  },
+  "traits": {},
+  "functions": {}
 }"#;
 
-/// A domain-types.json with one `value_object` entry whose
-/// `expected_methods` is non-empty — fires the demo `FieldEmpty` rule
+/// A domain-types.json (v3) with one `value_object` entry whose
+/// `methods` list is non-empty — fires the demo `FieldEmpty` rule
 /// (violation expected).
 const CATALOGUE_WITH_METHODS: &str = r#"{
-  "schema_version": 2,
-  "type_definitions": [
-    {
-      "name": "MethodfulObject",
-      "description": "A value object with behavioral methods",
-      "approved": true,
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MethodfulObject": {
       "action": "add",
-      "kind": "value_object",
-      "expected_methods": [
-        {"name": "validate", "receiver": "&self", "params": [], "returns": "bool", "is_async": false}
-      ]
+      "role": "ValueObject",
+      "kind": {"kind": "plain_struct", "fields": [], "has_stripped_fields": false},
+      "methods": [
+        {"name": "validate", "receiver": "&self", "params": [], "returns": "()", "is_async": false}
+      ],
+      "trait_impls": [],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
     }
-  ]
+  },
+  "traits": {},
+  "functions": {}
 }"#;
 
 /// Write a file, creating all parent directories as needed.

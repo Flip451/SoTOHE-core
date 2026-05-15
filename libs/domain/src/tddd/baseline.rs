@@ -20,12 +20,45 @@
 //!   by fully-qualified name (e.g. `"crate::module::fn_name"`). String key is
 //!   used here (vs the in-memory tuple key in `TypeGraph`) so that JSON
 //!   serialization in T007 `baseline_codec` can use a plain object key.
+//!
+//! T008: this module is private (no pub re-export from lib.rs). The types are
+//! retained to avoid full deletion before the follow-up cleanup track.
+#![allow(dead_code)]
 
 use std::collections::HashMap;
 
 use crate::schema::TypeKind;
 use crate::tddd::catalogue::{MemberDeclaration, MethodDeclaration, ParamDeclaration};
 use crate::timestamp::Timestamp;
+
+// ---------------------------------------------------------------------------
+// Structural method comparison helper (ignores `docs` and param binding names)
+// ---------------------------------------------------------------------------
+
+/// Returns `true` if `a` and `b` describe the same method signature structurally.
+///
+/// Compares `name`, `receiver`, parameter *types* (not binding names), `returns`,
+/// and `is_async`.
+///
+/// Two fields are intentionally **excluded**:
+/// - `docs` — doc comments are metadata; a doc-only edit is not a structural change.
+/// - `ParamDeclaration.name` (binding name) — renaming a parameter (e.g. `id` → `user_id`)
+///   does not change the structural contract.  Only the parameter *type* is compared.
+fn methods_structurally_equal(a: &MethodDeclaration, b: &MethodDeclaration) -> bool {
+    let params_match = a.params.len() == b.params.len()
+        && a.params.iter().zip(b.params.iter()).all(|(pa, pb)| pa.ty == pb.ty);
+    a.name == b.name
+        && a.receiver == b.receiver
+        && params_match
+        && a.returns == b.returns
+        && a.is_async == b.is_async
+}
+
+/// Returns `true` if the two method slices are structurally equal
+/// (same length, pairwise `methods_structurally_equal`).
+fn method_slices_structurally_equal(a: &[MethodDeclaration], b: &[MethodDeclaration]) -> bool {
+    a.len() == b.len() && a.iter().zip(b.iter()).all(|(x, y)| methods_structurally_equal(x, y))
+}
 
 // ---------------------------------------------------------------------------
 // TraitImplBaselineEntry
@@ -97,7 +130,7 @@ impl TypeBaselineEntry {
         mut methods: Vec<MethodDeclaration>,
     ) -> Self {
         members.sort_by(|a, b| a.name().cmp(b.name()));
-        methods.sort_by(|a, b| a.name().cmp(b.name()));
+        methods.sort_by(|a, b| a.name.cmp(&b.name));
         Self { kind, members, methods, trait_impls: Vec::new() }
     }
 
@@ -110,7 +143,7 @@ impl TypeBaselineEntry {
         trait_impls: Vec<TraitImplBaselineEntry>,
     ) -> Self {
         members.sort_by(|a, b| a.name().cmp(b.name()));
-        methods.sort_by(|a, b| a.name().cmp(b.name()));
+        methods.sort_by(|a, b| a.name.cmp(&b.name));
         Self { kind, members, methods, trait_impls }
     }
 
@@ -144,9 +177,14 @@ impl TypeBaselineEntry {
     /// both fields are sorted at construction, this is a direct comparison.
     /// `trait_impls` is intentionally excluded from the structural equality
     /// check — trait impls are used for signal filtering, not structural diff.
+    ///
+    /// Method comparison uses `methods_structurally_equal`, which excludes the
+    /// `docs` field — doc-only differences do not constitute a structural change.
     #[must_use]
     pub fn structurally_equal(&self, other: &Self) -> bool {
-        self.kind == other.kind && self.members == other.members && self.methods == other.methods
+        self.kind == other.kind
+            && self.members == other.members
+            && method_slices_structurally_equal(&self.methods, &other.methods)
     }
 }
 
@@ -229,7 +267,7 @@ impl TraitBaselineEntry {
     /// Creates a new `TraitBaselineEntry` with methods sorted.
     #[must_use]
     pub fn new(mut methods: Vec<MethodDeclaration>) -> Self {
-        methods.sort_by(|a, b| a.name().cmp(b.name()));
+        methods.sort_by(|a, b| a.name.cmp(&b.name));
         Self { methods }
     }
 
@@ -240,9 +278,12 @@ impl TraitBaselineEntry {
     }
 
     /// Returns `true` if this entry is structurally equal to `other`.
+    ///
+    /// Method comparison uses `methods_structurally_equal`, which excludes the
+    /// `docs` field — doc-only differences do not constitute a structural change.
     #[must_use]
     pub fn structurally_equal(&self, other: &Self) -> bool {
-        self.methods == other.methods
+        method_slices_structurally_equal(&self.methods, &other.methods)
     }
 }
 
@@ -369,11 +410,19 @@ impl TypeBaseline {
 mod tests {
     use super::*;
     use crate::schema::TypeKind;
-    use crate::tddd::catalogue::ParamDeclaration;
+    use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use crate::tddd::catalogue_v2::roles::SelfReceiver;
     use crate::timestamp::Timestamp;
 
     fn unit_method(name: &str) -> MethodDeclaration {
-        MethodDeclaration::new(name, Some("&self".into()), vec![], "()", false)
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            None,
+        )
     }
 
     // --- TypeBaselineEntry ---
@@ -400,7 +449,7 @@ mod tests {
             vec![],
             vec![unit_method("publish"), unit_method("archive")],
         );
-        let names: Vec<&str> = entry.methods().iter().map(|m| m.name()).collect();
+        let names: Vec<&str> = entry.methods().iter().map(|m| m.name.as_str()).collect();
         assert_eq!(names, vec!["archive", "publish"]);
     }
 
@@ -446,17 +495,28 @@ mod tests {
         let a = TypeBaselineEntry::new(
             TypeKind::Struct,
             vec![],
-            vec![MethodDeclaration::new("find", Some("&self".into()), vec![], "()", false)],
+            vec![MethodDeclaration::new(
+                MethodName::new("find").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                None,
+            )],
         );
         let b = TypeBaselineEntry::new(
             TypeKind::Struct,
             vec![],
             vec![MethodDeclaration::new(
-                "find",
-                Some("&self".into()),
-                vec![ParamDeclaration::new("id", "UserId")],
-                "()",
+                MethodName::new("find").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![ParamDeclaration::new(
+                    ParamName::new("id").unwrap(),
+                    TypeRef::new("UserId").unwrap(),
+                )],
+                TypeRef::new("()").unwrap(),
                 false,
+                None,
             )],
         );
         assert!(!a.structurally_equal(&b));
@@ -473,7 +533,81 @@ mod tests {
         assert_eq!(entry.members().len(), 1);
         assert_eq!(entry.members()[0].name(), "field");
         assert_eq!(entry.methods().len(), 1);
-        assert_eq!(entry.methods()[0].name(), "get");
+        assert_eq!(entry.methods()[0].name.as_str(), "get");
+    }
+
+    #[test]
+    fn test_type_baseline_entry_structurally_equal_ignores_docs_only_diff() {
+        // Two entries that differ only in the `docs` field of a method must
+        // compare as structurally equal — docs are metadata, not structure.
+        let a = TypeBaselineEntry::new(
+            TypeKind::Struct,
+            vec![],
+            vec![MethodDeclaration::new(
+                MethodName::new("save").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                None, // no docs
+            )],
+        );
+        let b = TypeBaselineEntry::new(
+            TypeKind::Struct,
+            vec![],
+            vec![MethodDeclaration::new(
+                MethodName::new("save").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                Some("Saves the entity.".to_string()), // docs differ
+            )],
+        );
+        assert!(
+            a.structurally_equal(&b),
+            "doc-only difference must not affect structural equality"
+        );
+    }
+
+    #[test]
+    fn test_type_baseline_entry_structurally_equal_ignores_param_binding_name_diff() {
+        // Renaming a parameter binding (e.g. `id` → `user_id`) must not trigger
+        // a structural drift — only the parameter *type* is part of the contract.
+        let a = TypeBaselineEntry::new(
+            TypeKind::Struct,
+            vec![],
+            vec![MethodDeclaration::new(
+                MethodName::new("find").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![ParamDeclaration::new(
+                    ParamName::new("id").unwrap(),
+                    TypeRef::new("UserId").unwrap(),
+                )],
+                TypeRef::new("Option<User>").unwrap(),
+                false,
+                None,
+            )],
+        );
+        let b = TypeBaselineEntry::new(
+            TypeKind::Struct,
+            vec![],
+            vec![MethodDeclaration::new(
+                MethodName::new("find").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![ParamDeclaration::new(
+                    ParamName::new("user_id").unwrap(), // renamed binding
+                    TypeRef::new("UserId").unwrap(),    // same type
+                )],
+                TypeRef::new("Option<User>").unwrap(),
+                false,
+                None,
+            )],
+        );
+        assert!(
+            a.structurally_equal(&b),
+            "param binding rename must not affect structural equality"
+        );
     }
 
     // --- TraitBaselineEntry ---
@@ -485,7 +619,7 @@ mod tests {
             unit_method("find"),
             unit_method("delete"),
         ]);
-        let names: Vec<&str> = entry.methods().iter().map(|m| m.name()).collect();
+        let names: Vec<&str> = entry.methods().iter().map(|m| m.name.as_str()).collect();
         assert_eq!(names, vec!["delete", "find", "save"]);
     }
 
@@ -501,6 +635,31 @@ mod tests {
         let a = TraitBaselineEntry::new(vec![unit_method("save")]);
         let b = TraitBaselineEntry::new(vec![unit_method("delete")]);
         assert!(!a.structurally_equal(&b));
+    }
+
+    #[test]
+    fn test_trait_baseline_entry_structurally_equal_ignores_docs_only_diff() {
+        // Trait entries that differ only in method docs must be structurally equal.
+        let a = TraitBaselineEntry::new(vec![MethodDeclaration::new(
+            MethodName::new("find").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Option<Self>").unwrap(),
+            false,
+            None,
+        )]);
+        let b = TraitBaselineEntry::new(vec![MethodDeclaration::new(
+            MethodName::new("find").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Option<Self>").unwrap(),
+            false,
+            Some("Returns the entity, if found.".to_string()),
+        )]);
+        assert!(
+            a.structurally_equal(&b),
+            "doc-only difference must not affect structural equality"
+        );
     }
 
     // --- TypeBaseline ---
@@ -525,11 +684,12 @@ mod tests {
                     MemberDeclaration::unit_variant("Done"),
                 ],
                 vec![MethodDeclaration::new(
-                    "kind",
-                    Some("&self".into()),
+                    MethodName::new("kind").unwrap(),
+                    Some(SelfReceiver::SharedRef),
                     vec![],
-                    "TaskStatusKind",
+                    TypeRef::new("TaskStatusKind").unwrap(),
                     false,
+                    None,
                 )],
             ),
         );
@@ -572,7 +732,7 @@ mod tests {
         let bl = sample_baseline();
         let entry = bl.get_trait("TrackReader").unwrap();
         assert_eq!(entry.methods().len(), 1);
-        assert_eq!(entry.methods()[0].name(), "find");
+        assert_eq!(entry.methods()[0].name.as_str(), "find");
     }
 
     #[test]
@@ -671,12 +831,15 @@ mod tests {
 
     #[test]
     fn test_function_baseline_entry_accessors() {
-        let params = vec![ParamDeclaration::new("id", "TrackId")];
+        let params = vec![ParamDeclaration::new(
+            ParamName::new("id").unwrap(),
+            TypeRef::new("TrackId").unwrap(),
+        )];
         let returns = vec!["Option<Track>".to_string()];
         let entry =
             FunctionBaselineEntry::new(params, returns, false, Some("domain::track".to_string()));
         assert_eq!(entry.params().len(), 1);
-        assert_eq!(entry.params()[0].name(), "id");
+        assert_eq!(entry.params()[0].name.as_str(), "id");
         assert_eq!(entry.returns(), &["Option<Track>"]);
         assert!(!entry.is_async());
         assert_eq!(entry.module_path(), Some("domain::track"));
@@ -731,7 +894,10 @@ mod tests {
         let mut functions = HashMap::new();
         let fq = "infra::tddd::build_type_graph".to_string();
         let entry = FunctionBaselineEntry::new(
-            vec![ParamDeclaration::new("schema", "SchemaExport")],
+            vec![ParamDeclaration::new(
+                ParamName::new("schema").unwrap(),
+                TypeRef::new("SchemaExport").unwrap(),
+            )],
             vec!["TypeGraph".to_string()],
             false,
             Some("infra::tddd".to_string()),
@@ -747,7 +913,7 @@ mod tests {
         let result = bl.get_function(&fq);
         assert!(result.is_some());
         assert_eq!(result.unwrap().params().len(), 1);
-        assert_eq!(result.unwrap().params()[0].name(), "schema");
+        assert_eq!(result.unwrap().params()[0].name.as_str(), "schema");
     }
 
     #[test]

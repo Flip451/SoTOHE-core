@@ -1,6 +1,8 @@
 #![forbid(unsafe_code)]
 //! Use case layer for the SoTOHE-core track state machine.
 
+pub mod baseline_capture;
+pub mod catalogue_impl_signals;
 pub mod catalogue_lint_workflow;
 pub mod catalogue_spec_refs;
 pub mod catalogue_spec_signals;
@@ -23,6 +25,7 @@ pub mod task_ops;
 pub mod track_activation;
 pub mod track_phase;
 pub mod track_resolution;
+pub mod type_signals;
 pub mod verify_adr_signals;
 pub mod worktree_guard;
 

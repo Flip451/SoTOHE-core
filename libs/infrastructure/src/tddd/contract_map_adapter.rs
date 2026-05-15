@@ -2,9 +2,10 @@
 //! `domain::tddd::catalogue_ports`.
 //!
 //! * [`FsCatalogueLoader`] wraps [`crate::tddd::catalogue_bulk_loader::
-//!   load_all_catalogues`] (T002) behind the domain `CatalogueLoader`
+//!   load_all_catalogues_native`] (T025) behind the domain `CatalogueLoader`
 //!   trait and maps the infrastructure-level error enum onto the domain
-//!   error enum.
+//!   error enum. Returns `CatalogueDocument` values directly — v3-native,
+//!   fail-closed (CN-11: non-v3 catalogues are a hard error).
 //! * [`FsContractMapWriter`] writes `track_dir/contract-map.md`
 //!   atomically via [`atomic_write_file`] after guarding the path with
 //!   [`reject_symlinks_below`].
@@ -16,13 +17,13 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use domain::TrackId;
-use domain::tddd::catalogue::TypeCatalogueDocument;
+use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::{
     CatalogueLoader, CatalogueLoaderError, ContractMapContent, ContractMapWriter,
     ContractMapWriterError, LayerId,
 };
 
-use crate::tddd::catalogue_bulk_loader::{self, LoadAllCataloguesError};
+use crate::tddd::catalogue_bulk_loader::{self, LoadAllCataloguesNativeError};
 use crate::track::atomic_write::atomic_write_file;
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::tddd_layers::LoadTdddLayersError;
@@ -30,11 +31,14 @@ use crate::verify::tddd_layers::LoadTdddLayersError;
 /// Filesystem-backed [`CatalogueLoader`] implementation.
 ///
 /// Resolves `track_dir = track_root / track_id` and delegates to
-/// [`catalogue_bulk_loader::load_all_catalogues`]. A surface-level
-/// symlink check on `track_dir` runs **before** the bulk loader is
-/// invoked, so symlinked track directories are rejected with a precise
-/// [`CatalogueLoaderError::SymlinkRejected`] variant rather than being
-/// absorbed as a generic I/O error.
+/// [`catalogue_bulk_loader::load_all_catalogues_native`]. Returns
+/// `CatalogueDocument` values directly (v3-native, CN-11 fail-closed —
+/// non-v3 catalogues are a hard decode error).
+///
+/// A surface-level symlink check on `track_dir` runs **before** the bulk
+/// loader is invoked, so symlinked track directories are rejected with a
+/// precise [`CatalogueLoaderError::SymlinkRejected`] variant rather than
+/// being absorbed as a generic I/O error.
 pub struct FsCatalogueLoader {
     track_root: PathBuf,
     rules_path: PathBuf,
@@ -59,8 +63,7 @@ impl CatalogueLoader for FsCatalogueLoader {
     fn load_all(
         &self,
         track_id: &TrackId,
-    ) -> Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError>
-    {
+    ) -> Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError> {
         let track_dir = self.track_root.join(track_id.as_ref());
         // Adapter-level symlink guard on the track directory itself —
         // guarantees `SymlinkRejected` (rather than a generic I/O error)
@@ -73,19 +76,19 @@ impl CatalogueLoader for FsCatalogueLoader {
             };
         }
 
-        catalogue_bulk_loader::load_all_catalogues(&track_dir, &self.rules_path, &self.trusted_root)
-            .map_err(map_loader_error)
+        catalogue_bulk_loader::load_all_catalogues_native(
+            &track_dir,
+            &self.rules_path,
+            &self.trusted_root,
+        )
+        .map_err(map_loader_error)
     }
 }
 
-fn map_loader_error(err: LoadAllCataloguesError) -> CatalogueLoaderError {
+fn map_loader_error(err: LoadAllCataloguesNativeError) -> CatalogueLoaderError {
     match err {
-        LoadAllCataloguesError::LayerBindings(ref inner) => {
-            // Preserve symlink-rejection classification: if the rules-file load
-            // failed because `reject_symlinks_below` returned `InvalidInput`,
-            // surface that as `SymlinkRejected` rather than the generic
-            // `LayerDiscoveryFailed` so callers can distinguish security
-            // rejections from parse failures.
+        LoadAllCataloguesNativeError::LayerBindings(ref inner) => {
+            // Preserve symlink-rejection classification.
             if let LoadTdddLayersError::Io { path, source } = inner {
                 if source.kind() == std::io::ErrorKind::InvalidInput {
                     return CatalogueLoaderError::SymlinkRejected { path: path.clone() };
@@ -93,30 +96,30 @@ fn map_loader_error(err: LoadAllCataloguesError) -> CatalogueLoaderError {
             }
             CatalogueLoaderError::LayerDiscoveryFailed { reason: err.to_string() }
         }
-        LoadAllCataloguesError::ArchRulesParse { path, reason } => {
+        LoadAllCataloguesNativeError::ArchRulesParse { path, reason } => {
             CatalogueLoaderError::LayerDiscoveryFailed {
                 reason: format!("{}: {reason}", path.display()),
             }
         }
-        LoadAllCataloguesError::Io { path, source } => {
+        LoadAllCataloguesNativeError::Io { path, source } => {
             if source.kind() == std::io::ErrorKind::InvalidInput {
                 CatalogueLoaderError::SymlinkRejected { path }
             } else {
                 CatalogueLoaderError::IoError { path, reason: source.to_string() }
             }
         }
-        LoadAllCataloguesError::CatalogueNotFound { layer_id, path } => {
+        LoadAllCataloguesNativeError::CatalogueNotFound { layer_id, path } => {
             CatalogueLoaderError::CatalogueNotFound { layer_id, path }
         }
-        LoadAllCataloguesError::Decode { layer_id, path: _, source } => {
+        LoadAllCataloguesNativeError::Decode { layer_id, path: _, source } => {
             CatalogueLoaderError::DecodeFailed { layer_id, reason: source.to_string() }
         }
-        LoadAllCataloguesError::TopologicalSortFailed { cycle } => {
+        LoadAllCataloguesNativeError::TopologicalSortFailed { cycle } => {
             CatalogueLoaderError::TopologicalSortFailed {
                 reason: format!("cycle among layers {cycle:?}"),
             }
         }
-        LoadAllCataloguesError::InvalidLayerId { value, source } => {
+        LoadAllCataloguesNativeError::InvalidLayerId { value, source } => {
             CatalogueLoaderError::LayerDiscoveryFailed {
                 reason: format!("invalid layer id '{value}': {source}"),
             }
@@ -199,7 +202,6 @@ pub fn contract_map_path(track_root: &Path, track_id: &TrackId) -> PathBuf {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
-    use domain::tddd::catalogue::TypeCatalogueDocument;
     use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
 
     const RULES_JSON: &str = r#"{
@@ -219,7 +221,41 @@ mod tests {
       ]
     }"#;
 
-    const EMPTY_CATALOGUE: &str = r#"{"schema_version": 2, "type_definitions": []}"#;
+    // Minimal v3 catalogue (empty entries — all BTreeMaps empty).
+    const EMPTY_CATALOGUE_V3: &str = r#"{
+      "schema_version": 3,
+      "crate_name": "domain",
+      "layer": "domain",
+      "types": {},
+      "traits": {},
+      "functions": {}
+    }"#;
+
+    // Minimal v3 catalogue with two types for the E2E test.
+    const CATALOGUE_V3_TWO_TYPES: &str = r#"{
+      "schema_version": 3,
+      "crate_name": "domain",
+      "layer": "domain",
+      "types": {
+        "UserId": {
+          "action": "add",
+          "role": "ValueObject",
+          "kind": {
+            "kind": "tuple_struct",
+            "fields": ["u64"]
+          },
+          "module_path": "domain::user"
+        },
+        "User": {
+          "action": "add",
+          "role": "Entity",
+          "kind": { "kind": "plain_struct" },
+          "module_path": "domain::user"
+        }
+      },
+      "traits": {},
+      "functions": {}
+    }"#;
 
     fn write(path: &std::path::Path, content: &str) {
         if let Some(parent) = path.parent() {
@@ -242,15 +278,17 @@ mod tests {
         let track_root = root.join("track-items");
         let id = track_id("t001");
         let track_dir = track_root.join(id.as_ref());
-        write(&track_dir.join("domain-types.json"), EMPTY_CATALOGUE);
+        write(&track_dir.join("domain-types.json"), EMPTY_CATALOGUE_V3);
 
         let loader = FsCatalogueLoader::new(track_root, rules, root.to_path_buf());
         let (order, catalogues) = loader.load_all(&id).unwrap();
         assert_eq!(order.len(), 1);
         assert_eq!(order[0].as_ref(), "domain");
         assert_eq!(catalogues.len(), 1);
-        let doc: &TypeCatalogueDocument = catalogues.get(&order[0]).unwrap();
-        assert_eq!(doc.entries().len(), 0);
+        let doc: &CatalogueDocument = catalogues.get(&order[0]).unwrap();
+        assert_eq!(doc.types.len(), 0);
+        assert_eq!(doc.traits.len(), 0);
+        assert_eq!(doc.functions.len(), 0);
     }
 
     #[test]
@@ -419,115 +457,50 @@ mod tests {
         );
     }
 
-    /// E2E: load a catalogue that declares `MemberDeclaration` (kind=enum) with
-    /// a `Variant` arm carrying `payload_types: ["EnumVariantDeclaration"]`, and
-    /// `EnumVariantDeclaration` (kind=value_object) in the same layer.
+    /// E2E: load a v3 catalogue with two types and verify the IN-24 placeholder
+    /// renderer emits entry names as comments in the subgraph.
     ///
-    /// After loading via `FsCatalogueLoader` and rendering via
-    /// `render_contract_map`, the output must contain the variant payload edge
-    /// `MemberDeclaration -->|"::Variant"| EnumVariantDeclaration`.
-    ///
-    /// This test proves that:
-    /// 1. `decode_enum_variant_list` correctly round-trips `expected_variants`
-    ///    from the JSON into `Vec<EnumVariantDeclaration>`.
-    /// 2. `render_contract_map` emits the edge for the `Variant` arm's payload
-    ///    type when the target (`EnumVariantDeclaration`) is present in the
-    ///    `type_index` built from the same catalogue.
-    ///
-    /// Reproduces the "0 edges" regression described in the PR follow-up for
-    /// track `enum-variant-payload-schema-2026-05-02`.
+    /// T025: The renderer is now v3-native (no v3→v2 stub conversion).
+    /// The output contains the flowchart scaffold and an IN-24 / OS-07 deferral
+    /// comment, with entry names listed as mermaid comments.
     #[test]
-    fn test_e2e_member_declaration_variant_payload_edge_roundtrip() {
-        const RULES: &str = r#"{
-          "version": 2,
-          "layers": [
-            {
-              "crate": "domain",
-              "path": "libs/domain",
-              "may_depend_on": [],
-              "deny_reason": "no reverse dep",
-              "tddd": {
-                "enabled": true,
-                "catalogue_file": "domain-types.json",
-                "schema_export": {"method": "rustdoc", "targets": ["domain"]}
-              }
-            }
-          ]
-        }"#;
-
-        // Minimal catalogue reflecting the actual `domain-types.json` for the
-        // `enum-variant-payload-schema-2026-05-02` track:
-        //   - EnumVariantDeclaration  (value_object)
-        //   - MemberDeclaration       (enum, Variant arm with payload_types: ["EnumVariantDeclaration"])
-        const CATALOGUE: &str = r#"{
-          "schema_version": 2,
-          "type_definitions": [
-            {
-              "name": "EnumVariantDeclaration",
-              "description": "Holds variant name and payload types.",
-              "approved": true,
-              "kind": "value_object",
-              "expected_members": [],
-              "expected_methods": []
-            },
-            {
-              "name": "MemberDeclaration",
-              "description": "Enum variant or struct field.",
-              "approved": true,
-              "kind": "enum",
-              "expected_variants": [
-                {"name": "Variant", "payload_types": ["EnumVariantDeclaration"]},
-                {"name": "Field",   "payload_types": ["String", "String"]}
-              ]
-            }
-          ]
-        }"#;
-
+    fn test_e2e_v3_catalogue_renders_in24_placeholder() {
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let rules_path = root.join("architecture-rules.json");
-        write(&rules_path, RULES);
+        write(&rules_path, RULES_JSON);
 
         let track_root = root.join("track-items");
         let id = track_id("t-e2e");
         let track_dir = track_root.join(id.as_ref());
-        write(&track_dir.join("domain-types.json"), CATALOGUE);
+        write(&track_dir.join("domain-types.json"), CATALOGUE_V3_TWO_TYPES);
 
         let loader = FsCatalogueLoader::new(track_root, rules_path, root.to_path_buf());
         let (layer_order, catalogues) = loader.load_all(&id).unwrap();
 
         assert_eq!(layer_order.len(), 1, "expected 1 layer");
         let domain_doc = catalogues.get(&layer_order[0]).unwrap();
-        // Verify the codec decoded expected_variants correctly (pre-render
-        // assertion so a codec failure surfaces before the render assertion).
-        let member_entry = domain_doc
-            .entries()
-            .iter()
-            .find(|e| e.name() == "MemberDeclaration")
-            .expect("MemberDeclaration must be present in decoded catalogue");
-        let domain::tddd::catalogue::TypeDefinitionKind::Enum { expected_variants } =
-            member_entry.kind()
-        else {
-            panic!("MemberDeclaration must decode as TypeDefinitionKind::Enum");
-        };
-        assert_eq!(expected_variants.len(), 2, "expected 2 variants (Variant, Field)");
-        let variant_arm =
-            expected_variants.iter().find(|v| v.name() == "Variant").expect("Variant arm missing");
-        assert_eq!(
-            variant_arm.payload_types(),
-            &["EnumVariantDeclaration"],
-            "Variant arm payload_types must survive codec round-trip"
-        );
+        // v3-native: 2 types loaded directly from CatalogueDocument.
+        assert_eq!(domain_doc.types.len(), 2, "expected 2 type entries from v3 doc");
 
-        // Render and assert edge is present.
+        // Render: IN-24 placeholder must emit deferral comment + domain subgraph.
         let opts = ContractMapRenderOptions::default();
         let content = render_contract_map(&catalogues, &layer_order, &opts);
         let text = content.as_ref();
+        assert!(text.contains("flowchart LR"), "render must contain flowchart LR; got:\n{text}");
+        assert!(text.contains("IN-24"), "render must contain IN-24 deferral comment; got:\n{text}");
         assert!(
-            text.contains(
-                "L6_domain_MemberDeclaration -->|\"::Variant\"| L6_domain_EnumVariantDeclaration"
-            ),
-            "render_contract_map must emit variant payload edge; output was:\n{text}"
+            text.contains("OS-07"),
+            "render must contain OS-07 deferral reference; got:\n{text}"
         );
+        assert!(
+            text.contains("subgraph domain [domain]"),
+            "render must contain domain subgraph; got:\n{text}"
+        );
+        // Placeholder: no mermaid edge arrows emitted.
+        assert!(!text.contains("-->|"), "placeholder must not emit edges");
+        // Old stale references must be gone.
+        assert!(!text.contains("OS-06"), "render must NOT reference OS-06; got:\n{text}");
+        assert!(!text.contains("T012"), "render must NOT reference T012; got:\n{text}");
     }
 }

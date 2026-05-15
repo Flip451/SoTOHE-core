@@ -19,7 +19,7 @@ use std::path::PathBuf;
 
 use crate::TrackId;
 use crate::tddd::LayerId;
-use crate::tddd::catalogue::TypeCatalogueDocument;
+use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::contract_map_content::ContractMapContent;
 
 /// Secondary port that loads every `tddd.enabled` layer's catalogue for a
@@ -28,7 +28,7 @@ use crate::tddd::contract_map_content::ContractMapContent;
 /// Returns a tuple of `(layer_order, catalogues)` where `layer_order` is
 /// the `may_depend_on`-based topological sort (dependency-less layers
 /// first) and `catalogues` maps each layer to its decoded
-/// [`TypeCatalogueDocument`]. Implementations must preserve the
+/// [`CatalogueDocument`]. Implementations must preserve the
 /// `Vec<LayerId>` ordering — downstream Contract Map rendering relies on
 /// it to produce stable, left-to-right subgraph layout.
 pub trait CatalogueLoader: Send + Sync {
@@ -43,7 +43,7 @@ pub trait CatalogueLoader: Send + Sync {
     fn load_all(
         &self,
         track_id: &TrackId,
-    ) -> Result<(Vec<LayerId>, BTreeMap<LayerId, TypeCatalogueDocument>), CatalogueLoaderError>;
+    ) -> Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError>;
 }
 
 /// Secondary port that persists a rendered Contract Map to the track

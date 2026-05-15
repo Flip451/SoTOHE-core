@@ -219,15 +219,17 @@ mod tests {
     }
 
     fn write_catalogue(track_dir: &Path) {
+        // v3-native format required by CatalogueDocumentCodec::decode.
+        // BTreeMap ordering: BlueType < RedType < YellowType (alphabetical).
         let catalogue = serde_json::json!({
-            "schema_version": 2,
-            "type_definitions": [
-                {
-                    "name": "BlueType",
-                    "description": "blue entry — has spec_refs, no informal_grounds",
-                    "approved": true,
-                    "kind": "value_object",
-                    "expected_methods": [],
+            "schema_version": 3,
+            "crate_name": "test_layer",
+            "layer": "test_layer",
+            "types": {
+                "BlueType": {
+                    "action": "add",
+                    "role": "ValueObject",
+                    "kind": { "kind": "unit_struct" },
                     "spec_refs": [
                         {
                             "file": "track/items/x/spec.json",
@@ -236,24 +238,22 @@ mod tests {
                         }
                     ]
                 },
-                {
-                    "name": "YellowType",
-                    "description": "yellow entry — has informal_grounds",
-                    "approved": true,
-                    "kind": "value_object",
-                    "expected_methods": [],
+                "RedType": {
+                    "action": "add",
+                    "role": "ValueObject",
+                    "kind": { "kind": "unit_struct" }
+                },
+                "YellowType": {
+                    "action": "add",
+                    "role": "ValueObject",
+                    "kind": { "kind": "unit_struct" },
                     "informal_grounds": [
                         {"kind": "user_directive", "summary": "pending formalization"}
                     ]
-                },
-                {
-                    "name": "RedType",
-                    "description": "red entry — no refs, no grounds",
-                    "approved": true,
-                    "kind": "value_object",
-                    "expected_methods": []
                 }
-            ]
+            },
+            "traits": {},
+            "functions": {}
         });
         fs::write(
             track_dir.join("test_layer-types.json"),
@@ -292,12 +292,13 @@ mod tests {
         assert_eq!(raw["schema_version"].as_u64().unwrap(), 1);
         let sigs = raw["signals"].as_array().unwrap();
         assert_eq!(sigs.len(), 3);
+        // BTreeMap keys are sorted alphabetically: BlueType < RedType < YellowType.
         assert_eq!(sigs[0]["type_name"].as_str().unwrap(), "BlueType");
         assert_eq!(sigs[0]["signal"].as_str().unwrap(), "blue");
-        assert_eq!(sigs[1]["type_name"].as_str().unwrap(), "YellowType");
-        assert_eq!(sigs[1]["signal"].as_str().unwrap(), "yellow");
-        assert_eq!(sigs[2]["type_name"].as_str().unwrap(), "RedType");
-        assert_eq!(sigs[2]["signal"].as_str().unwrap(), "red");
+        assert_eq!(sigs[1]["type_name"].as_str().unwrap(), "RedType");
+        assert_eq!(sigs[1]["signal"].as_str().unwrap(), "red");
+        assert_eq!(sigs[2]["type_name"].as_str().unwrap(), "YellowType");
+        assert_eq!(sigs[2]["signal"].as_str().unwrap(), "yellow");
     }
 
     #[test]

@@ -1,0 +1,1058 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-15T01:52:22Z",
+  "declaration_hash": "caaa8ef98b69d8505daf8d9fdc83129b2a4711d838c176da8c88c8aab62c497f",
+  "signals": [
+    {
+      "type_name": "BaselineCaptureIoError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CatalogueDocumentError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLinter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLoader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueToExtendedCratePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractMapRenderOptions",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ContractRole",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::marker::Copy",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "CrateName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "DataRole",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::marker::Copy",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "ExtendedCrate",
+      "kind_tag": "domain_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FieldDecl",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FieldName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "FunctionEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FunctionName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "FunctionPath",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "FunctionRole",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::marker::Copy",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "GenericArgsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "Identifier",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "IdentifierError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ItemAction",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::default::Default",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::marker::Copy",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "MethodDeclaration",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "MethodGenericParam",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "MethodName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "MissingCataloguePolicy",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "ModulePath",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::default::Default",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "NewTypeGraphCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ParamDeclaration",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ParamName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "Phase1Error",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RustdocBaselineCapturePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RustdocCratePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RustdocCratePortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SelfReceiver",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::convert::TryFrom",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::marker::Copy",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "SignalEvaluatorPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalRegion",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "SpecFileLoadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SpecFileLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SymlinkGuardError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SymlinkGuardPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TdddLayerBinding",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TdddLayerBindingsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TdddLayerBindingsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ThreeWayEvaluationReport",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ThreeWaySignal",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ThreeWaySignalKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "TrackStatus",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "TrackStatusReadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TrackStatusReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TraitName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "TypeEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TypeKindV2",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TypeName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "TypeRef",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutionError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypestateMarker",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypestateTransitions",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "VariantDecl",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "VariantName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::convert::AsRef",
+        "core::fmt::Debug",
+        "core::fmt::Display",
+        "core::hash::Hash",
+        "core::str::traits::FromStr"
+      ]
+    },
+    {
+      "type_name": "VariantPayload",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "WherePredicateDecl",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "domain::tddd::catalogue_spec_signal::evaluate_catalogue_entry_signal",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "domain::tddd::consistency::check_type_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "domain::tddd::contract_map_render::render_contract_map",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ActionContradiction",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ActionContradictionKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ConsistencyReport",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "FunctionBaselineEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "FunctionNode",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TraitBaselineEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TraitImplBaselineEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TraitImplDecl",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TraitImplEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TraitNode",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeAction",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeBaseline",
+      "kind_tag": "domain_service",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeBaselineEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeCatalogueDocument",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeCatalogueEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeDefinitionKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeGraph",
+      "kind_tag": "domain_service",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeNode",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "domain::tddd::catalogue_spec_signal::check_catalogue_spec_ref_integrity",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "domain::tddd::catalogue_spec_signal::check_catalogue_spec_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "domain::tddd::consistency::check_consistency",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "domain::tddd::signals::evaluate_type_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "domain::tddd::signals::undeclared_functions_to_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "domain::tddd::signals::undeclared_to_signals",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogueLintViolation",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLinterError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLinterRule",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractMapWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "EnumVariantDeclaration",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "LayerId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MemberDeclaration",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SchemaExporter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignal",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

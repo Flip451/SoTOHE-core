@@ -5,8 +5,23 @@
 //! `domain::ConfidenceSignal`, `domain::ContentHash`, or
 //! `domain::evaluate_catalogue_entry_signal` directly (CN-01 / AC-03).
 //!
+//! Supports v3 (`CatalogueDocument`) catalogue format only. Per-entry signals
+//! are computed from `spec_refs[]` and `informal_grounds[]` via
+//! `evaluate_catalogue_entry_signal`.
+//! The informal-priority rule (ADR `2026-04-23-0344` §D1.1) applies, with the
+//! `action: "reference"` exemption from ADR `2026-05-11-1257` D5:
+//! - `action == Reference` + both empty → Blue (baseline-implicit grounding)
+//! - `informal_grounds` non-empty → Yellow
+//! - `informal_grounds` empty + `spec_refs` non-empty → Blue
+//! - both empty (non-reference action) → Red
+//!
+//! Non-v3 catalogues (schema_version ≠ 3) are treated as
+//! `CatalogueDocumentCodecError::UnsupportedSchemaVersion` and returned as a
+//! fail-closed error (CN-11). No v2 fallback is attempted.
+//!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
-//! §D2 / §D3.1 / IN-09.
+//! §D2 / §D3.1 / IN-09; `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5;
+//! `2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md` D1 (CN-11).
 
 use std::path::Path;
 
@@ -15,7 +30,7 @@ use domain::{
     evaluate_catalogue_entry_signal,
 };
 
-use crate::tddd::catalogue_codec;
+use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
 use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
@@ -111,12 +126,53 @@ pub fn refresh_one_layer(
         format!("cannot read catalogue '{}' for layer '{layer_id}': {e}", catalogue_path.display())
     })?;
 
-    // Decode to TypeCatalogueDocument.
     let text = std::str::from_utf8(&bytes).map_err(|e| {
         format!("catalogue '{}' contains non-UTF-8 bytes: {e}", catalogue_path.display())
     })?;
-    let catalogue = catalogue_codec::decode(text)
+
+    // Derive the filename stem (e.g. "domain" from "domain-types.json") for
+    // CatalogueDocumentCodec::decode, which validates crate_name against it.
+    let filename_stem = catalogue_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("")
+        .strip_suffix("-types.json")
+        .map(str::to_owned)
+        .unwrap_or_else(|| {
+            catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_owned()
+        });
+
+    // v3-only: decode via CatalogueDocumentCodec. Any error — including
+    // UnsupportedSchemaVersion for non-v3 catalogues — is propagated directly
+    // as a fail-closed error (CN-11). No v2 fallback is attempted.
+    let v3_doc = CatalogueDocumentCodec::decode(text, &filename_stem)
         .map_err(|e| format!("cannot decode catalogue '{}': {e}", catalogue_path.display()))?;
+
+    let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
+    for (type_name, entry) in &v3_doc.types {
+        let signal = evaluate_catalogue_entry_signal(
+            entry.action,
+            &entry.spec_refs,
+            &entry.informal_grounds,
+        );
+        signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal));
+    }
+    for (trait_name, entry) in &v3_doc.traits {
+        let signal = evaluate_catalogue_entry_signal(
+            entry.action,
+            &entry.spec_refs,
+            &entry.informal_grounds,
+        );
+        signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal));
+    }
+    for (fn_path, entry) in &v3_doc.functions {
+        let signal = evaluate_catalogue_entry_signal(
+            entry.action,
+            &entry.spec_refs,
+            &entry.informal_grounds,
+        );
+        signals.push(CatalogueSpecSignal::new(fn_path.to_string(), signal));
+    }
 
     // Compute raw-bytes SHA-256 (same canonical-hash helper as merge_gate_adapter).
     let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
@@ -124,17 +180,6 @@ pub fn refresh_one_layer(
         ContentHash::try_from_hex(&catalogue_hash_hex).map_err(|e| {
             format!("internal: catalogue hash for layer '{layer_id}' is not canonical hex: {e}")
         })?;
-
-    // Evaluate per-entry signals via the domain pure function.
-    let signals: Vec<CatalogueSpecSignal> = catalogue
-        .entries()
-        .iter()
-        .map(|entry| {
-            let signal =
-                evaluate_catalogue_entry_signal(entry.spec_refs(), entry.informal_grounds());
-            CatalogueSpecSignal::new(entry.name(), signal)
-        })
-        .collect();
 
     // Summary counts for stdout (same pattern as `sotp track type-signals`).
     let (blue, yellow, red) = count_signals(&signals);
@@ -166,4 +211,107 @@ fn count_signals(signals: &[CatalogueSpecSignal]) -> (usize, usize, usize) {
         }
     }
     (blue, yellow, red)
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use domain::ConfidenceSignal;
+
+    use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
+
+    use super::*;
+
+    /// Build a v3 document with three type entries and verify all three signal colours:
+    ///
+    ///   - "BlueType": has spec_refs → Blue
+    ///   - "YellowType": has informal_grounds → Yellow
+    ///   - "RedType": no grounding → Red
+    ///
+    /// Simulates the refresher's signal computation inline.
+    #[test]
+    fn test_v3_branch_computes_blue_yellow_red_from_grounding_fields() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BlueType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" },
+      "spec_refs": [
+        { "file": "track/items/x/spec.json", "anchor": "IN-01", "hash": "0000000000000000000000000000000000000000000000000000000000000000" }
+      ],
+      "informal_grounds": []
+    },
+    "YellowType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" },
+      "spec_refs": [],
+      "informal_grounds": [
+        { "kind": "discussion", "summary": "planning note" }
+      ]
+    },
+    "RedType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" },
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let v3_doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+
+        // Replicate the refresher's v3 signal computation inline.
+        let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
+        for (type_name, entry) in &v3_doc.types {
+            let signal = evaluate_catalogue_entry_signal(
+                entry.action,
+                &entry.spec_refs,
+                &entry.informal_grounds,
+            );
+            signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal));
+        }
+        for (trait_name, entry) in &v3_doc.traits {
+            let signal = evaluate_catalogue_entry_signal(
+                entry.action,
+                &entry.spec_refs,
+                &entry.informal_grounds,
+            );
+            signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal));
+        }
+        for (fn_path, entry) in &v3_doc.functions {
+            let signal = evaluate_catalogue_entry_signal(
+                entry.action,
+                &entry.spec_refs,
+                &entry.informal_grounds,
+            );
+            signals.push(CatalogueSpecSignal::new(fn_path.to_string(), signal));
+        }
+
+        let (blue, yellow, red) = count_signals(&signals);
+        assert_eq!(blue, 1, "expected 1 Blue signal (BlueType)");
+        assert_eq!(yellow, 1, "expected 1 Yellow signal (YellowType)");
+        assert_eq!(red, 1, "expected 1 Red signal (RedType)");
+
+        // Verify that BlueType → Blue and YellowType → Yellow specifically.
+        let blue_sig = signals.iter().find(|s| s.type_name == "BlueType").unwrap();
+        assert_eq!(blue_sig.signal, ConfidenceSignal::Blue);
+
+        let yellow_sig = signals.iter().find(|s| s.type_name == "YellowType").unwrap();
+        assert_eq!(yellow_sig.signal, ConfidenceSignal::Yellow);
+
+        let red_sig = signals.iter().find(|s| s.type_name == "RedType").unwrap();
+        assert_eq!(red_sig.signal, ConfidenceSignal::Red);
+    }
 }

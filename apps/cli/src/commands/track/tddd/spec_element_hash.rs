@@ -2,15 +2,13 @@
 //! spec.json elements so type-designer can author `spec_refs[].hash`
 //! values for catalogue entries (Cat-Spec Blue promotion).
 //!
-//! Reuses `infrastructure::verify::plan_artifact_refs::build_element_map`
-//! + `canonical_json_sha256` so the digests match the format consumed by
-//!   `sotp verify catalogue-spec-refs`.
+//! Thin CLI wrapper: validates the track id, delegates all I/O (including
+//! the `symlink_metadata` guard on `items_dir`) to
+//! `infrastructure::track::spec_element_hash::compute_spec_element_hashes`,
+//! then maps the result to stdout output plus an exit code.
 
-use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::process::ExitCode;
-
-use infrastructure::track::symlink_guard::reject_symlinks_below;
 
 use crate::CliError;
 
@@ -33,87 +31,27 @@ pub fn execute_spec_element_hash(
     crate::commands::track::validate_track_id_str(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
 
-    // Security: verify the items_dir root itself is not a symlink before using it as the
-    // trusted anchor for `reject_symlinks_below`. That helper only checks components
-    // *below* the trusted_root, so a symlinked items_dir would bypass all path guards.
-    // Mirrors `execute_catalogue_spec_signals` (catalogue_spec_signals.rs).
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(CliError::Message(format!(
-                "symlink guard: refusing to follow symlink at items_dir: {}",
-                items_dir.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(CliError::Message(format!(
-                "symlink guard: cannot stat items_dir {}: {e}",
-                items_dir.display()
-            )));
-        }
-    }
-
-    // Security: verify the track directory itself is not a symlink before joining
-    // spec.json beneath it. A symlinked track directory would escape the trusted tree
-    // before `reject_symlinks_below` (anchored at `items_dir`) can catch it.
-    // Mirrors `execute_catalogue_spec_signals` (catalogue_spec_signals.rs).
-    let track_dir = items_dir.join(&track_id);
-    match track_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(CliError::Message(format!(
-                "symlink guard: refusing to follow symlink at track directory: {}",
-                track_dir.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Track directory absent — the spec.json read below will produce a
-            // clear error message. Don't short-circuit here.
-        }
-        Err(e) => {
-            return Err(CliError::Message(format!(
-                "symlink guard: cannot stat track directory {}: {e}",
-                track_dir.display()
-            )));
-        }
-    }
-
-    let spec_path = track_dir.join("spec.json");
-
-    // Security: reject symlinks at spec.json and every ancestor below items_dir.
-    reject_symlinks_below(&spec_path, &items_dir).map_err(|e| {
-        CliError::Message(format!(
-            "symlink guard: refusing to read spec.json at '{}': {e}",
-            spec_path.display()
-        ))
-    })?;
-
-    let text = std::fs::read_to_string(&spec_path).map_err(|e| {
-        CliError::Message(format!("cannot read spec.json at '{}': {e}", spec_path.display()))
-    })?;
-
-    // Validate schema first so malformed spec.json fails closed instead of
-    // emitting a partial hash map (mirrors verify_catalogue_spec_refs.rs).
-    infrastructure::spec::codec::decode(&text).map_err(|e| {
-        CliError::Message(format!("spec.json schema error at '{}': {e}", spec_path.display()))
-    })?;
-
-    let raw: serde_json::Value = serde_json::from_str(&text)
-        .map_err(|e| CliError::Message(format!("spec.json JSON parse error: {e}")))?;
-
-    let hashes = compute_hashes_from_raw(&raw);
+    // Delegate all I/O (symlink guard on items_dir, spec.json load, hash computation)
+    // to the infrastructure layer. CLI is wiring + output formatting only.
+    let hashes = infrastructure::track::spec_element_hash::compute_spec_element_hashes(
+        items_dir,
+        &track_id,
+        anchor.as_deref(),
+    )
+    .map_err(|e| CliError::Message(e.0))?;
 
     match anchor {
-        Some(anchor_id) => match hashes.get(&anchor_id) {
-            Some(hash) => {
+        Some(anchor_id) => {
+            // compute_spec_element_hashes already validated the anchor; the map has exactly
+            // one entry when an anchor is requested and succeeded.
+            if let Some(hash) = hashes.get(&anchor_id) {
                 println!("{hash}");
                 Ok(ExitCode::SUCCESS)
+            } else {
+                // Should not be reached (infrastructure returns Err on missing anchor).
+                Err(CliError::Message(format!("anchor '{anchor_id}' not found in spec.json")))
             }
-            None => Err(CliError::Message(format!(
-                "anchor '{anchor_id}' not found in spec.json (available: {})",
-                hashes.keys().cloned().collect::<Vec<_>>().join(", ")
-            ))),
-        },
+        }
         None => {
             let json = serde_json::to_string_pretty(&hashes)
                 .map_err(|e| CliError::Message(format!("JSON encode error: {e}")))?;
@@ -121,20 +59,6 @@ pub fn execute_spec_element_hash(
             Ok(ExitCode::SUCCESS)
         }
     }
-}
-
-/// Build a sorted map from spec element id to canonical SHA-256 hex.
-///
-/// Extracted for unit-test access: callers can verify both the keys and the
-/// 64-char hex format of every value without capturing stdout.
-fn compute_hashes_from_raw(raw: &serde_json::Value) -> BTreeMap<String, String> {
-    let element_map = infrastructure::verify::plan_artifact_refs::build_element_map(raw);
-    let mut hashes: BTreeMap<String, String> = BTreeMap::new();
-    for (id, canonical) in element_map {
-        let hash = infrastructure::verify::plan_artifact_refs::canonical_json_sha256(&canonical);
-        hashes.insert(id, hash);
-    }
-    hashes
 }
 
 #[cfg(test)]
@@ -170,27 +94,8 @@ mod tests {
         (items_dir, track_dir)
     }
 
-    #[test]
-    fn test_compute_hashes_from_raw_produces_64_char_lowercase_hex_per_element() {
-        // Verifies that every value in the output map is a 64-char lowercase hex string
-        // (i.e., the output of canonical_json_sha256) and that both spec sections are
-        // covered (goal + scope.in_scope).
-        let raw: serde_json::Value = serde_json::from_str(VALID_SPEC_JSON).unwrap();
-        let hashes = compute_hashes_from_raw(&raw);
-
-        // VALID_SPEC_JSON has GL-01 (goal) and IN-01 (in_scope).
-        assert_eq!(hashes.len(), 2, "expected two elements: GL-01 and IN-01");
-        assert!(hashes.contains_key("GL-01"), "GL-01 must be present");
-        assert!(hashes.contains_key("IN-01"), "IN-01 must be present");
-
-        for (id, hex) in &hashes {
-            assert_eq!(hex.len(), 64, "hash for '{id}' must be 64 chars, got {}: {hex}", hex.len());
-            assert!(
-                hex.chars().all(|c| c.is_ascii_hexdigit() && !c.is_uppercase()),
-                "hash for '{id}' must be lowercase hex: {hex}"
-            );
-        }
-    }
+    // Note: the raw-hash computation test (formerly test_compute_hashes_from_raw_*) has
+    // been moved to infrastructure::track::spec_element_hash tests, where the logic lives.
 
     #[test]
     fn test_execute_spec_element_hash_with_no_anchor_returns_success() {
@@ -241,7 +146,7 @@ mod tests {
         let result = execute_spec_element_hash(items_dir, "my-track-2026-04-26".to_owned(), None);
         assert!(result.is_err());
         let msg = result.unwrap_err().to_string();
-        assert!(msg.contains("cannot read spec.json"), "error should mention read failure: {msg}");
+        assert!(msg.contains("spec.json"), "error should mention spec.json read failure: {msg}");
     }
 
     #[test]

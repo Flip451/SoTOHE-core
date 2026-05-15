@@ -6,6 +6,47 @@
 //! `knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md`
 //! §S3 / IN-05 / AC-05 / CN-06.
 //!
+//! ## T025: v3-native migration
+//!
+//! As of T025 the linter accepts `&CatalogueDocument` (v3 schema). The v3
+//! `DataRole` / `ContractRole` / `TypeKindV2` values are converted to
+//! **v2-compatible** kind-tag strings (the grandfathered scheme) that match
+//! the signal evaluator's storage keys:
+//!
+//! Type entries (`types` BTreeMap) — kind derived from both `TypeKindV2` and
+//! `DataRole` (structural shape takes priority):
+//!
+//! | `TypeKindV2` + `DataRole`                        | kind tag           |
+//! |--------------------------------------------------|-------------------|
+//! | `PlainStruct { typestate: Some(_), .. }` (any role) | `typestate`    |
+//! | `Enum { .. }` with `ErrorType` role              | `error_type`      |
+//! | `Enum { .. }` with other role                    | `enum`            |
+//! | Other shape, `ValueObject`/`Entity`/`AggregateRoot`/`Specification` | `value_object` |
+//! | Other shape, `DomainService`                     | `domain_service`  |
+//! | Other shape, `Factory`                           | `factory`         |
+//! | Other shape, `UseCase`                           | `use_case`        |
+//! | Other shape, `Interactor`                        | `interactor`      |
+//! | Other shape, `Command`                           | `command`         |
+//! | Other shape, `Query`                             | `query`           |
+//! | Other shape, `Dto`                               | `dto`             |
+//! | Other shape, `ErrorType`                         | `error_type`      |
+//! | Other shape, `SecondaryAdapter`                  | `secondary_adapter`|
+//!
+//! Trait entries (`traits` BTreeMap):
+//!
+//! | `ContractRole` variant    | kind tag              |
+//! |--------------------------|----------------------|
+//! | `SpecificationPort`      | `secondary_port`     |
+//! | `ApplicationService`     | `application_service`|
+//! | `SecondaryPort`          | `secondary_port`     |
+//!
+//! Function entries (`functions` BTreeMap):
+//!
+//! | `FunctionRole` variant    | kind tag              |
+//! |--------------------------|----------------------|
+//! | `FreeFunction`           | `free_function`      |
+//! | `UseCaseFunction`        | `free_function`      |
+//!
 //! ## Rule primitives
 //!
 //! - `FieldEmpty` — violation when the named field is **non-empty** for entries
@@ -15,34 +56,134 @@
 //! - `KindLayerConstraint` — violation when the injected `layer_id` is **not**
 //!   in `permitted_layers` for entries of `target_kind`.
 //!
+//! ## Supported field names (v3 mapping)
+//!
+//! | `target_field`              | v3 field checked                                      |
+//! |-----------------------------|------------------------------------------------------|
+//! | `expected_methods`          | `TypeEntry::methods` or `TraitEntry::methods` length  |
+//! | `expected_members`          | field count from `TypeKindV2` (PlainStruct / TupleStruct fields) |
+//! | `expected_variants`         | variant count from `TypeKindV2::Enum::variants`       |
+//!
+//! `expected_members` is derived from the `TypeKindV2` variant of `TypeEntry`:
+//! - `PlainStruct { fields, .. }` → `fields.len()`
+//! - `TupleStruct { fields, .. }` → `fields.len()`
+//! - `UnitStruct` → `0`
+//! - `Enum { .. }` / `TypeAlias { .. }` → `Ok(None)` (field concept not applicable)
+//!
+//! `expected_variants` is derived from `TypeKindV2::Enum { variants }`:
+//! - `Enum { variants }` → `variants.len()`
+//! - All other kinds → `Ok(None)`
+//!
+//! The legacy v2 `declares_application_service` field has no v3 equivalent (the
+//! v3 `TypeEntry` carries no such field): a `FieldEmpty` / `FieldNonEmpty` rule
+//! targeting it is **rejected** as an unsupported `target_field`
+//! (`CatalogueLinterError::InvalidRuleConfig`) rather than silently passing —
+//! the linter never reports a clean result for a constraint it cannot enforce.
+//!
 //! ## Disabled rules opt-out (CN-06)
 //!
 //! Construct with [`InMemoryCatalogueLinter::with_disabled_rules`] and pass a
 //! list of rule-id strings (format: `"{rule_kind:?}::{target_kind}"`, e.g.
 //! `"FieldEmpty::value_object"`). Rules whose id appears in this list are
 //! silently skipped, allowing opt-out for false positives.
-//!
-//! ## Supported field names
-//!
-//! The `FieldEmpty` / `FieldNonEmpty` primitives recognise the following
-//! `target_field` values:
-//!
-//! | `target_field` | Applicable `target_kind`(s) |
-//! |---|---|
-//! | `expected_methods` | All struct-based kinds (typestate, value_object, use_case, interactor, dto, command, query, factory, secondary_adapter, domain_service, secondary_port, application_service) |
-//! | `expected_members` | typestate, value_object, use_case, interactor, dto, command, query, factory, secondary_adapter, domain_service |
-//! | `expected_variants` | enum, error_type |
-//! | `declares_application_service` | interactor |
-//!
-//! Any other `target_field` name triggers
-//! [`CatalogueLinterError::InvalidRuleConfig`].
 
-use domain::TypeCatalogueDocument;
-use domain::tddd::catalogue::TypeDefinitionKind;
 use domain::tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,
     CatalogueLinterRuleKind,
 };
+use domain::tddd::catalogue_v2::{
+    CatalogueDocument, ContractRole, DataRole, FunctionRole, TypeKindV2,
+};
+
+// ---------------------------------------------------------------------------
+// Kind-tag helpers
+// ---------------------------------------------------------------------------
+
+/// Derives the v2-compatible kind tag for a v3 `TypeEntry`.
+///
+/// This is a self-contained definition of the grandfathered kind-tag mapping.
+/// Lint rules targeting v2 kind tags fire for v3 entries equivalently:
+///
+/// 1. `PlainStruct { typestate: Some(_) }` → `"typestate"`
+/// 2. `Enum { .. }` with `ErrorType` role → `"error_type"`
+/// 3. `Enum { .. }` with other role → `"enum"`
+/// 4. All other shapes → v2-compat role mapping via `data_role_kind_tag_v2compat`
+///
+/// The role mapping collapses `Entity`, `AggregateRoot`, and `Specification` to
+/// `"value_object"` so that `value_object` lint rules cover those entries (the v2
+/// stub rendered all three as `ValueObject` shape).
+fn type_entry_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
+    match kind {
+        TypeKindV2::PlainStruct { typestate: Some(_), .. } => "typestate",
+        TypeKindV2::Enum { .. } if matches!(role, DataRole::ErrorType) => "error_type",
+        TypeKindV2::Enum { .. } => "enum",
+        _ => data_role_kind_tag_v2compat(role),
+    }
+}
+
+/// Maps a v3 `DataRole` to its v2-compatible kind tag string.
+///
+/// `Entity`, `AggregateRoot`, and `Specification` collapse to `"value_object"`
+/// (v2-compatible kind-tag scheme, grandfathered). All other roles map 1-to-1.
+fn data_role_kind_tag_v2compat(role: DataRole) -> &'static str {
+    match role {
+        DataRole::ValueObject
+        | DataRole::Entity
+        | DataRole::AggregateRoot
+        | DataRole::Specification => "value_object",
+        DataRole::DomainService => "domain_service",
+        DataRole::Factory => "factory",
+        DataRole::UseCase => "use_case",
+        DataRole::Interactor => "interactor",
+        DataRole::Command => "command",
+        DataRole::Query => "query",
+        DataRole::Dto => "dto",
+        DataRole::ErrorType => "error_type",
+        DataRole::SecondaryAdapter => "secondary_adapter",
+    }
+}
+
+fn contract_role_kind_tag(role: ContractRole) -> &'static str {
+    match role {
+        // SpecificationPort collapses to "secondary_port" for lint-rule compatibility:
+        // both SecondaryPort and SpecificationPort map to kind_tag "secondary_port"
+        // under the v2-compatible (grandfathered) scheme. Existing lint rules
+        // configured for "secondary_port" must continue to fire for SpecificationPort
+        // entries so rule behaviour is equivalent to the v2 mapping.
+        ContractRole::SpecificationPort | ContractRole::SecondaryPort => "secondary_port",
+        ContractRole::ApplicationService => "application_service",
+    }
+}
+
+fn function_role_kind_tag(role: FunctionRole) -> &'static str {
+    match role {
+        // All FunctionRole variants collapse to "free_function" for lint-rule
+        // compatibility (v2-compatible grandfathered scheme): both `FreeFunction` and
+        // `UseCaseFunction` map to `"free_function"`, matching the `type_signals_evaluator`
+        // storage key. Lint rules targeting "free_function" fire for UseCaseFunction entries.
+        FunctionRole::FreeFunction | FunctionRole::UseCaseFunction => "free_function",
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Field-length bundle
+// ---------------------------------------------------------------------------
+
+/// Field-length bundle passed to [`InMemoryCatalogueLinter::apply_rule_to_entry`].
+///
+/// Grouping these reduces the argument count below the `clippy::too_many_arguments`
+/// threshold and keeps the call sites readable.
+struct EntryFieldLengths {
+    /// Length of the `methods` Vec, or `None` when the `expected_methods` field
+    /// concept is not applicable to the entry kind (e.g. function entries have no
+    /// `methods` field — `expected_methods` rules must skip them, not fire on `0`).
+    methods: Option<usize>,
+    /// Field count from `TypeKindV2` (`None` when not applicable — e.g. for
+    /// traits, functions, enum types, and type aliases).
+    members: Option<usize>,
+    /// Variant count from `TypeKindV2::Enum` (`None` when not applicable).
+    variants: Option<usize>,
+}
 
 // ---------------------------------------------------------------------------
 // InMemoryCatalogueLinter
@@ -51,10 +192,11 @@ use domain::tddd::catalogue_linter::{
 /// In-memory adapter for the [`CatalogueLinter`] secondary port.
 ///
 /// Runs catalogue lint rules entirely in memory against a
-/// [`TypeCatalogueDocument`]. Instantiate with [`InMemoryCatalogueLinter::new`]
-/// for a fully-active linter, or with
+/// [`CatalogueDocument`] (v3 schema). Instantiate with
+/// [`InMemoryCatalogueLinter::new`] for a fully-active linter, or with
 /// [`InMemoryCatalogueLinter::with_disabled_rules`] to suppress specific rules
 /// by their rule-id (see CN-06).
+#[derive(Default)]
 pub struct InMemoryCatalogueLinter {
     disabled_rules: Vec<String>,
 }
@@ -62,12 +204,8 @@ pub struct InMemoryCatalogueLinter {
 impl InMemoryCatalogueLinter {
     /// The set of `target_field` names recognized by the `FieldEmpty` and
     /// `FieldNonEmpty` rule primitives.
-    const KNOWN_TARGET_FIELDS: &'static [&'static str] = &[
-        "expected_methods",
-        "expected_members",
-        "expected_variants",
-        "declares_application_service",
-    ];
+    const KNOWN_TARGET_FIELDS: &'static [&'static str] =
+        &["expected_methods", "expected_members", "expected_variants"];
 
     /// Creates a new `InMemoryCatalogueLinter` with no disabled rules.
     #[must_use]
@@ -105,129 +243,114 @@ impl InMemoryCatalogueLinter {
         } else {
             Err(CatalogueLinterError::InvalidRuleConfig(format!(
                 "unknown target_field: \"{field_name}\"; supported values are \
-                 expected_methods, expected_members, expected_variants, declares_application_service"
+                 expected_methods, expected_members, expected_variants"
             )))
         }
     }
 
-    /// Extracts the length of the named field from a `TypeDefinitionKind`.
+    /// Resolve the effective field length for a `FieldEmpty` / `FieldNonEmpty` rule.
     ///
-    /// Returns:
-    /// - `Ok(Some(len))` — field found; `len` is the number of elements.
-    /// - `Ok(None)` — the entry kind does not carry this field at all (field
-    ///   not applicable to this kind — skip the entry rather than error).
-    /// - `Err(...)` — the field name is unknown across all kinds; this
-    ///   indicates an invalid rule configuration.
-    fn field_len(
-        kind: &TypeDefinitionKind,
+    /// Returns `Ok(Some(len))` when the field is supported for this entry kind,
+    /// `Ok(None)` when the field is not applicable (skip the entry silently),
+    /// or `Err` for unknown field names.
+    fn field_len_for_entry(
+        lengths: &EntryFieldLengths,
         field_name: &str,
     ) -> Result<Option<usize>, CatalogueLinterError> {
         match field_name {
-            "expected_methods" => {
-                let len = match kind {
-                    TypeDefinitionKind::Typestate { expected_methods, .. } => {
-                        expected_methods.len()
-                    }
-                    TypeDefinitionKind::ValueObject { expected_methods, .. } => {
-                        expected_methods.len()
-                    }
-                    TypeDefinitionKind::SecondaryPort { expected_methods } => {
-                        expected_methods.len()
-                    }
-                    TypeDefinitionKind::ApplicationService { expected_methods } => {
-                        expected_methods.len()
-                    }
-                    TypeDefinitionKind::UseCase { expected_methods, .. } => expected_methods.len(),
-                    TypeDefinitionKind::Interactor { expected_methods, .. } => {
-                        expected_methods.len()
-                    }
-                    TypeDefinitionKind::Dto { expected_methods, .. } => expected_methods.len(),
-                    TypeDefinitionKind::Command { expected_methods, .. } => expected_methods.len(),
-                    TypeDefinitionKind::Query { expected_methods, .. } => expected_methods.len(),
-                    TypeDefinitionKind::Factory { expected_methods, .. } => expected_methods.len(),
-                    TypeDefinitionKind::SecondaryAdapter { expected_methods, .. } => {
-                        expected_methods.len()
-                    }
-                    TypeDefinitionKind::DomainService { expected_methods, .. } => {
-                        expected_methods.len()
-                    }
-                    // Kinds that do not carry expected_methods — skip entry.
-                    TypeDefinitionKind::Enum { .. }
-                    | TypeDefinitionKind::ErrorType { .. }
-                    | TypeDefinitionKind::FreeFunction { .. } => return Ok(None),
-                };
-                Ok(Some(len))
-            }
-
-            "expected_members" => {
-                let len = match kind {
-                    TypeDefinitionKind::Typestate { expected_members, .. } => {
-                        expected_members.len()
-                    }
-                    TypeDefinitionKind::ValueObject { expected_members, .. } => {
-                        expected_members.len()
-                    }
-                    TypeDefinitionKind::UseCase { expected_members, .. } => expected_members.len(),
-                    TypeDefinitionKind::Interactor { expected_members, .. } => {
-                        expected_members.len()
-                    }
-                    TypeDefinitionKind::Dto { expected_members, .. } => expected_members.len(),
-                    TypeDefinitionKind::Command { expected_members, .. } => expected_members.len(),
-                    TypeDefinitionKind::Query { expected_members, .. } => expected_members.len(),
-                    TypeDefinitionKind::Factory { expected_members, .. } => expected_members.len(),
-                    TypeDefinitionKind::SecondaryAdapter { expected_members, .. } => {
-                        expected_members.len()
-                    }
-                    TypeDefinitionKind::DomainService { expected_members, .. } => {
-                        expected_members.len()
-                    }
-                    // Kinds that do not carry expected_members — skip entry.
-                    TypeDefinitionKind::SecondaryPort { .. }
-                    | TypeDefinitionKind::ApplicationService { .. }
-                    | TypeDefinitionKind::Enum { .. }
-                    | TypeDefinitionKind::ErrorType { .. }
-                    | TypeDefinitionKind::FreeFunction { .. } => return Ok(None),
-                };
-                Ok(Some(len))
-            }
-
-            "expected_variants" => {
-                let len = match kind {
-                    TypeDefinitionKind::Enum { expected_variants } => expected_variants.len(),
-                    TypeDefinitionKind::ErrorType { expected_variants } => expected_variants.len(),
-                    // Kinds that do not carry expected_variants — skip entry.
-                    _ => return Ok(None),
-                };
-                Ok(Some(len))
-            }
-
-            "declares_application_service" => {
-                let len = match kind {
-                    TypeDefinitionKind::Interactor { declares_application_service, .. } => {
-                        declares_application_service.len()
-                    }
-                    // Kinds that do not carry declares_application_service — skip entry.
-                    _ => return Ok(None),
-                };
-                Ok(Some(len))
-            }
-
+            "expected_methods" => Ok(lengths.methods),
+            "expected_members" => Ok(lengths.members),
+            "expected_variants" => Ok(lengths.variants),
+            // The legacy v2 `declares_application_service` field has no v3
+            // equivalent — reject the rule rather than silently skipping it.
             other => Err(CatalogueLinterError::InvalidRuleConfig(format!(
                 "unknown target_field: \"{other}\"; supported values are \
-                 expected_methods, expected_members, expected_variants, declares_application_service"
+                 expected_methods, expected_members, expected_variants"
             ))),
         }
     }
-}
 
-impl Default for InMemoryCatalogueLinter {
-    fn default() -> Self {
-        Self::new()
+    /// Apply a single rule to a v3 entry.
+    ///
+    /// Appends to `violations` when the rule fires.
+    ///
+    /// # Errors
+    ///
+    /// Returns `CatalogueLinterError::InvalidRuleConfig` for unknown `target_field`.
+    fn apply_rule_to_entry(
+        rule: &CatalogueLinterRule,
+        entry_name: &str,
+        kind_tag: &str,
+        lengths: &EntryFieldLengths,
+        layer_id: &str,
+        violations: &mut Vec<CatalogueLintViolation>,
+    ) -> Result<(), CatalogueLinterError> {
+        if kind_tag != rule.target_kind() {
+            return Ok(());
+        }
+
+        match rule.rule_kind() {
+            CatalogueLinterRuleKind::FieldEmpty => {
+                let field_name = rule.target_field().unwrap_or("");
+                match Self::field_len_for_entry(lengths, field_name)? {
+                    None => {}
+                    Some(len) if len > 0 => {
+                        violations.push(CatalogueLintViolation::new(
+                            CatalogueLinterRuleKind::FieldEmpty,
+                            entry_name,
+                            format!(
+                                "FieldEmpty rule violated: `{field_name}` must be empty \
+                                 for `{kind_tag}` entries, but has {len} item(s)"
+                            ),
+                        ));
+                    }
+                    Some(_) => {}
+                }
+            }
+
+            CatalogueLinterRuleKind::FieldNonEmpty => {
+                let field_name = rule.target_field().unwrap_or("");
+                match Self::field_len_for_entry(lengths, field_name)? {
+                    None => {}
+                    Some(0) => {
+                        violations.push(CatalogueLintViolation::new(
+                            CatalogueLinterRuleKind::FieldNonEmpty,
+                            entry_name,
+                            format!(
+                                "FieldNonEmpty rule violated: `{field_name}` must not be \
+                                 empty for `{kind_tag}` entries"
+                            ),
+                        ));
+                    }
+                    Some(_) => {}
+                }
+            }
+
+            CatalogueLinterRuleKind::KindLayerConstraint => {
+                if !rule.permitted_layers().contains(&layer_id.to_owned()) {
+                    violations.push(CatalogueLintViolation::new(
+                        CatalogueLinterRuleKind::KindLayerConstraint,
+                        entry_name,
+                        format!(
+                            "KindLayerConstraint rule violated: `{kind_tag}` is not permitted in \
+                             layer `{layer_id}`; permitted layers: [{}]",
+                            rule.permitted_layers().join(", "),
+                        ),
+                    ));
+                }
+            }
+        }
+
+        Ok(())
     }
 }
 
 impl CatalogueLinter for InMemoryCatalogueLinter {
-    /// Run `rules` against `catalogue` for the given `layer_id`.
+    /// Run `rules` against `catalogue` (v3 `CatalogueDocument`) for the given `layer_id`.
+    ///
+    /// Iterates over all `types`, `traits`, and `functions` entries in the v3
+    /// `CatalogueDocument`, mapping each entry's `DataRole` / `ContractRole` /
+    /// `FunctionRole` to a snake_case kind tag for rule matching.
     ///
     /// Returns the full list of violations found. An empty `Vec` means no
     /// rules fired.
@@ -239,7 +362,7 @@ impl CatalogueLinter for InMemoryCatalogueLinter {
     fn run(
         &self,
         rules: &[CatalogueLinterRule],
-        catalogue: &TypeCatalogueDocument,
+        catalogue: &CatalogueDocument,
         layer_id: &str,
     ) -> Result<Vec<CatalogueLintViolation>, CatalogueLinterError> {
         let mut violations: Vec<CatalogueLintViolation> = Vec::new();
@@ -251,90 +374,85 @@ impl CatalogueLinter for InMemoryCatalogueLinter {
             }
 
             // Validate field-based rules once per rule, before scanning entries.
-            // This guarantees InvalidRuleConfig is returned for unknown
-            // target_field values even when no catalogue entries match
-            // target_kind (so the per-entry check would never run).
             match rule.rule_kind() {
                 CatalogueLinterRuleKind::FieldEmpty | CatalogueLinterRuleKind::FieldNonEmpty => {
                     let field_name = rule.target_field().unwrap_or("");
                     Self::validate_field_rule_target_field(field_name)?;
                 }
-                CatalogueLinterRuleKind::KindLayerConstraint => {
-                    // No target_field to validate for layer constraint rules.
-                }
+                CatalogueLinterRuleKind::KindLayerConstraint => {}
             }
 
-            for entry in catalogue.entries() {
-                // Only process entries whose kind matches the rule's target_kind.
-                if entry.kind().kind_tag() != rule.target_kind() {
-                    continue;
-                }
+            // Walk v3 type entries.
+            for (type_name, type_entry) in &catalogue.types {
+                // Derive the v2-compatible kind tag from both role and structural
+                // kind (TypeKindV2), matching the signal evaluator's storage key.
+                // This ensures typestate structs fire `typestate` rules, enums
+                // fire `enum` or `error_type` rules (not `value_object`/role rules),
+                // and Entity/AggregateRoot/Specification entries fire `value_object`
+                // rules — per the v2-compatible kind-tag scheme.
+                let kind_tag = type_entry_kind_tag(type_entry.role, &type_entry.kind);
+                // Derive members_len and variants_len from TypeKindV2 so that
+                // `expected_members` and `expected_variants` rules can fire on v3
+                // entries equivalently to the v2 linter.
+                let (members_len, variants_len) = match &type_entry.kind {
+                    TypeKindV2::UnitStruct => (Some(0), None),
+                    TypeKindV2::PlainStruct { fields, .. } => (Some(fields.len()), None),
+                    TypeKindV2::TupleStruct { fields, .. } => (Some(fields.len()), None),
+                    TypeKindV2::Enum { variants } => (None, Some(variants.len())),
+                    TypeKindV2::TypeAlias { .. } => (None, None),
+                };
+                let lengths = EntryFieldLengths {
+                    methods: Some(type_entry.methods.len()),
+                    members: members_len,
+                    variants: variants_len,
+                };
+                Self::apply_rule_to_entry(
+                    rule,
+                    type_name.as_str(),
+                    kind_tag,
+                    &lengths,
+                    layer_id,
+                    &mut violations,
+                )?;
+            }
 
-                match rule.rule_kind() {
-                    CatalogueLinterRuleKind::FieldEmpty => {
-                        // target_field is validated to be Some (non-empty) by try_new.
-                        let field_name = rule.target_field().unwrap_or("");
-                        match Self::field_len(entry.kind(), field_name)? {
-                            None => {
-                                // Field not applicable to this kind — skip.
-                            }
-                            Some(len) if len > 0 => {
-                                // Field is non-empty — rule fires.
-                                violations.push(CatalogueLintViolation::new(
-                                    CatalogueLinterRuleKind::FieldEmpty,
-                                    entry.name(),
-                                    format!(
-                                        "FieldEmpty rule violated: `{field_name}` must be empty \
-                                         for `{}` entries, but has {len} item(s)",
-                                        rule.target_kind(),
-                                    ),
-                                ));
-                            }
-                            Some(_) => {
-                                // Field is empty — rule satisfied.
-                            }
-                        }
-                    }
+            // Walk v3 trait entries.
+            // Traits have no members or variants.
+            for (trait_name, trait_entry) in &catalogue.traits {
+                let kind_tag = contract_role_kind_tag(trait_entry.role);
+                let lengths = EntryFieldLengths {
+                    methods: Some(trait_entry.methods.len()),
+                    members: None,
+                    variants: None,
+                };
+                Self::apply_rule_to_entry(
+                    rule,
+                    trait_name.as_str(),
+                    kind_tag,
+                    &lengths,
+                    layer_id,
+                    &mut violations,
+                )?;
+            }
 
-                    CatalogueLinterRuleKind::FieldNonEmpty => {
-                        let field_name = rule.target_field().unwrap_or("");
-                        match Self::field_len(entry.kind(), field_name)? {
-                            None => {
-                                // Field not applicable to this kind — skip.
-                            }
-                            Some(0) => {
-                                // Field is empty — rule fires.
-                                violations.push(CatalogueLintViolation::new(
-                                    CatalogueLinterRuleKind::FieldNonEmpty,
-                                    entry.name(),
-                                    format!(
-                                        "FieldNonEmpty rule violated: `{field_name}` must not be \
-                                         empty for `{}` entries",
-                                        rule.target_kind(),
-                                    ),
-                                ));
-                            }
-                            Some(_) => {
-                                // Field is non-empty — rule satisfied.
-                            }
-                        }
-                    }
-
-                    CatalogueLinterRuleKind::KindLayerConstraint => {
-                        if !rule.permitted_layers().contains(&layer_id.to_owned()) {
-                            violations.push(CatalogueLintViolation::new(
-                                CatalogueLinterRuleKind::KindLayerConstraint,
-                                entry.name(),
-                                format!(
-                                    "KindLayerConstraint rule violated: `{}` is not permitted in \
-                                     layer `{layer_id}`; permitted layers: [{}]",
-                                    rule.target_kind(),
-                                    rule.permitted_layers().join(", "),
-                                ),
-                            ));
-                        }
-                    }
-                }
+            // Walk v3 function entries.
+            // Functions have no `methods`, `members`, or `variants` fields.
+            // `expected_methods` is not applicable to function entries (`None`),
+            // matching the v2 behaviour where `FreeFunction` returned `Ok(None)`
+            // for `expected_methods` — so rules targeting that field skip functions
+            // rather than falsely firing on a zero-length methods list.
+            for (fn_path, fn_entry) in &catalogue.functions {
+                let kind_tag = function_role_kind_tag(fn_entry.role);
+                let fn_path_str = fn_path.to_string();
+                let lengths = EntryFieldLengths { methods: None, members: None, variants: None };
+                Self::apply_rule_to_entry(
+                    rule,
+                    &fn_path_str,
+                    kind_tag,
+                    &lengths,
+                    layer_id,
+                    &mut violations,
+                )?;
             }
         }
 
@@ -349,11 +467,13 @@ impl CatalogueLinter for InMemoryCatalogueLinter {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
-    use domain::tddd::catalogue::{
-        MemberDeclaration, MethodDeclaration, TypeAction, TypeCatalogueDocument,
-        TypeCatalogueEntry, TypeDefinitionKind,
-    };
     use domain::tddd::catalogue_linter::{CatalogueLinterRule, CatalogueLinterRuleKind};
+    use domain::tddd::catalogue_v2::roles::ContractRole;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CrateName, DataRole, ItemAction, MethodDeclaration, MethodName,
+        ModulePath, SelfReceiver, TraitEntry, TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
+    };
+    use domain::tddd::layer_id::LayerId;
 
     use super::InMemoryCatalogueLinter;
     use domain::tddd::catalogue_linter::CatalogueLinter as _;
@@ -362,78 +482,108 @@ mod tests {
     // Test fixture helpers
     // ------------------------------------------------------------------
 
-    fn value_object_entry_empty_methods(name: &str) -> TypeCatalogueEntry {
-        TypeCatalogueEntry::new(
-            name,
-            "A value object with no methods",
-            TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: Vec::new(),
-            },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap()
+    fn layer(name: &str) -> LayerId {
+        LayerId::try_new(name.to_owned()).unwrap()
     }
 
-    fn value_object_entry_with_methods(name: &str) -> TypeCatalogueEntry {
-        let method =
-            MethodDeclaration::new("is_valid", Some("&self".into()), vec![], "bool", false);
-        TypeCatalogueEntry::new(
-            name,
-            "A value object with a behavioral method",
-            TypeDefinitionKind::ValueObject {
-                expected_members: Vec::new(),
-                expected_methods: vec![method],
-            },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap()
+    fn empty_doc(crate_name: &str) -> CatalogueDocument {
+        CatalogueDocument::new(3, CrateName::new(crate_name).unwrap(), layer(crate_name))
     }
 
-    fn interactor_entry_with_app_service(name: &str) -> TypeCatalogueEntry {
-        TypeCatalogueEntry::new(
-            name,
-            "Interactor implementing an ApplicationService",
-            TypeDefinitionKind::Interactor {
-                expected_members: Vec::new(),
-                declares_application_service: vec!["SaveTrackApplicationService".into()],
-                expected_methods: Vec::new(),
+    fn value_object_entry_empty_methods() -> TypeEntry {
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
             },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap()
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
     }
 
-    fn interactor_entry_no_app_service(name: &str) -> TypeCatalogueEntry {
-        TypeCatalogueEntry::new(
-            name,
-            "Interactor with no declared ApplicationService",
-            TypeDefinitionKind::Interactor {
-                expected_members: Vec::new(),
-                declares_application_service: Vec::new(),
-                expected_methods: Vec::new(),
+    fn value_object_entry_with_methods() -> TypeEntry {
+        let method = MethodDeclaration::new(
+            MethodName::new("is_valid").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("bool").unwrap(),
+            false,
+            None,
+        );
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
             },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap()
+            methods: vec![method],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
     }
 
-    fn domain_service_entry(name: &str) -> TypeCatalogueEntry {
-        TypeCatalogueEntry::new(
-            name,
-            "A domain service",
-            TypeDefinitionKind::DomainService {
-                expected_members: vec![MemberDeclaration::field("repo", "UserRepository")],
-                expected_methods: Vec::new(),
+    fn secondary_port_with_methods() -> TraitEntry {
+        let method = MethodDeclaration::new(
+            MethodName::new("load").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            None,
+        );
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![method],
+            supertrait_bounds: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
+    }
+
+    fn secondary_port_no_methods() -> TraitEntry {
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
+    }
+
+    fn domain_service_entry() -> TypeEntry {
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::DomainService,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
             },
-            TypeAction::Add,
-            true,
-        )
-        .unwrap()
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        }
     }
 
     fn field_empty_rule(target_kind: &str, target_field: &str) -> CatalogueLinterRule {
@@ -470,69 +620,64 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // FieldEmpty rule tests
+    // FieldEmpty rule tests (TypeEntry — maps to expected_methods via methods len)
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_field_empty_rule_with_empty_expected_methods_produces_no_violation() {
+    fn test_field_empty_rule_with_empty_methods_produces_no_violation() {
         let linter = InMemoryCatalogueLinter::new();
-        let entry = value_object_entry_empty_methods("Email");
-        let catalogue = TypeCatalogueDocument::new(1, vec![entry]);
+        let mut catalogue = empty_doc("domain");
+        catalogue.types.insert(TypeName::new("Email").unwrap(), value_object_entry_empty_methods());
         let rule = field_empty_rule("value_object", "expected_methods");
 
         let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
 
-        assert!(violations.is_empty(), "empty expected_methods should not fire FieldEmpty");
+        assert!(violations.is_empty(), "empty methods should not fire FieldEmpty");
     }
 
     #[test]
-    fn test_field_empty_rule_with_non_empty_expected_methods_generates_violation() {
+    fn test_field_empty_rule_with_non_empty_methods_generates_violation() {
         let linter = InMemoryCatalogueLinter::new();
-        let entry = value_object_entry_with_methods("Money");
-        let catalogue = TypeCatalogueDocument::new(1, vec![entry]);
+        let mut catalogue = empty_doc("domain");
+        catalogue.types.insert(TypeName::new("Money").unwrap(), value_object_entry_with_methods());
         let rule = field_empty_rule("value_object", "expected_methods");
 
         let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
 
-        assert_eq!(violations.len(), 1, "non-empty expected_methods must fire FieldEmpty");
+        assert_eq!(violations.len(), 1, "non-empty methods must fire FieldEmpty");
         assert_eq!(violations[0].entry_name(), "Money");
         assert_eq!(violations[0].rule_kind(), &CatalogueLinterRuleKind::FieldEmpty);
     }
 
     // ------------------------------------------------------------------
-    // FieldNonEmpty rule tests
+    // FieldNonEmpty rule tests (TraitEntry — secondary_port with methods)
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_field_non_empty_rule_with_non_empty_field_produces_no_violation() {
+    fn test_field_non_empty_rule_with_non_empty_methods_on_trait_produces_no_violation() {
         let linter = InMemoryCatalogueLinter::new();
-        let entry = interactor_entry_with_app_service("SaveTrackInteractor");
-        let catalogue = TypeCatalogueDocument::new(1, vec![entry]);
-        let rule = field_non_empty_rule("interactor", "declares_application_service");
+        let mut catalogue = empty_doc("domain");
+        catalogue
+            .traits
+            .insert(TraitName::new("UserRepository").unwrap(), secondary_port_with_methods());
+        let rule = field_non_empty_rule("secondary_port", "expected_methods");
 
-        let violations = linter.run(&[rule], &catalogue, "usecase").unwrap();
+        let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
 
-        assert!(
-            violations.is_empty(),
-            "non-empty declares_application_service should not fire FieldNonEmpty"
-        );
+        assert!(violations.is_empty(), "non-empty methods should not fire FieldNonEmpty");
     }
 
     #[test]
-    fn test_field_non_empty_rule_with_empty_field_generates_violation() {
+    fn test_field_non_empty_rule_with_empty_methods_on_trait_generates_violation() {
         let linter = InMemoryCatalogueLinter::new();
-        let entry = interactor_entry_no_app_service("LazyInteractor");
-        let catalogue = TypeCatalogueDocument::new(1, vec![entry]);
-        let rule = field_non_empty_rule("interactor", "declares_application_service");
+        let mut catalogue = empty_doc("domain");
+        catalogue.traits.insert(TraitName::new("LazyPort").unwrap(), secondary_port_no_methods());
+        let rule = field_non_empty_rule("secondary_port", "expected_methods");
 
-        let violations = linter.run(&[rule], &catalogue, "usecase").unwrap();
+        let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
 
-        assert_eq!(
-            violations.len(),
-            1,
-            "empty declares_application_service must fire FieldNonEmpty"
-        );
-        assert_eq!(violations[0].entry_name(), "LazyInteractor");
+        assert_eq!(violations.len(), 1, "empty methods must fire FieldNonEmpty");
+        assert_eq!(violations[0].entry_name(), "LazyPort");
         assert_eq!(violations[0].rule_kind(), &CatalogueLinterRuleKind::FieldNonEmpty);
     }
 
@@ -543,11 +688,11 @@ mod tests {
     #[test]
     fn test_kind_layer_constraint_with_layer_not_in_permitted_generates_violation() {
         let linter = InMemoryCatalogueLinter::new();
-        let entry = domain_service_entry("TransferService");
-        let catalogue = TypeCatalogueDocument::new(1, vec![entry]);
+        let mut catalogue = empty_doc("infrastructure");
+        catalogue.types.insert(TypeName::new("TransferService").unwrap(), domain_service_entry());
         let rule = kind_layer_constraint_rule("domain_service", vec!["domain"]);
 
-        let violations = linter.run(&[rule], &catalogue, "usecase").unwrap();
+        let violations = linter.run(&[rule], &catalogue, "infrastructure").unwrap();
 
         assert_eq!(
             violations.len(),
@@ -556,14 +701,14 @@ mod tests {
         );
         assert_eq!(violations[0].entry_name(), "TransferService");
         assert_eq!(violations[0].rule_kind(), &CatalogueLinterRuleKind::KindLayerConstraint);
-        assert!(violations[0].message().contains("usecase"));
+        assert!(violations[0].message().contains("infrastructure"));
     }
 
     #[test]
     fn test_kind_layer_constraint_with_layer_in_permitted_produces_no_violation() {
         let linter = InMemoryCatalogueLinter::new();
-        let entry = domain_service_entry("TransferService");
-        let catalogue = TypeCatalogueDocument::new(1, vec![entry]);
+        let mut catalogue = empty_doc("domain");
+        catalogue.types.insert(TypeName::new("TransferService").unwrap(), domain_service_entry());
         let rule = kind_layer_constraint_rule("domain_service", vec!["domain"]);
 
         let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
@@ -580,11 +725,10 @@ mod tests {
 
     #[test]
     fn test_disabled_rules_skips_matching_rule() {
-        // A rule that would normally fire is skipped because its id is disabled.
         let disabled_id = "FieldEmpty::value_object".to_owned();
         let linter = InMemoryCatalogueLinter::with_disabled_rules(vec![disabled_id]);
-        let entry = value_object_entry_with_methods("Money");
-        let catalogue = TypeCatalogueDocument::new(1, vec![entry]);
+        let mut catalogue = empty_doc("domain");
+        catalogue.types.insert(TypeName::new("Money").unwrap(), value_object_entry_with_methods());
         let rule = field_empty_rule("value_object", "expected_methods");
 
         let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
@@ -602,8 +746,8 @@ mod tests {
     #[test]
     fn test_unknown_target_field_returns_invalid_rule_config_error() {
         let linter = InMemoryCatalogueLinter::new();
-        let entry = value_object_entry_empty_methods("Email");
-        let catalogue = TypeCatalogueDocument::new(1, vec![entry]);
+        let mut catalogue = empty_doc("domain");
+        catalogue.types.insert(TypeName::new("Email").unwrap(), value_object_entry_empty_methods());
         let rule = field_empty_rule("value_object", "nonexistent_field");
 
         let result = linter.run(&[rule], &catalogue, "domain");
@@ -618,6 +762,128 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
+    // expected_members / expected_variants v3 support
+    // ------------------------------------------------------------------
+
+    #[test]
+    fn test_expected_members_field_non_empty_rule_fires_when_plain_struct_has_no_fields() {
+        // `expected_members` is now derived from `TypeKindV2`: a `PlainStruct` with
+        // no fields has `members_len = Some(0)`, so a `FieldNonEmpty` rule fires.
+        let linter = InMemoryCatalogueLinter::new();
+        let mut catalogue = empty_doc("domain");
+        catalogue
+            .types
+            .insert(TypeName::new("MyType").unwrap(), value_object_entry_empty_methods());
+        // PlainStruct { fields: [] } → members_len = Some(0) → FieldNonEmpty fires.
+        let rule = field_non_empty_rule("value_object", "expected_members");
+
+        let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "FieldNonEmpty on expected_members must fire when PlainStruct has no fields: {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "MyType");
+    }
+
+    #[test]
+    fn test_expected_members_field_empty_rule_fires_when_plain_struct_has_fields() {
+        use domain::tddd::catalogue_v2::identifiers::FieldName;
+        use domain::tddd::catalogue_v2::variants::FieldDecl;
+
+        // A `PlainStruct` with one named field gives `members_len = Some(1)`,
+        // so a `FieldEmpty` rule fires.
+        let linter = InMemoryCatalogueLinter::new();
+        let mut catalogue = empty_doc("domain");
+        let field = FieldDecl::new(FieldName::new("inner").unwrap(), TypeRef::new("u64").unwrap());
+        let entry = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![field],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        catalogue.types.insert(TypeName::new("MyType").unwrap(), entry);
+        let rule = field_empty_rule("value_object", "expected_members");
+
+        let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "FieldEmpty on expected_members must fire when PlainStruct has fields: {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "MyType");
+    }
+
+    #[test]
+    fn test_expected_variants_field_non_empty_rule_fires_when_enum_has_no_variants() {
+        // An `Enum { variants: [] }` gives `variants_len = Some(0)`,
+        // so a `FieldNonEmpty` rule fires.
+        let linter = InMemoryCatalogueLinter::new();
+        let mut catalogue = empty_doc("domain");
+        let entry = TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ErrorType,
+            kind: TypeKindV2::Enum { variants: vec![] },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        catalogue.types.insert(TypeName::new("MyError").unwrap(), entry);
+        let rule = field_non_empty_rule("error_type", "expected_variants");
+
+        let violations = linter.run(&[rule], &catalogue, "domain").unwrap();
+
+        assert_eq!(
+            violations.len(),
+            1,
+            "FieldNonEmpty on expected_variants must fire when Enum has no variants: {violations:?}"
+        );
+        assert_eq!(violations[0].entry_name(), "MyError");
+    }
+
+    #[test]
+    fn test_declares_application_service_field_is_rejected_as_unsupported() {
+        // The legacy v2 `declares_application_service` field has no v3 equivalent.
+        // A rule targeting it is rejected as an unsupported `target_field`
+        // (InvalidRuleConfig) rather than silently passing — the linter never
+        // reports a clean result for a constraint it cannot enforce.
+        let linter = InMemoryCatalogueLinter::new();
+        let mut catalogue = empty_doc("domain");
+        catalogue
+            .types
+            .insert(TypeName::new("MyType").unwrap(), value_object_entry_empty_methods());
+        let rule = field_non_empty_rule("value_object", "declares_application_service");
+
+        let result = linter.run(&[rule], &catalogue, "domain");
+
+        match result {
+            Err(domain::tddd::catalogue_linter::CatalogueLinterError::InvalidRuleConfig(msg)) => {
+                assert!(
+                    msg.contains("declares_application_service"),
+                    "error must name the unsupported field: {msg}"
+                );
+            }
+            other => panic!(
+                "declares_application_service rule must return InvalidRuleConfig, got {other:?}"
+            ),
+        }
+    }
+
+    // ------------------------------------------------------------------
     // Multiple rules combined
     // ------------------------------------------------------------------
 
@@ -625,19 +891,17 @@ mod tests {
     fn test_multiple_rules_combined_collect_all_violations() {
         let linter = InMemoryCatalogueLinter::new();
 
-        // Entry 1: value_object with non-empty expected_methods → fires FieldEmpty
-        let vo_with_methods = value_object_entry_with_methods("Money");
-        // Entry 2: interactor with empty declares_application_service → fires FieldNonEmpty
-        let interactor_no_service = interactor_entry_no_app_service("BadInteractor");
-        // Entry 3: domain_service in infrastructure layer → fires KindLayerConstraint
-        let domain_svc = domain_service_entry("InfraService");
-
-        let catalogue =
-            TypeCatalogueDocument::new(1, vec![vo_with_methods, interactor_no_service, domain_svc]);
+        let mut catalogue = empty_doc("infrastructure");
+        // value_object with non-empty methods → fires FieldEmpty
+        catalogue.types.insert(TypeName::new("Money").unwrap(), value_object_entry_with_methods());
+        // secondary_port (trait) with no methods → fires FieldNonEmpty
+        catalogue.traits.insert(TraitName::new("LazyPort").unwrap(), secondary_port_no_methods());
+        // domain_service in infrastructure layer → fires KindLayerConstraint
+        catalogue.types.insert(TypeName::new("InfraService").unwrap(), domain_service_entry());
 
         let rules = vec![
             field_empty_rule("value_object", "expected_methods"),
-            field_non_empty_rule("interactor", "declares_application_service"),
+            field_non_empty_rule("secondary_port", "expected_methods"),
             kind_layer_constraint_rule("domain_service", vec!["domain"]),
         ];
 
@@ -647,7 +911,7 @@ mod tests {
 
         let entry_names: Vec<&str> = violations.iter().map(|v| v.entry_name()).collect();
         assert!(entry_names.contains(&"Money"), "Money must appear in violations");
-        assert!(entry_names.contains(&"BadInteractor"), "BadInteractor must appear in violations");
+        assert!(entry_names.contains(&"LazyPort"), "LazyPort must appear in violations");
         assert!(entry_names.contains(&"InfraService"), "InfraService must appear in violations");
     }
 }

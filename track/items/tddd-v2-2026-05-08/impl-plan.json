@@ -1,0 +1,521 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "新 catalogue schema domain 型 (newtype 系 + Role 3 enum + ItemAction + SelfReceiver + LayerId) を実装する。Identifier (共通 base validation) / TypeName / TraitName / FieldName / MethodName / ParamName / VariantName / CrateName / FunctionName / ModulePath / TypeRef / FunctionPath の 12 newtype に Display / Serialize / Deserialize / FromStr を実装する。DataRole (13 値) / ContractRole (3 値) / FunctionRole (2 値) / ItemAction (4 値) / SelfReceiver (3 値) を enum として実装する。Layer 軸は ADR `2026-04-17-1528-tddd-contract-map` §D1 で定義済みの `LayerId` newtype (architecture-rules.json 駆動) を使用する (固定 3 値 enum は導入しない)。libs/domain/src/tddd/catalogue.rs 内の新 tddd::catalogue_v2 (または tddd/catalogue/ サブモジュール) に配置する。ラウンドトリップ unit test (AC-03) を追加する。この時点では旧型 (TypeDefinitionKind 等) はまだ残す。",
+      "status": "done",
+      "commit_hash": "ba7d0eb2574049186b9478ffb62b0e62b07a3084"
+    },
+    {
+      "id": "T002",
+      "description": "新 catalogue schema domain 型 (複合構造: TypeKindV2 / VariantPayload / VariantDecl / FieldDecl / TypestateMarker / MethodDeclaration / ParamDeclaration 修正 / TraitImplDeclV2 / TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument + CatalogueDocumentError) を実装する。TypeKindV2 (UnitStruct / TupleStruct { fields: Vec<TypeRef>, has_stripped_fields } / PlainStruct { fields: Vec<FieldDecl>, has_stripped_fields, typestate: Option<TypestateMarker> } / Enum / TypeAlias の 5 flat variant payload-encoded) / VariantPayload (Unit/Tuple/Struct) / VariantDecl (name+payload, serde default=Unit) / FieldDecl / TraitImplDeclV2 (identity-only) を実装する。既存 ParamDeclaration / MethodDeclaration を newtype フィールド (ParamName/TypeRef/MethodName/SelfReceiver) に修正する。TypeEntry / TraitEntry / FunctionEntry / CatalogueDocument (3-BTreeMap + validation) / CatalogueDocumentError を実装する。crate_name とファイル名一致 validation を実装する。serde ラウンドトリップ unit test (AC-01 / AC-02 / AC-03 の新構造部分) を追加する。",
+      "status": "done",
+      "commit_hash": "1efb5b6bdd0d91e29e2136644fc291e60ddfc1e3"
+    },
+    {
+      "id": "T003",
+      "description": "新 catalogue schema の infrastructure 層 serde codec を実装する。CatalogueDocumentCodecError (Json / UnsupportedSchemaVersion / InvalidEntry / CrateNameMismatch) を infrastructure 層に実装する。TypeCatalogueDocument / TypeCatalogueEntry / TypeDefinitionKind を読む旧 serde 経路を削除し (no-backward-compat 原則)、新 CatalogueDocument 専用 codec を infrastructure/src/tddd/catalogue_document_codec.rs に実装する。FsCatalogueLoader (infrastructure) の内部実装を v3 CatalogueDocument 読み込みに切り替え、v3_doc_to_stub で CatalogueDocument → TypeCatalogueDocument stub 変換を行い CatalogueLoader port の返り値 BTreeMap<LayerId, TypeCatalogueDocument> に詰めて返す (CatalogueLoader port の返り値型は既存の BTreeMap<LayerId, TypeCatalogueDocument> のまま維持 — 呼び出し元 CatalogueLinter が TypeCatalogueDocument を要求するため互換性を保持)。TypeCatalogueCodecError は既存 pre-migration track ディレクトリ用の v3-first/v2-fallback 経路の reference として残存する (新規 v2 ファイルは作成しない)。codec unit test (AC-01 の serde round-trip / CrateNameMismatch / UnsupportedSchemaVersion) を追加する。",
+      "status": "done",
+      "commit_hash": "c7dbcbc152f045c8635c53d5c3069d5eb65879fd"
+    },
+    {
+      "id": "T004",
+      "description": "ExtendedCrate schema を domain 層に実装する。ExtendedCrate { krate: rustdoc_types::Crate, item_actions: BTreeMap<Id, ItemAction> } を libs/domain/src/tddd/ 内 (例: extended_crate.rs) に実装する。BaselineRustdocCodecError (Json/IoError/UnsupportedFormatVersion) を infrastructure 層に実装し、rustdoc_types::Crate JSON をロードする concrete deserializer を infrastructure internal implementation (catalogue に track する named adapter contract なし) として実装する。CatalogueToExtendedCratePort (domain 層 secondary_port) と NewTypeGraphCodecError (domain 層 error_type) を実装する。CatalogueToExtendedCrateCodecError (infrastructure 層 error_type) を実装する。AC-04 の ExtendedCrate unit test を追加する。",
+      "status": "done",
+      "commit_hash": "bad65779e39fef3e6a7a143c5492888367c8c2a0"
+    },
+    {
+      "id": "T005",
+      "description": "Catalogue → ExtendedCrate (TypeGraph A) codec の core 変換ロジックを実装する。syn crate を使用した TypeRef generics parse (syn::parse_str::<syn::Type> → rustdoc_types::Type 変換) を実装する。std prelude allowlist (Vec/Option/Result/String/Box 等) の自動解決を実装する。未解決マーカー表現 (未 declare 型の保持方式) を実装する。TraitImplDeclV2.origin_crate + TypeRef crate prefix からの external_crates 自動 build (per-graph incremental crate_id 発番, crate_id==0 は自 crate) を実装する。inline → id 参照変換 (FieldDecl/VariantDecl を別 Item として index に登録し Vec<Id> 参照) を実装する。1 type = 1 Inherent Impl block の grouping を実装する。Crate.paths の [crate_name, ...module_path, item_name] 形式生成を実装する。CatalogueToExtendedCrateCodec (infrastructure 層 secondary_adapter) として CatalogueToExtendedCratePort を実装する。AC-05 / AC-06 の codec unit test (inline→id-ref 変換 / generics parse / module_path 込み paths 生成 / std prelude 自動解決 / 未解決マーカー生成) を追加する。",
+      "status": "done",
+      "commit_hash": "c34b14e"
+    },
+    {
+      "id": "T006",
+      "description": "Signal evaluator Phase 1 (S/D 構築) を domain 層に実装する。SignalRegion (12 variant) / ThreeWaySignalKind (Skip/Blue/Yellow/Red) / ThreeWaySignal / ThreeWayEvaluationReport を domain 層に実装する (T007 の SignalEvaluatorV2 が実装する SignalEvaluatorPort の戻り値型として T006 で定義する必要がある)。SignalEvaluatorPort を domain 層に実装する (evaluate(&self, a: ExtendedCrate, b: Crate, c: Crate) -> Result<ThreeWayEvaluationReport, Phase1Error>)。Phase1Error (ActionContradiction / UnresolvedTypeRef / DanglingId) を実装する。Phase 1 アルゴリズム: B 由来全要素を S に Reference で attach (types/traits=short name / functions=FunctionPath で identity、S 内 flat incremental Id 再発番)。A の各要素を action 別 (Add/Modify/Reference/Delete) に処理して S/D を構築する。Phase 1.5 (unresolved marker closed-world 検証: Delete 後の S を universe set とし、resolve 不能なら Phase1Error) を実装する。Phase 1.6 (dangling Id 検証) を実装する。external_crates の S/D 各スコープでの再発番を実装する。AC-07 の Phase 1 unit test (action 別処理 / ActionContradiction / UnresolvedTypeRef / DanglingId) を追加する。",
+      "status": "done",
+      "commit_hash": "55281f5103e1e30b4c1db8aa2593b109496be385"
+    },
+    {
+      "id": "T007",
+      "description": "Signal evaluator Phase 2 (S/D/C 3-way 評価) を infrastructure 層に実装する。SignalRegion / ThreeWaySignalKind / ThreeWaySignal / ThreeWayEvaluationReport は T006 で domain 層に定義済み。SignalEvaluatorV2 (infrastructure 層 secondary_adapter: implements SignalEvaluatorPort) を実装し、Phase 2 の 11 領域 × signal table (ADR 3 D3) を実装する: S∩C+構造一致+action別 / S∩C+構造不一致+action別 / S\\C+action別 / D∩C / D\\C / C\\(S∪D) の各領域を網羅する。identity 判定は types/traits=short name / functions=FunctionPath で統一する。AC-08 の Phase 2 unit test (全 11 領域の signal 判定、境界ケース含む) を追加する。",
+      "status": "done",
+      "commit_hash": "cdb77d020122336ac1140077c138a7d53acd60d7"
+    },
+    {
+      "id": "T008",
+      "description": "既存 TypeGraph (libs/domain/src/schema.rs の TypeNode/TraitNode/FunctionNode/TraitImplEntry HashMap ベース独自 schema) を削除し、TypeGraph を読む既存コード (tddd/consistency.rs / tddd/signals.rs / contract_map_render.rs / infrastructure/tddd/type_signals_evaluator.rs / infrastructure/tddd/type_graph_cluster.rs 等) を新 TypeGraph 形式 (rustdoc_types::Crate / ExtendedCrate) に書き換える。旧 TypeBaseline / TypeBaselineEntry / TraitBaselineEntry / FunctionBaselineEntry / TraitImplBaselineEntry (libs/domain/src/tddd/baseline.rs) を削除し、baseline の保存・ロードを rustdoc_types::Crate JSON に変更する。SchemaExportCodecError / EvaluateSignalsError など既存 reference 型は signature 整合性のみ確認し必要に応じて修正する。FsContractMapWriter など reference adapter は TypeGraph 形式変更に合わせて最低限の呼び出し側修正を行う (renderer の詳細化は OS-06 でスコープ外)。cargo make ci-rust (fmt-check + clippy + nextest + deny + check-layers) が通るよう Rust CI を緑にする。verify-* catalogue 整合性ゲート (verify-catalogue-spec-refs / check-catalogue-spec-signals) は T003 以降の *-types.json 旧フォーマットに対して新 codec が読めないため T009 完了後に確認する。",
+      "status": "done",
+      "commit_hash": "c7dbcbc152f045c8653c53d5c3069d5eb65879fd"
+    },
+    {
+      "id": "T009",
+      "description": "bin/sotp を rebuild し (cargo make build-sotp)、新 catalogue schema / signal evaluator の実装が完了した状態で現 branch の track item の TDDD 信号が整合することを確認する。track/items/tddd-v2-2026-05-08/ の既存 catalogue JSON (*-types.json) を新 CatalogueDocument schema (3-BTreeMap 形式) に書き換える。旧 payload_types: Vec<String> 形式 / TypeDefinitionKind ベース形式を新 CatalogueDocument 形式に変換する (後方互換なし: 新 codec 専用)。TypeKindV2 の informal_grounds を spec_refs へ昇格させる (IN-01 / AC-01 の spec element との対応を追加)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する (AC-10)。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T010",
+      "description": "v3 catalogue の全エントリ種 (TypeEntry / TraitEntry / FunctionEntry) に grounding コレクション (`spec_refs: Vec<SpecRef>` と `informal_grounds: Vec<InformalGroundRef>`) を追加する (ADR 2026-05-11-1257 D1)。既存 v2 catalogue の SpecRef / InformalGroundRef 型を domain 層の共有モジュールから再利用する。serde default で空 Vec を許容し、フィールド省略時は空 Vec として decode する (migration smoothness)。既存 domain unit test を更新し、grounding コレクションを含む ラウンドトリップ unit test を追加する。Layer: domain。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T011",
+      "description": "CatalogueDocumentCodec (infrastructure/src/tddd/catalogue_document_codec.rs) を拡張し、TypeEntry / TraitEntry / FunctionEntry の `spec_refs` および `informal_grounds` フィールドを encode / decode する (ADR 2026-05-11-1257 D1 / D3)。DTO 側に SpecRefDto / InformalGroundRefDto を追加する (v2 codec の既存 DTO を共通モジュールに移動して再利用する)。常に空でもフィールドを emit する (explicit visibility)。フィールドが存在しない場合は空 Vec として decode する (migration smoothness)。round-trip unit test (spec_refs + informal_grounds の全エントリ種) を追加する。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T012",
+      "description": "CatalogueDocumentCodec::decode で `functions` map の各キー (FunctionPath) が catalogue 自身の crate_name prefix で始まることを検証し、他 crate prefix のキーを silent drop せず `CatalogueDocumentCodecError::CrossCrateFunctionPath { key, expected_crate }` として decode error にする (ADR 2026-05-11-1257 D4 / 2026-05-08-0248 §D11 amendment)。テスト: 自 crate prefix のみのキーは成功 / 他 crate prefix のキーは明示的 error / 空の functions map は成功。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T013",
+      "description": "catalogue_spec_signals_refresher.rs (infrastructure) の v3 branch を書き換え、一律 Blue fallback を除去して実際の signal 評価を行う (ADR 2026-05-11-1257 D2 / D5)。各エントリの `action` / `spec_refs` / `informal_grounds` を domain 層の `evaluate_catalogue_entry_signal(action, spec_refs, informal_grounds)` に渡して信号色を決定する。`action: reference` かつ grounding 空のエントリは 🔵 Blue (ADR 2026-05-11-1257 D5)、それ以外は informal-priority rule (ADR 2026-04-23-0344 §D1.1) を適用する。v3 エントリに対する「一律 Blue」doc comment ブロックを削除する。T012 により codec decode 段階で cross-crate function path が reject されるため、refresher 内の cross-crate function フィルタ (lines ~168-178 付近) は dead code となる — 削除する。テスト: Blue / Yellow / Red が混在する grounding を持つエントリが正しい信号色になることを確認する。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T014",
+      "description": "catalogue_bulk_loader.rs (infrastructure) の `v3_doc_to_stub` 関数を更新し、CatalogueDocument → TypeCatalogueDocument stub 変換時に `spec_refs` と `informal_grounds` を stub に複写する (ADR 2026-05-11-1257 D3)。T012 により codec decode 段階で cross-crate function path が reject されるため、`v3_doc_to_stub` 内の cross-crate function フィルタ (line ~493 付近) は dead code となる — 削除する。テスト: grounding コレクションが変換後 stub に保存されることを確認する。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T015",
+      "description": "type_signals_evaluator.rs (infrastructure, line ~250 付近) の cross-crate function フィルタを削除する (ADR 2026-05-11-1257 D4)。T012 により codec decode 段階で cross-crate path が reject されるため、このフィルタは impossible-to-trigger な dead code となる。フィルタ削除後、type-signal 評価が全エントリで uniform に動作することを unit test で確認する。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T016",
+      "description": "track/render.rs (infrastructure) の v3 fallback を修正し、catalogue-spec-signals doc を正しくロードして `render_type_catalogue` に渡す (ADR 2026-05-11-1257 D2 — 信号の可視性)。現状は v3 fallback で `None` を渡しているため Cat-Spec 列が非表示になっている。修正後に Cat-Spec 列が rendered view に表示されることを確認する。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T017",
+      "description": "統合ゲート確認: bin/sotp を rebuild し (cargo make build-sotp)、全 3 layer の type-signals と catalogue-spec-signals を再生成する (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3 + `bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3)。`cargo make track-sync-views` で rendered view を再生成する。`cargo make ci` が pass することを確認する (verify-catalogue-spec-refs / check-catalogue-spec-signals を含む全ゲート通過)。AC-10 を充足する最終統合タスク。Layer: integration。",
+      "status": "done",
+      "commit_hash": "81f86500d926f4da6adaef1817897d86393922b9"
+    },
+    {
+      "id": "T018",
+      "description": "WS-B D1: 旧 `spec-code-consistency` stub 全体を削除し、`bin/sotp track three-way-signals` コマンドを `bin/sotp track catalogue-impl-signals` にリネームする。対象変更: (1) `libs/infrastructure/src/verify/spec_code_consistency.rs` を削除し、同モジュールの `mod` 宣言と `pub use` を infrastructure `lib.rs` から除去する。(2) `apps/cli/src/commands/verify.rs` から `SpecCodeConsistency` enum variant / `SpecCodeConsistencyArgs` struct / `execute_spec_code_consistency` 関数呼び出しを削除する。(3) `apps/cli/src/commands/track/tddd/three_way_signals.rs` を `catalogue_impl_signals.rs` にリネームし、`execute_three_way_signals` 関数を `execute_catalogue_impl_signals` に、モジュール doc コメントを `catalogue-impl-signals` 向けに更新する。(4) CLI のサブコマンド登録 (track コマンドの `three-way-signals` → `catalogue-impl-signals`) を更新する。(5) `Makefile.toml` の `track-three-way-signals` タスクを削除する (D3: Makefile ラッパー不追加のため、既存タスクも削除)。この時点では `--output` モードはまだ残す (T019 で除去)。`cargo make ci-rust` が通ることを確認する。Layer: apps/cli + infrastructure。",
+      "status": "done",
+      "commit_hash": "c4f8352eec156e62e29d6f02896374725ec5c5e8"
+    },
+    {
+      "id": "T019",
+      "description": "WS-B D2 + D3: `CatalogueImplSignalsInteractor` / `CatalogueImplSignalsService` / `CatalogueImplSignalsError` を `libs/usecase/` に実装し、`execute_catalogue_impl_signals` からオーケストレーション (per-layer A/B/C TypeGraph 取得・signal evaluator 呼び出し・領域別結果の収集・整形) をインタラクターの `run` メソッドに移動する。CLI handler は `CatalogueImplSignalsInteractor::new(catalogue_loader, ext_crate_codec, evaluator, rustdoc_crate_port, layer_bindings_port)` を構築して `interactor.run(track_id, workspace_root, layer)` を呼び出し、返ってきた `Result<String, CatalogueImplSignalsError>` を stdout に print するだけの薄いアダプターにする。同時に D3 インターフェース trim を実施: `--output <path>` 引数、`write_output_file` / `normalize_output_path` ヘルパー、`file_buf` 蓄積ロジックを削除する。`CatalogueImplSignalsInteractor` は 5 ポート注入 (`CatalogueDocumentLoaderPort`, `CatalogueToExtendedCratePort`, `SignalEvaluatorPort`, `RustdocCratePort`, `TdddLayerBindingsPort`) で構成し、`apps/cli` の composition root で `FsCatalogueDocumentLoader`, `CatalogueToExtendedCrateCodec`, `SignalEvaluatorV2`, `RustdocCrateAdapter`, `FsTdddLayerBindingsAdapter` を構築して注入する。usecase ユニットテスト: 正常系 (空カタログで空出力が返る) / 無効トラック ID → `CatalogueImplSignalsError::InvalidTrackId` を追加する。`cargo make ci-rust` が通ることを確認する。Layer: usecase + apps/cli。",
+      "status": "done",
+      "commit_hash": "c4f8352eec156e62e29d6f02896374725ec5c5e8"
+    },
+    {
+      "id": "T020",
+      "description": "WS-B D4 回帰テスト: `C\\(S∪D)` 「宣言されていない実装」シナリオが `verify spec-states-current` を通じて 🔴 を生成し、コミットゲートをブロックすることを regression test で確認する。具体的には、`check_type_signals` の unit test / integration test として、`ThreeWayEvaluationReport` に `C\\(S∪D)` 領域の 🔴 エントリを持つ `<layer>-type-signals.json` fixture を用意し、`check_type_signals(doc, strict=false)` が `has_errors() == true` を返すことをアサートする (D4 の「undeclared-impl は Red チェックで無条件にカウントされる」を実行パスで確認)。新規 test file は `libs/domain/src/tddd/` 以下の適切な test モジュールに追加する。Layer: domain (test only)。",
+      "status": "done",
+      "commit_hash": "c4f8352eec156e62e29d6f02896374725ec5c5e8"
+    },
+    {
+      "id": "T021",
+      "description": "IN-22/IN-23 (usecase + infrastructure — 先行ステップ): `usecase::merge_gate::TrackBlobReader` トレイトに `read_type_signals` メソッドを追加する (`BlobFetchResult<TypeSignalsDocument>` を返す)。このトレイトメソッドにはデフォルト実装 (`BlobFetchResult::FetchError(\"read_type_signals not implemented\".to_owned())` を返す) を付与することで、既存のテストモック (`MockTrackBlobReader` / `RecordingTrackBlobReader` / `MultiLayerMock` / `ChainTwoMock` 等 merge_gate.rs・catalogue_spec_refs.rs・catalogue_spec_signals.rs・task_completion.rs 内の全 `impl TrackBlobReader`) が本タスク単体でコンパイルを通し続けられるようにする (既存パターン: `read_enabled_layers` / `read_catalogue_for_spec_ref_check` / `read_catalogue_spec_signals_document` と同様)。`infrastructure::verify::merge_gate_adapter::GitShowTrackBlobReader` に `read_type_signals` の本実装を追加する (`<layer>-type-signals.json` を git blob から取得し `type_signals_codec` でデコードして返す)。この時点では `check_type_signals` のシグネチャは変更しない — トレイトメソッドの追加のみで `cargo make ci-rust` が通ることを確認する。`usecase-types.json` の `TrackBlobReader` エントリに `read_type_signals` メソッドを追加する (`BlobFetchResult<domain::TypeSignalsDocument>` を returns に記載)。`infrastructure-types.json` の `GitShowTrackBlobReader` エントリの `docs` を更新して T021 の追加実装を記録する (トレイトメソッドのシグネチャは `BlobFetchResult` が infrastructure 型ユニバース外のため existence-only 宣言のまま)。Layer: usecase + infrastructure。",
+      "status": "done",
+      "commit_hash": "85ffbb3f638741df3d01380210531df7acd39a24"
+    },
+    {
+      "id": "T022",
+      "description": "IN-23 (domain + usecase + infrastructure — 原子的シグネチャ切り替え): `domain::tddd::consistency::check_type_signals` のシグネチャを `(&TypeCatalogueDocument, bool, &str)` から `(&TypeSignalsDocument, bool)` に変更し (純粋関数化)、内部のカバレッジチェックおよび「宣言エントリのみの Yellow フィルタ」を削除する (ADR 2026-05-11-2330 §D4)。同じコミットで下記の全変更点を原子的に行う: (1) `usecase::merge_gate::TrackBlobReader::read_type_catalogue` のトレイトシグネチャを bytes-only (`BlobFetchResult<(Vec<u8>, String)>` — バイト列 + declaration_hash 文字列) に変更し、`check_strict_merge_gate` の Stage 2 を `read_type_signals` + `check_type_signals(&TypeSignalsDocument, strict=true)` パターンに置換する。(2) `infrastructure::verify::merge_gate_adapter::GitShowTrackBlobReader::read_type_catalogue` 実装を bytes-only 戻り値型 (`BlobFetchResult<(Vec<u8>, String)>`) に変更し、内部の `catalogue_codec::decode` + `doc.set_signals` + Stage-2 ハッシュ検証を除去する (declaration_hash 鮮度チェックは呼び出し元の usecase 側で `read_type_signals` から取得した `declaration_hash` と比較する形に移行)。(3) `infrastructure::verify::spec_states::verify_from_spec_json` の Stage 2 を `type_signals_codec::decode` + `check_type_signals(&signals_doc, strict)` パターンに置換し、`catalogue_codec::decode` + `v3_doc_to_stub` 経由の `TypeCatalogueDocument` 生成を廃止する。さらに、`check_type_signals` の呼び出しに加えて、カタログファイルをバイト列として読み取り SHA-256 ハッシュを計算して `signals_doc.declaration_hash` と比較する `declaration_hash` 鮮度チェックを Stage 2 に追加する (CN-11 — コミットゲートは `declaration_hash` 不一致でブロックされなければならない)。この鮮度チェックは `check_type_signals` がカタログ非依存化した後も維持される (`TypeSignalsDocument` からは `declaration_hash` を取得し、カタログはバイト列としてのみ読む形に変更)。**同一コミット内で `use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub` と `use crate::tddd::catalogue_codec` の dead import を spec_states から除去する** (T023 の内容を本タスクに取り込む — これを別タスクに分離すると clippy `-D warnings` により T022 単体で `ci-rust` が失敗するため)。(4) `usecase` / `infrastructure` の全テスト内 `read_type_catalogue` モック実装の戻り値型を `BlobFetchResult<(Vec<u8>, String)>` に更新する (影響ファイル: `merge_gate.rs` / `catalogue_spec_signals.rs` / `catalogue_spec_refs.rs` / `task_completion.rs` のテストモック)。(5) T020 の D4 回帰テスト (`test_check_type_signals_cminussunion_d_red_blocks_commit_gate_d4_regression`) を新 `check_type_signals(&TypeSignalsDocument, bool)` シグネチャに適応する。`domain-types.json` / `usecase-types.json` / `infrastructure-types.json` の対象エントリを修正済み状態に更新する。`cargo make ci-rust` が通ることを確認する。Layer: domain + usecase + infrastructure。",
+      "status": "done",
+      "commit_hash": "141300f0ab5a8064cf0a279326fa5983ff96c252"
+    },
+    {
+      "id": "T023",
+      "description": "IN-22 (infrastructure 層 — spec_states 残余 import 除去): この内容は T022 に取り込み済み — `use crate::tddd::catalogue_bulk_loader::v3_doc_to_stub` と `use crate::tddd::catalogue_codec` の dead import 除去は T022 の同一コミット内で実施する (clippy `-D warnings` 制約のため T022 単体で `ci-rust` が通る必要がある)。`infrastructure-types.json` の `verify_from_spec_json` エントリのコメント更新も T022 で実施する。本タスク (T023) は独立した実装ステップを持たない (T022 完了をもって T023 の内容も充足される)。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": "141300f0ab5a8064cf0a279326fa5983ff96c252"
+    },
+    {
+      "id": "T024",
+      "description": "IN-22 (infrastructure 層 + usecase 層 — chain-② verify パス全体): (A) infrastructure chain-② verify パス: `infrastructure::verify::{catalogue_spec_signals, catalogue_spec_refs, plan_artifact_refs}` の各ファイルから `catalogue_codec` + `v3_doc_to_stub` の参照を除去し、カタログ読み取りを `CatalogueDocumentCodec::decode` (v3-native) に直接置換する。`v3_doc_to_stub` を経由して `TypeCatalogueDocument` を生成していた箇所では、代わりに `CatalogueDocument` を直接読んでエントリを走査する。`check_catalogue_spec_ref_integrity` / `check_catalogue_spec_signals` の呼び出し箇所は **infrastructure 層内部でインライン等価ロジックに置換する** (domain 関数の引数型は変更しない — それらの関数は T027 で削除されるため)。非 v3 カタログは `CatalogueDocumentCodec` の fail-closed エラーとして自動的に処理される (CN-11)。(B) usecase merge-gate chain-② ポート移行: `usecase::merge_gate::TrackBlobReader::read_catalogue_for_spec_ref_check` のトレイトシグネチャを `BlobFetchResult<(TypeCatalogueDocument, String)>` から `BlobFetchResult<(CatalogueDocument, String)>` に変更する (v3-native `CatalogueDocument` を返す)。同一コミット内で `infrastructure::verify::merge_gate_adapter::GitShowTrackBlobReader::read_catalogue_for_spec_ref_check` の実装を対応する `BlobFetchResult<(CatalogueDocument, String)>` 戻り値型に更新し、内部の `catalogue_codec` + `v3_doc_to_stub` 変換を `CatalogueDocumentCodec::decode` に置換する。`usecase::merge_gate::check_strict_merge_gate` Stage 3 を `CatalogueDocument` を直接受け取るインライン等価ロジックに置換する (domain の `check_catalogue_spec_ref_integrity` / `check_catalogue_spec_signals` 呼び出しを Stage 3 内でインライン化する — これらの domain 関数は T027 で削除されるため、T024 ではシグネチャを変更せずインライン化のみ行う)。`read_catalogue_for_spec_ref_check` を使用している全テストモック (`merge_gate.rs` / `catalogue_spec_signals.rs` / `catalogue_spec_refs.rs` / `task_completion.rs` 内) を新しい戻り値型に更新する。`usecase-types.json` の `TrackBlobReader` エントリに `read_catalogue_for_spec_ref_check` を修正メソッドとして追加し (`BlobFetchResult<(CatalogueDocument, String)>` を returns に記載)、`infrastructure-types.json` の対象エントリを修正済み状態に更新する。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure + usecase。",
+      "status": "done",
+      "commit_hash": "9fe294f650af875772e05c2b0fe31034256d5ac9"
+    },
+    {
+      "id": "T025",
+      "description": "IN-22 + IN-24 (infrastructure/domain 層 — レンダリングパス): `infrastructure::track::render` の `<layer>-types.md` レンダラーを v3-native に移行: `v3_doc_to_stub` 経由の変換を廃止し `CatalogueDocument` を直接読んで `render_type_catalogue` に渡す (または v3 用の新しい render 関数を使う)。`domain::tddd::contract_map_render::render_contract_map` のシグネチャを `&BTreeMap<LayerId, TypeCatalogueDocument>` から `&BTreeMap<LayerId, CatalogueDocument>` に変更し (IN-24)、最小限プレースホルダー出力 (エントリ名リスト + OS-07 繰り延べ注記) を実装し、v3-native 化に伴い renderer 内の `OS-06` / `T012` 等の旧 v2 deferral 参照も削除する。`domain::tddd::catalogue_ports::CatalogueLoader::load_all` の戻り値型は `Result<(Vec<LayerId>, BTreeMap<LayerId, …>), CatalogueLoaderError>` のタプル形状を維持したまま、`BTreeMap` の値型を `TypeCatalogueDocument` から `CatalogueDocument` (v3-native) に変更する (IN-22)。`domain::tddd::catalogue_linter::CatalogueLinter::run` の `catalogue` 引数を `&CatalogueDocument` に変更する。**`infrastructure::tddd::InMemoryCatalogueLinter::run` の実装も同一コミット内で `catalogue: &CatalogueDocument` に変更し、v3 CatalogueDocument エントリの走査に対応する** (`CatalogueLinter` トレイトシグネチャ変更の全実装を atomic に更新するため)。`FsCatalogueLoader` の `v3_doc_to_stub` 変換ステップを削除し、`Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError>` のタプルをそのまま返す形に変更する。`domain-types.json` の `CatalogueLoader` / `CatalogueLinter` / `render_contract_map` エントリを修正済み状態に更新する。`infrastructure-types.json` の `FsCatalogueLoader` / `InMemoryCatalogueLinter` エントリを修正済み状態に更新する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
+      "status": "done",
+      "commit_hash": "b31437ff42b7c6d1a08e9e2d9c9aed1bb79d3b94"
+    },
+    {
+      "id": "T026",
+      "description": "IN-25 + IN-26: (1) `infrastructure::tddd::type_signals_evaluator` の `kind_tag` 導出ロジックを v3 エントリの kind/role から直接決定するよう変更する — `v3_doc_to_stub` の v2-kind マッピングへの依存を取り除く (IN-25)。(2) `infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer` から v2 フォールバックブランチ (schema_version ≠ 3 の場合に `catalogue_codec` にフォールバックする分岐) を削除し v3-only にする — v3 以外のカタログは `CatalogueDocumentCodec::decode` の fail-closed エラーとして即座にエラーリターンする (IN-26, CN-11)。`infrastructure-types.json` の `type_signals_evaluator` / `catalogue_spec_signals_refresher::refresh_one_layer` エントリを修正済み状態に更新する。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": "0868b1741fc4e7b6b2917f02700c94b1de5ac677"
+    },
+    {
+      "id": "T027",
+      "description": "IN-21: v1/v2 レガシー資産の完全削除。(1) `libs/infrastructure/src/tddd/catalogue_codec.rs` ファイルを削除し、`infrastructure::tddd::mod.rs` から `pub mod catalogue_codec` を除去する。(2) `libs/infrastructure/src/tddd/v3_stub.rs` ファイルを削除し、`mod v3_stub` 宣言 / `pub(crate) use` を除去する。(3) `domain::tddd::catalogue` から `TypeCatalogueDocument` / `TypeCatalogueEntry` / `TypeDefinitionKind` / `TraitImplDecl` / `TypeAction` / `TypestateTransitionsSpec` を削除する (これら全ての呼び出し元が T021-T026 で移行済みであること前提)。`TypeSignal` / `MemberDeclaration` / `EnumVariantDeclaration` の 3 型は削除しない — `TypeSignal` は v3 ネイティブのシグナル型 (マージゲート / コミットゲートが現在も使用) であり、`MemberDeclaration` / `EnumVariantDeclaration` は `catalogue_v2::variants` / `signals` / `baseline` / `schema` / `infrastructure::schema_export` / `infrastructure::schema_export_codec` / `infrastructure::track::render` 等から参照されている v3 稼働中の型であるため保持する (v1/v2 レガシーではない)。実装者の判断で `TypeSignal` とその `impl` を `catalogue.rs` から `type_signals_doc.rs` に移動してモジュール整理しても構わないが、それは任意であり `catalogue.rs` に残したままでも問題ない。(このステップの付随クリーンアップ: `infrastructure::track::render` にあった v2 `render_type_catalogue` 関数とそのヘルパー・テストを削除する — `TypeCatalogueDocument` を引数に取るため (3) で型が消えた時点で dead になる; `infrastructure-types.json` の同エントリを `action: delete` に変更する。`infrastructure::tddd::catalogue_bulk_loader::derive_filename_stem` の suffix strip を `.json` から `-types.json` に修正する — このヘルパーが `v3_stub.rs` から移動した際に suffix が短すぎるまま残っており、修正しないと `cli_track_lint` 統合テストの `crate_name` 検証が失敗する。) (4) `libs/domain/src/lib.rs` から削除した型 (`TypeCatalogueDocument` / `TypeCatalogueEntry` / `TypeDefinitionKind` / `TraitImplDecl` / `TypeAction` / `TypestateTransitionsSpec`) の `pub use` エクスポートを除去する。`TypeSignal` / `MemberDeclaration` / `EnumVariantDeclaration` のエクスポートは残す。(5) `domain` の `check_catalogue_spec_ref_integrity` / `check_catalogue_spec_signals` 自由関数を削除する (TypeCatalogueDocument に依存するため不要になる)。(6) `infrastructure::tddd::catalogue_bulk_loader` の旧 `load_all_catalogues` 関数と `LoadAllCataloguesError` enum を削除する — これらは T025 以降 `FsCatalogueLoader` が `load_all_catalogues_native` / `LoadAllCataloguesNativeError` を使うようになったことで完全に dead になった。削除によって `V3StubConversion` バリアントと `TypeCatalogueCodecError` への依存も一緒に消える。(7) `domain-types.json` の削除対象型のエントリを gate-safe に更新する。マージ済みベースラインに存在する型 (`TypeCatalogueDocument` / `TypeCatalogueEntry` / `TypeDefinitionKind` / `TraitImplDecl` / `TypeAction`) のエントリは `action: delete` に変更する (ベースライン存在が必要なため)。`TypestateTransitionsSpec` はこのトラック内で `action: add` として追加されたエントリであり、マージ済みベースラインには存在しない — `action: delete` を宣言するとシグナル評価器がベースライン不在を検出してエラーになるため、エントリを完全に除去する (ベースライン外の add-then-remove は除去が gate-safe な処理)。`TypeSignal` / `MemberDeclaration` / `EnumVariantDeclaration` のエントリは変更しない。(8) `infrastructure-types.json` の `catalogue_codec::decode` / `catalogue_codec::encode` / `TypeCatalogueCodecError` / `LoadAllCataloguesError` を `action: delete` に変更する (`LoadAllCataloguesError` は enum ごと削除されるため `action: delete` とする)。`cargo make ci-rust` が通ることを確認する (コンパイルエラーゼロ)。Layer: domain + infrastructure。",
+      "status": "done",
+      "commit_hash": "e1ab29cc90b019374e0fc36c1f41697422123373"
+    },
+    {
+      "id": "T028",
+      "description": "AC-12 統合確認 (end-to-end): `cargo make build-sotp` で bin/sotp を rebuild する。全 3 layer の type-signals (`bin/sotp track type-signals tddd-v2-2026-05-08` × 3) と catalogue-spec-signals (`bin/sotp track catalogue-spec-signals tddd-v2-2026-05-08` × 3) を再生成する。`cargo make track-sync-views` で rendered view (plan.md / domain-types.md 等) を再生成する。`cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。コードベース全体に `catalogue_codec` / `TypeCatalogueDocument` / `v3_doc_to_stub` への参照が残っていないこと (`grep` で確認)。（このステップの付随クリーンアップ: (a) `libs/` / `apps/` の doc コメントに残っていた `catalogue_codec` / `v3_stub` / `v3_doc_to_stub` / `TypeCatalogueDocument` への言及（および `// T008: ... 削除` 等の墓標コメント）を現状記述に書き換える。(b) `libs/domain/src/tddd/signals.rs`（T008 以降 `mod` 宣言が外れたまま残っていた約 3700 行の孤立 dead ファイル — 削除済みの v2 カタログ型を import していたため AC-12.1 の grep で検出された）を削除する。いずれも gate-safe — `signals.rs` はコンパイル対象外だったため削除しても挙動に影響なし。）コミットゲート (`verify spec-states-current`) とマージゲート (`check_strict_merge_gate`) が v3 catalogue の本トラックに対して正しくフェイルクローズド動作すること: 不在 → BLOCKED / declaration_hash 不一致 → BLOCKED / 非 v3 → BLOCKED / 🔴 → BLOCKED / strict=true かつ 🟡 → BLOCKED。AC-12 (4) の確認として `cargo make track-pr-merge` が v3 カタログの本トラックで正常動作すること: 本タスク (T028) の一環として `/track:review` → `/track:commit` → `/track:pr` → `cargo make track-pr-merge` の通常マージフローを実行し、マージゲートが v3 カタログに対して正しく評価してマージが完了することを確認する (T028 完了をもって AC-12 全項目が充足される)。Layer: integration。",
+      "status": "done",
+      "commit_hash": "4523ab0105139908044d2a3efbe47759dad669b0"
+    },
+    {
+      "id": "T029",
+      "description": "`catalogue-impl-signals` の symlink チェック I/O を domain port + infra adapter の背後に移し、usecase 層を raw filesystem I/O から解放する。具体的には: (1) 新規 `domain::SymlinkGuardPort` (secondary port — `reject_symlinks_from_root` / `reject_symlinks_below` の 2 メソッド) と `domain::SymlinkGuardError` (`SymlinkFound` / `Io` の enum) を `libs/domain/src/symlink_guard_port.rs` に追加し、`libs/domain/src/lib.rs` から `pub use` する。(2) 新規 `infrastructure::FsSymlinkGuard` adapter (`libs/infrastructure/src/track/fs_symlink_guard.rs`) を追加する — `reject_symlinks_below` は既存 `infrastructure::track::symlink_guard::reject_symlinks_below` に委譲し、`reject_symlinks_from_root` は path の全 ancestor を `symlink_metadata` でチェックする。(3) `usecase::catalogue_impl_signals::CatalogueImplSignalsInteractor::new` に 6 番目のポート `symlink_guard: Arc<dyn domain::SymlinkGuardPort>` を追加し、`helpers.rs` の `Path::symlink_metadata()` 直接呼び出しを port 経由に置き換える。(4) `apps/cli` の composition root で `FsSymlinkGuard::new()` を構築して注入し、`apps/cli` 側に残っていた standalone symlink チェックを削除する。(5) ユニットテストを追加する (`FsSymlinkGuard` の symlink 検出 / 通常パス通過; usecase 側の symlink 拒否経路; apps/cli 側の \"symlink guard\" エラーメッセージ確認)。`cargo make ci-rust` が通ることを確認する。背景: Codex PR #132 レビュー finding — T019 が `apps/cli` から `libs/usecase` へオーケストレーションを移した際に symlink チェックの fs I/O も一緒に持ち込まれた; IN-18 のレイヤリング (cli→usecase→domain, usecase に infra/fs I/O を持ち込まない) を正しく実現するための後追い修正。残る `infrastructure::track::symlink_guard` 本体の TOCTOU hardening (metadata-walk → `O_NOFOLLOW` open + inode 検証) と重複ガードの統合は別フォローアップ (`knowledge/strategy/TODO.md` の `TDDD-BUG-06`)。Layer: domain + infrastructure + usecase + apps/cli。",
+      "status": "done",
+      "commit_hash": "76cc334"
+    },
+    {
+      "id": "T030",
+      "description": "IN-27 (= ADR `2026-05-08-0258` D13) の triple-structure 要件が `signal_evaluator_v2` の実コード上で既に成立していることを test 化する。具体的: `libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs` の test module に「A-side が短い path (例 `domain::TypeSignalsDocument`) で C-side が長い path (例 `domain::tddd::type_signals_doc::TypeSignalsDocument`) を持ち、両者の per-graph id 値も異なる場合でも `format_type` の L1 short-name reduction によって `structs_structurally_equal` が `true` を返すこと」を確認するユニットテストを 1 件追加する (D13 の shape-based matching の構造的検証)。事前 investigate により、`catalogue_to_extended_crate_codec` の `resolve_external_type_ids` post-pass が D5 由来の `external_crates` 自動 build に加えて `paths` への外部 item registration と `Type::ResolvedPath.id` の synthetic Id 置換まで一貫して構築し、Phase 1.5 `resolve_type` の `is_local_unresolved_path` 条件が外部 path をスキップし、Phase 2 `format_type` が `p.path.rsplit(\"::\").next()` で短名 reduction する — の 3 段で triple-structure 突合が既に動作することが確認できているため、`libs/**` の実装コードに変更は加えない。`SignalEvaluatorPort::evaluate(a, b, c)` の signature (ADR `2026-05-08-0305` D5) は変えない。multi-crate rustdoc 読込は採らない。AC-13 の達成 (4 entries → 🔵 + strict merge gate 通過) の実体化は T031 (4 entries の全 method + FQN re-author) が担う。Layer: infrastructure (test addition only)。",
+      "status": "done",
+      "commit_hash": "266d0ef"
+    },
+    {
+      "id": "T031",
+      "description": "T033 (Gap 1: `MethodDeclaration.has_default_impl`) + T034 (Gap 2: `FunctionEntry.generics`) + T035 (Gap 3: `where_predicates` schema/A-codec/evaluator) の実装完了後、4 つのカタログエントリを最終 finalize して AC-13 を達成する。具体的: (1) `usecase-types.json` の `TrackBlobReader` (secondary_port, `action: modify`) — 実 trait の 全 method (`read_spec_document` / `read_type_catalogue` / `read_impl_plan` / `read_enabled_layers` / `read_catalogue_for_spec_ref_check` / `read_catalogue_spec_signals_document` / `read_catalogue_spec_signal_opted_in_layers` / `read_type_signals` 等 ─ 実 trait 定義を rust source で再確認) を、各 method の `has_default_impl` 値 (default 実装あり = `true`、abstract = `false`) と cross-crate 参照 FQN (例 `domain::tddd::type_signals_doc::TypeSignalsDocument`) で宣言。(2) `usecase-types.json` の `usecase::merge_gate::check_strict_merge_gate` (free_function, `action: modify`) — 実 signature (`generics: Vec<MethodGenericParam>` + params + returns) を FQN で declare。`bool` placeholder return は実 return type (例 `domain::verify::VerifyOutcome` 等; rust source 再確認) に書き換え。(3) `infrastructure-types.json` の `GitShowTrackBlobReader` (secondary_adapter, `action: modify`) — 既に T031 working tree で 🔵 達成済の状態を維持し、TrackBlobReader trait 側の `has_default_impl` 変更に追従して再 verify。(4) `infrastructure-types.json` の `infrastructure::verify::spec_states::verify_from_spec_json` (free_function, `action: modify`) — 既に T031 working tree で 🔵 達成済を維持し、`FunctionEntry.generics` 拡張に追従 (generic を持たない場合 `vec![]` のまま)。各 entry の `docs` から partial declaration / placeholder 記述を削除し正確な説明に更新。全 3 レイヤーの `*-type-signals.json` / `*-catalogue-spec-signals.json` を再生成し 4 件が 🔵 になることを確認、`*-types.md` / `contract-map.md` を再 render。`cargo make ci` が通り `cargo make track-pr-merge` の strict merge gate が green になることを確認 → AC-13 達成。`libs/**` のコード変更は含まない (catalogue + signals + view のみ; type-designer scope)。Layer: domain + infrastructure + usecase。",
+      "status": "done"
+    },
+    {
+      "id": "T032",
+      "description": "本トラックで露見したメタバグ (type-designer agent が orchestrator briefing 中の評価器挙動主張を実コード verify なしで採用し、誤った verdict (1) を出して T030 が「存在しない実装ギャップを埋める」task として impl-plan に commit された) への対処として、type-designer agent の自己完結性 (orchestrator briefing 主張を盲信せず運用文書のみで正しい catalogue 判断を下せる能力) を高める doc 修正を行う。briefing 周りの構造的整備 (briefing 機械生成 / 検証 hook 等) は別 follow-up track の責務として本トラックでは扱わない (既存 memory `feedback_briefing_anti_pattern.md` 最有力案 B/C は本 track scope 外)。`.claude/agents/type-designer.md` の更新のみで完結する最小集合として、以下 4 点を整備:\n\n(1) **v3 schema reference の更新**: 現状の \"Kind Field Schemas (concise)\" + \"Catalogue Pattern Cookbook\" は schema_version 2 ベース (`schema_version: 2`, `type_definitions: [...]`, 14-variant `TypeDefinitionKind` 単一 enum) で書かれている。本トラック以降の catalogue は v3 schema (ADR `2026-05-08-0248` D1-D3) — `schema_version: 3`, トップレベルに `types: {} / traits: {} / functions: {}` の 3 BTreeMap、`role` 軸 (`DataRole` 13 値 / `ContractRole` 3 値 / `FunctionRole` 2 値) と `kind` 軸 (`TypeKindV2`: **5 variants** = `UnitStruct` / `TupleStruct { fields, has_stripped_fields }` / `PlainStruct { fields, has_stripped_fields, typestate }` / `Enum { variants }` / `TypeAlias { target }`、JSON では `kind: { \"kind\": \"unit_struct\"|\"tuple_struct\"|\"plain_struct\"|\"enum\"|\"type_alias\", ... }`) の 2 軸構造 — を使う。Kind Field Schemas + Cookbook 全体を v3 schema 前提に書き換える。各 entry / role / kind / variants の正本は次のソースから引く: `libs/domain/src/tddd/catalogue_v2/entries.rs` (`TypeEntry` / `TraitEntry` / `FunctionEntry` の各 struct とフィールド), `libs/domain/src/tddd/catalogue_v2/composite.rs` (`TypeKindV2` enum の 5 variants と payload), `libs/domain/src/tddd/catalogue_v2/roles.rs` (`DataRole` 13 値 / `ContractRole` 3 値 / `FunctionRole` 2 値 / `ItemAction` 4 値 / `SelfReceiver` 3 値), `libs/domain/src/tddd/catalogue_v2/variants.rs` (`FieldDecl` / `VariantDecl` / `VariantPayload` の 3 variant), `libs/domain/src/tddd/catalogue_v2/document.rs` (`CatalogueDocument` トップレベル schema)。\n\n(2) **action semantics の明示**: `ItemAction` (`add` / `modify` / `reference` / `delete`) 各々が catalogue declaration に何を要求するかを **strong claim として明文化**:\n  - `add`: 当該 entry は baseline (B) に存在せず、本トラックで新規追加される。catalogue declaration は **当該トラックで生み出す rust source と structurally identical** であることが要求される (Phase 2 で `add` × `Match` の region は 🔵、`add` × `Mismatch` は 🟡)。\n  - `modify`: 当該 entry は baseline (B) に存在し、本トラックで変更される。catalogue declaration は **変更後の (= 当該トラック完了時点の) rust source と structurally identical** であることが要求される。**trait は全 method を宣言必須、struct は全 field を宣言必須、function は全 param/returns を宣言必須**。partial 宣言 (modified subset のみ列挙) は Phase 2 の structural equality check で `a.items.len() != b.items.len()` 等で即 Mismatch_Modify → 🟡 を生む。\n  - `reference`: 当該 entry は baseline (B) に存在し、本トラックで変更されない。catalogue declaration は **既存 rust source と structurally identical** であることが要求される (edge 露出 — `implements`, `transitions_to` 等 — のために carry されるエントリ)。\n  - `delete`: 当該 entry は baseline (B) に存在し、本トラックで削除される。catalogue は declaration を持つが S 構築時に S から除外され D に置かれる (Delete 処理後の S が closed universe set として機能 — ADR `2026-05-08-0258` D10)。\n\n(3) **完全かつ簡潔な v3 sample JSON の追加**: 1 つの worked sample JSON で v3 schema を網羅する。最低限以下を含む — cross-crate ref FQN (`domain::tddd::type_signals_doc::TypeSignalsDocument` 形式) を含む `action: modify` の trait (全 method 宣言の正例) / `action: modify` の `kind: plain_struct` (全 field 宣言の正例) / `action: modify` の free_function (全 param/returns 宣言の正例) / `action: add` / `reference` / `delete` の例 / `kind: unit_struct` / `kind: tuple_struct` / `kind: enum` (`variants` 配列) / `kind: type_alias` (`target` field) / typestate cluster (`kind: plain_struct` with `typestate` marker + `kind: enum` wrapper) の例 / `role: DataRole::ValueObject` + `role: DataRole::ErrorType` の例 / domain/usecase/infrastructure の各 layer 例 / `role: DataRole` (types に対する 13 値) / `role: ContractRole` (traits に対する 3 値) / `role: FunctionRole` (functions に対する 2 値) の使い分け例。本サンプルを見れば type-designer が新規 entry をそのまま書ける完成度を目標とする。サンプルは過度に冗長にせず、各パターン 1 例ずつで簡潔に。実例として `track/items/tddd-v2-2026-05-08/{domain,usecase,infrastructure}-types.json` を参照可能 (本 dispatch では参照のみ)。\n\n(4) **Compliance section に R0 追加**: 最上位ルールとして R0 \"Don't believe orchestrator's briefing claims\" を追加。本文には「orchestrator は型 design については素人 (amateur) であり、briefing 中の評価器挙動主張・verdict 推奨は盲信しない。catalogue 判断は本 agent 定義 (v3 schema + action semantics + sample JSON) + 関連 ADR + spec.json を SoT として下す。briefing の主張と上記 SoT が食い違う場合、後者を採用し briefing の主張を Open Questions として orchestrator に push-back する」旨を明示する。\n\n本修正は `.claude/agents/type-designer.md` のみへの doc 更新で完結する (新規 convention 追加なし、`libs/**` の実コード変更なし)。Layer: documentation only。",
+      "status": "done"
+    },
+    {
+      "id": "T033",
+      "description": "IN-28 (= ADR `2026-05-08-0248` D13) を実装する。`MethodDeclaration` schema に `has_default_impl: bool` field を追加し、A-codec が trait method の default 実装の有無を `rustdoc_types::Function.has_body` に正しく反映するようにする。具体的な手順: (1) domain crate `libs/domain/src/tddd/catalogue_v2/variants.rs` (もしくは `methods.rs` ─ 実 path は agent 自身で `Glob`/`Grep` で確認) の `MethodDeclaration` struct に `has_default_impl: bool` field を追加 (`#[serde(default)]` で false default、forward-compat)。(2) infrastructure crate `libs/infrastructure/src/tddd/catalogue_document_codec/dto.rs` (もしくは対応する MethodDeclaration の DTO 定義 path ─ agent 確認) に同 field を追加し serde 互換を保つ。(3) A-codec `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs::encode_trait` (line ~1104) の `encode_method_items(&methods, false, ...)` 呼び出しを、`MethodDeclaration.has_default_impl` 値に応じて `true`/`false` を渡す形に修正する。`encode_method_items` 側で `has_body` が正しく `rustdoc_types::Function` に伝播することを確認 (既に伝播経路があれば呼び出し側修正だけで足りる)。(4) ユニットテスト: domain crate の `MethodDeclaration` field 追加に対応する unit test (serde round-trip 含む) を追加。`signal_evaluator_v2/structural_eq.rs` test module に「`action: modify` の trait で `has_default_impl: true` を持つ method declaration が A side / C side で `has_body: true` 対称になり structurally_equal が `true` を返す」を確認する unit test を追加。(5) `domain-types.json` の `MethodDeclaration` エントリ (現在 `action: modify`) に `has_default_impl: bool` field を `fields` 配列へ追加 (同 commit 内で catalogue + Rust source を atomically 更新)。(6) `cargo make ci-rust` が通り、domain layer の type-signals が `MethodDeclaration` で 🟡 / 🔴 を出さないことを確認。AC-13 達成は T031 の finalization (T033 + T034 完了後の TrackBlobReader 全 method `has_default_impl` 宣言付き再認証) を経て成立する。`libs/**` の他箇所への影響 (MethodDeclaration 利用箇所が `has_default_impl` 値を構築する必要がある場合) は最小限の修正で carry。Layer: domain + infrastructure。",
+      "status": "done"
+    },
+    {
+      "id": "T034",
+      "description": "IN-29 (= ADR `2026-05-08-0248` D14) を実装する。`FunctionEntry` schema に `generics: Vec<MethodGenericParam>` field を追加し、A-codec が generic free function の generics を `rustdoc_types::Generics` に正しく反映するようにする。具体的な手順: (1) domain crate `libs/domain/src/tddd/catalogue_v2/entries.rs` の `FunctionEntry` struct に `generics: Vec<MethodGenericParam>` field を追加 (`#[serde(default)]` で empty vec default、forward-compat)。既存 `MethodGenericParam` 型をそのまま再利用 (新規型追加不要)。(2) infrastructure crate `libs/infrastructure/src/tddd/catalogue_document_codec/dto.rs::FunctionEntryDto` (line ~314) に対応する `generics: Vec<MethodGenericParamDto>` field を追加し serde 互換を保つ。`deny_unknown_fields` の場合は backward-compat 影響を確認 (既存 catalogue は generics field 欠落でも `#[serde(default)]` でロード可能)。(3) A-codec `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs::encode_function` (line ~1177) の `generics: empty_generics()` 固定を、`FunctionEntry.generics` を `rustdoc_types::Generics` に変換する処理に置き換える。既存 `MethodDeclaration.generics` を encode するロジックがあるはずなので再利用 (`encode_method_items` 内の generics 処理を参照)。(4) ユニットテスト: domain crate の `FunctionEntry` field 追加に対応する unit test (serde round-trip 含む) を追加。`signal_evaluator_v2` test module に「`action: modify` の generic free function (例 `fn f<T>(...)`) が A side / C side で `generics` 数比較を通る」を確認する unit test を追加。(5) `domain-types.json` の `FunctionEntry` エントリ (現在 `action: add`) の `fields` 配列に `generics` を追加 (同 commit 内で atomically 更新)。(6) `cargo make ci-rust` が通り、domain layer の type-signals が `FunctionEntry` で 🟡 / 🔴 を出さないことを確認。`libs/**` の他箇所 (`FunctionEntry` を構築する全 catalogue authoring 箇所) は generics field を `vec![]` で構築するだけで backward-compat。AC-13 達成は T031 finalization で結実。Layer: domain + infrastructure。",
+      "status": "done"
+    },
+    {
+      "id": "T035",
+      "description": "IN-30 (= ADR `2026-05-13-1153` D1 + D2) を実装する。where 形式 generics の正規化スキーマ拡張 (domain 型 + infra DTO codec) と A-codec の where 形式固定出力への変更、Signal evaluator の C 側仮想正規化ビュー構築を行う。\n\n## 対象レイヤーと変更内容\n\n### 1. domain 層 (`libs/domain/src/tddd/catalogue_v2/methods.rs`)\n新規 struct `WherePredicateDecl` を `MethodGenericParam` の下に追加する。フィールドは `type_: TypeRef`（左辺の型式。例: \"T\"、\"Vec<T>\"、\"T::Item\"）と `bounds: Vec<TypeRef>`（右辺のトレイト参照のみのリスト — `GenericBound::Outlives` のような lifetime バウンドは `TypeRef` で表現できないためスコープ外）。domain 層は serde-free のため derive なし (`#[derive(Debug, Clone, PartialEq, Eq)]` のみ)。\n\n`MethodDeclaration` struct (`libs/domain/src/tddd/catalogue_v2/methods.rs` line ~104) に `where_predicates: Vec<WherePredicateDecl>` フィールドを追加する。`MethodDeclaration::new` と `MethodDeclaration::associated_function` の両コンストラクタで `where_predicates: vec![]` をデフォルト初期化する。\n\n`FunctionEntry` struct (`libs/domain/src/tddd/catalogue_v2/entries.rs` line ~112) に `where_predicates: Vec<WherePredicateDecl>` フィールドを追加する。`TraitEntry` 自体への `where_predicates` 追加は D2 スコープ外 (トレイト level の generics 宣言が別途スキーマ化されるまで保留)。\n\n`entries.rs` の import に `WherePredicateDecl` を追加する (`use crate::tddd::catalogue_v2::methods::...,WherePredicateDecl`)。\n\n`entries.rs` 内の全テストフィクスチャ（`TypeEntry` / `FunctionEntry` を直接構築しているもの）に `where_predicates: vec![]` フィールドを追加する (`TraitEntry` は変更なし)。\n\nユニットテストを `methods.rs` の tests モジュールに追加する（最低 3 件）: (a) `WherePredicateDecl` フィールドが正しく格納される; (b) `MethodDeclaration::new` で `where_predicates` がデフォルト空になる; (c) `MethodDeclaration::associated_function` で `where_predicates` がデフォルト空になる。\n\n`entries.rs` の tests モジュールに追加テストを加える（最低 2 件）: (d) `FunctionEntry` に `where_predicates` フィールドが存在し非空で格納できる; (e) `where_predicates` が equality に参加する。\n\n### 2. infra DTO 層 (`libs/infrastructure/src/tddd/catalogue_document_codec/dto.rs`)\n新規 struct `WherePredicateDeclDto` を追加する: `type_: String`（JSON キー名は `\"type_\"` のまま。`type` は Rust の予約語なので rename は不要）、`bounds: Vec<String>`。\n\n`MethodDeclarationDto` に `where_predicates: Vec<WherePredicateDeclDto>`（`#[serde(default, skip_serializing_if = \"Vec::is_empty\")]`）を追加する。\n\n`FunctionEntryDto` に `where_predicates: Vec<WherePredicateDeclDto>`（`#[serde(default, skip_serializing_if = \"Vec::is_empty\")]`）を追加する。\n\n`TraitEntryDto` は変更しない (D2 スコープ外)。\n\n### 3. codec round-trip (`libs/infrastructure/src/tddd/catalogue_document_codec/{encode,decode}.rs`)\nencode 側: `method_decl_to_dto` / `function_entry_to_dto` (それぞれ既存の encode 関数) で `where_predicates` フィールドを書き出す (`trait_entry_to_dto` は D2 スコープ外のため変更しない)。`WherePredicateDecl` → `WherePredicateDeclDto` の変換は `type_.as_str().to_string()` と `bounds.iter().map(|b| b.as_str().to_string()).collect()`。\n\ndecode 側: `where_predicates_from_dtos(entry_name, dtos)` のような共有ヘルパーを追加する（`method_generics_from_dtos` と同様のパターン）。各 dto の `type_` が空文字でないことを検証し（`TypeRef::new` で構築）、`bounds` の各文字列も `TypeRef::new` で構築する。\n\n`mod.rs` の codec テストに最低 4 件追加する: (a) `where_predicates` が非空の `MethodDeclaration` のラウンドトリップ; (b) デフォルト空 Vec のとき JSON に `where_predicates` フィールドが出力されない (`skip_serializing_if`); (c) 空文字 `type_` を含む DTO を decode するとエラーになる（無効バウンド拒否）; (d) `FunctionEntry` の `where_predicates` ラウンドトリップ。\n\n### 4. A-codec — where 形式固定出力 (`libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs`)\n`encode_function`（line ~1137-1186）: `fn_generic_params` 構築時に `bounds: vec![]` かつ `is_synthetic: false` で `GenericParamDef` を作る（インラインバウンドを空にする）。`entry.generics` の各 `MethodGenericParam.bounds`（インライン形式）と `entry.where_predicates` の各 `WherePredicateDecl` を合わせて `WherePredicate::BoundPredicate { type_, bounds, generic_params: vec![] }` のリストを構築し、`fn_generics.where_predicates` にセットする。インライン形式 bounds 経路 (`entry.generics[i]`): `entry.generics[i].name` は `ParamName` 型であり、`ParamName`→`String`→`Type::Generic` に変換する (`TypeRef` 経由ではない)。bounds は既存の `encode_bound_str` + `rewrite_generic_types_in_bound` を使う。where_predicates 経路 (`entry.where_predicates[j]`): `entry.where_predicates[j].type_` は `TypeRef` 型であり、`parse_type_ref_str` で `Type` に変換してから、その結果に対して `rewrite_generic_types(parsed_type, &generic_names_set)` を呼んで generic パラメータ名の出現を `Type::Generic` に置換する。`generic_names_set` は `entry.generics` の `name` フィールドを集めた名前集合。この `rewrite_generic_types` 呼び出しを省くと、`Vec<T>` や `T::Item` のような LHS に含まれる generic 名が unresolved のまま残り、`encode_bound_str` が正しく変換できない。\n\n`encode_method_items`（line ~1216-1340）: `method_generic_params` 構築時に同様に `bounds: vec![]` かつ `is_synthetic: false` にする (ADR D1 の要件 — A-codec は常に `is_synthetic: false` で出力する)。インライン形式 bounds 経路: `method.generics[i].name` (`ParamName`) を `ParamName`→`String`→`Type::Generic` に変換する。where_predicates 経路: `method.where_predicates[j].type_` (`TypeRef`) を `parse_type_ref_str` で `Type` に変換してから `rewrite_generic_types(parsed_type, &method_generic_names_set)` で generic パラメータ名を `Type::Generic` に置換する。`method_generic_names_set` は `method.generics` の `name` フィールドを集めた名前集合。\n\n追加テストを A-codec のテストスイートに 3 件加える: (a) `where_predicates` を持つ `FunctionEntry` を encode すると `fn_generics.where_predicates` が生成され `GenericParamDef.bounds` が空になる; (b) インライン形式 bounds（`MethodGenericParam.bounds` 経由）も `where_predicates` に移動される; (c) `MethodDeclaration.where_predicates` を持つ trait method の encode が正しく `method_generics.where_predicates` を生成する。\n\n`encode_trait` は変更しない (D2 スコープ外)。\n\n### 5. Signal evaluator 正規化 (`libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs`)\n`build_generics_fingerprint(generics: &Generics)`（line ~177-201）を変更する。正規化ビューを次の手順で構築する: (i) `generics.params` の各 `GenericParamDef::Type` について `p.bounds` を検査する。`p.bounds` の各 `GenericBound` を検査し、サポート外の bound が 1 つでも含まれていればエラー（あるいは比較不能な sentinel）を返す。サポート外の条件: `GenericBound::Outlives` (lifetime バウンド)、`GenericBound::TraitBound` 以外の任意の variant (例: `GenericBound::Use` 等の新規 variant)、`GenericBound::TraitBound.generic_params` が非空 (HRTB binder `for<'a>` を TraitBound に持つケース — 例: `F: for<'a> Fn(&'a ())`)。すべての bound が `GenericBound::TraitBound { generic_params: [], .. }` の場合のみ、`p.bounds` が非空なら `format_type(&Type::Generic(p.name.clone()))` をキーとして bounds を一時 map に追加する; (ii) `generics.where_predicates` の各要素を match する。`WherePredicate::BoundPredicate { type_, bounds, generic_params, .. }` については、`generic_params` が非空（HRTB binder `for<'a>` 形式）の場合はエラー（あるいは比較不能な sentinel）を返す（D3 のフェイルクローズドと同じ扱い — HRTB は BoundPredicate の内部でもサポート外）。`generic_params` が空の場合は次に `bounds` の各 `GenericBound` を検査し、サポート外の bound が 1 つでも含まれていればエラー（あるいは sentinel）を返す。サポート外の条件（step (i) と同一）: `GenericBound::Outlives`、`GenericBound::TraitBound` 以外の任意の variant、`GenericBound::TraitBound.generic_params` が非空 (HRTB binder を TraitBound に持つケース — 例: `F: for<'a> Fn(&'a ())`)。すべての bound が `GenericBound::TraitBound { generic_params: [], .. }` の場合のみ `format_type(type_)` をキーとして bounds を一時 map にマージ（同一キーへの追加は vec を extend する）する。`WherePredicate::LifetimePredicate` / `WherePredicate::EqPredicate` については、`build_generics_fingerprint` を `Result<String, FingerprintError>` に変更してエラーを返す（あるいは `fingerprint` を即座に比較不能な sentinel 値にする）ことで、この predicate が C 側に出現した時点で常に mismatch とする（unconditional fail-closed — D3 要件）。トークンを追加して比較する方式は採用しない（A/C 両側が同じ unsupported predicate を持つ場合に誤って equal と判定される可能性があるため）；(iii) 一時 map の各エントリを `format_generic_bounds(merged_bounds)` で文字列化し、キー（type_str）昇順でソートして `type_str:bound_str` 形式で join する。これが where 形式の正規化 fingerprint となる。`params` の non-lifetime 部分（bound なしのパラメータ名のみ）は引き続き先頭に `T:=` 形式で出力する（順序は保持）。入力 `Generics` は変換しない（不変）。\n\n`build_trait_method_map` 内の method signature 構築部分（line ~133）で `build_generics_fingerprint` が呼ばれているため、fingerprint が正規化されれば `build_trait_method_map` は自動的に正規化の恩恵を受ける（追加変更不要）。\n\n`generics_eq.rs` の tests モジュールに最低 9 件追加する: (a) `<T: Bound>` インライン形式（A 側）と `<T> where T: Bound` where 形式（C 側）の `Generics` に対して `generics_structurally_equal` が `true` を返す; (b) `<T: A + B>` インライン形式と `<T> where T: A + B` where 形式で `true`; (c) `<T: A>` と `<T: B>` で `false`; (d) 両辺ともに空 Generics で `true`; (e) C 側が HRTB binder (`generic_params` 非空の `WherePredicate::BoundPredicate`) を持つ場合に `build_generics_fingerprint` がエラー（あるいは比較不能な sentinel）を返し、`generics_structurally_equal` が `false` になること; (f) C 側の `WherePredicate::BoundPredicate.bounds` に `GenericBound::Outlives` が含まれる場合に `build_generics_fingerprint` がエラー（あるいは比較不能な sentinel）を返し `generics_structurally_equal` が `false` になること; (g) C 側の `GenericParamDef::Type.bounds` に `GenericBound::Outlives` が含まれる（インライン lifetime バウンド `T: 'a` 形）場合に `build_generics_fingerprint` がエラー（あるいは比較不能な sentinel）を返し `generics_structurally_equal` が `false` になること; (h) C 側の `GenericBound::TraitBound.generic_params` が非空 (HRTB on TraitBound — 例: `for<'a> Fn(&'a ())`) の場合に `build_generics_fingerprint` がエラー（あるいは比較不能な sentinel）を返し `generics_structurally_equal` が `false` になること (WherePredicate 経路・inline param bounds 経路いずれかでよい); (i) `GenericBound::TraitBound` でない非 Outlives の bound variant (例: `GenericBound::Use`) が含まれる場合に `build_generics_fingerprint` がエラー（あるいは比較不能な sentinel）を返し `generics_structurally_equal` が `false` になること。\n\n### 6. 型カタログ更新 (`track/items/tddd-v2-2026-05-08/domain-types.json`)\n`WherePredicateDecl` エントリを新規追加する（`action: add`、`role: DataRole::ValueObject`、`kind: plain_struct`、`fields: [{name: type_, ty: TypeRef}, {name: bounds, ty: Vec<TypeRef>}]`）。\n\n`MethodDeclaration` エントリ（現在 `action: modify`）の `fields` 配列に `{name: where_predicates, ty: Vec<WherePredicateDecl>}` を追加する。\n\n`FunctionEntry` エントリ（現在 `action: add`）の `fields` 配列に `{name: where_predicates, ty: Vec<WherePredicateDecl>}` を追加する。\n\n`TraitEntry` エントリは変更しない (D2 スコープ外)。\n\n## 成功条件\n- `cargo make ci-rust`（fmt-check + clippy + nextest + deny + check-layers）が通る。\n- T035 完了後、T031 の finalize は `check_strict_merge_gate` のインライン形式 `generics[].bounds` を維持したまま完了する — T035 の evaluator 正規化によりインライン形式と where 形式が同一 fingerprint に統一されるため、明示的な `where_predicates` 宣言への書き換えは不要 — その結果 usecase カタログエントリは 0 🟡 / 0 🔴 になる。\n- AC-13 は T035 + T031 finalization の両方が完了した時点で達成される。\n\nLayer: domain + infrastructure。",
+      "status": "done"
+    },
+    {
+      "id": "T036",
+      "description": "T036: Phase 1.45 rewrite discriminator を s_actions first ロジックに統一し、B-sourced Reference function の signature corruption (Id 衝突時) を防ぐ + 回帰テスト追加 (libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs + tests.rs)",
+      "status": "done"
+    },
+    {
+      "id": "T037",
+      "description": "Symptom A 本修正: `insert_b_item_tree_into_s` (libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/child_items.rs) に B 側 Id の S 内再発番を実装する。具体的には、B 由来の全アイテム (types / traits / functions) を S に Reference で取り込む際に、B 側の Id をそのまま流用せず、S の flat incremental Id 空間で新規 Id を割り当て直す。Id の付け替えには B アイテムから参照されている child Id (FieldDecl / VariantDecl / method items 等 inline 参照チェーン) もすべて追従して書き換える必要があるため、B サブツリー全体を walk して id_map (old B id → new S id) を構築してから index への挿入を行う。実装完了後、T036 が `builder.rs:~392` に追加した `s_actions`-first discriminator ワークアラウンドを削除する (B-side renumber が正規修正となるため)。回帰テスト: (a) B 側 Id と A 側 Id が衝突する fixture (同一の u32 値を使う B アイテムと A アイテム) を用意し、renumber 後も S アイテムが正しく参照されることをアサート。(b) T036 ワークアラウンド削除後も B-sourced Reference function の signature が壊れないことをアサート (T036 の既存回帰テストを維持しつつ、workaround ブランチが不要になることを確認)。Layer: infrastructure。",
+      "status": "done"
+    },
+    {
+      "id": "T038",
+      "description": "Symptom B 修正 (IN-31): Phase 1 A-side に TypeAlias 由来の孤立 Impl アイテムを S へ組み込む pass を追加する。`rustdoc_types::TypeAlias` は `impls` フィールドを持たないため、`encode_type_alias` が生成した TraitImpl アイテムは TypeAlias アイテムから直接参照されない standalone エントリとして `ExtendedCrate.krate.index` に存在する。B 側は `insert_b_item_tree_into_s` の orphan-impl pass (b.index のキーを走査してどの Item からも参照されない Impl を検出する) と同等の処理を A 側 Phase 1 S 構築ループに追加する: `a.krate.index` を走査し、まず `impls` フィールドを持つアイテム種別 (Struct / Enum) から参照される Impl の Id 集合を収集し、その集合に含まれていない Impl アイテムを「孤立 Impl」として検出する (TypeAlias は `impls` フィールドを持たないため孤立 Impl 集合の算出には含めず、孤立 Impl とは「Struct または Enum の `impls` リストから参照されていない Impl」と定義する)。検出した孤立 Impl のうち `a.item_actions` に対応する action が存在するものを、catalogue で宣言された action (Add/Modify/Reference のいずれか) に従って S に取り込む。取り込み時には T037 と同じ Id 再発番規則を適用する。ユニットテスト: TypeAlias に trait_impls を持つ CatalogueDocument から生成した ExtendedCrate を入力として Phase 1 を実行し、該当の Impl が S に取り込まれ Phase 2 で正しい signal (例: S∩C + 構造一致 + action=Add → 🔵) が生成されることをアサート。Phase 2 が spurious `CMinusSUnionD` (🔴) を出さないことを確認する。Layer: infrastructure。",
+      "status": "done"
+    },
+    {
+      "id": "T039",
+      "description": "Symptom C 修正 (AC-14): `DERIVE_TRAIT_NAMES` 定数 (libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs) と `is_derive_trait` ヘルパー関数を削除する。これらの定数・関数を参照している `build_impl_identity_map` / Phase 2 の構造一致比較コードから provenance-based フィルタ呼び出しをすべて除去する。削除に伴い関連するテスト (「derive trait は除外される」ことを確認していた test) も削除する。同一コミット内で `StructuralPartialEq` / `StructuralEq` 除外機構を導入する: これらは rustdoc が `is_synthetic: false` で出力するコンパイラ内部トレイトであり、`DERIVE_TRAIT_NAMES` 削除後も catalogue が宣言しないため `CMinusSUnionD` (🔴) を生成する。除外機構として `COMPILER_INTERNAL_TRAIT_NAMES: &[&str]` 定数 (値: `[\"StructuralPartialEq\", \"StructuralEq\"]`) を追加し、`build_impl_identity_map` 内で identity map 構築時に compiler-internal trait の Impl アイテムをスキップする (catalogue 由来フィルタではなく、コンパイラ実装詳細として明示的に文書化する)。ユニットテスト: (a) `Debug` / `Clone` / `Copy` / `IntoStaticStr` の derive 由来 TraitImplDecl を catalogue が宣言した場合に Phase 2 で 🔵 が生成されることをアサート (catalogue-declared derive traits evaluate as Blue)。(b) `StructuralPartialEq` / `StructuralEq` の Impl が C 側のみに存在する場合に `CMinusSUnionD` が生成されないことをアサート (compiler-internal は除外される)。(c) `DERIVE_TRAIT_NAMES` に相当するフィルタが存在しないことを確認する (コンパイルテスト相当: `DERIVE_TRAIT_NAMES` / `is_derive_trait` identifier がコードに存在しない)。Layer: infrastructure。",
+      "status": "done"
+    },
+    {
+      "id": "T043",
+      "description": "Symptom D 修正 (PR #132 review 中に T040 CLI thinning + T042 catalogue 更新で発覚した evaluator 限界): `build_impl_identity_map` (libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs) が generic 型パラメータを保持したままで impl identity キーを構築する問題を修正する。具体的には、rustdoc から得た Impl の `for_` フィールドが `TaskOperationInteractor<S>` のような generic struct を指す場合、`format_type` がそのまま `<S>` 込みの文字列 `TaskOperationInteractor<S>: TaskOperationService` を生成するため、catalogue 側の A-codec が生成する非ジェネリックキー `TaskOperationInteractor: TaskOperationService` と一致せず CMinusSUnionD Red を発火する。修正: `build_impl_identity_map` (および同等の impl key 構築箇所) で `for_` 型の `format_type` 結果から impl の `generics` セクションで宣言された type parameter (impl block の `<S>` 等) のみを normalize/strip する。具体的には Impl item の `generics.params: Vec<GenericParamDef>` を読み、`GenericParamDefKind::Type` の name 集合を構築してから、`format_type` 経由で得た文字列を解析して該当 name の generic args を取り除く (concrete 型引数 `Vec<u32>` 等は保持する。あくまで type parameter 由来の args のみ strip)。回帰テスト: (a) 既存の non-generic struct + trait_impls の Blue 評価が壊れないことを確認 (`SymlinkGuardPort` 等)。(b) generic struct `TaskOperationInteractor<S>: TaskOperationService` impl が catalogue 側 `TaskOperationInteractor: TaskOperationService` 宣言と Blue マッチすることをアサート (catalogue-impl-signals で usecase layer 0 Red)。(c) 具体型引数 `impl Foo<Vec<u32>>` のような type-parameter ではない args は normalize 対象外であることをアサート。Layer: infrastructure。",
+      "status": "done"
+    },
+    {
+      "id": "T044",
+      "description": "signal_evaluator_v2 extension — Outlives bound 対応 + Mismatch_Modify region での generic struct impl identity 正規化: (1) `generics_eq.rs::bounds_supported()` に `GenericBound::Outlives(_) => true` を追加して lifetime bound を verbatim 比較対象に含める。回帰テスト: Outlives 同一性 (両辺ともに `T: 'static` 等) は equal、Outlives 不一致 (片方のみ `T: 'static`) は not-equal をアサート。(2) `Mismatch_Modify` region における generic struct impl identity のキー正規化を実装する: T043 の `format_type_strip_type_params` ロジック (Match region で適用済み) を Mismatch_Modify region の identity 照合経路にも適用し、`TaskOperationInteractor<S>: TaskOperationService` と catalogue 側 `TaskOperationInteractor: TaskOperationService` 宣言の一致を Mismatch_Modify 経路でも正しく解決する。回帰テスト: generic struct `TaskOperationInteractor<S>: TaskOperationService` の Mismatch_Modify 経路が CMinusSUnionD (Red) ではなく Mismatch_Modify 信号として正しく評価されることをアサート。根拠 ADR: `2026-05-08-0258` D10 (trait identity normalization) + `2026-05-08-0305` D9 (provenance-blind structural equality)。Layer: infrastructure。",
+      "status": "done",
+      "commit_hash": null
+    },
+    {
+      "id": "T045",
+      "description": "fail-open synthetic-domain fallback 削除 (CN-11 フェイルクローズド保守): `FsTdddLayerBindingsAdapter::new_with_legacy_fallback()` と関連する `legacy_fallback: bool` field / `LEGACY_FALLBACK_JSON` 定数、および `load_tddd_layers_from_path` 関数 (infrastructure/src/verify/tddd_layers.rs) を完全削除し、`load_tddd_layers_strict` を `load_tddd_layers` にリネームする。callers (`apps/cli/src/commands/track/tddd/signals.rs` / `baseline.rs`、`libs/infrastructure/src/tddd/catalogue_bulk_loader.rs`、`libs/infrastructure/src/track/render.rs`) を新 API に切り替える。完了後: catalogue (`*-types.json`) 側の `FsTdddLayerBindingsAdapter` エントリを削除済み API を反映した状態に更新し、stale doc comment (`catalogue_bulk_loader.rs` の fallback 参照コメント) を現状記述に書き換える。type-signals / catalogue-spec-signals を再生成して信号機を再評価する。根拠: `feedback_no_backward_compat.md` (no backward compat across tracks) および `feedback_sot_chain_disable_disguised_as_blue.md` (fail-open patterns disguised as Blue)。Layer: infrastructure + apps/cli。",
+      "status": "done",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "新 CatalogueDocument schema — domain 型 (newtype 系 + Role/Action/Pattern 軸分離)",
+        "description": [
+          "T001 は newtype 系 12 種 (Identifier base + 各 newtype) と Role/Action の primitive enum および Layer 軸に使用する LayerId newtype を実装する。T002 はこれを基盤として複合構造 (TypeKindV2 / CompositePattern / VariantPayload / エントリ群 / CatalogueDocument) を実装する。",
+          "ADR 1 D1-D12 の型レベル制約 (TypeEntry に ContractRole を付けようとすると parse 段階で reject / members×kind の制約 schema 構造 encode / VariantPayload 3 variant) を CatalogueDocument 実装に折り込む。",
+          "旧型 (TypeDefinitionKind 等) はこのフェーズでは削除しない。T003 の codec 切り替え後に T008 で一括削除する。<500 行 / commit を維持するため newtype+primitive と複合構造を T001/T002 に 2 分割している。"
+        ],
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "新 CatalogueDocument serde codec — infrastructure 層 (CatalogueLoader 更新含む)",
+        "description": [
+          "T003 は新 CatalogueDocument 専用 codec を infrastructure 層に実装し、旧 TypeCatalogueDocument 直接読み込み経路を削除する (no-backward-compat 原則)。",
+          "FsCatalogueLoader の内部実装を v3 CatalogueDocument 読み込みに切り替える。CatalogueLoader port の返り値型は BTreeMap<LayerId, TypeCatalogueDocument> を維持し、infrastructure 側で v3_doc_to_stub 変換を行う (CatalogueLinter との互換性保持)。",
+          "CatalogueLoader port は domain-types.json に宣言されている (既存の tddd-contract-map-phase1 catalogue から踏襲した domain 層配置)。FsCatalogueLoader adapter が infrastructure-types.json に宣言される。",
+          "S1 (domain 型 T001/T002) の完了後に着手する。"
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "ExtendedCrate schema + Catalogue → TypeGraph A codec (domain port + infrastructure adapter)",
+        "description": [
+          "T004 は ExtendedCrate schema (domain 層) と BaselineRustdocCodec / CatalogueToExtendedCratePort を実装する。T005 は syn 依存の TypeRef parse + external_crates auto-build + inline→id 参照変換 + Catalogue→ExtendedCrate codec (infrastructure 層 adapter) を実装する。",
+          "T004 と T005 は依存関係があるため逐次実施 (T004 完了 → T005 着手)。",
+          "TypeRef parse は syn::parse_str::<syn::Type> を使い自前 tokenizer は書かない (CN-08)。未解決マーカーは open-world で保持し、closed-world 検証は T006 Phase 1 で実施 (CN-06)。",
+          "S1/S2 の完了後に着手する。"
+        ],
+        "task_ids": [
+          "T004",
+          "T005"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Signal evaluator Phase 1 (S/D 構築) + Phase 2 (3-way 評価)",
+        "description": [
+          "T006 は Phase 1 (S/D 構築 + declare 整合性検証 + closed-world 検証) を domain 層に実装する。T007 は Phase 2 (11 領域 × signal table) を infrastructure 層 SignalEvaluatorV2 として実装する。",
+          "T006/T007 は依存関係があるため逐次実施 (T006 完了 → T007 着手)。",
+          "S3 の ExtendedCrate + codec が前提となるため S3 完了後に着手する。",
+          "identity 判定基準 (types/traits=short name / functions=FunctionPath、ADR 2 D3 / ADR 3 D2) を Phase 1/2 の全処理で統一する (CN-03)。"
+        ],
+        "task_ids": [
+          "T006",
+          "T007"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "旧 TypeGraph 置換 + 旧 schema 削除 + 既存コード書き換え",
+        "description": [
+          "T008 は旧 TypeGraph (schema.rs の TypeNode/TraitNode/FunctionNode/TraitImplEntry HashMap 独自 schema) と旧 TypeBaseline 系を削除し、TypeGraph を読む全既存コードを新形式 (rustdoc_types::Crate / ExtendedCrate) に書き換える。",
+          "旧型の削除タイミングを S4 完了後まで遅らせることで、S1-S4 の各 task では旧コードを壊さずに新コードを追加できる。T008 で一括置換することでレビューサーフェースを明確化する。",
+          "Contract Map renderer / Reality View renderer の新 TypeGraph 形式への完全対応は OS-06 でスコープ外。T008 では callers が compile error にならない最小限の修正を行う。",
+          "S4 完了後に着手する。"
+        ],
+        "task_ids": [
+          "T008"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "bin/sotp rebuild + 現 track catalogue 書き換え + CI ゲート確認 (v3 schema migration)",
+        "description": [
+          "T009 は新 schema 実装完了後に bin/sotp を rebuild し、現 branch の track/items/tddd-v2-2026-05-08/ の *-types.json を新 CatalogueDocument 形式 (3-BTreeMap) に書き換える。",
+          "旧 TypeDefinitionKind / payload_types: Vec<String> 形式の catalogue JSON は新 schema codec で読めないため全 catalogue ファイルを書き換える (no-backward-compat: backward compat 移行 layer は導入しない、CN-09)。",
+          "TypeKindV2 informal_grounds を spec_refs へ昇格させ、型カタログの信号機評価の yellow を解消する。",
+          "S5 完了後に着手する。"
+        ],
+        "task_ids": [
+          "T009"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "v3 catalogue spec-link 復元 — grounding フィールド追加 (domain 型拡張)",
+        "description": [
+          "T010 は v3 catalogue の全エントリ種 (TypeEntry / TraitEntry / FunctionEntry) に `spec_refs` と `informal_grounds` コレクションを追加する (ADR 2026-05-11-1257 D1)。",
+          "既存 v2 catalogue の SpecRef / InformalGroundRef 型を domain 層で再利用し、serde default で空 Vec を許容する。",
+          "S6 (v3 catalogue JSON 書き換え完了) を前提とし、domain 型レベルの変更から着手する。T011 の codec 拡張より先に完了させる必要がある。"
+        ],
+        "task_ids": [
+          "T010"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "v3 catalogue spec-link 復元 — codec 拡張 + D4 クロス crate 検証 (infrastructure codec)",
+        "description": [
+          "T011 は CatalogueDocumentCodec を拡張して spec_refs / informal_grounds の encode / decode を実装する (ADR 2026-05-11-1257 D1 / D3)。T012 は codec decode 時に cross-crate function path を silent drop ではなく明示的 error にする (ADR 2026-05-11-1257 D4)。",
+          "T011 と T012 は同じ codec ファイル上の独立した変更であり、parallel 実施が可能 (ただし T010 domain 型拡張の完了後)。",
+          "<500 行 / commit を維持するため grounding フィールド encode/decode (T011) と cross-crate key 検証 (T012) を分割している。",
+          "T010 完了後に着手する。"
+        ],
+        "task_ids": [
+          "T011",
+          "T012"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "v3 catalogue spec-link 復元 — refresher/loader/evaluator の dead code 除去 + 実評価有効化",
+        "description": [
+          "T013 は catalogue_spec_signals_refresher の v3 branch を実際の信号評価に書き換え、一律 Blue fallback と cross-crate フィルタ dead code を除去する (ADR 2026-05-11-1257 D2 / D4)。T014 は v3_doc_to_stub の grounding 複写と cross-crate フィルタ除去を行う (ADR 2026-05-11-1257 D3 / D4)。T015 は type_signals_evaluator の cross-crate フィルタ dead code を除去する (ADR 2026-05-11-1257 D4)。",
+          "T013 / T014 / T015 は T012 の D4 codec enforcement 完了を前提とする (codec reject により全 3 フィルタが dead code 化する)。3 task は異なるファイルへの変更であり parallel 実施が可能。",
+          "T016 は render.rs の v3 fallback を修正して Cat-Spec 列を復元する (ADR 2026-05-11-1257 D2)。S8 完了後に着手する。",
+          "S8 完了後に着手する。"
+        ],
+        "task_ids": [
+          "T013",
+          "T014",
+          "T015",
+          "T016"
+        ]
+      },
+      {
+        "id": "S10",
+        "title": "統合ゲート確認 — signals 再生成 + CI pass (spec-link 復元完了確認)",
+        "description": [
+          "T017 は bin/sotp rebuild 後に全 3 layer の type-signals / catalogue-spec-signals を再生成し、rendered view を更新して cargo make ci を pass させる (AC-10 充足)。",
+          "T013-T016 (S9) 全完了後に着手する。CI ゲートが全通過することで spec-link 復元スコープの完了を確認する。"
+        ],
+        "task_ids": [
+          "T017"
+        ]
+      },
+      {
+        "id": "S11",
+        "title": "WS-B: catalogue-impl-signals コマンド導入 — stub 廃止・リネーム・インタラクター分離・インターフェース整理",
+        "description": [
+          "T018 は旧 `spec-code-consistency` stub モジュールを削除し、`three-way-signals` CLI コマンドを `catalogue-impl-signals` にリネームする (ADR 2026-05-11-2330 D1)。Makefile の `track-three-way-signals` タスクも削除する (D3)。",
+          "T019 は `CatalogueImplSignalsInteractor` / `CatalogueImplSignalsService` / `CatalogueImplSignalsError` を `libs/usecase/` に実装し、オーケストレーションをインタラクターに移動する (ADR 2026-05-11-2330 D2)。同時に `--output` モード削除と file_buf 蓄積ロジックの除去で stdout 専用インターフェースに整理する (D3)。",
+          "T020 は `C\\(S∪D)` シナリオが既存の chain-③ ゲートで 🔴 を生成することを回帰テストで確認する (ADR 2026-05-11-2330 D4)。",
+          "T018 → T019 の順に実施 (T019 は T018 でリネーム済みのファイルを基盤とする)。T020 は T017 の CI ゲート確認完了後に並行実施可能。",
+          "usecase 層への interactor 追加は `architecture-rules.json` の依存方向 (usecase → domain のみ) に従い、cli → usecase → domain の呼び出し連鎖を維持する。"
+        ],
+        "task_ids": [
+          "T018",
+          "T019",
+          "T020"
+        ]
+      },
+      {
+        "id": "S12",
+        "title": "IN-22/IN-23: read_type_signals 追加 — コンパイル互換先行ステップ",
+        "description": [
+          "T021 は `TrackBlobReader` トレイトへの `read_type_signals` メソッド追加と `GitShowTrackBlobReader` への実装のみを行う。`check_type_signals` のシグネチャはまだ変更しないため、既存呼び出し元は変更せずにコンパイルが通る。",
+          "この先行ステップを設けることで、T022 の原子的シグネチャ切り替えが `read_type_signals` を前提として安全に行えるようになる。S11 (T020 を含む WS-B) の完了後に着手する。"
+        ],
+        "task_ids": [
+          "T021"
+        ]
+      },
+      {
+        "id": "S13",
+        "title": "IN-23: check_type_signals 純粋関数化 — 全呼び出し元・全実装の原子的切り替え (spec_states dead import 除去を含む)",
+        "description": [
+          "T022 は `check_type_signals` シグネチャ変更 (domain) / `TrackBlobReader::read_type_catalogue` トレイトシグネチャ変更 (usecase) / `GitShowTrackBlobReader::read_type_catalogue` 実装変更 (infrastructure) / `check_strict_merge_gate` + `verify_from_spec_json` の Stage 2 置換 / 全テストモック更新を 1 コミットで原子的に行う。**同一コミット内で `spec_states.rs` の dead import (`catalogue_codec` / `v3_doc_to_stub`) も除去する** (clippy `-D warnings` 制約: import 除去を分離すると T022 単体で `ci-rust` が失敗する)。trait+impl の全変更 + dead import 除去が同一コミットに収まることで `cargo make ci-rust` が通る。",
+          "T023 は T022 に統合済み (独立した実装ステップなし)。",
+          "T021 完了後に T022 に着手する。"
+        ],
+        "task_ids": [
+          "T022",
+          "T023"
+        ]
+      },
+      {
+        "id": "S14",
+        "title": "IN-22/IN-24/IN-25/IN-26: 残存消費パス + レンダラーの v3-native 移行",
+        "description": [
+          "T024 は chain-② verify パス (catalogue_spec_signals / catalogue_spec_refs / plan_artifact_refs) の catalogue_codec + v3_doc_to_stub 参照を CatalogueDocumentCodec 直接呼び出しに置換する。同時に `TrackBlobReader::read_catalogue_for_spec_ref_check` のポートシグネチャを `BlobFetchResult<(TypeCatalogueDocument, String)>` から `BlobFetchResult<(CatalogueDocument, String)>` に変更し、`check_strict_merge_gate` Stage 3 を CatalogueDocument を直接使うインラインロジックに置換することで usecase merge-gate の chain-② パスも v3-native に移行する (IN-22 のマージゲート対象: `usecase::merge_gate::check_strict_merge_gate` を網羅)。",
+          "T025 は track/render.rs + CatalogueLoader port + FsCatalogueLoader + contract_map_render を v3-native CatalogueDocument に移行し、CatalogueLinter の署名も更新する。IN-24 の最小プレースホルダー出力 (エントリ名リスト + OS-07 注記) を実装する。",
+          "T026 は type_signals_evaluator の kind_tag 導出を v3 kind/role ベースに変更し (IN-25)、catalogue_spec_signals_refresher の v2 フォールバックを削除する (IN-26)。",
+          "T022 完了後に着手する (T023 は T022 に統合済みのため独立した前提条件ではない)。T024 / T025 / T026 はソースコードレベルでは互いに独立した変更だが、いずれも `infrastructure-types.json` を更新するため、カタログ更新ステップは順次実施するか、各タスク完了後に手動でマージする必要がある。",
+          "これらのタスクが完了した時点で v1/v2 コード (catalogue_codec / v3_stub) の全参照が解消される。IN-21 削除 (S15 T027) の前提条件となる。"
+        ],
+        "task_ids": [
+          "T024",
+          "T025",
+          "T026"
+        ]
+      },
+      {
+        "id": "S15",
+        "title": "IN-21: v1/v2 レガシー資産の完全削除",
+        "description": [
+          "T027 は S14 の全消費パス移行が完了したことを前提として、`catalogue_codec.rs` / `v3_stub.rs` / `TypeCatalogueDocument` + companions を一括削除する。",
+          "この task 完了後にコードベースから v2 カタログ読み取りパスが完全消滅する (no-backward-compat)。",
+          "削除と同時に domain-types.json / infrastructure-types.json の対象エントリを `action: delete` に更新し、型シグナルゲートの DanglingId / SMinusC_Reference 問題を回避する。",
+          "S14 全タスク完了後に着手する。"
+        ],
+        "task_ids": [
+          "T027"
+        ]
+      },
+      {
+        "id": "S16",
+        "title": "AC-12/AC-13 統合確認 — v3-native 移行完了 + CI pass / クロスクレート TypeRef 解決検証 + Gap 1/2 schema-codec fix + メタバグ修正",
+        "description": [
+          "T028 は bin/sotp rebuild + signals 再生成 + `cargo make ci` 全通過でトラック全体の整合を確認する (AC-12 充足)。",
+          "マージゲートとコミットゲートが v3 catalogue 環境でフェイルクローズド動作することを確認する。",
+          "T029 は Codex PR #132 レビュー finding に対処する後追い修正: T019 が usecase 層に持ち込んだ symlink チェックの raw fs I/O を domain port + infra adapter の背後に移し、IN-18 が求める cli→usecase→domain のレイヤー純粋性を正しく実現する。",
+          "T030 は IN-27 (ADR D13) の triple-structure 要件が `signal_evaluator_v2` 実コード上で既に成立していることを test 化する (実装コード変更なし、test addition only)。T031 は T033/T034/T035 完了後に 4 つの catalogue エントリを実 trait の全 method + FQN + has_default_impl で最終 finalize し、signals を再生成して AC-13 を達成する (type-designer scope)。T035 の evaluator 正規化によりインライン `generics[].bounds` と明示的 `where_predicates` が同一 fingerprint に統一されるため、`check_strict_merge_gate` エントリは明示的 where_predicates 宣言への書き換えなしに 🔵 になる。",
+          "T032 は本トラックで露見したメタバグへの対処: `.claude/agents/type-designer.md` 単一ファイルの更新で type-designer agent の自己完結性を高める (v3 schema reference + action semantics + 完全かつ簡潔な v3 sample JSON + Compliance R0 \"Don't believe orchestrator\" の 4 点)。新規 convention は追加しない。",
+          "T033 は IN-28 (ADR D13 Gap 1) を実装する: `MethodDeclaration` schema への `has_default_impl: bool` field 追加 + A-codec の `encode_trait` 修正 + catalogue + Rust source の同 commit atomic 更新 (domain + infrastructure)。T034 は IN-29 (ADR D14 Gap 2) を実装する: `FunctionEntry` schema への `generics: Vec<MethodGenericParam>` field 追加 + A-codec の `encode_function` 修正 + catalogue + Rust source の同 commit atomic 更新 (domain + infrastructure)。T035 は IN-30 (ADR `2026-05-13-1153` D1 + D2 Gap 3) を実装する: `WherePredicateDecl` 型と `where_predicates` フィールドの domain + infra 追加、A-codec の where 形式固定出力、Signal evaluator の C 側仮想正規化ビュー構築 (domain + infrastructure)。T033/T034/T035 は T031 の finalization の前提条件であり、T031 は 3 タスク完了後に着手する。",
+          "S15 (T027 削除タスク) 完了後に着手する。T030 → T033 → T034 → T035 → T031 → T032 の順に commit する。T033/T034/T035 は互いに独立した変更であり parallel 実施が可能だが、各タスク完了後に catalogue を順次確認すること。T032 は T031 完了後に実施する。"
+        ],
+        "task_ids": [
+          "T028",
+          "T029",
+          "T030",
+          "T033",
+          "T034",
+          "T035",
+          "T031",
+          "T032",
+          "T036"
+        ]
+      },
+      {
+        "id": "S17",
+        "title": "Phase 1 / Phase 2 正確性修正 — B-side renumber + TypeAlias orphan-impl + DERIVE_TRAIT_NAMES 除去",
+        "description": [
+          "T037 は Symptom A (B-side renumber 未実装) の本修正: `insert_b_item_tree_into_s` に B アイテムの S 内 Id 再発番を実装し、T036 が `builder.rs` に追加したワークアラウンド discriminator を削除する。IN-11 + AC-07 が要求する B 由来要素の per-graph flat incremental 再発番を正しく実現する。",
+          "T038 は Symptom B (A-side TypeAlias 孤立 Impl pass 欠如) の修正: IN-31 が定義する A-side 孤立 Impl 取り込み pass を Phase 1 S 構築ループに追加する。B 側の orphan-impl pass と対称的に `a.krate.index` を走査し、Struct / Enum の `impls` リストから参照されていない Impl アイテムを catalogue action に従って S に組み込む。",
+          "T039 は Symptom C (`DERIVE_TRAIT_NAMES` provenance-based filter) の除去: AC-14 が要求する通り `DERIVE_TRAIT_NAMES` 定数と `is_derive_trait` ヘルパーを削除し、同一コミット内でコンパイラ内部トレイト (`StructuralPartialEq` / `StructuralEq`) 専用の除外機構を導入する。",
+          "T037 と T038 は Phase 1 コードの異なる箇所を変更するが、T037 の B-side renumber が完成している方が T038 のテストで正確な Id を扱えるため、T037 → T038 の順が望ましい。T039 は Phase 2 / identity map の変更であり T037 / T038 と独立して実施できる。",
+          "S16 (T028-T036) 完了後に着手する。"
+        ],
+        "task_ids": [
+          "T037",
+          "T038",
+          "T039"
+        ]
+      },
+      {
+        "id": "S18",
+        "title": "Phase 2 generic impl identity normalization — `build_impl_identity_map` で type parameter を strip + Outlives bound + Mismatch_Modify 経路",
+        "description": [
+          "T043 は PR #132 review 中に発覚した evaluator 限界の修正: 既存 `build_impl_identity_map` (libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs) が rustdoc Impl の `for_` フィールドに含まれる generic 型パラメータ (impl block 宣言の `<S>` 等) をそのまま impl identity キーに含めるため、catalogue 側の非ジェネリックキーと一致せず `CMinusSUnionD` を発火する問題を本修正する。",
+          "T044 は T043 で未対応だった 2 つの残余課題を解消する: (1) `bounds_supported()` への `GenericBound::Outlives` 対応 (lifetime bound を verbatim 比較対象に含める)。(2) `Mismatch_Modify` region における generic struct impl identity 正規化 — T043 の type parameter strip が Match region にのみ適用されていたため Mismatch_Modify 経路では未適用だった点を修正する。",
+          "T042 (catalogue 更新) で T040 由来の 20 Red のうち 19 を Blue 化したが、`TaskOperationInteractor<S>: TaskOperationService` の 1 件は catalogue schema 内では解決不能であることが明らかになった。catalogue key は valid Rust identifier 必須 (`<S>` 含めない) のため、evaluator 側で normalize して両者を一致させるのが正しい修正方向。",
+          "S17 (T037-T039) 完了後に着手する。本修正群は ADR 既決事項 (2026-05-08-0258 D10 trait identity normalization + 2026-05-08-0305 D9 provenance-blind structural equality) の更なる実装であり、新規 ADR は不要。"
+        ],
+        "task_ids": [
+          "T043",
+          "T044"
+        ]
+      },
+      {
+        "id": "S19",
+        "title": "fail-open synthetic-domain fallback 削除 — CN-11 フェイルクローズド保守",
+        "description": [
+          "T045 は `architecture-rules.json` 不在時に合成 single-domain binding を silently 返す fail-open switch (`FsTdddLayerBindingsAdapter::new_with_legacy_fallback()` / `LEGACY_FALLBACK_JSON` / `load_tddd_layers_from_path`) を完全削除する。",
+          "この fail-open 機構は `feedback_no_backward_compat.md` (no backward compat across tracks) および `feedback_sot_chain_disable_disguised_as_blue.md` (fail-open patterns disguised as Blue) に反するため防御的コーディング上の修正として除去する。CN-11 のフェイルクローズド保証を維持するための corrective action。",
+          "削除後に catalogue (`*-types.json`) の `FsTdddLayerBindingsAdapter` エントリを削除済み API に追従させ、stale doc comment を現状記述に更新し、type-signals / catalogue-spec-signals を再生成して信号機状態を確認する。",
+          "S18 (T043) の完了後に着手する。新規 ADR は不要。"
+        ],
+        "task_ids": [
+          "T045"
+        ]
+      }
+    ]
+  }
+}

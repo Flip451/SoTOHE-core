@@ -94,9 +94,9 @@ pub enum MemberDeclarationDto {
 /// DTO mirror of `domain::tddd::catalogue::ParamDeclaration` in the
 /// schema-export context.
 ///
-/// The `Schema` prefix distinguishes this from `catalogue_codec::ParamDto`
-/// which carries L1 `::` enforcement for catalogue decode validation.
-/// `schema_export_codec` is encode-only and does not need that constraint.
+/// The `Schema` prefix avoids name collisions with the `ParamDto` types in
+/// other codecs. `schema_export_codec` is encode-only and does not apply the
+/// L1 `::` name-format enforcement used by catalogue decode paths.
 #[derive(Debug, Serialize)]
 pub struct SchemaParamDto {
     pub name: String,
@@ -210,7 +210,7 @@ impl From<&MemberDeclaration> for MemberDeclarationDto {
 
 impl From<&ParamDeclaration> for SchemaParamDto {
     fn from(p: &ParamDeclaration) -> Self {
-        Self { name: p.name().to_owned(), ty: p.ty().to_owned() }
+        Self { name: p.name.as_str().to_owned(), ty: p.ty.as_str().to_owned() }
     }
 }
 
@@ -259,6 +259,7 @@ mod tests {
     use super::*;
     use domain::schema::{FunctionInfo, ImplInfo, SchemaExport, TraitInfo, TypeInfo, TypeKind};
     use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
+    use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
 
     fn empty_schema() -> SchemaExport {
         SchemaExport::new("empty_crate".to_string(), vec![], vec![], vec![], vec![])
@@ -289,7 +290,7 @@ mod tests {
             None,
             vec!["i32".to_string()],
             false,
-            vec![ParamDeclaration::new("x", "i32")],
+            vec![ParamDeclaration::new(ParamName::new("x").unwrap(), TypeRef::new("i32").unwrap())],
             "i32".to_string(),
             None,
             false,

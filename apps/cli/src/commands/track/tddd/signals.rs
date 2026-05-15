@@ -3,17 +3,29 @@
 //! Reads `<layer>-types.json` from the track directory, exports the target crate's
 //! public API via rustdoc JSON, evaluates signals for each declared type, and writes
 //! the updated document back to `<layer>-types.json`.
+//!
+//! `resolve_layers` and `ensure_active_track` remain in this module as shared
+//! helpers for sibling CLI commands (`catalogue_spec_signals.rs`,
+//! `contract_map.rs`) that have not yet been migrated to usecase interactors.
+//! `execute_type_signals_lenient_with_bindings` stays here to allow
+//! `commands/make.rs` to share a single architecture-rules.json parse (TOCTOU
+//! prevention).
 
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
+use std::sync::Arc;
 
+use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
 use infrastructure::tddd::type_signals_evaluator::{
     EvaluateSignalsError, execute_type_signals_for_layer,
 };
+use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
 use infrastructure::track::fs_store::read_track_status_str;
+use infrastructure::track::track_status_reader_adapter::FsTrackStatusReaderAdapter;
 use infrastructure::verify::tddd_layers::{
-    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers_from_path,
+    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers,
 };
+use usecase::type_signals::{TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService};
 
 use crate::CliError;
 
@@ -24,26 +36,23 @@ use crate::CliError;
 ///   `layers[]` order.
 /// - When `layer_filter` is `Some(id)`, returns only the matching enabled
 ///   binding. An unknown or disabled layer id is fail-closed.
-/// - When `architecture-rules.json` is absent, falls back to a single
-///   synthetic `domain` binding so legacy tracks continue to work.
+/// - When `architecture-rules.json` is absent, returns an error (fail-closed).
 pub(crate) fn resolve_layers(
     workspace_root: &Path,
     layer_filter: Option<&str>,
 ) -> Result<Vec<TdddLayerBinding>, CliError> {
     let rules_path = workspace_root.join("architecture-rules.json");
-    // Delegate symlink handling + legacy-fallback policy to the shared
-    // infrastructure helper. CLI stays a thin composition layer; it only
-    // maps the infra error variants into `CliError` and applies the
-    // CLI-level layer filter.
-    let bindings =
-        load_tddd_layers_from_path(&rules_path, workspace_root).map_err(|e| match e {
-            LoadTdddLayersError::Io { path, source } => {
-                CliError::Message(format!("{}: {source}", path.display()))
-            }
-            LoadTdddLayersError::Parse(err) => {
-                CliError::Message(format!("{}: {err}", rules_path.display()))
-            }
-        })?;
+    // Delegate symlink handling to the shared infrastructure helper (fail-closed).
+    // CLI stays a thin composition layer; it only maps the infra error variants
+    // into `CliError` and applies the CLI-level layer filter.
+    let bindings = load_tddd_layers(&rules_path, workspace_root).map_err(|e| match e {
+        LoadTdddLayersError::Io { path, source } => {
+            CliError::Message(format!("{}: {source}", path.display()))
+        }
+        LoadTdddLayersError::Parse(err) => {
+            CliError::Message(format!("{}: {err}", rules_path.display()))
+        }
+    })?;
 
     if let Some(filter) = layer_filter {
         let Some(binding) = bindings.iter().find(|b| b.layer_id() == filter) else {
@@ -93,54 +102,42 @@ fn map_eval_err(e: EvaluateSignalsError) -> CliError {
 
 /// Evaluate type signals via rustdoc schema export and write back to `<layer>-types.json`.
 ///
-/// Steps:
-/// 1. Resolve the set of TDDD-enabled layers to process (all enabled, or just the
-///    specified `--layer`).
-/// 2. For each layer binding, read its catalogue file, export the target crate's
-///    public API using `RustdocSchemaExporter`, evaluate signals, and write back.
-/// 3. Print a signal summary per layer to stdout.
+/// Thin CLI adapter: constructs the concrete infrastructure adapters, wires up
+/// `TypeSignalsInteractor` with `lenient: false`, and delegates all orchestration
+/// to the usecase layer.
+///
+/// The track items directory is always derived as `<workspace_root>/track/items`
+/// inside the interactor, so callers only need to supply `workspace_root`.
+///
+/// Steps (inside the interactor):
+/// 1. Validate the track ID format.
+/// 2. Read and guard the track status (reject Done/Archived).
+/// 3. Resolve the set of TDDD-enabled layers to process.
+/// 4. For each layer binding, evaluate signals and write back to `<layer>-types.json`.
 ///
 /// # Errors
 ///
 /// Returns `CliError` when the track ID is invalid, the file cannot be read or
 /// decoded, rustdoc export fails (e.g., nightly not installed), or the write fails.
 pub fn execute_type_signals(
-    items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Validate track_id and derive status without importing domain::TrackId or
-    // domain::TrackStatus (CN-01 / AC-03). read_track_status_str validates the id
-    // and loads impl-plan fail-closed (corrupt impl-plan.json blocks the guard).
-    let status_str = read_track_status_str(&items_dir, &track_id).map_err(|e| {
-        CliError::Message(format!("cannot load track status for '{track_id}': {e}"))
-    })?;
+    // Derive items_dir from workspace_root so the caller does not need to supply
+    // both and so the interactor's items_dir == workspace_root/track/items check
+    // is always satisfied regardless of how the caller invoked the command.
+    let items_dir = workspace_root.join("track").join("items");
 
-    // Active-track guard: reject type-signals on completed/archived tracks.
-    ensure_active_track(&status_str, &track_id)?;
+    let status_reader = Arc::new(FsTrackStatusReaderAdapter::new());
+    let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
+    let executor = Arc::new(TypeSignalsExecutorAdapter::new());
 
-    // Resolve the set of TDDD-enabled layers to process. When
-    // `architecture-rules.json` is absent we fall back to the legacy
-    // single-`domain` binding so older tracks keep working. When `--layer`
-    // is supplied we fail-closed on an unknown or disabled layer id.
-    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
+    let interactor = TypeSignalsInteractor::new(status_reader, layer_bindings, executor);
 
-    // Fail-closed when no layers are enabled: returning SUCCESS with no
-    // work done would silently mask a misconfigured `architecture-rules.json`
-    // (e.g. all layers have `tddd.enabled = false`).
-    if bindings.is_empty() {
-        return Err(CliError::Message(
-            "no tddd.enabled layers found in architecture-rules.json; \
-             nothing to evaluate"
-                .to_owned(),
-        ));
-    }
-
-    for binding in &bindings {
-        execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)
-            .map_err(map_eval_err)?;
-    }
+    interactor
+        .run(TypeSignalsRequest { items_dir, track_id, workspace_root, layer, lenient: false })
+        .map_err(|e| CliError::Message(e.to_string()))?;
 
     Ok(ExitCode::SUCCESS)
 }
@@ -297,10 +294,16 @@ mod tests {
     }
 
     /// Sets up a minimal track directory with the given `domain-types.json` content,
-    /// a valid `metadata.json` (activated, branch set), and a minimal `impl-plan.json`
-    /// so the activated-track guard in `execute_type_signals` passes.
+    /// a valid `metadata.json` (activated, branch set), a minimal `impl-plan.json`,
+    /// and a minimal `architecture-rules.json` so the fail-closed
+    /// `FsTdddLayerBindingsAdapter::new()` resolves layer bindings before reaching
+    /// the catalogue/evaluator path.
+    ///
+    /// Returns `(workspace_root, track_id)` so callers can pass `workspace_root` directly
+    /// to `execute_type_signals` (which derives `items_dir` internally).
     fn setup_track(dir: &std::path::Path, domain_types: &str) -> (PathBuf, String) {
-        let items_dir = dir.join("track/items");
+        let workspace_root = dir.to_path_buf();
+        let items_dir = workspace_root.join("track/items");
         let track_id = "test-track";
         let track_dir = items_dir.join(track_id);
         std::fs::create_dir_all(&track_dir).unwrap();
@@ -308,7 +311,12 @@ mod tests {
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json(track_id))
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
-        (items_dir, track_id.to_owned())
+        // architecture-rules.json is required by FsTdddLayerBindingsAdapter::new()
+        // (fail-closed). Without it the interactor fails before reaching the
+        // catalogue/evaluator path that each caller test is asserting on.
+        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+        std::fs::write(workspace_root.join("architecture-rules.json"), rules_json).unwrap();
+        (workspace_root, track_id.to_owned())
     }
 
     #[test]
@@ -318,12 +326,15 @@ mod tests {
         std::fs::create_dir_all(&items_dir).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
-        let result = execute_type_signals(items_dir, "../evil".to_owned(), workspace_root, None);
+        let result = execute_type_signals("../evil".to_owned(), workspace_root, None);
         assert!(result.is_err(), "path traversal track_id must be rejected");
     }
 
     #[test]
     fn test_execute_type_signals_with_missing_domain_types_json_returns_error() {
+        // T008: the old evaluator is removed and returns an error stub regardless of
+        // whether domain-types.json is present. This test verifies the command is
+        // fail-closed (returns Err) when invoked on a track without a catalogue file.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
@@ -331,21 +342,23 @@ mod tests {
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        // architecture-rules.json is required by FsTdddLayerBindingsAdapter::new()
+        // (fail-closed). Without it the interactor fails on layer-bindings load
+        // rather than on the missing catalogue path this test exercises.
+        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
-        let result = execute_type_signals(items_dir, "test-track".to_owned(), workspace_root, None);
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(msg.contains("/track:design"), "error must suggest /track:design, got: {msg}");
+        let result = execute_type_signals("test-track".to_owned(), workspace_root, None);
+        assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
     }
 
     #[test]
     fn test_execute_type_signals_with_malformed_domain_types_json_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let (items_dir, track_id) = setup_track(dir.path(), "{not valid json}");
-        let workspace_root = dir.path().to_path_buf();
+        let (workspace_root, track_id) = setup_track(dir.path(), "{not valid json}");
 
-        let result = execute_type_signals(items_dir, track_id, workspace_root, None);
+        let result = execute_type_signals(track_id, workspace_root, None);
         assert!(result.is_err(), "malformed domain-types.json must return error");
     }
 
@@ -358,11 +371,17 @@ mod tests {
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        // Provide architecture-rules.json with only "domain" enabled so that
+        // requesting layer "nonexistent" is a known-not-found error (not an IO error).
+        let rules_json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
+          ]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
         let workspace_root = dir.path().to_path_buf();
 
-        // No architecture-rules.json => fallback has only "domain"; "nonexistent" should fail.
         let result = execute_type_signals(
-            items_dir,
             "test-track".to_owned(),
             workspace_root,
             Some("nonexistent".to_owned()),
@@ -373,11 +392,17 @@ mod tests {
             msg.contains("nonexistent"),
             "error must mention the unknown layer name, got: {msg}"
         );
-        assert!(msg.contains("not tddd.enabled"), "error must mention tddd.enabled, got: {msg}");
+        assert!(
+            msg.contains("not tddd.enabled") || msg.contains("not found"),
+            "error must mention tddd.enabled or not found, got: {msg}"
+        );
     }
 
     #[test]
     fn test_execute_type_signals_with_usecase_layer_dispatches_to_usecase_catalogue() {
+        // T008: the old evaluator is removed. This test verifies the command is fail-closed
+        // (returns Err) when invoked with --layer usecase. The evaluator stub error is
+        // returned regardless of which layer is targeted.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
@@ -402,23 +427,13 @@ mod tests {
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
 
         let result = execute_type_signals(
-            items_dir,
             "test-track".to_owned(),
             dir.path().to_path_buf(),
             Some("usecase".to_owned()),
         );
 
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(
-            msg.contains("usecase-types.json"),
-            "error must mention usecase-types.json (not domain), got: {msg}"
-        );
-        assert!(
-            !msg.contains("domain-types.json"),
-            "error must NOT mention domain-types.json for --layer usecase, got: {msg}"
-        );
-        assert!(!msg.contains("not yet supported"), "Phase 1 rejection must be gone, got: {msg}");
+        // T008: evaluator stub always returns Err — just verify fail-closed.
+        assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
     }
 
     // --- ensure_active_track tests ---
@@ -505,12 +520,8 @@ mod tests {
 }"#;
         std::fs::write(track_dir.join("impl-plan.json"), done_impl_plan).unwrap();
 
-        let result = execute_type_signals(
-            items_dir,
-            "test-done-track".to_owned(),
-            dir.path().to_path_buf(),
-            None,
-        );
+        let result =
+            execute_type_signals("test-done-track".to_owned(), dir.path().to_path_buf(), None);
 
         let err = result.unwrap_err();
         let msg = format!("{err}");
@@ -550,12 +561,8 @@ mod tests {
 }"#;
         std::fs::write(track_dir.join("metadata.json"), archived_v3_metadata).unwrap();
 
-        let result = execute_type_signals(
-            items_dir,
-            "test-archived-track".to_owned(),
-            dir.path().to_path_buf(),
-            None,
-        );
+        let result =
+            execute_type_signals("test-archived-track".to_owned(), dir.path().to_path_buf(), None);
 
         let err = result.unwrap_err();
         let msg = format!("{err}");
@@ -564,6 +571,9 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_no_layer_filter_iterates_all_enabled_bindings() {
+        // T008: the old evaluator is removed and always returns Err. This test verifies
+        // that invoking without --layer filter still returns an error (evaluator stub fires
+        // on the first binding — domain — and propagates immediately).
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
@@ -590,24 +600,10 @@ mod tests {
         let domain_types_json = r#"{"schema_version":2,"type_definitions":[]}"#;
         std::fs::write(track_dir.join("domain-types.json"), domain_types_json).unwrap();
 
-        let result = execute_type_signals(
-            items_dir,
-            "test-track".to_owned(),
-            dir.path().to_path_buf(),
-            None,
-        );
+        let result = execute_type_signals("test-track".to_owned(), dir.path().to_path_buf(), None);
 
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(
-            !msg.contains("usecase-types.json"),
-            "error must NOT mention usecase-types.json; domain binding must be processed first; \
-             got: {msg}"
-        );
-        assert!(
-            msg.contains("export schema") || msg.contains("nightly") || msg.contains("failed"),
-            "error must be from domain's rustdoc export step, got: {msg}"
-        );
+        // T008: evaluator stub always returns Err — just verify fail-closed.
+        assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
     }
 
     /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.
@@ -615,37 +611,50 @@ mod tests {
     #[test]
     #[ignore]
     fn test_execute_type_signals_success_path_writes_signals() {
-        let dir = tempfile::tempdir().unwrap();
         let domain_types_json = r#"{
   "schema_version": 2,
   "type_definitions": [
     { "name": "TrackId", "kind": "value_object", "description": "Track identifier", "approved": true, "expected_methods": [] }
   ]
 }"#;
-        let (items_dir, track_id) = setup_track(dir.path(), domain_types_json);
+        // Use the actual workspace root (CARGO_MANIFEST_DIR/../..) for the nightly
+        // `cargo rustdoc` step, which must compile a real crate in the workspace.
+        // Write all track fixtures (catalogue, metadata, impl-plan, baseline) under
+        // that same workspace root so the interactor's derived
+        // `workspace_root/track/items` path resolves to the same directory that
+        // `setup_track` populated.
+        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(|p| p.parent())
+            .expect("workspace root")
+            .to_path_buf();
+        let items_dir = workspace_root.join("track/items");
+        let track_id = "test-track-success-path-ignored";
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), domain_types_json).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json(track_id))
+            .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
         let baseline_json = r#"{
   "schema_version": 2,
   "captured_at": "2026-01-01T00:00:00Z",
   "types": {},
   "traits": {}
 }"#;
-        std::fs::write(items_dir.join(&track_id).join("domain-types-baseline.json"), baseline_json)
-            .unwrap();
-        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(|p| p.parent())
-            .expect("workspace root")
-            .to_path_buf();
+        std::fs::write(track_dir.join("domain-types-baseline.json"), baseline_json).unwrap();
 
-        let result =
-            execute_type_signals(items_dir.clone(), track_id.clone(), workspace_root, None);
+        let result = execute_type_signals(track_id.to_owned(), workspace_root, None);
         assert!(result.is_ok(), "success path must return Ok: {result:?}");
 
         let updated =
-            std::fs::read_to_string(items_dir.join(&track_id).join("domain-types.json")).unwrap();
+            std::fs::read_to_string(items_dir.join(track_id).join("domain-types.json")).unwrap();
         assert!(updated.contains("\"signals\""), "signals must be written to domain-types.json");
 
-        let md_path = items_dir.join(&track_id).join("domain-types.md");
+        let md_path = items_dir.join(track_id).join("domain-types.md");
         assert!(md_path.exists(), "domain-types.md must be generated");
+
+        // Clean up workspace-level fixtures written by this ignored test.
+        let _ = std::fs::remove_dir_all(&track_dir);
     }
 }

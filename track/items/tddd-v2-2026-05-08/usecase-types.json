@@ -1,0 +1,684 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "BaselineCaptureError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidTrackId", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "SymlinkRejected", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }] } },
+          { "name": "LayerBindingsLoad", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "NoLayers", "payload": { "kind": "unit" } },
+          { "name": "CaptureFailed", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for BaselineCaptureService::run.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineCaptureInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "has_stripped_fields": true
+      },
+      "trait_impls": [
+        { "trait_name": "BaselineCaptureService", "origin_crate": "usecase" }
+      ],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            { "name": "symlink_guard", "ty": "Arc<dyn domain::SymlinkGuardPort>" },
+            { "name": "layer_bindings", "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>" },
+            { "name": "capture", "ty": "Arc<dyn domain::tddd::catalogue_v2::RustdocBaselineCapturePort>" }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "docs": "Interactor implementing BaselineCaptureService. Orchestrates symlink guards, track-id validation, layer-bindings resolution, and per-layer rustdoc baseline capture. All I/O is performed via injected ports (no direct infrastructure calls).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineCaptureRequest": {
+      "action": "add",
+      "role": "Command",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "workspace_root", "ty": "std::path::PathBuf" },
+          { "name": "source_workspace", "ty": "Option<std::path::PathBuf>" },
+          { "name": "layer", "ty": "Option<String>" },
+          { "name": "force", "ty": "bool" }
+        ],
+        "has_stripped_fields": false
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" }
+      ],
+      "methods": [],
+      "docs": "Input parameters for BaselineCaptureService::run.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueImplSignalsReport": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "text", "ty": "String" },
+          { "name": "any_red", "ty": "bool" }
+        ],
+        "has_stripped_fields": false
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" }
+      ],
+      "methods": [],
+      "docs": "Result of a completed catalogue-impl-signals evaluation run. Carries the formatted markdown text and a pre-computed any_red flag so callers do not need to re-parse the report string.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "PreCommitTypeSignalsInteractor": {
+      "action": "reference",
+      "role": "Interactor",
+      "kind": { "kind": "plain_struct" },
+      "trait_impls": [{ "trait_name": "PreCommitTypeSignalsService", "origin_crate": "usecase" }],
+      "docs": "Existing interactor implementing PreCommitTypeSignalsService. Referenced for continuity.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewCheckApprovedInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "has_stripped_fields": true
+      },
+      "trait_impls": [
+        { "trait_name": "ReviewCheckApprovedService", "origin_crate": "usecase" }
+      ],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "build_fn", "ty": "F" }],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [
+            { "name": "F", "bounds": ["Fn(&str, &std::path::Path) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>", "Send", "Sync"] }
+          ],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Concrete struct implementing ReviewCheckApprovedService. Modified in T040 thinning: build_fn field (CheckApprovedBuildFn type alias) replaces earlier direct domain imports at the CLI boundary.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "TaskOperationInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "has_stripped_fields": true
+      },
+      "trait_impls": [
+        { "trait_name": "TaskOperationService", "origin_crate": "usecase" }
+      ],
+      "methods": [],
+      "docs": "Concrete generic struct implementing TaskOperationService. Modified in T040 thinning: generic over S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync with injected branch_reader closure and schema_version_reader for branchless-activation guard. Generic trait impl TaskOperationInteractor<S>: TaskOperationService normalizes to bare type name after T043 type-param stripping.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidTrackId", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "StatusReadFailed", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "TrackFrozen", "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }, { "name": "status", "ty": "String" }] } },
+          { "name": "LayerBindingsLoad", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "NoLayers", "payload": { "kind": "unit" } },
+          { "name": "EvaluationFailed", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "InconsistentRequest", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error variants for TypeSignalsService::run.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "has_stripped_fields": true
+      },
+      "trait_impls": [
+        { "trait_name": "TypeSignalsService", "origin_crate": "usecase" }
+      ],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            { "name": "status_reader", "ty": "Arc<dyn domain::tddd::catalogue_v2::TrackStatusReaderPort>" },
+            { "name": "layer_bindings", "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>" },
+            { "name": "executor", "ty": "Arc<dyn domain::tddd::catalogue_v2::TypeSignalsExecutorPort>" }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "docs": "Interactor implementing TypeSignalsService. Orchestrates track-status guard, layer-bindings resolution, and per-layer signal evaluation. All I/O is performed via injected ports (no direct infrastructure calls).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsRequest": {
+      "action": "add",
+      "role": "Command",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "items_dir", "ty": "std::path::PathBuf" },
+          { "name": "track_id", "ty": "String" },
+          { "name": "workspace_root", "ty": "std::path::PathBuf" },
+          { "name": "layer", "ty": "Option<String>" },
+          { "name": "lenient", "ty": "bool" }
+        ],
+        "has_stripped_fields": false
+      },
+      "trait_impls": [],
+      "methods": [],
+      "docs": "Request DTO for TypeSignalsService::run.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueImplSignalsInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "has_stripped_fields": true
+      },
+      "trait_impls": [{ "trait_name": "CatalogueImplSignalsService", "origin_crate": "usecase" }],
+      "methods": [
+        {
+          "name": "new",
+          "params": [
+            { "name": "catalogue_loader", "ty": "Arc<dyn domain::tddd::catalogue_v2::CatalogueDocumentLoaderPort>" },
+            { "name": "ext_crate_codec", "ty": "Arc<dyn domain::tddd::CatalogueToExtendedCratePort>" },
+            { "name": "evaluator", "ty": "Arc<dyn domain::tddd::signal_evaluator::SignalEvaluatorPort>" },
+            { "name": "rustdoc_crate_port", "ty": "Arc<dyn domain::tddd::catalogue_v2::RustdocCratePort>" },
+            { "name": "layer_bindings_port", "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>" },
+            { "name": "symlink_guard", "ty": "Arc<dyn domain::SymlinkGuardPort>" }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "docs": "Interactor implementing CatalogueImplSignalsService. Orchestrates per-layer A/B/C TypeGraph fetch, signal evaluator invocation, and region-by-region result formatting. Injected dependencies: CatalogueDocumentLoaderPort (A-side catalogue file load), CatalogueToExtendedCratePort (A-side CatalogueDocument → ExtendedCrate conversion), SignalEvaluatorPort (Phase 1 + Phase 2 evaluation), RustdocCratePort (B-side baseline load via load_from_path; C-side live capture via capture_current), TdddLayerBindingsPort (architecture-rules.json enumeration), SymlinkGuardPort (symlink stat checks — keeps usecase free of direct std::fs I/O per hexagonal-purity rule). apps/cli constructs the concrete infrastructure adapters (FsCatalogueDocumentLoader, CatalogueToExtendedCrateCodec, SignalEvaluatorV2, RustdocCrateAdapter, FsTdddLayerBindingsAdapter, FsSymlinkGuard) and injects them at the composition root. The 6th port (SymlinkGuardPort) is the proper-layering realization that IN-18 mandates (hexagonal purity: no raw std::fs I/O in the usecase layer); surfaced by a Codex PR-review finding. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-17", "hash": "f3302fe868e8c61ed23817d97159e9696aa2224a3942e534a4d5e94f62851127" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueImplSignalsError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidTrackId", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "LayerBindingsLoad", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "CatalogueLoad", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "BaselineLoad", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "ExtendedCrateConversion", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "SchemaExport", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "Evaluation", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "SymlinkRejected", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }] } },
+          { "name": "NoLayers" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error type for CatalogueImplSignalsService::run. Variants: InvalidTrackId (track id format invalid), LayerBindingsLoad (loading TDDD layer bindings from architecture-rules.json failed; covers both file-read/parse failure and requested layer not found or not tddd.enabled), CatalogueLoad (A-side catalogue document read/decode failure), BaselineLoad (B-side baseline rustdoc load failure), ExtendedCrateConversion (A-side CatalogueDocument → ExtendedCrate conversion failure), SchemaExport (C-side live capture failure), Evaluation (signal evaluator failure), SymlinkRejected (path traversal or symlink guard rejection from the security validation in the interactor), NoLayers (no TDDD-enabled layers found or resolved). [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "RenderContractMapCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "layer_filter", "ty": "Option<Vec<String>>" }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "docs": "Command input for RenderContractMap::execute. Modified: removed stale kind_filter field (baseline was captured before T003 removed it); current shape is 2 fields (track_id, layer_filter).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+      ],
+      "informal_grounds": []
+    },
+    "RenderContractMapError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "CatalogueLoaderFailed", "payload": { "kind": "tuple", "fields": ["domain::tddd::catalogue_ports::CatalogueLoaderError"] } },
+          { "name": "ContractMapWriterFailed", "payload": { "kind": "tuple", "fields": ["domain::tddd::catalogue_ports::ContractMapWriterError"] } },
+          { "name": "EmptyCatalogue", "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }] } },
+          { "name": "LayerNotFound", "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }, { "name": "layer_id", "ty": "String" }] } },
+          { "name": "InvalidTrackId", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } }
+        ]
+      },
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "From", "origin_crate": "core", "generic_args": "CatalogueLoaderError" },
+        { "trait_name": "From", "origin_crate": "core", "generic_args": "ContractMapWriterError" },
+        { "trait_name": "Display", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "docs": "Error variants for RenderContractMap::execute. Modified: removed stale UnknownKindFilter variant (baseline was captured before T003 removed it); corrected variant payloads to match actual enum (tuple and struct variants, not unit). thiserror #[from] generates From<CatalogueLoaderError> and From<ContractMapWriterError>; declared with explicit generic_args to disambiguate the two impls. Also Display/Error for thiserror-generated impls.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-01", "hash": "8ad4bcd053e1743cccde2fe5b7c49a35edda0efee59246ac2b21a6ef50298ba4" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "BaselineCaptureService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "request", "ty": "BaselineCaptureRequest" }
+          ],
+          "returns": "Result<(), BaselineCaptureError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Application service (driving port) for the bin/sotp track baseline-capture use case. Orchestrates symlink guards, track-id validation, layer-bindings resolution, and per-layer rustdoc baseline capture.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueImplSignalsService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "returns": "Result<CatalogueImplSignalsReport, CatalogueImplSignalsError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Application service (driving port) for the bin/sotp track catalogue-impl-signals use case. Returns a CatalogueImplSignalsReport (text + any_red flag). Modified in T040 addendum: return type changed from Result<String, ...> to Result<CatalogueImplSignalsReport, ...>. [source: ADR 2026-05-11-2330 D2]",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-17", "hash": "f3302fe868e8c61ed23817d97159e9696aa2224a3942e534a4d5e94f62851127" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "AC-11", "hash": "67a07554aab4803297b1891e637f61d97027d86fe18e35cbae086d6458858c79" }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "supertrait_bounds": ["Send", "Sync"],
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "request", "ty": "TypeSignalsRequest" }
+          ],
+          "returns": "Result<(), TypeSignalsError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "docs": "Application service trait for the sotp track type-signals use case. Orchestrates track-ID validation, track-status guard (active-track check), layer-bindings resolution, and per-layer signal evaluation.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-18", "hash": "25956e359d8c1c93d9ce4901902f3ae0108b25bcf0cda2597b20addad58a704a" }
+      ],
+      "informal_grounds": []
+    },
+    "TrackBlobReader": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::spec::SpecDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<(Vec<u8>, String)>",
+          "is_async": false
+        },
+        {
+          "name": "read_impl_plan",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::ImplPlanDocument>",
+          "is_async": false
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false,
+          "has_default_impl": true
+        },
+        {
+          "name": "read_catalogue_for_spec_ref_check",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)>",
+          "is_async": false,
+          "has_default_impl": true
+        },
+        {
+          "name": "read_catalogue_spec_signals_document",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::CatalogueSpecSignalsDocument>",
+          "is_async": false,
+          "has_default_impl": true
+        },
+        {
+          "name": "read_catalogue_spec_signal_opted_in_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false,
+          "has_default_impl": true
+        },
+        {
+          "name": "read_type_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::TypeSignalsDocument>",
+          "is_async": false,
+          "has_default_impl": true
+        }
+      ],
+      "docs": "Secondary port for reading track-level domain documents from an external source (git ref, filesystem). All 8 trait methods are declared here for full structural equality. Modified in T021 (read_type_signals added), T022 (read_type_catalogue return type changed to BlobFetchResult<(Vec<u8>, String)>), T024 (read_catalogue_for_spec_ref_check changed to BlobFetchResult<(CatalogueDocument, String)>). Methods with default implementations (read_enabled_layers, read_catalogue_for_spec_ref_check, read_catalogue_spec_signals_document, read_catalogue_spec_signal_opted_in_layers, read_type_signals) are declared with has_default_impl: true and underscore-prefixed param names matching the trait default impl signatures (T033 done, has_body asymmetry resolved for this entry). BlobFetchResult type parameters use last-segment names per L1 short-name reduction: SpecDocument, ImplPlanDocument, TypeSignalsDocument, CatalogueSpecSignalsDocument are all resolvable in usecase scope. CatalogueDocument is cross-crate and declared with its qualified path. IN-27: resolves the method count/name mismatch (partial-declaration issue) for this trait — all 8 methods are now declared. This entry is 🔵-equivalent pending T031 finalization (which re-verifies post-T033 changes). The remaining AC-13 blocker is check_strict_merge_gate (where_predicates gap, see Gap 3 / T035).",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-20", "hash": "72c389f3e5a5d5d00814ffa689abd3c1183a623c68fe84d9743e793e4384c3c8" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-27", "hash": "f7c0c24f1d015e09f5d560f153b997558d664b062e545b43836925f21dd5259e" }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueSpecSignalsWriter": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "write_catalogue_spec_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&TrackId" },
+            { "name": "layer_id", "ty": "&str" },
+            { "name": "doc", "ty": "&CatalogueSpecSignalsDocument" }
+          ],
+          "returns": "Result<(), RepositoryError>",
+          "is_async": false
+        }
+      ],
+      "docs": "Existing secondary_port for persisting catalogue-spec signal documents. Referenced to expose implements edge for FsCatalogueSpecSignalsStore.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "PreCommitTypeSignalsService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "workspace_root", "ty": "PathBuf" }
+          ],
+          "returns": "Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError>",
+          "is_async": false
+        }
+      ],
+      "docs": "Existing application_service trait for running pre-commit type signal checks. Referenced for continuity.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewCheckApprovedService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "check_approved",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<ReviewApprovalOutput, ReviewCheckApprovedError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "docs": "Pre-existing application service trait for review check-approved. Referenced to expose ReviewCheckApprovedInteractor implements edge.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TaskOperationService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "transition_task",
+          "receiver": "&self",
+          "params": [{ "name": "cmd", "ty": "TaskTransitionCommand" }],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "add_task",
+          "receiver": "&self",
+          "params": [{ "name": "cmd", "ty": "AddTaskCommand" }],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "set_override",
+          "receiver": "&self",
+          "params": [{ "name": "cmd", "ty": "SetOverrideCommand" }],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "clear_override",
+          "receiver": "&self",
+          "params": [{ "name": "cmd", "ty": "ClearOverrideCommand" }],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "docs": "Pre-existing application service trait for task mutation operations. Referenced to expose TaskOperationInteractor implements edge.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SchemaExporterPort": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "export_as_json",
+          "receiver": "&self",
+          "params": [{ "name": "crate_name", "ty": "&str" }],
+          "returns": "Result<String, String>",
+          "is_async": false
+        }
+      ],
+      "docs": "Existing secondary_port for exporting crate schema as JSON string. Referenced to expose implements edge for RustdocSchemaExporter.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SpecElementHashReader": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read_spec_element_hashes",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<BTreeMap<SpecElementId, ContentHash>>",
+          "is_async": false
+        }
+      ],
+      "docs": "Secondary port for reading per-element SHA-256 digests from spec.json on a remote git ref (usecase::catalogue_spec_refs). Referenced to expose the GitShowTrackBlobReader -.impl.-> SpecElementHashReader edge in the contract map. Pre-existing baseline port, not modified in this track. BlobFetchResult is parameterised with the concrete BTreeMap return type (R8 full-generic declaration).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "usecase::merge_gate::check_strict_merge_gate": {
+      "action": "modify",
+      "role": "UseCaseFunction",
+      "params": [
+        { "name": "branch", "ty": "&str" },
+        { "name": "reader", "ty": "&R" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [
+        {
+          "name": "R",
+          "bounds": ["TrackBlobReader", "SpecElementHashReader"]
+        }
+      ],
+      "docs": "IN-23/IN-20/IN-22: Strict merge gate orchestration. Actual Rust signature: pub fn check_strict_merge_gate<R>(branch: &str, reader: &R) -> VerifyOutcome where R: TrackBlobReader + SpecElementHashReader. Modified in T022 (Stage 2 rewired to read_type_signals returning TypeSignalsDocument) and T024 (Stage 3 migrated to read_catalogue_for_spec_ref_check returning BlobFetchResult<(CatalogueDocument, String)>). The return type is domain::verify::VerifyOutcome (FQN path; L1 reduces to 'VerifyOutcome' matching C-side rustdoc). Generics structural equality requires T035 (where-form normalization) to land first: C-side rustdoc emits `where R: TrackBlobReader + SpecElementHashReader` in where-predicate form, while A-codec emits inline bounds before T035. After T035 normalizes A-codec output to where form, post-T035+T031 re-finalization will achieve structural equality for this entry.",
+      "spec_refs": [
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-23", "hash": "75a96f2f44b863a75611ca0cd04babcdffe999a4ae3584361fb451d3a7ed7534" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-20", "hash": "72c389f3e5a5d5d00814ffa689abd3c1183a623c68fe84d9743e793e4384c3c8" },
+        { "file": "track/items/tddd-v2-2026-05-08/spec.json", "anchor": "IN-22", "hash": "44d45c3ef61f7fd8b946589f3a08eb29ca4444bf24fd2909d35bda6af7e98b43" }
+      ],
+      "informal_grounds": []
+    }
+  }
+}
