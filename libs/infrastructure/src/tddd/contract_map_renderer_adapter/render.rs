@@ -15,13 +15,16 @@
 //! - TypeAlias undirected `---|alias_of|` edge (Decision N-1', AC-09)
 //! - Typestate transition `==>|transitions_to|` returns edge (Decision G-2'b, AC-03)
 //!
-//! Out of scope for T006/T007 (deferred to T008):
-//! - Cross-catalogue trait_impl edges (T008)
-//! - classDef alphabetical ordering + `class <id> <className>` attach lines (T008)
+//! T008 additions (this module):
+//! - Cross-catalogue trait_impl edges (Decision O-2 + O-3 + O-a)
+//! - FunctionEntry role filter: empty `include_function_roles` = all; non-empty = subset
+//!   (Decision I-1, IN-10)
 
 mod builder;
 mod enum_variants;
+mod field_edges;
 mod style_helpers;
+mod trait_impl;
 mod type_index;
 mod typestate;
 
@@ -30,14 +33,16 @@ use std::collections::BTreeSet;
 
 use domain::tddd::catalogue_v2::composite::TypeKindV2;
 use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
-use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeRef};
+use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath};
 use domain::tddd::catalogue_v2::{CatalogueDocument, FunctionPath, TraitName, TypeName};
 use domain::tddd::{ContractMapRenderOptions, LayerId};
 
-use super::{EdgeStyle, StyleConfig, function_node_id, trait_node_id, type_node_id};
+use super::{StyleConfig, function_node_id, trait_node_id, type_node_id};
 use builder::MermaidBuilder;
-use enum_variants::{emit_enum_variant_nodes, emit_type_alias_edge};
+use enum_variants::emit_enum_variant_nodes;
+use field_edges::{collect_param_edge, collect_returns_edge, emit_field_edges, entry_label};
 use style_helpers::{collect_classdefs, node_class_name, node_shape, role_class_name};
+use trait_impl::{TraitIndex, emit_trait_impl_edges};
 use type_index::TypeIndex;
 use typestate::{emit_methods_with_typestate, maybe_emit_typestate_overlay};
 
@@ -51,6 +56,18 @@ use typestate::{emit_methods_with_typestate, maybe_emit_typestate_overlay};
 /// method), Decision F-2+b2-ii (TypeEntry / TraitEntry as subgraphs), and
 /// Decision F-2+d1 (FunctionEntry as standalone node). Field edges and method
 /// edges are emitted after subgraph declarations.
+///
+/// T008 additions:
+/// - Cross-catalogue trait_impl edges (Decision O-2 + O-3 + O-a): a `TraitIndex`
+///   is built once at render start from the **rendered** catalogues only (layers that
+///   pass both `layer_order` and `opts.layers`), then used during TypeEntry rendering
+///   to emit `-.->|impl|` edges to workspace-internal trait targets. Building from the
+///   rendered subset prevents dangling Mermaid edges to traits whose layer was excluded
+///   by the filter (Decision O-a, CN-08). Workspace-external traits (std, core, serde,
+///   etc.) silently produce no edge.
+/// - FunctionEntry role filter (Decision I-1, IN-10): when `style.filter.
+///   include_function_roles` is non-empty, only functions whose `FunctionRole`
+///   Display string appears in the list are emitted. An empty list means render all.
 ///
 /// Layer iteration follows `layer_order`. When `opts.layers` is non-empty it
 /// acts as an allowlist: only layers present in both `layer_order` and
@@ -68,9 +85,6 @@ pub(super) fn render_mermaid(
     opts: &ContractMapRenderOptions,
     style: &StyleConfig,
 ) -> String {
-    // Build the type index for same-catalogue TypeRef resolution.
-    let type_index = TypeIndex::build(catalogues);
-
     // Group documents by layer.
     let mut by_layer: BTreeMap<&str, Vec<&CatalogueDocument>> = BTreeMap::new();
     for doc in catalogues {
@@ -86,8 +100,29 @@ pub(super) fn render_mermaid(
     let allowlist: BTreeSet<&str> = opts.layers.iter().map(|l| l.as_ref()).collect();
     let has_filter = !allowlist.is_empty();
 
-    // Collect minimal classDef lines (T006: emit class definitions but no
-    // ordering enforcement — T008 finalizes alphabetical ordering).
+    // Collect only the catalogues that will actually be rendered (i.e., from
+    // layers that pass both the layer_order filter and the opts.layers allowlist).
+    // The TraitIndex and TypeIndex must be built from this filtered set so that
+    // trait_impl edges never point to trait nodes that were not rendered — which
+    // would leave dangling Mermaid edges (Decision O-a, CN-08).
+    let rendered_layer_strs: BTreeSet<&str> = layer_order
+        .iter()
+        .map(|l| l.as_ref())
+        .filter(|l| !has_filter || allowlist.contains(l))
+        .collect();
+    let rendered_catalogues: Vec<&CatalogueDocument> =
+        catalogues.iter().filter(|doc| rendered_layer_strs.contains(doc.layer.as_ref())).collect();
+
+    // Build the same-catalogue type index for TypeRef resolution.
+    // Only includes catalogues from rendered layers (no dangling edges).
+    let type_index = TypeIndex::build(&rendered_catalogues);
+
+    // Build the cross-catalogue trait index for trait_impl edge resolution (T008).
+    // Only includes catalogues from rendered layers so that trait_impl edges never
+    // point to trait nodes absent from the rendered output (Decision O-a, CN-08).
+    let trait_index = TraitIndex::build(&rendered_catalogues);
+
+    // Collect classDef lines (alphabetical by class name — Decision U, CN-05).
     let classdefs = collect_classdefs(style);
 
     let mut builder = MermaidBuilder::new();
@@ -101,7 +136,7 @@ pub(super) fn render_mermaid(
             continue;
         }
         if let Some(docs) = by_layer.get(layer_str) {
-            emit_layer(&mut builder, layer_id, docs, &type_index, style);
+            emit_layer(&mut builder, layer_id, docs, &type_index, &trait_index, style);
         }
     }
 
@@ -172,6 +207,7 @@ fn emit_layer(
     layer_id: &LayerId,
     docs: &[&CatalogueDocument],
     type_index: &TypeIndex,
+    trait_index: &TraitIndex,
     style: &StyleConfig,
 ) {
     let layer_str = layer_id.as_ref();
@@ -190,7 +226,7 @@ fn emit_layer(
 
     // Emit crate-root entries directly in the layer subgraph (AC-11).
     for entry in &root_entries {
-        emit_layer_entry(builder, entry, layer_id, type_index, style);
+        emit_layer_entry(builder, entry, layer_id, type_index, trait_index, style);
     }
 
     // Emit top-module subgraphs in alphabetical order (BTreeMap iter is sorted).
@@ -201,7 +237,7 @@ fn emit_layer(
         builder.open_subgraph(&top_module_id, &top_module_label);
 
         for entry in entries {
-            emit_layer_entry(builder, entry, layer_id, type_index, style);
+            emit_layer_entry(builder, entry, layer_id, type_index, trait_index, style);
         }
 
         builder.close_subgraph();
@@ -345,6 +381,7 @@ fn emit_layer_entry(
     entry: &LayerEntry<'_>,
     layer_id: &LayerId,
     type_index: &TypeIndex,
+    trait_index: &TraitIndex,
     style: &StyleConfig,
 ) {
     match entry {
@@ -357,6 +394,7 @@ fn emit_layer_entry(
                 entry,
                 module_path,
                 type_index,
+                trait_index,
                 style,
             );
         }
@@ -373,7 +411,7 @@ fn emit_layer_entry(
             );
         }
         LayerEntry::Function { path, entry, module_path, crate_name } => {
-            emit_function_node(
+            emit_function_node_filtered(
                 builder,
                 layer_id,
                 crate_name,
@@ -405,6 +443,10 @@ fn emit_layer_entry(
 /// - For `PlainStruct` entries with typestate, transition method returns edges
 ///   use `==>|transitions_to|` (Decision G-2'b, AC-03).
 /// - Typestate overlay class is attached additively after the role class (T007).
+///
+/// T008 additions:
+/// - After field edges, emit cross-catalogue trait_impl edges (Decision O-2 + O-3 + O-a).
+///   Workspace-external traits silently produce no edge (Decision J-2 + CN-08).
 #[allow(clippy::too_many_arguments)]
 fn emit_type_subgraph(
     builder: &mut MermaidBuilder,
@@ -414,6 +456,7 @@ fn emit_type_subgraph(
     entry: &TypeEntry,
     module_path: &ModulePath,
     type_index: &TypeIndex,
+    trait_index: &TraitIndex,
     style: &StyleConfig,
 ) {
     let entry_id = type_node_id(layer_id, crate_name, name);
@@ -460,6 +503,9 @@ fn emit_type_subgraph(
     // Emit field edges for PlainStruct / TupleStruct (Decision K-2+(d), K-2).
     // For TypeAlias, emit the undirected alias edge (Decision N-1', AC-09).
     emit_field_edges(builder, &entry_id, &entry.kind, crate_name, type_index, style);
+
+    // T008: emit cross-catalogue trait_impl edges (Decision O-2 + O-3 + O-a).
+    emit_trait_impl_edges(builder, &entry_id, entry, trait_index, style);
 
     // Emit class attach for entry subgraph.
     let class_name = role_class_name(&entry.role.to_string(), style);
@@ -533,17 +579,21 @@ fn emit_trait_subgraph(
 }
 
 // ---------------------------------------------------------------------------
-// FunctionEntry node rendering
+// FunctionEntry node rendering (with T008 role filter)
 // ---------------------------------------------------------------------------
 
-/// Emits a FunctionEntry as a standalone callable node (Decision F-2+d1).
+/// Emits a FunctionEntry as a standalone callable node (Decision F-2+d1),
+/// applying the function role filter from the style config (T008, Decision I-1).
+///
+/// When `style.filter.include_function_roles` is non-empty, the function is
+/// only emitted if its `FunctionRole` Display string appears in the list.
+/// An empty list means "render all functions" (Decision I-1).
 ///
 /// Node shape is driven by `[node.Function].shape` in the style config (e.g. `"subroutine"`
 /// → `[[name]]`). Node id: `F<len>_<sanitized_layer>_<sanitized_full_path>` (Decision D-2).
-/// NOT a subgraph — entry subgraphs and function nodes are parallel siblings.
 /// `crate_name` scopes TypeRef resolution to the same catalogue document.
 #[allow(clippy::too_many_arguments)]
-fn emit_function_node(
+fn emit_function_node_filtered(
     builder: &mut MermaidBuilder,
     layer_id: &LayerId,
     crate_name: &CrateName,
@@ -553,6 +603,15 @@ fn emit_function_node(
     type_index: &TypeIndex,
     style: &StyleConfig,
 ) {
+    // T008 function role filter (Decision I-1, IN-10).
+    // Empty include_function_roles → render all (no filter).
+    if !style.filter.include_function_roles.is_empty() {
+        let role_str = entry.role.to_string();
+        if !style.filter.include_function_roles.iter().any(|r| r == &role_str) {
+            return; // Silently skip this function.
+        }
+    }
+
     let fn_id = function_node_id(layer_id, path);
     let fn_shape = node_shape("Function", style);
     builder.push_function_node(&fn_id, path.name.as_str(), &fn_shape);
@@ -569,125 +628,4 @@ fn emit_function_node(
     // Both role class and node class are attached (role for color, Function for shape).
     builder.push_class(&fn_id, &class_name);
     builder.push_class(&fn_id, &fn_node_class);
-}
-
-// ---------------------------------------------------------------------------
-// Field edges (Decision K-2+(d) + Decision K-2 for TupleStruct)
-// ---------------------------------------------------------------------------
-
-/// Emits field edges from a TypeEntry subgraph to field type subgraphs, and
-/// for `TypeAlias` emits the undirected `---|alias_of|` edge (T007, Decision N-1').
-///
-/// - `PlainStruct { has_stripped_fields: false, fields }`: one `--o|field_name|` edge per field.
-/// - `PlainStruct { has_stripped_fields: true }`: no edges emitted (AC-08).
-/// - `TupleStruct { has_stripped_fields: false, fields }`: `--o|.0|`, `--o|.1|` etc.
-/// - `TupleStruct { has_stripped_fields: true }`: no edges emitted (AC-08).
-/// - `UnitStruct`: no edges.
-/// - `Enum`: variant payload edges are emitted by `emit_enum_variant_nodes` (T007); no
-///   additional edges here.
-/// - `TypeAlias { target }`: emits `---|alias_of|` undirected edge to target type (T007,
-///   Decision N-1', AC-09).
-///
-/// `caller_crate` scopes TypeRef resolution to the same catalogue document (same-catalogue).
-fn emit_field_edges(
-    builder: &mut MermaidBuilder,
-    entry_id: &str,
-    kind: &TypeKindV2,
-    caller_crate: &CrateName,
-    type_index: &TypeIndex,
-    style: &StyleConfig,
-) {
-    let arrow = style.edge.get("field").map(|e| e.arrow.as_str()).unwrap_or("--o");
-
-    match kind {
-        TypeKindV2::PlainStruct { fields, has_stripped_fields: false, .. } => {
-            for field in fields {
-                if let Some(target_id) = type_index.resolve(&field.ty, caller_crate) {
-                    builder.push_edge(format!(
-                        "{entry_id} {arrow}|{}| {target_id}",
-                        field.name.as_str()
-                    ));
-                }
-            }
-        }
-        TypeKindV2::TupleStruct { fields, has_stripped_fields: false } => {
-            for (i, field_ty) in fields.iter().enumerate() {
-                if let Some(target_id) = type_index.resolve(field_ty, caller_crate) {
-                    builder.push_edge(format!("{entry_id} {arrow}|.{i}| {target_id}"));
-                }
-            }
-        }
-        TypeKindV2::TypeAlias { target } => {
-            // Undirected alias edge: alias entry subgraph --- alias_of --- target subgraph
-            // (Decision N-1', AC-09). Delegated to enum_variants module.
-            emit_type_alias_edge(builder, entry_id, target, caller_crate, type_index, style);
-        }
-        // has_stripped_fields: true → skip all field edges (AC-08).
-        TypeKindV2::PlainStruct { has_stripped_fields: true, .. }
-        | TypeKindV2::TupleStruct { has_stripped_fields: true, .. }
-        // UnitStruct: no field edges.
-        | TypeKindV2::UnitStruct
-        // Enum: variant payload edges handled by emit_enum_variant_nodes (T007).
-        | TypeKindV2::Enum { .. } => {}
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Method edge emission helpers
-// ---------------------------------------------------------------------------
-
-/// Emits a `--o` edge from `src_id` to the resolved param type subgraph.
-///
-/// The edge style is read from `style.edge["method_param"].arrow`. If the
-/// TypeRef is unresolvable (not in the same catalogue), the edge is silently skipped.
-/// `caller_crate` scopes TypeRef resolution to the same catalogue document.
-fn collect_param_edge(
-    builder: &mut MermaidBuilder,
-    src_id: &str,
-    param_ty: &TypeRef,
-    caller_crate: &CrateName,
-    type_index: &TypeIndex,
-    style: &StyleConfig,
-) {
-    if let Some(target_id) = type_index.resolve(param_ty, caller_crate) {
-        let arrow =
-            style.edge.get("method_param").map(|e: &EdgeStyle| e.arrow.as_str()).unwrap_or("--o");
-        builder.push_edge(format!("{src_id} {arrow} {target_id}"));
-    }
-}
-
-/// Emits a `-->` edge from `src_id` to the resolved return type subgraph.
-///
-/// The edge style is read from `style.edge["method_returns"].arrow`. If the
-/// TypeRef is unresolvable (not in the same catalogue), the edge is silently skipped.
-/// `caller_crate` scopes TypeRef resolution to the same catalogue document.
-fn collect_returns_edge(
-    builder: &mut MermaidBuilder,
-    src_id: &str,
-    returns_ty: &TypeRef,
-    caller_crate: &CrateName,
-    type_index: &TypeIndex,
-    style: &StyleConfig,
-) {
-    if let Some(target_id) = type_index.resolve(returns_ty, caller_crate) {
-        let arrow =
-            style.edge.get("method_returns").map(|e: &EdgeStyle| e.arrow.as_str()).unwrap_or("-->");
-        builder.push_edge(format!("{src_id} {arrow} {target_id}"));
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Label helpers
-// ---------------------------------------------------------------------------
-
-/// Builds the entry subgraph label from sub-module path and short name.
-///
-/// When `module_path` is root (empty), returns just `name`.
-/// When `module_path` has segments, returns `seg1::seg2::...::name`
-/// (sub-module path + name, per Decision U-6d-iii label spec).
-///
-/// Example: `module_path = ["team", "manager"]`, `name = "TeamManager"` →
-/// `"team::manager::TeamManager"`.
-fn entry_label(module_path: &ModulePath, name: &str) -> String {
-    if module_path.is_root() { name.to_owned() } else { format!("{}::{name}", module_path) }
 }

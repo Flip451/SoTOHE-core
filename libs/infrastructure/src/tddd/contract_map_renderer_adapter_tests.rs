@@ -9,7 +9,8 @@ use domain::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, FunctionName, FunctionPath, ModulePath, TraitName, TypeName,
+    CatalogueDocument, CrateName, FunctionName, FunctionPath, ModulePath, TraitImplDeclV2,
+    TraitName, TypeName,
 };
 use domain::tddd::{
     ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError, LayerId,
@@ -128,6 +129,10 @@ label = "alias_of"
 arrow = "==>"
 label = "transitions_to"
 
+[edge.trait_impl]
+arrow = '-.->'
+label = "impl"
+
 [role.ValueObject]
 class = "valueObject"
 
@@ -136,6 +141,9 @@ class = "secondaryPort"
 
 [role.FreeFunction]
 class = "freeFunction"
+
+[role.UseCaseFunction]
+class = "useCaseFunction"
 
 [node.Method]
 shape = "round"
@@ -155,6 +163,68 @@ overlay_class = "typestate"
 [filter]
 include_function_roles = []
 "#
+}
+
+/// Full style config with function role filter applied (T008 Decision I-1 tests).
+fn toml_with_function_role_filter(roles: &[&str]) -> String {
+    let roles_list = roles.iter().map(|r| format!("\"{r}\"")).collect::<Vec<_>>().join(", ");
+    format!(
+        r#"
+[edge.method_param]
+arrow = "--o"
+
+[edge.method_returns]
+arrow = "-->"
+
+[edge.field]
+arrow = "--o"
+
+[edge.variant_payload]
+arrow = "--o"
+
+[edge.alias]
+arrow = "---"
+label = "alias_of"
+
+[edge.transition]
+arrow = "==>"
+label = "transitions_to"
+
+[edge.trait_impl]
+arrow = '-.->'
+label = "impl"
+
+[role.ValueObject]
+class = "valueObject"
+
+[role.SecondaryPort]
+class = "secondaryPort"
+
+[role.FreeFunction]
+class = "freeFunction"
+
+[role.UseCaseFunction]
+class = "useCaseFunction"
+
+[node.Method]
+shape = "round"
+class = "methodNode"
+
+[node.Variant]
+shape = "stadium"
+class = "variantNode"
+
+[node.Function]
+shape = "subroutine"
+class = "functionNode"
+
+[pattern.Typestate]
+overlay_class = "typestate"
+
+[filter]
+include_function_roles = [{roles_list}]
+"#
+    )
 }
 
 /// Renders using the full style config and returns the mermaid string.
@@ -1485,5 +1555,473 @@ fn test_render_enum_tuple_variant_with_multiple_type_refs_emits_one_edge_per_ref
     assert!(
         mermaid.contains(&format!("{variant_id} --o {msg_id}")),
         "tuple variant must have edge to ErrorMsg, got:\n{mermaid}"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// T008 tests: cross-catalogue trait_impl edges, function role filter,
+//             mermaid output ordering, AC-14 layer-agnostic invariant
+// ---------------------------------------------------------------------------
+
+// Test 40 (T008-a): cross-catalogue trait_impl edge — type in crate A implements
+// trait declared in crate B; edge emitted as -.->|impl| (Decision O-2 + O-3 + O-a)
+#[test]
+fn test_render_cross_catalogue_trait_impl_edge_is_emitted() {
+    // Two catalogues in the same layer:
+    // - domain_crate: declares TypeA with trait_impls = [MyPort (from port_crate)]
+    // - port_crate: declares TraitMyPort
+    let layer_id = layer("domain");
+
+    let mut doc_domain = make_minimal_catalogue("domain", "domain_crate");
+    let mut doc_port = make_minimal_catalogue("domain", "port_crate");
+
+    // Declare the trait in port_crate
+    doc_port.traits.insert(trait_name("MyPort"), make_trait_entry());
+
+    // TypeA in domain_crate implements MyPort from port_crate
+    let type_a = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::Entity,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![TraitImplDeclV2::new(
+            TraitName::new("MyPort").unwrap(),
+            CrateName::new("port_crate").unwrap(),
+        )],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc_domain.types.insert(type_name("TypeA"), type_a);
+
+    let type_a_id = type_node_id(&layer_id, &crate_name("domain_crate"), &type_name("TypeA"));
+    let my_port_id = trait_node_id(&layer_id, &crate_name("port_crate"), &trait_name("MyPort"));
+
+    let mermaid = render_with_full_style(&[doc_domain, doc_port], &[layer_id]);
+
+    // Edge: TypeA -.->|impl| MyPort (Decision O-2 + O-3)
+    assert!(
+        mermaid.contains(&format!("{type_a_id} -.->|impl| {my_port_id}")),
+        "cross-catalogue trait_impl edge must be emitted as -.->|impl|, got:\n{mermaid}"
+    );
+}
+
+// Test 41 (T008-a): workspace-external trait → silent skip, no edge emitted
+// (Decision J-2 + CN-08)
+#[test]
+fn test_render_workspace_external_trait_impl_is_silently_skipped() {
+    let layer_id = layer("domain");
+    let mut doc = make_minimal_catalogue("domain", "my_crate");
+
+    // TypeA implements std::fmt::Display — "std" crate has no catalogue
+    let type_a = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![TraitImplDeclV2::new(
+            TraitName::new("Display").unwrap(),
+            CrateName::new("std").unwrap(),
+        )],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.types.insert(type_name("MyType"), type_a);
+
+    let mermaid = render_with_full_style(&[doc], &[layer_id]);
+
+    // "Display" trait is from "std" which has no catalogue entry → silent skip
+    assert!(
+        !mermaid.contains("-.->"),
+        "workspace-external trait impl must be silently skipped (no edge), got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains("Display"),
+        "workspace-external trait name must not appear in the output, got:\n{mermaid}"
+    );
+}
+
+// Test 42 (T008): mermaid output ordering — classDef before subgraphs before
+// edges before class attach lines (Decision U, CN-05)
+#[test]
+fn test_render_output_ordering_classdef_before_subgraphs_before_edges_before_class_lines() {
+    let layer_id = layer("domain");
+    let mut doc_domain = make_minimal_catalogue("domain", "domain_crate");
+    let mut doc_port = make_minimal_catalogue("domain", "port_crate");
+
+    // A trait in port_crate
+    doc_port.traits.insert(trait_name("MyTrait"), make_trait_entry());
+
+    // A type that has a class and a trait impl edge
+    let type_entry = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::ValueObject,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![TraitImplDeclV2::new(
+            TraitName::new("MyTrait").unwrap(),
+            CrateName::new("port_crate").unwrap(),
+        )],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc_domain.types.insert(type_name("MyType"), type_entry);
+
+    // Use style config with a classDef
+    let dir = TempDir::new().unwrap();
+    let style_content = r##"
+[edge.trait_impl]
+arrow = '-.->'
+label = "impl"
+
+[role.ValueObject]
+class = "valueObject"
+
+[role.SecondaryPort]
+class = "secondaryPort"
+
+[node.Method]
+shape = "round"
+class = "methodNode"
+
+[class.valueObject]
+fill = "#fff"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[filter]
+include_function_roles = []
+"##;
+    let path = write_style_config(&dir, style_content);
+    let adapter = ContractMapRendererAdapter::new(path);
+    let opts = ContractMapRenderOptions::empty();
+    let result = adapter.render(&[doc_domain, doc_port], &[layer_id], &opts).unwrap();
+    let mermaid = result.into_string();
+
+    // Find positions of each section
+    let classdef_pos = mermaid.find("classDef ").unwrap();
+    let subgraph_pos = mermaid.find("subgraph ").unwrap();
+    let edge_pos = mermaid.find("-.->").unwrap();
+    // class attach lines come after edges
+    let class_attach_pos =
+        mermaid.find("class T").unwrap_or_else(|| mermaid.find("class R").unwrap_or(mermaid.len()));
+
+    assert!(
+        classdef_pos < subgraph_pos,
+        "classDef lines must precede subgraph lines, got:\n{mermaid}"
+    );
+    assert!(subgraph_pos < edge_pos, "subgraph lines must precede edge lines, got:\n{mermaid}");
+    assert!(
+        edge_pos < class_attach_pos,
+        "edge lines must precede class attach lines, got:\n{mermaid}"
+    );
+}
+
+// Test 43 (T008, AC-14): layer-agnostic invariant — arbitrary LayerId values used
+// as subgraph labels without hardcoding (CN-02, AC-14)
+#[test]
+fn test_render_arbitrary_layer_ids_used_as_subgraph_labels() {
+    let doc_a = make_minimal_catalogue("my-layer", "crate_a");
+    let doc_b = make_minimal_catalogue("other-layer", "crate_b");
+    let layer_order = vec![layer("my-layer"), layer("other-layer")];
+
+    let mermaid = render_with_full_style(&[doc_a, doc_b], &layer_order);
+
+    // Each LayerId must appear verbatim as the subgraph label (not mangled)
+    assert!(
+        mermaid.contains("subgraph L_my_d_layer[\"my-layer\"]"),
+        "arbitrary layer 'my-layer' must appear as subgraph label, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains("subgraph L_other_d_layer[\"other-layer\"]"),
+        "arbitrary layer 'other-layer' must appear as subgraph label, got:\n{mermaid}"
+    );
+    // Must NOT contain any hardcoded layer name like "domain" or "infrastructure"
+    assert!(
+        !mermaid.contains("\"domain\""),
+        "output must not contain hardcoded 'domain' label, got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains("\"infrastructure\""),
+        "output must not contain hardcoded 'infrastructure' label, got:\n{mermaid}"
+    );
+}
+
+// Test 44 (T008): classDef lines are alphabetically ordered by class name (Decision U, CN-05)
+#[test]
+fn test_render_classdef_lines_are_alphabetically_ordered() {
+    // Style with multiple class entries to verify alphabetical ordering
+    let dir = TempDir::new().unwrap();
+    let style_content = r##"
+[class.zClass]
+fill = "#fff"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.aClass]
+fill = "#f00"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[class.mClass]
+fill = "#0f0"
+stroke = "#000"
+stroke_width = "1px"
+stroke_dasharray = "0"
+
+[filter]
+include_function_roles = []
+"##;
+    let path = write_style_config(&dir, style_content);
+    let adapter = ContractMapRendererAdapter::new(path);
+    let opts = ContractMapRenderOptions::empty();
+    let result = adapter.render(&[], &[], &opts).unwrap();
+    let mermaid = result.into_string();
+
+    let pos_a = mermaid.find("classDef aClass").unwrap();
+    let pos_m = mermaid.find("classDef mClass").unwrap();
+    let pos_z = mermaid.find("classDef zClass").unwrap();
+
+    assert!(
+        pos_a < pos_m && pos_m < pos_z,
+        "classDef lines must be alphabetically ordered (a < m < z), got:\n{mermaid}"
+    );
+}
+
+// Test 45 (T008): class attach lines use separate `class <id> <className>` format
+// (Decision U, CN-05 — no subgraph-inline ::: syntax)
+#[test]
+fn test_render_class_attach_uses_separate_class_lines_not_inline_syntax() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+    doc.types.insert(type_name("MyType"), make_type_entry());
+    let layer_id = layer("domain");
+    let cn = crate_name("mylib");
+
+    let mermaid = render_with_full_style(&[doc], std::slice::from_ref(&layer_id));
+    let entry_id = type_node_id(&layer_id, &cn, &type_name("MyType"));
+
+    // Separate class attach line: "class <id> <className>"
+    assert!(
+        mermaid.contains(&format!("class {entry_id} ")),
+        "class attach must use separate 'class <id> <className>' line, got:\n{mermaid}"
+    );
+    // Must NOT use inline ::: syntax on the subgraph line.
+    // Mermaid's inline class form is `subgraph id:::className` (no `{` separator
+    // between `:::` and the class name). Check for `{entry_id}:::` to catch any
+    // reintroduction of this banned form (CN-05).
+    assert!(
+        !mermaid.contains(&format!("{entry_id}:::")),
+        "class attach must NOT use inline subgraph ::: syntax, got:\n{mermaid}"
+    );
+}
+
+// Test 46 (T008, Decision I-1): empty include_function_roles → all functions rendered
+#[test]
+fn test_render_empty_function_role_filter_renders_all_functions() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+    let fn_path_a =
+        FunctionPath::at_root(CrateName::new("mylib").unwrap(), FunctionName::new("fn_a").unwrap());
+    let fn_path_b =
+        FunctionPath::at_root(CrateName::new("mylib").unwrap(), FunctionName::new("fn_b").unwrap());
+
+    // fn_a: FreeFunction
+    doc.functions.insert(fn_path_a.clone(), make_function_entry());
+    // fn_b: UseCaseFunction
+    doc.functions.insert(
+        fn_path_b.clone(),
+        FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::UseCaseFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let layer_id = layer("domain");
+    let fn_a_id = function_node_id(&layer_id, &fn_path_a);
+    let fn_b_id = function_node_id(&layer_id, &fn_path_b);
+
+    // With empty filter → both functions rendered
+    let mermaid = render_with_full_style(&[doc], &[layer_id]);
+
+    assert!(
+        mermaid.contains(&format!("{fn_a_id}[[fn_a]]")),
+        "empty filter: FreeFunction fn_a must be rendered, got:\n{mermaid}"
+    );
+    assert!(
+        mermaid.contains(&format!("{fn_b_id}[[fn_b]]")),
+        "empty filter: UseCaseFunction fn_b must be rendered, got:\n{mermaid}"
+    );
+}
+
+// Test 47 (T008, Decision I-1): non-empty include_function_roles → only matching
+// functions rendered, others silently skipped (IN-10)
+#[test]
+fn test_render_non_empty_function_role_filter_skips_non_matching_functions() {
+    let mut doc = make_minimal_catalogue("domain", "mylib");
+    let fn_path_free = FunctionPath::at_root(
+        CrateName::new("mylib").unwrap(),
+        FunctionName::new("free_fn").unwrap(),
+    );
+    let fn_path_uc = FunctionPath::at_root(
+        CrateName::new("mylib").unwrap(),
+        FunctionName::new("uc_fn").unwrap(),
+    );
+
+    // free_fn: FreeFunction
+    doc.functions.insert(fn_path_free.clone(), make_function_entry());
+    // uc_fn: UseCaseFunction
+    doc.functions.insert(
+        fn_path_uc.clone(),
+        FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::UseCaseFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let layer_id = layer("domain");
+    let fn_free_id = function_node_id(&layer_id, &fn_path_free);
+    let fn_uc_id = function_node_id(&layer_id, &fn_path_uc);
+
+    // With filter ["UseCaseFunction"] → only uc_fn rendered; free_fn skipped
+    let dir = TempDir::new().unwrap();
+    let toml_content = toml_with_function_role_filter(&["UseCaseFunction"]);
+    let path = write_style_config(&dir, &toml_content);
+    let adapter = ContractMapRendererAdapter::new(path);
+    let opts = ContractMapRenderOptions::empty();
+    let result = adapter.render(&[doc], &[layer_id], &opts).unwrap();
+    let mermaid = result.into_string();
+
+    assert!(
+        mermaid.contains(&format!("{fn_uc_id}[[uc_fn]]")),
+        "UseCaseFunction uc_fn must be rendered when in filter, got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains(&format!("{fn_free_id}[[free_fn]]")),
+        "FreeFunction free_fn must be skipped when not in filter, got:\n{mermaid}"
+    );
+}
+
+// Test 48 (T008-b): trait in an excluded layer (via opts.layers allowlist) must
+// NOT produce a trait_impl edge — prevents dangling Mermaid edges (Decision O-a,
+// CN-08). This is the cross-layer exclusion case: TypeA is in the rendered layer
+// "domain" and implements TraitB from the excluded layer "infra".
+#[test]
+fn test_render_trait_impl_edge_not_emitted_when_trait_layer_is_excluded_by_opts_layers() {
+    // domain layer: one type that implements a trait from the infra layer.
+    let layer_domain = layer("domain");
+    let layer_infra = layer("infra");
+
+    let mut doc_domain = make_minimal_catalogue("domain", "domain_crate");
+    let mut doc_infra = make_minimal_catalogue("infra", "infra_crate");
+
+    // Declare the trait in the infra catalogue (a different layer).
+    doc_infra.traits.insert(trait_name("InfraTrait"), make_trait_entry());
+
+    // TypeA in domain_crate declares an impl of InfraTrait from infra_crate.
+    let type_a = TypeEntry {
+        action: ItemAction::Add,
+        role: DataRole::Entity,
+        kind: TypeKindV2::PlainStruct {
+            fields: vec![],
+            has_stripped_fields: false,
+            typestate: None,
+        },
+        methods: vec![],
+        trait_impls: vec![TraitImplDeclV2::new(
+            TraitName::new("InfraTrait").unwrap(),
+            CrateName::new("infra_crate").unwrap(),
+        )],
+        module_path: ModulePath::root(),
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc_domain.types.insert(type_name("TypeA"), type_a);
+
+    // Render only the "domain" layer (opts.layers = ["domain"]). The "infra" layer
+    // is excluded: its trait node is never rendered, so no edge should be emitted.
+    let dir = TempDir::new().unwrap();
+    let path = write_style_config(&dir, full_toml_content());
+    let adapter = ContractMapRendererAdapter::new(path);
+    let opts = ContractMapRenderOptions { layers: vec![layer_domain.clone()] };
+    let result =
+        adapter.render(&[doc_domain, doc_infra], &[layer_domain, layer_infra], &opts).unwrap();
+    let mermaid = result.into_string();
+
+    // The infra layer (and its trait node) is excluded: no edge must be emitted.
+    assert!(
+        !mermaid.contains("-.->"),
+        "trait_impl edge must not be emitted when the trait's layer is excluded by opts.layers, \
+         got:\n{mermaid}"
+    );
+    assert!(
+        !mermaid.contains("InfraTrait"),
+        "excluded trait name must not appear in the output, got:\n{mermaid}"
+    );
+    // The type in the rendered domain layer must still appear.
+    assert!(
+        mermaid.contains("TypeA"),
+        "TypeA in the rendered domain layer must appear in the output, got:\n{mermaid}"
+    );
+}
+
+// Test 48 (T008-i): unknown FunctionRole name in include_function_roles → StyleConfigParse
+// (fail-closed validation; a typo must not silently filter everything out)
+#[test]
+fn test_render_with_unknown_function_role_in_filter_returns_style_config_parse() {
+    let dir = TempDir::new().unwrap();
+    let bad_toml = r#"
+[filter]
+include_function_roles = ["FreeFunctionn"]
+"#;
+    let path = write_style_config(&dir, bad_toml);
+    let adapter = ContractMapRendererAdapter::new(path.clone());
+    let catalogues: Vec<CatalogueDocument> = vec![];
+    let layer_order: Vec<LayerId> = vec![];
+    let opts = ContractMapRenderOptions::empty();
+
+    let result = adapter.render(&catalogues, &layer_order, &opts);
+    assert!(
+        matches!(
+            result,
+            Err(ContractMapRendererError::StyleConfigParse { path: ref p, reason: ref r })
+            if *p == path && r.contains("FreeFunctionn")
+        ),
+        "expected StyleConfigParse for unknown role 'FreeFunctionn', got: {result:?}"
     );
 }

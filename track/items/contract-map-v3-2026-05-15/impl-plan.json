@@ -40,12 +40,13 @@
     {
       "id": "T007",
       "description": "infrastructure 層: ContractMapRendererAdapter の render ロジック part 2 — Enum variant nodes + TypeAlias + typestate transition edge。TypeKindV2::Enum.variants を node 化し entry subgraph 内に配置する。VariantPayload::Tuple → 各 TypeRef へ無 label edge `--o`、VariantPayload::Struct → FieldDecl.name を label に `--o|field_name|`、VariantPayload::Unit → edge なし (Decision H-3, AC-04)。TypeAlias を空 subgraph + target type subgraph への無向 edge `---|alias_of|` で描画する (Decision N-1', AC-09)。TypeKindV2::PlainStruct.typestate: Some(TypestateMarker) のとき、transitions.transition_methods() 由来の method の returns edge を `==>|transitions_to|` style で描画する (Decision G-2'b, AC-03)。unit test: Enum 各 VariantPayload の edge / TypeAlias undirected edge / typestate transition edge vs 通常 returns edge の区別 (snapshot test)。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3452a95e3f0e0ac94e22e25552aa6ea2ac291805"
     },
     {
       "id": "T008",
       "description": "infrastructure 層: ContractMapRendererAdapter の render ロジック part 3 — trait impl edge + cross-catalogue index + output ordering + layer-agnostic。render 関数冒頭で catalogues 全走査により global trait index BTreeMap<(CrateName, TraitName), trait_subgraph_id> を 1 回構築する (Decision O-2)。TypeEntry.trait_impls の各 TraitImplDeclV2 について trait index を引き (trait_name + origin_crate で lookup)、workspace 内 trait は concrete type node から trait node へ `-.impl.->` edge を生成、workspace 外 (std / 外部 crate) は silent skip (Decision J-2 + O-a, CN-08, AC-07 + AC-10)。TraitEntry は trait index の target node / ContractRole の source として使用するのみであり、TraitEntry 自身は trait_impls フィールドを持たない点に注意 (v3 schema: trait_impls は TypeEntry のフィールド、TraitEntry はメソッド定義と role のみを保持)。mermaid 出力順序: classDef 定義 (alphabetical) → layer subgraph 群 (layer_order 順) → edge 定義群 → class attach 群 (`class <id> <className>` 別行, subgraph inline `:::` 使用禁止 CN-05) (Decision U, AC-12)。layer 名は LayerId のみ使用、文字列ハードコード禁止 (CN-02, AC-14)。FunctionEntry default 全件 render (Decision I-1, IN-10)。unit test: (a) cross-catalogue trait impl edge 解決 / workspace 外 silent skip / mermaid 出力順序 (snapshot test); (b) AC-14 検証のため LayerId を任意の文字列 (例: \"my-layer\" / \"other-layer\") に設定した fixture を使用し、renderer がその LayerId をそのまま subgraph ラベルに使用すること (\"domain\" 等の固定文字列ハードコードが存在しないこと) を確認する。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T009",

@@ -39,14 +39,18 @@ pub(super) struct TypeIndex {
 }
 
 impl TypeIndex {
-    /// Builds a `TypeIndex` from a flat slice of `CatalogueDocument`s.
+    /// Builds a `TypeIndex` from a slice of `CatalogueDocument` references.
     ///
-    /// `TypeEntry` names and `TraitEntry` names are stored in separate maps under
-    /// the owning document's `crate_name`. This prevents a TypeRef in crate A from
-    /// resolving to an identically named entry in crate B (same-catalogue semantics),
-    /// and prevents a same-name type/trait collision from silently overwriting the
-    /// type node id with the trait node id (T006 scope).
-    pub(super) fn build(catalogues: &[CatalogueDocument]) -> Self {
+    /// Accepts `&[&CatalogueDocument]` so that callers can pass a pre-filtered
+    /// reference slice (e.g. catalogues from rendered layers only) without an extra
+    /// allocation. `TypeEntry` names and `TraitEntry` names are stored in separate
+    /// maps under the owning document's `crate_name` to preserve same-catalogue
+    /// semantics (T006) and prevent same-name type/trait id collisions.
+    ///
+    /// `render_mermaid` restricts the input to rendered layers so that TypeRef
+    /// resolution never produces node ids for entries that were not emitted, avoiding
+    /// dangling Mermaid edges.
+    pub(super) fn build(catalogues: &[&CatalogueDocument]) -> Self {
         let mut types = HashMap::new();
         let mut traits = HashMap::new();
         for doc in catalogues {

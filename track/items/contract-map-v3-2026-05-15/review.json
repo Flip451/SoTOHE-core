@@ -1,50 +1,531 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "plan-artifacts": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
-          "at": "2026-05-15T10:10:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
-          "at": "2026-05-15T10:11:55Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Follow-up` claims that old ADR D4 (including `spec_source edge`) is fully superseded by the new ADR, but the new ADR still leaves `spec_source edge` as an open question (`Q`) and explicitly says its adoption is undecided. That makes the supersession map internally inconsistent: one part of D4 is still unresolved, so it cannot be described as wholly rewritten yet.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 411,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision C says entry shapes are fixed to subgraph rectangles because entries are subgraphized, but Decision F explicitly exempts `FunctionEntry` from subgraphization and places it as a standalone callable node. The shape rule therefore does not apply uniformly to all entries, so the renderer model is inconsistent for functions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 155,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:477514eabfbce85e27f9e7762ebcfe94ec3e40af1448b7feb45c3f0ec6ef8a47",
+          "at": "2026-05-15T04:18:56Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `ContractMapRendererError` does not actually preserve an error chain for the parse/render failures. `StyleConfigParse` and `RenderFailed` store only `String`, so `thiserror` cannot expose an underlying `source()` here, and the current tests only check `to_string()`. That means the new public error type cannot propagate the original failure cause the way the task describes.",
+              "message": "The FunctionEntry clause claims standalone function nodes can inherit 'Decision F's shape choice', but Decision F only defines Type/Trait entry subgraph behavior and method/variant nodes. As written, the styling rule for FunctionEntry is unsupported and leaves the function-node shape semantics ambiguous.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/contract_map_renderer.rs",
-              "line": 66,
-              "category": "missing error handling"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 155,
+              "category": "factual error"
+            },
+            {
+              "message": "`ADR 2026-05-08-0248 D5` is the wrong source for the alleged 'syn-free principle'. In that ADR, D5 is about identifier/newtype wrappers, not parser placement or syn usage, so the rejection rationale points at an unrelated decision.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 321,
+              "category": "broken reference"
             }
           ],
-          "hash": "rvw1:sha256:6ab930a16d6d3b410d9dde0ba43e5fadac75eb6de3c69066902bf04d0df72b75",
-          "at": "2026-05-15T10:34:53Z"
+          "hash": "rvw1:sha256:4ebd3f4c61d67749c75f73d0876bf4d7e13a7bc543bbdb21c9840dfd1f40fa33",
+          "at": "2026-05-15T04:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [`knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md:246-249`](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md#L246-L249) treats `TypeAlias` as a symmetric relation and renders it with an undirected edge. `TypeAlias.target` is directional in the schema, so this loses which symbol is the alias and which is the canonical target, which is semantically misleading for the rendered contract map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 248,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:334a9f008a4c4d8e788d01b22306e8df8efb8769ae649aed0fbb201b382870c2",
+          "at": "2026-05-15T04:28:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The render-order section is not exhaustive: it enumerates classDefs, layer/module/entry subgraphs, method/variant nodes, crate-root entries, edges, and class attachments, but it never assigns a placement/order for `FunctionEntry` nodes. That conflicts with Decision C, F, and I, which require standalone function nodes to be styled and rendered by default, so the implementation still lacks a deterministic rendering rule for functions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 277,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:79cd39833684c166bf4e2e8e7d6e68a9f2a05a19f848bef301bf77afc3237a9e",
+          "at": "2026-05-15T04:33:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Decision C` makes `FunctionEntry` styling depend on `[node.Function]`, but `Decision L` only defines node buckets as `Method`, `Variant`, and `Field`. As written, the config schema never actually allocates a `Function` node section, so the function-node styling path is left undefined in the document itself.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 234,
+              "category": "contradiction"
+            },
+            {
+              "message": "The render-order summary says the first block contains classDef definitions derived from `[class.*] + [edge.*]`, but the `[edge.*]` section is defined as arrow/label styling, not classDef data. That misclassifies edge configuration as class styling and makes the output-structure description semantically wrong.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 280,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:22f574f74101bca04775f7c9883891dab3736b39b420d5636f6167d0daa55897",
+          "at": "2026-05-15T04:36:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
-          "at": "2026-05-15T10:37:48Z"
+          "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
+          "at": "2026-05-15T04:38:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
-          "at": "2026-05-15T10:40:08Z"
+          "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
+          "at": "2026-05-15T04:43:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file says `From<ContractMapRendererError>` is omitted, but `impl-plan.json` T003 and `plan.md` S3 require that conversion to be implemented. The artifact set describes two different target states for `RenderContractMapError`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/usecase-types.json",
+              "line": 59,
+              "category": "contradiction"
+            },
+            {
+              "message": "`IN-24` is referenced as the deferred placeholder target, but the spec only defines `IN-01` through `IN-18`. That anchor is not part of this track's spec, so the comment should point at the actual deferred scope instead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/contract-map.md",
+              "line": 2,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:77f3506630b403856e5d777d0391ba9a99105cf82cb51727b83c2f84cdfeba2d",
+          "at": "2026-05-15T06:34:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ContractMapRendererError` introduces a public `RenderFailed` variant here, but the plan never assigns a task that actually exercises or asserts that path. T002 only covers `Display`/`Error` formatting, T005 only covers config-missing/parse failures, and T010 is limited to AC-01..14 acceptance behavior. As written, the generic renderer-failure branch can be implemented incorrectly without any planned test catching it. Add an explicit unit or integration test that forces `render` to return `RenderFailed` and verifies propagation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 19,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:2cb51e61db1ebea0cbb2a2ec8bd146fef216ac592c38c964b1a53350a1763786",
+          "at": "2026-05-15T06:42:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011 says to confirm that all Yellow signals are Blue, but the briefing's accepted deviations explicitly allow the `<layer>-catalogue-spec-signals.json` Yellow items to remain Yellow. As written, this completion criterion contradicts the allowed end state and could push the gate toward an unachievable target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c013e0ef61e6aae8e21a7bff78e71c5da29594373e2a443912a2fac02dd51723",
+          "at": "2026-05-15T06:45:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The machine-readable plan has no dependency graph: every task object in this file omits `depends_on`, so prerequisite ordering is not enforced. That leaves tasks like T003, T009, and T011 schedulable before the artifacts they require, which makes the plan infeasible as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 5,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T005 describes Function node IDs as `F<len>_<layer_path>`, but the spec requires `F<len>_<sanitized_full_path>` for functions (`spec.md:64`). As written, the plan would generate the wrong identifier shape for function nodes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 42,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8c78b35ef07d508c175305b45d798966ede71edaef6936d2eabc74a07f323011",
+          "at": "2026-05-15T06:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[plan.md:L54] T010 claims to cover AC-01 and AC-11, but the task only specifies a two-layer fixture plus TypeKindV2 variant coverage. It never says the fixture includes multiple `CatalogueDocument`s in the same layer or any `module_path = []` / nested-module cases, so the layer-aggregation behaviors required by those acceptance criteria are not actually specified by this task.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
+              "line": 54,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:75e7f25341e733a276eab6c4917b994a43966e4e972914fe0aabda35315cd992",
+          "at": "2026-05-15T06:53:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-01` still specifies `render_contract_map(...)->ContractMapContent`, but this track deletes `domain::tddd::contract_map_render::render_contract_map` and replaces it with the fallible `ContractMapRenderer::render(...)->Result<ContractMapContent, ContractMapRendererError>`. `T010` repeats the same stale API name. As written, the acceptance criteria and test plan point at an API that the rest of the plan explicitly removes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/spec.md",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a4b112bc0e27364466788455491a7cc4f73de6f8493a3a08f859390694b2f7e7",
+          "at": "2026-05-15T06:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0333ca40752e65319bfa3b6a2710857c0b54a9fb22d8b4c6c0b10d132bd0c617",
+          "at": "2026-05-15T07:04:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan still leaves the workflow unable to feed the new renderer's v3 input shape. IN-01/AC-01 require `ContractMapRenderer::render` to consume `&[CatalogueDocument]` and correctly handle multiple `CatalogueDocument`s with the same `LayerId`, but `CatalogueLoader` is kept as a reference returning `BTreeMap<LayerId, CatalogueDocument>`. T003/T009 only inject and call the renderer; no task changes the loader contract or adds an equivalent collection step that can preserve 1-layer-N-crate catalogues. Because a `BTreeMap<LayerId, ...>` cannot represent two documents for the same layer, the CLI/usecase path cannot satisfy the stated v3 design outside isolated adapter tests.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/domain-types.json",
+              "line": 111,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T010 is described as an acceptance test spanning AC-01 through AC-14, and task coverage assigns T010 to AC-07 and AC-10, but the task's explicit fixture/test targets never require any `trait_impls`, all three `ContractRole` cases, or a workspace-external trait to exercise silent-skip behavior. As written, the acceptance task can be completed while missing the trait-impl edge behaviors that AC-07/AC-10 require, contradicting the coverage claims.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0333ca40752e65319bfa3b6a2710857c0b54a9fb22d8b4c6c0b10d132bd0c617",
+          "at": "2026-05-15T07:09:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-01 says the ContractMapRenderer method signature, adapter struct definition, and RenderContractMapInteractor coordination API are out of scope for this track's behavioral spec, but IN-01/IN-05 and the implementation plan make those exact API details in-scope and required. This leaves the plan artifacts with conflicting target-state guidance for T002/T003/T005.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/spec.json",
+              "line": 259,
+              "category": "contradiction"
+            },
+            {
+              "message": "T010 is described as an acceptance test spanning AC-01 through AC-14, but the explicit test targets only list AC-01/02/05/06/07/10/11/12, while task-coverage assigns AC-13 to T002/T009/T011 and AC-14 only to T008. Either T010 needs explicit checks for the remaining ACs or the \"AC-01〜AC-14\" claim should be narrowed to match the coverage map.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:504ea4db0bf8bd81d7f13ec4ac00410795758c7a31fa5402bca3b84b17434380",
+          "at": "2026-05-15T07:14:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010's coverage is internally inconsistent. The S6 section says T010 adds an AC-01 through AC-14 acceptance test, and task-coverage assigns T010 to AC-03, AC-04, AC-08, and AC-09, but the T010 task text explicitly limits its integration targets to AC-01/02/05/06/07/10/11/12 and says AC-03/04/08/09 are handled elsewhere. It also says AC-08 is covered by T007 even though the plan assigns has_stripped_fields rendering to T006. As written, implementers cannot tell whether T010 must actually test AC-03/04/08/09, and the coverage artifact overstates T010's acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/task-coverage.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb622638c2a9a3a0ebc8c4e205dd194292f92e230bc7f0eb3c30df7cc913b5b6",
+          "at": "2026-05-15T07:19:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-14 requires both no hardcoded layer names and successful rendering in a workspace with arbitrary layer names, and task-coverage assigns AC-14 only to T008 while T010 explicitly defers AC-14 to T008. However T008's listed unit tests cover trait impl resolution, external-trait skipping, and output ordering only; they do not require an arbitrary-layer fixture or assertion. An implementer can complete every listed T008/T010 test without verifying the second half of AC-14, so the coverage claim is incomplete.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9f3a5eb11ed6da9036abbda2ccbfe553df83e201c6b2d402ebabb0219ae0b66c",
+          "at": "2026-05-15T07:25:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 requires the default style config to define `NodeCategory {Method, Variant, Field, Function}` with shape/class settings, which makes `Field` a node category. That conflicts with the same plan/spec stating PlainStruct and TupleStruct fields are not node-ized and are rendered only as edges/labels (`IN-12`, T006). An implementer following T004 could add `[node.Field]` semantics that T006 explicitly forbids, so the config contract needs to remove or clarify `Field` as a non-node edge label/style concern.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e445d7b51cbba61aef03da39384917d9ed02f56cb2c3b6f585a226566e3c6648",
+          "at": "2026-05-15T07:30:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca08b935fe8872756a97bfc1aeafe9462559fb832f4289744264c4c02f7ec5a5",
+          "at": "2026-05-15T07:32:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c2b9012cd0b98974c68e8588c42e0027ba9bad60f079ef6ba8e5b387b1138dc",
+          "at": "2026-05-15T09:44:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008/T010 tell implementers to build trait-impl edges from `TraitEntry.trait_impls`, but the catalogue v3 artifacts model implementations on concrete type entries (`types[*].trait_impls`), while trait entries only define the target trait/role. Following this plan would either look at a non-existent field or build fixtures that cannot express workspace-internal/external impls, so AC-07/AC-10 coverage is not actually implementable as written. The plan should say to iterate type entries' `trait_impls` and resolve those references against the trait index, using TraitEntry only as the target node/role source.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 48,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:2c2b9012cd0b98974c68e8588c42e0027ba9bad60f079ef6ba8e5b387b1138dc",
+          "at": "2026-05-15T09:48:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ef286a9ec1430fcec7f3d272261e13bbc61f9b497e7b4d07c25c6e5975b312b",
+          "at": "2026-05-15T09:53:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` now drops `commit_hash` from the task objects, so T001 is no longer represented as the briefing-required `commit_hash: null` pending state. That is a metadata-shape drift from the intended in-progress transition.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "`domain-types.md` also changed the generated signal for `domain::tddd::contract_map_render::render_contract_map` from 🟡 to 🔵. The briefing for this round says only T001 status should move to `in_progress` and `plan.md` should rerender, so this is an extra semantic drift in a layer-types artifact.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/domain-types.md",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
+          "at": "2026-05-15T10:11:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
+          "at": "2026-05-15T10:15:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
+          "at": "2026-05-15T10:16:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
+          "at": "2026-05-15T10:33:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.md` was re-rendered to mark T002-owned declarations (`ContractMapRenderOptions`, `ContractMapRendererError`, and `ContractMapRenderer`) as fully Blue, while the same plan artifacts still declare T002 only `in_progress` with no commit hash. This makes the plan-artifact snapshot no longer a pure T001 done / T002 start transition and presents T002 implementation signals as completed before the task is resolved.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/domain-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
+          "at": "2026-05-15T10:36:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
+          "at": "2026-05-15T10:38:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69de7001e726651d3ff40408e7a36e75ec2f24905c8bb0bc9db288cfd831e96c",
+          "at": "2026-05-15T10:53:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69de7001e726651d3ff40408e7a36e75ec2f24905c8bb0bc9db288cfd831e96c",
+          "at": "2026-05-15T10:55:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:11:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is still marked `todo` here, and the generated `plan.md` mirrors it as `[ ]` at line 34, but the plan-artifacts briefing for this round explicitly says T004 is the current `in_progress` task with no commit hash. This leaves the handoff state contradictory: downstream reviewers/operators will see no active task even though T004 is supposed to be in progress. Set T004 to `in_progress` and re-render `plan.md` so it shows `[~]`.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:16:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
+          "at": "2026-05-15T11:17:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ffaf870aaa113da3c0db71ae2c008da75aa4a464fb921f5881e75af2ea59acd",
+          "at": "2026-05-15T11:34:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ffaf870aaa113da3c0db71ae2c008da75aa4a464fb921f5881e75af2ea59acd",
+          "at": "2026-05-15T11:36:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e527d4bc808fbd3a9699e5d8ea4db07124e581648959eae61f217fd936bdbd12",
+          "at": "2026-05-15T12:16:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e527d4bc808fbd3a9699e5d8ea4db07124e581648959eae61f217fd936bdbd12",
+          "at": "2026-05-15T12:18:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
+          "at": "2026-05-15T12:39:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
+          "at": "2026-05-15T12:40:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1763555a5ac515d07106740727818277efd07ffcd632d096b37bb89f1e3e1ea4",
+          "at": "2026-05-15T14:30:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1763555a5ac515d07106740727818277efd07ffcd632d096b37bb89f1e3e1ea4",
+          "at": "2026-05-15T14:31:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e9b614091bc6735b47514c780eca8a8ffdbd9fbb5cdf095052d3613ef3e9aa9",
+          "at": "2026-05-15T15:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e9b614091bc6735b47514c780eca8a8ffdbd9fbb5cdf095052d3613ef3e9aa9",
+          "at": "2026-05-15T15:47:03Z"
         }
       ]
     },
@@ -63,114 +544,6 @@
           "findings": [],
           "hash": "rvw1:sha256:a9c5328ba80ec417ff494235aade4f955d8680d6edd86fe45ba085e4e963be49",
           "at": "2026-05-15T10:55:28Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
-          "at": "2026-05-15T10:10:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
-          "at": "2026-05-15T10:12:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
-          "at": "2026-05-15T10:55:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
-          "at": "2026-05-15T10:58:32Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "INF-24 points readers at a C-side `for_is_external` leak in `mod.rs` and labels the result `Mismatch_Reference Red`, but the linked track artifact documents a different bug: `patch_impl_for_ids` in Phase 1 leaves the impl in S and produces `SMinusC_Reference Red` (`track/items/contract-map-v3-2026-05-15/infrastructure-types.json:40-45`). As written, the TODO entry sends maintainers to the wrong subsystem and the wrong signal polarity.",
-              "severity": "P1",
-              "file": "knowledge/strategy/TODO.md",
-              "line": 285,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b2bbf03c0377e06ccea65dc5f35625702ec1e2a9f8ec2f2eaf1ef3c5ef5ab59b",
-          "at": "2026-05-15T06:37:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "INF-24 describes a `patch_impl_for_ids` bug in `phase1/child_items.rs`, but the briefing for this round says the intended issue is the external-type filter gap in `mod.rs:362-380`. As written, the TODO points maintainers at the wrong subsystem and the wrong red polarity, so the follow-up track will likely fix the wrong code path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/TODO.md",
-              "line": 285,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0b68c1b8ce62ac5225a376f9191075b76eec169ba1562efacd6472f3686bc512",
-          "at": "2026-05-15T06:39:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
-          "at": "2026-05-15T06:43:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
-          "at": "2026-05-15T06:46:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
-          "at": "2026-05-15T09:45:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
-          "at": "2026-05-15T09:47:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f1551562ba5677044a0f0445df52b2f8fe05fb9c34dd54b07ead74f41bfa854",
-          "at": "2026-05-15T11:12:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f1551562ba5677044a0f0445df52b2f8fe05fb9c34dd54b07ead74f41bfa854",
-          "at": "2026-05-15T11:16:09Z"
         }
       ]
     },
@@ -697,520 +1070,264 @@
           "findings": [],
           "hash": "rvw1:sha256:30594f27acc44e952f22eebcb51c1c62b34fefb4d49cb1657e6067c6d5908165",
           "at": "2026-05-15T14:47:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitIndex` is built from every catalogue before the layer allowlist is applied, and `emit_trait_impl_edges()` never checks whether the resolved trait layer will actually be rendered. When `opts.layers` or `layer_order` excludes the trait’s layer, the renderer still emits an `impl` edge to a node that never gets declared, which produces a dangling/implicit node and breaks the layer-filter contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 86,
+              "category": "correctness"
+            },
+            {
+              "message": "`include_function_roles` is stored as raw `Vec<String>` and compared as strings at render time, so TOML typos or unsupported role names are accepted silently and can suppress function rendering without surfacing a config error. This should validate against `FunctionRole` during config load, or at least reject unknown values instead of treating them as an empty match set.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 137,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:7f4637d37d3dfd92d68a94c8aec178e458656bb19d13701002550d7a68dc7cd2",
+          "at": "2026-05-15T15:47:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitIndex` is built from every catalogue before `opts.layers`/`layer_order` filtering is applied, so a type in a rendered layer can now emit `-.->|impl|` to a trait node in a layer that is never rendered. That leaves dangling Mermaid edges whenever the target trait lives on an excluded layer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 87,
+              "category": "correctness"
+            },
+            {
+              "message": "The regression test for forbidding inline `:::class` syntax does not actually match Mermaid's inline form. Searching for `subgraph {entry_id}:::{` will never catch a reintroduction of `:::className[...]`, so this test would pass even if the forbidden syntax comes back.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter_tests.rs",
+              "line": 1828,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7f4637d37d3dfd92d68a94c8aec178e458656bb19d13701002550d7a68dc7cd2",
+          "at": "2026-05-15T15:49:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `include_function_roles` filters out every function in a module, `emit_layer()` still opens that top-module subgraph before the filter runs, so the output contains empty `subgraph ... end` blocks. That is a user-visible regression because the diagram reports modules that contain no rendered entries.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 230,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9235ec3cfdc415f023f0afbdb0f842010b16a7bf04bb007d02298a5da70598ee",
+          "at": "2026-05-15T15:57:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9235ec3cfdc415f023f0afbdb0f842010b16a7bf04bb007d02298a5da70598ee",
+          "at": "2026-05-15T15:59:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`include_function_roles` is deserialized as raw strings and compared with `FunctionRole::to_string()` at render time, so unknown role names in the style TOML are accepted silently and can filter out functions without any config error. T008 explicitly relies on `FunctionRole`/`EnumString` alignment; this should deserialize or validate against `FunctionRole` during config load so typos fail closed instead of producing incomplete diagrams.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 139,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:9235ec3cfdc415f023f0afbdb0f842010b16a7bf04bb007d02298a5da70598ee",
+          "at": "2026-05-15T16:01:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render.rs` is now 750 lines, exceeding the repository's 700-line production-module max. The T008 additions should be split into a focused submodule before this grows further.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render.rs",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:31ed8ba820c8ba3caf64afafe28ff6a1ba5230c078893aca743a6d537960c3e2",
+          "at": "2026-05-15T16:06:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d848bb97646dc1f076b1795f8549507ae91326ce6e4eff0dac047642191b9c6d",
+          "at": "2026-05-15T16:12:49Z"
         }
       ]
     },
-    "plan-artifacts": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
+          "at": "2026-05-15T10:10:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:001fcd403d938d737782c20ab055b92f26bfd23885adec8b1c74dd3d510bcaf9",
+          "at": "2026-05-15T10:11:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ContractMapRendererError` does not actually preserve an error chain for the parse/render failures. `StyleConfigParse` and `RenderFailed` store only `String`, so `thiserror` cannot expose an underlying `source()` here, and the current tests only check `to_string()`. That means the new public error type cannot propagate the original failure cause the way the task describes.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/contract_map_renderer.rs",
+              "line": 66,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:6ab930a16d6d3b410d9dde0ba43e5fadac75eb6de3c69066902bf04d0df72b75",
+          "at": "2026-05-15T10:34:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
+          "at": "2026-05-15T10:37:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf9521dba547d97a0e1004c849c4b4d7254f8377856d7daa29e1eaaf3062bfe2",
+          "at": "2026-05-15T10:40:08Z"
+        }
+      ]
+    },
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`Follow-up` claims that old ADR D4 (including `spec_source edge`) is fully superseded by the new ADR, but the new ADR still leaves `spec_source edge` as an open question (`Q`) and explicitly says its adoption is undecided. That makes the supersession map internally inconsistent: one part of D4 is still unresolved, so it cannot be described as wholly rewritten yet.",
+              "message": "INF-24 points readers at a C-side `for_is_external` leak in `mod.rs` and labels the result `Mismatch_Reference Red`, but the linked track artifact documents a different bug: `patch_impl_for_ids` in Phase 1 leaves the impl in S and produces `SMinusC_Reference Red` (`track/items/contract-map-v3-2026-05-15/infrastructure-types.json:40-45`). As written, the TODO entry sends maintainers to the wrong subsystem and the wrong signal polarity.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
-              "line": 411,
-              "category": "contradiction"
-            },
-            {
-              "message": "Decision C says entry shapes are fixed to subgraph rectangles because entries are subgraphized, but Decision F explicitly exempts `FunctionEntry` from subgraphization and places it as a standalone callable node. The shape rule therefore does not apply uniformly to all entries, so the renderer model is inconsistent for functions.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 155,
-              "category": "contradiction"
+              "file": "knowledge/strategy/TODO.md",
+              "line": 285,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:477514eabfbce85e27f9e7762ebcfe94ec3e40af1448b7feb45c3f0ec6ef8a47",
-          "at": "2026-05-15T04:18:56Z"
+          "hash": "rvw1:sha256:b2bbf03c0377e06ccea65dc5f35625702ec1e2a9f8ec2f2eaf1ef3c5ef5ab59b",
+          "at": "2026-05-15T06:37:29Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The FunctionEntry clause claims standalone function nodes can inherit 'Decision F's shape choice', but Decision F only defines Type/Trait entry subgraph behavior and method/variant nodes. As written, the styling rule for FunctionEntry is unsupported and leaves the function-node shape semantics ambiguous.",
+              "message": "INF-24 describes a `patch_impl_for_ids` bug in `phase1/child_items.rs`, but the briefing for this round says the intended issue is the external-type filter gap in `mod.rs:362-380`. As written, the TODO points maintainers at the wrong subsystem and the wrong red polarity, so the follow-up track will likely fix the wrong code path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 155,
-              "category": "factual error"
-            },
-            {
-              "message": "`ADR 2026-05-08-0248 D5` is the wrong source for the alleged 'syn-free principle'. In that ADR, D5 is about identifier/newtype wrappers, not parser placement or syn usage, so the rejection rationale points at an unrelated decision.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 321,
-              "category": "broken reference"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/TODO.md",
+              "line": 285,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:4ebd3f4c61d67749c75f73d0876bf4d7e13a7bc543bbdb21c9840dfd1f40fa33",
-          "at": "2026-05-15T04:22:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: [`knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md:246-249`](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md#L246-L249) treats `TypeAlias` as a symmetric relation and renders it with an undirected edge. `TypeAlias.target` is directional in the schema, so this loses which symbol is the alias and which is the canonical target, which is semantically misleading for the rendered contract map.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 248,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:334a9f008a4c4d8e788d01b22306e8df8efb8769ae649aed0fbb201b382870c2",
-          "at": "2026-05-15T04:28:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The render-order section is not exhaustive: it enumerates classDefs, layer/module/entry subgraphs, method/variant nodes, crate-root entries, edges, and class attachments, but it never assigns a placement/order for `FunctionEntry` nodes. That conflicts with Decision C, F, and I, which require standalone function nodes to be styled and rendered by default, so the implementation still lacks a deterministic rendering rule for functions.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 277,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:79cd39833684c166bf4e2e8e7d6e68a9f2a05a19f848bef301bf77afc3237a9e",
-          "at": "2026-05-15T04:33:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Decision C` makes `FunctionEntry` styling depend on `[node.Function]`, but `Decision L` only defines node buckets as `Method`, `Variant`, and `Field`. As written, the config schema never actually allocates a `Function` node section, so the function-node styling path is left undefined in the document itself.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 234,
-              "category": "contradiction"
-            },
-            {
-              "message": "The render-order summary says the first block contains classDef definitions derived from `[class.*] + [edge.*]`, but the `[edge.*]` section is defined as arrow/label styling, not classDef data. That misclassifies edge configuration as class styling and makes the output-structure description semantically wrong.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 280,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:22f574f74101bca04775f7c9883891dab3736b39b420d5636f6167d0daa55897",
-          "at": "2026-05-15T04:36:39Z"
+          "hash": "rvw1:sha256:0b68c1b8ce62ac5225a376f9191075b76eec169ba1562efacd6472f3686bc512",
+          "at": "2026-05-15T06:39:36Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
-          "at": "2026-05-15T04:38:52Z"
+          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
+          "at": "2026-05-15T06:43:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
-          "at": "2026-05-15T04:43:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This file says `From<ContractMapRendererError>` is omitted, but `impl-plan.json` T003 and `plan.md` S3 require that conversion to be implemented. The artifact set describes two different target states for `RenderContractMapError`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/usecase-types.json",
-              "line": 59,
-              "category": "contradiction"
-            },
-            {
-              "message": "`IN-24` is referenced as the deferred placeholder target, but the spec only defines `IN-01` through `IN-18`. That anchor is not part of this track's spec, so the comment should point at the actual deferred scope instead.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/contract-map.md",
-              "line": 2,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:77f3506630b403856e5d777d0391ba9a99105cf82cb51727b83c2f84cdfeba2d",
-          "at": "2026-05-15T06:34:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `ContractMapRendererError` introduces a public `RenderFailed` variant here, but the plan never assigns a task that actually exercises or asserts that path. T002 only covers `Display`/`Error` formatting, T005 only covers config-missing/parse failures, and T010 is limited to AC-01..14 acceptance behavior. As written, the generic renderer-failure branch can be implemented incorrectly without any planned test catching it. Add an explicit unit or integration test that forces `render` to return `RenderFailed` and verifies propagation.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
-              "line": 19,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:2cb51e61db1ebea0cbb2a2ec8bd146fef216ac592c38c964b1a53350a1763786",
-          "at": "2026-05-15T06:42:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T011 says to confirm that all Yellow signals are Blue, but the briefing's accepted deviations explicitly allow the `<layer>-catalogue-spec-signals.json` Yellow items to remain Yellow. As written, this completion criterion contradicts the allowed end state and could push the gate toward an unachievable target.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
-              "line": 55,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c013e0ef61e6aae8e21a7bff78e71c5da29594373e2a443912a2fac02dd51723",
-          "at": "2026-05-15T06:45:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The machine-readable plan has no dependency graph: every task object in this file omits `depends_on`, so prerequisite ordering is not enforced. That leaves tasks like T003, T009, and T011 schedulable before the artifacts they require, which makes the plan infeasible as written.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/impl-plan.json",
-              "line": 5,
-              "category": "infeasibility"
-            },
-            {
-              "message": "T005 describes Function node IDs as `F<len>_<layer_path>`, but the spec requires `F<len>_<sanitized_full_path>` for functions (`spec.md:64`). As written, the plan would generate the wrong identifier shape for function nodes.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
-              "line": 42,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:8c78b35ef07d508c175305b45d798966ede71edaef6936d2eabc74a07f323011",
-          "at": "2026-05-15T06:48:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "[plan.md:L54] T010 claims to cover AC-01 and AC-11, but the task only specifies a two-layer fixture plus TypeKindV2 variant coverage. It never says the fixture includes multiple `CatalogueDocument`s in the same layer or any `module_path = []` / nested-module cases, so the layer-aggregation behaviors required by those acceptance criteria are not actually specified by this task.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/plan.md",
-              "line": 54,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:75e7f25341e733a276eab6c4917b994a43966e4e972914fe0aabda35315cd992",
-          "at": "2026-05-15T06:53:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AC-01` still specifies `render_contract_map(...)->ContractMapContent`, but this track deletes `domain::tddd::contract_map_render::render_contract_map` and replaces it with the fallible `ContractMapRenderer::render(...)->Result<ContractMapContent, ContractMapRendererError>`. `T010` repeats the same stale API name. As written, the acceptance criteria and test plan point at an API that the rest of the plan explicitly removes.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/spec.md",
-              "line": 60,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a4b112bc0e27364466788455491a7cc4f73de6f8493a3a08f859390694b2f7e7",
-          "at": "2026-05-15T06:56:25Z"
+          "hash": "rvw1:sha256:96a7bc4e7c26f39994303935abe1e784eba768e4caeff45cb4337e27c5d625c7",
+          "at": "2026-05-15T06:46:12Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0333ca40752e65319bfa3b6a2710857c0b54a9fb22d8b4c6c0b10d132bd0c617",
-          "at": "2026-05-15T07:04:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The plan still leaves the workflow unable to feed the new renderer's v3 input shape. IN-01/AC-01 require `ContractMapRenderer::render` to consume `&[CatalogueDocument]` and correctly handle multiple `CatalogueDocument`s with the same `LayerId`, but `CatalogueLoader` is kept as a reference returning `BTreeMap<LayerId, CatalogueDocument>`. T003/T009 only inject and call the renderer; no task changes the loader contract or adds an equivalent collection step that can preserve 1-layer-N-crate catalogues. Because a `BTreeMap<LayerId, ...>` cannot represent two documents for the same layer, the CLI/usecase path cannot satisfy the stated v3 design outside isolated adapter tests.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/domain-types.json",
-              "line": 111,
-              "category": "infeasibility"
-            },
-            {
-              "message": "T010 is described as an acceptance test spanning AC-01 through AC-14, and task coverage assigns T010 to AC-07 and AC-10, but the task's explicit fixture/test targets never require any `trait_impls`, all three `ContractRole` cases, or a workspace-external trait to exercise silent-skip behavior. As written, the acceptance task can be completed while missing the trait-impl edge behaviors that AC-07/AC-10 require, contradicting the coverage claims.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
-              "line": 60,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0333ca40752e65319bfa3b6a2710857c0b54a9fb22d8b4c6c0b10d132bd0c617",
-          "at": "2026-05-15T07:09:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "OS-01 says the ContractMapRenderer method signature, adapter struct definition, and RenderContractMapInteractor coordination API are out of scope for this track's behavioral spec, but IN-01/IN-05 and the implementation plan make those exact API details in-scope and required. This leaves the plan artifacts with conflicting target-state guidance for T002/T003/T005.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/spec.json",
-              "line": 259,
-              "category": "contradiction"
-            },
-            {
-              "message": "T010 is described as an acceptance test spanning AC-01 through AC-14, but the explicit test targets only list AC-01/02/05/06/07/10/11/12, while task-coverage assigns AC-13 to T002/T009/T011 and AC-14 only to T008. Either T010 needs explicit checks for the remaining ACs or the \"AC-01〜AC-14\" claim should be narrowed to match the coverage map.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
-              "line": 60,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:504ea4db0bf8bd81d7f13ec4ac00410795758c7a31fa5402bca3b84b17434380",
-          "at": "2026-05-15T07:14:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T010's coverage is internally inconsistent. The S6 section says T010 adds an AC-01 through AC-14 acceptance test, and task-coverage assigns T010 to AC-03, AC-04, AC-08, and AC-09, but the T010 task text explicitly limits its integration targets to AC-01/02/05/06/07/10/11/12 and says AC-03/04/08/09 are handled elsewhere. It also says AC-08 is covered by T007 even though the plan assigns has_stripped_fields rendering to T006. As written, implementers cannot tell whether T010 must actually test AC-03/04/08/09, and the coverage artifact overstates T010's acceptance coverage.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/task-coverage.json",
-              "line": 48,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:bb622638c2a9a3a0ebc8c4e205dd194292f92e230bc7f0eb3c30df7cc913b5b6",
-          "at": "2026-05-15T07:19:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-14 requires both no hardcoded layer names and successful rendering in a workspace with arbitrary layer names, and task-coverage assigns AC-14 only to T008 while T010 explicitly defers AC-14 to T008. However T008's listed unit tests cover trait impl resolution, external-trait skipping, and output ordering only; they do not require an arbitrary-layer fixture or assertion. An implementer can complete every listed T008/T010 test without verifying the second half of AC-14, so the coverage claim is incomplete.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
-              "line": 48,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9f3a5eb11ed6da9036abbda2ccbfe553df83e201c6b2d402ebabb0219ae0b66c",
-          "at": "2026-05-15T07:25:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T004 requires the default style config to define `NodeCategory {Method, Variant, Field, Function}` with shape/class settings, which makes `Field` a node category. That conflicts with the same plan/spec stating PlainStruct and TupleStruct fields are not node-ized and are rendered only as edges/labels (`IN-12`, T006). An implementer following T004 could add `[node.Field]` semantics that T006 explicitly forbids, so the config contract needs to remove or clarify `Field` as a non-node edge label/style concern.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
-              "line": 24,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e445d7b51cbba61aef03da39384917d9ed02f56cb2c3b6f585a226566e3c6648",
-          "at": "2026-05-15T07:30:19Z"
+          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
+          "at": "2026-05-15T09:45:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ca08b935fe8872756a97bfc1aeafe9462559fb832f4289744264c4c02f7ec5a5",
-          "at": "2026-05-15T07:32:23Z"
+          "hash": "rvw1:sha256:a2866a1d5cecabe4a041518590ec2935ab73a902ae00252614b421780bc90034",
+          "at": "2026-05-15T09:47:41Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2c2b9012cd0b98974c68e8588c42e0027ba9bad60f079ef6ba8e5b387b1138dc",
-          "at": "2026-05-15T09:44:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T008/T010 tell implementers to build trait-impl edges from `TraitEntry.trait_impls`, but the catalogue v3 artifacts model implementations on concrete type entries (`types[*].trait_impls`), while trait entries only define the target trait/role. Following this plan would either look at a non-existent field or build fixtures that cannot express workspace-internal/external impls, so AC-07/AC-10 coverage is not actually implementable as written. The plan should say to iterate type entries' `trait_impls` and resolve those references against the trait index, using TraitEntry only as the target node/role source.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
-              "line": 48,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:2c2b9012cd0b98974c68e8588c42e0027ba9bad60f079ef6ba8e5b387b1138dc",
-          "at": "2026-05-15T09:48:23Z"
+          "hash": "rvw1:sha256:2f1551562ba5677044a0f0445df52b2f8fe05fb9c34dd54b07ead74f41bfa854",
+          "at": "2026-05-15T11:12:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9ef286a9ec1430fcec7f3d272261e13bbc61f9b497e7b4d07c25c6e5975b312b",
-          "at": "2026-05-15T09:53:06Z"
-        },
+          "hash": "rvw1:sha256:2f1551562ba5677044a0f0445df52b2f8fe05fb9c34dd54b07ead74f41bfa854",
+          "at": "2026-05-15T11:16:09Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`impl-plan.json` now drops `commit_hash` from the task objects, so T001 is no longer represented as the briefing-required `commit_hash: null` pending state. That is a metadata-shape drift from the intended in-progress transition.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/impl-plan.json",
-              "line": 7,
-              "category": "contradiction"
-            },
-            {
-              "message": "`domain-types.md` also changed the generated signal for `domain::tddd::contract_map_render::render_contract_map` from 🟡 to 🔵. The briefing for this round says only T001 status should move to `in_progress` and `plan.md` should rerender, so this is an extra semantic drift in a layer-types artifact.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-15/domain-types.md",
-              "line": 27,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
-          "at": "2026-05-15T10:11:57Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:10:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d405b4851d99752c089d4baea28caaf76259de6fcb3ffecfcf8839bb97fd21fe",
+          "at": "2026-05-15T10:12:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
-          "at": "2026-05-15T10:15:01Z"
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:55:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:67ae97a95dc2ec49e40be7aa0226d21c2cff6add570b38e5bda98c61aceb7e4c",
-          "at": "2026-05-15T10:16:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
-          "at": "2026-05-15T10:33:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain-types.md` was re-rendered to mark T002-owned declarations (`ContractMapRenderOptions`, `ContractMapRendererError`, and `ContractMapRenderer`) as fully Blue, while the same plan artifacts still declare T002 only `in_progress` with no commit hash. This makes the plan-artifact snapshot no longer a pure T001 done / T002 start transition and presents T002 implementation signals as completed before the task is resolved.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/domain-types.md",
-              "line": 7,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
-          "at": "2026-05-15T10:36:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e7a45e602d021801fe727df632eae98f0b193175f58b7a6860c28d6327dca441",
-          "at": "2026-05-15T10:38:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69de7001e726651d3ff40408e7a36e75ec2f24905c8bb0bc9db288cfd831e96c",
-          "at": "2026-05-15T10:53:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69de7001e726651d3ff40408e7a36e75ec2f24905c8bb0bc9db288cfd831e96c",
-          "at": "2026-05-15T10:55:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
-          "at": "2026-05-15T11:11:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T004 is still marked `todo` here, and the generated `plan.md` mirrors it as `[ ]` at line 34, but the plan-artifacts briefing for this round explicitly says T004 is the current `in_progress` task with no commit hash. This leaves the handoff state contradictory: downstream reviewers/operators will see no active task even though T004 is supposed to be in progress. Set T004 to `in_progress` and re-render `plan.md` so it shows `[~]`.",
-              "severity": "P1",
-              "file": "track/items/contract-map-v3-2026-05-15/impl-plan.json",
-              "line": 25,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
-          "at": "2026-05-15T11:16:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a0c0af432cf653e3ced701c4fd62ffa2e5adf52d17d01878d8491b8c7b29f5e",
-          "at": "2026-05-15T11:17:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ffaf870aaa113da3c0db71ae2c008da75aa4a464fb921f5881e75af2ea59acd",
-          "at": "2026-05-15T11:34:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ffaf870aaa113da3c0db71ae2c008da75aa4a464fb921f5881e75af2ea59acd",
-          "at": "2026-05-15T11:36:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e527d4bc808fbd3a9699e5d8ea4db07124e581648959eae61f217fd936bdbd12",
-          "at": "2026-05-15T12:16:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e527d4bc808fbd3a9699e5d8ea4db07124e581648959eae61f217fd936bdbd12",
-          "at": "2026-05-15T12:18:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
-          "at": "2026-05-15T12:39:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:de046b34b3b4e5f4488c24643af6d1fd1c45eeb43ed099ce66e5cb91f218d3cc",
-          "at": "2026-05-15T12:40:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1763555a5ac515d07106740727818277efd07ffcd632d096b37bb89f1e3e1ea4",
-          "at": "2026-05-15T14:30:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1763555a5ac515d07106740727818277efd07ffcd632d096b37bb89f1e3e1ea4",
-          "at": "2026-05-15T14:31:56Z"
+          "hash": "rvw1:sha256:81096d10d0fdda5287fdc993e956ce822abdd7971eea699280e5d4c66627efa2",
+          "at": "2026-05-15T10:58:32Z"
         }
       ]
     }

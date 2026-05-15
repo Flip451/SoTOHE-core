@@ -26,8 +26,8 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, FunctionEntry, FunctionPath, TraitEntry, TraitName, TypeEntry,
-    TypeName,
+    CatalogueDocument, CrateName, FunctionEntry, FunctionPath, FunctionRole, TraitEntry, TraitName,
+    TypeEntry, TypeName,
 };
 use domain::tddd::{
     ContractMapContent, ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError,
@@ -74,9 +74,8 @@ pub(super) struct StyleConfig {
     pub(super) edge: HashMap<String, EdgeStyle>,
 
     /// `[filter]` section — render filter configuration.
-    /// Used by T008 filter enforcement. `dead_code` allow covers T006.
+    /// Used by T008 function role filter.
     #[serde(default)]
-    #[allow(dead_code)]
     pub(super) filter: FilterConfig,
 }
 
@@ -133,8 +132,9 @@ pub(super) struct EdgeStyle {
 /// `[filter]` section: render filter configuration.
 ///
 /// Default produces "render everything" behaviour (Decision I-1).
-/// `include_function_roles` used by T008 filter enforcement.
-#[allow(dead_code)]
+/// `include_function_roles` is deserialized as `Vec<String>` and then validated
+/// against `FunctionRole` in `load_style_config` — unknown role names are a
+/// fail-closed config error rather than silently skipped (T008, Decision I-1).
 #[derive(Debug, Default, Deserialize)]
 pub(super) struct FilterConfig {
     #[serde(default)]
@@ -152,9 +152,9 @@ pub(super) struct FilterConfig {
 /// no data is cloned during flattening.
 ///
 /// T006–T008 will consume the fields in each variant. The `dead_code` allow is
-/// intentional for the T005 scaffold; it will be removed when rendering logic lands.
-#[derive(Debug)]
+/// a gap cover until the render sub-module uses this enum directly.
 #[allow(dead_code)]
+#[derive(Debug)]
 pub(crate) enum CatalogueNode<'a> {
     /// A type entry (struct / enum / type alias). Role: `DataRole`.
     Type {
@@ -303,9 +303,6 @@ pub(crate) fn function_node_id(layer: &LayerId, path: &FunctionPath) -> String {
 /// (`.harness/config/contract-map-style.toml`). The config is loaded on each
 /// `render()` call — no long-lived index is kept (Decision O-a: avoid stale
 /// issues). A missing config is a fail-closed error (CN-03).
-///
-/// Rendering logic will be added incrementally in T006–T008. This T005 scaffold
-/// returns a placeholder `ContractMapContent` after successful config load.
 pub struct ContractMapRendererAdapter {
     /// Path to `.harness/config/contract-map-style.toml`. Declared `pub` to match
     /// the catalogue's `has_stripped_fields: false` field list for this struct.
@@ -326,7 +323,9 @@ impl ContractMapRendererAdapter {
     /// # Errors
     ///
     /// Returns `StyleConfigNotFound` when the file is absent.
-    /// Returns `StyleConfigParse` when the TOML is malformed.
+    /// Returns `StyleConfigParse` when the TOML is malformed or when
+    /// `[filter].include_function_roles` contains an unrecognised role name
+    /// (fail-closed per Decision I-1 + T008).
     fn load_style_config(&self) -> Result<StyleConfig, ContractMapRendererError> {
         let content = std::fs::read_to_string(&self.style_config_path).map_err(|e| {
             if e.kind() == std::io::ErrorKind::NotFound {
@@ -340,12 +339,29 @@ impl ContractMapRendererAdapter {
                 }
             }
         })?;
-        toml::from_str::<StyleConfig>(&content).map_err(|e| {
+        let style = toml::from_str::<StyleConfig>(&content).map_err(|e| {
             ContractMapRendererError::StyleConfigParse {
                 path: self.style_config_path.clone(),
                 reason: e.to_string(),
             }
-        })
+        })?;
+
+        // Validate each entry in `[filter].include_function_roles` against the
+        // `FunctionRole` enum (fail-closed: unknown role names are a config error,
+        // not silently ignored — Decision I-1 + T008).
+        for role_str in &style.filter.include_function_roles {
+            role_str.parse::<FunctionRole>().map_err(|_| {
+                ContractMapRendererError::StyleConfigParse {
+                    path: self.style_config_path.clone(),
+                    reason: format!(
+                        "[filter].include_function_roles contains unknown FunctionRole \
+                         \"{role_str}\"; valid values are \"FreeFunction\", \"UseCaseFunction\""
+                    ),
+                }
+            })?;
+        }
+
+        Ok(style)
     }
 }
 
@@ -354,7 +370,9 @@ impl ContractMapRenderer for ContractMapRendererAdapter {
     ///
     /// Loads the style config (fail-closed per CN-03), then delegates to
     /// `render::render_mermaid` which generates the mermaid flowchart string
-    /// implementing Decisions U-6d-iii, F-2+b2-ii, F-2+d1, K-2+(d), and K-2.
+    /// implementing Decisions U-6d-iii, F-2+b2-ii, F-2+d1, K-2+(d), K-2,
+    /// O-2, O-3, O-a (T008: cross-catalogue trait_impl edges), and I-1
+    /// (T008: function role filter).
     ///
     /// # Errors
     ///
@@ -372,7 +390,7 @@ impl ContractMapRenderer for ContractMapRendererAdapter {
         // Fail-closed: load style config first (CN-03).
         let style = self.load_style_config()?;
 
-        // Delegate actual mermaid generation to the render sub-module (T006).
+        // Delegate actual mermaid generation to the render sub-module (T006+).
         let mermaid = render::render_mermaid(catalogues, layer_order, opts, &style);
         Ok(ContractMapContent::new(mermaid))
     }
