@@ -2439,17 +2439,15 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
         "contract-map.md must be rendered for done tracks; changed: {changed:?}"
     );
 
-    // IN-24 placeholder: the rendered contract-map must contain the deferment
-    // comment and the domain subgraph. Full v3 rendering is deferred per IN-24.
+    // T001 stub: render_contract_map free function removed; ContractMapRendererAdapter
+    // will be wired in T009. The placeholder produces a minimal flowchart scaffold.
     let cmap = std::fs::read_to_string(track_dir.join("contract-map.md")).unwrap();
-    assert!(
-        cmap.contains("IN-24"),
-        "IN-24 deferment comment must appear in contract-map.md; got:\n{cmap}"
+    // Pin the exact placeholder payload — equality check so extra content or a
+    // changed scaffold also fails (regression guard for T009 wiring).
+    const EXPECTED_PLACEHOLDER: &str = "<!-- contract-map renderer not yet wired (T009) -->\n\
+         ```mermaid\nflowchart LR\nend\n```\n";
+    assert_eq!(
+        cmap, EXPECTED_PLACEHOLDER,
+        "contract-map.md must match the T009 placeholder exactly"
     );
-    assert!(
-        cmap.contains("subgraph domain [domain]"),
-        "domain subgraph must appear in contract-map.md; got:\n{cmap}"
-    );
-    // Placeholder must not emit mermaid edge arrows.
-    assert!(!cmap.contains("-->|"), "placeholder must not emit mermaid edges; got:\n{cmap}");
 }

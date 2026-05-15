@@ -8,7 +8,7 @@
 > 旧 catalogue schema (TypeDefinitionKind / per-layer catalogue) を前提とした contract_map_render.rs および関連コードを domain 層から削除する。
 > 旧 shape mapping table / action overlay / signal overlay / SecondaryAdapter.trait_impl_methods 経由 edge 生成コードをすべて除去し、後続 task の新規実装の土台を整える。
 
-- [ ] **T001**: 旧 renderer artifact の削除: libs/domain/src/tddd/contract_map_render.rs (旧 render_contract_map 自由関数) を削除し、同ファイルから参照される旧 shape mapping table (13 kind × shape) / action overlay / signal overlay コードを除去する。旧 SecondaryAdapter.trait_impl_methods 経由の edge 生成コードも除去する。削除後に cargo make ci-rust (fmt-check + clippy + nextest) が pass することを確認する。domain-types.json の `domain::tddd::contract_map_render::render_contract_map` (action: delete) を実装する。
+- [~] **T001**: 旧 renderer artifact の削除: libs/domain/src/tddd/contract_map_render.rs (旧 render_contract_map 自由関数) を削除し、同ファイルから参照される旧 shape mapping table (13 kind × shape) / action overlay / signal overlay コードを除去する。旧 SecondaryAdapter.trait_impl_methods 経由の edge 生成コードも除去する。削除後に cargo make ci-rust (fmt-check + clippy + nextest) が pass することを確認する。domain-types.json の `domain::tddd::contract_map_render::render_contract_map` (action: delete) を実装する。
 
 ### S2 — domain 層: ContractMapRenderer port + error type の新設
 

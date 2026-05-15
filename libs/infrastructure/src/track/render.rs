@@ -2,9 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use domain::tddd::{
-    CatalogueLoader, CatalogueLoaderError, ContractMapRenderOptions, render_contract_map,
-};
+use domain::tddd::{CatalogueLoader, CatalogueLoaderError, ContractMapContent};
 use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, derive_track_status};
 
 use super::atomic_write::atomic_write_file;
@@ -1227,8 +1225,13 @@ fn render_contract_map_view(
         return Ok(());
     }
 
-    let opts = ContractMapRenderOptions::default();
-    let content = render_contract_map(&catalogues, &layer_order, &opts);
+    // T001: render_contract_map free function removed.
+    // T009 will wire ContractMapRendererAdapter here. Placeholder until then.
+    let _ = (catalogues, layer_order);
+    let content = ContractMapContent::new(
+        "<!-- contract-map renderer not yet wired (T009) -->\n\
+         ```mermaid\nflowchart LR\nend\n```\n",
+    );
     let contract_map_path = track_dir.join("contract-map.md");
     let old = match std::fs::read_to_string(&contract_map_path) {
         Ok(existing) => Some(existing),

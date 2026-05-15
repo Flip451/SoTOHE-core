@@ -24,5 +24,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| domain::tddd::contract_map_render::render_contract_map | free_function | delete | fn(catalogues: &BTreeMap<LayerId, CatalogueDocument>, layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> ContractMapContent | 🟡 | 🔵 |
+| domain::tddd::contract_map_render::render_contract_map | free_function | delete | fn(catalogues: &BTreeMap<LayerId, CatalogueDocument>, layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> ContractMapContent | 🔵 | 🔵 |
 

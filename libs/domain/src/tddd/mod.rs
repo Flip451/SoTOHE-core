@@ -22,7 +22,6 @@ pub mod catalogue_v2;
 pub mod consistency;
 pub mod contract_map_content;
 pub mod contract_map_options;
-pub mod contract_map_render;
 pub mod extended_crate;
 pub mod layer_id;
 pub mod new_typegraph_codec_error;
@@ -35,7 +34,6 @@ pub use catalogue_ports::{
 pub use catalogue_to_extended_crate_port::CatalogueToExtendedCratePort;
 pub use contract_map_content::ContractMapContent;
 pub use contract_map_options::ContractMapRenderOptions;
-pub use contract_map_render::render_contract_map;
 pub use extended_crate::ExtendedCrate;
 pub use layer_id::LayerId;
 pub use new_typegraph_codec_error::NewTypeGraphCodecError;

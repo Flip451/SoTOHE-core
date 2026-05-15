@@ -19,7 +19,7 @@ use domain::TrackId;
 use domain::tddd::catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
 };
-use domain::tddd::{ContractMapRenderOptions, LayerId, render_contract_map};
+use domain::tddd::{ContractMapContent, LayerId};
 
 /// Command input for [`RenderContractMap::execute`].
 ///
@@ -172,14 +172,13 @@ where
             })
             .transpose()?;
 
-        let opts = ContractMapRenderOptions {
-            layers: layer_filter.clone().unwrap_or_default(),
-            signal_overlay: false,
-            action_overlay: false,
-            include_spec_source_edges: false,
-        };
-
-        let content = render_contract_map(&catalogues, &layer_order, &opts);
+        // T001: render_contract_map free function removed. Placeholder emits empty scaffold.
+        // T003 will inject ContractMapRenderer port and replace this stub.
+        // ContractMapRenderOptions construction is deferred to T003.
+        let content = ContractMapContent::new(
+            "<!-- contract-map renderer not yet wired (T003) -->\n\
+             ```mermaid\nflowchart LR\n```\n",
+        );
 
         self.writer.write(&track_id, &content)?;
 
