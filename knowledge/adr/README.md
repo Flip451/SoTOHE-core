@@ -91,7 +91,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Catalogue active-track guard + renderer source-file-name + sync_rendered_views multilayer](2026-04-15-1012-catalogue-active-guard-fix.md) | Accepted | 2026-04-15 |
 | [TDDD-05: Secondary Adapter variant の追加 — infrastructure 層における hexagonal port 実装の検証](2026-04-15-1636-tddd-05-secondary-adapter.md) | Accepted | 2026-04-15 |
 | [TDDD Type Graph View — TypeGraph から mermaid 図をレンダーして型間関係を可視化する](2026-04-16-2200-tddd-type-graph-view.md) | Accepted | 2026-04-16 |
-| [TDDD Contract Map — 全層カタログを入力とする統合 mermaid view](2026-04-17-1528-tddd-contract-map.md) | Accepted | 2026-04-17 |
+| [TDDD Contract Map — 全層カタログを入力とする統合 mermaid view](2026-04-17-1528-tddd-contract-map.md) | Superseded by 2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation | 2026-04-17 |
 | [型カタログ → 仕様書 signal 評価の有効化 (SoT Chain ②)](2026-04-23-0344-catalogue-spec-signal-activation.md) | — | 2026-04-23 |
 | [type-designer Phase 2 reconnaissance step — 設計開始前に baseline + type-graph で既存型インベントリを把握する](2026-04-25-0353-type-designer-reconnaissance-step.md) | — | 2026-04-25 |
 | [type-designer reconnaissance のレンダリングオプション既定値 — depth=1+2 + edges=all](2026-04-25-0530-type-designer-recon-options-defaults.md) | — | 2026-04-25 |
@@ -102,6 +102,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Free Function L2 Evaluator: returns 比較を source form に統一する](2026-05-01-0702-free-function-l2-source-form-evaluator.md) | Proposed | 2026-05-01 |
 | [Reality View renderer の edge カバレッジ拡張 — receiver-less method / trait-method incoming + 起源別視覚区別](2026-05-01-1226-reality-view-edge-coverage-expansion.md) | — | 2026-05-01 |
 | [旧 spec-code-consistency の廃止と catalogue-impl-signals 診断コマンドの導入: レイヤー配置・インターフェース・CI ゲート](2026-05-11-2330-catalogue-impl-signals-command-layering.md) | Proposed | 2026-05-11 |
+| [Contract Map Renderer: catalogue schema v3 対応設計](2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md) | Proposed | 2026-05-13 |
 
 ### トラック・ワークフロー
 

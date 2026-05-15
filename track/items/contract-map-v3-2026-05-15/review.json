@@ -1,0 +1,119 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Follow-up` claims that old ADR D4 (including `spec_source edge`) is fully superseded by the new ADR, but the new ADR still leaves `spec_source edge` as an open question (`Q`) and explicitly says its adoption is undecided. That makes the supersession map internally inconsistent: one part of D4 is still unresolved, so it cannot be described as wholly rewritten yet.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 411,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision C says entry shapes are fixed to subgraph rectangles because entries are subgraphized, but Decision F explicitly exempts `FunctionEntry` from subgraphization and places it as a standalone callable node. The shape rule therefore does not apply uniformly to all entries, so the renderer model is inconsistent for functions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 155,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:477514eabfbce85e27f9e7762ebcfe94ec3e40af1448b7feb45c3f0ec6ef8a47",
+          "at": "2026-05-15T04:18:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The FunctionEntry clause claims standalone function nodes can inherit 'Decision F's shape choice', but Decision F only defines Type/Trait entry subgraph behavior and method/variant nodes. As written, the styling rule for FunctionEntry is unsupported and leaves the function-node shape semantics ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 155,
+              "category": "factual error"
+            },
+            {
+              "message": "`ADR 2026-05-08-0248 D5` is the wrong source for the alleged 'syn-free principle'. In that ADR, D5 is about identifier/newtype wrappers, not parser placement or syn usage, so the rejection rationale points at an unrelated decision.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 321,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:4ebd3f4c61d67749c75f73d0876bf4d7e13a7bc543bbdb21c9840dfd1f40fa33",
+          "at": "2026-05-15T04:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [`knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md:246-249`](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md#L246-L249) treats `TypeAlias` as a symmetric relation and renders it with an undirected edge. `TypeAlias.target` is directional in the schema, so this loses which symbol is the alias and which is the canonical target, which is semantically misleading for the rendered contract map.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 248,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:334a9f008a4c4d8e788d01b22306e8df8efb8769ae649aed0fbb201b382870c2",
+          "at": "2026-05-15T04:28:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The render-order section is not exhaustive: it enumerates classDefs, layer/module/entry subgraphs, method/variant nodes, crate-root entries, edges, and class attachments, but it never assigns a placement/order for `FunctionEntry` nodes. That conflicts with Decision C, F, and I, which require standalone function nodes to be styled and rendered by default, so the implementation still lacks a deterministic rendering rule for functions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 277,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:79cd39833684c166bf4e2e8e7d6e68a9f2a05a19f848bef301bf77afc3237a9e",
+          "at": "2026-05-15T04:33:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Decision C` makes `FunctionEntry` styling depend on `[node.Function]`, but `Decision L` only defines node buckets as `Method`, `Variant`, and `Field`. As written, the config schema never actually allocates a `Function` node section, so the function-node styling path is left undefined in the document itself.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 234,
+              "category": "contradiction"
+            },
+            {
+              "message": "The render-order summary says the first block contains classDef definitions derived from `[class.*] + [edge.*]`, but the `[edge.*]` section is defined as arrow/label styling, not classDef data. That misclassifies edge configuration as class styling and makes the output-structure description semantically wrong.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-13-0000-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 280,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:22f574f74101bca04775f7c9883891dab3736b39b420d5636f6167d0daa55897",
+          "at": "2026-05-15T04:36:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
+          "at": "2026-05-15T04:38:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:974452188cb7c389e152c30b754151a0167336049c7b4c54833b452307275060",
+          "at": "2026-05-15T04:43:12Z"
+        }
+      ]
+    }
+  }
+}
