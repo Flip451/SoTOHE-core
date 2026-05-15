@@ -527,6 +527,7 @@ fn sync_rendered_views_writes_plan_and_registry() {
         ),
     )
     .unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -613,6 +614,7 @@ fn sync_rendered_views_omits_unchanged_registry_from_changed_set() {
         ),
     )
     .unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     // First call populates plan.md and registry.md.
     let first_changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
@@ -1226,6 +1228,7 @@ fn sync_rendered_views_generates_spec_md_from_spec_json() {
 }"#,
     )
     .unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -1257,6 +1260,7 @@ fn sync_rendered_views_skips_spec_md_when_spec_json_absent() {
         ),
     )
     .unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     // No spec.json written — legacy mode
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
@@ -1292,6 +1296,7 @@ fn sync_rendered_views_does_not_overwrite_spec_md_when_already_up_to_date() {
   "scope": { "in_scope": [], "out_of_scope": [] }
 }"#;
     std::fs::write(track_dir.join("spec.json"), spec_json).unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     // First sync — generates spec.md
     sync_rendered_views(dir.path(), Some("track-a")).unwrap();
@@ -1323,6 +1328,7 @@ fn sync_rendered_views_continues_on_malformed_spec_json() {
 
     // Write malformed spec.json (JSON parse error — warn and continue)
     std::fs::write(track_dir.join("spec.json"), "{not valid json}").unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     // Must succeed (only warn) — plan.md and registry.md are still generated
     let result = sync_rendered_views(dir.path(), Some("track-a"));
@@ -1546,6 +1552,7 @@ fn sync_rendered_views_skips_domain_types_md_when_domain_types_json_absent() {
         ),
     )
     .unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
     // No domain-types.json
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
@@ -1607,6 +1614,7 @@ fn sync_rendered_views_continues_on_malformed_domain_types_json() {
     .unwrap();
     // Write malformed domain-types.json (JSON parse error).
     std::fs::write(track_dir.join("domain-types.json"), "{ not valid json }").unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     let result = sync_rendered_views(dir.path(), Some("track-a"));
     assert!(result.is_ok(), "malformed domain-types.json must not abort sync");
@@ -1715,6 +1723,7 @@ fn sync_rendered_views_single_track_renders_done_track() {
     .unwrap();
     // Sentinel content that must be overwritten by the single-track render.
     std::fs::write(done_dir.join("plan.md"), "STALE_SENTINEL_MUST_BE_OVERWRITTEN").unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     // Single-track path with track_id=Some.
     let changed = sync_rendered_views(dir.path(), Some("track-done")).unwrap();
@@ -1762,6 +1771,10 @@ fn sync_rendered_views_single_track_skips_spec_md_for_done_track() {
     .unwrap();
     // Sentinel spec.md that must stay intact.
     std::fs::write(done_dir.join("spec.md"), "LEGACY_SPEC_SENTINEL_PRESERVED").unwrap();
+    // architecture-rules.json is required by render_contract_map_view (fail-closed).
+    // Done tracks skip the per-layer catalogue iteration, but contract-map.md is
+    // rendered unconditionally; a missing arch-rules file now propagates as an error.
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     let changed = sync_rendered_views(dir.path(), Some("track-done-spec")).unwrap();
 
@@ -1797,6 +1810,8 @@ fn sync_rendered_views_single_track_skips_domain_types_md_for_done_track() {
     std::fs::write(done_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(done_dir.join("domain-types.md"), "LEGACY_DOMAIN_TYPES_SENTINEL_PRESERVED")
         .unwrap();
+    // architecture-rules.json is required by render_contract_map_view (fail-closed).
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
 
     let changed = sync_rendered_views(dir.path(), Some("track-done-domain")).unwrap();
 

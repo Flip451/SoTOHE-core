@@ -12,7 +12,7 @@ use rustdoc_types::{
 };
 
 use super::format::{
-    build_generic_canon_map, format_generic_bounds, format_generic_bounds_with_canon,
+    apply_canon_to_str, build_generic_canon_map, format_generic_bounds_with_canon,
     format_type_with_canon, format_where_predicate_with_canon,
 };
 
@@ -251,12 +251,20 @@ pub(super) fn traits_structurally_equal(
     if !bounds_supported(&a.bounds) || !bounds_supported(&b.bounds) {
         return false;
     }
-    let a_bounds = format_generic_bounds(&a.bounds);
-    let b_bounds = format_generic_bounds(&b.bounds);
-    // D3 fail-closed: `format_generic_bounds` can emit `<UNSUPPORTED:...>` sentinels
-    // for nested unsupported types inside otherwise-supported `TraitBound` generic args
-    // (e.g. supertrait `Foo<impl for<'a> Trait<'a>>`).  Two identical sentinels would
-    // compare equal even though they are outside D3 scope — reject them here.
+    // Build per-side positional canon maps from the trait's own generic parameters
+    // so that supertrait bounds that reference a trait generic (e.g. `From<T>` in
+    // `trait Repo<T>: From<T>`) are rendered as `From<#0>` on both sides, making
+    // a rename of `T` → `U` invisible to the comparison.  This mirrors the
+    // canon-aware treatment already applied to method and associated-type paths.
+    let a_trait_canon = build_generic_canon_map(&a.generics);
+    let b_trait_canon = build_generic_canon_map(&b.generics);
+    let a_bounds = format_generic_bounds_with_canon(&a.bounds, &a_trait_canon);
+    let b_bounds = format_generic_bounds_with_canon(&b.bounds, &b_trait_canon);
+    // D3 fail-closed: `format_generic_bounds_with_canon` can emit `<UNSUPPORTED:...>`
+    // sentinels for nested unsupported types inside otherwise-supported `TraitBound`
+    // generic args (e.g. supertrait `Foo<impl for<'a> Trait<'a>>`).  Two identical
+    // sentinels would compare equal even though they are outside D3 scope — reject
+    // them here.
     if contains_unsupported_sentinel(&a_bounds) || contains_unsupported_sentinel(&b_bounds) {
         return false;
     }
@@ -318,56 +326,10 @@ fn build_combined_canon_map(
     map
 }
 
-/// Applies a canonical generic-name map to a plain expression string by replacing
-/// each whole-word occurrence of a generic name with its positional placeholder.
-///
-/// Used to canonicalize associated const default values that may reference parent
-/// generic parameters (e.g. `const SIZE: usize = N` where `N` is a const generic).
-/// Replacement is whole-word only (bounded by non-alphanumeric / non-`_` characters)
-/// so that `"N"` in `"N + 1"` is replaced by `"#0"` but `"Nested"` is left intact.
-///
-/// If `canon` is empty, the original string is returned unchanged.
-fn apply_canon_to_str(s: &str, canon: &HashMap<String, String>) -> String {
-    if canon.is_empty() || s.is_empty() {
-        return s.to_owned();
-    }
-    let mut result = s.to_owned();
-    for (name, placeholder) in canon {
-        if name.is_empty() {
-            continue;
-        }
-        // Scan for whole-word occurrences of `name` and replace them.
-        let mut out = String::with_capacity(result.len());
-        let mut remaining = result.as_str();
-        while let Some(pos) = remaining.find(name.as_str()) {
-            // Check word boundary: char before the match must not be alphanumeric or `_`.
-            let before_ok = pos == 0
-                || remaining
-                    .get(..pos)
-                    .and_then(|s| s.chars().next_back())
-                    .is_none_or(|c| !c.is_alphanumeric() && c != '_');
-            let after_pos = pos + name.len();
-            // Check word boundary: char after the match must not be alphanumeric or `_`.
-            let after_ok = remaining
-                .get(after_pos..)
-                .and_then(|s| s.chars().next())
-                .is_none_or(|c| !c.is_alphanumeric() && c != '_');
-            if before_ok && after_ok {
-                out.push_str(&remaining[..pos]);
-                out.push_str(placeholder);
-                remaining = &remaining[after_pos..];
-            } else {
-                // Not a whole-word match; advance past this occurrence to avoid infinite loop.
-                let advance = pos + 1;
-                out.push_str(&remaining[..advance]);
-                remaining = &remaining[advance..];
-            }
-        }
-        out.push_str(remaining);
-        result = out;
-    }
-    result
-}
+// `apply_canon_to_str` is defined in `super::format` (moved there so that
+// `format_generic_args_with_canon` can also canonicalize `GenericArg::Const`
+// expression strings without duplicating the implementation).  It is imported
+// at the top of this file via `use super::format::apply_canon_to_str`.
 
 /// Builds a `method_name → sig_string` map for trait items.
 ///
@@ -693,12 +655,14 @@ pub(super) fn fn_sigs_structurally_equal(
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use std::collections::HashMap;
+
     use rustdoc_types::{
-        GenericArgs, GenericBound, GenericParamDef, GenericParamDefKind, Generics, Path,
-        TraitBoundModifier, Type, WherePredicate,
+        GenericArgs, GenericBound, GenericParamDef, GenericParamDefKind, Generics, Id, Item, Path,
+        Trait, TraitBoundModifier, Type, WherePredicate,
     };
 
-    use super::generics_structurally_equal;
+    use super::{generics_structurally_equal, traits_structurally_equal};
 
     // Helper: a simple named type (no generic args).
     fn ty(name: &str) -> Type {
@@ -1069,6 +1033,87 @@ mod tests {
         assert!(
             !generics_structurally_equal(&make(), &make()),
             "HRTB bound inside associated-type constraint must still return false (D3 fail-closed)"
+        );
+    }
+
+    // --- Supertrait bounds: canon-aware comparison ---
+
+    // Helper: a `GenericBound::TraitBound` whose path has one generic type argument.
+    // Used to model `From<T>` / `From<u32>` / etc. in supertrait bounds.
+    fn trait_bound_with_type_arg(trait_name: &str, arg: Type) -> GenericBound {
+        GenericBound::TraitBound {
+            trait_: Path {
+                path: trait_name.to_string(),
+                id: Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![rustdoc_types::GenericArg::Type(arg)],
+                    constraints: vec![],
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        }
+    }
+
+    // Helper: constructs a minimal `rustdoc_types::Trait` with the given generics and
+    // supertrait bounds (no methods, no implementations).
+    fn make_trait(generics: Generics, bounds: Vec<GenericBound>) -> Trait {
+        Trait {
+            is_auto: false,
+            is_unsafe: false,
+            is_dyn_compatible: true,
+            items: vec![],
+            generics,
+            bounds,
+            implementations: vec![],
+        }
+    }
+
+    // Helper: empty item index (no methods to look up).
+    fn empty_index() -> HashMap<Id, Item> {
+        HashMap::new()
+    }
+
+    /// `trait A<T>: From<T>` and `trait A<U>: From<U>` must compare structurally
+    /// equal — renaming the generic parameter in both the trait generics and the
+    /// supertrait bound should be invisible to the canon-aware comparison.
+    #[test]
+    fn traits_with_renamed_supertrait_generic_param_compare_equal() {
+        let trait_t = make_trait(
+            Generics { params: vec![type_param("T", vec![])], where_predicates: vec![] },
+            vec![trait_bound_with_type_arg("From", Type::Generic("T".to_string()))],
+        );
+        let trait_u = make_trait(
+            Generics { params: vec![type_param("U", vec![])], where_predicates: vec![] },
+            vec![trait_bound_with_type_arg("From", Type::Generic("U".to_string()))],
+        );
+        let idx = empty_index();
+        assert!(
+            traits_structurally_equal(&trait_t, &trait_u, &idx, &idx),
+            "`trait A<T>: From<T>` must equal `trait A<U>: From<U>` (canon rename)"
+        );
+    }
+
+    /// `trait A<T>: From<u32>` and `trait A<T>: From<u64>` must compare
+    /// structurally unequal — concrete type arguments differ and are not
+    /// affected by the generic parameter canon map.
+    #[test]
+    fn traits_with_different_supertrait_concrete_arg_compare_unequal() {
+        let concrete_type = |name: &str| {
+            Type::ResolvedPath(Path { path: name.to_string(), id: Id(999), args: None })
+        };
+        let trait_u32 = make_trait(
+            Generics { params: vec![type_param("T", vec![])], where_predicates: vec![] },
+            vec![trait_bound_with_type_arg("From", concrete_type("u32"))],
+        );
+        let trait_u64 = make_trait(
+            Generics { params: vec![type_param("T", vec![])], where_predicates: vec![] },
+            vec![trait_bound_with_type_arg("From", concrete_type("u64"))],
+        );
+        let idx = empty_index();
+        assert!(
+            !traits_structurally_equal(&trait_u32, &trait_u64, &idx, &idx),
+            "`trait A<T>: From<u32>` must NOT equal `trait A<T>: From<u64>`"
         );
     }
 }

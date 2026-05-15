@@ -2,7 +2,9 @@
 
 use std::path::{Path, PathBuf};
 
-use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
+use domain::tddd::{
+    CatalogueLoader, CatalogueLoaderError, ContractMapRenderOptions, render_contract_map,
+};
 use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, derive_track_status};
 
 use super::atomic_write::atomic_write_file;
@@ -933,26 +935,15 @@ pub fn sync_rendered_views(
         //   - CatalogueDocumentCodecError::Json (syntax/EOF) warn-and-continue (file may be mid-edit)
         if !is_done_or_archived {
             let arch_rules_path = root.join("architecture-rules.json");
-            // `load_tddd_layers` is fail-closed (no synthetic fallback). Here we
-            // distinguish three cases:
-            //   - absent file (NotFound): no TDDD layers configured, render no
-            //     per-layer catalogues; plan.md / registry.md still rendered above
-            //   - other Io error (e.g. rejected symlink, permission denied): hard fail
-            //   - parse error: hard fail (malformed rules file is a configuration error)
-            let bindings = match load_tddd_layers(&arch_rules_path, root) {
-                Ok(b) => b,
-                Err(LoadTdddLayersError::Io { source, .. })
-                    if source.kind() == std::io::ErrorKind::NotFound =>
-                {
-                    Vec::new()
-                }
-                Err(LoadTdddLayersError::Io { source, .. }) => return Err(RenderError::Io(source)),
-                Err(LoadTdddLayersError::Parse(err)) => {
-                    return Err(RenderError::Io(std::io::Error::other(format!(
-                        "architecture-rules.json: {err}"
-                    ))));
-                }
-            };
+            // `load_tddd_layers` is fail-closed. Missing / symlinked / malformed
+            // `architecture-rules.json` are all hard configuration errors —
+            // never synthesize a fallback nor silently skip the layer iteration.
+            let bindings = load_tddd_layers(&arch_rules_path, root).map_err(|e| match e {
+                LoadTdddLayersError::Io { source, .. } => RenderError::Io(source),
+                LoadTdddLayersError::Parse(err) => RenderError::Io(std::io::Error::other(format!(
+                    "architecture-rules.json: {err}"
+                ))),
+            })?;
 
             // Guard against duplicate rendered paths: `parse_tddd_layers` rejects
             // duplicate `catalogue_file` values (exact string match), but two names
@@ -1119,7 +1110,7 @@ pub fn sync_rendered_views(
         // are non-fatal: log to stderr and leave the existing file untouched.
         // The authoritative fail-closed gate lives in
         // `spec_states::evaluate_layer_catalogue` and the merge-gate adapter.
-        render_contract_map_view(root, &track_dir, track_id, &mut changed);
+        render_contract_map_view(root, &track_dir, track_id, &mut changed)?;
     }
 
     if let Some(parent) = registry_path.parent() {
@@ -1142,27 +1133,38 @@ pub fn sync_rendered_views(
 /// Renders `contract-map.md` for the active track and appends the path to
 /// `changed` when the content actually differs on disk.
 ///
-/// Non-fatal by design — all failures (loader error, empty catalogues,
-/// invalid TrackId) produce a stderr warning and leave the existing
-/// `contract-map.md` untouched. The authoritative fail-closed gate for
-/// TDDD correctness lives in `spec_states::evaluate_layer_catalogue` /
-/// the merge-gate adapter; this function just keeps the rendered diagram
-/// in sync with the declarations.
+/// Fail-closed for `architecture-rules.json` discovery failures: a missing or
+/// malformed `architecture-rules.json` causes `CatalogueLoaderError::LayerDiscoveryFailed`
+/// or `CatalogueLoaderError::SymlinkRejected`, both of which are propagated as
+/// `RenderError::Io` so that callers detect the configuration error regardless of
+/// track status (including done/archived tracks that skip the per-layer catalogue
+/// iteration block).
+///
+/// Non-fatal for catalogue-level failures (`CatalogueNotFound`, `DecodeFailed`,
+/// `TopologicalSortFailed`): these indicate per-catalogue errors that should warn
+/// but not abort view-sync, because the authoritative fail-closed gate for TDDD
+/// correctness lives in `spec_states::evaluate_layer_catalogue` / the merge-gate
+/// adapter.
+///
+/// Returning `Ok(())` means the render either succeeded or was intentionally
+/// skipped (no track id, invalid track id, empty layer list, non-fatal catalogue
+/// error). Returning `Err(RenderError::Io(_))` means a hard configuration error
+/// (`architecture-rules.json` absent or malformed / symlinked).
 fn render_contract_map_view(
     root: &Path,
     track_dir: &Path,
     track_id_str: Option<&str>,
     changed: &mut Vec<PathBuf>,
-) {
+) -> Result<(), RenderError> {
     let Some(track_id_raw) = track_id_str else {
-        return;
+        return Ok(());
     };
     let Ok(track_id) = TrackId::try_new(track_id_raw) else {
         eprintln!(
             "warning: skipping contract-map.md render for {} (invalid track id)",
             track_dir.display()
         );
-        return;
+        return Ok(());
     };
 
     let items_dir = root.join(TRACK_ITEMS_DIR);
@@ -1170,18 +1172,59 @@ fn render_contract_map_view(
     let loader = FsCatalogueLoader::new(items_dir, rules_path, root.to_path_buf());
     let (layer_order, catalogues) = match loader.load_all(&track_id) {
         Ok(result) => result,
-        Err(e) => {
+        // Hard errors: architecture-rules.json missing / malformed / symlinked.
+        // These are configuration errors that must be visible regardless of track
+        // status (a done track with a missing arch-rules file is still broken).
+        Err(CatalogueLoaderError::LayerDiscoveryFailed { reason }) => {
+            return Err(RenderError::Io(std::io::Error::other(format!(
+                "architecture-rules.json error for contract-map render at {}: {reason}",
+                track_dir.display()
+            ))));
+        }
+        Err(CatalogueLoaderError::SymlinkRejected { path }) => {
+            return Err(RenderError::Io(std::io::Error::other(format!(
+                "symlink rejected at {} (contract-map render for {})",
+                path.display(),
+                track_dir.display()
+            ))));
+        }
+        // Hard error: non-symlink I/O failure reading a catalogue artifact or the
+        // architecture-rules.json dependency graph.  Propagate so that callers
+        // detect file-system corruption regardless of track status.
+        Err(CatalogueLoaderError::IoError { path, reason }) => {
+            return Err(RenderError::Io(std::io::Error::other(format!(
+                "I/O error at {} (contract-map render for {}): {reason}",
+                path.display(),
+                track_dir.display()
+            ))));
+        }
+        // Hard error: a cycle in `may_depend_on` is an invalid architecture-rules.json
+        // configuration — the contract-map cannot be rendered until the cycle is
+        // resolved, so propagate as a hard error rather than silently skipping.
+        Err(CatalogueLoaderError::TopologicalSortFailed { reason }) => {
+            return Err(RenderError::Io(std::io::Error::other(format!(
+                "architecture-rules.json cycle detected (contract-map render for {}): {reason}",
+                track_dir.display()
+            ))));
+        }
+        // Non-fatal catalogue-level errors (absent catalogue, decode failure): warn
+        // and skip. The authoritative fail-closed gate for TDDD correctness lives in
+        // `spec_states::evaluate_layer_catalogue`.
+        Err(
+            e @ (CatalogueLoaderError::CatalogueNotFound { .. }
+            | CatalogueLoaderError::DecodeFailed { .. }),
+        ) => {
             eprintln!(
                 "warning: skipping contract-map.md render for {} ({})",
                 track_dir.display(),
                 e
             );
-            return;
+            return Ok(());
         }
     };
     if layer_order.is_empty() {
         // No TDDD-enabled layers on this track — nothing to render.
-        return;
+        return Ok(());
     }
 
     let opts = ContractMapRenderOptions::default();
@@ -1195,17 +1238,18 @@ fn render_contract_map_view(
                 "warning: cannot read existing contract-map.md for {}: {e}",
                 track_dir.display()
             );
-            return;
+            return Ok(());
         }
     };
     let rendered_str: &str = content.as_ref();
     if old.as_deref().is_none_or(|existing| !rendered_matches(existing, rendered_str)) {
         if let Err(e) = atomic_write_file(&contract_map_path, rendered_str.as_bytes()) {
             eprintln!("warning: cannot write contract-map.md for {}: {e}", track_dir.display());
-            return;
+            return Ok(());
         }
         changed.push(contract_map_path);
     }
+    Ok(())
 }
 
 #[cfg(test)]
