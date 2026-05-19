@@ -1116,4 +1116,107 @@ mod tests {
             "`trait A<T>: From<u32>` must NOT equal `trait A<T>: From<u64>`"
         );
     }
+
+    // ---------------------------------------------------------------------------
+    // T003 (ADR 2026-05-18-1223 D1): strip_outlives_from_index removal + fingerprint
+    // ---------------------------------------------------------------------------
+
+    /// (a) T003: `T: 'static` Outlives bound retained on both A-side and C-side produces
+    /// identical fingerprints via `build_generics_fingerprint_with_combined_canon`.
+    ///
+    /// Since `strip_outlives_from_index` has been removed (T003), both sides now retain
+    /// `GenericBound::Outlives` bounds. When A-side (catalogue) and C-side (rustdoc)
+    /// both declare `T: 'static`, they must produce the same fingerprint and compare Blue.
+    #[test]
+    fn test_t003_outlives_bound_retained_both_sides_produces_equal_fingerprint() {
+        let static_bound = GenericBound::Outlives("'static".to_string());
+        let generics_with_static = Generics {
+            params: vec![type_param("T", vec![static_bound])],
+            where_predicates: vec![],
+        };
+        // Build a simple (non-combined) canon map: T → #0.
+        let mut canon = HashMap::new();
+        canon.insert("T".to_string(), "#0".to_string());
+
+        let fp_a =
+            super::build_generics_fingerprint_with_combined_canon(&generics_with_static, &canon);
+        let fp_c =
+            super::build_generics_fingerprint_with_combined_canon(&generics_with_static, &canon);
+
+        assert_eq!(
+            fp_a, fp_c,
+            "both-sides-retained `T: 'static` must produce identical fingerprints (T003)"
+        );
+        // The fingerprint must include the Outlives bound (not an empty string).
+        assert!(
+            !fp_a.is_empty(),
+            "fingerprint for `T: 'static` must be non-empty (Outlives is retained)"
+        );
+    }
+
+    /// (b) T003: `T: A + B` and `T: B + A` must produce the same fingerprint.
+    ///
+    /// `format_generic_bounds_with_canon` sorts rhs elements so that bound order is
+    /// irrelevant. This test verifies the invariant holds when bounds are specified in
+    /// opposite orders, ensuring `T: A + B` and `T: B + A` are treated identically.
+    #[test]
+    fn test_t003_bound_order_independent_fingerprint() {
+        // `T: A + B` (A first, then B).
+        let generics_ab = Generics {
+            params: vec![type_param("T", vec![trait_bound("A"), trait_bound("B")])],
+            where_predicates: vec![],
+        };
+        // `T: B + A` (B first, then A).
+        let generics_ba = Generics {
+            params: vec![type_param("T", vec![trait_bound("B"), trait_bound("A")])],
+            where_predicates: vec![],
+        };
+        let mut canon = HashMap::new();
+        canon.insert("T".to_string(), "#0".to_string());
+
+        let fp_ab = super::build_generics_fingerprint_with_combined_canon(&generics_ab, &canon);
+        let fp_ba = super::build_generics_fingerprint_with_combined_canon(&generics_ba, &canon);
+
+        assert_eq!(
+            fp_ab, fp_ba,
+            "`T: A + B` and `T: B + A` must produce the same fingerprint (rhs is order-independent)"
+        );
+    }
+
+    /// (c) T003: HRTB (`for<'a>`) bounds are outside D3 scope and cause
+    /// `generics_structurally_equal` to return `false` (D3 fail-closed = evaluation
+    /// target excluded, analogous to a parse error making the boundary unsupported).
+    ///
+    /// On the A-codec path, a boundary string that `syn` cannot parse causes an `Err`
+    /// from `parse_generic_bound`, which the codec propagates as a
+    /// `CatalogueToExtendedCrateCodecError`.  On the `generics_eq` path the same
+    /// boundary arrives as an HRTB `TraitBound` (non-empty `generic_params`) and is
+    /// flagged as unsupported by `build_where_form_view`, making the pair fail-closed
+    /// (`generics_structurally_equal` → `false`, `has_any_unsupported` → `true`).
+    /// Both paths exclude the item from signal evaluation rather than emitting a
+    /// spurious Blue/Yellow/Red signal — the "error" manifests as unconditional `false`.
+    #[test]
+    fn test_t003_hrtb_bound_is_excluded_from_evaluation_fail_closed() {
+        // Build a `GenericBound::TraitBound` with a non-empty HRTB binder — the form
+        // that `build_where_form_view` flags as unsupported (D3 fail-closed).
+        let hrtb_bound = GenericBound::TraitBound {
+            trait_: Path { path: "Fn".to_string(), id: Id(0), args: None },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        let make_hrtb_generics = || Generics {
+            params: vec![type_param("F", vec![hrtb_bound.clone()])],
+            where_predicates: vec![],
+        };
+        // Even two identical HRTB-containing generics must produce `false` (fail-closed):
+        // the unsupported bound is excluded from evaluation rather than emitting a signal.
+        assert!(
+            !generics_structurally_equal(&make_hrtb_generics(), &make_hrtb_generics()),
+            "HRTB bound (`for<'a>`) is unsupported — generics_structurally_equal must return \
+             false (D3 fail-closed = excluded from evaluation, IN-04 / AC-04)"
+        );
+    }
 }

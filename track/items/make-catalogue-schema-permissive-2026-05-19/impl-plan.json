@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "D1-codec: A-codec の validate_supported_bound を撤廃する (IN-02)。libs/infrastructure の catalogue_to_extended_crate_codec.rs から `validate_supported_bound` 関数および呼び出し箇所をすべて削除する。syn でパース可能な境界文字列 (ライフタイム境界 / HRTB / 精密捕捉等) を境界の種類によらず accept する。ライフタイム境界を含む宣言 (`<F: Fn(...) + Send + Sync + 'static>` 等) が A-codec でエラーなくエンコードされることを確認するユニットテストを追加する (AC-02)。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d5ab5dedb1d20cc6902e36c65fce15d6efc82f88"
     },
     {
       "id": "T003",
       "description": "D1-evaluator: signal evaluator の strip_outlives_from_index 撤廃 + build_generics_fingerprint の全境界種類対応 + syn パース失敗エラー処理を実装する (IN-03 / IN-04)。libs/infrastructure の signal_evaluator_v2/generics_eq.rs から `strip_outlives_from_index` 関数と呼び出し箇所を削除し、A 側・C 側の両側でライフタイム境界を保持する。`build_generics_fingerprint` を `{lhs, rhs, operator}` 単位でフィンガープリントを生成する形に更新する。rhs の要素は集合として正規化 (昇順ソート) し、`T: A + B` と `T: B + A` を同一フィンガープリントとする (AC-03)。A 側・C 側のいずれかで syn のパースが失敗した境界文字列は信号評価の対象外として明示的なエラーを返す (IN-04 / AC-04)。unit test を追加する: (a) `T: 'static` のライフタイム境界が両側で保持されて Blue になる、(b) `T: A + B` と `T: B + A` が同一フィンガープリントになる、(c) syn パース不能な文字列がエラーを返す。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",

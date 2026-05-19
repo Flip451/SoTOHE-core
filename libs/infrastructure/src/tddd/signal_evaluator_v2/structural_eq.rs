@@ -188,119 +188,6 @@ fn build_inherent_method_map(
     (merged, any_unsupported)
 }
 
-/// Returns a copy of `index` where every `Function` item has all
-/// `GenericBound::Outlives` bounds stripped from its generic params and
-/// `where_predicates`.
-///
-/// The A-codec (`validate_supported_bound`) rejects Outlives bounds in method
-/// generics, so A-side method fingerprints never include lifetime bounds such as
-/// `'static`.  When comparing inherent methods for a catalogue-thinned struct
-/// (A-codec side), the C-side (rustdoc) may carry extra `'static` bounds
-/// (in inline `params[F].bounds` or in `where_predicates`) that the catalogue
-/// author intentionally omitted because the codec cannot express them.
-///
-/// Stripping Outlives from the C-side before fingerprinting makes the comparison
-/// A-codec-compatible so that `F: Fn(...) + Send + Sync` (A-side) and
-/// `F: Fn(...) + Send + Sync + 'static` (C-side) produce identical method map entries.
-///
-/// Rustdoc may encode lifetime bounds as inline `params[F].bounds` (when written
-/// inline as `<F: Trait + 'static>`) or as `WherePredicate::BoundPredicate` entries
-/// (when written in a `where` clause as `F: Trait where F: 'static`). Both forms are
-/// stripped to ensure complete Outlives removal regardless of source representation.
-fn strip_outlives_from_index(index: &HashMap<Id, Item>) -> HashMap<Id, Item> {
-    use rustdoc_types::{GenericBound, WherePredicate};
-    index
-        .iter()
-        .map(|(id, item)| {
-            let new_inner = match &item.inner {
-                ItemEnum::Function(f) => {
-                    // Strip Outlives from inline type-param bounds.
-                    let new_params: Vec<rustdoc_types::GenericParamDef> = f
-                        .generics
-                        .params
-                        .iter()
-                        .map(|p| {
-                            let new_kind = match &p.kind {
-                                rustdoc_types::GenericParamDefKind::Type {
-                                    bounds,
-                                    default,
-                                    is_synthetic,
-                                } => {
-                                    let filtered: Vec<GenericBound> = bounds
-                                        .iter()
-                                        .filter(|b| !matches!(b, GenericBound::Outlives(_)))
-                                        .cloned()
-                                        .collect();
-                                    rustdoc_types::GenericParamDefKind::Type {
-                                        bounds: filtered,
-                                        default: default.clone(),
-                                        is_synthetic: *is_synthetic,
-                                    }
-                                }
-                                other => other.clone(),
-                            };
-                            rustdoc_types::GenericParamDef { name: p.name.clone(), kind: new_kind }
-                        })
-                        .collect();
-                    // Strip Outlives from where_predicates.
-                    // A `BoundPredicate` may carry a mix of trait bounds and Outlives
-                    // (e.g. `where F: Fn(...) + 'static`). Filter the bounds list; if
-                    // all bounds are stripped AND the predicate has no HRTB binder, drop
-                    // the entire predicate (it was Outlives-only on a plain type param).
-                    //
-                    // When `generic_params` is non-empty the predicate has an HRTB binder
-                    // (e.g. `for<'a> T: 'static`).  Such predicates are outside D3 scope
-                    // and must NOT be dropped — `build_trait_method_map` / `generics_eq`
-                    // downstream will flag them as unsupported (fail-closed).  Dropping
-                    // them here would silently erase the unsupported signal and allow a
-                    // method with `for<'a> T: 'static` to compare equal to one without it.
-                    //
-                    // `LifetimePredicate` / `EqPredicate` are left as-is (they are not
-                    // Outlives on a type param and are handled by `generics_structurally_equal`).
-                    let new_where: Vec<WherePredicate> = f
-                        .generics
-                        .where_predicates
-                        .iter()
-                        .filter_map(|wp| match wp {
-                            WherePredicate::BoundPredicate { type_, bounds, generic_params } => {
-                                let filtered: Vec<GenericBound> = bounds
-                                    .iter()
-                                    .filter(|b| !matches!(b, GenericBound::Outlives(_)))
-                                    .cloned()
-                                    .collect();
-                                if filtered.is_empty() && generic_params.is_empty() {
-                                    // All bounds were Outlives and there is no HRTB binder
-                                    // — the predicate is Outlives-only on a plain type param.
-                                    // Drop it entirely; it is the A-codec-invisible Outlives.
-                                    None
-                                } else {
-                                    // Either some non-Outlives bounds remain, or this predicate
-                                    // has an HRTB binder (unsupported by D3 — must be preserved
-                                    // so downstream fail-closed logic can detect it).
-                                    Some(WherePredicate::BoundPredicate {
-                                        type_: type_.clone(),
-                                        bounds: filtered,
-                                        generic_params: generic_params.clone(),
-                                    })
-                                }
-                            }
-                            other => Some(other.clone()),
-                        })
-                        .collect();
-                    let new_generics =
-                        rustdoc_types::Generics { params: new_params, where_predicates: new_where };
-                    ItemEnum::Function(rustdoc_types::Function {
-                        generics: new_generics,
-                        ..f.clone()
-                    })
-                }
-                other => other.clone(),
-            };
-            (*id, Item { inner: new_inner, ..item.clone() })
-        })
-        .collect()
-}
-
 fn structs_structurally_equal(
     a: &rustdoc_types::Struct,
     b: &rustdoc_types::Struct,
@@ -324,15 +211,14 @@ fn structs_structurally_equal(
     if a_methods.is_empty() {
         // Skip: no inherent methods declared in the catalogue.
     } else {
-        // The A-codec rejects Outlives bounds in method generics, so A-side method
-        // fingerprints never include lifetime bounds such as `'static`.  The C-side
-        // (rustdoc) may carry extra `'static` bounds (e.g. `F: 'static + Fn(...)`)
-        // that the catalogue author intentionally omitted because the codec cannot
-        // express them.  Strip Outlives bounds from the C-side index before building
-        // the method map so that both sides produce identical fingerprints.
-        let b_index_stripped = strip_outlives_from_index(b_index);
-        let (b_methods, b_methods_unsupported) =
-            build_inherent_method_map(&b.impls, &b_index_stripped);
+        // Both A-side (catalogue) and C-side (rustdoc) retain Outlives bounds in
+        // their method generics.  Since ADR `2026-05-18-1223` D1, the A-codec no
+        // longer rejects Outlives bounds (`validate_supported_bound` removed in T002)
+        // and `strip_outlives_from_index` has been removed (T003).  Catalogue authors
+        // can now declare `<F: Fn(...) + Send + Sync + 'static>` directly; both sides
+        // carry the same lifetime bounds and produce symmetric fingerprints via
+        // `generics_structurally_equal` / `build_generics_fingerprint_with_combined_canon`.
+        let (b_methods, b_methods_unsupported) = build_inherent_method_map(&b.impls, b_index);
         // D3 fail-closed: any method with unsupported generics on either side.
         if a_methods_unsupported || b_methods_unsupported {
             return false;
@@ -1104,16 +990,48 @@ mod tests {
         );
     }
 
-    /// T044 regression: A-side `new<F: Fn(...) + Send + Sync>` must compare equal to
-    /// C-side `new<F: Fn(...) + Send + Sync + 'static>`.
-    ///
-    /// The A-codec cannot encode `GenericBound::Outlives` in method generics, so the
-    /// catalogue always omits `'static` bounds.  The C-side (rustdoc) carries them
-    /// because `Arc::new(build_fn)` requires `F: 'static`.  Outlives bounds should be
-    /// stripped from the C-side before comparing method fingerprints.
+    /// T003 (ADR D1): Both A-side and C-side now retain Outlives bounds (strip_outlives_from_index
+    /// removed). When both sides declare the same Outlives bound they must compare equal.
+    /// This is the symmetric-both-sides scenario: A-side `new<F: Send + Sync + 'static>`
+    /// matches C-side `new<F: Send + Sync + 'static>`.
     #[test]
-    fn test_plain_struct_method_outlives_stripped_from_c_side_matches_a_side() {
-        // A-side: `new<F: Send + Sync>` (no Outlives — A-codec cannot encode them).
+    fn test_plain_struct_method_outlives_both_sides_retained_compares_equal() {
+        // A-side: `new<F: Send + Sync + 'static>` — catalogue now declares the Outlives bound
+        // (A-codec validate_supported_bound removed in T002; catalogue can express 'static).
+        let f_bounds = vec![
+            make_trait_bound("Send"),
+            make_trait_bound("Sync"),
+            make_outlives_bound("'static"),
+        ];
+        let make_fn_struct = |fn_id: Id, impl_id: Id| {
+            let fn_generics = Generics {
+                params: vec![make_type_param("F", f_bounds.clone())],
+                where_predicates: vec![],
+            };
+            let fn_item = make_fn_item_with_generics(fn_id, "new", fn_generics);
+            let impl_item = make_inherent_impl_item(impl_id, "Bar", vec![fn_id]);
+            let mut idx = HashMap::new();
+            idx.insert(fn_id, fn_item);
+            idx.insert(impl_id, impl_item);
+            let s = make_plain_struct_stripped(empty_generics(), vec![impl_id]);
+            (s, idx)
+        };
+        let (a_struct, a_index) = make_fn_struct(Id(10), Id(5));
+        let (c_struct, c_index) = make_fn_struct(Id(20), Id(15));
+
+        assert!(
+            structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
+            "A-side and C-side both with `new<F: Send+Sync+'static>` must compare equal \
+             (T003: Outlives retained on both sides symmetrically)"
+        );
+    }
+
+    /// T003 (ADR D1): With strip_outlives_from_index removed, A-side without an Outlives bound
+    /// must NOT compare equal to C-side with an Outlives bound. Catalogue authors must now
+    /// declare the 'static bound explicitly to achieve Blue.
+    #[test]
+    fn test_plain_struct_method_outlives_asymmetric_is_mismatch() {
+        // A-side: `new<F: Send + Sync>` (no Outlives).
         let f_bounds_a = vec![make_trait_bound("Send"), make_trait_bound("Sync")];
         let a_generics =
             Generics { params: vec![make_type_param("F", f_bounds_a)], where_predicates: vec![] };
@@ -1144,20 +1062,16 @@ mod tests {
         let c_struct = make_plain_struct_stripped(empty_generics(), vec![c_impl_id]);
 
         assert!(
-            structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
-            "A-side `new<F: Send+Sync>` must match C-side `new<F: Send+Sync+'static>` \
-             (A-codec cannot encode Outlives; T044 regression)"
+            !structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
+            "A-side `new<F: Send+Sync>` must NOT match C-side `new<F: Send+Sync+'static>` \
+             (T003: Outlives no longer stripped; catalogue must declare 'static explicitly)"
         );
     }
 
-    /// Same as `test_plain_struct_method_outlives_stripped_from_c_side_matches_a_side`
-    /// but the `'static` Outlives bound on the C-side is encoded in `where_predicates`
-    /// (the `where F: 'static` form) rather than inline in `params[F].bounds`.
-    ///
-    /// Rustdoc may use either form depending on how the programmer wrote the constraint.
-    /// Both must be stripped.
+    /// T003 (ADR D1): Asymmetric Outlives in where_predicates is also a mismatch after
+    /// strip_outlives_from_index removal. A-side without Outlives vs C-side with `where F: 'static`.
     #[test]
-    fn test_plain_struct_method_outlives_in_where_predicates_stripped() {
+    fn test_plain_struct_method_outlives_in_where_predicates_asymmetric_is_mismatch() {
         // A-side: `new<F: Send + Sync>` (no Outlives).
         let f_bounds_a = vec![make_trait_bound("Send"), make_trait_bound("Sync")];
         let a_generics =
@@ -1171,9 +1085,8 @@ mod tests {
         a_index.insert(a_impl_id, a_impl_item);
         let a_struct = make_plain_struct_stripped(empty_generics(), vec![a_impl_id]);
 
-        // C-side: `new<F>` with trait bounds in inline params AND `'static` in where_predicates.
+        // C-side: `new<F: Send + Sync>` with `where F: 'static` in where_predicates.
         let f_bounds_c_inline = vec![make_trait_bound("Send"), make_trait_bound("Sync")];
-        // 'static as a BoundPredicate with a single Outlives bound in where_predicates.
         let static_predicate = rustdoc_types::WherePredicate::BoundPredicate {
             type_: rustdoc_types::Type::Generic("F".to_string()),
             bounds: vec![make_outlives_bound("'static")],
@@ -1193,14 +1106,14 @@ mod tests {
         let c_struct = make_plain_struct_stripped(empty_generics(), vec![c_impl_id]);
 
         assert!(
-            structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
-            "C-side `where F: 'static` in where_predicates must also be stripped \
-             (T044 regression — Outlives in either inline or where form)"
+            !structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
+            "A-side without 'static must NOT match C-side with `where F: 'static` \
+             (T003: Outlives in where_predicates no longer stripped)"
         );
     }
 
-    /// Converse of the above: a genuine method signature difference (different trait
-    /// bound, not just Outlives) must still detect the mismatch.
+    /// A genuine method signature difference (different trait bound, not just Outlives)
+    /// must still detect the mismatch.
     #[test]
     fn test_plain_struct_different_non_outlives_method_bound_is_mismatch() {
         // A-side: `new<F: Send + Sync>`.
