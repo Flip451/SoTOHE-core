@@ -290,6 +290,124 @@ impl Encoder {
             item_actions.insert(fn_id, action);
         }
 
+        // Encode `inherent_impls` (IN-05 / IN-08, ADR `2026-05-18-1223` D2).
+        //
+        // `CatalogueDocument::inherent_impls` is a Vec of `InherentImplDeclV2` entries,
+        // each representing one inherent `impl` block for a named type with optional
+        // impl-block-level generic parameters. Multiple entries for the same type_name
+        // represent multiple impl blocks (the Rust source may split methods across impl
+        // blocks, each potentially with its own generic constraints).
+        //
+        // Each `InherentImplDeclV2` entry is encoded as a separate `Impl` item (inherent,
+        // `trait_: None`) with the type's pre-assigned `Id` as the `for_` type. The
+        // impl-block-level generics are encoded in the maximally-desugared where-form via
+        // `build_where_form_generics`, mirroring the treatment of method-level and
+        // function-level generics.
+        //
+        // The new `Impl` items are appended to the existing type's `impls` list. If the
+        // type is not found in `local_name_to_id`, encoding fails with `InvalidTypeRef`:
+        // inherent impl blocks for external types are not valid Rust, so a missing entry
+        // indicates a malformed catalogue (the domain catalogue must always declare the
+        // type in the `types` map before referencing it from `inherent_impls`).
+        for iid in &doc.inherent_impls {
+            let type_name_str = iid.type_name.as_str();
+            let type_id = match state.local_name_to_id.get(type_name_str).copied() {
+                Some(id) => id,
+                None => {
+                    // Fail-closed: `InherentImplDeclV2` must always reference a type declared
+                    // in this catalogue's `types` map. Inherent impl blocks for external types
+                    // are not valid Rust, so a missing entry indicates a malformed catalogue.
+                    return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                        type_ref: type_name_str.to_string(),
+                        reason: format!(
+                            "InherentImplDeclV2 references type '{type_name_str}' which is not \
+                             declared in the catalogue's types map"
+                        ),
+                    });
+                }
+            };
+
+            // Encode impl-block-level generics in the maximally-desugared where form.
+            let impl_generic_names: Vec<&str> =
+                iid.impl_generics.iter().map(|g| g.name.as_str()).collect();
+            let impl_generics = state.build_where_form_generics(
+                &iid.impl_generics,
+                &iid.impl_where_predicates,
+                &impl_generic_names,
+            )?;
+
+            // Encode methods in this impl block (has_body: true — inherent methods).
+            let module_path = state
+                .index
+                .get(&type_id)
+                .and_then(|_item| {
+                    // Retrieve the module path from the existing paths entry so that method
+                    // paths are registered with the correct module prefix.
+                    state.paths.get(&type_id).map(|ps| {
+                        // Build a ModulePath from the paths entry segments (excluding crate_name and type_name).
+                        let segs: Vec<String> = ps
+                            .path
+                            .iter()
+                            .skip(1) // skip crate_name
+                            .rev()
+                            .skip(1) // skip type_name (last segment)
+                            .rev()
+                            .cloned()
+                            .collect();
+                        segs
+                    })
+                })
+                .unwrap_or_default();
+            let module_path_domain = if module_path.is_empty() {
+                ModulePath::root()
+            } else {
+                ModulePath::from_segments(module_path).unwrap_or_else(|_| ModulePath::root())
+            };
+            let method_ids = state.encode_method_items(
+                &iid.methods,
+                true,
+                type_name_str,
+                &module_path_domain,
+                &impl_generic_names,
+            )?;
+
+            let impl_id = state.alloc_id();
+            let for_type = resolved_path_type(type_id, type_name_str);
+            let impl_inner = Impl {
+                is_unsafe: false,
+                generics: impl_generics,
+                provided_trait_methods: vec![],
+                trait_: None, // inherent impl
+                for_: for_type,
+                items: method_ids,
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            };
+            state.index.insert(impl_id, make_item(impl_id, None, None, ItemEnum::Impl(impl_inner)));
+
+            // Append the new impl_id to the type's impls list.
+            // Fail-closed: only Struct and Enum have an `impls` field in rustdoc_types.
+            // TypeAlias and other kinds cannot bear inherent impl blocks in valid Rust,
+            // so a catalogue that declares one indicates a malformed entry.
+            if let Some(type_item) = state.index.get_mut(&type_id) {
+                match &mut type_item.inner {
+                    ItemEnum::Struct(s) => s.impls.push(impl_id),
+                    ItemEnum::Enum(e) => e.impls.push(impl_id),
+                    _ => {
+                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                            type_ref: type_name_str.to_string(),
+                            reason: format!(
+                                "InherentImplDeclV2 targets '{type_name_str}' which is not a \
+                                 Struct or Enum — only Struct and Enum can bear inherent impl \
+                                 blocks in Rust; TypeAlias and other kinds are not supported"
+                            ),
+                        });
+                    }
+                }
+            }
+        }
+
         // Root module: children = all top-level ids assigned in pre-pass
         // (types + traits from `local_name_to_id`, functions from `fn_path_to_id`).
         // Sort by numeric id to produce a stable ordering across runs (HashMap iteration
@@ -1015,7 +1133,7 @@ impl EncoderState {
         // Encode inherent method items.
         let methods: Vec<MethodDeclaration> = entry.methods.clone();
         let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path)?;
+            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
 
         // Inherent Impl block.
         let impl_id = self.alloc_id();
@@ -1090,7 +1208,7 @@ impl EncoderState {
         // Encode inherent method items.
         let methods: Vec<MethodDeclaration> = entry.methods.clone();
         let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path)?;
+            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
 
         let impl_id = self.alloc_id();
         let for_type = resolved_path_type(type_id, type_name.as_str());
@@ -1159,7 +1277,7 @@ impl EncoderState {
         // Encode inherent method items.
         let methods: Vec<MethodDeclaration> = entry.methods.clone();
         let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path)?;
+            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
 
         let impl_id = self.alloc_id();
         let for_type = resolved_path_type(type_id, type_name.as_str());
@@ -1223,7 +1341,7 @@ impl EncoderState {
         // Inherent methods (concrete implementations → has_body: true).
         let methods: Vec<MethodDeclaration> = entry.methods.clone();
         let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path)?;
+            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
 
         // Inherent Impl block.
         let impl_id = self.alloc_id();
@@ -1275,7 +1393,7 @@ impl EncoderState {
         // Encode inherent methods (rare for type aliases; concrete implementations → has_body: true).
         let methods: Vec<MethodDeclaration> = entry.methods.clone();
         let method_ids =
-            self.encode_method_items(&methods, true, type_name.as_str(), &module_path)?;
+            self.encode_method_items(&methods, true, type_name.as_str(), &module_path, &[])?;
         let impl_id = self.alloc_id();
         let for_type = resolved_path_type(type_id, type_name.as_str());
         self.index.insert(
@@ -1311,18 +1429,44 @@ impl EncoderState {
         let module_path = entry.module_path.clone();
         let docs = entry.docs.clone();
 
+        // Encode trait-level generics (IN-07, ADR `2026-05-18-1223` D2).
+        // `TraitEntry.generics` is a Vec<MethodGenericParam> (reused type); the generic
+        // names are collected so that type references inside bounds can be resolved to
+        // `Type::Generic` rather than unresolved-marker paths.
+        // Uses the maximally-desugared where-form so both inline (`<T: Bound>`) and
+        // explicit-where (`<T> where T: Bound`) catalogue declarations produce the same
+        // rustdoc-style `Generics` representation that the signal evaluator fingerprints
+        // correctly. (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D1)
+        let trait_generic_names: Vec<&str> =
+            entry.generics.iter().map(|g| g.name.as_str()).collect();
+        let trait_generics = self.build_where_form_generics(
+            &entry.generics,
+            &entry.where_predicates,
+            &trait_generic_names,
+        )?;
+
         // Trait methods are declarations, not implementations (has_body: false).
+        // Trait-level generic names are passed as outer context so that method signatures
+        // that reference trait parameters (e.g. `fn get(&self) -> T` in `trait Foo<T>`)
+        // encode `T` as `Type::Generic` rather than an unresolved-marker path.
         let methods: Vec<MethodDeclaration> = entry.methods.clone();
-        let method_ids =
-            self.encode_method_items(&methods, false, trait_name.as_str(), &module_path)?;
+        let method_ids = self.encode_method_items(
+            &methods,
+            false,
+            trait_name.as_str(),
+            &module_path,
+            &trait_generic_names,
+        )?;
 
         // Encode supertrait bounds as GenericBound::TraitBound entries.
-        // Each bound string (e.g. "Send", "Sync", "Into<String>") is parsed via
-        // `encode_bound_str` so that generic args land in `Path.args` (not embedded
-        // in `Path.path`) and external types get proper crate ids for Phase 1 visibility.
+        // Each bound string (e.g. "Send", "Sync", "Into<T>") is parsed via
+        // `encode_and_validate_bound` with `trait_generic_names` so that:
+        //   - generic args land in `Path.args` (not embedded in `Path.path`)
+        //   - trait-level generics in bound args (e.g. `T` in `Into<T>`) are
+        //     rewritten to `Type::Generic` rather than an unresolved-marker path.
         let mut bounds: Vec<GenericBound> = Vec::with_capacity(entry.supertrait_bounds.len());
         for b in &entry.supertrait_bounds {
-            bounds.push(self.encode_bound_str(b.as_str())?);
+            bounds.push(self.encode_and_validate_bound(b.as_str(), &trait_generic_names)?);
         }
 
         let trait_item = make_item(
@@ -1334,7 +1478,7 @@ impl EncoderState {
                 is_unsafe: false,
                 is_dyn_compatible: true,
                 items: method_ids,
-                generics: empty_generics(),
+                generics: trait_generics,
                 bounds,
                 implementations: vec![],
             }),
@@ -1460,12 +1604,20 @@ impl EncoderState {
     /// `parent_name` is the short name of the containing type or trait (used to build
     /// `Crate::paths` entries with path `[crate, ...module, ParentName, method_name]`).
     /// `parent_module_path` is the module path of the containing item.
+    ///
+    /// `outer_generic_names` is a slice of generic parameter names that are in scope
+    /// from the enclosing impl block (e.g. `T` in `impl<T> Foo`). These names are
+    /// combined with each method's own generic parameter names so that type references
+    /// to outer generics in method signatures are encoded as `Type::Generic` rather
+    /// than as unresolved path markers.  Pass an empty slice when there are no enclosing
+    /// impl-level generics (the common case for `TypeEntry.methods`).
     fn encode_method_items(
         &mut self,
         methods: &[MethodDeclaration],
         force_has_body: bool,
         parent_name: &str,
         parent_module_path: &ModulePath,
+        outer_generic_names: &[&str],
     ) -> Result<Vec<Id>, CatalogueToExtendedCrateCodecError> {
         let mut ids = vec![];
         for method in methods {
@@ -1482,9 +1634,8 @@ impl EncoderState {
                 let recv_ty = receiver_type(recv);
                 inputs.push(("self".to_string(), recv_ty));
             }
-            // Collect method-level generic parameter names so that occurrences of
-            // those names in param/return type strings are encoded as `Type::Generic`
-            // rather than as unresolved path markers.
+            // Collect the combined set of generic parameter names in scope for this method:
+            // method-level generic params AND any outer impl-block-level generic params.
             //
             // Rustdoc emits `Type::Generic("T")` for generic parameters in function
             // signatures (both bare `T` and composite `Option<T>`, `&T`, etc.).
@@ -1492,19 +1643,27 @@ impl EncoderState {
             // `UnresolvedTypeRef` and Phase 2 structural comparison mismatches.
             //
             // Strategy:
-            // 1. For a bare single-word type string that matches a method generic name
-            //    (e.g. `"T"`, `"From"`, `"Display"`), produce `Type::Generic` directly
-            //    WITHOUT calling `parse_type_ref_str`.  This avoids the STD_PRELUDE_TYPES
-            //    expansion that `parse_type_ref_str` applies to well-known names: e.g.
-            //    a generic named `"From"` would otherwise be expanded to the canonical
-            //    path `"std::convert::From"`, which `rewrite_generic_types` would then
-            //    fail to rewrite back (it checks for single-segment bare paths with no
-            //    `::` in them).
+            // 1. For a bare single-word type string that matches a known generic name
+            //    (method-level OR outer impl-level, e.g. `"T"`, `"From"`, `"Display"`),
+            //    produce `Type::Generic` directly WITHOUT calling `parse_type_ref_str`.
+            //    This avoids the STD_PRELUDE_TYPES expansion that `parse_type_ref_str`
+            //    applies to well-known names: e.g. a generic named `"From"` would
+            //    otherwise be expanded to the canonical path `"std::convert::From"`,
+            //    which `rewrite_generic_types` would then fail to rewrite back (it
+            //    checks for single-segment bare paths with no `::` in them).
             // 2. For all other type strings, parse via `parse_type_ref_str` (composite
             //    types, references, generics-in-generics like `Option<T>`) and then call
             //    `rewrite_generic_types` to replace any inner bare generic occurrences.
-            let generic_names: Vec<&str> =
+            let method_generic_names: Vec<&str> =
                 method.generics.iter().map(|g| g.name.as_str()).collect();
+            // Combine outer (impl-level) and method-level generic names. Outer names come
+            // first so that method-level names can shadow them if needed (though shadowing
+            // generic names is rare in practice).
+            let generic_names: Vec<&str> = outer_generic_names
+                .iter()
+                .copied()
+                .chain(method_generic_names.iter().copied())
+                .collect();
 
             let param_pairs: Vec<(String, String)> = method
                 .params
@@ -1553,6 +1712,15 @@ impl EncoderState {
             // representation for `where`-form sources and is normalized to match
             // inline-form sources by the signal evaluator.
             // (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D1)
+            //
+            // Note: `build_where_form_generics` receives the combined `generic_names`
+            // (outer impl/trait generics + method-level generics) so that bound strings
+            // referencing outer-scope names — e.g. `U: Into<T>` where `T` is an outer
+            // impl/trait parameter — encode `T` as `Type::Generic` rather than an
+            // unresolved-marker path. The `GenericParamDef` list produced by the function
+            // only includes method-level params (`method.generics`) — outer params are
+            // NOT duplicated into `Function.generics`; they appear on the enclosing
+            // `Impl.generics` / `Trait.generics`.
             let method_generics = self.build_where_form_generics(
                 &method.generics,
                 &method.where_predicates,
@@ -1742,15 +1910,32 @@ impl EncoderState {
                 }
             };
             let trait_path = Path { path: trait_path_str, id: trait_id, args: None };
-            self.index.insert(
-                impl_id,
-                make_item(
-                    impl_id,
-                    None,
-                    None,
-                    ItemEnum::Impl(make_impl(for_type, Some(trait_path), vec![])),
-                ),
-            );
+
+            // Encode impl-block-level generics (IN-06, ADR `2026-05-18-1223` D2).
+            // `TraitImplDeclV2.impl_generics` holds type parameters on the impl block itself
+            // (e.g. `impl<L, R, W> Trait for Foo<L, R, W>`). The names are collected so that
+            // type references inside bounds resolve to `Type::Generic` correctly.
+            // Empty Vec (old catalogues / non-generic impls) produces `empty_generics()`.
+            let impl_generic_names: Vec<&str> =
+                ti.impl_generics.iter().map(|g| g.name.as_str()).collect();
+            let impl_generics = self.build_where_form_generics(
+                &ti.impl_generics,
+                &ti.impl_where_predicates,
+                &impl_generic_names,
+            )?;
+
+            let impl_inner = Impl {
+                is_unsafe: false,
+                generics: impl_generics,
+                provided_trait_methods: vec![],
+                trait_: Some(trait_path),
+                for_: for_type,
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            };
+            self.index.insert(impl_id, make_item(impl_id, None, None, ItemEnum::Impl(impl_inner)));
             impl_ids.push(impl_id);
         }
         Ok(impl_ids)

@@ -33,12 +33,12 @@
     {
       "id": "T006",
       "description": "D2-schema-trait-entry: TraitEntry に generics と where_predicates フィールドを追加する (IN-07)。libs/domain の catalogue_v2/entries.rs の `TraitEntry` struct に `generics: Vec<MethodGenericParam>` (型パラメータのみ、ライフタイム/const パラメータはスコープ外) と `where_predicates: Vec<WherePredicateDecl>` フィールドを追加する。serde は `#[serde(default)]` で既存 catalogue JSON が無修正でロードできる後方互換設計を維持する (CN-01)。trait Foo<T> where T: Clone のようなトレイト宣言レベルのジェネリックを catalogue で正規に宣言できることを示す unit test を追加する (AC-07)。infrastructure 層の catalogue_document_codec DTO に対応フィールドを追加し、round-trip codec unit test を追加する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T007",
       "description": "D2-codec-evaluator: A-codec と信号評価器を更新して InherentImplDeclV2 / TraitImplDeclV2.impl_generics / TraitEntry.generics を rustdoc の対応レベルのジェネリックと対称比較できるようにする (IN-09)。A-codec 側: (a) rustdoc の inherent impl ブロックレベルのジェネリックを InherentImplDeclV2.impl_generics / impl_where_predicates に正しく配置する encode ロジックを実装する。(b) rustdoc の trait impl ブロックレベルのジェネリックを TraitImplDeclV2.impl_generics / impl_where_predicates に配置する。(c) rustdoc のトレイト宣言レベルのジェネリックを TraitEntry.generics / where_predicates に配置する。信号評価器側: 各レベルのジェネリック (impl ブロック・トレイト宣言) の比較を rustdoc 側と catalogue 側で対称に行う比較ロジックを追加する。CN-02 のアーキテクチャ制約に従い、評価器内部の rustdoc 解析・codec・比較ロジックは libs/infrastructure/ に実装する (signal evaluator の orchestration は libs/usecase/ が担う)。既存 catalogue JSON (新フィールドなし) に対して信号評価結果が変化しないことを確認するテストを追加する (AC-08)。unit test: impl<L: Left, R: Right, W: Write> Foo<L, R, W> の InherentImplDeclV2 が A 側で正しくエンコードされ C 側 rustdoc と Blue 一致することを確認。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T008",

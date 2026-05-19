@@ -2979,3 +2979,467 @@ fn test_t043_hrtb_function_pointer_binders_preserved() {
          got: {rendered:?}"
     );
 }
+
+// -----------------------------------------------------------------------
+// T007: impl-block-level / trait-decl-level generics symmetric comparison
+// (IN-09, AC-08)
+// -----------------------------------------------------------------------
+
+/// T007 (a): When both A-side (catalogue) and C-side (rustdoc) carry the same
+/// impl-block-level generics on a trait impl, the signal must be Blue (Match).
+///
+/// Uses the CatalogueToExtendedCrateCodec to build the A side so the test
+/// verifies the full A-codec → evaluator pipeline.
+#[test]
+fn test_impl_block_generics_symmetric_compare_blue() {
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CrateName, ModulePath, ParamName, TraitName, TypeName, TypeRef,
+    };
+    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
+    use rustdoc_types::{
+        GenericBound, GenericParamDef, GenericParamDefKind, Impl, Path, TraitBoundModifier,
+        WherePredicate,
+    };
+
+    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+
+    let crate_name = "my_crate";
+    let mut doc = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new("domain").expect("static"),
+    );
+
+    // A-side: `impl<T: Clone> MyTrait for Foo` — impl_generics: [T: Clone]
+    let mut trait_impl = TraitImplDeclV2::new(
+        TraitName::new("MyTrait").unwrap(),
+        CrateName::new(crate_name).unwrap(),
+    );
+    trait_impl.impl_generics = vec![MethodGenericParam {
+        name: ParamName::new("T").unwrap(),
+        bounds: vec![TypeRef::new("Clone").unwrap()],
+    }];
+
+    doc.types.insert(
+        TypeName::new("Foo").unwrap(),
+        TypeEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![trait_impl],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+    // Also register the local trait "MyTrait" (needed for local trait id resolution).
+    use domain::tddd::catalogue_v2::entries::TraitEntry;
+    doc.traits.insert(
+        TraitName::new("MyTrait").unwrap(),
+        TraitEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+
+    // Verify A-side actually encoded impl_generics: the codec must emit a trait Impl item
+    // with non-empty `generics.params` — a Blue signal alone cannot prove this because the
+    // evaluator's `items_structurally_equal` treats an empty A-side as "not encoded yet"
+    // and skips the comparison rather than diffing. Without this check the test would pass
+    // even if the codec silently emitted `empty_generics()`.
+    {
+        let a_krate = a.krate();
+        // Use filter_map to both locate and downcast the trait Impl item in one pass,
+        // avoiding `let-else { panic! }` which triggers clippy::panic in non-test scopes.
+        let a_impl_inner = a_krate
+            .index
+            .values()
+            .filter_map(|item| {
+                if let ItemEnum::Impl(i) = &item.inner {
+                    if i.trait_.is_some() { Some(i) } else { None }
+                } else {
+                    None
+                }
+            })
+            .next()
+            .expect("A-side must contain a trait Impl item for `impl<T: Clone> MyTrait for Foo`");
+        assert!(
+            !a_impl_inner.generics.params.is_empty(),
+            "A-side Impl must have non-empty generics.params (impl_generics encoded from \
+             TraitImplDeclV2.impl_generics:[T:Clone]), got: {:?}",
+            a_impl_inner.generics.params
+        );
+        assert_eq!(
+            a_impl_inner.generics.params[0].name, "T",
+            "A-side Impl first generic param must be 'T'"
+        );
+    }
+
+    // B = empty (Add action, B has nothing).
+    let b = empty_crate();
+
+    // C-side: crate with "Foo" (Struct) + "MyTrait" (Trait) + impl<T: Clone> MyTrait for Foo.
+    let root_id = Id(0);
+    let foo_id = Id(1);
+    let my_trait_id = Id(2);
+    let impl_id = Id(3);
+
+    let mut c_index = HashMap::new();
+    let mut c_paths = HashMap::new();
+
+    c_index.insert(root_id, root_module_item(root_id, crate_name, vec![foo_id, my_trait_id]));
+
+    // Struct "Foo"
+    c_index.insert(
+        foo_id,
+        make_item(
+            foo_id,
+            Some("Foo"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                impls: vec![impl_id],
+            }),
+        ),
+    );
+    c_paths.insert(
+        foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    // Trait "MyTrait"
+    c_index.insert(
+        my_trait_id,
+        make_item(
+            my_trait_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    c_paths.insert(
+        my_trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // `impl<T: Clone> MyTrait for Foo`
+    // C-side rustdoc: generics.params = [T (type param)], where_predicates = [T: Clone]
+    let t_param = GenericParamDef {
+        name: "T".to_string(),
+        kind: GenericParamDefKind::Type { bounds: vec![], default: None, is_synthetic: false },
+    };
+    let clone_bound = GenericBound::TraitBound {
+        trait_: Path { path: "Clone".to_string(), id: Id(999), args: None },
+        generic_params: vec![],
+        modifier: TraitBoundModifier::None,
+    };
+    let t_where = WherePredicate::BoundPredicate {
+        type_: Type::Generic("T".to_string()),
+        bounds: vec![clone_bound],
+        generic_params: vec![],
+    };
+    c_index.insert(
+        impl_id,
+        make_item(
+            impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: Generics { params: vec![t_param], where_predicates: vec![t_where] },
+                provided_trait_methods: vec![],
+                trait_: Some(Path { path: "MyTrait".to_string(), id: my_trait_id, args: None }),
+                for_: Type::ResolvedPath(Path { path: "Foo".to_string(), id: foo_id, args: None }),
+                items: vec![],
+                is_negative: false,
+                is_synthetic: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+
+    let c = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: c_index,
+        paths: c_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, b, c).unwrap();
+
+    // The "Foo: MyTrait" impl signal must be Blue: both A-side and C-side have the same
+    // generics shape (impl<T: Clone>), so the evaluator must report Match (Blue), not Mismatch
+    // (Yellow) and not CMinusSUnionD (Red).
+    let impl_signal =
+        report.iter().find(|s| s.item_name().contains("Foo") && s.item_name().contains("MyTrait"));
+    assert!(
+        impl_signal.is_some(),
+        "must find a signal for Foo: MyTrait impl, got signals: {:?}",
+        report.iter().map(|s| s.item_name()).collect::<Vec<_>>()
+    );
+    assert!(
+        impl_signal.unwrap().signal().is_blue(),
+        "Foo: MyTrait signal must be Blue when both sides declare the same impl_generics; \
+         got region={:?}",
+        impl_signal.unwrap().region()
+    );
+}
+
+/// T007 (b): When A-side declares `impl_generics: []` (empty, old catalogue) and
+/// C-side has `impl<T: Clone> MyTrait for Foo`, the existing behaviour is preserved:
+/// the signal must not regress (backward compat).
+///
+/// With the current design, impl-block generics from empty A-side are not compared
+/// so the existing Blue evaluation is retained.
+#[test]
+fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CrateName, ModulePath, TraitName, TypeName,
+    };
+    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
+    use rustdoc_types::{
+        GenericBound, GenericParamDef, GenericParamDefKind, Impl, Path, TraitBoundModifier,
+        WherePredicate,
+    };
+
+    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+
+    let crate_name = "my_crate";
+    let mut doc = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new("domain").expect("static"),
+    );
+
+    // A-side: `impl MyTrait for Foo` — impl_generics: [] (old catalogue, no impl generics).
+    let trait_impl = TraitImplDeclV2::new(
+        TraitName::new("MyTrait").unwrap(),
+        CrateName::new(crate_name).unwrap(),
+    );
+
+    doc.types.insert(
+        TypeName::new("Foo").unwrap(),
+        TypeEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![trait_impl],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+    doc.traits.insert(
+        TraitName::new("MyTrait").unwrap(),
+        TraitEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+
+    // Verify A-side emits empty generics for old catalogue (impl_generics: []).
+    // Without this check the test would pass even if the codec started emitting non-empty
+    // generics for old catalogues (breaking backward compatibility).
+    {
+        let a_krate = a.krate();
+        let a_impl_inner = a_krate
+            .index
+            .values()
+            .filter_map(|item| {
+                if let ItemEnum::Impl(i) = &item.inner {
+                    if i.trait_.is_some() { Some(i) } else { None }
+                } else {
+                    None
+                }
+            })
+            .next()
+            .expect("A-side must contain a trait Impl item for `impl MyTrait for Foo`");
+        assert!(
+            a_impl_inner.generics.params.is_empty(),
+            "A-side Impl with impl_generics:[] must have empty generics.params (backward \
+             compat: old catalogues must not produce impl-level generics), got: {:?}",
+            a_impl_inner.generics.params
+        );
+        assert!(
+            a_impl_inner.generics.where_predicates.is_empty(),
+            "A-side Impl with impl_generics:[] must have empty where_predicates, got: {:?}",
+            a_impl_inner.generics.where_predicates
+        );
+    }
+
+    let b = empty_crate();
+
+    // C-side: `impl<T: Clone> MyTrait for Foo` (C has impl generics but A declares none).
+    let root_id = Id(0);
+    let foo_id = Id(1);
+    let my_trait_id = Id(2);
+    let impl_id = Id(3);
+
+    let mut c_index = HashMap::new();
+    let mut c_paths = HashMap::new();
+
+    c_index.insert(root_id, root_module_item(root_id, crate_name, vec![foo_id, my_trait_id]));
+    c_index.insert(
+        foo_id,
+        make_item(
+            foo_id,
+            Some("Foo"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                impls: vec![impl_id],
+            }),
+        ),
+    );
+    c_paths.insert(
+        foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    c_index.insert(
+        my_trait_id,
+        make_item(
+            my_trait_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    c_paths.insert(
+        my_trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+    // C-side impl with generics
+    let t_param = GenericParamDef {
+        name: "T".to_string(),
+        kind: GenericParamDefKind::Type { bounds: vec![], default: None, is_synthetic: false },
+    };
+    let clone_bound = GenericBound::TraitBound {
+        trait_: Path { path: "Clone".to_string(), id: Id(999), args: None },
+        generic_params: vec![],
+        modifier: TraitBoundModifier::None,
+    };
+    let t_where = WherePredicate::BoundPredicate {
+        type_: Type::Generic("T".to_string()),
+        bounds: vec![clone_bound],
+        generic_params: vec![],
+    };
+    c_index.insert(
+        impl_id,
+        make_item(
+            impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: Generics { params: vec![t_param], where_predicates: vec![t_where] },
+                provided_trait_methods: vec![],
+                trait_: Some(Path { path: "MyTrait".to_string(), id: my_trait_id, args: None }),
+                for_: Type::ResolvedPath(Path { path: "Foo".to_string(), id: foo_id, args: None }),
+                items: vec![],
+                is_negative: false,
+                is_synthetic: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    let c = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: c_index,
+        paths: c_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, b, c).unwrap();
+
+    // When A-side declares no impl_generics (empty Vec = old catalogue) and C-side has
+    // impl<T: Clone>, the identity keys still match ("Foo: MyTrait"), so the signal must
+    // be Blue (Match_Add) — backward compat: old catalogues must not regress to Yellow or Red.
+    let impl_signal =
+        report.iter().find(|s| s.item_name().contains("Foo") && s.item_name().contains("MyTrait"));
+    assert!(impl_signal.is_some(), "must find a signal for Foo: MyTrait impl");
+    assert!(
+        impl_signal.unwrap().signal().is_blue(),
+        "old catalogue (impl_generics: []) must produce Blue when C has impl<T> generics; \
+         identity keys must still match; got region={:?}",
+        impl_signal.unwrap().region()
+    );
+}

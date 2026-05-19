@@ -1707,3 +1707,378 @@ fn test_encode_function_with_hrtb_trait_bound_succeeds() {
         f.generics.where_predicates
     );
 }
+
+// -----------------------------------------------------------------------
+// T007 / AC-08: A-codec — impl-block-level generics encoding
+// (IN-09: InherentImplDeclV2.impl_generics, TraitImplDeclV2.impl_generics,
+//  TraitEntry.generics)
+// -----------------------------------------------------------------------
+
+/// T007 AC-08 (a): `TraitEntry` with `generics: [T]` encodes the trait-level
+/// generic as a `GenericParamDef` in the Trait item's `Generics`.
+///
+/// The codec must call `build_where_form_generics` for trait-level generics so that
+/// `trait Foo<T>` produces a `Trait` item with one type param in its `generics.params`,
+/// not `empty_generics()`.
+#[test]
+fn test_trait_decl_generics_encoded_correctly() {
+    use domain::tddd::catalogue_v2::WherePredicateDecl;
+    use rustdoc_types::{GenericParamDefKind, WherePredicate};
+
+    let mut doc = make_doc("domain");
+    let method_generic = MethodGenericParam {
+        name: ParamName::new("T").unwrap(),
+        bounds: vec![TypeRef::new("Clone").unwrap()],
+    };
+    let where_pred = WherePredicateDecl {
+        lhs: TypeRef::new("T").unwrap(),
+        operator: domain::tddd::catalogue_v2::BoundOp::Bound,
+        rhs: vec![TypeRef::new("Send").unwrap()],
+    };
+    doc.traits.insert(
+        TraitName::new("MyTrait").unwrap(),
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![method_generic],
+            where_predicates: vec![where_pred],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = ec.krate();
+
+    // Find the Trait item for "MyTrait".
+    let trait_item = krate
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("MyTrait") && matches!(item.inner, ItemEnum::Trait(_))
+        })
+        .expect("MyTrait trait item must be present");
+    let ItemEnum::Trait(ref trait_inner) = trait_item.inner else {
+        panic!("expected Trait inner");
+    };
+
+    // generics.params must have one type param "T".
+    assert_eq!(
+        trait_inner.generics.params.len(),
+        1,
+        "TraitEntry with generics:[T] must produce 1 GenericParamDef, got: {:?}",
+        trait_inner.generics.params
+    );
+    assert_eq!(trait_inner.generics.params[0].name, "T");
+    assert!(
+        matches!(trait_inner.generics.params[0].kind, GenericParamDefKind::Type { .. }),
+        "type param T must be GenericParamDefKind::Type"
+    );
+
+    // In where-form encoding: bounds from `generics[T].bounds` and `where_predicates`
+    // are both emitted as WherePredicate::BoundPredicate entries.
+    // The `T: Clone` inline bound and `T: Send` where_predicate should both appear.
+    let wp_lhs_strings: Vec<String> = trait_inner
+        .generics
+        .where_predicates
+        .iter()
+        .filter_map(|wp| {
+            if let WherePredicate::BoundPredicate {
+                type_: rustdoc_types::Type::Generic(n), ..
+            } = wp
+            {
+                Some(n.clone())
+            } else {
+                None
+            }
+        })
+        .collect();
+    // Both "T: Clone" (from generics.bounds) and "T: Send" (from where_predicates) land
+    // in where_predicates as BoundPredicate entries. They may be merged into one or kept
+    // separate depending on build_where_form_generics merging strategy.
+    // At minimum, "T" must appear as the LHS of at least one where predicate.
+    assert!(
+        wp_lhs_strings.contains(&"T".to_string()),
+        "T must appear as LHS of at least one WherePredicate::BoundPredicate, got: {:?}",
+        trait_inner.generics.where_predicates
+    );
+}
+
+/// T007 AC-08 (b): `TraitImplDeclV2` with `impl_generics: [T]` encodes the
+/// impl-block-level generic as a `GenericParamDef` in the Impl item's `Generics`.
+///
+/// The codec must use `build_where_form_generics` for impl-block generics so that
+/// `impl<T: Send> Trait for Foo` produces an Impl item with `generics.params = [T]`,
+/// not `empty_generics()`.
+#[test]
+fn test_trait_impl_block_generics_encoded_correctly() {
+    use rustdoc_types::{GenericParamDefKind, WherePredicate};
+
+    let mut doc = make_doc("domain");
+    let mut trait_impl =
+        TraitImplDeclV2::new(TraitName::new("Send").unwrap(), CrateName::new("std").unwrap());
+    trait_impl.impl_generics = vec![MethodGenericParam {
+        name: ParamName::new("T").unwrap(),
+        bounds: vec![TypeRef::new("Clone").unwrap()],
+    }];
+    // impl_where_predicates: T: Send (explicit where predicate)
+    trait_impl.impl_where_predicates = vec![domain::tddd::catalogue_v2::WherePredicateDecl {
+        lhs: TypeRef::new("T").unwrap(),
+        operator: domain::tddd::catalogue_v2::BoundOp::Bound,
+        rhs: vec![TypeRef::new("Send").unwrap()],
+    }];
+
+    doc.types.insert(
+        TypeName::new("Foo").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![trait_impl],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = ec.krate();
+
+    // Find the trait Impl item (trait_ is Some).
+    let trait_impl_item = krate
+        .index
+        .values()
+        .find(|item| matches!(&item.inner, ItemEnum::Impl(i) if i.trait_.is_some()))
+        .expect("must find a trait Impl item");
+    let ItemEnum::Impl(ref impl_inner) = trait_impl_item.inner else {
+        panic!("expected Impl inner");
+    };
+
+    // generics.params must have one type param "T".
+    assert_eq!(
+        impl_inner.generics.params.len(),
+        1,
+        "TraitImplDeclV2 with impl_generics:[T] must produce 1 GenericParamDef, got: {:?}",
+        impl_inner.generics.params
+    );
+    assert_eq!(impl_inner.generics.params[0].name, "T");
+    assert!(
+        matches!(impl_inner.generics.params[0].kind, GenericParamDefKind::Type { .. }),
+        "impl generic T must be GenericParamDefKind::Type"
+    );
+
+    // where_predicates must contain bound predicates for T (from both impl_generics.bounds
+    // and impl_where_predicates).
+    let has_t_predicate = impl_inner.generics.where_predicates.iter().any(|wp| {
+        matches!(wp, WherePredicate::BoundPredicate { type_: rustdoc_types::Type::Generic(n), .. } if n == "T")
+    });
+    assert!(
+        has_t_predicate,
+        "T must appear as LHS of at least one WherePredicate::BoundPredicate in the impl block \
+         generics, got: {:?}",
+        impl_inner.generics.where_predicates
+    );
+}
+
+/// T007 AC-08 (c): `InherentImplDeclV2` entries in `CatalogueDocument::inherent_impls`
+/// with `impl_generics: [L, R, W]` are encoded as separate Impl items whose
+/// `generics.params` contains L, R, W.
+///
+/// When an `InherentImplDeclV2` is present, the codec must create a *separate*
+/// inherent Impl item (in addition to the type's own TypeEntry-driven impl block,
+/// if any). The new Impl item must carry the impl-block-level generics.
+#[test]
+fn test_inherent_impl_block_generics_encoded_correctly() {
+    use domain::tddd::catalogue_v2::entries::InherentImplDeclV2;
+    use rustdoc_types::GenericParamDefKind;
+
+    let mut doc = make_doc("domain");
+
+    // Register the type "Bar" so the impl block can reference it.
+    doc.types.insert(
+        TypeName::new("Bar").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    // InherentImplDeclV2 with impl_generics: [L, R, W].
+    doc.inherent_impls.push(InherentImplDeclV2 {
+        type_name: TypeName::new("Bar").unwrap(),
+        impl_generics: vec![
+            MethodGenericParam {
+                name: ParamName::new("L").unwrap(),
+                bounds: vec![TypeRef::new("Send").unwrap()],
+            },
+            MethodGenericParam { name: ParamName::new("R").unwrap(), bounds: vec![] },
+            MethodGenericParam {
+                name: ParamName::new("W").unwrap(),
+                bounds: vec![TypeRef::new("Sync").unwrap()],
+            },
+        ],
+        impl_where_predicates: vec![],
+        methods: vec![],
+    });
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = ec.krate();
+
+    // Find the inherent Impl item that was produced from the InherentImplDeclV2
+    // (trait_ is None, generics.params is non-empty with [L, R, W]).
+    let generic_inherent_impl = krate.index.values().find(|item| {
+        if let ItemEnum::Impl(i) = &item.inner {
+            i.trait_.is_none() && !i.generics.params.is_empty()
+        } else {
+            false
+        }
+    });
+
+    let impl_item = generic_inherent_impl
+        .expect("must find an inherent Impl item with non-empty generics from InherentImplDeclV2");
+    let ItemEnum::Impl(ref impl_inner) = impl_item.inner else {
+        panic!("expected Impl inner");
+    };
+
+    assert_eq!(
+        impl_inner.generics.params.len(),
+        3,
+        "InherentImplDeclV2 with impl_generics:[L, R, W] must produce 3 GenericParamDefs, got: {:?}",
+        impl_inner.generics.params
+    );
+    let names: Vec<&str> = impl_inner.generics.params.iter().map(|p| p.name.as_str()).collect();
+    assert_eq!(names, vec!["L", "R", "W"], "generic param names must be L, R, W in order");
+    for p in &impl_inner.generics.params {
+        assert!(
+            matches!(p.kind, GenericParamDefKind::Type { .. }),
+            "each impl generic must be GenericParamDefKind::Type, got: {:?}",
+            p.kind
+        );
+    }
+
+    // where_predicates coverage: L has bounds:[Send] and W has bounds:[Sync], so two
+    // WherePredicate::BoundPredicate entries must be emitted. R has no bounds and must
+    // produce a GenericParamDef but no WherePredicate.
+    // (build_where_form_generics emits bounds inline on params only if non-empty)
+    use rustdoc_types::WherePredicate;
+    let wp_names: Vec<String> = impl_inner
+        .generics
+        .where_predicates
+        .iter()
+        .filter_map(|wp| {
+            if let WherePredicate::BoundPredicate {
+                type_: rustdoc_types::Type::Generic(n), ..
+            } = wp
+            {
+                Some(n.clone())
+            } else {
+                None
+            }
+        })
+        .collect();
+    assert!(
+        wp_names.contains(&"L".to_string()),
+        "L (bounds:[Send]) must appear as WherePredicate LHS, got: {:?}",
+        impl_inner.generics.where_predicates
+    );
+    assert!(
+        wp_names.contains(&"W".to_string()),
+        "W (bounds:[Sync]) must appear as WherePredicate LHS, got: {:?}",
+        impl_inner.generics.where_predicates
+    );
+    assert!(
+        !wp_names.contains(&"R".to_string()),
+        "R (no bounds) must NOT appear as WherePredicate LHS, got: {:?}",
+        impl_inner.generics.where_predicates
+    );
+
+    // Critical Phase-1 linkage check: the inherent impl's Id must appear in the
+    // owning type ("Bar")'s `Struct.impls` list. Without this linkage the impl
+    // item exists in the index but the type does not point to it, which means
+    // downstream signal evaluation never compares it.
+    let impl_id = impl_item.id;
+    let bar_item = krate
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("Bar") && matches!(item.inner, ItemEnum::Struct(_))
+        })
+        .expect("Bar struct item must be present");
+    let ItemEnum::Struct(ref bar_struct) = bar_item.inner else {
+        panic!("expected Struct inner for Bar");
+    };
+    assert!(
+        bar_struct.impls.contains(&impl_id),
+        "inherent impl Id {:?} must be linked in Bar's Struct.impls, got: {:?}",
+        impl_id,
+        bar_struct.impls
+    );
+}
+
+/// T007 AC-08 (regression): a catalogue without `TraitEntry.generics` / `impl_generics`
+/// (legacy empty-Vec fields) must encode to an item with `empty_generics()` for trait
+/// and impl blocks, preserving the existing (pre-T007) signal evaluation behaviour.
+#[test]
+fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
+    let mut doc = make_doc("domain");
+    doc.traits.insert(
+        TraitName::new("MyPort").unwrap(),
+        TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],         // empty = old catalogue
+            where_predicates: vec![], // empty = old catalogue
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = ec.krate();
+
+    let trait_item = krate
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("MyPort") && matches!(item.inner, ItemEnum::Trait(_))
+        })
+        .expect("MyPort must be present");
+    let ItemEnum::Trait(ref t) = trait_item.inner else { panic!("expected Trait") };
+
+    // No generics declared → empty_generics().
+    assert!(
+        t.generics.params.is_empty(),
+        "trait with no generics must encode to empty params, got: {:?}",
+        t.generics.params
+    );
+    assert!(
+        t.generics.where_predicates.is_empty(),
+        "trait with no generics must encode to empty where_predicates, got: {:?}",
+        t.generics.where_predicates
+    );
+}

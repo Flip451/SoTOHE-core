@@ -1,297 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fccf6f562fd4d261f7c9e8bd259055857f62d574253bbceb7ec56dd2ea9b821a",
-          "at": "2026-05-19T13:09:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing the external-`for_` filter admits cross-crate impls into a key space that still uses only the bare `for_` short name. If a crate has both a local type and an external type with the same last path segment implementing the same trait (for example, `impl Printable for Error` and `impl Printable for std::error::Error`), the `BTreeMap<String, Id>` will silently collapse one impl and phase 2 can evaluate the wrong impl set.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
-              "line": 369,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9422caf6c2b6719e0fb49cafe6ea6b15b74973080780784241b6f9d77b0a5afe",
-          "at": "2026-05-19T13:23:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: [mod.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs#L389) The new `for_path_raw` tiebreaker assumes the raw `Type::ResolvedPath.path` is identical on S and C, but this map also contains A-sourced impls whose `for_.path` is synthesized from catalogue short names rather than rustdoc’s original module-qualified path. On a same-key collision that mixes A-sourced and rustdoc-sourced impls, S and C can still sort different winners and produce a false `CMinusSUnionD` red.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
-              "line": 389,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: [tests.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L2716) The new collision regression test does not exercise the changed behavior: both competing impl fixtures use the same `for_.path` (`\"MyError\"`), so the assertion only checks the final `Id` fallback. A regression in the new path-based ordering would still pass this test.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
-              "line": 2716,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:6f27f12b3d13494a1a7c5232918c5c0274b7cf08fdc85aed1c637ec8b584deed",
-          "at": "2026-05-19T13:39:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `(key, for_path_raw, id)` tiebreaker relies on the verbatim `Type::ResolvedPath.path` string, but this field is not canonicalized anywhere in the function. If C-side rustdoc and the S-side/orphan-impl data spell the same type differently (for example `Foo` vs `ext_crate::Foo`), the surviving impl for a colliding key can still differ between sides, which reintroduces the false `CMinusSUnionD` mismatch this change is meant to eliminate.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
-              "line": 405,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1e1c15aaaba788332e92566461c6c05e9aac5fdfcd459665599847a77401b7d9",
-          "at": "2026-05-19T13:45:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b5239ca77aeb2355e0ce0234d8af4f6d082ca5b748c21131c6733a2e2deb9a0",
-          "at": "2026-05-19T13:54:46Z"
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:32:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8b5239ca77aeb2355e0ce0234d8af4f6d082ca5b748c21131c6733a2e2deb9a0",
-          "at": "2026-05-19T13:58:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BoundOp::Equal` is still being dropped here: every `WherePredicateDecl` is emitted as `WherePredicate::BoundPredicate`, and the `operator` field is only read to silence the warning. That means a catalogue decoded from `\"operator\": \"Equal\"` will silently turn back into a `:` predicate when it is converted to the extended crate, which breaks round-tripping and changes semantics.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 938,
-              "category": "correctness"
-            },
-            {
-              "message": "The new `operator` field is not validated for `Equal` predicates. This boundary only rejects empty `rhs`, so `operator = Equal` with zero or multiple RHS entries is still accepted and then re-serialized by the encoder, leaving illegal domain states representable even though `WherePredicateDecl` documents `Equal` as a single-RHS form.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-              "line": 398,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:e58f6239be64735b8ac59c5c7bc5ad3fd72fc839636384abc74f90e7884d65ce",
-          "at": "2026-05-19T14:27:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`rhs` is still validated with `validate_bound_str()`, which parses `TypeParamBound`. That rejects valid equality RHS values like `u32`, so the new `operator: \"Equal\"` form cannot actually be decoded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-              "line": 425,
-              "category": "correctness"
-            },
-            {
-              "message": "`BoundOp::Equal` is serialized without enforcing `rhs.len() == 1`, so a malformed in-memory predicate can round-trip into invalid JSON, and the extended-crate codec will silently drop every RHS entry after the first. This is a data-loss regression for the new schema.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 951,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3b56f636f0c084d90fb5a78cebe9533234a467e8a52271a47cccbdef783bc442",
-          "at": "2026-05-19T14:33:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueToExtendedCrateCodec` now handles `BoundOp::Equal`, but it never re-validates that the domain value actually has exactly one RHS element. The branch at [catalogue_to_extended_crate_codec.rs:946](./libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L946) takes `.first()` and silently drops any extra entries, so an in-memory `WherePredicateDecl { operator: Equal, rhs: [U, V] }` is corrupted into `where ... = U` instead of failing.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 946,
-              "category": "correctness"
-            },
-            {
-              "message": "The new `Equal` branch accepts any RHS string that parses as a `TypeRef`, but it does not reject RHS forms that `parse_type_ref_str` cannot preserve, such as qualified paths (`<T as Trait>::Assoc`). `decode.rs` will accept those inputs via `validate_type_ref_str` at [decode.rs:434](./libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs#L434), and `catalogue_to_extended_crate_codec.rs` then silently degrades them to unresolved placeholders at [catalogue_to_extended_crate_codec.rs:968](./libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L968), breaking round-trip fidelity.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 968,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:109f8f2a82ba1a2cd51a39c6b65a389ca737a94bec881399f38c7764fc5f59c0",
-          "at": "2026-05-19T14:37:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `BoundOp::Equal` path is not exercised by any regression test. The added codec tests cover legacy decode, new-format decode, and Bound-only JSON emission, but they never verify `where_predicate_decl_to_dto` or the `EqPredicate` branch in `CatalogueToExtendedCrateCodec`, so a break in single-RHS equality serialization would slip past CI.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
-              "line": 1195,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:35f71d4d837ba6e6355f3264f6684eca3f8d14e70a33db5c6e8f9feb39b80ed3",
-          "at": "2026-05-19T14:42:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bb74af39862f9e56e45e896bce3c3b9504f1d11722da225aace245ba9725076a",
-          "at": "2026-05-19T14:49:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`operator: Equal` only validates that `rhs.len() == 1`; it does not validate that `lhs` is an associated-type projection. A catalogue entry such as `{ \"lhs\": \"T\", \"rhs\": [\"U\"], \"operator\": \"Equal\" }` decodes successfully even though `where T = U` is not valid Rust, and the extended-crate encoder will emit an `EqPredicate` with a bare `Type::Generic` LHS. Please reject Equal predicates whose LHS is not a supported projection form such as `T::Assoc`, so invalid external input cannot become a nonsensical `ExtendedCrate`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
-              "line": 407,
-              "category": "input-validation"
-            }
-          ],
-          "hash": "rvw1:sha256:bb74af39862f9e56e45e896bce3c3b9504f1d11722da225aace245ba9725076a",
-          "at": "2026-05-19T14:52:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BoundOp::Equal` only checks `rhs.len() == 1` before serializing. The decoder added an additional invariant that Equal predicates must have a projection LHS such as `T::Assoc`, so a domain value constructed directly with `lhs = \"T\"`, `rhs = [\"u32\"]`, `operator = Equal` will encode successfully to JSON that this same codec rejects on decode. This breaks the advertised round-trip behavior for domain-to-DTO conversion; mirror the decoder's Equal-LHS validation here before returning `BoundOpDto::Equal`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
-              "line": 175,
-              "category": "correctness"
-            },
-            {
-              "message": "The ExtendedCrate encoder has the same missing Equal-LHS validation for in-memory domain values. A direct `WherePredicateDecl { lhs: \"T\", rhs: [\"u32\"], operator: Equal }` passes this branch and emits an `EqPredicate` corresponding to invalid Rust (`where T = u32`), even though the JSON decoder rejects that shape. Since this public adapter already defensively validates Equal RHS cardinality for direct domain inputs, it should also reject non-projection Equal LHS values before emitting `WherePredicate::EqPredicate`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 946,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:065cee86ae45cb5c4663d99959a9b4414cdb8eed502e79f94dfa59cbfacd3249",
-          "at": "2026-05-19T14:57:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd519b06f1b318b4c838146a0577a183c1329ce3e9558c1a2c17926001e92a57",
-          "at": "2026-05-19T15:02:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Dropping `validate_supported_bound` makes `use<...>` look accepted at the codec boundary, but the value still round-trips as a placeholder `GenericBound::TraitBound` with path `use<U>`. Phase 1.5/1.6 treats any unresolved local `ResolvedPath` as an unresolved type reference and will raise `UnresolvedTypeRef`, so this does not actually support precise-capture bounds end-to-end. The new tests only assert `encode()` succeeds, which misses that downstream failure.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 751,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:09826770a38cde91cbc5a5bea2a5679326bfd22cc78ad1e0b5008f3365055ad9",
-          "at": "2026-05-19T15:24:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a995a176b7d0899946f6e7a252dd3600d0a13bb903e1ad2616107bf3a6cf0533",
-          "at": "2026-05-19T15:28:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a995a176b7d0899946f6e7a252dd3600d0a13bb903e1ad2616107bf3a6cf0533",
-          "at": "2026-05-19T15:31:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:61cff238d823248ba9f8462ec7fa8c0afb0f12f57ce496e16d82a393920ba76a",
-          "at": "2026-05-19T15:45:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:61cff238d823248ba9f8462ec7fa8c0afb0f12f57ce496e16d82a393920ba76a",
-          "at": "2026-05-19T15:47:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2fcb489a61551d740d76e4250a3eafcd0d80087d1a574798b76be9d26f3b69a4",
-          "at": "2026-05-19T15:57:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2fcb489a61551d740d76e4250a3eafcd0d80087d1a574798b76be9d26f3b69a4",
-          "at": "2026-05-19T16:01:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3952b0404d6ef2a65b4285e104f360169af836a19a7c25e8ff7b38a4a5fb5859",
-          "at": "2026-05-19T16:19:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3952b0404d6ef2a65b4285e104f360169af836a19a7c25e8ff7b38a4a5fb5859",
-          "at": "2026-05-19T16:22:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9795a6870dccf658b057916733bab6b4c6f05bba40a9e2e211fc2b336075f806",
-          "at": "2026-05-19T16:33:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9795a6870dccf658b057916733bab6b4c6f05bba40a9e2e211fc2b336075f806",
-          "at": "2026-05-19T16:37:39Z"
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:33:56Z"
         }
       ]
     },
@@ -807,24 +531,27 @@
           "findings": [],
           "hash": "rvw1:sha256:311c0037fc34d5fb81b15a0d242551338e2fda4e52a05f67b336115325774386",
           "at": "2026-05-19T16:34:28Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
-          "at": "2026-05-19T16:32:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
-          "at": "2026-05-19T16:33:56Z"
+          "hash": "rvw1:sha256:78737ed64aa1a25cd31ba419172a9ce9f3f0818e217600bc2e800baeb6f8163a",
+          "at": "2026-05-19T16:40:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7115bd7f27cd89c20a4b9adc026eec1768edc2c0acd25b373170660d72389d18",
+          "at": "2026-05-19T16:53:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7115bd7f27cd89c20a4b9adc026eec1768edc2c0acd25b373170660d72389d18",
+          "at": "2026-05-19T16:55:30Z"
         }
       ]
     },
@@ -885,6 +612,461 @@
           "findings": [],
           "hash": "rvw1:sha256:1d9cd173137b41e312b851b835143684ff3c860c847acac0f0b7874e5e54454e",
           "at": "2026-05-19T16:35:39Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fccf6f562fd4d261f7c9e8bd259055857f62d574253bbceb7ec56dd2ea9b821a",
+          "at": "2026-05-19T13:09:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the external-`for_` filter admits cross-crate impls into a key space that still uses only the bare `for_` short name. If a crate has both a local type and an external type with the same last path segment implementing the same trait (for example, `impl Printable for Error` and `impl Printable for std::error::Error`), the `BTreeMap<String, Id>` will silently collapse one impl and phase 2 can evaluate the wrong impl set.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 369,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9422caf6c2b6719e0fb49cafe6ea6b15b74973080780784241b6f9d77b0a5afe",
+          "at": "2026-05-19T13:23:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [mod.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs#L389) The new `for_path_raw` tiebreaker assumes the raw `Type::ResolvedPath.path` is identical on S and C, but this map also contains A-sourced impls whose `for_.path` is synthesized from catalogue short names rather than rustdoc’s original module-qualified path. On a same-key collision that mixes A-sourced and rustdoc-sourced impls, S and C can still sort different winners and produce a false `CMinusSUnionD` red.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 389,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: [tests.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L2716) The new collision regression test does not exercise the changed behavior: both competing impl fixtures use the same `for_.path` (`\"MyError\"`), so the assertion only checks the final `Id` fallback. A regression in the new path-based ordering would still pass this test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 2716,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:6f27f12b3d13494a1a7c5232918c5c0274b7cf08fdc85aed1c637ec8b584deed",
+          "at": "2026-05-19T13:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `(key, for_path_raw, id)` tiebreaker relies on the verbatim `Type::ResolvedPath.path` string, but this field is not canonicalized anywhere in the function. If C-side rustdoc and the S-side/orphan-impl data spell the same type differently (for example `Foo` vs `ext_crate::Foo`), the surviving impl for a colliding key can still differ between sides, which reintroduces the false `CMinusSUnionD` mismatch this change is meant to eliminate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 405,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e1c15aaaba788332e92566461c6c05e9aac5fdfcd459665599847a77401b7d9",
+          "at": "2026-05-19T13:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b5239ca77aeb2355e0ce0234d8af4f6d082ca5b748c21131c6733a2e2deb9a0",
+          "at": "2026-05-19T13:54:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b5239ca77aeb2355e0ce0234d8af4f6d082ca5b748c21131c6733a2e2deb9a0",
+          "at": "2026-05-19T13:58:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BoundOp::Equal` is still being dropped here: every `WherePredicateDecl` is emitted as `WherePredicate::BoundPredicate`, and the `operator` field is only read to silence the warning. That means a catalogue decoded from `\"operator\": \"Equal\"` will silently turn back into a `:` predicate when it is converted to the extended crate, which breaks round-tripping and changes semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 938,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `operator` field is not validated for `Equal` predicates. This boundary only rejects empty `rhs`, so `operator = Equal` with zero or multiple RHS entries is still accepted and then re-serialized by the encoder, leaving illegal domain states representable even though `WherePredicateDecl` documents `Equal` as a single-RHS form.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 398,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:e58f6239be64735b8ac59c5c7bc5ad3fd72fc839636384abc74f90e7884d65ce",
+          "at": "2026-05-19T14:27:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`rhs` is still validated with `validate_bound_str()`, which parses `TypeParamBound`. That rejects valid equality RHS values like `u32`, so the new `operator: \"Equal\"` form cannot actually be decoded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 425,
+              "category": "correctness"
+            },
+            {
+              "message": "`BoundOp::Equal` is serialized without enforcing `rhs.len() == 1`, so a malformed in-memory predicate can round-trip into invalid JSON, and the extended-crate codec will silently drop every RHS entry after the first. This is a data-loss regression for the new schema.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 951,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3b56f636f0c084d90fb5a78cebe9533234a467e8a52271a47cccbdef783bc442",
+          "at": "2026-05-19T14:33:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueToExtendedCrateCodec` now handles `BoundOp::Equal`, but it never re-validates that the domain value actually has exactly one RHS element. The branch at [catalogue_to_extended_crate_codec.rs:946](./libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L946) takes `.first()` and silently drops any extra entries, so an in-memory `WherePredicateDecl { operator: Equal, rhs: [U, V] }` is corrupted into `where ... = U` instead of failing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 946,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `Equal` branch accepts any RHS string that parses as a `TypeRef`, but it does not reject RHS forms that `parse_type_ref_str` cannot preserve, such as qualified paths (`<T as Trait>::Assoc`). `decode.rs` will accept those inputs via `validate_type_ref_str` at [decode.rs:434](./libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs#L434), and `catalogue_to_extended_crate_codec.rs` then silently degrades them to unresolved placeholders at [catalogue_to_extended_crate_codec.rs:968](./libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L968), breaking round-trip fidelity.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 968,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:109f8f2a82ba1a2cd51a39c6b65a389ca737a94bec881399f38c7764fc5f59c0",
+          "at": "2026-05-19T14:37:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `BoundOp::Equal` path is not exercised by any regression test. The added codec tests cover legacy decode, new-format decode, and Bound-only JSON emission, but they never verify `where_predicate_decl_to_dto` or the `EqPredicate` branch in `CatalogueToExtendedCrateCodec`, so a break in single-RHS equality serialization would slip past CI.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1195,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:35f71d4d837ba6e6355f3264f6684eca3f8d14e70a33db5c6e8f9feb39b80ed3",
+          "at": "2026-05-19T14:42:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bb74af39862f9e56e45e896bce3c3b9504f1d11722da225aace245ba9725076a",
+          "at": "2026-05-19T14:49:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`operator: Equal` only validates that `rhs.len() == 1`; it does not validate that `lhs` is an associated-type projection. A catalogue entry such as `{ \"lhs\": \"T\", \"rhs\": [\"U\"], \"operator\": \"Equal\" }` decodes successfully even though `where T = U` is not valid Rust, and the extended-crate encoder will emit an `EqPredicate` with a bare `Type::Generic` LHS. Please reject Equal predicates whose LHS is not a supported projection form such as `T::Assoc`, so invalid external input cannot become a nonsensical `ExtendedCrate`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 407,
+              "category": "input-validation"
+            }
+          ],
+          "hash": "rvw1:sha256:bb74af39862f9e56e45e896bce3c3b9504f1d11722da225aace245ba9725076a",
+          "at": "2026-05-19T14:52:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BoundOp::Equal` only checks `rhs.len() == 1` before serializing. The decoder added an additional invariant that Equal predicates must have a projection LHS such as `T::Assoc`, so a domain value constructed directly with `lhs = \"T\"`, `rhs = [\"u32\"]`, `operator = Equal` will encode successfully to JSON that this same codec rejects on decode. This breaks the advertised round-trip behavior for domain-to-DTO conversion; mirror the decoder's Equal-LHS validation here before returning `BoundOpDto::Equal`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 175,
+              "category": "correctness"
+            },
+            {
+              "message": "The ExtendedCrate encoder has the same missing Equal-LHS validation for in-memory domain values. A direct `WherePredicateDecl { lhs: \"T\", rhs: [\"u32\"], operator: Equal }` passes this branch and emits an `EqPredicate` corresponding to invalid Rust (`where T = u32`), even though the JSON decoder rejects that shape. Since this public adapter already defensively validates Equal RHS cardinality for direct domain inputs, it should also reject non-projection Equal LHS values before emitting `WherePredicate::EqPredicate`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 946,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:065cee86ae45cb5c4663d99959a9b4414cdb8eed502e79f94dfa59cbfacd3249",
+          "at": "2026-05-19T14:57:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd519b06f1b318b4c838146a0577a183c1329ce3e9558c1a2c17926001e92a57",
+          "at": "2026-05-19T15:02:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Dropping `validate_supported_bound` makes `use<...>` look accepted at the codec boundary, but the value still round-trips as a placeholder `GenericBound::TraitBound` with path `use<U>`. Phase 1.5/1.6 treats any unresolved local `ResolvedPath` as an unresolved type reference and will raise `UnresolvedTypeRef`, so this does not actually support precise-capture bounds end-to-end. The new tests only assert `encode()` succeeds, which misses that downstream failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 751,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:09826770a38cde91cbc5a5bea2a5679326bfd22cc78ad1e0b5008f3365055ad9",
+          "at": "2026-05-19T15:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a995a176b7d0899946f6e7a252dd3600d0a13bb903e1ad2616107bf3a6cf0533",
+          "at": "2026-05-19T15:28:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a995a176b7d0899946f6e7a252dd3600d0a13bb903e1ad2616107bf3a6cf0533",
+          "at": "2026-05-19T15:31:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61cff238d823248ba9f8462ec7fa8c0afb0f12f57ce496e16d82a393920ba76a",
+          "at": "2026-05-19T15:45:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61cff238d823248ba9f8462ec7fa8c0afb0f12f57ce496e16d82a393920ba76a",
+          "at": "2026-05-19T15:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fcb489a61551d740d76e4250a3eafcd0d80087d1a574798b76be9d26f3b69a4",
+          "at": "2026-05-19T15:57:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fcb489a61551d740d76e4250a3eafcd0d80087d1a574798b76be9d26f3b69a4",
+          "at": "2026-05-19T16:01:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3952b0404d6ef2a65b4285e104f360169af836a19a7c25e8ff7b38a4a5fb5859",
+          "at": "2026-05-19T16:19:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3952b0404d6ef2a65b4285e104f360169af836a19a7c25e8ff7b38a4a5fb5859",
+          "at": "2026-05-19T16:22:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9795a6870dccf658b057916733bab6b4c6f05bba40a9e2e211fc2b336075f806",
+          "at": "2026-05-19T16:33:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9795a6870dccf658b057916733bab6b4c6f05bba40a9e2e211fc2b336075f806",
+          "at": "2026-05-19T16:37:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run()` now hard-fails on an `InherentImplDeclV2` whose `type_name` is not in `local_name_to_id`, but the design note in this same block says these entries should be skipped defensively. As written, one stray or external inherent impl will abort the whole codec run instead of being ignored.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 313,
+              "category": "correctness"
+            },
+            {
+              "message": "The new evaluator tests only assert `!is_red()` at both [signal_evaluator_v2/tests.rs:3177](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3177) and [signal_evaluator_v2/tests.rs:3368](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3368). That leaves room for a Yellow regression to pass, even though the brief says these cases should stay Blue.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 3177,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:3edadc56ee0d080b9de95081911fe2eedd20064d7344d336c3d948c373d5c317",
+          "at": "2026-05-19T16:58:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new inherent-impl path calls `encode_method_items` without passing the enclosing impl generics, and `encode_method_items` itself only rewrites types against `method.generics`. Any method inside `impl<T> ...` or `trait Foo<T>` that mentions an outer `T` will be encoded as an unresolved path instead of `Type::Generic`, so generic methods will miscompare in phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 359,
+              "category": "correctness"
+            },
+            {
+              "message": "The inherent-impl loop silently skips entries whose `type_name` is missing from `local_name_to_id`. That drops catalogue data without surfacing an error, so a malformed `inherent_impls` entry can disappear from the output and the caller never learns the codec input was inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 313,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:de9f40d1237473b2e809d215cc4c826a3522b2ea91a9ca06317e686c62691834",
+          "at": "2026-05-19T17:03:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode_trait` now records trait-level generics on the trait item, but it still calls `encode_method_items(..., &[])`. That means any trait method that mentions a trait parameter, e.g. `trait Foo<T> { fn get(&self) -> T; }`, will encode `T` as an unresolved type in the method signature and fail A/C structural comparison for valid generic traits.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1423,
+              "category": "correctness"
+            },
+            {
+              "message": "`encode_method_items` now uses outer impl generic names for parameter/return parsing, but `build_where_form_generics` still receives only `method_generic_names`. For valid methods like `impl<T> Foo<T> { fn make<U: Into<T>>() {} }`, the `T` inside `U`'s bound will still be encoded as an unresolved type instead of an in-scope generic, so the encoded `Function.generics` will not match rustdoc.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1697,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:51830f37c98080113948eaa05a33fc1ca5877ea3e4feec07d8d6970eb47cbf66",
+          "at": "2026-05-19T17:11:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These new end-to-end cases only cover the happy path (`impl<T: Clone>` on both sides) plus the legacy empty-A case. They never assert that a changed `Impl.generics` shape becomes non-Blue, so a regression that keeps ignoring impl-block generics would still pass this suite. Add a negative mismatch case here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 2994,
+              "category": "testing"
+            },
+            {
+              "message": "The codec tests verify generic-parameter counts and names, but they do not check the actual bound payloads emitted by `build_where_form_generics`. For example, `test_trait_decl_generics_encoded_correctly` would still pass if the inline `Clone` bound or the explicit `where T: Send` predicate were dropped. That leaves the new generic/where-form encoding insufficiently covered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1724,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b8c904f3a2ebd7b48990d1d243c5fe76f266a18c5ad676c618424cc5d369a5a8",
+          "at": "2026-05-19T17:19:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`inherent_impls` are accepted for any `TypeName`, but the append logic only handles `Struct` and `Enum` items. If a catalogue points an inherent impl at a `TypeAlias` (or any future non-struct/enum type), the codec silently leaves the impl orphaned instead of rejecting it. That produces an impossible Rust item in the output and can skew downstream signal evaluation; this should fail closed with an error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 389,
+              "category": "missing validation"
+            }
+          ],
+          "hash": "rvw1:sha256:b8c904f3a2ebd7b48990d1d243c5fe76f266a18c5ad676c618424cc5d369a5a8",
+          "at": "2026-05-19T17:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `encode_trait` still serializes `supertrait_bounds` with `encode_bound_str` at [libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs:1461](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L1461), so trait generics are not in scope there. A valid declaration like `trait Foo<T>: Into<T>` will encode `T` as an unresolved/path type instead of `Type::Generic`, which breaks the new trait-generic support for any generic supertrait bounds.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1461,
+              "category": "bug"
+            },
+            {
+              "message": "P1: The new coverage does not actually pin down the new impl-linking behavior. The inherent-impl test at [libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs:1948](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs#L1948) only checks that some generic `Impl` exists; it never asserts that the generated impl id was appended to the owning type's `impls` list. Likewise, the signal tests at [libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3177](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L3177) and [libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3369](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L3369) only assert that the final signal is Blue, which would still pass even if the codec stopped emitting `impl_generics`. That leaves the critical Phase-1 linkage path unprotected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1948,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7e9b6b93ffdd677a25fd68eb733736473b2e4601289034718fc2235afb2b2710",
+          "at": "2026-05-19T17:28:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new inherent-impl codec test only checks `generics.params` and linkage into `Struct.impls`; it never asserts `impl_inner.generics.where_predicates`. A regression in `InherentImplDeclV2.impl_where_predicates` translation would still pass this test, so the new public path is not actually covered end-to-end.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1901,
+              "category": "testing"
+            },
+            {
+              "message": "P1: The backward-compat test for legacy trait impls only asserts the evaluator returns Blue. It does not verify the A-side `Impl` still encodes empty `generics.params` / `where_predicates`, and the evaluator intentionally ignores impl-block generics in structural comparison. That means this regression test would still pass even if old catalogues started emitting impl generics again.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 3228,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1eaa3eccc21218d80a6dcd267dc8db08f289b461da7ad1c8b4d9bd43ded63104",
+          "at": "2026-05-19T17:37:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9f001d25bbbf0b72a35224c045da4e4f226e6e85d5d86fbfcf9aae55b8f60cc",
+          "at": "2026-05-19T17:42:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9f001d25bbbf0b72a35224c045da4e4f226e6e85d5d86fbfcf9aae55b8f60cc",
+          "at": "2026-05-19T17:45:37Z"
         }
       ]
     }
