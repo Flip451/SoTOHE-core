@@ -492,6 +492,229 @@ impl EncoderState {
         synthetic_id
     }
 
+    /// Checks whether a path string refers to the local crate and, if so, returns it with
+    /// the root segment replaced by `"crate"` (e.g. `"domain::Foo<T>"` → `"crate::Foo<T>"`).
+    ///
+    /// Returns `Some(normalized)` when the root matches `self.crate_name` or is a Rust path
+    /// keyword (`crate`, `self`, `super`).  Returns `None` for external-crate paths or bare
+    /// names without `::`.
+    fn try_normalize_to_local_crate_path(&self, path: &str) -> Option<String> {
+        let root_crate = path.split("::").next()?;
+        if root_crate.is_empty() || !path.contains("::") {
+            return None;
+        }
+        let is_same_crate = root_crate == self.crate_name.as_str()
+            || root_crate == "crate"
+            || root_crate == "self"
+            || root_crate == "super";
+        if is_same_crate {
+            let rest = &path[root_crate.len()..]; // includes the leading "::"
+            // Normalize the root segment and also replace all occurrences of the explicit
+            // crate name inside generic arguments (e.g. `crate::Foo<domain::Bar>` →
+            // `crate::Foo<crate::Bar>`).
+            let root_normalized = format!("crate{rest}");
+            Some(self.replace_crate_prefix_globally(&root_normalized))
+        } else {
+            None
+        }
+    }
+
+    /// Replaces occurrences of `{crate_name}::` in `s` with `crate::`, but only when
+    /// `{crate_name}` appears as the **first segment** of a path component.
+    ///
+    /// In Rust path strings, `{crate_name}` is a module sub-segment (not a crate root) exactly
+    /// when it is immediately preceded by `::` (e.g. `other::domain::Bar`).  In all other
+    /// positions — start of string, after `<`, `(`, `[`, `,`, `=`, `&`, `*`, `+`, ` `, etc. —
+    /// it is the root of a new path and should be normalised to `crate`.
+    ///
+    /// This preserves module paths (e.g. `crate::domain::Foo` is NOT rewritten to
+    /// `crate::crate::Foo`) while normalising all crate-root occurrences inside generic
+    /// arguments (e.g. `domain::Wrapper<domain::Inner>` → `crate::Wrapper<crate::Inner>`
+    /// and `Vec<domain::A,domain::B>` → `Vec<crate::A,crate::B>`).
+    fn replace_crate_prefix_globally(&self, s: &str) -> String {
+        let cn = self.crate_name.as_str();
+        if cn == "crate" || cn == "self" || cn == "super" {
+            // Keywords are already valid — nothing to replace.
+            return s.to_string();
+        }
+        let needle = format!("{cn}::");
+        if !s.contains(needle.as_str()) {
+            return s.to_string();
+        }
+        // Collect the byte offsets of all `{crate_name}::` occurrences that qualify as
+        // crate-root matches (not sub-module segments or partial identifier matches).
+        // Use the ORIGINAL string for all lookups to avoid the context-loss problem that
+        // arises when iteratively consuming `remaining` after each replacement.
+        let mut replace_at: Vec<usize> = Vec::new();
+        let s_bytes = s.as_bytes();
+        let needle_len = needle.len();
+        let mut search_from = 0;
+        while let Some(rel) = s[search_from..].find(needle.as_str()) {
+            let abs = search_from + rel;
+            // Determine whether `{crate_name}` is an independent path root at `abs`.
+            // It is NOT a path root when immediately preceded by:
+            //   - `:` → sub-module segment (e.g. `other::domain::Foo`)
+            //   - alphanumeric or `_` → part of a longer identifier (e.g. `mydomain::Foo`)
+            let is_path_root = abs == 0
+                || s_bytes
+                    .get(abs - 1)
+                    .map(|&b| b != b':' && !b.is_ascii_alphanumeric() && b != b'_')
+                    .unwrap_or(true);
+            if is_path_root {
+                replace_at.push(abs);
+            }
+            search_from = abs + needle_len;
+        }
+        if replace_at.is_empty() {
+            return s.to_string();
+        }
+        // Build the result by copying segments from the original string, inserting `crate::`
+        // at the recorded positions.
+        let mut result = String::with_capacity(s.len());
+        let mut cursor = 0;
+        for pos in replace_at {
+            result.push_str(&s[cursor..pos]);
+            result.push_str("crate::");
+            cursor = pos + needle_len;
+        }
+        result.push_str(&s[cursor..]);
+        result
+    }
+
+    /// Encodes a `TraitImplDeclV2.for_` override path string into a `Type`.
+    ///
+    /// Classification:
+    /// - **Same crate**: root segment matches `self.crate_name` or is a Rust path keyword
+    ///   (`crate`, `self`, `super`).  The last path-segment ident (without generic args)
+    ///   is looked up in `local_name_to_id`; unknown names are rejected with `InvalidTypeRef`.
+    ///   Returns `Type::ResolvedPath` with `crate_id = 0` and `args: None`.
+    /// - **External crate**: encoded via `parse_type_ref_str` so that generic arguments
+    ///   (e.g. `Map<K, V>` in `serde::Map<K, V>`) are correctly placed in `Path.args`
+    ///   rather than embedded in the name string.  After encoding, `rewrite_generic_types`
+    ///   is applied so that impl-level generics become `Type::Generic` nodes.
+    ///
+    /// Validation:
+    /// - `for_path` must contain at least one `::` (bare names are rejected).
+    /// - The root crate segment must not be empty (`::Foo` absolute-path syntax is rejected).
+    ///
+    /// # Errors
+    ///
+    /// Returns `InvalidTypeRef` if:
+    /// - `for_path` contains no `::` (ambiguous bare name).
+    /// - The root segment is empty (absolute-path `::Foo` syntax).
+    /// - A same-crate type is not declared in this catalogue document.
+    /// - `parse_type_ref_str` fails for an external crate path.
+    fn encode_for_path(
+        &mut self,
+        for_path: &str,
+        generic_names: &[&str],
+    ) -> Result<Type, CatalogueToExtendedCrateCodecError> {
+        // Require at least one `::` so the root crate segment is unambiguous.
+        if !for_path.contains("::") {
+            return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: for_path.to_owned(),
+                reason: "TraitImplDeclV2.for_ must be a fully-qualified path \
+                         (e.g. `crate_name::TypeName`) — bare single-segment paths are \
+                         ambiguous in cross-crate impl context"
+                    .to_owned(),
+            });
+        }
+        // Reject absolute-path syntax (`::Foo`) that would produce an empty root crate name.
+        let root_crate = for_path.split("::").next().unwrap_or("");
+        if root_crate.is_empty() {
+            return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: for_path.to_owned(),
+                reason: "TraitImplDeclV2.for_ may not start with `::` — use an explicit \
+                         crate-name prefix (e.g. `crate::Foo` or `my_crate::Foo`) instead"
+                    .to_owned(),
+            });
+        }
+        // Rust path keywords (`crate`, `self`, `super`) and the document crate name all
+        // denote the local crate.
+        let is_same_crate = root_crate == self.crate_name.as_str()
+            || root_crate == "crate"
+            || root_crate == "self"
+            || root_crate == "super";
+        if is_same_crate {
+            // Same-crate type: normalize the path root to `crate` so `parse_type_ref_str`
+            // treats it as a local reference (which looks up `local_name_to_id`) rather than
+            // registering a spurious external crate entry.  For example, `"domain::Foo<T>"`
+            // becomes `"crate::Foo<T>"` before being passed to the parser.
+            // Also replace all nested occurrences of the explicit crate name (e.g.
+            // `domain::Wrapper<domain::Inner>` → `crate::Wrapper<crate::Inner>`) so that
+            // generic arguments referencing same-crate types are also correctly classified.
+            let rest = &for_path[root_crate.len()..]; // includes the leading "::"
+            let root_normalized = format!("crate{rest}");
+            let normalized = self.replace_crate_prefix_globally(&root_normalized);
+            let raw = self.parse_type_ref_str(&normalized)?;
+            // Apply `rewrite_generic_types` BEFORE checking for unresolved local types.
+            // `parse_type_ref_str` represents generic parameters (e.g. `T` in `Foo<T>`) as
+            // `Type::ResolvedPath { path: "T", id: UNRESOLVED_CRATE_ID }` until `rewrite_generic_types`
+            // converts them to `Type::Generic("T")`.  Running the unresolved-type check before
+            // the rewrite would incorrectly reject valid generic impls such as `impl<T> Trait for crate::Foo<T>`.
+            let rewrote = if generic_names.is_empty() {
+                raw
+            } else {
+                rewrite_generic_types(raw, generic_names)
+            };
+            // After generic rewriting, any remaining `UNRESOLVED_CRATE_ID` node (including
+            // nodes nested inside generic arguments) indicates an undeclared same-crate type.
+            // Reject to avoid dangling impl targets.
+            if let Some(unresolved_path) = find_unresolved_local_path(&rewrote) {
+                let short = unresolved_path
+                    .rsplit("::")
+                    .next()
+                    .unwrap_or(unresolved_path)
+                    .split('<')
+                    .next()
+                    .unwrap_or(unresolved_path);
+                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                    type_ref: for_path.to_owned(),
+                    reason: format!(
+                        "TraitImplDeclV2.for_ references same-crate type `{short}` that \
+                         is not declared in this catalogue document — check spelling or \
+                         add the type entry before using it as an impl target"
+                    ),
+                });
+            }
+            // Normalize the path string to the bare short name so that `for_path_raw`
+            // (used as a tiebreaker in `build_impl_identity_map`) matches the spelling
+            // that organic C-side rustdoc impls use for local types.  Rustdoc emits
+            // `Type::ResolvedPath.path = "Foo"` (last segment only) for local types;
+            // emitting `"crate::Foo"` here would make the tiebreaker non-deterministic
+            // when an A-sourced impl and an organic local impl share the same key.
+            let for_type = match rewrote {
+                Type::ResolvedPath(mut p) => {
+                    if p.path.contains("::") {
+                        if let Some(short) = p.path.rsplit("::").next() {
+                            let short = short.split('<').next().unwrap_or(short);
+                            p.path = short.to_string();
+                        }
+                    }
+                    Type::ResolvedPath(p)
+                }
+                other => other,
+            };
+            Ok(for_type)
+        } else {
+            // External crate type: use `parse_type_ref_str` so that generic arguments
+            // (e.g. `serde::Map<K, V>`) are correctly encoded in `Path.args` rather than
+            // embedded in the name string.  Apply `rewrite_generic_types` so that impl-level
+            // generics become `Type::Generic` nodes.
+            // Also normalize any occurrences of the local crate name inside generic arguments
+            // (e.g. `other::Wrapper<domain::Inner>` → `other::Wrapper<crate::Inner>`) so that
+            // `parse_type_ref_str` does not register the local crate as an external crate.
+            let parse_path = self.replace_crate_prefix_globally(for_path);
+            let raw = self.parse_type_ref_str(&parse_path)?;
+            let for_type = if generic_names.is_empty() {
+                raw
+            } else {
+                rewrite_generic_types(raw, generic_names)
+            };
+            Ok(for_type)
+        }
+    }
+
     /// Post-processes a `Type` tree returned by `parse_type_ref`, replacing the
     /// `UNRESOLVED_CRATE_ID` sentinel with fresh synthetic item ids for
     /// identifiers that are **known externals** (std prelude or crate-prefixed with a
@@ -945,46 +1168,57 @@ impl EncoderState {
                         .to_owned(),
                 });
             }
-            // Reject qualified-path LHS forms (`<T as Trait>::Item`) before they
-            // reach `parse_type_ref_str`. `parse_type_ref_str` cannot reconstruct
-            // the `Type::QualifiedPath` shape that rustdoc emits for such predicates
-            // and degrades them to an unresolved placeholder, producing a silent
-            // structural mismatch in the signal evaluator (ADR D3 fail-closed).
             // Note: `use<...>` (precise-capture) bounds in the RHS position are
             // accepted by ADR `2026-05-18-1223` D1 — `parse_generic_bound` encodes
             // them as a best-effort `GenericBound::TraitBound` placeholder.
-            if lhs_str.trim().starts_with('<') {
-                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: lhs_str.to_owned(),
-                    reason: "qualified-path where-predicate LHS (`<T as Trait>::Assoc`) is not \
-                             yet supported in catalogue where-predicates — use simple \
-                             associated-type projection (`T::Assoc`) instead"
-                        .to_owned(),
-                });
-            }
-            let lhs_type =
-                if !generic_names.is_empty() && is_bare_generic_name(lhs_str, generic_names) {
-                    // Simple bare generic: `T` → `Type::Generic("T")`
-                    Type::Generic(lhs_str.trim().to_string())
-                } else if !generic_names.is_empty() {
-                    if let Some(proj) = try_build_generic_projection(lhs_str, generic_names) {
-                        // Single-level associated-type projection: `T::Item` →
-                        // `Type::QualifiedPath { name: "Item", self_type: Generic("T"),
-                        //  trait_: None, args: None }`.
-                        //
-                        // This matches the shape that rustdoc emits for `where T::Item: …`
-                        // predicates so that A-catalogue and C-rustdoc representations
-                        // compare equal in `build_where_form_view`.
-                        proj
-                    } else {
-                        let raw = self.parse_type_ref_str(lhs_str)?;
-                        rewrite_generic_types(raw, generic_names)
-                    }
-                } else {
-                    self.parse_type_ref_str(lhs_str)?
-                };
+            //
+            // For `BoundOp::Bound`, qualified-path LHS forms (`<T as Trait>::Item`) are
+            // rejected because `parse_type_ref_str` cannot reconstruct the
+            // `Type::QualifiedPath` shape that rustdoc emits for such predicates and
+            // degrades them to an unresolved placeholder, producing a silent structural
+            // mismatch in the signal evaluator (ADR D3 fail-closed).
+            //
+            // For `BoundOp::Equal`, qualified-path LHS forms are accepted because
+            // `where <T as Trait>::Assoc = U` is valid Rust and the decoder already
+            // accepts them.  The LHS is parsed by `encode_qualified_equal_lhs`.
             match w.operator {
                 BoundOp::Bound => {
+                    // Reject qualified-path LHS forms (`<T as Trait>::Item`) before they
+                    // reach `parse_type_ref_str`. `parse_type_ref_str` cannot reconstruct
+                    // the `Type::QualifiedPath` shape that rustdoc emits for such predicates
+                    // and degrades them to an unresolved placeholder, producing a silent
+                    // structural mismatch in the signal evaluator (ADR D3 fail-closed).
+                    if lhs_str.trim().starts_with('<') {
+                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                            type_ref: lhs_str.to_owned(),
+                            reason: "qualified-path where-predicate LHS (`<T as Trait>::Assoc`) \
+                                     is not supported in `Bound` where-predicates — use simple \
+                                     associated-type projection (`T::Assoc`) instead"
+                                .to_owned(),
+                        });
+                    }
+                    let lhs_type = if !generic_names.is_empty()
+                        && is_bare_generic_name(lhs_str, generic_names)
+                    {
+                        // Simple bare generic: `T` → `Type::Generic("T")`
+                        Type::Generic(lhs_str.trim().to_string())
+                    } else if !generic_names.is_empty() {
+                        if let Some(proj) = try_build_generic_projection(lhs_str, generic_names) {
+                            // Single-level associated-type projection: `T::Item` →
+                            // `Type::QualifiedPath { name: "Item", self_type: Generic("T"),
+                            //  trait_: None, args: None }`.
+                            //
+                            // This matches the shape that rustdoc emits for `where T::Item: …`
+                            // predicates so that A-catalogue and C-rustdoc representations
+                            // compare equal in `build_where_form_view`.
+                            proj
+                        } else {
+                            let raw = self.parse_type_ref_str(lhs_str)?;
+                            rewrite_generic_types(raw, generic_names)
+                        }
+                    } else {
+                        self.parse_type_ref_str(lhs_str)?
+                    };
                     let mut bounds: Vec<GenericBound> = Vec::with_capacity(w.rhs.len());
                     for b in &w.rhs {
                         bounds.push(self.encode_and_validate_bound(b.as_str(), generic_names)?);
@@ -996,7 +1230,8 @@ impl EncoderState {
                     });
                 }
                 BoundOp::Equal => {
-                    // `Equal` predicates (`where T::Assoc = U`) encode as `EqPredicate`.
+                    // `Equal` predicates (`where T::Assoc = U`, `where <T as Trait>::Assoc = U`)
+                    // encode as `EqPredicate`.
                     // Enforce rhs.len() == 1 defensively: decode validates this, but
                     // in-memory domain values constructed outside the codec must also pass.
                     if w.rhs.len() != 1 {
@@ -1010,23 +1245,55 @@ impl EncoderState {
                         });
                     }
                     // Mirror the JSON decoder's Equal-LHS invariant: the LHS must be an
-                    // associated-type projection (e.g. `T::Assoc`).  A bare type parameter
-                    // such as `"T"` would produce `WherePredicate::EqPredicate` for
-                    // `where T = U`, which is not valid Rust.  Catching this here prevents
-                    // domain values constructed outside the JSON codec path from generating
-                    // nonsensical `ExtendedCrate` representations.
+                    // associated-type projection (e.g. `T::Assoc`, `<T as Trait>::Assoc`).
+                    // A bare type parameter such as `"T"` would produce
+                    // `WherePredicate::EqPredicate` for `where T = U`, which is not valid Rust.
+                    // Catching this here prevents domain values constructed outside the JSON
+                    // codec path from generating nonsensical `ExtendedCrate` representations.
                     if !lhs_str.contains("::") {
                         return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
                             type_ref: lhs_str.to_owned(),
                             reason: format!(
                                 "Equal where-predicate lhs '{}' is not a supported projection \
                                  form; expected a path with at least one '::' segment \
-                                 (e.g. `T::Assoc`) — bare type parameters cannot appear as \
-                                 the LHS of a `where T = U` equality constraint",
+                                 (e.g. `T::Assoc`, `<T as Trait>::Assoc`) — bare type parameters \
+                                 cannot appear as the LHS of a `where T = U` equality constraint",
                                 lhs_str
                             ),
                         });
                     }
+                    // Build the LHS type for this Equal predicate.
+                    //
+                    // Unlike `Bound` predicates, `Equal` predicates accept qualified-path LHS
+                    // forms (`<T as Trait>::Assoc`) in addition to simple projections
+                    // (`T::Assoc`).  The decoder already accepts both forms
+                    // (`validate_equal_predicate_lhs` only requires `lhs_str.contains("::")`),
+                    // so the encoder must accept them too (decode-success / encode-fail symmetry).
+                    let lhs_type = if lhs_str.trim().starts_with('<') {
+                        // Qualified-path LHS: `<SelfType as Trait>::Assoc`.
+                        // Delegates to `encode_qualified_equal_lhs` which handles all self-type
+                        // forms: generic params, `Self`, and concrete paths like `Vec<T>`.
+                        self.encode_qualified_equal_lhs(lhs_str, generic_names)?
+                    } else if !generic_names.is_empty()
+                        && is_bare_generic_name(lhs_str, generic_names)
+                    {
+                        // Simple bare generic: `T` → `Type::Generic("T")`.
+                        // (Already rejected above for Equal if it has no `::`, so this branch
+                        // is unreachable for valid Equal LHS, but kept for completeness.)
+                        Type::Generic(lhs_str.trim().to_string())
+                    } else if let Some(proj) = try_build_generic_projection(lhs_str, generic_names)
+                    {
+                        // Associated-type projection starting with a generic param or `Self`:
+                        // single-level `T::Item`, `Self::Assoc`, or multi-level `T::Nested::Assoc`.
+                        // `try_build_generic_projection` returns `Some` for both generic params and
+                        // the `Self` keyword, independent of whether `generic_names` is non-empty.
+                        proj
+                    } else if !generic_names.is_empty() {
+                        let raw = self.parse_type_ref_str(lhs_str)?;
+                        rewrite_generic_types(raw, generic_names)
+                    } else {
+                        self.parse_type_ref_str(lhs_str)?
+                    };
                     // Safe: len == 1 asserted above.
                     let rhs_entry = w.rhs.first().ok_or_else(|| {
                         CatalogueToExtendedCrateCodecError::InvalidTypeRef {
@@ -1036,29 +1303,26 @@ impl EncoderState {
                         }
                     })?;
                     let rhs_str = rhs_entry.as_str();
-                    // Reject qualified-path RHS forms (`<T as Trait>::Assoc`).
-                    // `parse_type_ref_str` cannot reconstruct the correct `Type::QualifiedPath`
-                    // shape and silently produces an unresolved placeholder, breaking round-trip.
-                    if rhs_str.trim().starts_with('<') {
-                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                            type_ref: rhs_str.to_owned(),
-                            reason: "qualified-path Equal predicate RHS \
-                                     (`<T as Trait>::Assoc`) is not supported — \
-                                     use a simple type expression instead"
-                                .to_owned(),
-                        });
-                    }
-                    let rhs_type = if !generic_names.is_empty()
+                    // Encode the RHS of the `Equal` predicate.  The decoder accepts any valid
+                    // `syn::Type` as the RHS (including qualified-path forms such as
+                    // `<U as Trait>::Assoc`), so the encoder must handle the same set to
+                    // maintain decode-encode symmetry.
+                    let rhs_type = if rhs_str.trim().starts_with('<') {
+                        // Qualified-path RHS: `<U as Trait>::Assoc`.
+                        // Delegates to `encode_qualified_equal_lhs` which handles all self-type
+                        // forms: generic params, `Self`, and concrete paths.
+                        self.encode_qualified_equal_lhs(rhs_str, generic_names)?
+                    } else if !generic_names.is_empty()
                         && is_bare_generic_name(rhs_str, generic_names)
                     {
                         Type::Generic(rhs_str.trim().to_string())
+                    } else if let Some(proj) = try_build_generic_projection(rhs_str, generic_names)
+                    {
+                        // Projection starting with a generic param or `Self` (e.g. `Self::Assoc`).
+                        proj
                     } else if !generic_names.is_empty() {
-                        if let Some(proj) = try_build_generic_projection(rhs_str, generic_names) {
-                            proj
-                        } else {
-                            let raw = self.parse_type_ref_str(rhs_str)?;
-                            rewrite_generic_types(raw, generic_names)
-                        }
+                        let raw = self.parse_type_ref_str(rhs_str)?;
+                        rewrite_generic_types(raw, generic_names)
                     } else {
                         self.parse_type_ref_str(rhs_str)?
                     };
@@ -1780,7 +2044,20 @@ impl EncoderState {
         let mut impl_ids = vec![];
         for ti in trait_impls {
             let impl_id = self.alloc_id();
-            let for_type = resolved_path_type(type_id, type_name);
+            // `TraitImplDeclV2.for_` overrides the enclosing type when the impl targets a
+            // different type (e.g. `impl MyTrait for ExternalCrate::ExternalType`).
+            // When `None`, fall back to the enclosing `type_name` (the common case).
+            // Collect impl-level generic parameter names early so they can be passed to
+            // `encode_for_path` for correct `Type::Generic` rewriting in the `for_` type.
+            // (e.g. `impl<T> MyTrait for crate::Foo<T>` — `T` must become `Type::Generic("T")`)
+            let impl_generic_names: Vec<&str> =
+                ti.impl_generics.iter().map(|g| g.name.as_str()).collect();
+
+            let for_type = if let Some(ref for_path) = ti.for_ {
+                self.encode_for_path(for_path, &impl_generic_names)?
+            } else {
+                resolved_path_type(type_id, type_name)
+            };
 
             // `Path.id` is an item id, not a crate id.
             // * Local traits: use the pre-assigned item id from the pre-pass.
@@ -1912,12 +2189,8 @@ impl EncoderState {
             let trait_path = Path { path: trait_path_str, id: trait_id, args: None };
 
             // Encode impl-block-level generics (IN-06, ADR `2026-05-18-1223` D2).
-            // `TraitImplDeclV2.impl_generics` holds type parameters on the impl block itself
-            // (e.g. `impl<L, R, W> Trait for Foo<L, R, W>`). The names are collected so that
-            // type references inside bounds resolve to `Type::Generic` correctly.
-            // Empty Vec (old catalogues / non-generic impls) produces `empty_generics()`.
-            let impl_generic_names: Vec<&str> =
-                ti.impl_generics.iter().map(|g| g.name.as_str()).collect();
+            // `impl_generic_names` was computed above (before `for_type`) so it could be passed
+            // to `encode_for_path` for generic rewriting.  Reuse it here for `build_where_form_generics`.
             let impl_generics = self.build_where_form_generics(
                 &ti.impl_generics,
                 &ti.impl_where_predicates,
@@ -1980,6 +2253,256 @@ impl EncoderState {
                 Ok(VariantKind::Struct { fields: field_ids, has_stripped_fields: false })
             }
         }
+    }
+
+    /// Encodes a qualified-path `Equal` predicate LHS of the form `<SelfType as Trait>::Assoc`
+    /// where `SelfType` may be any of:
+    /// - A known generic parameter name → `Type::Generic(name)`
+    /// - The keyword `"Self"` → `Type::ResolvedPath(Path { path: "Self", id: Id(0), .. })`
+    /// - A concrete type expression → resolved via `parse_type_ref_str` with generic rewriting
+    ///
+    /// The trait segment is always resolved via `parse_type_ref_str` so that external traits
+    /// (e.g. `std::iter::Iterator`, `serde::Serialize`) obtain a proper synthetic item id rather
+    /// than the `UNRESOLVED_CRATE_ID` sentinel.  Storing `UNRESOLVED_CRATE_ID` for a trait that
+    /// is not in the local catalogue causes Phase 1 `resolve_type` to raise `UnresolvedTypeRef`
+    /// when it detects a bare single-segment path without `::` that is not in `s_known_names`.
+    ///
+    /// Returns `InvalidTypeRef` if the string does not match the `<...as...>::...` pattern,
+    /// if the trait segment is empty, or if `parse_type_ref_str` fails for the self type or trait.
+    fn encode_qualified_equal_lhs(
+        &mut self,
+        lhs_str: &str,
+        generic_names: &[&str],
+    ) -> Result<Type, CatalogueToExtendedCrateCodecError> {
+        let t = lhs_str.trim();
+        // Find the `>::` delimiter at the **outermost** nesting level.
+        // Simple `find(">::")` would match the first inner delimiter in nested forms such as
+        // `<<T as Trait>::Assoc as Another>::Item`, producing an incorrect split.
+        // Walk the string tracking angle-bracket depth and stop at the `>` that closes the
+        // outermost `<` (i.e., where depth returns to 0 and `::`follows).
+        let delim = {
+            let mut depth: usize = 0;
+            let mut found: Option<usize> = None;
+            let bytes = t.as_bytes();
+            let mut i = 0;
+            while i < bytes.len() {
+                match bytes.get(i) {
+                    Some(b'<') => {
+                        depth += 1;
+                        i += 1;
+                    }
+                    Some(b'>') if depth > 0 => {
+                        depth -= 1;
+                        if depth == 0 {
+                            // Check whether `>::` follows.
+                            if bytes.get(i + 1..i + 3) == Some(b"::") {
+                                found = Some(i);
+                                break;
+                            }
+                        }
+                        i += 1;
+                    }
+                    _ => {
+                        i += 1;
+                    }
+                }
+            }
+            found.ok_or_else(|| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: lhs_str.to_owned(),
+                reason: "could not parse qualified-path Equal predicate LHS \
+                         (`<SelfType as Trait>::AssocIdent` expected — missing `>::` delimiter \
+                         at the outermost nesting level)"
+                    .to_owned(),
+            })?
+        };
+        let inner = &t[1..delim];
+        // Trim the associated-type name to handle spaces after `>::` (e.g. `>:: Item`).
+        let assoc = t[delim + 3..].trim();
+        // `assoc` must be a non-empty plain identifier (no angle brackets or `::` separators).
+        if assoc.is_empty() || assoc.contains('<') || assoc.contains('>') || assoc.contains("::") {
+            return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: lhs_str.to_owned(),
+                reason: "qualified-path Equal predicate LHS has an invalid associated-type \
+                         identifier after `>::`"
+                    .to_owned(),
+            });
+        }
+        // Find the `as` keyword at the outermost nesting level of `inner`, accepting any
+        // surrounding whitespace (e.g. `T  as  Trait` or `T\tas\tTrait`).
+        //
+        // `inner.find(" as ")` would fail for multiple spaces or tab-separated forms that
+        // `syn::Type` accepts, and would also match inside nested paths
+        // (e.g. `<T as Trait>::Assoc as Another` — the first ` as ` is inside the nested `<T as
+        // Trait>`).  Instead, walk `inner` with depth tracking and look for the pattern
+        // `<whitespace> "as" <whitespace>` at depth 0 where "whitespace" is at least one
+        // ASCII space or tab.
+        //
+        // Returns `(ws_start, kw_end)`:
+        //   - `ws_start`: byte index of the first whitespace character before `as`.
+        //   - `kw_end`:   byte index immediately after the trailing whitespace (start of the
+        //                 trait name segment).
+        //
+        // `self_str = inner[..ws_start].trim()` and `trait_str = inner[kw_end..].trim()` so
+        // that both sides are whitespace-independent.
+        let (ws_start, kw_end) = {
+            let mut depth: usize = 0;
+            let ibytes = inner.as_bytes();
+            let mut found: Option<(usize, usize)> = None;
+            let mut i = 0;
+            while i < ibytes.len() {
+                match ibytes.get(i) {
+                    Some(b'<') => {
+                        depth += 1;
+                        i += 1;
+                    }
+                    Some(b'>') if depth > 0 => {
+                        depth -= 1;
+                        i += 1;
+                    }
+                    Some(b' ' | b'\t') if depth == 0 => {
+                        // Possible start of `<ws>as<ws>` pattern.
+                        let ws_start = i;
+                        // Skip all leading whitespace.
+                        let mut j = i;
+                        while matches!(ibytes.get(j), Some(b' ' | b'\t')) {
+                            j += 1;
+                        }
+                        // Require the token `as` (exactly two bytes).
+                        if ibytes.get(j..j + 2) == Some(b"as") {
+                            let after_as = j + 2;
+                            // Require at least one trailing whitespace char.
+                            if matches!(ibytes.get(after_as), Some(b' ' | b'\t')) {
+                                // Skip all trailing whitespace.
+                                let mut k = after_as;
+                                while matches!(ibytes.get(k), Some(b' ' | b'\t')) {
+                                    k += 1;
+                                }
+                                // `k` is now at the first non-whitespace byte after `as`.
+                                // Make sure the byte at `j - 1` (the char before the leading
+                                // whitespace) is not part of an identifier (prevents matching
+                                // `foo_as_bar` at depth 0 which should not be split).
+                                // Since we only enter this branch when `ibytes[ws_start]` is
+                                // whitespace (not alphanumeric or `_`), this guard is satisfied
+                                // by the match condition above.
+                                found = Some((ws_start, k));
+                                break;
+                            }
+                        }
+                        // Not a valid `<ws>as<ws>` — advance past the leading whitespace we
+                        // already scanned so we do not re-examine those bytes.
+                        i = j;
+                    }
+                    _ => {
+                        i += 1;
+                    }
+                }
+            }
+            found.ok_or_else(|| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: lhs_str.to_owned(),
+                reason: "qualified-path Equal predicate LHS is missing the `as` keyword \
+                         (with surrounding whitespace) between the self type and trait name \
+                         at the outermost nesting level"
+                    .to_owned(),
+            })?
+        };
+        let self_str = inner[..ws_start].trim();
+        let trait_str = inner[kw_end..].trim();
+        if trait_str.is_empty() {
+            return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: lhs_str.to_owned(),
+                reason: "qualified-path Equal predicate LHS has an empty trait name".to_owned(),
+            });
+        }
+        // Encode the self type:
+        //   (a) known generic param → `Type::Generic(name)` (no parse needed)
+        //   (b) `Self` keyword    → `Type::ResolvedPath(Path { path: "Self", id: Id(0), .. })`
+        //   (c) nested qualified path (`<T as Trait>::Assoc`) → recursive call to
+        //       `encode_qualified_equal_lhs` (since `parse_type_ref_str` cannot reconstruct
+        //       the correct `Type::QualifiedPath` shape for `qself` syntax)
+        //   (d) concrete path     → `parse_type_ref_str` with same-crate normalization + generic
+        //       rewriting.  Same-crate paths (e.g. `domain::Foo`) are normalized to `crate::Foo`
+        //       before parsing so that `parse_type_ref_str` looks up `local_name_to_id` rather
+        //       than registering a spurious `external_crates` entry for the local crate name.
+        let self_type = if generic_names.contains(&self_str) {
+            Type::Generic(self_str.to_string())
+        } else if self_str == "Self" {
+            Type::ResolvedPath(Path { path: "Self".to_string(), id: Id(0), args: None })
+        } else if self_str.starts_with('<') {
+            // Nested qualified-path self type: `<T as Trait>::Assoc` appearing as the self type
+            // of an outer `<<T as Trait>::Assoc as AnotherTrait>::Item` predicate.
+            // `parse_type_ref_str` returns an unresolved placeholder for `qself` syntax, so we
+            // delegate to `encode_qualified_equal_lhs` which correctly produces `QualifiedPath`.
+            self.encode_qualified_equal_lhs(self_str, generic_names)?
+        } else {
+            let parse_str = self
+                .try_normalize_to_local_crate_path(self_str)
+                .unwrap_or_else(|| self.replace_crate_prefix_globally(self_str));
+            let raw_self = self.parse_type_ref_str(&parse_str)?;
+            // Apply generic rewriting BEFORE the unresolved-type check.  `parse_type_ref_str`
+            // represents generic parameters as `UNRESOLVED_CRATE_ID` until `rewrite_generic_types`
+            // converts them to `Type::Generic`.  Running the check before the rewrite would
+            // incorrectly reject valid generic self types such as `<Foo<T> as Trait>::Assoc`.
+            let rewritten_self = if generic_names.is_empty() {
+                raw_self
+            } else {
+                rewrite_generic_types(raw_self, generic_names)
+            };
+            // Reject any self type with an unresolved local-type marker.  After generic
+            // rewriting, `UNRESOLVED_CRATE_ID` indicates an undeclared type (bare name or
+            // qualified same-crate path not in `local_name_to_id`), including unknown bare
+            // names like `"Missing"` which have no `::` and therefore bypass the same-crate
+            // detection heuristic.
+            if let Some(unresolved_path) = find_unresolved_local_path(&rewritten_self) {
+                let short = unresolved_path
+                    .rsplit("::")
+                    .next()
+                    .unwrap_or(unresolved_path)
+                    .split('<')
+                    .next()
+                    .unwrap_or(unresolved_path);
+                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                    type_ref: lhs_str.to_owned(),
+                    reason: format!(
+                        "qualified Equal predicate LHS self type `{short}` is not \
+                         declared in this catalogue document — check spelling or add \
+                         the type entry before using it in a qualified path predicate"
+                    ),
+                });
+            }
+            rewritten_self
+        };
+        // Encode the trait segment via `parse_type_ref_str` with same-crate normalization so
+        // that predicates like `<domain::Foo as domain::Trait>::Assoc` correctly identify
+        // `domain::Trait` as a local (same-crate) trait rather than treating `domain` as an
+        // external crate.  Also applies `rewrite_generic_types` so that generic params in the
+        // trait's args (e.g. `U` in `<T as Foo<U>>::Assoc`) become `Type::Generic` nodes.
+        let trait_parse_str = self
+            .try_normalize_to_local_crate_path(trait_str)
+            .unwrap_or_else(|| self.replace_crate_prefix_globally(trait_str));
+        let trait_type_raw = self.parse_type_ref_str(&trait_parse_str)?;
+        let trait_type_rewritten = if generic_names.is_empty() {
+            trait_type_raw
+        } else {
+            rewrite_generic_types(trait_type_raw, generic_names)
+        };
+        let trait_path = match trait_type_rewritten {
+            Type::ResolvedPath(p) => p,
+            _ => {
+                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                    type_ref: lhs_str.to_owned(),
+                    reason: format!(
+                        "qualified-path Equal predicate LHS trait `{trait_str}` did not parse \
+                         as a path type — only named trait paths are supported"
+                    ),
+                });
+            }
+        };
+        Ok(Type::QualifiedPath {
+            name: assoc.to_string(),
+            args: None,
+            self_type: Box::new(self_type),
+            trait_: Some(trait_path),
+        })
     }
 }
 
@@ -2307,35 +2830,135 @@ fn is_bare_generic_name(type_str: &str, generic_names: &[&str]) -> bool {
 /// self_type: Generic("T"), trait_: None, args: None }, ... }`.  `parse_type_ref_str`
 /// cannot produce this shape (it treats the first segment as a crate name), so we
 /// must handle the pattern here before falling through to the parser.
+/// Attempts to build a `Type::QualifiedPath` chain from a multi-segment associated-type
+/// projection string such as `"T::Item"` or `"T::Nested::Assoc"`.
+///
+/// The first path segment must be a known generic parameter name.  Each subsequent segment
+/// adds a nesting level, producing a chain of `QualifiedPath` nodes (e.g. `T::A::B` becomes
+/// `QualifiedPath { name: "B", self_type: QualifiedPath { name: "A", self_type: Generic("T"), .. }, .. }`).
+///
+/// Returns `None` if:
+/// - `type_str` contains no `::` (not a projection).
+/// - The first segment is not in `generic_names`.
+/// - Any segment contains angle brackets (generic args in projections are not supported).
+/// - Any segment is an invalid identifier.
 fn try_build_generic_projection(type_str: &str, generic_names: &[&str]) -> Option<Type> {
     let t = type_str.trim();
-    // Must contain exactly one `::` separator (two-segment form only).
+    // Reject any angle brackets — generic args in projections are not supported.
+    if t.contains('<') || t.contains('>') {
+        return None;
+    }
+    // Must have at least one `::`.
     let sep_pos = t.find("::")?;
     let prefix = &t[..sep_pos];
-    let rest = &t[sep_pos + 2..];
-    // No further `::` in the rest (single-level projection only).
-    if rest.contains("::") {
+    // Prefix must be either a known generic parameter name OR the `Self` keyword.
+    // `Self::Assoc` is a valid projection form in where-predicates.
+    let is_self_keyword = prefix == "Self";
+    if !is_self_keyword && !generic_names.contains(&prefix) {
         return None;
     }
-    // No angle brackets (associated type with no generic args).
-    if rest.contains('<') || rest.contains('>') {
-        return None;
+    // Collect all segments after the prefix.
+    let rest_str = &t[sep_pos + 2..];
+    let segments: Vec<&str> = rest_str.split("::").collect();
+    // Each segment must be a valid identifier (non-empty, starts with letter or `_`).
+    for seg in &segments {
+        if seg.is_empty() {
+            return None;
+        }
+        let first_char = seg.chars().next()?;
+        if !first_char.is_ascii_alphabetic() && first_char != '_' {
+            return None;
+        }
     }
-    // Prefix must be a known generic parameter name.
-    if !generic_names.contains(&prefix) {
-        return None;
+    // Build a nested `QualifiedPath` chain.
+    // For generic params: innermost is `Generic(prefix)`.
+    // For `Self`: innermost is `ResolvedPath { path: "Self", id: Id(0), .. }`.
+    // For `T::A::B`: QualifiedPath { name: "B", self_type: QualifiedPath { name: "A", self_type: Generic("T") } }
+    // For `Self::A::B`: QualifiedPath { name: "B", self_type: QualifiedPath { name: "A", self_type: ResolvedPath("Self") } }
+    let mut current = if is_self_keyword {
+        Type::ResolvedPath(Path { path: "Self".to_string(), id: Id(0), args: None })
+    } else {
+        Type::Generic(prefix.to_string())
+    };
+    for seg in &segments {
+        current = Type::QualifiedPath {
+            name: seg.to_string(),
+            args: None,
+            self_type: Box::new(current),
+            trait_: None,
+        };
     }
-    // `rest` must be a valid identifier (non-empty, starts with letter or `_`).
-    let first_char = rest.chars().next()?;
-    if !first_char.is_ascii_alphabetic() && first_char != '_' {
-        return None;
+    Some(current)
+}
+
+/// Walks a `Type` tree recursively and returns the `.path` string of the first
+/// `Type::ResolvedPath` node whose `id` is `UNRESOLVED_CRATE_ID`, or `None` if every
+/// node is resolved.
+///
+/// Used by `encode_for_path` to detect undeclared same-crate types nested inside generic
+/// arguments (e.g. `crate::Outer<crate::Missing>`) after `parse_type_ref_str`.  Since the
+/// same-crate branch normalises all local references to `crate::` before parsing, any
+/// remaining `UNRESOLVED_CRATE_ID` node indicates an undeclared type that should be rejected
+/// at the codec boundary rather than propagated to Phase 1.
+fn find_unresolved_local_path(ty: &Type) -> Option<&str> {
+    match ty {
+        Type::ResolvedPath(p) => {
+            if p.id == Id(UNRESOLVED_CRATE_ID) {
+                return Some(p.path.as_str());
+            }
+            if let Some(args) = &p.args {
+                return find_unresolved_in_generic_args(args);
+            }
+            None
+        }
+        Type::BorrowedRef { type_: inner, .. } | Type::RawPointer { type_: inner, .. } => {
+            find_unresolved_local_path(inner)
+        }
+        Type::Slice(inner) | Type::Array { type_: inner, .. } => find_unresolved_local_path(inner),
+        Type::Tuple(tys) => tys.iter().find_map(find_unresolved_local_path),
+        Type::QualifiedPath { self_type, trait_, .. } => find_unresolved_local_path(self_type)
+            .or_else(|| {
+                trait_.as_ref().and_then(|tp| {
+                    if tp.id == Id(UNRESOLVED_CRATE_ID) {
+                        Some(tp.path.as_str())
+                    } else {
+                        tp.args.as_deref().and_then(find_unresolved_in_generic_args)
+                    }
+                })
+            }),
+        // Generic, Primitive, Infer, Never, Pat, DynTrait, ImplTrait, FunctionPointer:
+        // none of these embed a ResolvedPath with an id.
+        _ => None,
     }
-    Some(Type::QualifiedPath {
-        name: rest.to_string(),
-        args: None,
-        self_type: Box::new(Type::Generic(prefix.to_string())),
-        trait_: None,
-    })
+}
+
+fn find_unresolved_in_generic_args(args: &GenericArgs) -> Option<&str> {
+    match args {
+        GenericArgs::AngleBracketed { args, constraints } => args
+            .iter()
+            .find_map(|arg| match arg {
+                GenericArg::Type(ty) => find_unresolved_local_path(ty),
+                _ => None,
+            })
+            .or_else(|| {
+                constraints.iter().find_map(|c| {
+                    c.args.as_deref().and_then(find_unresolved_in_generic_args).or_else(|| match &c
+                        .binding
+                    {
+                        AssocItemConstraintKind::Equality(Term::Type(ty)) => {
+                            find_unresolved_local_path(ty)
+                        }
+                        _ => None,
+                    })
+                })
+            }),
+        GenericArgs::Parenthesized { inputs, output } => inputs
+            .iter()
+            .find_map(find_unresolved_local_path)
+            .or_else(|| output.as_ref().and_then(find_unresolved_local_path)),
+        // `ReturnTypeNotation` (`(..)`) contains no nested types.
+        GenericArgs::ReturnTypeNotation => None,
+    }
 }
 
 #[cfg(test)]

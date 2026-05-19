@@ -64,7 +64,7 @@
     {
       "id": "T011",
       "description": "統合確認: bin/sotp を rebuild し (cargo make build-sotp)、本トラックの type-signals / catalogue-spec-signals を全 3 layer で再生成する。track-sync-views で rendered view を再生成する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。domain layer の Phase 2 Yellow (action: add / modify エントリの実装前正常 Yellow) が本実装によって Blue 化することを確認する。usecase layer の false-positive Red 2 件 (Interactor エントリの Outlives strip 非対称性由来 — IN-03 / T003 で解消する見込み) と infrastructure layer の Red 1 件 (NewTypeGraphCodecError cross-crate From impl — IN-10 / IN-11 / T008-T009 および D4 / T012 で解消する見込み) が解消していることを確認する。AC-01〜AC-12 の充足確認をコメントとして残す。Layer: integration。",
-      "status": "in_progress"
+      "status": "done"
     }
   ],
   "plan": {

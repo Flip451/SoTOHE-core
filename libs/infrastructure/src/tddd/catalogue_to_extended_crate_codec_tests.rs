@@ -2082,3 +2082,615 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_no_generics() {
         t.generics.where_predicates
     );
 }
+
+// -----------------------------------------------------------------------
+// Finding 1: TraitImplDeclV2.for_ override
+// -----------------------------------------------------------------------
+
+/// When `TraitImplDeclV2.for_` is `Some("external_crate::ExternalType")`, the
+/// Impl item's `for_` type must be a `Type::ResolvedPath` pointing to a synthetic
+/// id that has a `Crate::paths` entry with the external crate's `crate_id` (non-zero).
+///
+/// Verifies ADR/IN-13: `for_` override path encodes the correct impl target type
+/// and registers the external crate entry so `krate.external_crates` is non-empty.
+#[test]
+fn test_for_override_with_external_crate_path_registers_external_crate() {
+    use rustdoc_types::Path as RdPath;
+
+    let mut doc = make_doc("domain");
+    let mut ti =
+        TraitImplDeclV2::new(TraitName::new("Display").unwrap(), CrateName::new("std").unwrap());
+    ti.for_ = Some("external_crate::ExternalType".to_string());
+
+    doc.types.insert(
+        TypeName::new("LocalType").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![ti],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = ec.krate();
+
+    // Find the trait Impl item (trait_ is Some).
+    let trait_impl_item = krate
+        .index
+        .values()
+        .find(|item| matches!(&item.inner, ItemEnum::Impl(i) if i.trait_.is_some()))
+        .expect("must find a trait Impl item");
+    let ItemEnum::Impl(ref impl_inner) = trait_impl_item.inner else {
+        panic!("expected Impl inner");
+    };
+
+    // The `for_` type must be a ResolvedPath whose path is the fully-qualified type path.
+    // `parse_type_ref_str` stores the full multi-segment path (e.g. `"external_crate::ExternalType"`)
+    // in `Path.path` for external crate types.
+    let Type::ResolvedPath(RdPath { path, id, .. }) = &impl_inner.for_ else {
+        panic!("expected Type::ResolvedPath for for_, got {:?}", impl_inner.for_);
+    };
+    assert_eq!(
+        path, "external_crate::ExternalType",
+        "for_ path must be the fully-qualified type path"
+    );
+
+    // The id must have a paths entry with a non-zero crate_id (external crate).
+    let summary = krate
+        .paths
+        .get(id)
+        .unwrap_or_else(|| panic!("paths must contain an entry for the for_ type id {id:?}"));
+    assert_ne!(summary.crate_id, 0, "external for_ type must have non-zero crate_id in paths");
+    assert!(
+        krate.external_crates.contains_key(&summary.crate_id),
+        "external_crates must contain the crate_id {} for external_crate",
+        summary.crate_id
+    );
+}
+
+/// When `TraitImplDeclV2.for_` is `Some("domain::LocalType")` (same crate as the
+/// enclosing document), the Impl item's `for_` type must be a `Type::ResolvedPath`
+/// with `crate_id = 0` in `Crate::paths` (self-crate type).
+#[test]
+fn test_for_override_with_self_crate_path_uses_crate_id_zero() {
+    use rustdoc_types::Path as RdPath;
+
+    let mut doc = make_doc("domain");
+    let mut ti =
+        TraitImplDeclV2::new(TraitName::new("Clone").unwrap(), CrateName::new("std").unwrap());
+    // `for_` points to a type in the same crate ("domain").
+    // The target type must be declared in the catalogue; unknown same-crate names are rejected.
+    ti.for_ = Some("domain::LocalType".to_string());
+
+    doc.types.insert(
+        TypeName::new("Host").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![ti],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+    // Declare `LocalType` so `local_name_to_id` has an entry for it.
+    doc.types.insert(
+        TypeName::new("LocalType").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = ec.krate();
+
+    // Find the trait Impl item.
+    let trait_impl_item = krate
+        .index
+        .values()
+        .find(|item| matches!(&item.inner, ItemEnum::Impl(i) if i.trait_.is_some()))
+        .expect("must find a trait Impl item");
+    let ItemEnum::Impl(ref impl_inner) = trait_impl_item.inner else {
+        panic!("expected Impl inner");
+    };
+
+    // The `for_` type must be a ResolvedPath.
+    // Same-crate overrides with an explicit crate name prefix (e.g. `"domain::LocalType"`)
+    // are normalized to `"crate::LocalType"` for parsing, but the resulting `Path.path` is
+    // the bare short name `"LocalType"` — matching the spelling that organic C-side rustdoc
+    // impls produce for local types (used as a tiebreaker in `build_impl_identity_map`).
+    let Type::ResolvedPath(RdPath { path, id, .. }) = &impl_inner.for_ else {
+        panic!("expected Type::ResolvedPath for for_, got {:?}", impl_inner.for_);
+    };
+    assert_eq!(
+        path, "LocalType",
+        "same-crate for_ path must be the bare short name (matching organic rustdoc impl format)"
+    );
+
+    // The id must have a paths entry with crate_id = 0 (self-crate).
+    let summary = krate
+        .paths
+        .get(id)
+        .unwrap_or_else(|| panic!("paths must contain an entry for the for_ type id {id:?}"));
+    assert_eq!(summary.crate_id, 0, "same-crate for_ type must have crate_id = 0 in paths");
+}
+
+/// When `TraitImplDeclV2.for_` is `None`, the Impl item's `for_` type must be the
+/// enclosing `type_name` (existing behaviour preserved).
+#[test]
+fn test_for_override_none_uses_enclosing_type_name() {
+    use rustdoc_types::Path as RdPath;
+
+    let mut doc = make_doc("domain");
+    // `for_` is None (default).
+    let ti = TraitImplDeclV2::new(TraitName::new("Debug").unwrap(), CrateName::new("std").unwrap());
+
+    doc.types.insert(
+        TypeName::new("MyType").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![ti],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = ec.krate();
+
+    // Find the trait Impl item.
+    let trait_impl_item = krate
+        .index
+        .values()
+        .find(|item| matches!(&item.inner, ItemEnum::Impl(i) if i.trait_.is_some()))
+        .expect("must find a trait Impl item");
+    let ItemEnum::Impl(ref impl_inner) = trait_impl_item.inner else {
+        panic!("expected Impl inner");
+    };
+
+    // The `for_` type must be a ResolvedPath with the enclosing type's name.
+    let Type::ResolvedPath(RdPath { path, .. }) = &impl_inner.for_ else {
+        panic!("expected Type::ResolvedPath for for_, got {:?}", impl_inner.for_);
+    };
+    assert_eq!(path, "MyType", "for_ must use the enclosing type name when for_ is None");
+}
+
+// -----------------------------------------------------------------------
+// Finding 2: Equal predicate with qualified LHS
+// -----------------------------------------------------------------------
+
+/// A `FunctionEntry` with `BoundOp::Equal` and a qualified-path LHS
+/// (`<T as Trait>::Assoc = U`) must encode successfully as an `EqPredicate`.
+///
+/// Previously this was rejected because the common `starts_with('<')` guard fired
+/// for both `Bound` and `Equal` operators.  The fix moves the guard into the
+/// `Bound` branch only, and routes `Equal` qualified LHS through `encode_qualified_equal_lhs`.
+#[test]
+fn test_encode_equal_predicate_with_qualified_lhs_succeeds() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use rustdoc_types::{Term, WherePredicate};
+
+    let mut doc = make_doc("domain");
+    let crate_n = CrateName::new("domain").unwrap();
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("qualified_equal_fn").unwrap());
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        // Qualified-path Equal LHS: `<T as Iterator>::Item = u32`.
+        where_predicates: vec![WherePredicateDecl {
+            lhs: TypeRef::new("<T as Iterator>::Item").unwrap(),
+            rhs: vec![TypeRef::new("u32").unwrap()],
+            operator: BoundOp::Equal,
+        }],
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+
+    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    assert!(
+        result.is_ok(),
+        "qualified-path Equal predicate LHS must encode successfully, got: {result:?}"
+    );
+
+    let ec = result.unwrap();
+    let fn_item = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("qualified_equal_fn")
+                && matches!(item.inner, ItemEnum::Function(_))
+        })
+        .expect("expected Function item for qualified_equal_fn");
+    let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+
+    assert_eq!(
+        f.generics.where_predicates.len(),
+        1,
+        "expected 1 where predicate for qualified Equal predicate"
+    );
+    // Must be an EqPredicate.
+    assert!(
+        matches!(f.generics.where_predicates[0], WherePredicate::EqPredicate { .. }),
+        "qualified Equal operator must emit WherePredicate::EqPredicate, got {:?}",
+        f.generics.where_predicates[0]
+    );
+    let WherePredicate::EqPredicate { ref lhs, ref rhs } = f.generics.where_predicates[0] else {
+        panic!("expected EqPredicate");
+    };
+    // LHS must be a QualifiedPath with name "Item", self_type = Generic("T"),
+    // trait_ = Some(Path { path: "std::iter::Iterator", .. }).
+    // `Iterator` is a std prelude type; `parse_type_ref_str` resolves it to the canonical
+    // std path so Phase 1 does not raise `UnresolvedTypeRef`.
+    let Type::QualifiedPath { name, self_type, trait_, .. } = lhs else {
+        panic!("EqPredicate lhs must be Type::QualifiedPath, got {lhs:?}");
+    };
+    assert_eq!(name, "Item", "QualifiedPath name must be the assoc type name");
+    assert!(
+        matches!(self_type.as_ref(), Type::Generic(n) if n == "T"),
+        "QualifiedPath self_type must be Generic(\"T\"), got {self_type:?}"
+    );
+    assert!(
+        trait_.as_ref().is_some_and(|p| p.path == "std::iter::Iterator"),
+        "QualifiedPath trait_ must have canonical path \"std::iter::Iterator\", got {trait_:?}"
+    );
+    // RHS must be Term::Type.
+    assert!(matches!(rhs, Term::Type(_)), "EqPredicate rhs must be Term::Type, got {rhs:?}");
+}
+
+// -----------------------------------------------------------------------
+// Finding 1 regression: crate:: / self:: / super:: in for_ treated as same-crate
+// -----------------------------------------------------------------------
+
+/// When `TraitImplDeclV2.for_` is `Some("crate::LocalType")`, the Rust path keyword
+/// `crate` must be treated as a same-crate reference (crate_id = 0), not registered
+/// as a fake external crate named "crate".
+#[test]
+fn test_for_override_with_crate_keyword_prefix_uses_crate_id_zero() {
+    use rustdoc_types::Path as RdPath;
+
+    let mut doc = make_doc("domain");
+    let mut ti =
+        TraitImplDeclV2::new(TraitName::new("Clone").unwrap(), CrateName::new("std").unwrap());
+    // `for_` uses the Rust `crate::` path keyword prefix.
+    // `LocalType` must be declared in the catalogue so the encoder can resolve the same-crate
+    // reference.  (Since the fix, unknown same-crate types are rejected with `InvalidTypeRef`
+    // to prevent silently encoding dangling impl targets.)
+    ti.for_ = Some("crate::LocalType".to_string());
+
+    // Declare `LocalType` in the catalogue so `local_name_to_id` has an entry for it.
+    doc.types.insert(
+        TypeName::new("LocalType").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+    doc.types.insert(
+        TypeName::new("Host").unwrap(),
+        TypeEntry {
+            action: ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            trait_impls: vec![ti],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let krate = ec.krate();
+
+    let trait_impl_item = krate
+        .index
+        .values()
+        .find(|item| matches!(&item.inner, ItemEnum::Impl(i) if i.trait_.is_some()))
+        .expect("must find a trait Impl item");
+    let ItemEnum::Impl(ref impl_inner) = trait_impl_item.inner else {
+        panic!("expected Impl inner");
+    };
+
+    let Type::ResolvedPath(RdPath { id, .. }) = &impl_inner.for_ else {
+        panic!("expected Type::ResolvedPath for for_, got {:?}", impl_inner.for_);
+    };
+    // The id must have a paths entry with crate_id = 0 (same-crate).
+    let summary = krate
+        .paths
+        .get(id)
+        .unwrap_or_else(|| panic!("paths must contain an entry for the for_ type id {id:?}"));
+    assert_eq!(
+        summary.crate_id, 0,
+        "for_ with `crate::` prefix must use crate_id = 0, not register a fake external crate"
+    );
+    // Must NOT have a fake external crate named "crate".
+    let has_fake_crate = krate.external_crates.values().any(|ec| ec.name == "crate");
+    assert!(
+        !has_fake_crate,
+        "Rust keyword `crate` must not be registered as an external crate name"
+    );
+}
+
+// -----------------------------------------------------------------------
+// Finding 2 extension: <Self as Trait>::Assoc = U qualified Equal LHS
+// -----------------------------------------------------------------------
+
+/// A `FunctionEntry` with `BoundOp::Equal` and a `<Self as Trait>::Assoc = U`
+/// qualified-path LHS (using `Self` as the self type, not a generic param) must
+/// encode successfully as an `EqPredicate`.
+///
+/// The decoder accepts any `for_` value with `contains("::")`, so `<Self as Trait>::Assoc`
+/// is a valid decoded value.  The encoder must accept it to maintain decode-encode symmetry.
+#[test]
+fn test_encode_equal_predicate_with_self_qualified_lhs_succeeds() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use rustdoc_types::{Term, WherePredicate};
+
+    let mut doc = make_doc("domain");
+    let crate_n = CrateName::new("domain").unwrap();
+    let fn_path =
+        FunctionPath::at_root(crate_n, FunctionName::new("self_qualified_equal_fn").unwrap());
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        // No generic params — the self type in the qualified path is `Self`.
+        generics: vec![],
+        // Qualified-path Equal LHS with `Self`: `<Self as Iterator>::Item = u32`.
+        where_predicates: vec![WherePredicateDecl {
+            lhs: TypeRef::new("<Self as Iterator>::Item").unwrap(),
+            rhs: vec![TypeRef::new("u32").unwrap()],
+            operator: BoundOp::Equal,
+        }],
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+
+    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    assert!(
+        result.is_ok(),
+        "qualified Equal predicate with `Self` as self type must encode successfully, got: {result:?}"
+    );
+
+    let ec = result.unwrap();
+    let fn_item = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("self_qualified_equal_fn")
+                && matches!(item.inner, ItemEnum::Function(_))
+        })
+        .expect("expected Function item for self_qualified_equal_fn");
+    let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+
+    assert_eq!(
+        f.generics.where_predicates.len(),
+        1,
+        "expected 1 where predicate for Self-qualified Equal predicate"
+    );
+    assert!(
+        matches!(f.generics.where_predicates[0], WherePredicate::EqPredicate { .. }),
+        "Self-qualified Equal operator must emit WherePredicate::EqPredicate, got {:?}",
+        f.generics.where_predicates[0]
+    );
+    let WherePredicate::EqPredicate { ref lhs, ref rhs } = f.generics.where_predicates[0] else {
+        panic!("expected EqPredicate");
+    };
+    // LHS must be a QualifiedPath with name "Item", self_type = ResolvedPath("Self").
+    let Type::QualifiedPath { name, self_type, trait_, .. } = lhs else {
+        panic!("EqPredicate lhs must be Type::QualifiedPath, got {lhs:?}");
+    };
+    assert_eq!(name, "Item");
+    assert!(
+        matches!(self_type.as_ref(), Type::ResolvedPath(p) if p.path == "Self"),
+        "QualifiedPath self_type for `Self` must be ResolvedPath(\"Self\"), got {self_type:?}"
+    );
+    // `Iterator` is a std prelude type; `parse_type_ref_str` resolves it to the canonical
+    // std path `"std::iter::Iterator"` so Phase 1 does not raise `UnresolvedTypeRef`.
+    assert!(
+        trait_.as_ref().is_some_and(|p| p.path == "std::iter::Iterator"),
+        "QualifiedPath trait_ must have canonical path \"std::iter::Iterator\", got {trait_:?}"
+    );
+    assert!(matches!(rhs, Term::Type(_)), "EqPredicate rhs must be Term::Type, got {rhs:?}");
+}
+
+// -----------------------------------------------------------------------
+// Whitespace-insensitive `as` keyword and trimmed assoc name
+// -----------------------------------------------------------------------
+
+/// `encode_qualified_equal_lhs` must accept qualified-path forms with extra whitespace
+/// around the `as` keyword (e.g. `<T  as  Iterator>::Item` or `<T as Iterator>:: Item`),
+/// mirroring the set of inputs that `syn::Type` would accept.
+///
+/// This guards against the decode-success/encode-fail asymmetry where `syn` normalizes
+/// whitespace at decode time but the encoder's literal `" as "` search would reject the
+/// same form at encode time.
+#[test]
+fn test_encode_equal_predicate_qualified_lhs_with_extra_whitespace_succeeds() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use rustdoc_types::WherePredicate;
+
+    // Test 1: double space before and after `as`: `<T  as  Iterator>::Item`.
+    {
+        let mut doc = make_doc("domain");
+        let crate_n = CrateName::new("domain").unwrap();
+        let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("ws_equal_fn1").unwrap());
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![],
+            }],
+            where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("<T  as  Iterator>::Item").unwrap(),
+                rhs: vec![TypeRef::new("u32").unwrap()],
+                operator: BoundOp::Equal,
+            }],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.functions.insert(fn_path, entry);
+
+        let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+        assert!(
+            result.is_ok(),
+            "qualified Equal LHS with extra whitespace around `as` must encode successfully, got: {result:?}"
+        );
+
+        let ec = result.unwrap();
+        let fn_item = ec
+            .krate()
+            .index
+            .values()
+            .find(|item| {
+                item.name.as_deref() == Some("ws_equal_fn1")
+                    && matches!(item.inner, ItemEnum::Function(_))
+            })
+            .expect("expected Function item for ws_equal_fn1");
+        let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+        assert_eq!(f.generics.where_predicates.len(), 1);
+        let WherePredicate::EqPredicate { ref lhs, .. } = f.generics.where_predicates[0] else {
+            panic!("expected EqPredicate");
+        };
+        let Type::QualifiedPath { name, .. } = lhs else {
+            panic!("EqPredicate lhs must be Type::QualifiedPath, got {lhs:?}");
+        };
+        assert_eq!(name, "Item", "assoc name must be trimmed to 'Item'");
+    }
+
+    // Test 2: extra space after `>::`: `<T as Iterator>:: Item` (leading space before `Item`).
+    {
+        let mut doc = make_doc("domain");
+        let crate_n = CrateName::new("domain").unwrap();
+        let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("ws_equal_fn2").unwrap());
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()").unwrap(),
+            is_async: false,
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![],
+            }],
+            where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("<T as Iterator>:: Item").unwrap(),
+                rhs: vec![TypeRef::new("u32").unwrap()],
+                operator: BoundOp::Equal,
+            }],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        doc.functions.insert(fn_path, entry);
+
+        let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+        assert!(
+            result.is_ok(),
+            "qualified Equal LHS with extra space after `>::` must encode successfully, got: {result:?}"
+        );
+
+        let ec = result.unwrap();
+        let fn_item = ec
+            .krate()
+            .index
+            .values()
+            .find(|item| {
+                item.name.as_deref() == Some("ws_equal_fn2")
+                    && matches!(item.inner, ItemEnum::Function(_))
+            })
+            .expect("expected Function item for ws_equal_fn2");
+        let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+        assert_eq!(f.generics.where_predicates.len(), 1);
+        let WherePredicate::EqPredicate { ref lhs, .. } = f.generics.where_predicates[0] else {
+            panic!("expected EqPredicate");
+        };
+        let Type::QualifiedPath { name, .. } = lhs else {
+            panic!("EqPredicate lhs must be Type::QualifiedPath, got {lhs:?}");
+        };
+        assert_eq!(name, "Item", "assoc name with leading space must be trimmed to 'Item'");
+    }
+}
