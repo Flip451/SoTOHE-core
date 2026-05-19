@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-19T14:01:18Z",
+  "declaration_hash": "417ba463b81b83e1651d4f37f4447de5322572c1ef3ab3e873fe639ae4d2e06b",
+  "signals": [
+    {
+      "type_name": "CatalogueToExtendedCrateCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueToExtendedCratePort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "SignalEvaluatorV2",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SignalEvaluatorPort",
+        "core::clone::Clone",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CatalogueToExtendedCrateCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

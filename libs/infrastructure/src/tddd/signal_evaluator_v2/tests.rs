@@ -2247,6 +2247,670 @@ fn test_t043_generic_in_parenthesized_and_fn_pointer_positions_stripped() {
     );
 }
 
+// -----------------------------------------------------------------------
+// T012 regression: cross-crate impl (for_ is external type) included in identity map
+// -----------------------------------------------------------------------
+
+/// Helper: build a `rustdoc_types::Crate` that contains a local type `local_type_name` and an
+/// `impl local_trait_name for ExternalType` block, where `ExternalType` lives in an external crate
+/// (`crate_id != 0`).
+///
+/// `external_crate_name` is registered in `krate.external_crates` (external_crate_id = 2).
+/// The external type's `crate_id` in `krate.index` is set to 2 so that
+/// `build_impl_identity_map`'s loop skips the type item itself (crate_id != 0) but still
+/// processes the Impl item (the impl item itself always has crate_id == 0 because the impl
+/// was declared in THIS crate).
+///
+/// This fixture models `impl LocalTrait for ExternalType` — a "cross-crate target" impl where
+/// the impl is defined in the local crate but the implementing type (`for_`) is external.
+fn crate_with_cross_crate_target_impl(
+    crate_name: &str,
+    local_trait_name: &str,
+    external_type_name: &str,
+    external_crate_name: &str,
+) -> Crate {
+    use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
+
+    let root_id = Id(0);
+    let local_trait_id = Id(1);
+    let impl_id = Id(2);
+    // The external type's item is in the index but with crate_id != 0.
+    let external_type_id = Id(3);
+    let external_type_crate_id: u32 = 2;
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+    let mut external_crates = HashMap::new();
+
+    // Root module references the local trait and the impl.
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![local_trait_id, impl_id]));
+
+    // Local trait item (crate_id == 0).
+    index.insert(
+        local_trait_id,
+        make_item(
+            local_trait_id,
+            Some(local_trait_name),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    paths.insert(
+        local_trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), local_trait_name.to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // External type entry in the index with crate_id != 0 — so the type item is skipped by the
+    // `crate_id != 0` loop guard, but the Impl item (which has crate_id == 0) is still processed.
+    let mut external_type_item = make_item(
+        external_type_id,
+        Some(external_type_name),
+        ItemEnum::Struct(Struct {
+            kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+            generics: empty_generics(),
+            impls: vec![],
+        }),
+    );
+    external_type_item.crate_id = external_type_crate_id; // mark as external
+    index.insert(external_type_id, external_type_item);
+    // The external type appears in krate.paths with crate_id != 0.
+    paths.insert(
+        external_type_id,
+        ItemSummary {
+            crate_id: external_type_crate_id,
+            path: vec![external_crate_name.to_string(), external_type_name.to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    // Register the external crate.
+    external_crates.insert(
+        external_type_crate_id,
+        ExternalCrate {
+            name: external_crate_name.to_string(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+
+    // The impl `impl LocalTrait for ExternalType` — the Impl item itself has crate_id == 0
+    // (it was declared in THIS crate).
+    let cross_crate_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath {
+            path: local_trait_name.to_string(),
+            id: local_trait_id, // local trait — in krate.paths with crate_id == 0
+            args: None,
+        }),
+        for_: Type::ResolvedPath(RdPath {
+            path: external_type_name.to_string(),
+            id: external_type_id, // external type
+            args: None,
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(impl_id, make_item(impl_id, None, ItemEnum::Impl(cross_crate_impl)));
+
+    Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates,
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    }
+}
+
+/// T012 (new behavior, ADR D4): `impl LocalTrait for ExternalType` where `ExternalType` is an
+/// external type (`for_` has `crate_id != 0` in `krate.paths`) must be included in
+/// `build_impl_identity_map`.
+///
+/// Before T012, a `for_is_external` guard filtered these out.  After T012, the guard is removed
+/// per ADR D4 (catalogue-schema-permissive): both C-side and S-side (B-side orphan-impl pass)
+/// include cross-crate impls symmetrically so that fingerprints match and no spurious
+/// `CMinusSUnionD` signal is generated.
+///
+/// This test validates the **new behavior** (inclusion).
+#[test]
+fn test_t012_cross_crate_target_impl_included_in_identity_map() {
+    use super::build_impl_identity_map;
+
+    let crate_name = "my_crate";
+    let krate = crate_with_cross_crate_target_impl(
+        crate_name,
+        "MyLocalTrait",
+        "ExternalType",
+        "external_crate",
+    );
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    // The identity key is formed as "{for_name}: {trait_str}".
+    // `for_name` = `format_type(&impl_.for_)` = last path segment of `ExternalType` = "ExternalType".
+    // `trait_str` = normalized local trait = "MyLocalTrait" (local trait → stripped to short name).
+    let expected_key = "ExternalType: MyLocalTrait";
+    assert!(
+        map.contains_key(expected_key),
+        "T012: cross-crate target impl `impl MyLocalTrait for ExternalType` must be included \
+         in build_impl_identity_map after D4 filter removal; \
+         all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+}
+
+/// T012 (local-crate target regression): `impl LocalTrait for LocalType` (both `for_` and `trait_`
+/// are local, `crate_id == 0`) must continue to be included in `build_impl_identity_map`.
+///
+/// This is a regression guard: the D4 filter removal must not break the existing behavior
+/// for ordinary same-crate impls.
+#[test]
+fn test_t012_local_crate_target_impl_still_included_in_identity_map() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let struct_id = Id(1);
+    let trait_id = Id(2);
+    let impl_id = Id(3);
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+
+    index
+        .insert(root_id, root_module_item(root_id, crate_name, vec![struct_id, trait_id, impl_id]));
+    index.insert(struct_id, struct_item(struct_id, "LocalType"));
+    index.insert(
+        trait_id,
+        make_item(
+            trait_id,
+            Some("LocalTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    paths.insert(
+        struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "LocalType".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "LocalTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // `impl LocalTrait for LocalType` — both sides are local.
+    let local_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "LocalTrait".to_string(), id: trait_id, args: None }),
+        for_: Type::ResolvedPath(RdPath {
+            path: "LocalType".to_string(),
+            id: struct_id,
+            args: None,
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(impl_id, make_item(impl_id, None, ItemEnum::Impl(local_impl)));
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    // Both `for_` (local → short name "LocalType") and `trait_` (local → short name "LocalTrait")
+    // produce the key "LocalType: LocalTrait".
+    let expected_key = "LocalType: LocalTrait";
+    assert!(
+        map.contains_key(expected_key),
+        "T012 regression: local-crate impl `impl LocalTrait for LocalType` must still be included \
+         in build_impl_identity_map; all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+}
+
+/// T012 (excluded by inherent/negative/synthetic/blanket filter): cross-crate target impls that
+/// are inherent (no trait), negative, synthetic, or blanket must still be excluded —
+/// the D4 change only removed the `for_is_external` guard, not the other guards.
+///
+/// Validates that the non-`for_`-based exclusion guards are intact after T012.
+#[test]
+fn test_t012_excluded_impl_variants_still_excluded() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let struct_id = Id(1);
+    let trait_id = Id(2);
+    // external_type for `for_` — crate_id != 0.
+    let external_type_id = Id(3);
+    let external_type_crate_id: u32 = 2;
+
+    // --- Inherent impl with external `for_` (no trait_ → excluded) ---
+    {
+        let mut index = HashMap::new();
+        let mut paths = HashMap::new();
+        let mut external_crates = HashMap::new();
+
+        index.insert(root_id, root_module_item(root_id, crate_name, vec![struct_id]));
+        index.insert(struct_id, struct_item(struct_id, "LocalHelper"));
+        paths.insert(
+            struct_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "LocalHelper".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let mut ext_item = make_item(
+            external_type_id,
+            Some("ExtType"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        );
+        ext_item.crate_id = external_type_crate_id;
+        index.insert(external_type_id, ext_item);
+        paths.insert(
+            external_type_id,
+            ItemSummary {
+                crate_id: external_type_crate_id,
+                path: vec!["ext".to_string(), "ExtType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        external_crates.insert(
+            external_type_crate_id,
+            rustdoc_types::ExternalCrate {
+                name: "ext".to_string(),
+                html_root_url: None,
+                path: std::path::PathBuf::new(),
+            },
+        );
+
+        // Inherent impl (no trait_) — must be excluded regardless of D4.
+        let inherent_impl_id = Id(10);
+        let inherent_impl = Impl {
+            is_unsafe: false,
+            generics: empty_generics(),
+            provided_trait_methods: vec![],
+            trait_: None, // inherent impl — excluded
+            for_: Type::ResolvedPath(RdPath {
+                path: "ExtType".to_string(),
+                id: external_type_id,
+                args: None,
+            }),
+            items: vec![],
+            is_synthetic: false,
+            is_negative: false,
+            blanket_impl: None,
+        };
+        index.insert(
+            inherent_impl_id,
+            make_item(inherent_impl_id, None, ItemEnum::Impl(inherent_impl)),
+        );
+
+        let krate = Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates,
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+        let map = build_impl_identity_map(&krate, crate_name);
+        assert!(
+            map.is_empty(),
+            "T012: inherent impl (no trait) must be excluded; keys: {:?}",
+            map.keys().collect::<Vec<_>>()
+        );
+    }
+
+    // --- Negative impl with external `for_` — must be excluded ---
+    {
+        let mut index = HashMap::new();
+        let mut paths = HashMap::new();
+        let mut external_crates = HashMap::new();
+
+        index.insert(root_id, root_module_item(root_id, crate_name, vec![trait_id]));
+        index.insert(
+            trait_id,
+            make_item(
+                trait_id,
+                Some("LocalTrait"),
+                ItemEnum::Trait(rustdoc_types::Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        paths.insert(
+            trait_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "LocalTrait".to_string()],
+                kind: ItemKind::Trait,
+            },
+        );
+
+        let mut ext_item = make_item(
+            external_type_id,
+            Some("ExtType"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        );
+        ext_item.crate_id = external_type_crate_id;
+        index.insert(external_type_id, ext_item);
+        paths.insert(
+            external_type_id,
+            ItemSummary {
+                crate_id: external_type_crate_id,
+                path: vec!["ext".to_string(), "ExtType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        external_crates.insert(
+            external_type_crate_id,
+            rustdoc_types::ExternalCrate {
+                name: "ext".to_string(),
+                html_root_url: None,
+                path: std::path::PathBuf::new(),
+            },
+        );
+
+        let neg_impl_id = Id(11);
+        let neg_impl = Impl {
+            is_unsafe: false,
+            generics: empty_generics(),
+            provided_trait_methods: vec![],
+            trait_: Some(RdPath { path: "LocalTrait".to_string(), id: trait_id, args: None }),
+            for_: Type::ResolvedPath(RdPath {
+                path: "ExtType".to_string(),
+                id: external_type_id,
+                args: None,
+            }),
+            items: vec![],
+            is_synthetic: false,
+            is_negative: true, // negative impl — excluded
+            blanket_impl: None,
+        };
+        index.insert(neg_impl_id, make_item(neg_impl_id, None, ItemEnum::Impl(neg_impl)));
+
+        let krate = Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates,
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+        let map = build_impl_identity_map(&krate, crate_name);
+        assert!(
+            map.is_empty(),
+            "T012: negative impl must be excluded; keys: {:?}",
+            map.keys().collect::<Vec<_>>()
+        );
+    }
+}
+
+/// T012 (collision tiebreaker): when two impls produce the same short-name key because two
+/// different `for_` path strings share the same last segment (e.g., `"MyError"` and
+/// `"ext_crate::MyError"` both produce short name `"MyError"`), `build_impl_identity_map`
+/// must resolve the collision *deterministically using the raw `for_` path string* — not by
+/// raw `Id` value.
+///
+/// The raw `for_` path string (`Type::ResolvedPath.path`) is preserved identically in
+/// B-origin orphan impls and C-side rustdoc output, making the tiebreaker consistent across
+/// both sides and preventing a spurious structural mismatch in Phase 2.
+///
+/// The test is structured so that the `for_path_raw` tiebreaker is decisive: the impl whose
+/// `for_.path` sorts lexicographically *earlier* (`"MyError"` < `"ext_crate::MyError"`) has a
+/// **larger** Id than its competitor.  An id-only sort would pick the wrong impl.
+#[test]
+fn test_t012_collision_tiebreaker_uses_for_path_not_id() {
+    use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
+
+    use super::build_impl_identity_map;
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let trait_id = Id(1);
+    // Local struct whose impl.for_.path will be the SHORT form "MyError".
+    let local_error_id = Id(2);
+    // External struct whose impl.for_.path will be the QUALIFIED form "ext_crate::MyError".
+    // format_type() takes the last segment of both → both produce the short name "MyError"
+    // → same identity key → collision.
+    let ext_error_id = Id(3);
+    let ext_crate_id: u32 = 2;
+
+    // Id assignment: the impl whose for_path_raw sorts earlier ("MyError") gets the LARGER id
+    // (10).  An id-only sort would incorrectly keep the impl with id 4 (ext impl,
+    // for_path_raw = "ext_crate::MyError").  The for_path_raw tiebreaker corrects this.
+    let impl_short_path_id = Id(10); // large id — for_path_raw = "MyError" (sorts first)
+    let impl_qualified_path_id = Id(4); // small id — for_path_raw = "ext_crate::MyError" (sorts second)
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+    let mut external_crates = HashMap::new();
+
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![trait_id, local_error_id]));
+
+    // Trait (local).
+    index.insert(
+        trait_id,
+        make_item(
+            trait_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // Local struct. impl.for_.path will use the short form "MyError".
+    index.insert(local_error_id, struct_item(local_error_id, "MyError"));
+    paths.insert(
+        local_error_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyError".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    // External struct. impl.for_.path will use the qualified form "ext_crate::MyError"
+    // (rustdoc sometimes emits module-qualified paths for external types in impl.for_).
+    // format_type() strips to "MyError" → same key → collision.
+    let mut ext_item = make_item(
+        ext_error_id,
+        Some("MyError"),
+        ItemEnum::Struct(Struct {
+            kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+            generics: empty_generics(),
+            impls: vec![],
+        }),
+    );
+    ext_item.crate_id = ext_crate_id;
+    index.insert(ext_error_id, ext_item);
+    paths.insert(
+        ext_error_id,
+        ItemSummary {
+            crate_id: ext_crate_id,
+            path: vec!["ext_crate".to_string(), "MyError".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    external_crates.insert(
+        ext_crate_id,
+        ExternalCrate {
+            name: "ext_crate".to_string(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+
+    // impl MyTrait for local MyError — for_.path = "MyError" (short form).
+    // Assigned impl_short_path_id = Id(10) — the LARGER id.
+    let short_path_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "MyTrait".to_string(), id: trait_id, args: None }),
+        for_: Type::ResolvedPath(RdPath {
+            path: "MyError".to_string(), // short form — for_path_raw = "MyError"
+            id: local_error_id,
+            args: None,
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(
+        impl_short_path_id,
+        make_item(impl_short_path_id, None, ItemEnum::Impl(short_path_impl)),
+    );
+
+    // impl MyTrait for ext_crate::MyError — for_.path = "ext_crate::MyError" (qualified form,
+    // as rustdoc might emit for external types).  Assigned impl_qualified_path_id = Id(4) — the
+    // SMALLER id.  An id-only sort would keep THIS impl; the for_path_raw sort must override it.
+    let qualified_path_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "MyTrait".to_string(), id: trait_id, args: None }),
+        for_: Type::ResolvedPath(RdPath {
+            path: "ext_crate::MyError".to_string(), // qualified form — for_path_raw = "ext_crate::MyError"
+            id: ext_error_id,
+            args: None,
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(
+        impl_qualified_path_id,
+        make_item(impl_qualified_path_id, None, ItemEnum::Impl(qualified_path_impl)),
+    );
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates,
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    // Both impls produce the same short-name key "MyError: MyTrait" (collision).
+    // The map must contain exactly one entry.
+    assert_eq!(
+        map.len(),
+        1,
+        "T012 collision tiebreaker: exactly one impl must survive; all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+    assert!(
+        map.contains_key("MyError: MyTrait"),
+        "T012 collision tiebreaker: the surviving key must be \"MyError: MyTrait\"; \
+         all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+
+    // The for_path_raw tiebreaker must pick the impl with the lexicographically smaller
+    // path string regardless of Id ordering:
+    //   "MyError" < "ext_crate::MyError"  → impl_short_path_id (Id 10) wins
+    // Without the tiebreaker, impl_qualified_path_id (Id 4, the SMALLER id) would win instead.
+    let surviving_id = map["MyError: MyTrait"];
+    assert_eq!(
+        surviving_id, impl_short_path_id,
+        "T012 collision tiebreaker: the impl with the lexicographically smaller for_path_raw \
+         must win, regardless of Id ordering. Expected impl_short_path_id={:?} \
+         (for_path_raw=\"MyError\"), got {:?}. \
+         An id-only sort would have kept impl_qualified_path_id={:?} (Id 4, smaller).",
+        impl_short_path_id, surviving_id, impl_qualified_path_id
+    );
+}
+
 /// T043 (f): HRTB binders on `FunctionPointer` must be preserved (not collapsed to
 /// `<UNSUPPORTED:FunctionPointer>`).
 ///

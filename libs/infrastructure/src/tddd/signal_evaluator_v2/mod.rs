@@ -50,7 +50,7 @@ use std::collections::BTreeMap;
 
 use domain::tddd::ExtendedCrate;
 use domain::tddd::{Phase1Error, SignalEvaluatorPort, ThreeWayEvaluationReport};
-use rustdoc_types::{Crate, Id, Item, ItemEnum, ItemKind, Type};
+use rustdoc_types::{Crate, Id, Item, ItemEnum, ItemKind};
 
 // ---------------------------------------------------------------------------
 // Sub-modules
@@ -303,9 +303,37 @@ pub(super) fn is_compiler_internal_trait(normalized_trait_name: &str) -> bool {
 /// every trait impl regardless of generation method.
 ///
 /// When two impls produce the same identity key (e.g. two `impl Bar for Foo`
-/// blocks in different modules with the same short-name key), the one whose
-/// `Id` value is smallest is kept so the result is deterministic regardless of
-/// `HashMap` iteration order.
+/// blocks in different modules with the same short-name key), the candidates are
+/// sorted by `(key, for_path_raw, id)`: first by the key, then by the raw path
+/// string of the `for_` type, then by the smallest `Id` as a final tiebreaker.
+/// The `for_path_raw` tiebreaker — the verbatim path string stored in the
+/// `Type::ResolvedPath.path` field — makes collision resolution consistent across
+/// S-side and C-side maps for **B-origin orphan impls** (cross-crate impls from
+/// the baseline crate, inserted into S by `phase1/builder.rs`), because both
+/// sides preserve the same rustdoc-emitted path string.  This matters when a
+/// local type and an external type share the same short name (e.g. a local
+/// `Error` struct and `std::error::Error`): without the tiebreaker, S and C could
+/// each keep a *different* impl (depending on raw Id ordering), causing a spurious
+/// structural mismatch in Phase 2.
+///
+/// **Why `for_path_raw` is consistent across S and C**: S-side and C-side maps are
+/// always computed in the same CI run from rustdoc JSON produced by the same toolchain
+/// version.  The `phase1/builder.rs` orphan-impl insertion pass copies each B-side
+/// `Impl` item into S verbatim (only the `Id` fields are remapped via `b_id_remap`;
+/// the `Type::ResolvedPath.path` string inside `for_` is not modified).  Therefore
+/// the `for_path_raw` string for any given physical type is byte-for-byte identical on
+/// both S and C.  A scenario where B's and C's rustdoc emit different spellings for the
+/// same external type (e.g. `"Error"` vs `"std::error::Error"`) cannot arise within a
+/// single CI run.
+///
+/// **Limitation**: A-sourced impls (catalogue-declared via `TypeEntry.trait_impls`)
+/// currently only declare impls whose `for_` is a **local** type (the catalogue has no
+/// `for_` field in `TraitImplDeclV2` for cross-crate impl declaration).  Therefore the
+/// same-key collision between a local type and an external type that motivated the
+/// `for_path_raw` tiebreaker cannot be triggered by A-sourced impls today.  If a future
+/// catalogue extension adds a `for_` field to `TraitImplDeclV2`, the codec must emit a
+/// `for_.path` in the same form as the C-side rustdoc output for the tiebreaker to
+/// remain consistent.
 ///
 /// ## Why inherent impls are excluded
 ///
@@ -319,9 +347,30 @@ pub(super) fn is_compiler_internal_trait(normalized_trait_name: &str) -> bool {
 /// so they cannot appear in S or D and have no valid identity key.  Including
 /// them here would generate spurious `CMinusSUnionD` signals for every inherent
 /// impl in C, which is not the intent of the spec.
+///
+/// ## Cross-crate impls (ADR D4)
+///
+/// Per ADR D4 (catalogue-schema-permissive), cross-crate impls (where `for_` is
+/// an external type, e.g. `impl From<LocalErr> for external::Error`) are included
+/// in the identity map on **both** sides:
+/// - C-side: this function includes them (no `for_`-external filter).
+/// - S-side: the B-side orphan-impl pass in `phase1/builder.rs` inserts them with
+///   no `for_`-external check either.
+///
+/// Symmetric inclusion ensures fingerprints match and no spurious `CMinusSUnionD`
+/// Red signals are generated for cross-crate impls.
 pub(super) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeMap<String, Id> {
-    // Collect candidates: (key, id) — then sort to make result deterministic.
-    let mut candidates: Vec<(String, Id)> = Vec::new();
+    // Collect candidates: (key, for_path_raw, id) — then sort to make result deterministic.
+    //
+    // `for_path_raw` is the verbatim path string from the `for_` type's
+    // `Type::ResolvedPath.path` field (for other type variants, the formatted
+    // short name).  Using it as a secondary sort key ensures that when two impls
+    // share the same short-name key (e.g. a local `Error` and `std::error::Error`
+    // both producing `"Error: Foo"`), the same impl wins on both the S-side and
+    // the C-side — because B-origin orphan impls preserve the rustdoc-emitted path
+    // string, keeping the tiebreaker consistent across S and C (see the doc comment
+    // above for the limitation regarding future A-sourced cross-crate impls).
+    let mut candidates: Vec<(String, String, Id)> = Vec::new();
     for (id, item) in &krate.index {
         if item.crate_id != 0 {
             continue;
@@ -359,25 +408,24 @@ pub(super) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
             } else {
                 format_type_strip_type_params(&impl_.for_, &type_params)
             };
+            // Raw `for_` path used as a secondary sort key for deterministic collision
+            // resolution when two impls share the same short-name key (e.g. a local
+            // `Error` type and an external `std::error::Error` both producing `"Error:
+            // Foo"`).  The verbatim `Type::ResolvedPath.path` string is preserved
+            // identically in S-side (B-origin orphan impls) and C-side (rustdoc output),
+            // making the tiebreaker consistent across both sides without requiring a
+            // `krate.paths` lookup (which is unavailable for remapped S-side external ids).
+            let for_path_raw: String = match &impl_.for_ {
+                rustdoc_types::Type::ResolvedPath(p) => p.path.clone(),
+                other => format_type(other),
+            };
 
-            // Skip impls where `for_` is an external type (belongs to another crate).
-            //
-            // Cross-crate impls such as `impl From<LocalErr> for external::Error` appear
-            // in C's rustdoc (crate_id == 0 for the Impl item itself) but have no
-            // corresponding catalogue entry because the `for_` type is not owned by this
-            // crate.  Including them would generate spurious `CMinusSUnionD` Red signals.
-            //
-            // Detection: if `impl_.for_` is a `ResolvedPath` whose Id appears in
-            // `krate.paths` with `crate_id != 0`, the target type is external.
-            // When the Id is absent from `krate.paths` (e.g. A-side synthetic Ids for
-            // which no paths entry was created) the type is treated as local (conservative,
-            // avoids false positives on S-side impls encoded by the catalogue codec).
-            if let Type::ResolvedPath(p) = &impl_.for_ {
-                let for_is_external = krate.paths.get(&p.id).is_some_and(|ps| ps.crate_id != 0);
-                if for_is_external {
-                    continue;
-                }
-            }
+            // Per ADR D4 (catalogue-schema-permissive): the `for_` external-type filter
+            // is intentionally absent.  Cross-crate impls such as
+            // `impl From<LocalErr> for external::Error` are included in C's identity map
+            // symmetrically with S (the B-side orphan-impl pass in `phase1/builder.rs`
+            // inserts ALL orphan impls with no `for_`-external check).  Both sides track
+            // the same set → fingerprints match → no spurious CMinusSUnionD signal.
 
             // Resolve the trait path to a canonical identity key.
             //
@@ -564,15 +612,19 @@ pub(super) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
             };
             let key = format!("{for_name}: {trait_str}");
             if !key.is_empty() {
-                candidates.push((key, *id));
+                candidates.push((key, for_path_raw, *id));
             }
         }
     }
-    // Sort by (key, id) so that for each key the smallest Id wins — deterministic
-    // across crates regardless of HashMap iteration order.
-    candidates.sort_unstable_by(|a, b| a.0.cmp(&b.0).then(a.1.0.cmp(&b.1.0)));
+    // Sort by (key, for_path_raw, id): primary key first, then the raw `for_`
+    // path string as a secondary tiebreaker, then the smallest Id as a final
+    // tiebreaker.  The `for_path_raw` ordering is consistent across S-side and
+    // C-side maps because both preserve the same rustdoc-emitted path string,
+    // so the same impl always wins when multiple impls share the same short-name
+    // key (e.g. a local `Error` and an external `std::error::Error`).
+    candidates.sort_unstable_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)).then(a.2.0.cmp(&b.2.0)));
     let mut map: BTreeMap<String, Id> = BTreeMap::new();
-    for (key, id) in candidates {
+    for (key, _for_path_raw, id) in candidates {
         map.entry(key).or_insert(id);
     }
     map

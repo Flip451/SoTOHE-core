@@ -1,0 +1,254 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BoundOp": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Bound",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Equal",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Copy", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "module_path": "tddd::catalogue_v2::methods",
+      "docs": "Operator for a WherePredicateDecl entry. Bound = `:` (T: Bound1 + Bound2), Equal = `=` (T::Assoc = U). (ADR 2026-05-18-1223-make-catalogue-schema-permissive D1)",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-01",
+          "hash": "62a36842c7f80b93c1c478bc91be1ee1ef4badaf314d22a6151a7c0ce909e96b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "InherentImplDeclV2": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "type_name", "ty": "TypeName" },
+          { "name": "impl_generics", "ty": "Vec<MethodGenericParam>" },
+          { "name": "impl_where_predicates", "ty": "Vec<WherePredicateDecl>" },
+          { "name": "methods", "ty": "Vec<MethodDeclaration>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "Inherent impl block declaration for a struct. One entry per impl block. Carries impl-level generics (type parameters only) and where-clause, plus the methods within that impl block. TypeEntry itself carries no impl info; N impl blocks for the same struct = N InherentImplDeclV2 entries. (ADR 2026-05-18-1223-make-catalogue-schema-permissive D2)",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-05",
+          "hash": "7e111bfa32e2e0e047206042685f51144b8f827ab3e371dbc7dc99ac09ee7f91"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueDocument": {
+      "action": "modify",
+      "role": "AggregateRoot",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "schema_version", "ty": "u32" },
+          { "name": "crate_name", "ty": "CrateName" },
+          { "name": "layer", "ty": "LayerId" },
+          { "name": "types", "ty": "BTreeMap<TypeName, TypeEntry>" },
+          { "name": "traits", "ty": "BTreeMap<TraitName, TraitEntry>" },
+          { "name": "functions", "ty": "BTreeMap<FunctionPath, FunctionEntry>" },
+          { "name": "inherent_impls", "ty": "Vec<InherentImplDeclV2>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" }
+      ],
+      "module_path": "tddd::catalogue_v2::document",
+      "docs": "Top-level catalogue document. Modified in this track to add inherent_impls: Vec<InherentImplDeclV2> field (serde default = empty Vec) for inherent impl block declarations introduced by ADR D2 / IN-05. Other fields (types, traits, functions) are unchanged.",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-05",
+          "hash": "7e111bfa32e2e0e047206042685f51144b8f827ab3e371dbc7dc99ac09ee7f91"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "NewTypeGraphCodecError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTypeRef",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          },
+          {
+            "name": "AmbiguousTypeName",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          }
+        ]
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "Error", "origin_crate": "core" }
+      ],
+      "module_path": "tddd",
+      "docs": "Domain-layer error returned by CatalogueToExtendedCratePort::encode. Carried for edge exposure: infrastructure defines impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError (a cross-crate impl). The B-side orphan impl insertion (phase1/builder.rs) already inserts this cross-crate impl into s_impls without checking for_type externality. The C-side build_impl_identity_map had a for_is_external filter that excluded cross-crate impls from c_impls, causing a false-positive Red (SMinusC_Reference). D4 (IN-13) removes the C-side filter so cross-crate impls appear symmetrically in both s_impls and c_impls. Before D4 implementation, infrastructure-type-signals shows Red 1 (missing core::convert::From<CatalogueToExtendedCrateCodecError>) — accepted deviation, resolves when T012 lands. Not modified in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TraitEntry": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "action", "ty": "ItemAction" },
+          { "name": "role", "ty": "ContractRole" },
+          { "name": "methods", "ty": "Vec<MethodDeclaration>" },
+          { "name": "supertrait_bounds", "ty": "Vec<TypeRef>" },
+          { "name": "generics", "ty": "Vec<MethodGenericParam>" },
+          { "name": "where_predicates", "ty": "Vec<WherePredicateDecl>" },
+          { "name": "module_path", "ty": "ModulePath" },
+          { "name": "docs", "ty": "Option<String>" },
+          { "name": "spec_refs", "ty": "Vec<SpecRef>" },
+          { "name": "informal_grounds", "ty": "Vec<InformalGroundRef>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "module_path": "tddd::catalogue_v2::entries",
+      "docs": "Entry in CatalogueDocument::traits BTreeMap. Now carries trait-declaration-level generics (type parameters only) and where_predicates fields. (ADR 2026-05-18-1223-make-catalogue-schema-permissive D2 / IN-07)",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-07",
+          "hash": "8314b4129b04f3d6772fa9f5a526828ec1af238e4e884079b98763fce28c77a8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TraitImplDeclV2": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "trait_name", "ty": "TraitName" },
+          { "name": "origin_crate", "ty": "CrateName" },
+          { "name": "generic_args", "ty": "Option<String>" },
+          { "name": "for_", "ty": "Option<String>" },
+          { "name": "impl_generics", "ty": "Vec<MethodGenericParam>" },
+          { "name": "impl_where_predicates", "ty": "Vec<WherePredicateDecl>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" },
+        { "trait_name": "Display", "origin_crate": "core" }
+      ],
+      "module_path": "tddd::catalogue_v2::traits",
+      "docs": "Identity-only trait implementation record. Modified in this track to add: (1) impl_generics (MethodGenericParam array, type params only) and impl_where_predicates (WherePredicateDecl array) per ADR D2/IN-06; (2) for_ (Option<String>, serde default None) per ADR D4/IN-13. for_ carries a fully-qualified self-type path (e.g. domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError) when the implementing type is external to the catalogue's crate. When None (the common case), the A-codec derives the for_ type from the parent TypeEntry context. This enables cross-crate impl declarations such as impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError to be represented in the catalogue and evaluated by the signal evaluator.",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-06",
+          "hash": "0ad214ee48bf9b931451c9bc8d7b47809ade3c5e027d8d83b57595f398b2725b"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-13",
+          "hash": "8c7f6907aee315e5f9561b225a541d3a604304e715b0752d25eb2e66048e5b9f"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "WherePredicateDecl": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "lhs", "ty": "TypeRef" },
+          { "name": "rhs", "ty": "Vec<TypeRef>" },
+          { "name": "operator", "ty": "BoundOp" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "Debug", "origin_crate": "core" },
+        { "trait_name": "Clone", "origin_crate": "core" },
+        { "trait_name": "Eq", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" }
+      ],
+      "module_path": "tddd::catalogue_v2::methods",
+      "docs": "A single where-clause predicate in lhs/rhs/operator 3-field structure. lhs: arbitrary Rust where-clause LHS (including HRTB binders, e.g. `for<'a> T::Item<'a>`). rhs: Vec<TypeRef> with `+`-joined bounds. operator: BoundOp (Bound = `:`, Equal = `=`). Supersedes the 2-field type_/bounds structure. (ADR 2026-05-18-1223-make-catalogue-schema-permissive D1 / IN-01)",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-01",
+          "hash": "62a36842c7f80b93c1c478bc91be1ee1ef4badaf314d22a6151a7c0ce909e96b"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-03",
+          "hash": "437b0f678dcaf45301523ddca44f948cedebb62e50626d90edfb4aebd063a531"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}

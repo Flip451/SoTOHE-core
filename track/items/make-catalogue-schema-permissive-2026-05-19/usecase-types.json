@@ -1,0 +1,139 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "ReviewCheckApprovedInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "ReviewCheckApprovedService", "origin_crate": "usecase" }
+      ],
+      "module_path": "review_v2::check_approved",
+      "docs": "Concrete struct implementing ReviewCheckApprovedService. All fields are private (has_stripped_fields). action:modify with methods:[] so A's empty method list enters S; the evaluator skips method comparison when A.methods is empty, avoiding the asymmetric strip_outlives false-positive that fires for action:reference (B's item seeds S with 'static bounds while C_stripped lacks them). Not modified in this track — action:modify is a workaround for evaluator asymmetry (see Open Questions).",
+      "spec_refs": [],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "action:modify workaround for evaluator asymmetric strip_outlives false-positive: action:reference with methods in B causes SMinusC_Reference_Red; action:modify with empty methods skips method comparison. Not modified in this track's scope."
+        }
+      ]
+    },
+    "TaskOperationInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [],
+      "trait_impls": [
+        { "trait_name": "TaskOperationService", "origin_crate": "usecase" }
+      ],
+      "module_path": "task_ops",
+      "docs": "Concrete generic struct implementing TaskOperationService. Generic over S satisfying TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync. All fields are private (has_stripped_fields). action:modify with methods:[] so A's empty method list enters S; the evaluator skips method comparison when A.methods is empty, avoiding the asymmetric strip_outlives false-positive (same as ReviewCheckApprovedInteractor). Not modified in this track — action:modify is a workaround for evaluator asymmetry (see Open Questions).",
+      "spec_refs": [],
+      "informal_grounds": [
+        {
+          "kind": "user_directive",
+          "summary": "action:modify workaround for evaluator asymmetric strip_outlives false-positive: action:reference with methods in B causes SMinusC_Reference_Red; action:modify with empty methods skips method comparison. Not modified in this track's scope."
+        }
+      ]
+    }
+  },
+  "traits": {
+    "ReviewCheckApprovedService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "check_approved",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<ReviewApprovalOutput, ReviewCheckApprovedError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::check_approved",
+      "docs": "Application service trait for the review check-approved use case. Carried for edge exposure so ReviewCheckApprovedInteractor impl edges are visible.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TaskOperationService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "transition_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "TaskTransitionCommand" }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "add_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "AddTaskCommand" }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "set_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "SetOverrideCommand" }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "clear_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "ClearOverrideCommand" }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "task_ops",
+      "docs": "Application service trait for track task mutation operations. Carried for edge exposure so TaskOperationInteractor impl edges are visible.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {}
+}
