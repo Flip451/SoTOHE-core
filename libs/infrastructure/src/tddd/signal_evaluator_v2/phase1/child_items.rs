@@ -103,9 +103,9 @@ pub(super) fn collect_all_subtree_ids(item: &Item, source_index: &HashMap<Id, It
 /// generics, etc.) are remapped separately via `rewrite_type_ref_ids_in_item`
 /// using `b_id_remap` so that they remain consistent after B-side renumbering (T037).
 ///
-/// The only case where a structural parent id needs rewriting is `impl.for_`
-/// (for struct/enum parents) and `impl.trait_` (for trait parents), handled
-/// separately by `patch_impl_for_ids` and `patch_impl_trait_ids` after insertion.
+/// `impl.for_` (for struct/enum parents) and `impl.trait_` (for trait parents)
+/// are type-level `ResolvedPath.id` references and are rewritten by
+/// `rewrite_type_ref_ids_in_item`, not by this function.
 pub(super) fn remap_child_ids_in_item(mut item: Item, id_remap: &HashMap<Id, Id>) -> Item {
     item.inner = match item.inner {
         ItemEnum::Struct(mut s) => {
@@ -185,10 +185,9 @@ pub(super) fn remap_child_ids_in_item(mut item: Item, id_remap: &HashMap<Id, Id>
 /// (symmetric to `state.b_id_remap`).  The local remap is now derived from
 /// `state.a_id_remap` rather than allocated on-the-fly.
 ///
-/// Note (T008 / T009 transition): `patch_impl_for_ids` / `patch_impl_trait_ids`
-/// are intentionally kept here during T008 as a fallback.  T009 will remove
-/// them once `rewrite_type_ref_ids_in_item` + `a_id_remap` is confirmed to
-/// cover all `for_` / `trait_` rewriting without additional patching.
+/// After T009 (IN-11): `for_` / `trait_` id rewriting in impl blocks is handled
+/// solely by `rewrite_type_ref_ids_in_item` + `a_id_remap` in Phase 1.45.
+/// No post-insertion patching is performed here.
 pub(super) fn insert_a_item_tree_into_s(
     state: &mut Phase1State,
     root_item: Item,
@@ -197,16 +196,6 @@ pub(super) fn insert_a_item_tree_into_s(
     source_index: &HashMap<Id, Item>,
 ) -> Id {
     let old_root_id = root_item.id;
-
-    // Identify which direct children are impl blocks BEFORE remapping, so we
-    // can patch their `for_` / `trait_` ids after the root gets a fresh S id.
-    let is_trait = matches!(root_item.inner, ItemEnum::Trait(_));
-    let old_impl_ids: Vec<Id> = collect_child_ids(&root_item)
-        .into_iter()
-        .filter(|id| {
-            source_index.get(id).is_some_and(|item| matches!(item.inner, ItemEnum::Impl(_)))
-        })
-        .collect();
 
     // Build the subtree id_remap from `state.a_id_remap` (pre-allocated in the
     // A-side pre-step).  Fall back to `state.alloc_id()` for any id not present in
@@ -244,19 +233,6 @@ pub(super) fn insert_a_item_tree_into_s(
     state.s_actions.insert(new_s_id, action);
     if !name.is_empty() {
         state.s_type_name_to_id.insert(name, new_s_id);
-    }
-
-    // Patch the impl blocks' self-type / trait reference to the fresh S root id.
-    // Use the remapped impl ids (each old impl id maps to a fresh S id via id_remap).
-    // NOTE (T008): patch_impl_for_ids / patch_impl_trait_ids are kept here as a
-    // fallback; T009 will remove them once rewrite_type_ref_ids_in_item + a_id_remap
-    // covers all for_ / trait_ rewriting.
-    let new_impl_ids: Vec<Id> =
-        old_impl_ids.iter().filter_map(|id| id_remap.get(id)).copied().collect();
-    if is_trait {
-        patch_impl_trait_ids(&mut state.s_index, &new_impl_ids, new_s_id);
-    } else {
-        patch_impl_for_ids(&mut state.s_index, &new_impl_ids, new_s_id);
     }
 
     new_s_id
@@ -317,6 +293,11 @@ pub(super) fn insert_remapped_children(
 /// `s_actions` is populated for ALL inserted items (root + all descendants) so
 /// that the Phase 1.45 / Phase 1.6 / Step 6 discriminators can rely on
 /// `s_actions` as the sole authoritative source.
+///
+/// After T009 (IN-11): `for_` / `trait_` id rewriting in impl blocks is handled
+/// solely by `rewrite_type_ref_ids_in_item` + `b_id_remap`, applied to the root
+/// item inline below.  No post-insertion patching via `patch_impl_for_ids` /
+/// `patch_impl_trait_ids` is performed.
 pub(super) fn insert_b_item_tree_into_s(
     state: &mut Phase1State,
     root_item: Item,
@@ -333,16 +314,6 @@ pub(super) fn insert_b_item_tree_into_s(
             state.alloc_id()
         }
     };
-    let is_trait = matches!(root_item.inner, rustdoc_types::ItemEnum::Trait(_));
-
-    // Collect the direct impl-child Ids BEFORE remapping so we can patch
-    // impl.for_ / impl.trait_ to the new root S Id afterwards.
-    let old_impl_ids: Vec<Id> = collect_child_ids(&root_item)
-        .into_iter()
-        .filter(|id| {
-            source_index.get(id).is_some_and(|item| matches!(item.inner, ItemEnum::Impl(_)))
-        })
-        .collect();
 
     // Insert all descendant items with their remapped Ids.
     // `insert_remapped_children` now propagates `action` to ALL children.
@@ -350,7 +321,9 @@ pub(super) fn insert_b_item_tree_into_s(
 
     // Remap structural child-list references in the root item.
     let remapped_root = remap_child_ids_in_item(root_item, &state.b_id_remap.clone());
-    // Rewrite type-level ResolvedPath.id references (cross-type refs).
+    // Rewrite type-level ResolvedPath.id references (cross-type refs), including
+    // impl.for_ and impl.trait_ ids via b_id_remap — this is the sole remap path
+    // after T009 (IN-11).
     let rewritten_root = rewrite_type_ref_ids_in_item(remapped_root, &state.b_id_remap.clone());
 
     // Insert the root at its new S Id.
@@ -365,16 +338,6 @@ pub(super) fn insert_b_item_tree_into_s(
     state.s_actions.insert(new_s_id, action);
     if !name.is_empty() {
         state.s_type_name_to_id.insert(name, new_s_id);
-    }
-
-    // Patch impl blocks' for_ / trait_ to the new root S Id.
-    // The old B-side impl Ids have been remapped; use b_id_remap to get the new Ids.
-    let new_impl_ids: Vec<Id> =
-        old_impl_ids.iter().filter_map(|id| state.b_id_remap.get(id).copied()).collect();
-    if is_trait {
-        patch_impl_trait_ids(&mut state.s_index, &new_impl_ids, new_s_id);
-    } else {
-        patch_impl_for_ids(&mut state.s_index, &new_impl_ids, new_s_id);
     }
 
     new_s_id
@@ -548,55 +511,6 @@ pub(super) fn collect_impl_child_ids(parent: &Item, s_index: &HashMap<Id, Item>)
         .into_iter()
         .filter(|id| s_index.get(id).is_some_and(|item| matches!(item.inner, ItemEnum::Impl(_))))
         .collect()
-}
-
-/// Patches the `for_.id` field of impl blocks in `index` to `new_parent_id`.
-///
-/// Used when the parent is a **type** (struct / enum): the impl block's `for_`
-/// field records the implementing type.  Called after a parent type is inserted
-/// or moved with a fresh Id to fix stale `for_` references.
-///
-/// Only `Type::ResolvedPath` `for_` values are patched; other shapes
-/// (primitives, tuples, etc.) do not carry an Id and are left unchanged.
-///
-/// Works on both `s_index` (after `insert_b_item_tree_into_s`) and `d_index`
-/// (after `move_type_to_d`).
-pub(super) fn patch_impl_for_ids(
-    index: &mut HashMap<Id, Item>,
-    impl_ids: &[Id],
-    new_parent_id: Id,
-) {
-    for impl_id in impl_ids {
-        if let Some(item) = index.get_mut(impl_id) {
-            if let ItemEnum::Impl(ref mut impl_inner) = item.inner {
-                if let rustdoc_types::Type::ResolvedPath(ref mut path) = impl_inner.for_ {
-                    path.id = new_parent_id;
-                }
-            }
-        }
-    }
-}
-
-/// Patches the `trait_.id` field of impl blocks in `index` to `new_trait_id`.
-///
-/// Used when the parent is a **trait**: the impl block's `trait_` field records
-/// the trait being implemented, while `for_` is the implementing type.  Called
-/// after a trait is inserted or moved with a fresh Id so that `trait_.id` points
-/// to the new scope-local Id rather than the stale B-side or A-side Id.
-pub(super) fn patch_impl_trait_ids(
-    index: &mut HashMap<Id, Item>,
-    impl_ids: &[Id],
-    new_trait_id: Id,
-) {
-    for impl_id in impl_ids {
-        if let Some(item) = index.get_mut(impl_id) {
-            if let ItemEnum::Impl(ref mut impl_inner) = item.inner {
-                if let Some(ref mut trait_path) = impl_inner.trait_ {
-                    trait_path.id = new_trait_id;
-                }
-            }
-        }
-    }
 }
 
 /// Copies A-sourced child items (for Modify) into S at a specific root Id,

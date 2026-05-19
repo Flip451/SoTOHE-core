@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, HashMap};
 
 use super::child_items::{
     collect_impl_child_ids, copy_non_impl_children_to_d, move_impl_children_to_d,
-    patch_impl_for_ids, patch_impl_trait_ids, remove_child_items_from_s,
+    remove_child_items_from_s,
 };
 use domain::tddd::catalogue_v2::ItemAction;
 use rustdoc_types::{Id, Item, ItemKind, ItemSummary};
@@ -178,10 +178,25 @@ impl Phase1State {
             // S-side or B-side Id to the fresh D-side new_id.
             // - For types (struct/enum): patch `impl.for_.id`.
             // - For traits: patch `impl.trait_.id` (for_ is the implementing type, not the trait).
-            if is_trait {
-                patch_impl_trait_ids(&mut self.d_index, &impl_ids, new_id);
-            } else {
-                patch_impl_for_ids(&mut self.d_index, &impl_ids, new_id);
+            //
+            // T009 (IN-11): `patch_impl_for_ids` / `patch_impl_trait_ids` are deleted.
+            // The D-side id patching is inlined here because it patches to a freshly
+            // allocated `new_id` that is not present in any pre-built remap — this
+            // specific case cannot go through `rewrite_type_ref_ids_in_item`.
+            for impl_id in &impl_ids {
+                if let Some(item) = self.d_index.get_mut(impl_id) {
+                    if let rustdoc_types::ItemEnum::Impl(ref mut impl_inner) = item.inner {
+                        if is_trait {
+                            if let Some(ref mut trait_path) = impl_inner.trait_ {
+                                trait_path.id = new_id;
+                            }
+                        } else if let rustdoc_types::Type::ResolvedPath(ref mut path) =
+                            impl_inner.for_
+                        {
+                            path.id = new_id;
+                        }
+                    }
+                }
             }
 
             // Orphan impl handling: move any remaining S-index Impl items whose

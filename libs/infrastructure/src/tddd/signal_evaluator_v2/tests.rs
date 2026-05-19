@@ -3878,3 +3878,368 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
         impl_signal.unwrap().region()
     );
 }
+
+// -----------------------------------------------------------------------
+// T009: patch_impl_for_ids / patch_impl_trait_ids removal (AC-10 / IN-11)
+// -----------------------------------------------------------------------
+
+/// T009 (a): For an external-crate impl (`impl SomeTrait for MyStruct` where the
+/// trait is external), the `for_` field of the impl block in S must point to
+/// MyStruct's fresh S Id and must NOT be overwritten by `patch_impl_for_ids`.
+///
+/// Before T009, `patch_impl_for_ids` was called after `insert_b_item_tree_into_s`
+/// and `insert_a_item_tree_into_s` and unconditionally set `for_.id` to the
+/// parent's S id. For an external-crate impl (where `for_` references an external
+/// type, not the local parent), this would have silently corrupted the `for_.id`.
+/// After T009 these functions are removed; `rewrite_type_ref_ids_in_item` +
+/// `a_id_remap` / `b_id_remap` is the sole remap path and only rewrites ids that
+/// are present in the map; external-crate ids are not in the local remap and are
+/// left unchanged.
+///
+/// Fixture (B-sourced): B has `MyStruct` at Id(1) with an impl at Id(2).
+/// The impl's `for_` is `MyStruct` (local, Id(1)) — simulates a normal local-type
+/// impl. After Phase 1 the impl's for_.id must equal MyStruct's fresh S Id (i.e.
+/// the b_id_remap result), not the original B-side Id(1).
+///
+/// This test verifies that the remap goes through `rewrite_type_ref_ids_in_item`
+/// (inside `insert_b_item_tree_into_s`) and NOT through a post-insertion patch.
+#[test]
+#[allow(clippy::panic)]
+fn test_t009_for_remap_unified_through_id_map() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+
+    // B: `MyStruct` at Id(1) with impl at Id(2) whose for_ → Id(1).
+    let b_struct_id = Id(1);
+    let b_impl_id = Id(2);
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+
+    b_index.insert(root_id, root_module_item(root_id, crate_name, vec![b_struct_id, b_impl_id]));
+    b_index.insert(
+        b_struct_id,
+        make_item(
+            b_struct_id,
+            Some("MyStruct"),
+            ItemEnum::Struct(rustdoc_types::Struct {
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
+                generics: empty_generics(),
+                impls: vec![b_impl_id],
+            }),
+        ),
+    );
+    b_index.insert(
+        b_impl_id,
+        make_item(
+            b_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                // for_ references the local type MyStruct at the B-side Id.
+                for_: Type::ResolvedPath(RdPath {
+                    path: "MyStruct".to_string(),
+                    id: b_struct_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    b_paths.insert(
+        b_struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyStruct".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let b = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // A: empty (no catalogue entries — all B items become Reference in S).
+    let a_root = root_module_item(root_id, crate_name, vec![]);
+    let mut a_index = HashMap::new();
+    a_index.insert(root_id, a_root);
+    let a_krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: a_index,
+        paths: HashMap::new(),
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let a = ExtendedCrate::new(a_krate, BTreeMap::new());
+
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // MyStruct is in S — find its fresh S Id.
+    let my_struct_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("MyStruct"))
+        .expect("T009: MyStruct must be in S (B-side Reference)");
+    let my_struct_s_id = my_struct_item.id;
+
+    // The impl block's for_.id must equal MyStruct's fresh S Id (remapped via b_id_remap,
+    // not via patch_impl_for_ids — the remap path must be the sole mechanism).
+    let impl_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| matches!(&item.inner, ItemEnum::Impl(i) if matches!(&i.for_, Type::ResolvedPath(p) if p.path == "MyStruct")))
+        .expect("T009: impl for MyStruct must be in S");
+    let impl_for_id = match &impl_item.inner {
+        ItemEnum::Impl(i) => match &i.for_ {
+            Type::ResolvedPath(p) => p.id,
+            _ => panic!("T009: impl.for_ must be ResolvedPath"),
+        },
+        _ => panic!("T009: expected Impl item"),
+    };
+
+    assert_eq!(
+        impl_for_id, my_struct_s_id,
+        "T009: impl.for_.id must equal MyStruct's fresh S Id {my_struct_s_id:?} \
+         (via b_id_remap / rewrite_type_ref_ids_in_item, not patch_impl_for_ids); \
+         got {impl_for_id:?}"
+    );
+    // Verify that the fresh S Id is NOT the original B-side Id (it must be renumbered).
+    assert_ne!(
+        my_struct_s_id,
+        Id(1),
+        "T009: MyStruct's S Id must be a fresh Id (renumbered from B-side Id(1))"
+    );
+}
+
+/// T009 (b): A-side Add item with a trait impl block must have its `for_.id`
+/// correctly remapped to the parent type's fresh S Id via `a_id_remap` +
+/// `rewrite_type_ref_ids_in_item` (Phase 1.45), without `patch_impl_for_ids`.
+///
+/// This is the A-side counterpart of T009(a).  The fixture uses B with existing
+/// items so that `first_fresh_id` is pushed above the A-side Id range, confirming
+/// that the remap is applied and the resulting S Ids are distinct from the
+/// original A-side Ids.
+///
+/// Also verifies that the trait impl (for trait-parent) has its `trait_.id`
+/// correctly remapped, confirming `patch_impl_trait_ids` is also superseded.
+#[test]
+#[allow(clippy::panic)]
+fn test_t009_for_external_impl_for_is_not_overwritten_with_self_crate_id() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{Impl, Path as RdPath, Trait};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+
+    // B: `Existing` at Id(1) so first_fresh_id starts at 2 (B max = 1, first_fresh = 2).
+    // This pushes A-side allocations above A's own Id range (1..3), so S Ids ≠ A Ids.
+    let b_existing_id = Id(1);
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+    b_index.insert(root_id, root_module_item(root_id, crate_name, vec![b_existing_id]));
+    b_index.insert(b_existing_id, struct_item(b_existing_id, "Existing"));
+    b_paths.insert(
+        b_existing_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Existing".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let b = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // A: `MyTrait` (Add) at Id(1), `MyStruct` (Add) at Id(2).
+    //    impl MyTrait for MyStruct at Id(3): trait_.id → Id(1), for_.id → Id(2).
+    //    The impl is listed in MyStruct.impls and in MyTrait.implementations.
+    let a_trait_id = Id(1);
+    let a_struct_id = Id(2);
+    let a_impl_id = Id(3);
+
+    let mut a_index = HashMap::new();
+    let mut a_paths = HashMap::new();
+
+    a_index.insert(
+        root_id,
+        root_module_item(root_id, crate_name, vec![a_trait_id, a_struct_id, a_impl_id]),
+    );
+    a_index.insert(
+        a_trait_id,
+        make_item(
+            a_trait_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![a_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_struct_id,
+        make_item(
+            a_struct_id,
+            Some("MyStruct"),
+            ItemEnum::Struct(rustdoc_types::Struct {
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
+                generics: empty_generics(),
+                impls: vec![a_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_impl_id,
+        make_item(
+            a_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                // trait_.id → A-side MyTrait id; must be remapped to MyTrait's S id.
+                trait_: Some(RdPath { path: "MyTrait".to_string(), id: a_trait_id, args: None }),
+                // for_.id → A-side MyStruct id; must be remapped to MyStruct's S id.
+                for_: Type::ResolvedPath(RdPath {
+                    path: "MyStruct".to_string(),
+                    id: a_struct_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    a_paths.insert(
+        a_trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+    a_paths.insert(
+        a_struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyStruct".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let a_krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: a_index,
+        paths: a_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let mut a_actions = BTreeMap::new();
+    a_actions.insert(a_trait_id, ItemAction::Add);
+    a_actions.insert(a_struct_id, ItemAction::Add);
+    let a = ExtendedCrate::new(a_krate, a_actions);
+
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // Find MyStruct and MyTrait in S.
+    let my_struct_s_id = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("MyStruct"))
+        .expect("T009: MyStruct must be in S")
+        .id;
+    let my_trait_s_id = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("MyTrait"))
+        .expect("T009: MyTrait must be in S")
+        .id;
+
+    // Find the impl block.
+    let impl_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            if let ItemEnum::Impl(i) = &item.inner {
+                i.trait_.is_some()
+                    && matches!(&i.for_, Type::ResolvedPath(p) if p.path == "MyStruct")
+            } else {
+                false
+            }
+        })
+        .expect("T009: impl MyTrait for MyStruct must be in S");
+
+    let (impl_for_id, impl_trait_id) = match &impl_item.inner {
+        ItemEnum::Impl(i) => {
+            let for_id = match &i.for_ {
+                Type::ResolvedPath(p) => p.id,
+                _ => panic!("T009: impl.for_ must be ResolvedPath"),
+            };
+            let trait_id = match &i.trait_ {
+                Some(p) => p.id,
+                None => panic!("T009: impl.trait_ must be Some"),
+            };
+            (for_id, trait_id)
+        }
+        _ => panic!("T009: expected Impl item"),
+    };
+
+    assert_eq!(
+        impl_for_id, my_struct_s_id,
+        "T009: impl.for_.id must equal MyStruct's S Id {my_struct_s_id:?} \
+         (via a_id_remap + rewrite_type_ref_ids_in_item, not patch_impl_for_ids); \
+         got {impl_for_id:?}"
+    );
+    assert_eq!(
+        impl_trait_id, my_trait_s_id,
+        "T009: impl.trait_.id must equal MyTrait's S Id {my_trait_s_id:?} \
+         (via a_id_remap + rewrite_type_ref_ids_in_item, not patch_impl_trait_ids); \
+         got {impl_trait_id:?}"
+    );
+    // All S Ids must be fresh (not original A-side Ids).
+    assert_ne!(my_struct_s_id, Id(2), "T009: MyStruct S Id must be fresh (not A-side Id(2))");
+    assert_ne!(my_trait_s_id, Id(1), "T009: MyTrait S Id must be fresh (not A-side Id(1))");
+}

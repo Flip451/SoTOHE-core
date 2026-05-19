@@ -18,9 +18,8 @@ use super::super::external_crates::{
 use super::super::resolution::resolve_unresolved_in_item;
 use super::super::{build_function_identity_map, build_type_trait_identity_map};
 use super::child_items::{
-    collect_child_ids, insert_a_item_tree_into_s, insert_b_item_tree_into_s, patch_impl_for_ids,
-    patch_impl_trait_ids, remap_and_copy_a_children_to_s, remap_child_ids_in_item,
-    remove_b_children_from_s,
+    insert_a_item_tree_into_s, insert_b_item_tree_into_s, remap_and_copy_a_children_to_s,
+    remap_child_ids_in_item, remove_b_children_from_s,
 };
 use super::state::Phase1State;
 
@@ -185,13 +184,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     //      never inserted into `s_index`, causing Phase 1.6 to report spurious
     //      `DanglingId` errors.
     //
-    // NOTE (T008 / T009 transition):  In T008 the remap is built and stored in
-    // `state.a_id_remap`; action-specific passes now look up pre-allocated Ids from
-    // this map instead of calling `state.alloc_id()` per item.  The existing
-    // `patch_impl_for_ids` / `patch_impl_trait_ids` calls are intentionally left in
-    // place during T008 to maintain an equivalent intermediate state — T009 will
-    // remove them once `rewrite_type_ref_ids_in_item` + `a_id_remap` is confirmed
-    // to cover all `for_` / `trait_` rewriting without fallback.
+    // After T009 (IN-11): `patch_impl_for_ids` / `patch_impl_trait_ids` are fully
+    // removed.  All `for_` / `trait_` id rewriting in impl blocks goes through
+    // `rewrite_type_ref_ids_in_item` + `a_id_remap` (Phase 1.45) as the single
+    // unified path.
     {
         let mut a_keys: Vec<Id> = a_krate.index.keys().filter(|id| id.0 != 0).copied().collect();
         a_keys.sort_by_key(|id| id.0);
@@ -246,7 +242,6 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                         "action=Modify: '{a_name}' expected in S but not found (internal error)"
                     ))
                 })?;
-                let is_trait = matches!(a_item.inner, ItemEnum::Trait(_));
                 if let Some(b_item_in_s) = state.s_index.get(&s_id).cloned() {
                     remove_b_children_from_s(
                         &mut state.s_index,
@@ -262,25 +257,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                     &a_krate.index,
                     ItemAction::Modify,
                 );
-                // Collect new impl child Ids (from the remapped item) before inserting,
-                // so we can patch their impl.for_ / impl.trait_ references afterwards.
-                let new_impl_ids: Vec<rustdoc_types::Id> = collect_child_ids(&remapped_a_item)
-                    .into_iter()
-                    .filter(|id| {
-                        state
-                            .s_index
-                            .get(id)
-                            .is_some_and(|item| matches!(item.inner, ItemEnum::Impl(_)))
-                    })
-                    .collect();
+                // T009 (IN-11): `patch_impl_for_ids` / `patch_impl_trait_ids` calls are removed.
+                // `rewrite_type_ref_ids_in_item` + `a_id_remap` (applied in Phase 1.45) is the
+                // sole path for remapping `for_` / `trait_` ids in Modify impl blocks.
                 state.insert_s_type_at(s_id, remapped_a_item, ItemAction::Modify);
-                // Patch the impl blocks' self-type / trait reference to point at the preserved
-                // S-side parent id.  This is the same step performed in the Add path.
-                if is_trait {
-                    patch_impl_trait_ids(&mut state.s_index, &new_impl_ids, s_id);
-                } else {
-                    patch_impl_for_ids(&mut state.s_index, &new_impl_ids, s_id);
-                }
             }
             ItemAction::Reference => {
                 // Reference: identity must exist in B.

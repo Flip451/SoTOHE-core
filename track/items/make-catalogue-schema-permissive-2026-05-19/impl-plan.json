@@ -43,12 +43,12 @@
     {
       "id": "T008",
       "description": "D3-pre-step: A 側に B 側と対称な Pre-step を追加し、全 A Item に fresh S id を一括 pre-allocate する (IN-10)。libs/infrastructure の signal_evaluator_v2/phase1/builder.rs に `build_a_id_remap` 関数 (または同等のロジック) を追加し、B 側 `b_id_remap` 構築と対称なアルゴリズムで `a_id_remap: HashMap<old_a_id, new_s_id>` を一括構築する。action 別処理 (Add / Modify / Reference / Delete) の各ブランチで id 解決に `a_id_remap` を参照するよう修正する。この変更のみで CI が通ることを確認する (T009 の patch_impl_for_ids 削除は次タスク)。unit test を追加する: (a) A 側 id と B 側 id が衝突する fixture で renumber 後も S アイテムが正しく参照される、(b) a_id_remap 構築後に action 別処理が id_map に親型 mapping を持つ状態になる。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T009",
       "description": "D3-patch-removal: patch_impl_for_ids と patch_impl_trait_ids を削除し、for_ remap を rewrite_type_ref_ids_in_item + id_map の 1 経路に統一する (IN-11)。T008 完了後、a_id_remap が全 A Item に適用された状態で `patch_impl_for_ids` / `patch_impl_trait_ids` が不要になることを確認してから削除する。for_ の remap が `rewrite_type_ref_ids_in_item` + `a_id_remap` / `b_id_remap` の 1 経路に統一され、自クレート Item を指す id は id_map で新 S id に remap、外部クレート Item を指す id は external_crates rebuild で rebind される構造を実装する。外部クレート型を対象とする impl (impl From<MyError> for OtherCrateError 等) の for_ が誤って自クレート親型 id に上書きされなくなり、for_is_external フラグが正しく判定されることを確認する unit test を追加する (AC-10)。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T010",
