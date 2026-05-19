@@ -128,14 +128,6 @@ struct EncoderState {
     /// synthetic item id within a single codec run, so `Crate::paths` entries are not
     /// duplicated and downstream consumers can reliably look up external types.
     external_type_path_to_id: HashMap<String, Id>,
-    /// Orphan-impl ownership map: trait-impl `Id` → owning type `Id`.
-    ///
-    /// Populated during `encode_trait_impl_blocks` for every trait impl generated.
-    /// This is used by the Phase 1 orphan-impl pass to recover the owning type's
-    /// `ItemAction` when `impl.for_.id` points to an external synthetic id (i.e.
-    /// when `TraitImplDeclV2.for_` overrides the enclosing type with an external
-    /// type such as `impl MyTrait for other_crate::ExternalType`).
-    impl_orphan_owner: HashMap<Id, Id>,
 }
 
 impl Encoder {
@@ -154,7 +146,6 @@ impl Encoder {
                 fn_path_to_id: HashMap::new(),
                 crate_name,
                 external_type_path_to_id: HashMap::new(),
-                impl_orphan_owner: HashMap::new(),
             },
         }
     }
@@ -444,7 +435,7 @@ impl Encoder {
             target: Target { triple: String::new(), target_features: vec![] },
         };
 
-        Ok(ExtendedCrate::new(krate, item_actions).with_impl_owner_map(state.impl_orphan_owner))
+        Ok(ExtendedCrate::new(krate, item_actions))
     }
 }
 
@@ -2218,11 +2209,6 @@ impl EncoderState {
                 blanket_impl: None,
             };
             self.index.insert(impl_id, make_item(impl_id, None, None, ItemEnum::Impl(impl_inner)));
-            // Record impl_id → owning type_id in the orphan-owner map so that the
-            // Phase 1 orphan-impl pass can recover the parent action even when
-            // `impl.for_.id` points to an external synthetic id (i.e. when `ti.for_`
-            // overrides the enclosing type with an external path).
-            self.impl_orphan_owner.insert(impl_id, type_id);
             impl_ids.push(impl_id);
         }
         Ok(impl_ids)

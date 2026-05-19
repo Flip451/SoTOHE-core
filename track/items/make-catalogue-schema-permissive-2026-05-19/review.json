@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:32:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:33:56Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -72,35 +90,6 @@
           "findings": [],
           "hash": "rvw1:sha256:c53100bddc208035c5e87ceda0abc6de7a690393afa8a0d2c503ffada4a958a3",
           "at": "2026-05-19T18:58:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`into_parts()` still returns only `(Crate, BTreeMap<Id, ItemAction>)`, so any `ExtendedCrate` built with `with_impl_owner_map()` silently loses the new orphan-ownership metadata when it is decomposed. That makes the new field non-round-trippable and can break callers that rely on `into_parts()` to preserve all state.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/extended_crate.rs",
-              "line": 134,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d966db61a4c1256c0caa68e8020921f2891e8e337638380fbf402848466369f1",
-          "at": "2026-05-19T22:30:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fea607f84bc2a4bd6875c378a03dceceb56632763e500a14638b51755db1cc88",
-          "at": "2026-05-19T22:33:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fea607f84bc2a4bd6875c378a03dceceb56632763e500a14638b51755db1cc88",
-          "at": "2026-05-19T22:34:19Z"
         }
       ]
     },
@@ -1026,38 +1015,6 @@
           "findings": [],
           "hash": "rvw1:sha256:23525081f39a7298b56f0522ee4e2dc621d1dfcee3dbdeb7b8fbd0a884211810",
           "at": "2026-05-19T22:08:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8334036722e5411413c0dad5d084723aaaa8ee1ea52645857b25f664cccd887",
-          "at": "2026-05-19T22:32:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8334036722e5411413c0dad5d084723aaaa8ee1ea52645857b25f664cccd887",
-          "at": "2026-05-19T22:35:52Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
-          "at": "2026-05-19T16:32:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
-          "at": "2026-05-19T16:33:56Z"
         }
       ]
     },
