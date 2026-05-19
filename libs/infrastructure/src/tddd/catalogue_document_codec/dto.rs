@@ -450,6 +450,16 @@ pub(super) struct TraitImplDto {
     /// Defaults to `None` for backward compatibility.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(super) generic_args: Option<String>,
+    /// Impl-block-level generic type parameters (type parameters only).
+    /// Default empty for catalogues that predate this field (CN-01 backward compat, IN-06).
+    /// E.g. `impl<L, R, W> Trait for Foo<L, R, W>` → `[L, R, W]`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) impl_generics: Vec<MethodGenericParamDto>,
+    /// Impl-block-level where-clause predicates on `impl_generics`. Default empty.
+    /// E.g. `impl<L> Trait for Foo<L> where L: Send` → `[{ lhs: "L", rhs: ["Send"] }]`.
+    /// (IN-06)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) impl_where_predicates: Vec<WherePredicateDeclDto>,
 }
 
 // ---------------------------------------------------------------------------

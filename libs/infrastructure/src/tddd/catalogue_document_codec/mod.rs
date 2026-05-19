@@ -2069,4 +2069,180 @@ mod tests {
             "expected CrossCrateFunctionPath error for no-prefix path, got: {result:?}"
         );
     }
+
+    // -----------------------------------------------------------------------
+    // IN-06: TraitImplDeclV2 impl_generics + impl_where_predicates codec tests
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_trait_impl_with_impl_generics_and_where_predicates_succeeds() {
+        // AC-06: `impl<L, R, W> Trait for Foo<L, R, W> where L: Send` must round-trip.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Foo": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct", "fields": [] },
+      "trait_impls": [
+        {
+          "trait_name": "MyTrait",
+          "origin_crate": "domain",
+          "impl_generics": [
+            { "name": "L", "bounds": [] },
+            { "name": "R", "bounds": [] },
+            { "name": "W", "bounds": [] }
+          ],
+          "impl_where_predicates": [
+            { "lhs": "L", "rhs": ["Send"], "operator": "Bound" }
+          ]
+        }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        assert_eq!(entry.trait_impls.len(), 1);
+        let impl_decl = &entry.trait_impls[0];
+        assert_eq!(impl_decl.trait_name.as_str(), "MyTrait");
+        assert_eq!(impl_decl.impl_generics.len(), 3);
+        assert_eq!(impl_decl.impl_generics[0].name.as_str(), "L");
+        assert_eq!(impl_decl.impl_generics[1].name.as_str(), "R");
+        assert_eq!(impl_decl.impl_generics[2].name.as_str(), "W");
+        assert_eq!(impl_decl.impl_where_predicates.len(), 1);
+        assert_eq!(impl_decl.impl_where_predicates[0].lhs.as_str(), "L");
+        assert_eq!(impl_decl.impl_where_predicates[0].rhs[0].as_str(), "Send");
+    }
+
+    #[test]
+    fn test_decode_trait_impl_without_impl_generics_field_defaults_to_empty() {
+        // Catalogues that predate IN-06 omit impl_generics; serde default must produce
+        // an empty Vec for backward compatibility (CN-01).
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "OldType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        let impl_decl = &entry.trait_impls[0];
+        assert!(
+            impl_decl.impl_generics.is_empty(),
+            "omitted impl_generics must default to empty Vec (CN-01 backward compat)"
+        );
+        assert!(
+            impl_decl.impl_where_predicates.is_empty(),
+            "omitted impl_where_predicates must default to empty Vec (CN-01 backward compat)"
+        );
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_trait_impl_impl_generics_and_where_predicates() {
+        // AC-06 round-trip: decode → encode → decode must be stable.
+        use domain::tddd::catalogue_v2::methods::BoundOp;
+
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Foo": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "plain_struct", "fields": [] },
+      "trait_impls": [
+        {
+          "trait_name": "MyTrait",
+          "origin_crate": "domain",
+          "impl_generics": [
+            { "name": "L", "bounds": ["Send"] },
+            { "name": "R", "bounds": [] }
+          ],
+          "impl_where_predicates": [
+            { "lhs": "L", "rhs": ["Clone"], "operator": "Bound" }
+          ]
+        },
+        {
+          "trait_name": "Display",
+          "origin_crate": "core"
+        }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "encode-decode round-trip must be stable for impl_generics/where");
+
+        let entry = doc2.types.values().next().unwrap();
+        let generic_impl = &entry.trait_impls[0];
+        assert_eq!(generic_impl.impl_generics.len(), 2);
+        assert_eq!(generic_impl.impl_generics[0].name.as_str(), "L");
+        assert_eq!(generic_impl.impl_generics[0].bounds[0].as_str(), "Send");
+        assert_eq!(generic_impl.impl_generics[1].name.as_str(), "R");
+        assert_eq!(generic_impl.impl_where_predicates.len(), 1);
+        assert_eq!(generic_impl.impl_where_predicates[0].lhs.as_str(), "L");
+        assert_eq!(generic_impl.impl_where_predicates[0].rhs[0].as_str(), "Clone");
+        assert_eq!(generic_impl.impl_where_predicates[0].operator, BoundOp::Bound);
+
+        // The second trait impl (Display) must have empty impl_generics/where_predicates.
+        let display_impl = &entry.trait_impls[1];
+        assert!(display_impl.impl_generics.is_empty());
+        assert!(display_impl.impl_where_predicates.is_empty());
+    }
+
+    #[test]
+    fn test_encode_trait_impl_with_empty_impl_generics_omits_field() {
+        // `skip_serializing_if = "Vec::is_empty"` must suppress impl_generics and
+        // impl_where_predicates from the encoded JSON so legacy catalogues stay byte-stable.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Simple": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "unit_struct" },
+      "trait_impls": [
+        { "trait_name": "Display", "origin_crate": "core" }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        // The encoded JSON must NOT contain impl_generics or impl_where_predicates for
+        // this simple impl (both are empty Vecs → skip_serializing_if suppresses them).
+        assert!(
+            !encoded.contains("\"impl_generics\""),
+            "impl_generics must be omitted when empty: {encoded}"
+        );
+        assert!(
+            !encoded.contains("\"impl_where_predicates\""),
+            "impl_where_predicates must be omitted when empty: {encoded}"
+        );
+    }
 }

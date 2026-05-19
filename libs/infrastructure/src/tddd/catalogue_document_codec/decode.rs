@@ -564,11 +564,14 @@ fn trait_impl_from_dto(
         .map_err(|e| err(format!("invalid trait name '{}': {e}", dto.trait_name)))?;
     let origin_crate = CrateName::new(&dto.origin_crate)
         .map_err(|e| err(format!("invalid origin_crate '{}': {e}", dto.origin_crate)))?;
-    match dto.generic_args {
-        None => Ok(TraitImplDeclV2::new(trait_name, origin_crate)),
+    let mut decl = match dto.generic_args {
+        None => TraitImplDeclV2::new(trait_name, origin_crate),
         Some(args) => TraitImplDeclV2::new_with_generic_args(trait_name, origin_crate, args)
-            .map_err(|e: GenericArgsError| err(format!("invalid generic_args: {e}"))),
-    }
+            .map_err(|e: GenericArgsError| err(format!("invalid generic_args: {e}")))?,
+    };
+    decl.impl_generics = method_generics_from_dtos(entry_name, dto.impl_generics)?;
+    decl.impl_where_predicates = where_predicates_from_dtos(entry_name, dto.impl_where_predicates)?;
+    Ok(decl)
 }
 
 pub(super) fn trait_entry_from_dto(

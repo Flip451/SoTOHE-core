@@ -2,7 +2,8 @@
 //!
 //! Implements:
 //! - [`TraitImplDeclV2`]: identity-only trait implementation record (`trait_name`,
-//!   `origin_crate`, optional `generic_args`).
+//!   `origin_crate`, optional `generic_args`, optional `impl_generics`,
+//!   optional `impl_where_predicates`).
 //!   No `methods` field — trait/impl signature alignment is delegated to the Rust compiler
 //!   (ADR 1 D10 / CN-07).
 //!
@@ -12,6 +13,7 @@
 use std::fmt;
 
 use crate::tddd::catalogue_v2::identifiers::{CrateName, TraitName};
+use crate::tddd::catalogue_v2::methods::{MethodGenericParam, WherePredicateDecl};
 
 // ---------------------------------------------------------------------------
 // GenericArgsError — validation error for generic_args
@@ -84,13 +86,41 @@ pub struct TraitImplDeclV2 {
     /// - Must not be empty or whitespace-only.
     /// - Must not start with `<` (pass the raw type string; the Display impl adds brackets).
     generic_args: Option<String>,
+    /// Impl-block-level generic type parameters (type parameters only; lifetimes and
+    /// const parameters are out of scope per IN-06).
+    ///
+    /// Allows cataloguing `impl<L, R, W> Trait for Foo<L, R, W>` where the impl block
+    /// itself introduces generic parameters. Empty Vec when the trait impl is not generic
+    /// at the impl-block level (the common case).
+    ///
+    /// The infrastructure codec serialises this field with `#[serde(default,
+    /// skip_serializing_if = "Vec::is_empty")]` so existing catalogue JSON that lacks the
+    /// field loads unchanged (CN-01 backward-compatible design).
+    pub impl_generics: Vec<MethodGenericParam>,
+    /// Impl-block-level where-clause predicates applied to `impl_generics`.
+    ///
+    /// Allows cataloguing constraints such as `where L: Send` on an impl block.
+    /// Empty Vec when there are no impl-level where predicates.
+    ///
+    /// The infrastructure codec serialises this field with `#[serde(default,
+    /// skip_serializing_if = "Vec::is_empty")]` so existing catalogue JSON that lacks the
+    /// field loads unchanged (CN-01 backward-compatible design).
+    pub impl_where_predicates: Vec<WherePredicateDecl>,
 }
 
 impl TraitImplDeclV2 {
     /// Creates a new `TraitImplDeclV2` without generic args.
+    ///
+    /// `impl_generics` and `impl_where_predicates` default to empty Vec.
     #[must_use]
     pub fn new(trait_name: TraitName, origin_crate: CrateName) -> Self {
-        Self { trait_name, origin_crate, generic_args: None }
+        Self {
+            trait_name,
+            origin_crate,
+            generic_args: None,
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+        }
     }
 
     /// Creates a new `TraitImplDeclV2` with explicit generic args.
@@ -102,6 +132,8 @@ impl TraitImplDeclV2 {
     /// The `generic_args` string is the raw type argument **without** surrounding
     /// angle brackets. The Display impl wraps it automatically: `"CatalogueLoaderError"`
     /// renders as `From<CatalogueLoaderError>`.
+    ///
+    /// `impl_generics` and `impl_where_predicates` default to empty Vec.
     ///
     /// # Errors
     ///
@@ -130,7 +162,13 @@ impl TraitImplDeclV2 {
         if !Self::angle_brackets_are_valid(trimmed) {
             return Err(GenericArgsError::UnbalancedAngleBrackets);
         }
-        Ok(Self { trait_name, origin_crate, generic_args: Some(trimmed.to_owned()) })
+        Ok(Self {
+            trait_name,
+            origin_crate,
+            generic_args: Some(trimmed.to_owned()),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+        })
     }
 
     /// Returns the generic args string, if any.
@@ -198,7 +236,7 @@ impl fmt::Display for TraitImplDeclV2 {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
@@ -490,5 +528,105 @@ mod tests {
         let b =
             TraitImplDeclV2::new(TraitName::new("Copy").unwrap(), CrateName::new("core").unwrap());
         assert_ne!(a, b);
+    }
+
+    // -------------------------------------------------------------------
+    // AC-06: impl_generics + impl_where_predicates fields (IN-06)
+    // -------------------------------------------------------------------
+
+    #[test]
+    fn test_trait_impl_decl_v2_new_has_empty_impl_generics_by_default() {
+        // `impl_generics` defaults to empty Vec (serde backward-compat via `#[serde(default)]`).
+        let decl = TraitImplDeclV2::new(
+            TraitName::new("MyTrait").unwrap(),
+            CrateName::new("domain").unwrap(),
+        );
+        assert!(
+            decl.impl_generics.is_empty(),
+            "TraitImplDeclV2::new must initialise impl_generics to empty Vec"
+        );
+    }
+
+    #[test]
+    fn test_trait_impl_decl_v2_new_has_empty_impl_where_predicates_by_default() {
+        // `impl_where_predicates` defaults to empty Vec (serde backward-compat via
+        // `#[serde(default)]`).
+        let decl = TraitImplDeclV2::new(
+            TraitName::new("MyTrait").unwrap(),
+            CrateName::new("domain").unwrap(),
+        );
+        assert!(
+            decl.impl_where_predicates.is_empty(),
+            "TraitImplDeclV2::new must initialise impl_where_predicates to empty Vec"
+        );
+    }
+
+    #[test]
+    fn test_trait_impl_decl_v2_impl_generics_and_where_predicates_for_generic_impl_block() {
+        // AC-06: `impl<L, R, W> Trait for Foo<L, R, W> where L: Send` must be representable.
+        use crate::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
+        use crate::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
+
+        let mut decl = TraitImplDeclV2::new(
+            TraitName::new("MyTrait").unwrap(),
+            CrateName::new("domain").unwrap(),
+        );
+        // impl_generics: L, R, W (type parameters on the impl block)
+        decl.impl_generics = vec![
+            MethodGenericParam { name: ParamName::new("L").unwrap(), bounds: vec![] },
+            MethodGenericParam { name: ParamName::new("R").unwrap(), bounds: vec![] },
+            MethodGenericParam { name: ParamName::new("W").unwrap(), bounds: vec![] },
+        ];
+        // impl_where_predicates: L: Send
+        decl.impl_where_predicates = vec![WherePredicateDecl {
+            lhs: TypeRef::new("L").unwrap(),
+            rhs: vec![TypeRef::new("Send").unwrap()],
+            operator: BoundOp::Bound,
+        }];
+
+        assert_eq!(decl.impl_generics.len(), 3);
+        assert_eq!(decl.impl_generics[0].name.as_str(), "L");
+        assert_eq!(decl.impl_generics[1].name.as_str(), "R");
+        assert_eq!(decl.impl_generics[2].name.as_str(), "W");
+        assert_eq!(decl.impl_where_predicates.len(), 1);
+        assert_eq!(decl.impl_where_predicates[0].lhs.as_str(), "L");
+        assert_eq!(decl.impl_where_predicates[0].rhs[0].as_str(), "Send");
+        assert_eq!(decl.impl_where_predicates[0].operator, BoundOp::Bound);
+    }
+
+    #[test]
+    fn test_trait_impl_decl_v2_impl_generics_participates_in_equality() {
+        use crate::tddd::catalogue_v2::identifiers::ParamName;
+        use crate::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let base = TraitImplDeclV2::new(
+            TraitName::new("Serialize").unwrap(),
+            CrateName::new("serde").unwrap(),
+        );
+        let mut with_generics = base.clone();
+        with_generics.impl_generics =
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        assert_ne!(base, with_generics, "impl_generics participates in TraitImplDeclV2 equality");
+    }
+
+    #[test]
+    fn test_trait_impl_decl_v2_impl_where_predicates_participates_in_equality() {
+        use crate::tddd::catalogue_v2::identifiers::TypeRef;
+        use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+
+        let base = TraitImplDeclV2::new(
+            TraitName::new("Serialize").unwrap(),
+            CrateName::new("serde").unwrap(),
+        );
+        let mut with_where = base.clone();
+        with_where.impl_where_predicates = vec![WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
+        }];
+        assert_ne!(
+            base, with_where,
+            "impl_where_predicates participates in TraitImplDeclV2 equality"
+        );
     }
 }

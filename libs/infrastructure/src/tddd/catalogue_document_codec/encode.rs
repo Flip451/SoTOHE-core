@@ -63,12 +63,14 @@ pub(super) fn type_entry_to_dto(
     entry: &TypeEntry,
 ) -> Result<TypeEntryDto, CatalogueDocumentCodecError> {
     let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let trait_impls =
+        entry.trait_impls.iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(TypeEntryDto {
         action: entry.action.to_string(),
         role: entry.role.to_string(),
         kind: type_kind_to_dto(&entry.kind),
         methods,
-        trait_impls: entry.trait_impls.iter().map(trait_impl_to_dto).collect(),
+        trait_impls,
         module_path: entry.module_path.to_string(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
@@ -228,12 +230,26 @@ fn param_decl_to_dto(p: &ParamDeclaration) -> ParamDto {
     ParamDto { name: p.name.as_str().to_owned(), ty: p.ty.as_str().to_owned() }
 }
 
-fn trait_impl_to_dto(t: &TraitImplDeclV2) -> TraitImplDto {
-    TraitImplDto {
+fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocumentCodecError> {
+    let impl_where_predicates = t
+        .impl_where_predicates
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(TraitImplDto {
         trait_name: t.trait_name.as_str().to_owned(),
         origin_crate: t.origin_crate.as_str().to_owned(),
         generic_args: t.generic_args().map(str::to_owned),
-    }
+        impl_generics: t
+            .impl_generics
+            .iter()
+            .map(|g| MethodGenericParamDto {
+                name: g.name.as_str().to_owned(),
+                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+            })
+            .collect(),
+        impl_where_predicates,
+    })
 }
 
 pub(super) fn trait_entry_to_dto(
