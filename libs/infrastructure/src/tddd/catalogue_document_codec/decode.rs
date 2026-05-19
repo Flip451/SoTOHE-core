@@ -617,6 +617,9 @@ pub(super) fn trait_entry_from_dto(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
+    let generics = method_generics_from_dtos(name, dto.generics)?;
+    let where_predicates = where_predicates_from_dtos(name, dto.where_predicates)?;
+
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
         CatalogueDocumentCodecError::InvalidEntry {
             entry_name: name.to_owned(),
@@ -635,6 +638,8 @@ pub(super) fn trait_entry_from_dto(
         role,
         methods,
         supertrait_bounds,
+        generics,
+        where_predicates,
         module_path,
         docs: dto.docs,
         spec_refs,

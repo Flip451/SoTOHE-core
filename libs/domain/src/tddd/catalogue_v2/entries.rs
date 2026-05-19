@@ -18,10 +18,9 @@ use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeName, TypeRef};
 use crate::tddd::catalogue_v2::methods::{
     MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
 };
-// Note: `WherePredicateDecl` is used by `FunctionEntry.where_predicates` and
-// `MethodDeclaration.where_predicates`. `TraitEntry` does not currently carry
-// where-predicates (ADR `2026-05-13-1153` IN-30 scope: trait-level generic
-// parameter declarations are not yet schematized).
+// `MethodGenericParam` and `WherePredicateDecl` are used by `FunctionEntry`,
+// `MethodDeclaration`, `InherentImplDeclV2`, and now also `TraitEntry`
+// (ADR `2026-05-18-1223` D2 / IN-07).
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
 
@@ -90,6 +89,17 @@ pub struct TraitEntry {
     /// `TypeRef::new` rejects empty strings at construction time, so any stored bound is
     /// guaranteed to be a non-empty type/trait reference string.
     pub supertrait_bounds: Vec<TypeRef>,
+    /// Trait-level generic type parameters (e.g. `[T]` for `trait Foo<T>`).
+    ///
+    /// Default empty Vec for backward compatibility with catalogues that predate this field.
+    /// Reuses `MethodGenericParam` — no new type needed (ADR `2026-05-18-1223` D2 / IN-07).
+    pub generics: Vec<MethodGenericParam>,
+    /// Trait-level `where`-clause bound predicates (e.g. `[{ lhs: "T", rhs: ["Clone"] }]`
+    /// for `trait Foo<T> where T: Clone`).
+    ///
+    /// Default empty Vec for backward compatibility.
+    /// Reuses `WherePredicateDecl` — no new type needed (ADR `2026-05-18-1223` D2 / IN-07).
+    pub where_predicates: Vec<WherePredicateDecl>,
     /// Module path within the crate (empty = crate root). Serde default = empty.
     pub module_path: ModulePath,
     /// Optional documentation string.
@@ -389,6 +399,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![],
             supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -415,6 +427,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![save_method.clone()],
             supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: Some("User repository port.".to_string()),
             spec_refs: vec![],
@@ -434,6 +448,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![],
             supertrait_bounds: vec![send.clone(), sync.clone()],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -457,6 +473,8 @@ mod tests {
                 role,
                 methods: vec![],
                 supertrait_bounds: vec![],
+                generics: vec![],
+                where_predicates: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
                 spec_refs: vec![],
@@ -464,6 +482,118 @@ mod tests {
             };
             assert_eq!(entry.role, role);
         }
+    }
+
+    #[test]
+    fn test_trait_entry_new_has_empty_generics_by_default() {
+        // AC-07: TraitEntry must carry a generics field defaulting to empty Vec.
+        let entry = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert!(entry.generics.is_empty());
+    }
+
+    #[test]
+    fn test_trait_entry_new_has_empty_where_predicates_by_default() {
+        // AC-07: TraitEntry must carry a where_predicates field defaulting to empty Vec.
+        let entry = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert!(entry.where_predicates.is_empty());
+    }
+
+    #[test]
+    fn test_trait_entry_generics_and_where_predicates_for_generic_trait_decl() {
+        // AC-07 primary: `trait Foo<T> where T: Clone` can be represented.
+        use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+        let entry = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![],
+            }],
+            where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert_eq!(entry.generics.len(), 1);
+        assert_eq!(entry.generics[0].name.as_str(), "T");
+        assert_eq!(entry.where_predicates.len(), 1);
+        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Clone");
+    }
+
+    #[test]
+    fn test_trait_entry_generics_participates_in_equality() {
+        // generics field must participate in PartialEq (derive-level guarantee).
+        let base = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let mut with_generic = base.clone();
+        with_generic.generics =
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        assert_ne!(base, with_generic, "generics field must participate in equality");
+    }
+
+    #[test]
+    fn test_trait_entry_where_predicates_participates_in_equality() {
+        // where_predicates field must participate in PartialEq.
+        use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+        let base = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let mut with_pred = base.clone();
+        with_pred.where_predicates = vec![WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
+        }];
+        assert_ne!(base, with_pred, "where_predicates field must participate in equality");
     }
 
     // -----------------------------------------------------------------------
@@ -690,6 +820,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![],
             supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],

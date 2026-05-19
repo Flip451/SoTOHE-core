@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-19T16:24:11Z",
+  "generated_at": "2026-05-19T16:41:12Z",
   "declaration_hash": "a1c24fd0311c40a5afc31f633a7ff65d70e423ff791757be818cf7d36b2b6888",
   "signals": [
     {
@@ -44,7 +44,7 @@
     {
       "type_name": "TraitEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

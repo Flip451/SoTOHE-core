@@ -28,12 +28,12 @@
     {
       "id": "T005",
       "description": "D2-schema-trait-impl: TraitImplDeclV2 に impl_generics と impl_where_predicates フィールドを追加する (IN-06)。libs/domain の catalogue_v2/traits.rs の `TraitImplDeclV2` struct に `impl_generics: Vec<MethodGenericParam>` (型パラメータのみ) と `impl_where_predicates: Vec<WherePredicateDecl>` フィールドを追加する。serde は `#[serde(default)]` で既存 catalogue JSON が無修正でロードできる後方互換設計を維持する (CN-01)。impl<L, R, W> Trait for Foo<L, R, W> where L: Send のような trait impl ブロック固有のジェネリックと where 句を catalogue で正規に宣言できることを示す unit test を追加する (AC-06)。infrastructure 層の catalogue_document_codec DTO に対応フィールドを追加し、round-trip codec unit test を追加する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "D2-schema-trait-entry: TraitEntry に generics と where_predicates フィールドを追加する (IN-07)。libs/domain の catalogue_v2/entries.rs の `TraitEntry` struct に `generics: Vec<MethodGenericParam>` (型パラメータのみ、ライフタイム/const パラメータはスコープ外) と `where_predicates: Vec<WherePredicateDecl>` フィールドを追加する。serde は `#[serde(default)]` で既存 catalogue JSON が無修正でロードできる後方互換設計を維持する (CN-01)。trait Foo<T> where T: Clone のようなトレイト宣言レベルのジェネリックを catalogue で正規に宣言できることを示す unit test を追加する (AC-07)。infrastructure 層の catalogue_document_codec DTO に対応フィールドを追加し、round-trip codec unit test を追加する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T007",

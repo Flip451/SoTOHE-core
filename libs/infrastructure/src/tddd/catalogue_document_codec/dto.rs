@@ -315,6 +315,17 @@ pub(super) struct TraitEntryDto {
     /// Default empty for backward compatibility with catalogues that predate this field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub(super) supertrait_bounds: Vec<String>,
+    /// Trait-level generic type parameters (e.g. `[{ name: "T", bounds: ["Clone"] }]`
+    /// for `trait Foo<T: Clone>`).
+    /// Default empty for backward compatibility (CN-01 / OS-04).
+    /// (ADR `2026-05-18-1223-make-catalogue-schema-permissive` D2 / IN-07)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) generics: Vec<MethodGenericParamDto>,
+    /// Trait-level `where`-clause bound predicates.
+    /// Default empty for backward compatibility (CN-01 / OS-04).
+    /// (ADR `2026-05-18-1223-make-catalogue-schema-permissive` D2 / IN-07)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) where_predicates: Vec<WherePredicateDeclDto>,
     #[serde(default)]
     pub(super) module_path: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]

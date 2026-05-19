@@ -77,6 +77,8 @@ fn doc_with_trait(crate_name: &str, trait_name: &str) -> CatalogueDocument {
         role: ContractRole::SecondaryPort,
         methods: vec![method],
         supertrait_bounds: vec![],
+        generics: vec![],
+        where_predicates: vec![],
         module_path: ModulePath::root(),
         docs: None,
         spec_refs: vec![],

@@ -294,6 +294,8 @@ mod tests {
                         None,
                     )],
                     supertrait_bounds: vec![],
+                    generics: vec![],
+                    where_predicates: vec![],
                     module_path: ModulePath::root(),
                     docs: None,
                     spec_refs: vec![],

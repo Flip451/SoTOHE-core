@@ -256,11 +256,22 @@ pub(super) fn trait_entry_to_dto(
     entry: &TraitEntry,
 ) -> Result<TraitEntryDto, CatalogueDocumentCodecError> {
     let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let where_predicates =
+        entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
     Ok(TraitEntryDto {
         action: entry.action.to_string(),
         role: entry.role.to_string(),
         methods,
         supertrait_bounds: entry.supertrait_bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+        generics: entry
+            .generics
+            .iter()
+            .map(|g| MethodGenericParamDto {
+                name: g.name.as_str().to_owned(),
+                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+            })
+            .collect(),
+        where_predicates,
         module_path: entry.module_path.to_string(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),

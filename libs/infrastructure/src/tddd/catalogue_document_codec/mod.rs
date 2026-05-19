@@ -467,6 +467,142 @@ mod tests {
         assert_eq!(entry.role, ContractRole::SecondaryPort);
     }
 
+    // -----------------------------------------------------------------------
+    // TraitEntry generics + where_predicates (T006 / AC-07)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_trait_entry_with_generics_and_where_predicates() {
+        // AC-07: `trait Foo<T> where T: Clone` is expressible in JSON.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "Foo": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "generics": [{ "name": "T", "bounds": [] }],
+      "where_predicates": [{ "lhs": "T", "rhs": ["Clone"] }]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits.values().next().unwrap();
+        assert_eq!(entry.generics.len(), 1);
+        assert_eq!(entry.generics[0].name.as_str(), "T");
+        assert_eq!(entry.where_predicates.len(), 1);
+        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Clone");
+    }
+
+    #[test]
+    fn test_decode_trait_entry_missing_generics_and_where_predicates_defaults_to_empty() {
+        // CN-01 / OS-04 backward compat: catalogues that predate generics/where_predicates
+        // on traits must still decode successfully with both fields defaulting to empty.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "OldTrait": {
+      "action": "add",
+      "role": "SecondaryPort"
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits.values().next().unwrap();
+        assert!(entry.generics.is_empty(), "generics must default to empty Vec");
+        assert!(entry.where_predicates.is_empty(), "where_predicates must default to empty Vec");
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_trait_generics_and_where_predicates() {
+        // Round-trip: encode → JSON → decode preserves generics and where_predicates.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "Bar": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "generics": [{ "name": "T", "bounds": ["Clone"] }],
+      "where_predicates": [{ "lhs": "T", "rhs": ["Send"] }]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+        let entry = doc2.traits.values().next().unwrap();
+        assert_eq!(entry.generics[0].name.as_str(), "T");
+        assert_eq!(entry.generics[0].bounds[0].as_str(), "Clone");
+        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Send");
+    }
+
+    #[test]
+    fn test_encode_trait_entry_with_empty_generics_omits_field_from_json() {
+        // Byte-stable: empty generics/where_predicates must not appear in JSON
+        // (skip_serializing_if = "Vec::is_empty").
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "Plain": {
+      "action": "add",
+      "role": "SecondaryPort"
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(
+            !encoded.contains("\"generics\""),
+            "empty generics must be omitted from JSON (byte-stable); encoded:\n{encoded}"
+        );
+        assert!(
+            !encoded.contains("\"where_predicates\""),
+            "empty where_predicates must be omitted from JSON (byte-stable); encoded:\n{encoded}"
+        );
+    }
+
+    #[test]
+    fn test_decode_trait_entry_with_invalid_generics_returns_error() {
+        // Codec must reject malformed generic param names at decode time.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "BadTrait": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "generics": [{ "name": "", "bounds": [] }]
+    }
+  },
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "expected InvalidEntry for empty generic param name, got: {result:?}"
+        );
+    }
+
     #[test]
     fn test_encode_decode_round_trip_preserves_data() {
         let json = r#"{
