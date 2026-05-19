@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 gives `InherentImplDeclV2` its own entry type and simultaneously says `TypeEntry` must not carry impl data, but it never says where the new entry is stored in `CatalogueDocument`. In the current catalogue shape the only impl carrier is `TypeEntry.trait_impls`, so this leaves inherent impl blocks without a serialization/evaluation home.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 79,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The same D2 section reuses `MethodGenericParam` for impl- and trait-declaration generics, but that type only models a parameter name plus bounds for type parameters. It cannot represent lifetime or const generic parameters, so the advertised support for impl/trait generic declarations is narrower than the Rust syntax the ADR claims to cover.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 87,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:5d0e2f4679cafcc736df45ee74992093454b96357a6c2cf8a33e46de51bd7436",
+          "at": "2026-05-19T08:09:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d0e2f4679cafcc736df45ee74992093454b96357a6c2cf8a33e46de51bd7436",
+          "at": "2026-05-19T08:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 says the catalogue will model impl-block and trait-declaration generics, but the proposed fields reuse `Vec<MethodGenericParam>`. That type only represents a named type parameter plus bounds; it cannot encode lifetime parameters like `<'a>` or const parameters like `<const N: usize>`. As written, the plan still cannot represent valid Rust impl/trait generic declarations despite claiming to make this level of the schema Rust-syntax-permissive.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 87,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:5d0e2f4679cafcc736df45ee74992093454b96357a6c2cf8a33e46de51bd7436",
+          "at": "2026-05-19T08:14:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2's TraitEntry example models `trait Iterator<Item: Clone>` as a generic parameter (`generics: [{ name: \"Item\", ... }]`), but `Iterator::Item` is an associated type, not a trait type parameter. This puts an associated-type declaration in the trait-generic field and contradicts the stated D2 purpose of representing declarations like `trait Foo<T> where T: ...`; an implementer following the example would add the wrong schema surface for this Rust construct.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 151,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:d00bcc3b3e36df1aa42756fe14f053eb937a71ffd43f97d68376ef25181fe790",
+          "at": "2026-05-19T08:19:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be91fca4df58b9f2e2aac2922cf13765e7b3ed572e5ce87afaa2cd1e5192df36",
+          "at": "2026-05-19T08:21:46Z"
+        }
+      ]
+    }
+  }
+}

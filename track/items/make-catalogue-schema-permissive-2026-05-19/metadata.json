@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "make-catalogue-schema-permissive-2026-05-19",
+  "title": "catalogue スキーマを Rust 文法に対して寛容な設計にする",
+  "branch": "track/make-catalogue-schema-permissive-2026-05-19",
+  "created_at": "2026-05-19T07:59:39Z",
+  "updated_at": "2026-05-19T07:59:39Z"
+}
