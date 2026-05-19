@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BoundOp | enum | — | Bound, Equal | 🟡 | 🔵 |
+| BoundOp | enum | — | Bound, Equal | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -13,7 +13,7 @@
 | InherentImplDeclV2 | value_object | — | — | 🟡 | 🔵 |
 | TraitEntry | value_object | modify | — | 🟡 | 🔵 |
 | TraitImplDeclV2 | value_object | modify | — | 🟡 | 🔵 |
-| WherePredicateDecl | value_object | modify | — | 🟡 | 🔵 |
+| WherePredicateDecl | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types
 

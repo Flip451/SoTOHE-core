@@ -4,74 +4,63 @@
     {
       "id": "T001",
       "description": "D1-schema: WherePredicateDecl を lhs / rhs / operator の 3 フィールド構造に拡張し、BoundOp enum を追加する (IN-01)。libs/domain の catalogue_v2/methods.rs で既存の `type_: TypeRef` + `bounds: Vec<TypeRef>` フィールドを `lhs: TypeRef` (任意の where 句左辺、HRTB バインダー `for<'a> ...` を文字列として組み込む) / `rhs: Vec<TypeRef>` (`+` 連結された境界のリスト) / `operator: BoundOp` に rename / 追加変更する。BoundOp enum を同モジュールに追加し、Bound (`:`) と Equal (`=`) の 2 バリアントを実装する。後方互換設計 (CN-01 / OS-04): (a) domain 型の `WherePredicateDecl` は新フィールド (`lhs`/`rhs`/`operator`) に `#[serde(default)]` を付与し、`where_predicates` リスト自体が存在しない旧 catalogue ファイルが空リストとしてデシリアライズできるようにする。(b) infrastructure DTO (`CatalogueDocumentCodec` の DTO) では旧フィールド名 `type_` と `bounds` を `#[serde(alias)]` で `lhs` / `rhs` にマッピングし、旧フォーマットで書かれた述語エントリがある場合でも新フォーマットとして読み込めるようにする。(c) `operator` フィールドは旧フォーマットに存在しないため、`#[serde(default)]` で `BoundOp::Bound` (`:` バインド演算子) をデフォルト値とし、旧フォーマットのエントリが `operator` 省略でも正しくデシリアライズできるようにする。同モジュールの domain unit test に WherePredicateDecl の round-trip テストを追加する。infrastructure 層の catalogue_document_codec DTO も同一コミット内で更新し、codec unit test を追加する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "in_progress"
     },
     {
       "id": "T002",
       "description": "D1-codec: A-codec の validate_supported_bound を撤廃する (IN-02)。libs/infrastructure の catalogue_to_extended_crate_codec.rs から `validate_supported_bound` 関数および呼び出し箇所をすべて削除する。syn でパース可能な境界文字列 (ライフタイム境界 / HRTB / 精密捕捉等) を境界の種類によらず accept する。ライフタイム境界を含む宣言 (`<F: Fn(...) + Send + Sync + 'static>` 等) が A-codec でエラーなくエンコードされることを確認するユニットテストを追加する (AC-02)。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T003",
       "description": "D1-evaluator: signal evaluator の strip_outlives_from_index 撤廃 + build_generics_fingerprint の全境界種類対応 + syn パース失敗エラー処理を実装する (IN-03 / IN-04)。libs/infrastructure の signal_evaluator_v2/generics_eq.rs から `strip_outlives_from_index` 関数と呼び出し箇所を削除し、A 側・C 側の両側でライフタイム境界を保持する。`build_generics_fingerprint` を `{lhs, rhs, operator}` 単位でフィンガープリントを生成する形に更新する。rhs の要素は集合として正規化 (昇順ソート) し、`T: A + B` と `T: B + A` を同一フィンガープリントとする (AC-03)。A 側・C 側のいずれかで syn のパースが失敗した境界文字列は信号評価の対象外として明示的なエラーを返す (IN-04 / AC-04)。unit test を追加する: (a) `T: 'static` のライフタイム境界が両側で保持されて Blue になる、(b) `T: A + B` と `T: B + A` が同一フィンガープリントになる、(c) syn パース不能な文字列がエラーを返す。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T004",
       "description": "D2-schema-inherent: InherentImplDeclV2 を domain 層に新規追加する (IN-05 / IN-08)。libs/domain の catalogue_v2/entries.rs に `InherentImplDeclV2` struct を追加する。フィールド: `type_name: TypeName` (必須フィールド、デシリアライズ時に常に存在が要求される)、`impl_generics: Vec<MethodGenericParam>` (型パラメータのみ、ライフタイム/const パラメータはスコープ外)、`impl_where_predicates: Vec<WherePredicateDecl>`、`methods: Vec<MethodDeclaration>`。serde は Vec フィールド (`impl_generics` / `impl_where_predicates` / `methods`) のみ `#[serde(default)]` で空 Vec をデフォルト値とし、後方互換性を維持する (CN-01 / OS-04)。`type_name` は必須フィールドであり `#[serde(default)]` は付与しない。CatalogueDocument の `inherent_impls: Vec<InherentImplDeclV2>` フィールドも追加し、`#[serde(default)]` で空 Vec をデフォルト値とする。1 struct に対して複数の inherent impl ブロックを複数エントリで表現できることを示す unit test を追加する。infrastructure 層の catalogue_document_codec に InherentImplDeclV2 DTO を追加し、round-trip codec unit test を追加する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T005",
       "description": "D2-schema-trait-impl: TraitImplDeclV2 に impl_generics と impl_where_predicates フィールドを追加する (IN-06)。libs/domain の catalogue_v2/traits.rs の `TraitImplDeclV2` struct に `impl_generics: Vec<MethodGenericParam>` (型パラメータのみ) と `impl_where_predicates: Vec<WherePredicateDecl>` フィールドを追加する。serde は `#[serde(default)]` で既存 catalogue JSON が無修正でロードできる後方互換設計を維持する (CN-01)。impl<L, R, W> Trait for Foo<L, R, W> where L: Send のような trait impl ブロック固有のジェネリックと where 句を catalogue で正規に宣言できることを示す unit test を追加する (AC-06)。infrastructure 層の catalogue_document_codec DTO に対応フィールドを追加し、round-trip codec unit test を追加する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T006",
       "description": "D2-schema-trait-entry: TraitEntry に generics と where_predicates フィールドを追加する (IN-07)。libs/domain の catalogue_v2/entries.rs の `TraitEntry` struct に `generics: Vec<MethodGenericParam>` (型パラメータのみ、ライフタイム/const パラメータはスコープ外) と `where_predicates: Vec<WherePredicateDecl>` フィールドを追加する。serde は `#[serde(default)]` で既存 catalogue JSON が無修正でロードできる後方互換設計を維持する (CN-01)。trait Foo<T> where T: Clone のようなトレイト宣言レベルのジェネリックを catalogue で正規に宣言できることを示す unit test を追加する (AC-07)。infrastructure 層の catalogue_document_codec DTO に対応フィールドを追加し、round-trip codec unit test を追加する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T007",
       "description": "D2-codec-evaluator: A-codec と信号評価器を更新して InherentImplDeclV2 / TraitImplDeclV2.impl_generics / TraitEntry.generics を rustdoc の対応レベルのジェネリックと対称比較できるようにする (IN-09)。A-codec 側: (a) rustdoc の inherent impl ブロックレベルのジェネリックを InherentImplDeclV2.impl_generics / impl_where_predicates に正しく配置する encode ロジックを実装する。(b) rustdoc の trait impl ブロックレベルのジェネリックを TraitImplDeclV2.impl_generics / impl_where_predicates に配置する。(c) rustdoc のトレイト宣言レベルのジェネリックを TraitEntry.generics / where_predicates に配置する。信号評価器側: 各レベルのジェネリック (impl ブロック・トレイト宣言) の比較を rustdoc 側と catalogue 側で対称に行う比較ロジックを追加する。CN-02 のアーキテクチャ制約に従い、評価器内部の rustdoc 解析・codec・比較ロジックは libs/infrastructure/ に実装する (signal evaluator の orchestration は libs/usecase/ が担う)。既存 catalogue JSON (新フィールドなし) に対して信号評価結果が変化しないことを確認するテストを追加する (AC-08)。unit test: impl<L: Left, R: Right, W: Write> Foo<L, R, W> の InherentImplDeclV2 が A 側で正しくエンコードされ C 側 rustdoc と Blue 一致することを確認。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T008",
       "description": "D3-pre-step: A 側に B 側と対称な Pre-step を追加し、全 A Item に fresh S id を一括 pre-allocate する (IN-10)。libs/infrastructure の signal_evaluator_v2/phase1/builder.rs に `build_a_id_remap` 関数 (または同等のロジック) を追加し、B 側 `b_id_remap` 構築と対称なアルゴリズムで `a_id_remap: HashMap<old_a_id, new_s_id>` を一括構築する。action 別処理 (Add / Modify / Reference / Delete) の各ブランチで id 解決に `a_id_remap` を参照するよう修正する。この変更のみで CI が通ることを確認する (T009 の patch_impl_for_ids 削除は次タスク)。unit test を追加する: (a) A 側 id と B 側 id が衝突する fixture で renumber 後も S アイテムが正しく参照される、(b) a_id_remap 構築後に action 別処理が id_map に親型 mapping を持つ状態になる。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T009",
       "description": "D3-patch-removal: patch_impl_for_ids と patch_impl_trait_ids を削除し、for_ remap を rewrite_type_ref_ids_in_item + id_map の 1 経路に統一する (IN-11)。T008 完了後、a_id_remap が全 A Item に適用された状態で `patch_impl_for_ids` / `patch_impl_trait_ids` が不要になることを確認してから削除する。for_ の remap が `rewrite_type_ref_ids_in_item` + `a_id_remap` / `b_id_remap` の 1 経路に統一され、自クレート Item を指す id は id_map で新 S id に remap、外部クレート Item を指す id は external_crates rebuild で rebind される構造を実装する。外部クレート型を対象とする impl (impl From<MyError> for OtherCrateError 等) の for_ が誤って自クレート親型 id に上書きされなくなり、for_is_external フラグが正しく判定されることを確認する unit test を追加する (AC-10)。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T010",
       "description": "ADR-supersede: 旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 の frontmatter status を superseded に更新し、superseded_by フィールドに 2026-05-18-1223-make-catalogue-schema-permissive.md への参照を追加する (IN-12 / AC-11)。D1 (BoundPredicate 正規化) は引き続き有効のため status は変更しない。`cargo make ci` が通ることを確認する (verify-adr-signals を含む)。Layer: documentation。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T012",
       "description": "D4-filter-removal: (1) libs/domain の catalogue_v2/traits.rs の TraitImplDeclV2 struct に for_ フィールド (Option<String>、serde default None) を追加する (IN-13)。for_ は cross-crate impl を catalogue で declare する際に self-type の fully-qualified path を記述するフィールド (例: domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError)。既存 catalogue ファイルは for_ なしでロードできるため後方互換設計を維持する (CN-01)。infrastructure DTO にも for_ フィールドを追加し、round-trip codec unit test を追加する。(2) signal_evaluator_v2/mod.rs の build_impl_identity_map 内にある for_is_external filter を撤廃し、cross-crate impl も c_impls に含める (IN-13 / AC-12)。具体的な変更対象は libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs の line 363-380 付近: `if let Type::ResolvedPath(p) = &impl_.for_ { let for_is_external = krate.paths.get(&p.id).is_some_and(|ps| ps.crate_id != 0); if for_is_external { continue; } }` のブロックを削除する。B 側の orphan impl 挿入処理 (phase1/builder.rs) は現状維持 (filter なしで全 impl を S に挿入する既存の挙動)。(3) A-codec を更新して TraitImplDeclV2.for_ が Some の場合に fully-qualified path を parse して外部クレートを判定し external_crates および paths に登録する対応を追加する。for_ が None の場合は従来通り親 TypeEntry の型が for_ として使用される。結果として S 側と C 側の両側に cross-crate impl が含まれ、fingerprint が対称に生成されて Blue が得られる。unit test を追加する: (a) impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError のような cross-crate impl が c_impls に含まれる (filter 撤廃後の確認)、(b) S 側 (s_impls) と C 側 (c_impls) の両側に cross-crate impl が含まれ fingerprint が一致して Blue が得られる。T009 完了後に着手することで、for_ の id 管理が整備された状態で filter 撤廃を行える。cargo make ci-rust が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "125f85ad9b9e7f1f40f15508ab3b1dea113fa948"
     },
     {
       "id": "T011",
       "description": "統合確認: bin/sotp を rebuild し (cargo make build-sotp)、本トラックの type-signals / catalogue-spec-signals を全 3 layer で再生成する。track-sync-views で rendered view を再生成する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。domain layer の Phase 2 Yellow (action: add / modify エントリの実装前正常 Yellow) が本実装によって Blue 化することを確認する。usecase layer の false-positive Red 2 件 (Interactor エントリの Outlives strip 非対称性由来 — IN-03 / T003 で解消する見込み) と infrastructure layer の Red 1 件 (NewTypeGraphCodecError cross-crate From impl — IN-10 / IN-11 / T008-T009 および D4 / T012 で解消する見込み) が解消していることを確認する。AC-01〜AC-12 の充足確認をコメントとして残す。Layer: integration。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {
@@ -86,7 +75,11 @@
           "T002 は A-codec の validate_supported_bound を撤廃し、全 syn-parseable bound を境界の種類によらず accept する。",
           "T003 は signal evaluator の strip_outlives_from_index を撤廃し、{lhs, rhs, operator} 単位のフィンガープリント生成と rhs の順序非依存正規化を実装する。syn パース失敗は明示的エラーとして返す。"
         ],
-        "task_ids": ["T001", "T002", "T003"]
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003"
+        ]
       },
       {
         "id": "S2",
@@ -97,7 +90,11 @@
           "T006 は TraitEntry にトレイト宣言レベルの generics / where_predicates を追加する。旧 ADR D2 で先送りされていたトレイトエントリの generics スキーマ化を完了する。",
           "すべて serde default で既存 catalogue JSON が無修正でロードできる設計を維持する (CN-01 / AC-08)。T005 は catalogue_v2/traits.rs を修正するため T004 / T006 と独立して着手できる。T004 と T006 はともに catalogue_v2/entries.rs を修正するため順次実施する (並行不可)。T007 (codec / evaluator 更新) は T004-T006 の完了後に着手する。"
         ],
-        "task_ids": ["T004", "T005", "T006"]
+        "task_ids": [
+          "T004",
+          "T005",
+          "T006"
+        ]
       },
       {
         "id": "S3",
@@ -107,7 +104,9 @@
           "S2 (T004-T006) の完了後に着手する。<500 行/commit を維持するため D2 のスキーマ追加 (S2) と codec 更新 (S3) を分割している。",
           "既存 catalogue JSON の信号評価結果が変化しないことを確認する (AC-08)。"
         ],
-        "task_ids": ["T007"]
+        "task_ids": [
+          "T007"
+        ]
       },
       {
         "id": "S4",
@@ -118,7 +117,11 @@
           "T012 は T009 完了後に TraitImplDeclV2 に for_ フィールド (Option<String>、serde default None) を追加し (IN-13)、C 側 build_impl_identity_map の for_is_external filter を撤廃し (IN-13 / AC-12)、A-codec を更新して for_ Some の場合に fully-qualified path を parse して外部クレートを判定・登録する。signal_evaluator_v2/mod.rs の for_is_external 判定ブロックを削除し、cross-crate impl も c_impls に含める。B 側 orphan impl 挿入処理 (phase1/builder.rs) は現状維持。結果として S 側と C 側の両側に cross-crate impl が対称に含まれ fingerprint が一致して Blue が得られる。D4 は D3 の id 管理整備 (T009 完了) の後に着手することで、for_ の id 管理が整備された状態で filter 撤廃を行える。",
           "T008・T009・T012 を順次分割することで、Pre-step 追加 → patch 削除 → for_is_external filter 撤廃の各変更が独立してレビューできる状態を保つ。D3 + D4 は S1-S3 (D1/D2) と独立しているため S1-S3 と並行着手が可能。"
         ],
-        "task_ids": ["T008", "T009", "T012"]
+        "task_ids": [
+          "T008",
+          "T009",
+          "T012"
+        ]
       },
       {
         "id": "S5",
@@ -127,7 +130,10 @@
           "T010 は旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 を superseded に更新する (IN-12 / AC-11)。",
           "T011 は bin/sotp rebuild + 全 layer の type-signals / catalogue-spec-signals 再生成 + cargo make ci 通過確認を行う統合タスクである。T001-T010 および T012 のすべてが完了した後に着手する。domain Yellow の Blue 化、usecase Red / infrastructure Red の解消 (T012 の AC-12 検証を含む) を確認する。"
         ],
-        "task_ids": ["T010", "T011"]
+        "task_ids": [
+          "T010",
+          "T011"
+        ]
       }
     ]
   }

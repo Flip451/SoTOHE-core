@@ -352,16 +352,34 @@ pub(super) struct MethodGenericParamDto {
 
 /// JSON-shape mirror of `domain::tddd::catalogue_v2::WherePredicateDecl`.
 ///
-/// On the wire the field is named `"type"` (a reserved Rust keyword), so the
-/// struct field is `type_` with `#[serde(rename = "type")]`.
-/// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
+/// Wire format uses `"lhs"` / `"rhs"` / `"operator"` fields.
+/// Legacy catalogues that used `"type"` / `"bounds"` are supported via
+/// `#[serde(alias)]` for backward compatibility (CN-01 / OS-04).
+/// The `"operator"` field defaults to `"Bound"` when absent.
+///
+/// (ADR `2026-05-18-1223-make-catalogue-schema-permissive` D1 — supersedes
+/// the 2-field form from `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(super) struct WherePredicateDeclDto {
-    #[serde(rename = "type")]
-    pub(super) type_: String,
+    /// Left-hand side of the where predicate. Legacy alias: `"type"`.
+    #[serde(alias = "type")]
+    pub(super) lhs: String,
+    /// Right-hand side bounds. Legacy alias: `"bounds"`.
+    #[serde(default, alias = "bounds")]
+    pub(super) rhs: Vec<String>,
+    /// The predicate operator. Defaults to `"Bound"` when absent.
     #[serde(default)]
-    pub(super) bounds: Vec<String>,
+    pub(super) operator: BoundOpDto,
+}
+
+/// Serde-serializable mirror of `domain::tddd::catalogue_v2::BoundOp`.
+#[derive(Debug, Serialize, Deserialize, Default, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "PascalCase")]
+pub(super) enum BoundOpDto {
+    #[default]
+    Bound,
+    Equal,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

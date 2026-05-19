@@ -1,17 +1,18 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-19T14:01:16Z",
-  "declaration_hash": "1ac74463e01c2785f7f610eeeadf885576f1884611a77c6073ea7942c991d117",
+  "generated_at": "2026-05-19T15:11:14Z",
+  "declaration_hash": "a1c24fd0311c40a5afc31f633a7ff65d70e423ff791757be818cf7d36b2b6888",
   "signals": [
     {
       "type_name": "BoundOp",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
+        "core::default::Default",
         "core::fmt::Debug",
         "core::marker::Copy"
       ]
@@ -68,7 +69,7 @@
     {
       "type_name": "WherePredicateDecl",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

@@ -13,18 +13,18 @@ use domain::tddd::catalogue_v2::identifiers::{FieldName, VariantName};
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, FunctionPath, FunctionRole, GenericArgsError, ItemAction,
-    MethodDeclaration, MethodGenericParam, MethodName, ModulePath, ParamDeclaration, ParamName,
-    SelfReceiver, TraitImplDeclV2, TraitName, TypeName, TypeRef, WherePredicateDecl,
+    BoundOp, CatalogueDocument, CrateName, FunctionPath, FunctionRole, GenericArgsError,
+    ItemAction, MethodDeclaration, MethodGenericParam, MethodName, ModulePath, ParamDeclaration,
+    ParamName, SelfReceiver, TraitImplDeclV2, TraitName, TypeName, TypeRef, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_dtos};
 
 use super::CatalogueDocumentCodecError;
 use super::dto::{
-    CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto, ParamDto,
-    TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto,
-    VariantPayloadDto,
+    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto,
+    ParamDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto,
+    VariantDeclDto, VariantPayloadDto,
 };
 
 // ---------------------------------------------------------------------------
@@ -302,11 +302,14 @@ fn validate_bound_str(bound_str: &str) -> Result<(), String> {
 /// Validates that `type_str` is syntactically well-formed as a Rust type expression
 /// using `syn::parse_str::<syn::Type>`.
 ///
-/// Used to validate `WherePredicateDecl.type_` at the codec boundary so that malformed
+/// Used to validate `WherePredicateDecl.lhs` at the codec boundary so that malformed
 /// type syntax (e.g. `"Vec<"`, `"T U"`, `"<invalid>"`) is rejected at decode time
 /// rather than failing later inside `CatalogueToExtendedCrateCodec`.
 /// `TypeRef::new` only rejects empty strings and does not validate syntax; this
 /// function provides the stronger structural check for where-predicate LHS values.
+///
+/// Note: HRTB-prefixed LHS strings (e.g. `"for<'a> T"`) are accepted by `syn::Type`
+/// because they parse as `syn::Type::TraitObject` or similar constructs.
 ///
 /// # Errors
 ///
@@ -316,6 +319,41 @@ fn validate_type_ref_str(type_str: &str) -> Result<(), String> {
     syn::parse_str::<syn::Type>(type_str)
         .map(|_| ())
         .map_err(|e| format!("invalid type syntax '{}': {e}", type_str))
+}
+
+/// Validates that `lhs_str` is a supported associated-type projection for an `Equal`
+/// where-predicate.
+///
+/// Rust equality constraints (`where T::Assoc = U`, `where <T as Trait>::Assoc = U`)
+/// require the LHS to be a qualified type-path projection — either a bare
+/// multi-segment path (`T::Assoc`, `T::Nested::Assoc`) or a fully-qualified path
+/// (`<T as Trait>::Assoc`).  A single-segment path such as `T` would produce
+/// `where T = U`, which is not valid Rust syntax.
+///
+/// This function rejects LHS values that do not contain at least one `::` segment
+/// separator, so that a bare type parameter (`"T"`, `"String"`) cannot be accepted
+/// as an `Equal` predicate LHS.  The syntactic well-formedness check (`validate_type_ref_str`)
+/// must already have passed before this function is called.
+///
+/// # Errors
+///
+/// Returns an error string if `lhs_str` does not contain `"::"` (i.e., it is not a
+/// path projection of the required form).
+fn validate_equal_predicate_lhs(lhs_str: &str) -> Result<(), String> {
+    // A valid Equal-predicate LHS must contain at least one `::` — either a
+    // multi-segment bare path (`T::Assoc`) or a qualified-self form (`<T as Trait>::Assoc`).
+    // Single-segment forms like `"T"` are rejected here because `where T = U` is not
+    // valid Rust.
+    if !lhs_str.contains("::") {
+        return Err(format!(
+            "Equal where-predicate lhs '{}' is not a supported projection form; \
+             expected a path with at least one '::' segment (e.g. `T::Assoc`, \
+             `<T as Trait>::Assoc`) — bare type parameters cannot appear as the LHS \
+             of a `where T = U` equality constraint",
+            lhs_str
+        ));
+    }
+    Ok(())
 }
 
 /// Convert a Vec of `MethodGenericParamDto` (shared by Method and Function entries)
@@ -371,11 +409,12 @@ fn method_generics_from_dtos(
 }
 
 /// Convert a Vec of `WherePredicateDeclDto` (shared by Method, Function, and Trait entries)
-/// into validated `WherePredicateDecl` values, rejecting empty `type_` or bound entries.
+/// into validated `WherePredicateDecl` values, rejecting empty `lhs` or `rhs` entries.
 ///
-/// A `WherePredicateDeclDto` with an empty `bounds` vector is rejected because `where T:`
-/// (no bound after the colon) is syntactically invalid in Rust and would produce a
-/// `WherePredicate::BoundPredicate { bounds: vec![] }` in the extended crate representation.
+/// A `WherePredicateDeclDto` with an empty `rhs` vector and `BoundOp::Bound` operator is
+/// rejected because `where T:` (no bound after the colon) is syntactically invalid in Rust
+/// and would produce a `WherePredicate::BoundPredicate { bounds: vec![] }` in the extended
+/// crate representation.  For `BoundOp::Equal` predicates an empty `rhs` is also rejected.
 fn where_predicates_from_dtos(
     entry_name: &str,
     dtos: Vec<crate::tddd::catalogue_document_codec::dto::WherePredicateDeclDto>,
@@ -387,31 +426,62 @@ fn where_predicates_from_dtos(
     dtos.into_iter()
         .map(|w| {
             // Validate non-empty first (TypeRef::new check), then validate Rust type syntax.
-            let type_ = TypeRef::new(w.type_.clone())
-                .map_err(|e| err(format!("invalid where predicate type '{}': {e}", w.type_)))?;
-            validate_type_ref_str(w.type_.as_str())
-                .map_err(|e| err(format!("invalid where predicate type syntax: {e}")))?;
-            if w.bounds.is_empty() {
+            let lhs = TypeRef::new(w.lhs.clone())
+                .map_err(|e| err(format!("invalid where predicate lhs '{}': {e}", w.lhs)))?;
+            validate_type_ref_str(w.lhs.as_str())
+                .map_err(|e| err(format!("invalid where predicate lhs syntax: {e}")))?;
+            if w.rhs.is_empty() {
                 return Err(err(format!(
-                    "where predicate for '{}' has no bounds (expected at least one bound \
-                     after the colon; `where T:` is not valid Rust)",
-                    w.type_
+                    "where predicate for '{}' has no rhs bounds (expected at least one bound; \
+                     `where T:` or `where T =` without rhs is invalid)",
+                    w.lhs
                 )));
             }
-            let bounds = w
-                .bounds
+            let operator = match w.operator {
+                BoundOpDto::Bound => BoundOp::Bound,
+                BoundOpDto::Equal => {
+                    // `Equal` predicates (`where T::Assoc = U`) require exactly one RHS entry.
+                    // Multiple RHS entries would be invalid Rust syntax for an equality constraint.
+                    if w.rhs.len() != 1 {
+                        return Err(err(format!(
+                            "where predicate for '{}' with operator Equal must have exactly one \
+                             rhs entry (got {}); `where T::Assoc = U` accepts a single RHS only",
+                            w.lhs,
+                            w.rhs.len()
+                        )));
+                    }
+                    // `Equal` predicates require the LHS to be an associated-type projection
+                    // (e.g. `T::Assoc`, `<T as Trait>::Assoc`). A bare type parameter such as
+                    // `"T"` is not a valid LHS for `where T = U` in Rust.
+                    validate_equal_predicate_lhs(w.lhs.as_str())
+                        .map_err(|e| err(format!("invalid Equal where predicate lhs: {e}")))?;
+                    BoundOp::Equal
+                }
+            };
+            let rhs = w
+                .rhs
                 .into_iter()
                 .enumerate()
-                .map(|(idx, bound)| {
-                    validate_bound_str(&bound)
-                        .map_err(|e| err(format!("invalid where predicate bound[{idx}]: {e}")))?;
-                    TypeRef::new(bound.clone())
-                        .map_err(|e| err(format!("invalid bound type ref '{bound}': {e}")))
+                .map(|(idx, entry)| {
+                    // `Bound` RHS entries are trait bounds (e.g. `Clone`, `Iterator<Item = u32>`);
+                    // use `validate_bound_str` (parses `syn::TypeParamBound`).
+                    // `Equal` RHS entries are type expressions (e.g. `u32`, `Vec<T>`);
+                    // use `validate_type_ref_str` (parses `syn::Type`) because
+                    // `validate_bound_str` rejects plain types like `u32`.
+                    match operator {
+                        BoundOp::Bound => validate_bound_str(&entry)
+                            .map_err(|e| err(format!("invalid where predicate rhs[{idx}]: {e}")))?,
+                        BoundOp::Equal => validate_type_ref_str(&entry)
+                            .map_err(|e| err(format!("invalid where predicate rhs[{idx}]: {e}")))?,
+                    }
+                    TypeRef::new(entry.clone())
+                        .map_err(|e| err(format!("invalid rhs type ref '{entry}': {e}")))
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             Ok::<WherePredicateDecl, CatalogueDocumentCodecError>(WherePredicateDecl {
-                type_,
-                bounds,
+                lhs,
+                rhs,
+                operator,
             })
         })
         .collect()

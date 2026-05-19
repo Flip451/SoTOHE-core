@@ -1350,10 +1350,10 @@ mod tests {
         let entry = doc.traits.values().next().unwrap();
         let method = &entry.methods[0];
         assert_eq!(method.where_predicates.len(), 1);
-        assert_eq!(method.where_predicates[0].type_.as_str(), "T");
-        assert_eq!(method.where_predicates[0].bounds.len(), 2);
-        assert_eq!(method.where_predicates[0].bounds[0].as_str(), "Clone");
-        assert_eq!(method.where_predicates[0].bounds[1].as_str(), "Send");
+        assert_eq!(method.where_predicates[0].lhs.as_str(), "T");
+        assert_eq!(method.where_predicates[0].rhs.len(), 2);
+        assert_eq!(method.where_predicates[0].rhs[0].as_str(), "Clone");
+        assert_eq!(method.where_predicates[0].rhs[1].as_str(), "Send");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
@@ -1384,12 +1384,139 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let entry = doc.functions.values().next().unwrap();
         assert_eq!(entry.where_predicates.len(), 1);
-        assert_eq!(entry.where_predicates[0].type_.as_str(), "T");
-        assert_eq!(entry.where_predicates[0].bounds[0].as_str(), "Clone");
+        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Clone");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
         assert_eq!(doc, doc2);
+    }
+
+    // -----------------------------------------------------------------------
+    // ADR 2026-05-18-1223 D1: backward-compatible alias decode (CN-01 / OS-04)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_legacy_type_bounds_fields_decode_via_alias() {
+        // Legacy catalogues that use `"type"` / `"bounds"` fields (pre-ADR-2026-05-18-1223)
+        // must decode correctly via the `#[serde(alias)]` backward-compat path.
+        // The decoded domain value must use `lhs` / `rhs` with `BoundOp::Bound` default.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "LegacyRepo": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "find",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<T>",
+          "generics": [{ "name": "T", "bounds": [] }],
+          "where_predicates": [
+            { "type": "T", "bounds": ["Clone", "Send"] }
+          ]
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        use domain::tddd::catalogue_v2::methods::BoundOp;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let method = &doc.traits.values().next().unwrap().methods[0];
+        assert_eq!(method.where_predicates.len(), 1, "expected 1 where predicate");
+        let pred = &method.where_predicates[0];
+        assert_eq!(pred.lhs.as_str(), "T", "legacy `type` field maps to `lhs`");
+        assert_eq!(pred.rhs.len(), 2, "legacy `bounds` field maps to `rhs`");
+        assert_eq!(pred.rhs[0].as_str(), "Clone");
+        assert_eq!(pred.rhs[1].as_str(), "Send");
+        assert_eq!(pred.operator, BoundOp::Bound, "missing operator defaults to BoundOp::Bound");
+    }
+
+    #[test]
+    fn test_decode_new_lhs_rhs_operator_fields_decode_correctly() {
+        // New-style catalogues that use `"lhs"` / `"rhs"` / `"operator"` fields decode correctly.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::new_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()",
+      "generics": [{ "name": "T", "bounds": [] }],
+      "where_predicates": [
+        { "lhs": "T::Assoc", "rhs": ["u32"], "operator": "Equal" }
+      ]
+    }
+  }
+}"#;
+        use domain::tddd::catalogue_v2::methods::BoundOp;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let entry = doc.functions.values().next().unwrap();
+        assert_eq!(entry.where_predicates.len(), 1);
+        let pred = &entry.where_predicates[0];
+        assert_eq!(pred.lhs.as_str(), "T::Assoc");
+        assert_eq!(pred.rhs.len(), 1);
+        assert_eq!(pred.rhs[0].as_str(), "u32");
+        assert_eq!(
+            pred.operator,
+            BoundOp::Equal,
+            "explicit `Equal` operator must decode correctly"
+        );
+    }
+
+    #[test]
+    fn test_encode_new_fields_produces_lhs_rhs_operator_json() {
+        // After encode, the JSON output for where_predicates must use `"lhs"` / `"rhs"` / `"operator"`
+        // field names rather than the legacy `"type"` / `"bounds"` names.
+        let json_in = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::fn_with_where": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()",
+      "where_predicates": [
+        { "lhs": "T", "rhs": ["Clone"], "operator": "Bound" }
+      ]
+    }
+  }
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json_in, "usecase").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        // The where_predicates must use "lhs" and "rhs" (new schema).
+        assert!(
+            encoded.contains("\"lhs\""),
+            "encoded JSON where_predicates must use \"lhs\" field: {encoded}"
+        );
+        assert!(
+            encoded.contains("\"rhs\""),
+            "encoded JSON where_predicates must use \"rhs\" field: {encoded}"
+        );
+        // The legacy field names must not appear in the where_predicates context.
+        // We verify by checking that the encoded where_predicates block (which exists)
+        // does not contain "\"type\": " (the legacy LHS key).
+        // Note: "bounds" may appear in other fields (e.g. MethodGenericParamDto.bounds),
+        // so we only check that the legacy "type" key is absent (it's only used in where_predicates).
+        assert!(
+            !encoded.contains("\"type\":"),
+            "encoded JSON must NOT contain legacy \"type\" field in where_predicates: {encoded}"
+        );
     }
 
     #[test]
@@ -1485,18 +1612,20 @@ mod tests {
     }
 
     #[test]
-    fn test_encode_where_predicate_with_empty_bounds_returns_invalid_entry_error() {
+    fn test_encode_where_predicate_with_empty_rhs_returns_invalid_entry_error() {
         use domain::tddd::LayerId;
         use domain::tddd::catalogue_v2::entries::FunctionEntry;
         use domain::tddd::catalogue_v2::identifiers::{CrateName, FunctionName, FunctionPath};
+        use domain::tddd::catalogue_v2::methods::BoundOp;
         use domain::tddd::catalogue_v2::roles::FunctionRole;
         use domain::tddd::catalogue_v2::{CatalogueDocument, TypeRef, WherePredicateDecl};
 
-        // Construct a FunctionEntry with a WherePredicateDecl that has empty bounds.
+        // Construct a FunctionEntry with a WherePredicateDecl that has empty rhs.
         // The encoder must return an error in release builds (not just fire a debug_assert).
         let bad_predicate = WherePredicateDecl {
-            type_: TypeRef::new("T".to_string()).unwrap(),
-            bounds: vec![], // empty — violates the codec invariant
+            lhs: TypeRef::new("T".to_string()).unwrap(),
+            rhs: vec![], // empty — violates the codec invariant
+            operator: BoundOp::Bound,
         };
         let entry = FunctionEntry {
             action: ItemAction::Add,
@@ -1520,15 +1649,16 @@ mod tests {
         let result = CatalogueDocumentCodec::encode(&doc);
         assert!(
             matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
-            "expected InvalidEntry when encoding WherePredicateDecl with empty bounds, got: {result:?}"
+            "expected InvalidEntry when encoding WherePredicateDecl with empty rhs, got: {result:?}"
         );
     }
 
     #[test]
-    fn test_decode_where_predicate_with_empty_type_returns_invalid_entry_error() {
-        // T035 / ADR 2026-05-13-1153 D2: `WherePredicateDecl.type_` must be a non-empty
+    fn test_decode_where_predicate_with_empty_lhs_returns_invalid_entry_error() {
+        // ADR 2026-05-18-1223 D1: `WherePredicateDecl.lhs` must be a non-empty
         // TypeRef. `where_predicates_from_dtos` rejects empty strings at decode time so
         // the validation rule does not silently regress.
+        // Legacy alias `"type"` field is used here to verify backward-compat reads.
         let json = r#"{
   "schema_version": 3,
   "crate_name": "usecase",
@@ -1551,7 +1681,200 @@ mod tests {
         let result = CatalogueDocumentCodec::decode(json, "usecase");
         assert!(
             matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
-            "expected InvalidEntry for empty WherePredicateDecl.type_, got: {result:?}"
+            "expected InvalidEntry for empty WherePredicateDecl.lhs, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_where_predicate_equal_with_multiple_rhs_returns_invalid_entry_error() {
+        // `operator: Equal` requires exactly one RHS. Multiple RHS entries are invalid
+        // (`where T::Assoc = U + V` is not valid Rust) and must be rejected at decode time.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::bad_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()",
+      "generics": [{ "name": "T", "bounds": [] }],
+      "where_predicates": [
+        { "lhs": "T::Assoc", "rhs": ["u32", "String"], "operator": "Equal" }
+      ]
+    }
+  }
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "usecase");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "expected InvalidEntry for Equal predicate with multiple rhs, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_where_predicate_equal_with_multiple_rhs_returns_invalid_entry_error() {
+        // `where_predicate_decl_to_dto` (encode.rs) must reject Equal predicates with
+        // rhs.len() != 1, because the decoder enforces exactly one RHS for Equal.
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::entries::FunctionEntry;
+        use domain::tddd::catalogue_v2::identifiers::{CrateName, FunctionName, FunctionPath};
+        use domain::tddd::catalogue_v2::methods::BoundOp;
+        use domain::tddd::catalogue_v2::roles::FunctionRole;
+        use domain::tddd::catalogue_v2::{CatalogueDocument, TypeRef, WherePredicateDecl};
+
+        let bad_predicate = WherePredicateDecl {
+            lhs: TypeRef::new("T::Assoc".to_string()).unwrap(),
+            rhs: vec![
+                TypeRef::new("u32".to_string()).unwrap(),
+                TypeRef::new("String".to_string()).unwrap(),
+            ],
+            operator: BoundOp::Equal,
+        };
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()".to_string()).unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![bad_predicate],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let crate_name = CrateName::new("usecase".to_string()).unwrap();
+        let layer = LayerId::try_new("usecase").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
+        let fn_name = FunctionName::new("bad_eq_fn").unwrap();
+        let path = FunctionPath::at_root(crate_name, fn_name);
+        doc.functions.insert(path, entry);
+
+        let result = CatalogueDocumentCodec::encode(&doc);
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "expected InvalidEntry when encoding Equal WherePredicateDecl with multiple rhs, \
+             got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_decode_round_trip_preserves_equal_where_predicate() {
+        // A catalogue with `operator: Equal` must survive a decode → encode round-trip
+        // with the Equal operator and single RHS intact.
+        use domain::tddd::catalogue_v2::methods::BoundOp;
+
+        let json_in = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::eq_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()",
+      "generics": [{ "name": "T", "bounds": [] }],
+      "where_predicates": [
+        { "lhs": "T::Assoc", "rhs": ["u32"], "operator": "Equal" }
+      ]
+    }
+  }
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json_in, "usecase").unwrap();
+        let fn_entry = doc.functions.values().next().expect("expected one function entry");
+        assert_eq!(fn_entry.where_predicates.len(), 1);
+        let pred = &fn_entry.where_predicates[0];
+        assert_eq!(pred.lhs.as_str(), "T::Assoc");
+        assert_eq!(pred.rhs.len(), 1);
+        assert_eq!(pred.rhs[0].as_str(), "u32");
+        assert_eq!(pred.operator, BoundOp::Equal, "operator must survive round-trip");
+
+        // Encode and check that operator appears in JSON output.
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(
+            encoded.contains("\"Equal\""),
+            "encoded JSON must contain operator: Equal, got: {encoded}"
+        );
+    }
+
+    #[test]
+    fn test_encode_where_predicate_equal_with_bare_type_param_lhs_returns_invalid_entry_error() {
+        // `where_predicate_decl_to_dto` (encode.rs) must reject Equal predicates with a bare
+        // type param LHS (no `::`) to mirror the decoder invariant and preserve round-trip.
+        use domain::tddd::LayerId;
+        use domain::tddd::catalogue_v2::entries::FunctionEntry;
+        use domain::tddd::catalogue_v2::identifiers::{CrateName, FunctionName, FunctionPath};
+        use domain::tddd::catalogue_v2::methods::BoundOp;
+        use domain::tddd::catalogue_v2::roles::FunctionRole;
+        use domain::tddd::catalogue_v2::{CatalogueDocument, TypeRef, WherePredicateDecl};
+
+        let bad_predicate = WherePredicateDecl {
+            lhs: TypeRef::new("T".to_string()).unwrap(),
+            rhs: vec![TypeRef::new("u32".to_string()).unwrap()],
+            operator: BoundOp::Equal,
+        };
+        let entry = FunctionEntry {
+            action: ItemAction::Add,
+            role: FunctionRole::FreeFunction,
+            params: vec![],
+            returns: TypeRef::new("()".to_string()).unwrap(),
+            is_async: false,
+            generics: vec![],
+            where_predicates: vec![bad_predicate],
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let crate_name = CrateName::new("usecase".to_string()).unwrap();
+        let layer = LayerId::try_new("usecase").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
+        let fn_name = FunctionName::new("bad_bare_lhs_eq_fn").unwrap();
+        let path = FunctionPath::at_root(crate_name, fn_name);
+        doc.functions.insert(path, entry);
+
+        let result = CatalogueDocumentCodec::encode(&doc);
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "expected InvalidEntry when encoding Equal WherePredicateDecl with bare type param \
+             lhs (no '::'), got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_where_predicate_equal_with_bare_type_param_lhs_returns_invalid_entry_error() {
+        // ADR 2026-05-18-1223 D1: an `Equal` predicate LHS must be an associated-type
+        // projection (e.g. `T::Assoc`).  A bare type parameter like `"T"` maps to
+        // `where T = U`, which is not valid Rust, and must be rejected at decode time
+        // so it cannot become a nonsensical `EqPredicate` in the `ExtendedCrate`.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "usecase::bad_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "()",
+      "generics": [{ "name": "T", "bounds": [] }],
+      "where_predicates": [
+        { "lhs": "T", "rhs": ["u32"], "operator": "Equal" }
+      ]
+    }
+  }
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "usecase");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "expected InvalidEntry for bare type param as Equal predicate lhs, got: {result:?}"
         );
     }
 

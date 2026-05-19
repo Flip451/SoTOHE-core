@@ -551,9 +551,10 @@ mod tests {
 
     #[test]
     fn test_function_entry_with_where_predicates_stores_them() {
-        // ADR 2026-05-13-1153 D2: FunctionEntry carries explicit where_predicates so
+        // ADR 2026-05-18-1223 D1: FunctionEntry carries explicit where_predicates so
         // catalogue authors can express constraints whose LHS is a type expression
         // (e.g. `where Vec<T>: Bound`) that the inline form cannot represent.
+        use crate::tddd::catalogue_v2::methods::BoundOp;
         let entry = FunctionEntry {
             action: ItemAction::Add,
             role: FunctionRole::FreeFunction,
@@ -562,20 +563,22 @@ mod tests {
             is_async: false,
             generics: vec![],
             where_predicates: vec![WherePredicateDecl {
-                type_: TypeRef::new("Vec<T>").unwrap(),
-                bounds: vec![TypeRef::new("Send").unwrap()],
+                lhs: TypeRef::new("Vec<T>").unwrap(),
+                rhs: vec![TypeRef::new("Send").unwrap()],
+                operator: BoundOp::Bound,
             }],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
         };
         assert_eq!(entry.where_predicates.len(), 1);
-        assert_eq!(entry.where_predicates[0].type_.as_str(), "Vec<T>");
-        assert_eq!(entry.where_predicates[0].bounds[0].as_str(), "Send");
+        assert_eq!(entry.where_predicates[0].lhs.as_str(), "Vec<T>");
+        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Send");
     }
 
     #[test]
     fn test_function_entry_where_predicates_distinguish_otherwise_equal_entries() {
+        use crate::tddd::catalogue_v2::methods::BoundOp;
         let base = FunctionEntry {
             action: ItemAction::Add,
             role: FunctionRole::FreeFunction,
@@ -590,8 +593,9 @@ mod tests {
         };
         let mut with_where = base.clone();
         with_where.where_predicates = vec![WherePredicateDecl {
-            type_: TypeRef::new("T").unwrap(),
-            bounds: vec![TypeRef::new("Clone").unwrap()],
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
         }];
         assert_ne!(base, with_where, "where_predicates field participates in equality");
     }

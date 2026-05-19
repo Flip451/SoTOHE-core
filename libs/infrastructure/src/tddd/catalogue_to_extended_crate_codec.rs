@@ -34,8 +34,8 @@ use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, FunctionPath, MethodDeclaration, MethodGenericParam, ModulePath,
-    SelfReceiver, TraitImplDeclV2, TraitName, TypeKindV2, TypeName, WherePredicateDecl,
+    BoundOp, CatalogueDocument, CrateName, FunctionPath, MethodDeclaration, MethodGenericParam,
+    ModulePath, SelfReceiver, TraitImplDeclV2, TraitName, TypeKindV2, TypeName, WherePredicateDecl,
 };
 use domain::tddd::extended_crate::ExtendedCrate;
 use rustdoc_types::{
@@ -881,16 +881,16 @@ impl EncoderState {
         //     expression. Parse via `parse_type_ref_str` (with bare-generic-name
         //     short-circuit identical to the param/return logic).
         for w in where_decls {
-            let type_str = w.type_.as_str();
-            // Guard: a `WherePredicateDecl` with no bounds would encode to
+            let lhs_str = w.lhs.as_str();
+            // Guard: a `WherePredicateDecl` with no rhs would encode to
             // `WherePredicate::BoundPredicate { bounds: vec![] }` which is
             // syntactically invalid in Rust (`where T:` without any bound).
             // This mirrors the symmetrical check in `where_predicates_from_dtos`.
-            if w.bounds.is_empty() {
+            if w.rhs.is_empty() {
                 return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: type_str.to_owned(),
-                    reason: "where predicate has no bounds (`where T:` is not valid Rust); \
-                             at least one bound is required"
+                    type_ref: lhs_str.to_owned(),
+                    reason: "where predicate has no rhs (`where T:` is not valid Rust); \
+                             at least one rhs entry is required"
                         .to_owned(),
                 });
             }
@@ -901,9 +901,9 @@ impl EncoderState {
             // structural mismatch in the signal evaluator (ADR D3 fail-closed).
             // Failing early here matches the reject-unknown strategy for other
             // unsupported syntax (e.g. `use<...>` bounds).
-            if type_str.trim().starts_with('<') {
+            if lhs_str.trim().starts_with('<') {
                 return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: type_str.to_owned(),
+                    type_ref: lhs_str.to_owned(),
                     reason: "qualified-path where-predicate LHS (`<T as Trait>::Assoc`) is not \
                              yet supported in catalogue where-predicates — use simple \
                              associated-type projection (`T::Assoc`) instead"
@@ -911,11 +911,11 @@ impl EncoderState {
                 });
             }
             let lhs_type =
-                if !generic_names.is_empty() && is_bare_generic_name(type_str, generic_names) {
+                if !generic_names.is_empty() && is_bare_generic_name(lhs_str, generic_names) {
                     // Simple bare generic: `T` → `Type::Generic("T")`
-                    Type::Generic(type_str.trim().to_string())
+                    Type::Generic(lhs_str.trim().to_string())
                 } else if !generic_names.is_empty() {
-                    if let Some(proj) = try_build_generic_projection(type_str, generic_names) {
+                    if let Some(proj) = try_build_generic_projection(lhs_str, generic_names) {
                         // Single-level associated-type projection: `T::Item` →
                         // `Type::QualifiedPath { name: "Item", self_type: Generic("T"),
                         //  trait_: None, args: None }`.
@@ -925,21 +925,97 @@ impl EncoderState {
                         // compare equal in `build_where_form_view`.
                         proj
                     } else {
-                        let raw = self.parse_type_ref_str(type_str)?;
+                        let raw = self.parse_type_ref_str(lhs_str)?;
                         rewrite_generic_types(raw, generic_names)
                     }
                 } else {
-                    self.parse_type_ref_str(type_str)?
+                    self.parse_type_ref_str(lhs_str)?
                 };
-            let mut bounds: Vec<GenericBound> = Vec::with_capacity(w.bounds.len());
-            for b in &w.bounds {
-                bounds.push(self.encode_and_validate_bound(b.as_str(), generic_names)?);
+            match w.operator {
+                BoundOp::Bound => {
+                    let mut bounds: Vec<GenericBound> = Vec::with_capacity(w.rhs.len());
+                    for b in &w.rhs {
+                        bounds.push(self.encode_and_validate_bound(b.as_str(), generic_names)?);
+                    }
+                    where_predicates.push(WherePredicate::BoundPredicate {
+                        type_: lhs_type,
+                        bounds,
+                        generic_params: vec![],
+                    });
+                }
+                BoundOp::Equal => {
+                    // `Equal` predicates (`where T::Assoc = U`) encode as `EqPredicate`.
+                    // Enforce rhs.len() == 1 defensively: decode validates this, but
+                    // in-memory domain values constructed outside the codec must also pass.
+                    if w.rhs.len() != 1 {
+                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                            type_ref: lhs_str.to_owned(),
+                            reason: format!(
+                                "Equal predicate must have exactly one rhs entry (got {}); \
+                                 `where T::Assoc = U` accepts a single RHS only",
+                                w.rhs.len()
+                            ),
+                        });
+                    }
+                    // Mirror the JSON decoder's Equal-LHS invariant: the LHS must be an
+                    // associated-type projection (e.g. `T::Assoc`).  A bare type parameter
+                    // such as `"T"` would produce `WherePredicate::EqPredicate` for
+                    // `where T = U`, which is not valid Rust.  Catching this here prevents
+                    // domain values constructed outside the JSON codec path from generating
+                    // nonsensical `ExtendedCrate` representations.
+                    if !lhs_str.contains("::") {
+                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                            type_ref: lhs_str.to_owned(),
+                            reason: format!(
+                                "Equal where-predicate lhs '{}' is not a supported projection \
+                                 form; expected a path with at least one '::' segment \
+                                 (e.g. `T::Assoc`) — bare type parameters cannot appear as \
+                                 the LHS of a `where T = U` equality constraint",
+                                lhs_str
+                            ),
+                        });
+                    }
+                    // Safe: len == 1 asserted above.
+                    let rhs_entry = w.rhs.first().ok_or_else(|| {
+                        CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                            type_ref: lhs_str.to_owned(),
+                            reason: "Equal predicate has no rhs (codec invariant violated)"
+                                .to_owned(),
+                        }
+                    })?;
+                    let rhs_str = rhs_entry.as_str();
+                    // Reject qualified-path RHS forms (`<T as Trait>::Assoc`).
+                    // `parse_type_ref_str` cannot reconstruct the correct `Type::QualifiedPath`
+                    // shape and silently produces an unresolved placeholder, breaking round-trip.
+                    if rhs_str.trim().starts_with('<') {
+                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                            type_ref: rhs_str.to_owned(),
+                            reason: "qualified-path Equal predicate RHS \
+                                     (`<T as Trait>::Assoc`) is not supported — \
+                                     use a simple type expression instead"
+                                .to_owned(),
+                        });
+                    }
+                    let rhs_type = if !generic_names.is_empty()
+                        && is_bare_generic_name(rhs_str, generic_names)
+                    {
+                        Type::Generic(rhs_str.trim().to_string())
+                    } else if !generic_names.is_empty() {
+                        if let Some(proj) = try_build_generic_projection(rhs_str, generic_names) {
+                            proj
+                        } else {
+                            let raw = self.parse_type_ref_str(rhs_str)?;
+                            rewrite_generic_types(raw, generic_names)
+                        }
+                    } else {
+                        self.parse_type_ref_str(rhs_str)?
+                    };
+                    where_predicates.push(WherePredicate::EqPredicate {
+                        lhs: lhs_type,
+                        rhs: Term::Type(rhs_type),
+                    });
+                }
             }
-            where_predicates.push(WherePredicate::BoundPredicate {
-                type_: lhs_type,
-                bounds,
-                generic_params: vec![],
-            });
         }
 
         Ok(Generics { params, where_predicates })

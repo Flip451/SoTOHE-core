@@ -4,14 +4,15 @@ use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker};
 use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, MethodDeclaration, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
+    BoundOp, CatalogueDocument, MethodDeclaration, ParamDeclaration, TraitImplDeclV2,
+    WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
 
 use super::CatalogueDocumentCodecError;
 use super::dto::{
-    CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto,
+    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto,
     MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto,
     TypestateMarkerDto, VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
 };
@@ -153,24 +154,67 @@ pub(super) fn method_decl_to_dto(
 ///
 /// # Errors
 ///
-/// Returns `CatalogueDocumentCodecError::InvalidEntry` when `w.bounds` is
-/// empty. An empty bound list cannot round-trip through the codec because the
-/// decoder rejects `where T:` (a bare where-predicate with no RHS is invalid
-/// Rust and is rejected by `where_predicates_from_dtos`).
+/// Returns `CatalogueDocumentCodecError::InvalidEntry` when `w.rhs` is
+/// empty. An empty rhs list cannot round-trip through the codec because the
+/// decoder rejects predicates with no RHS (a bare `where T:` or `where T =`
+/// without a right-hand side is invalid and is rejected by
+/// `where_predicates_from_dtos`).
+///
+/// Returns `CatalogueDocumentCodecError::InvalidEntry` for `Equal` predicates
+/// when `w.rhs.len() != 1` or when `w.lhs` is not an associated-type projection
+/// (i.e., does not contain `"::"`). The decoder enforces these same invariants so
+/// the encoder mirrors them to prevent round-trip breakage.
 fn where_predicate_decl_to_dto(
     w: &WherePredicateDecl,
 ) -> Result<WherePredicateDeclDto, CatalogueDocumentCodecError> {
-    if w.bounds.is_empty() {
+    if w.rhs.is_empty() {
         return Err(CatalogueDocumentCodecError::InvalidEntry {
-            entry_name: w.type_.as_str().to_owned(),
-            reason: "where predicate has no bounds — empty bounds cannot round-trip through \
+            entry_name: w.lhs.as_str().to_owned(),
+            reason: "where predicate has no rhs — empty rhs cannot round-trip through \
                      the catalogue JSON codec (decoder rejects bare `where T:` predicates)"
                 .to_owned(),
         });
     }
+    let operator = match w.operator {
+        BoundOp::Bound => BoundOpDto::Bound,
+        BoundOp::Equal => {
+            // `Equal` predicates (`where T::Assoc = U`) must have exactly one RHS.
+            // Multiple RHS entries are syntactically invalid and would silently drop
+            // entries after the first in the extended-crate codec.
+            if w.rhs.len() != 1 {
+                return Err(CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: w.lhs.as_str().to_owned(),
+                    reason: format!(
+                        "where predicate with operator Equal must have exactly one rhs entry \
+                         (got {}); `where T::Assoc = U` accepts a single RHS only",
+                        w.rhs.len()
+                    ),
+                });
+            }
+            // Mirror the decoder's Equal-LHS invariant: the LHS must be an
+            // associated-type projection (e.g. `T::Assoc`, `<T as Trait>::Assoc`).
+            // A bare type parameter (`"T"`) encodes to JSON that the decoder then
+            // rejects, breaking the round-trip guarantee.
+            let lhs_str = w.lhs.as_str();
+            if !lhs_str.contains("::") {
+                return Err(CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: lhs_str.to_owned(),
+                    reason: format!(
+                        "Equal where-predicate lhs '{}' is not a supported projection form; \
+                         expected a path with at least one '::' segment (e.g. `T::Assoc`, \
+                         `<T as Trait>::Assoc`) — bare type parameters cannot appear as the \
+                         LHS of a `where T = U` equality constraint",
+                        lhs_str
+                    ),
+                });
+            }
+            BoundOpDto::Equal
+        }
+    };
     Ok(WherePredicateDeclDto {
-        type_: w.type_.as_str().to_owned(),
-        bounds: w.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+        lhs: w.lhs.as_str().to_owned(),
+        rhs: w.rhs.iter().map(|b| b.as_str().to_owned()).collect(),
+        operator,
     })
 }
 

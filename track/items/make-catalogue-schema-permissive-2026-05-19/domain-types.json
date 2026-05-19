@@ -24,8 +24,9 @@
         { "trait_name": "Debug", "origin_crate": "core" },
         { "trait_name": "Clone", "origin_crate": "core" },
         { "trait_name": "Copy", "origin_crate": "core" },
+        { "trait_name": "PartialEq", "origin_crate": "core" },
         { "trait_name": "Eq", "origin_crate": "core" },
-        { "trait_name": "PartialEq", "origin_crate": "core" }
+        { "trait_name": "Default", "origin_crate": "core" }
       ],
       "module_path": "tddd::catalogue_v2::methods",
       "docs": "Operator for a WherePredicateDecl entry. Bound = `:` (T: Bound1 + Bound2), Equal = `=` (T::Assoc = U). (ADR 2026-05-18-1223-make-catalogue-schema-permissive D1)",

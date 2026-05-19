@@ -1051,7 +1051,7 @@ fn test_encode_function_without_generics_emits_empty_generics() {
     );
 }
 
-/// A catalogue `WherePredicateDecl.bounds[i]` whose string form starts with `use<`
+/// A catalogue `WherePredicateDecl.rhs[i]` whose string form starts with `use<`
 /// must be rejected at encode time (ADR 2026-05-13-1153 D3). The syntactic
 /// pre-check fires before the internal parser, which currently converts `use<...>`
 /// to a placeholder `GenericBound::TraitBound` that would otherwise bypass the
@@ -1061,7 +1061,7 @@ fn test_encode_function_with_use_capture_bound_in_where_predicate_returns_error(
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
-    use domain::tddd::catalogue_v2::methods::{MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
     use domain::tddd::catalogue_v2::roles::FunctionRole;
     use domain::tddd::catalogue_v2::{ParamName, TypeRef};
 
@@ -1079,8 +1079,9 @@ fn test_encode_function_with_use_capture_bound_in_where_predicate_returns_error(
             MethodGenericParam { name: ParamName::new("U").unwrap(), bounds: vec![] },
         ],
         where_predicates: vec![WherePredicateDecl {
-            type_: TypeRef::new("T").unwrap(),
-            bounds: vec![TypeRef::new("use<U>").unwrap()],
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("use<U>").unwrap()],
+            operator: BoundOp::Bound,
         }],
         docs: None,
         spec_refs: vec![],
@@ -1103,7 +1104,7 @@ fn test_encode_function_with_use_capture_bound_with_space_returns_error() {
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
-    use domain::tddd::catalogue_v2::methods::{MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
     use domain::tddd::catalogue_v2::roles::FunctionRole;
     use domain::tddd::catalogue_v2::{ParamName, TypeRef};
 
@@ -1121,9 +1122,10 @@ fn test_encode_function_with_use_capture_bound_with_space_returns_error() {
             MethodGenericParam { name: ParamName::new("U").unwrap(), bounds: vec![] },
         ],
         where_predicates: vec![WherePredicateDecl {
-            type_: TypeRef::new("T").unwrap(),
+            lhs: TypeRef::new("T").unwrap(),
             // Precise-capture with whitespace between `use` and `<`.
-            bounds: vec![TypeRef::new("use <U>").unwrap()],
+            rhs: vec![TypeRef::new("use <U>").unwrap()],
+            operator: BoundOp::Bound,
         }],
         docs: None,
         spec_refs: vec![],
@@ -1138,7 +1140,7 @@ fn test_encode_function_with_use_capture_bound_with_space_returns_error() {
     );
 }
 
-/// A `WherePredicateDecl` whose `type_` is a qualified-path form
+/// A `WherePredicateDecl` whose `lhs` is a qualified-path form
 /// (`<T as Trait>::Assoc`) must be rejected at encode time. The A-codec
 /// cannot reconstruct the `Type::QualifiedPath` shape that rustdoc emits for
 /// such predicates — `parse_type_ref_str` degrades it to an unresolved
@@ -1148,7 +1150,7 @@ fn test_encode_function_with_qualified_path_lhs_in_where_predicate_returns_error
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
-    use domain::tddd::catalogue_v2::methods::{MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
     use domain::tddd::catalogue_v2::roles::FunctionRole;
     use domain::tddd::catalogue_v2::{ParamName, TypeRef};
 
@@ -1164,8 +1166,9 @@ fn test_encode_function_with_qualified_path_lhs_in_where_predicate_returns_error
         generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         where_predicates: vec![WherePredicateDecl {
             // Qualified-path LHS: `<T as Iterator>::Item`.
-            type_: TypeRef::new("<T as Iterator>::Item").unwrap(),
-            bounds: vec![TypeRef::new("Clone").unwrap()],
+            lhs: TypeRef::new("<T as Iterator>::Item").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
         }],
         docs: None,
         spec_refs: vec![],
@@ -1193,7 +1196,7 @@ fn test_encode_function_with_explicit_where_predicate_emits_bound_predicate() {
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
-    use domain::tddd::catalogue_v2::methods::{MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
     use domain::tddd::catalogue_v2::roles::FunctionRole;
     use domain::tddd::catalogue_v2::{ParamName, TypeRef};
 
@@ -1210,8 +1213,9 @@ fn test_encode_function_with_explicit_where_predicate_emits_bound_predicate() {
         generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         // explicit where predicate: `where T: Clone`
         where_predicates: vec![WherePredicateDecl {
-            type_: TypeRef::new("T").unwrap(),
-            bounds: vec![TypeRef::new("Clone").unwrap()],
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
         }],
         docs: None,
         spec_refs: vec![],
@@ -1269,7 +1273,7 @@ fn test_encode_function_with_non_trivial_lhs_where_predicate_emits_bound_predica
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
-    use domain::tddd::catalogue_v2::methods::{MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
     use domain::tddd::catalogue_v2::roles::FunctionRole;
     use domain::tddd::catalogue_v2::{ParamName, TypeRef};
 
@@ -1285,8 +1289,9 @@ fn test_encode_function_with_non_trivial_lhs_where_predicate_emits_bound_predica
         generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         // explicit where predicate: `where Vec<T>: Clone` — non-trivial LHS
         where_predicates: vec![WherePredicateDecl {
-            type_: TypeRef::new("Vec<T>").unwrap(),
-            bounds: vec![TypeRef::new("Clone").unwrap()],
+            lhs: TypeRef::new("Vec<T>").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
         }],
         docs: None,
         spec_refs: vec![],
@@ -1322,4 +1327,152 @@ fn test_encode_function_with_non_trivial_lhs_where_predicate_emits_bound_predica
         "LHS for `Vec<T>: Clone` must not be Type::Generic(\"T\")"
     );
     assert!(!bounds.is_empty(), "BoundPredicate bounds must be non-empty for Clone");
+}
+
+/// A `FunctionEntry` with a `WherePredicateDecl` using `BoundOp::Equal` must produce
+/// a `WherePredicate::EqPredicate` (not `BoundPredicate`) in the extended-crate output.
+/// Verifies the `Equal` branch of `build_where_form_generics`.
+#[test]
+fn test_encode_function_with_equal_where_predicate_emits_eq_predicate() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+    use rustdoc_types::{Term, WherePredicate};
+
+    let mut doc = make_doc("domain");
+    let crate_n = CrateName::new("domain").unwrap();
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("eq_where_fn").unwrap());
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        // explicit where predicate: `where T::Assoc = u32` (Equal operator)
+        where_predicates: vec![WherePredicateDecl {
+            lhs: TypeRef::new("T::Assoc").unwrap(),
+            rhs: vec![TypeRef::new("u32").unwrap()],
+            operator: BoundOp::Equal,
+        }],
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let fn_item = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("eq_where_fn")
+                && matches!(item.inner, ItemEnum::Function(_))
+        })
+        .expect("expected Function item for eq_where_fn");
+    let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+
+    assert_eq!(
+        f.generics.where_predicates.len(),
+        1,
+        "expected 1 where predicate for Equal predicate"
+    );
+    // Must be EqPredicate, not BoundPredicate.
+    assert!(
+        matches!(f.generics.where_predicates[0], WherePredicate::EqPredicate { .. }),
+        "Equal operator must emit WherePredicate::EqPredicate, got {:?}",
+        f.generics.where_predicates[0]
+    );
+    let WherePredicate::EqPredicate { ref rhs, .. } = f.generics.where_predicates[0] else {
+        panic!("expected EqPredicate");
+    };
+    // RHS must be Term::Type (not Term::Const).
+    assert!(matches!(rhs, Term::Type(_)), "EqPredicate rhs must be Term::Type, got {rhs:?}");
+}
+
+/// A `FunctionEntry` with a `BoundOp::Equal` predicate and multiple RHS entries
+/// must be rejected by `CatalogueToExtendedCrateCodec::encode` with an error.
+/// Verifies the defensive rhs.len() == 1 check in `build_where_form_generics`.
+#[test]
+fn test_encode_function_with_equal_predicate_multiple_rhs_returns_error() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+
+    let mut doc = make_doc("domain");
+    let crate_n = CrateName::new("domain").unwrap();
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bad_eq_fn").unwrap());
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        // Invalid: Equal with two RHS entries.
+        where_predicates: vec![WherePredicateDecl {
+            lhs: TypeRef::new("T::Assoc").unwrap(),
+            rhs: vec![TypeRef::new("u32").unwrap(), TypeRef::new("String").unwrap()],
+            operator: BoundOp::Equal,
+        }],
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+
+    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    assert!(
+        result.is_err(),
+        "Equal predicate with multiple rhs must return an error, got: {result:?}"
+    );
+}
+
+/// A `FunctionEntry` with a `BoundOp::Equal` predicate whose LHS is a bare type
+/// parameter (no `::`) must be rejected by `CatalogueToExtendedCrateCodec::encode`
+/// with an error.  `where T = u32` is not valid Rust; the LHS must be an
+/// associated-type projection such as `T::Assoc`.
+#[test]
+fn test_encode_function_with_equal_predicate_bare_type_param_lhs_returns_error() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+
+    let mut doc = make_doc("domain");
+    let crate_n = CrateName::new("domain").unwrap();
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bad_bare_lhs_eq_fn").unwrap());
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        // Invalid: Equal predicate with bare type parameter as LHS (`where T = u32`).
+        where_predicates: vec![WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("u32").unwrap()],
+            operator: BoundOp::Equal,
+        }],
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+
+    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    assert!(
+        result.is_err(),
+        "Equal predicate with bare type param LHS must return an error, got: {result:?}"
+    );
 }

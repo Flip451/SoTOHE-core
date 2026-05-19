@@ -51,7 +51,9 @@ pub use identifiers::{
     ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
 };
 
-pub use methods::{MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl};
+pub use methods::{
+    BoundOp, MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
+};
 
 pub use roles::{ContractRole, DataRole, FunctionRole, ItemAction, SelfReceiver};
 
