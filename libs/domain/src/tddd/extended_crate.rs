@@ -25,7 +25,7 @@
 //! No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
 //! the domain layer is serialization-free.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 
 use rustdoc_types::{Crate, Id};
 
@@ -57,6 +57,17 @@ pub struct ExtendedCrate {
     krate: Crate,
     /// Per-Item action map from the originating catalogue document.
     item_actions: BTreeMap<Id, ItemAction>,
+    /// Orphan-impl ownership map: trait-impl `Id` → owning type `Id`.
+    ///
+    /// Populated by the catalogue codec for trait-impl items whose `for_` type
+    /// is external (i.e. `impl MyTrait for external_crate::ExternalType`).
+    /// In these cases the orphan-impl pass in Phase 1 cannot infer the parent
+    /// type action from `impl.for_.id` (which points to a synthetic external id),
+    /// so it uses this map as a fallback to find the owning local type and inherit
+    /// its `ItemAction`.
+    ///
+    /// Empty for S-graph (Phase 1 output) and for B-/C-sourced crates.
+    impl_owner_map: HashMap<Id, Id>,
 }
 
 impl ExtendedCrate {
@@ -68,7 +79,20 @@ impl ExtendedCrate {
     /// `item_actions` exists in `krate.index`) is the codec's responsibility.
     #[must_use]
     pub fn new(krate: Crate, item_actions: BTreeMap<Id, ItemAction>) -> Self {
-        Self { krate, item_actions }
+        Self { krate, item_actions, impl_owner_map: HashMap::new() }
+    }
+
+    /// Attaches an orphan-impl ownership map and returns `self`.
+    ///
+    /// Used by the catalogue codec to record `impl_id → owning_type_id` for
+    /// trait-impl items whose `for_` type is external.  The Phase 1 orphan-impl
+    /// pass uses this map as a fallback when `impl.for_.id` does not appear in
+    /// `a_item_actions` (because it points to a synthetic external id rather
+    /// than the owning local type).
+    #[must_use]
+    pub fn with_impl_owner_map(mut self, map: HashMap<Id, Id>) -> Self {
+        self.impl_owner_map = map;
+        self
     }
 
     /// Returns a reference to the inner `rustdoc_types::Crate`.
@@ -81,6 +105,14 @@ impl ExtendedCrate {
     #[must_use]
     pub fn item_actions(&self) -> &BTreeMap<Id, ItemAction> {
         &self.item_actions
+    }
+
+    /// Returns a reference to the orphan-impl ownership map (`impl_id → owning_type_id`).
+    ///
+    /// Empty unless the catalogue codec explicitly set it via `with_impl_owner_map`.
+    #[must_use]
+    pub fn impl_owner_map(&self) -> &HashMap<Id, Id> {
+        &self.impl_owner_map
     }
 
     /// Looks up the action for a given `Id`.
@@ -98,9 +130,22 @@ impl ExtendedCrate {
     }
 
     /// Consumes `self` and returns `(krate, item_actions)`.
+    ///
+    /// Note: callers that need the orphan-impl ownership map must call
+    /// `impl_owner_map()` before invoking this method, or use
+    /// `into_all_parts()` to decompose all three fields at once.
     #[must_use]
     pub fn into_parts(self) -> (Crate, BTreeMap<Id, ItemAction>) {
         (self.krate, self.item_actions)
+    }
+
+    /// Consumes `self` and returns `(krate, item_actions, impl_owner_map)`.
+    ///
+    /// Unlike `into_parts()`, this method preserves the orphan-impl ownership
+    /// map, making round-tripping lossless for callers that need all three fields.
+    #[must_use]
+    pub fn into_all_parts(self) -> (Crate, BTreeMap<Id, ItemAction>, HashMap<Id, Id>) {
+        (self.krate, self.item_actions, self.impl_owner_map)
     }
 }
 
@@ -228,5 +273,46 @@ mod tests {
         // Both instances should have the same action for the id.
         assert_eq!(ec1.action_for(&id), Some(ItemAction::Add));
         assert_eq!(ec2.action_for(&id), Some(ItemAction::Add));
+    }
+
+    #[test]
+    fn test_extended_crate_impl_owner_map_default_is_empty() {
+        let krate = empty_krate();
+        let ec = ExtendedCrate::new(krate, BTreeMap::new());
+        assert!(ec.impl_owner_map().is_empty());
+    }
+
+    #[test]
+    fn test_extended_crate_with_impl_owner_map_stores_map() {
+        let krate = empty_krate();
+        let impl_id = Id(10);
+        let owner_id = Id(20);
+        let mut owner_map = HashMap::new();
+        owner_map.insert(impl_id, owner_id);
+
+        let ec = ExtendedCrate::new(krate, BTreeMap::new()).with_impl_owner_map(owner_map);
+
+        assert_eq!(ec.impl_owner_map().get(&impl_id), Some(&owner_id));
+        assert_eq!(ec.impl_owner_map().len(), 1);
+    }
+
+    #[test]
+    fn test_extended_crate_into_all_parts_roundtrip() {
+        let krate = empty_krate();
+        let mut actions = BTreeMap::new();
+        let action_id = Id(3);
+        actions.insert(action_id, ItemAction::Add);
+
+        let impl_id = Id(10);
+        let owner_id = Id(20);
+        let mut owner_map = HashMap::new();
+        owner_map.insert(impl_id, owner_id);
+
+        let ec = ExtendedCrate::new(krate, actions).with_impl_owner_map(owner_map);
+        let (recovered_krate, recovered_actions, recovered_owner_map) = ec.into_all_parts();
+
+        assert_eq!(recovered_krate.format_version, FORMAT_VERSION);
+        assert_eq!(recovered_actions.get(&action_id), Some(&ItemAction::Add));
+        assert_eq!(recovered_owner_map.get(&impl_id), Some(&owner_id));
     }
 }

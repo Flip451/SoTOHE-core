@@ -163,6 +163,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     }
 
     // --- Step 3: Build A identity maps ---
+    // Extract the orphan-owner map before consuming `a` so the orphan-impl pass
+    // (Step 5.5) can use it to recover the owning type action for impls whose
+    // `for_.id` points to an external synthetic id.
+    let a_impl_owner_map = a.impl_owner_map().clone();
     let (a_krate, a_item_actions) = a.into_parts();
     let a_types = build_type_trait_identity_map(&a_krate);
     let a_fns = build_function_identity_map(&a_krate);
@@ -441,9 +445,27 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
             };
 
             // Inherit action from the implementing type via `impl.for_.id` → `a_item_actions`.
+            //
+            // Fallback: when `impl.for_.id` points to an external synthetic id (i.e. the
+            // impl overrides the enclosing type with an external `for_` path, such as
+            // `impl MyTrait for other_crate::ExternalType`), `a_item_actions` will not
+            // contain that external id.  In this case, use `a_krate.impl_owner_map()` to
+            // recover the owning local type id and look up its action instead.
+            // The catalogue codec populates `impl_owner_map` for every trait-impl item it
+            // emits, so the fallback is always available for A-sourced orphan impls.
             let parent_action = if let ItemEnum::Impl(impl_) = &impl_item.inner {
                 if let Type::ResolvedPath(p) = &impl_.for_ {
-                    a_item_actions.get(&p.id).copied()
+                    // Primary: look up the `for_.id` directly in `a_item_actions`.
+                    let direct = a_item_actions.get(&p.id).copied();
+                    if direct.is_some() {
+                        direct
+                    } else {
+                        // Fallback: `for_.id` is a synthetic external id; use the
+                        // codec-populated orphan-owner map to find the owning local type.
+                        a_impl_owner_map
+                            .get(&orphan_id)
+                            .and_then(|owner_id| a_item_actions.get(owner_id).copied())
+                    }
                 } else {
                     None
                 }
