@@ -6,10 +6,12 @@ decisions:
     status: accepted
   - id: D2
     user_decision_ref: "chat_segment:tddd-v2-gap3-where-form:2026-05-13"
-    status: accepted
+    status: superseded
+    superseded_by: "2026-05-18-1223-make-catalogue-schema-permissive.md#D2"
   - id: D3
     user_decision_ref: "chat_segment:tddd-v2-gap3-where-form:2026-05-13"
-    status: accepted
+    status: superseded
+    superseded_by: "2026-05-18-1223-make-catalogue-schema-permissive.md#D3"
   - id: D4
     user_decision_ref: "chat_segment:tddd-v2-gap3-where-form:2026-05-13"
     status: accepted

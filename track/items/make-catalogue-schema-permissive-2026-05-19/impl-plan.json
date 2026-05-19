@@ -48,12 +48,12 @@
     {
       "id": "T009",
       "description": "D3-patch-removal: patch_impl_for_ids と patch_impl_trait_ids を削除し、for_ remap を rewrite_type_ref_ids_in_item + id_map の 1 経路に統一する (IN-11)。T008 完了後、a_id_remap が全 A Item に適用された状態で `patch_impl_for_ids` / `patch_impl_trait_ids` が不要になることを確認してから削除する。for_ の remap が `rewrite_type_ref_ids_in_item` + `a_id_remap` / `b_id_remap` の 1 経路に統一され、自クレート Item を指す id は id_map で新 S id に remap、外部クレート Item を指す id は external_crates rebuild で rebind される構造を実装する。外部クレート型を対象とする impl (impl From<MyError> for OtherCrateError 等) の for_ が誤って自クレート親型 id に上書きされなくなり、for_is_external フラグが正しく判定されることを確認する unit test を追加する (AC-10)。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T010",
       "description": "ADR-supersede: 旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 の frontmatter status を superseded に更新し、superseded_by フィールドに 2026-05-18-1223-make-catalogue-schema-permissive.md への参照を追加する (IN-12 / AC-11)。D1 (BoundPredicate 正規化) は引き続き有効のため status は変更しない。`cargo make ci` が通ることを確認する (verify-adr-signals を含む)。Layer: documentation。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T012",
