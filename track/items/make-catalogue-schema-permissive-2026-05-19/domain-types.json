@@ -181,12 +181,11 @@
         "fields": [
           { "name": "trait_name", "ty": "TraitName" },
           { "name": "origin_crate", "ty": "CrateName" },
-          { "name": "generic_args", "ty": "Option<String>" },
-          { "name": "for_", "ty": "Option<String>" },
           { "name": "impl_generics", "ty": "Vec<MethodGenericParam>" },
-          { "name": "impl_where_predicates", "ty": "Vec<WherePredicateDecl>" }
+          { "name": "impl_where_predicates", "ty": "Vec<WherePredicateDecl>" },
+          { "name": "for_", "ty": "Option<String>" }
         ],
-        "has_stripped_fields": false,
+        "has_stripped_fields": true,
         "typestate": null
       },
       "methods": [],

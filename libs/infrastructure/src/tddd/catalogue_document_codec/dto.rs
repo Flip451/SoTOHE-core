@@ -471,6 +471,13 @@ pub(super) struct TraitImplDto {
     /// (IN-06)
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub(super) impl_where_predicates: Vec<WherePredicateDeclDto>,
+    /// The concrete type path after `for` in the impl header, for cross-crate trait impls.
+    /// E.g. `"ExternalCrate::ExternalType"` for `impl MyTrait for ExternalCrate::ExternalType`.
+    /// Optional — absent in catalogues that predate IN-13. Defaults to `None` for backward
+    /// compatibility. Omitted from JSON when `None` (`skip_serializing_if`) so legacy
+    /// catalogues stay byte-stable. (IN-13 / AC-12)
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub(super) for_: Option<String>,
 }
 
 // ---------------------------------------------------------------------------
