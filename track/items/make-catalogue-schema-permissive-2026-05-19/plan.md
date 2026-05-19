@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # catalogue スキーマを Rust 文法に対して寛容な設計にする
 
-## Tasks (12/12 resolved)
+## Tasks (11/12 resolved)
 
 ### S1 — D1: WherePredicateDecl スキーマ拡張 — lhs/rhs/operator 3 フィールド構造への変更
 
@@ -50,4 +50,4 @@
 > T011 は bin/sotp rebuild + 全 layer の type-signals / catalogue-spec-signals 再生成 + cargo make ci 通過確認を行う統合タスクである。T001-T010 および T012 のすべてが完了した後に着手する。domain Yellow の Blue 化、usecase Red / infrastructure Red の解消 (T012 の AC-12 検証を含む) を確認する。
 
 - [x] **T010**: ADR-supersede: 旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 の frontmatter status を superseded に更新し、superseded_by フィールドに 2026-05-18-1223-make-catalogue-schema-permissive.md への参照を追加する (IN-12 / AC-11)。D1 (BoundPredicate 正規化) は引き続き有効のため status は変更しない。`cargo make ci` が通ることを確認する (verify-adr-signals を含む)。Layer: documentation。
-- [x] **T011**: 統合確認: bin/sotp を rebuild し (cargo make build-sotp)、本トラックの type-signals / catalogue-spec-signals を全 3 layer で再生成する。track-sync-views で rendered view を再生成する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。domain layer の Phase 2 Yellow (action: add / modify エントリの実装前正常 Yellow) が本実装によって Blue 化することを確認する。usecase layer の false-positive Red 2 件 (Interactor エントリの Outlives strip 非対称性由来 — IN-03 / T003 で解消する見込み) と infrastructure layer の Red 1 件 (NewTypeGraphCodecError cross-crate From impl — IN-10 / IN-11 / T008-T009 および D4 / T012 で解消する見込み) が解消していることを確認する。AC-01〜AC-12 の充足確認をコメントとして残す。Layer: integration。
+- [~] **T011**: 統合確認: bin/sotp を rebuild し (cargo make build-sotp)、本トラックの type-signals / catalogue-spec-signals を全 3 layer で再生成する。track-sync-views で rendered view を再生成する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。domain layer の Phase 2 Yellow (action: add / modify エントリの実装前正常 Yellow) が本実装によって Blue 化することを確認する。usecase layer の false-positive Red 2 件 (Interactor エントリの Outlives strip 非対称性由来 — IN-03 / T003 で解消する見込み) と infrastructure layer の Red 1 件 (NewTypeGraphCodecError cross-crate From impl — IN-10 / IN-11 / T008-T009 および D4 / T012 で解消する見込み) が解消していることを確認する。AC-01〜AC-12 の充足確認をコメントとして残す。Layer: integration。
