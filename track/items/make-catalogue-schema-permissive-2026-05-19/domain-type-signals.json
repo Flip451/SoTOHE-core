@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-19T19:07:16Z",
-  "declaration_hash": "0e4661f788f7d8343ba9afff543c5b5433bd389943ea515a26ff147d775e738e",
+  "generated_at": "2026-05-19T18:44:14Z",
+  "declaration_hash": "a1c24fd0311c40a5afc31f633a7ff65d70e423ff791757be818cf7d36b2b6888",
   "signals": [
     {
       "type_name": "BoundOp",
@@ -56,7 +56,7 @@
     {
       "type_name": "TraitImplDeclV2",
       "kind_tag": "value_object",
-      "signal": "blue",
+      "signal": "yellow",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

@@ -571,16 +571,6 @@ fn trait_impl_from_dto(
     };
     decl.impl_generics = method_generics_from_dtos(entry_name, dto.impl_generics)?;
     decl.impl_where_predicates = where_predicates_from_dtos(entry_name, dto.impl_where_predicates)?;
-    decl.for_ = match dto.for_ {
-        None => None,
-        Some(s) if s.is_empty() => {
-            return Err(err("for_ must not be empty when present".to_owned()));
-        }
-        Some(s) => {
-            validate_type_ref_str(&s).map_err(|e| err(format!("invalid for_ type syntax: {e}")))?;
-            Some(s)
-        }
-    };
     Ok(decl)
 }
 

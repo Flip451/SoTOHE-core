@@ -106,24 +106,12 @@ pub struct TraitImplDeclV2 {
     /// skip_serializing_if = "Vec::is_empty")]` so existing catalogue JSON that lacks the
     /// field loads unchanged (CN-01 backward-compatible design).
     pub impl_where_predicates: Vec<WherePredicateDecl>,
-    /// The type this impl block targets, for cross-crate trait implementations.
-    ///
-    /// Declares the concrete type path that appears after `for` in the impl header,
-    /// e.g. `"ExternalCrate::ExternalType"` for
-    /// `impl MyTrait for ExternalCrate::ExternalType`. When `None`, the impl targets
-    /// the type declared in the parent `TypeEntry` (the common case for same-crate impls).
-    ///
-    /// The infrastructure codec serialises this field with `#[serde(default,
-    /// skip_serializing_if = "Option::is_none")]` so existing catalogue JSON that lacks the
-    /// field loads unchanged with `None` (CN-01 backward-compatible design, IN-13).
-    pub for_: Option<String>,
 }
 
 impl TraitImplDeclV2 {
     /// Creates a new `TraitImplDeclV2` without generic args.
     ///
     /// `impl_generics` and `impl_where_predicates` default to empty Vec.
-    /// `for_` defaults to `None`.
     #[must_use]
     pub fn new(trait_name: TraitName, origin_crate: CrateName) -> Self {
         Self {
@@ -132,7 +120,6 @@ impl TraitImplDeclV2 {
             generic_args: None,
             impl_generics: vec![],
             impl_where_predicates: vec![],
-            for_: None,
         }
     }
 
@@ -181,7 +168,6 @@ impl TraitImplDeclV2 {
             generic_args: Some(trimmed.to_owned()),
             impl_generics: vec![],
             impl_where_predicates: vec![],
-            for_: None,
         })
     }
 
@@ -642,53 +628,5 @@ mod tests {
             base, with_where,
             "impl_where_predicates participates in TraitImplDeclV2 equality"
         );
-    }
-
-    // -------------------------------------------------------------------
-    // AC-12 / IN-13: for_ field (Option<String>, default None)
-    // -------------------------------------------------------------------
-
-    #[test]
-    fn test_trait_impl_decl_v2_new_has_none_for_by_default() {
-        // `for_` must default to None so catalogues that predate IN-13 stay backward-compat.
-        let decl = TraitImplDeclV2::new(
-            TraitName::new("Iterator").unwrap(),
-            CrateName::new("core").unwrap(),
-        );
-        assert!(decl.for_.is_none(), "TraitImplDeclV2::new must initialise for_ to None");
-    }
-
-    #[test]
-    fn test_trait_impl_decl_v2_new_with_generic_args_has_none_for_by_default() {
-        // `new_with_generic_args` must also default for_ to None.
-        let decl = TraitImplDeclV2::new_with_generic_args(
-            TraitName::new("From").unwrap(),
-            CrateName::new("core").unwrap(),
-            "SomeError".to_string(),
-        )
-        .unwrap();
-        assert!(
-            decl.for_.is_none(),
-            "TraitImplDeclV2::new_with_generic_args must initialise for_ to None"
-        );
-    }
-
-    #[test]
-    fn test_trait_impl_decl_v2_for_field_can_be_set_to_some() {
-        // `for_` can be set after construction (public field).
-        let mut decl =
-            TraitImplDeclV2::new(TraitName::new("Debug").unwrap(), CrateName::new("core").unwrap());
-        decl.for_ = Some("ExternalType".to_string());
-        assert_eq!(decl.for_.as_deref(), Some("ExternalType"));
-    }
-
-    #[test]
-    fn test_trait_impl_decl_v2_for_field_participates_in_equality() {
-        // for_ must be part of PartialEq: two decls differing only in for_ are not equal.
-        let base =
-            TraitImplDeclV2::new(TraitName::new("Clone").unwrap(), CrateName::new("core").unwrap());
-        let mut with_for = base.clone();
-        with_for.for_ = Some("ForeignType".to_string());
-        assert_ne!(base, with_for, "for_ participates in TraitImplDeclV2 equality");
     }
 }

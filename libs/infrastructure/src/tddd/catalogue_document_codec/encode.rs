@@ -249,7 +249,6 @@ fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocum
             })
             .collect(),
         impl_where_predicates,
-        for_: t.for_.clone(),
     })
 }
 

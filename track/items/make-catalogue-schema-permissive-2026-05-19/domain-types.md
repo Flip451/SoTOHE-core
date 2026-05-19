@@ -12,7 +12,7 @@
 |------|------|--------|---------|--------|----------|
 | InherentImplDeclV2 | value_object | — | — | 🔵 | 🔵 |
 | TraitEntry | value_object | modify | — | 🔵 | 🔵 |
-| TraitImplDeclV2 | value_object | modify | — | 🔵 | 🔵 |
+| TraitImplDeclV2 | value_object | modify | — | 🟡 | 🔵 |
 | WherePredicateDecl | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types

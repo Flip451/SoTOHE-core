@@ -53,18 +53,18 @@
     {
       "id": "T010",
       "description": "ADR-supersede: 旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 の frontmatter status を superseded に更新し、superseded_by フィールドに 2026-05-18-1223-make-catalogue-schema-permissive.md への参照を追加する (IN-12 / AC-11)。D1 (BoundPredicate 正規化) は引き続き有効のため status は変更しない。`cargo make ci` が通ることを確認する (verify-adr-signals を含む)。Layer: documentation。",
-      "status": "done"
+      "status": "in_progress"
     },
     {
       "id": "T012",
-      "description": "D4-filter-removal: (1) libs/domain の catalogue_v2/traits.rs の TraitImplDeclV2 struct に for_ フィールド (Option<String>、serde default None) を追加する (IN-13)。for_ は cross-crate impl を catalogue で declare する際に self-type の fully-qualified path を記述するフィールド (例: domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError)。既存 catalogue ファイルは for_ なしでロードできるため後方互換設計を維持する (CN-01)。infrastructure DTO にも for_ フィールドを追加し、round-trip codec unit test を追加する。(2) signal_evaluator_v2/mod.rs の build_impl_identity_map 内にある for_is_external filter を撤廃し、cross-crate impl も c_impls に含める (IN-13 / AC-12)。具体的な変更対象は libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs の line 363-380 付近: `if let Type::ResolvedPath(p) = &impl_.for_ { let for_is_external = krate.paths.get(&p.id).is_some_and(|ps| ps.crate_id != 0); if for_is_external { continue; } }` のブロックを削除する。B 側の orphan impl 挿入処理 (phase1/builder.rs) は現状維持 (filter なしで全 impl を S に挿入する既存の挙動)。T009 完了後に着手することで、for_ の id 管理が整備された状態で filter 撤廃を行える。cargo make ci-rust が通ることを確認する。注: A-codec の for_ パース機能 (TraitImplDeclV2.for_ が Some の場合に fully-qualified path を parse して外部クレートを external_crates / paths に登録する実装) は本トラックのスコープ外であり Phase 2 に deferred。本トラックのスコープは catalogue での for_ フィールド宣言 + DTO 後方互換 + C 側 filter 撤廃まで。Layer: domain + infrastructure。",
+      "description": "D4-filter-removal: (1) libs/domain の catalogue_v2/traits.rs の TraitImplDeclV2 struct に for_ フィールド (Option<String>、serde default None) を追加する (IN-13)。for_ は cross-crate impl を catalogue で declare する際に self-type の fully-qualified path を記述するフィールド (例: domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError)。既存 catalogue ファイルは for_ なしでロードできるため後方互換設計を維持する (CN-01)。infrastructure DTO にも for_ フィールドを追加し、round-trip codec unit test を追加する。(2) signal_evaluator_v2/mod.rs の build_impl_identity_map 内にある for_is_external filter を撤廃し、cross-crate impl も c_impls に含める (IN-13 / AC-12)。具体的な変更対象は libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs の line 363-380 付近: `if let Type::ResolvedPath(p) = &impl_.for_ { let for_is_external = krate.paths.get(&p.id).is_some_and(|ps| ps.crate_id != 0); if for_is_external { continue; } }` のブロックを削除する。B 側の orphan impl 挿入処理 (phase1/builder.rs) は現状維持 (filter なしで全 impl を S に挿入する既存の挙動)。(3) A-codec を更新して TraitImplDeclV2.for_ が Some の場合に fully-qualified path を parse して外部クレートを判定し external_crates および paths に登録する対応を追加する。for_ が None の場合は従来通り親 TypeEntry の型が for_ として使用される。結果として S 側と C 側の両側に cross-crate impl が含まれ、fingerprint が対称に生成されて Blue が得られる。unit test を追加する: (a) impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError のような cross-crate impl が c_impls に含まれる (filter 撤廃後の確認)、(b) S 側 (s_impls) と C 側 (c_impls) の両側に cross-crate impl が含まれ fingerprint が一致して Blue が得られる。T009 完了後に着手することで、for_ の id 管理が整備された状態で filter 撤廃を行える。cargo make ci-rust が通ることを確認する。Layer: domain + infrastructure。",
       "status": "done",
       "commit_hash": "125f85ad9b9e7f1f40f15508ab3b1dea113fa948"
     },
     {
       "id": "T011",
       "description": "統合確認: bin/sotp を rebuild し (cargo make build-sotp)、本トラックの type-signals / catalogue-spec-signals を全 3 layer で再生成する。track-sync-views で rendered view を再生成する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。domain layer の Phase 2 Yellow (action: add / modify エントリの実装前正常 Yellow) が本実装によって Blue 化することを確認する。usecase layer の false-positive Red 2 件 (Interactor エントリの Outlives strip 非対称性由来 — IN-03 / T003 で解消する見込み) と infrastructure layer の Red 1 件 (NewTypeGraphCodecError cross-crate From impl — IN-10 / IN-11 / T008-T009 および D4 / T012 で解消する見込み) が解消していることを確認する。AC-01〜AC-12 の充足確認をコメントとして残す。Layer: integration。",
-      "status": "in_progress"
+      "status": "todo"
     }
   ],
   "plan": {
@@ -118,7 +118,7 @@
         "description": [
           "T008 は A 側に B 側と対称な Pre-step を追加し、全 A Item に fresh S id を一括 pre-allocate する (a_id_remap 構築)。action 別処理が a_id_remap を参照して id を解決するよう変更する (IN-10 / AC-09)。",
           "T009 は T008 完了後に patch_impl_for_ids / patch_impl_trait_ids を削除し、for_ の remap を rewrite_type_ref_ids_in_item + id_map の 1 経路に統一する (IN-11 / AC-10)。外部クレート型を対象とする impl の for_is_external 誤判定を根本から解消する。",
-          "T012 は T009 完了後に TraitImplDeclV2 に for_ フィールド (Option<String>、serde default None) を追加し (IN-13)、C 側 build_impl_identity_map の for_is_external filter を撤廃し (IN-13 / AC-12)、cross-crate impl も c_impls に含める。B 側 orphan impl 挿入処理 (phase1/builder.rs) は現状維持。D4 は D3 の id 管理整備 (T009 完了) の後に着手することで、for_ の id 管理が整備された状態で filter 撤廃を行える。注: A-codec の for_ パース機能 (for_ Some の場合に fully-qualified path を parse して外部クレートを external_crates / paths に登録する実装、および S/C 両側の cross-crate impl fingerprint 完全一致による Blue 化) は本トラックのスコープ外であり Phase 2 に deferred。本トラックのスコープは catalogue での for_ フィールド宣言 + DTO 後方互換 + C 側 filter 撤廃まで。",
+          "T012 は T009 完了後に TraitImplDeclV2 に for_ フィールド (Option<String>、serde default None) を追加し (IN-13)、C 側 build_impl_identity_map の for_is_external filter を撤廃し (IN-13 / AC-12)、A-codec を更新して for_ Some の場合に fully-qualified path を parse して外部クレートを判定・登録する。signal_evaluator_v2/mod.rs の for_is_external 判定ブロックを削除し、cross-crate impl も c_impls に含める。B 側 orphan impl 挿入処理 (phase1/builder.rs) は現状維持。結果として S 側と C 側の両側に cross-crate impl が対称に含まれ fingerprint が一致して Blue が得られる。D4 は D3 の id 管理整備 (T009 完了) の後に着手することで、for_ の id 管理が整備された状態で filter 撤廃を行える。",
           "T008・T009・T012 を順次分割することで、Pre-step 追加 → patch 削除 → for_is_external filter 撤廃の各変更が独立してレビューできる状態を保つ。D3 + D4 は S1-S3 (D1/D2) と独立しているため S1-S3 と並行着手が可能。"
         ],
         "task_ids": [
