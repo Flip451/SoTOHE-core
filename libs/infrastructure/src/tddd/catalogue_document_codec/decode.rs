@@ -8,7 +8,9 @@ use std::str::FromStr;
 
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker, TypestateTransitions};
-use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use domain::tddd::catalogue_v2::entries::{
+    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+};
 use domain::tddd::catalogue_v2::identifiers::{FieldName, VariantName};
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
@@ -22,9 +24,9 @@ use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_
 
 use super::CatalogueDocumentCodecError;
 use super::dto::{
-    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto,
-    ParamDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto,
-    VariantDeclDto, VariantPayloadDto,
+    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
+    MethodDeclarationDto, ParamDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto,
+    TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
 };
 
 // ---------------------------------------------------------------------------
@@ -77,6 +79,12 @@ pub(super) fn dto_to_domain(
             .map_err(|e| err(&fn_path_str, format!("invalid function path: {e}")))?;
         let entry = function_entry_from_dto(&fn_path_str, entry_dto)?;
         doc.functions.insert(fn_path, entry);
+    }
+
+    // InherentImpls
+    for impl_dto in dto.inherent_impls {
+        let impl_decl = inherent_impl_from_dto(impl_dto)?;
+        doc.inherent_impls.push(impl_decl);
     }
 
     Ok(doc)
@@ -629,6 +637,33 @@ pub(super) fn trait_entry_from_dto(
         spec_refs,
         informal_grounds,
     })
+}
+
+pub(super) fn inherent_impl_from_dto(
+    dto: InherentImplDeclDto,
+) -> Result<InherentImplDeclV2, CatalogueDocumentCodecError> {
+    let err = |name: &str, reason: String| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: name.to_owned(),
+        reason,
+    };
+
+    // Keep a str reference alive for the error context closures below.
+    let type_name_str = dto.type_name.as_str();
+
+    let type_name = TypeName::new(type_name_str)
+        .map_err(|e| err(type_name_str, format!("invalid type_name: {e}")))?;
+
+    let impl_generics = method_generics_from_dtos(type_name_str, dto.impl_generics)?;
+    let impl_where_predicates =
+        where_predicates_from_dtos(type_name_str, dto.impl_where_predicates)?;
+
+    let methods = dto
+        .methods
+        .into_iter()
+        .map(|m| method_decl_from_dto(type_name_str, m))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(InherentImplDeclV2 { type_name, impl_generics, impl_where_predicates, methods })
 }
 
 pub(super) fn function_entry_from_dto(

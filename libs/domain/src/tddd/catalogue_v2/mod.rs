@@ -44,7 +44,7 @@ pub use composite::{TypeKindV2, TypestateMarker, TypestateTransitions};
 
 pub use document::{CatalogueDocument, CatalogueDocumentError};
 
-pub use entries::{FunctionEntry, TraitEntry, TypeEntry};
+pub use entries::{FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry};
 
 pub use identifiers::{
     CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError, MethodName,

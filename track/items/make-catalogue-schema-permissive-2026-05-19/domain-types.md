@@ -10,7 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| InherentImplDeclV2 | value_object | — | — | 🟡 | 🔵 |
+| InherentImplDeclV2 | value_object | — | — | 🔵 | 🔵 |
 | TraitEntry | value_object | modify | — | 🟡 | 🔵 |
 | TraitImplDeclV2 | value_object | modify | — | 🟡 | 🔵 |
 | WherePredicateDecl | value_object | modify | — | 🔵 | 🔵 |
@@ -25,5 +25,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueDocument | aggregate_root | modify | — | 🟡 | 🔵 |
+| CatalogueDocument | aggregate_root | modify | — | 🔵 | 🔵 |
 

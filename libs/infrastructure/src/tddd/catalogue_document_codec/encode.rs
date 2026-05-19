@@ -1,7 +1,9 @@
 //! Domain → DTO conversions for [`CatalogueDocument`] (encode path).
 
 use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker};
-use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use domain::tddd::catalogue_v2::entries::{
+    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
     BoundOp, CatalogueDocument, MethodDeclaration, ParamDeclaration, TraitImplDeclV2,
@@ -12,9 +14,10 @@ use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos
 
 use super::CatalogueDocumentCodecError;
 use super::dto::{
-    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto,
-    MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto,
-    TypestateMarkerDto, VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
+    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
+    MethodDeclarationDto, MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto,
+    TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
+    WherePredicateDeclDto,
 };
 
 // ---------------------------------------------------------------------------
@@ -39,6 +42,8 @@ pub(super) fn domain_to_dto(
         .iter()
         .map(|(k, v)| function_entry_to_dto(v).map(|dto| (k.to_string(), dto)))
         .collect::<Result<_, _>>()?;
+    let inherent_impls =
+        doc.inherent_impls.iter().map(inherent_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(CatalogueDocumentDto {
         schema_version: doc.schema_version,
         crate_name: doc.crate_name.as_str().to_owned(),
@@ -46,6 +51,7 @@ pub(super) fn domain_to_dto(
         types,
         traits,
         functions,
+        inherent_impls,
     })
 }
 
@@ -243,6 +249,30 @@ pub(super) fn trait_entry_to_dto(
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
+    })
+}
+
+pub(super) fn inherent_impl_to_dto(
+    decl: &InherentImplDeclV2,
+) -> Result<InherentImplDeclDto, CatalogueDocumentCodecError> {
+    let impl_where_predicates = decl
+        .impl_where_predicates
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<Vec<_>, _>>()?;
+    let methods = decl.methods.iter().map(method_decl_to_dto).collect::<Result<Vec<_>, _>>()?;
+    Ok(InherentImplDeclDto {
+        type_name: decl.type_name.as_str().to_owned(),
+        impl_generics: decl
+            .impl_generics
+            .iter()
+            .map(|g| MethodGenericParamDto {
+                name: g.name.as_str().to_owned(),
+                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+            })
+            .collect(),
+        impl_where_predicates,
+        methods,
     })
 }
 

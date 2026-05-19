@@ -26,7 +26,9 @@
 
 use std::collections::BTreeMap;
 
-use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use crate::tddd::catalogue_v2::entries::{
+    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+};
 use crate::tddd::catalogue_v2::identifiers::{CrateName, FunctionPath, TraitName, TypeName};
 use crate::tddd::layer_id::LayerId;
 
@@ -92,6 +94,9 @@ pub enum CatalogueDocumentError {
 /// - `types`: BTreeMap of type name → `TypeEntry` (Language = DataType).
 /// - `traits`: BTreeMap of trait name → `TraitEntry` (Language = Contract).
 /// - `functions`: BTreeMap of function path → `FunctionEntry` (Language = Function).
+/// - `inherent_impls`: Vec of `InherentImplDeclV2` (impl-block-level declarations).
+///   Multiple entries with the same `type_name` represent multiple impl blocks for
+///   one struct. Default empty Vec for backward compatibility.
 ///
 /// ## Validation
 ///
@@ -104,7 +109,7 @@ pub enum CatalogueDocumentError {
 /// - identifier format validation (via `FromStr` / `TryFrom`)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CatalogueDocument {
-    /// Format version; currently `2` for the v2 schema.
+    /// Format version; currently `3` for the v2 schema.
     pub schema_version: u32,
     /// The crate this catalogue describes.
     pub crate_name: CrateName,
@@ -116,6 +121,12 @@ pub struct CatalogueDocument {
     pub traits: BTreeMap<TraitName, TraitEntry>,
     /// Function entries (free function declarations).
     pub functions: BTreeMap<FunctionPath, FunctionEntry>,
+    /// Inherent impl block declarations (one entry per impl block).
+    ///
+    /// Multiple entries sharing the same `type_name` represent multiple inherent
+    /// `impl` blocks for one struct. Default empty Vec — catalogues predating
+    /// this field decode as if they had no inherent impl blocks.
+    pub inherent_impls: Vec<InherentImplDeclV2>,
 }
 
 impl CatalogueDocument {
@@ -129,6 +140,7 @@ impl CatalogueDocument {
             types: BTreeMap::new(),
             traits: BTreeMap::new(),
             functions: BTreeMap::new(),
+            inherent_impls: Vec::new(),
         }
     }
 

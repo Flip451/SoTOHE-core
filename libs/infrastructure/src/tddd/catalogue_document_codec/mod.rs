@@ -1878,6 +1878,174 @@ mod tests {
         );
     }
 
+    // -----------------------------------------------------------------------
+    // InherentImplDeclV2 (D2-schema): decode / encode / round-trip
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_decode_inherent_impl_with_minimal_fields_succeeds() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "Email",
+      "methods": [
+        { "name": "as_str", "receiver": "&self", "params": [], "returns": "str" }
+      ]
+    }
+  ]
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        assert_eq!(doc.inherent_impls.len(), 1);
+        assert_eq!(doc.inherent_impls[0].type_name.as_str(), "Email");
+        assert_eq!(doc.inherent_impls[0].methods.len(), 1);
+        assert_eq!(doc.inherent_impls[0].methods[0].name.as_str(), "as_str");
+    }
+
+    #[test]
+    fn test_decode_inherent_impls_absent_defaults_to_empty_vec() {
+        // Catalogues that predate InherentImplDeclV2 omit the field;
+        // serde default must produce an empty Vec.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        assert!(
+            doc.inherent_impls.is_empty(),
+            "omitted inherent_impls must default to empty Vec for backward compatibility"
+        );
+    }
+
+    #[test]
+    fn test_decode_one_struct_multiple_inherent_impl_blocks() {
+        // The primary design constraint: 1 struct represented by N entries.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "Email",
+      "methods": [
+        { "name": "as_str", "receiver": "&self", "params": [], "returns": "str" }
+      ]
+    },
+    {
+      "type_name": "Email",
+      "methods": [
+        { "name": "validate", "receiver": "&self", "params": [], "returns": "Result<(), DomainError>" }
+      ]
+    }
+  ]
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        assert_eq!(doc.inherent_impls.len(), 2, "two impl blocks must be decoded as two entries");
+        assert_eq!(doc.inherent_impls[0].type_name.as_str(), "Email");
+        assert_eq!(doc.inherent_impls[1].type_name.as_str(), "Email");
+        assert_eq!(doc.inherent_impls[0].methods[0].name.as_str(), "as_str");
+        assert_eq!(doc.inherent_impls[1].methods[0].name.as_str(), "validate");
+    }
+
+    #[test]
+    fn test_decode_inherent_impl_with_generics_and_where_predicates_round_trips() {
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "Container",
+      "impl_generics": [
+        { "name": "T", "bounds": ["Clone"] }
+      ],
+      "impl_where_predicates": [
+        { "lhs": "Vec<T>", "rhs": ["Send"], "operator": "Bound" }
+      ],
+      "methods": []
+    }
+  ]
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let impl_block = &doc.inherent_impls[0];
+        assert_eq!(impl_block.type_name.as_str(), "Container");
+        assert_eq!(impl_block.impl_generics.len(), 1);
+        assert_eq!(impl_block.impl_generics[0].name.as_str(), "T");
+        assert_eq!(impl_block.impl_generics[0].bounds[0].as_str(), "Clone");
+        assert_eq!(impl_block.impl_where_predicates.len(), 1);
+        assert_eq!(impl_block.impl_where_predicates[0].lhs.as_str(), "Vec<T>");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "round-trip must preserve inherent_impl with generics");
+    }
+
+    #[test]
+    fn test_encode_decode_inherent_impls_round_trip_preserves_multiple_blocks() {
+        let json_in = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "Email",
+      "methods": [
+        { "name": "as_str", "receiver": "&self", "params": [], "returns": "str" }
+      ]
+    },
+    {
+      "type_name": "Email",
+      "methods": [
+        { "name": "validate", "receiver": "&self", "params": [], "returns": "Result<(), DomainError>" }
+      ]
+    }
+  ]
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json_in, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "encode-decode round-trip must preserve inherent_impls");
+        assert_eq!(doc2.inherent_impls.len(), 2);
+    }
+
+    #[test]
+    fn test_encode_empty_inherent_impls_omits_field_from_json() {
+        // When inherent_impls is empty the field must be omitted from the encoded JSON
+        // so legacy catalogues stay byte-stable.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        assert!(
+            !encoded.contains("\"inherent_impls\""),
+            "empty inherent_impls must be omitted from encoded JSON: {encoded}"
+        );
+    }
+
     #[test]
     fn test_decode_function_with_no_crate_prefix_returns_cross_crate_error() {
         let json = r#"{

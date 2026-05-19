@@ -16,12 +16,13 @@
     {
       "id": "T003",
       "description": "D1-evaluator: signal evaluator の strip_outlives_from_index 撤廃 + build_generics_fingerprint の全境界種類対応 + syn パース失敗エラー処理を実装する (IN-03 / IN-04)。libs/infrastructure の signal_evaluator_v2/generics_eq.rs から `strip_outlives_from_index` 関数と呼び出し箇所を削除し、A 側・C 側の両側でライフタイム境界を保持する。`build_generics_fingerprint` を `{lhs, rhs, operator}` 単位でフィンガープリントを生成する形に更新する。rhs の要素は集合として正規化 (昇順ソート) し、`T: A + B` と `T: B + A` を同一フィンガープリントとする (AC-03)。A 側・C 側のいずれかで syn のパースが失敗した境界文字列は信号評価の対象外として明示的なエラーを返す (IN-04 / AC-04)。unit test を追加する: (a) `T: 'static` のライフタイム境界が両側で保持されて Blue になる、(b) `T: A + B` と `T: B + A` が同一フィンガープリントになる、(c) syn パース不能な文字列がエラーを返す。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "4d8f42aaf0811faf112317602f670a6fccdb509e"
     },
     {
       "id": "T004",
       "description": "D2-schema-inherent: InherentImplDeclV2 を domain 層に新規追加する (IN-05 / IN-08)。libs/domain の catalogue_v2/entries.rs に `InherentImplDeclV2` struct を追加する。フィールド: `type_name: TypeName` (必須フィールド、デシリアライズ時に常に存在が要求される)、`impl_generics: Vec<MethodGenericParam>` (型パラメータのみ、ライフタイム/const パラメータはスコープ外)、`impl_where_predicates: Vec<WherePredicateDecl>`、`methods: Vec<MethodDeclaration>`。serde は Vec フィールド (`impl_generics` / `impl_where_predicates` / `methods`) のみ `#[serde(default)]` で空 Vec をデフォルト値とし、後方互換性を維持する (CN-01 / OS-04)。`type_name` は必須フィールドであり `#[serde(default)]` は付与しない。CatalogueDocument の `inherent_impls: Vec<InherentImplDeclV2>` フィールドも追加し、`#[serde(default)]` で空 Vec をデフォルト値とする。1 struct に対して複数の inherent impl ブロックを複数エントリで表現できることを示す unit test を追加する。infrastructure 層の catalogue_document_codec に InherentImplDeclV2 DTO を追加し、round-trip codec unit test を追加する。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",

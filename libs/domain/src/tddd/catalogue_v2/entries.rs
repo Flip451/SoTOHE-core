@@ -14,7 +14,7 @@
 
 use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
-use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeRef};
+use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeName, TypeRef};
 use crate::tddd::catalogue_v2::methods::{
     MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
 };
@@ -154,6 +154,51 @@ pub struct FunctionEntry {
 }
 
 // ---------------------------------------------------------------------------
+// InherentImplDeclV2 — a single inherent impl block for a named type
+// ---------------------------------------------------------------------------
+
+/// A single inherent `impl` block for a named type (ADR D2, IN-05 / IN-08).
+///
+/// One struct may have multiple `impl` blocks in Rust source code. Each is
+/// represented as a separate `InherentImplDeclV2` entry in
+/// `CatalogueDocument::inherent_impls`. The `type_name` field identifies the
+/// target struct; multiple entries sharing the same `type_name` represent
+/// multiple impl blocks for that struct.
+///
+/// ## Scope
+///
+/// - `impl_generics`: type parameters only (lifetime / const parameters are out of scope).
+/// - `impl_where_predicates`: where-clause predicates on the impl-block-level generics.
+/// - `methods`: all methods declared in this impl block.
+///
+/// No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
+/// the domain layer is serialization-free. The infrastructure codec handles JSON.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InherentImplDeclV2 {
+    /// The name of the type this impl block belongs to.
+    ///
+    /// Multiple `InherentImplDeclV2` entries with the same `type_name` represent
+    /// multiple inherent impl blocks for that single struct in the source.
+    pub type_name: TypeName,
+
+    /// Impl-block-level generic type parameters (type parameters only; lifetimes
+    /// and const parameters are out of scope per D2 / IN-05).
+    ///
+    /// Empty Vec when the impl block is not generic (the common case).
+    pub impl_generics: Vec<MethodGenericParam>,
+
+    /// Impl-block-level where-clause predicates applied to `impl_generics`.
+    ///
+    /// Empty Vec when there are no impl-level where predicates.
+    pub impl_where_predicates: Vec<WherePredicateDecl>,
+
+    /// Method declarations inside this impl block.
+    ///
+    /// Empty Vec when the impl block contains no methods.
+    pub methods: Vec<MethodDeclaration>,
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -162,7 +207,7 @@ pub struct FunctionEntry {
 mod tests {
     use super::*;
     use crate::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, MethodName, ModulePath, ParamName, TraitName, TypeRef,
+        CrateName, FieldName, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef,
     };
     use crate::tddd::catalogue_v2::roles::SelfReceiver;
     use crate::tddd::catalogue_v2::variants::FieldDecl;
@@ -686,6 +731,160 @@ mod tests {
         assert_eq!(entry.spec_refs[0], spec_ref);
         assert_eq!(entry.informal_grounds.len(), 1);
         assert_eq!(entry.informal_grounds[0], ground);
+    }
+
+    // -----------------------------------------------------------------------
+    // InherentImplDeclV2
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_inherent_impl_decl_v2_one_struct_multiple_impl_blocks() {
+        // Verifies the primary design constraint: 1 struct can have N impl blocks
+        // represented as N separate `InherentImplDeclV2` entries in the Vec.
+        let type_name = TypeName::new("Email").unwrap();
+
+        let method_a = MethodDeclaration::new(
+            MethodName::new("as_str").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("str").unwrap(),
+            false,
+            None,
+        );
+        let method_b = MethodDeclaration::new(
+            MethodName::new("validate").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Result<(), DomainError>").unwrap(),
+            false,
+            None,
+        );
+
+        let impl_block_a = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_a.clone()],
+        };
+        let impl_block_b = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_b.clone()],
+        };
+
+        // Both blocks share the same type_name, representing two inherent impl blocks
+        // for `Email` in the source code.
+        assert_eq!(impl_block_a.type_name, type_name);
+        assert_eq!(impl_block_b.type_name, type_name);
+        assert_eq!(impl_block_a.methods.len(), 1);
+        assert_eq!(impl_block_b.methods.len(), 1);
+        assert_eq!(impl_block_a.methods[0].name.as_str(), "as_str");
+        assert_eq!(impl_block_b.methods[0].name.as_str(), "validate");
+
+        // A Vec of two entries represents the two impl blocks for one struct.
+        let inherent_impls = [impl_block_a, impl_block_b];
+        assert_eq!(inherent_impls.len(), 2);
+        assert_eq!(inherent_impls[0].type_name, inherent_impls[1].type_name);
+    }
+
+    #[test]
+    fn test_inherent_impl_decl_v2_with_generics_and_where_predicates() {
+        use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+
+        let type_name = TypeName::new("Container").unwrap();
+        let generic_param = MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Clone").unwrap()],
+        };
+        let where_pred = WherePredicateDecl {
+            lhs: TypeRef::new("Vec<T>").unwrap(),
+            rhs: vec![TypeRef::new("Send").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        let impl_block = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![generic_param],
+            impl_where_predicates: vec![where_pred],
+            methods: vec![],
+        };
+
+        assert_eq!(impl_block.type_name, type_name);
+        assert_eq!(impl_block.impl_generics.len(), 1);
+        assert_eq!(impl_block.impl_generics[0].name.as_str(), "T");
+        assert_eq!(impl_block.impl_where_predicates.len(), 1);
+        assert_eq!(impl_block.impl_where_predicates[0].lhs.as_str(), "Vec<T>");
+        assert!(impl_block.methods.is_empty());
+    }
+
+    #[test]
+    fn test_inherent_impl_decl_v2_default_fields_are_empty_vecs() {
+        let type_name = TypeName::new("Foo").unwrap();
+        let impl_block = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        };
+        assert!(impl_block.impl_generics.is_empty());
+        assert!(impl_block.impl_where_predicates.is_empty());
+        assert!(impl_block.methods.is_empty());
+    }
+
+    #[test]
+    fn test_inherent_impl_decl_v2_equality_by_all_fields() {
+        let type_name = TypeName::new("Foo").unwrap();
+        let a = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        };
+        let b = a.clone();
+        assert_eq!(a, b);
+    }
+
+    // -----------------------------------------------------------------------
+    // CatalogueDocument.inherent_impls
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_catalogue_document_inherent_impls_defaults_to_empty() {
+        use crate::tddd::catalogue_v2::document::CatalogueDocument;
+        use crate::tddd::layer_id::LayerId;
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let doc = CatalogueDocument::new(3, crate_name, layer);
+        assert!(doc.inherent_impls.is_empty());
+    }
+
+    #[test]
+    fn test_catalogue_document_inherent_impls_stores_multiple_entries_for_one_type() {
+        use crate::tddd::catalogue_v2::document::CatalogueDocument;
+        use crate::tddd::layer_id::LayerId;
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+
+        let type_name = TypeName::new("Email").unwrap();
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        });
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        });
+
+        assert_eq!(doc.inherent_impls.len(), 2);
+        assert_eq!(doc.inherent_impls[0].type_name, type_name);
+        assert_eq!(doc.inherent_impls[1].type_name, type_name);
     }
 
     // -----------------------------------------------------------------------

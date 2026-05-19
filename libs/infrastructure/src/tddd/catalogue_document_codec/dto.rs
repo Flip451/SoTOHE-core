@@ -41,6 +41,10 @@ pub(super) struct CatalogueDocumentDto {
     pub(super) types: BTreeMap<String, TypeEntryDto>,
     pub(super) traits: BTreeMap<String, TraitEntryDto>,
     pub(super) functions: BTreeMap<String, FunctionEntryDto>,
+    /// Inherent impl block declarations. Omitted from JSON when empty
+    /// (`skip_serializing_if`) so legacy catalogues stay byte-stable.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) inherent_impls: Vec<InherentImplDeclDto>,
 }
 
 /// Manual `Deserialize` for [`CatalogueDocumentDto`] that uses [`StrictMap`]
@@ -62,6 +66,7 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
             Types,
             Traits,
             Functions,
+            InherentImpls,
             #[serde(other)]
             Unknown,
         }
@@ -85,6 +90,7 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                 let mut types: Option<StrictMap<String, TypeEntryDto>> = None;
                 let mut traits: Option<StrictMap<String, TraitEntryDto>> = None;
                 let mut functions: Option<StrictMap<String, FunctionEntryDto>> = None;
+                let mut inherent_impls: Option<Vec<InherentImplDeclDto>> = None;
 
                 while let Some(key) = map.next_key()? {
                     match key {
@@ -124,6 +130,12 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                             }
                             functions = Some(map.next_value()?);
                         }
+                        Field::InherentImpls => {
+                            if inherent_impls.is_some() {
+                                return Err(de::Error::duplicate_field("inherent_impls"));
+                            }
+                            inherent_impls = Some(map.next_value()?);
+                        }
                         Field::Unknown => {
                             // Consume the value so the deserializer is in a clean
                             // state, then reject the unknown field to fail closed.
@@ -144,6 +156,8 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                 let types = types.ok_or_else(|| de::Error::missing_field("types"))?;
                 let traits = traits.ok_or_else(|| de::Error::missing_field("traits"))?;
                 let functions = functions.ok_or_else(|| de::Error::missing_field("functions"))?;
+                // `inherent_impls` defaults to empty Vec when absent (backward compat).
+                let inherent_impls = inherent_impls.unwrap_or_default();
 
                 Ok(CatalogueDocumentDto {
                     schema_version,
@@ -152,12 +166,20 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                     types: types.0,
                     traits: traits.0,
                     functions: functions.0,
+                    inherent_impls,
                 })
             }
         }
 
-        const FIELDS: &[&str] =
-            &["schema_version", "crate_name", "layer", "types", "traits", "functions"];
+        const FIELDS: &[&str] = &[
+            "schema_version",
+            "crate_name",
+            "layer",
+            "types",
+            "traits",
+            "functions",
+            "inherent_impls",
+        ];
         deserializer.deserialize_struct("CatalogueDocumentDto", FIELDS, DtoVisitor)
     }
 }
@@ -428,6 +450,35 @@ pub(super) struct TraitImplDto {
     /// Defaults to `None` for backward compatibility.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(super) generic_args: Option<String>,
+}
+
+// ---------------------------------------------------------------------------
+// InherentImplDeclV2 DTO
+// ---------------------------------------------------------------------------
+
+/// Wire format for `InherentImplDeclV2`.
+///
+/// Represents one inherent `impl` block for a named type. Multiple entries
+/// with the same `type_name` represent multiple inherent impl blocks for one
+/// struct (the primary design constraint of IN-05 / IN-08).
+///
+/// `type_name` is required (no `serde(default)`). All `Vec` fields default
+/// to empty when absent for backward compatibility.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct InherentImplDeclDto {
+    /// The name of the type this impl block belongs to (required).
+    pub(super) type_name: String,
+    /// Impl-block-level generic type parameters (type parameters only).
+    /// Default empty for catalogues that have no impl-level generics.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) impl_generics: Vec<MethodGenericParamDto>,
+    /// Impl-block-level where-clause predicates. Default empty.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) impl_where_predicates: Vec<WherePredicateDeclDto>,
+    /// Method declarations inside this impl block. Default empty.
+    #[serde(default)]
+    pub(super) methods: Vec<MethodDeclarationDto>,
 }
 
 pub(super) fn default_action() -> String {
