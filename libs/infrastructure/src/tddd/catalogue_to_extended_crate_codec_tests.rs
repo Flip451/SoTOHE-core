@@ -1052,12 +1052,12 @@ fn test_encode_function_without_generics_emits_empty_generics() {
 }
 
 /// A catalogue `WherePredicateDecl.rhs[i]` whose string form starts with `use<`
-/// must be rejected at encode time (ADR 2026-05-13-1153 D3). The syntactic
-/// pre-check fires before the internal parser, which currently converts `use<...>`
-/// to a placeholder `GenericBound::TraitBound` that would otherwise bypass the
-/// later `validate_supported_bound` check.
+/// must be accepted at encode time (ADR 2026-05-18-1223 D1 supersedes ADR
+/// 2026-05-13-1153 D3).  `validate_supported_bound` and the syntactic pre-check
+/// for `use<...>` are both removed; `parse_generic_bound` encodes `use<...>` as a
+/// best-effort placeholder `GenericBound::TraitBound` and the encode must succeed.
 #[test]
-fn test_encode_function_with_use_capture_bound_in_where_predicate_returns_error() {
+fn test_encode_function_with_use_capture_bound_in_where_predicate_succeeds() {
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
@@ -1067,7 +1067,7 @@ fn test_encode_function_with_use_capture_bound_in_where_predicate_returns_error(
 
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
-    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bad_use").unwrap());
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("ok_use").unwrap());
     let entry = FunctionEntry {
         action: ItemAction::Add,
         role: FunctionRole::FreeFunction,
@@ -1091,16 +1091,16 @@ fn test_encode_function_with_use_capture_bound_in_where_predicate_returns_error(
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
-        matches!(result, Err(NewTypeGraphCodecError::InvalidTypeRef(_))),
-        "expected InvalidTypeRef for use<...> bound, got: {result:?}"
+        result.is_ok(),
+        "precise-capture bound `use<U>` must be accepted without error, got: {result:?}"
     );
 }
 
 /// Same as the previous test but the precise-capture bound has a space between the
-/// `use` keyword and the `<` token (i.e. `use <U>`). This variant must also be
-/// rejected — the pre-check must handle optional whitespace after `use`.
+/// `use` keyword and the `<` token (i.e. `use <U>`).  This variant must also be
+/// accepted after the syntactic pre-check removal (ADR 2026-05-18-1223 D1).
 #[test]
-fn test_encode_function_with_use_capture_bound_with_space_returns_error() {
+fn test_encode_function_with_use_capture_bound_with_space_succeeds() {
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
@@ -1110,7 +1110,7 @@ fn test_encode_function_with_use_capture_bound_with_space_returns_error() {
 
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
-    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bad_use_space").unwrap());
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("ok_use_space").unwrap());
     let entry = FunctionEntry {
         action: ItemAction::Add,
         role: FunctionRole::FreeFunction,
@@ -1135,8 +1135,8 @@ fn test_encode_function_with_use_capture_bound_with_space_returns_error() {
 
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
-        matches!(result, Err(NewTypeGraphCodecError::InvalidTypeRef(_))),
-        "expected InvalidTypeRef for `use <U>` (spaced) bound, got: {result:?}"
+        result.is_ok(),
+        "precise-capture bound `use <U>` (spaced) must be accepted without error, got: {result:?}"
     );
 }
 
@@ -1474,5 +1474,228 @@ fn test_encode_function_with_equal_predicate_bare_type_param_lhs_returns_error()
     assert!(
         result.is_err(),
         "Equal predicate with bare type param LHS must return an error, got: {result:?}"
+    );
+}
+
+// -----------------------------------------------------------------------
+// ADR 2026-05-18-1223 D1: validate_supported_bound 撤廃 — lifetime / HRTB /
+// precise-capture bounds must be accepted (AC-02)
+// -----------------------------------------------------------------------
+
+/// A `FunctionEntry` with a lifetime bound (`'static`) on an inline
+/// `MethodGenericParam.bounds` entry must be accepted without error
+/// (ADR 2026-05-18-1223 D1 — `validate_supported_bound` abolished).
+/// The `GenericBound::Outlives("static")` produced by `parse_generic_bound`
+/// must appear in the encoded `BoundPredicate.bounds` for that parameter.
+#[test]
+fn test_encode_function_with_lifetime_bound_static_succeeds() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+
+    let mut doc = make_doc("domain");
+    let crate_n = CrateName::new("domain").unwrap();
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("lifetime_bound_fn").unwrap());
+    // `<F: Fn() + Send + Sync + 'static>` — inline bounds include a lifetime bound.
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        generics: vec![MethodGenericParam {
+            name: ParamName::new("F").unwrap(),
+            bounds: vec![
+                TypeRef::new("Fn()").unwrap(),
+                TypeRef::new("Send").unwrap(),
+                TypeRef::new("Sync").unwrap(),
+                // Lifetime bound: must be accepted after validate_supported_bound removal.
+                TypeRef::new("'static").unwrap(),
+            ],
+        }],
+        where_predicates: vec![],
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+
+    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    assert!(
+        result.is_ok(),
+        "lifetime bound `'static` must be accepted without error, got: {result:?}"
+    );
+
+    // Verify the encoded BoundPredicate contains a GenericBound::Outlives("static") entry.
+    let ec = result.unwrap();
+    let fn_item = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("lifetime_bound_fn")
+                && matches!(item.inner, ItemEnum::Function(_))
+        })
+        .expect("expected Function item for lifetime_bound_fn");
+    let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+
+    // All bounds are lifted to where form (ADR 2026-05-13-1153 D1).
+    // The BoundPredicate for `F` must contain a GenericBound::Outlives("static").
+    let has_static_outlives = f.generics.where_predicates.iter().any(|wp| {
+        if let WherePredicate::BoundPredicate { type_, bounds, .. } = wp {
+            matches!(type_, Type::Generic(g) if g == "F")
+                && bounds.iter().any(|b| matches!(b, GenericBound::Outlives(lt) if lt == "static"))
+        } else {
+            false
+        }
+    });
+    assert!(
+        has_static_outlives,
+        "encoded where_predicates must contain Outlives(\"static\") for `F: 'static`, \
+         got: {:?}",
+        f.generics.where_predicates
+    );
+}
+
+/// A `FunctionEntry` with a named lifetime bound (`'a`) on an inline
+/// `MethodGenericParam.bounds` entry must be accepted without error
+/// (ADR 2026-05-18-1223 D1).
+#[test]
+fn test_encode_function_with_lifetime_bound_named_succeeds() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+
+    let mut doc = make_doc("domain");
+    let crate_n = CrateName::new("domain").unwrap();
+    let fn_path =
+        FunctionPath::at_root(crate_n, FunctionName::new("named_lifetime_bound_fn").unwrap());
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        // `<T: Clone + 'a>` — named lifetime bound.
+        generics: vec![MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Clone").unwrap(), TypeRef::new("'a").unwrap()],
+        }],
+        where_predicates: vec![],
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+
+    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    assert!(
+        result.is_ok(),
+        "named lifetime bound `'a` must be accepted without error, got: {result:?}"
+    );
+
+    // The BoundPredicate for `T` must contain a GenericBound::Outlives("a").
+    let ec = result.unwrap();
+    let fn_item = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("named_lifetime_bound_fn")
+                && matches!(item.inner, ItemEnum::Function(_))
+        })
+        .expect("expected Function item for named_lifetime_bound_fn");
+    let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+    let has_named_outlives = f.generics.where_predicates.iter().any(|wp| {
+        if let WherePredicate::BoundPredicate { type_, bounds, .. } = wp {
+            matches!(type_, Type::Generic(g) if g == "T")
+                && bounds.iter().any(|b| matches!(b, GenericBound::Outlives(lt) if lt == "a"))
+        } else {
+            false
+        }
+    });
+    assert!(
+        has_named_outlives,
+        "encoded where_predicates must contain Outlives(\"a\") for `T: 'a`, \
+         got: {:?}",
+        f.generics.where_predicates
+    );
+}
+
+/// A `FunctionEntry` with an HRTB trait bound (`for<'a> Fn(&'a ())`) on an inline
+/// `MethodGenericParam.bounds` entry must be accepted without error
+/// (ADR 2026-05-18-1223 D1).  The encoded `GenericBound::TraitBound` must carry
+/// the `generic_params` field populated with the HRTB binder lifetime.
+#[test]
+fn test_encode_function_with_hrtb_trait_bound_succeeds() {
+    use domain::tddd::catalogue_v2::FunctionName;
+    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::identifiers::FunctionPath;
+    use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+
+    let mut doc = make_doc("domain");
+    let crate_n = CrateName::new("domain").unwrap();
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("hrtb_bound_fn").unwrap());
+    let entry = FunctionEntry {
+        action: ItemAction::Add,
+        role: FunctionRole::FreeFunction,
+        params: vec![],
+        returns: TypeRef::new("()").unwrap(),
+        is_async: false,
+        // `<F: for<'a> Fn(&'a ())>` — HRTB on inline bound.
+        generics: vec![MethodGenericParam {
+            name: ParamName::new("F").unwrap(),
+            bounds: vec![TypeRef::new("for<'a> Fn(&'a ())").unwrap()],
+        }],
+        where_predicates: vec![],
+        docs: None,
+        spec_refs: vec![],
+        informal_grounds: vec![],
+    };
+    doc.functions.insert(fn_path, entry);
+
+    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    assert!(
+        result.is_ok(),
+        "HRTB trait bound `for<'a> Fn(&'a ())` must be accepted without error, got: {result:?}"
+    );
+
+    // The BoundPredicate for `F` must contain a TraitBound with non-empty generic_params
+    // (the HRTB binder).
+    let ec = result.unwrap();
+    let fn_item = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("hrtb_bound_fn")
+                && matches!(item.inner, ItemEnum::Function(_))
+        })
+        .expect("expected Function item for hrtb_bound_fn");
+    let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+    let has_hrtb_trait_bound = f.generics.where_predicates.iter().any(|wp| {
+        if let WherePredicate::BoundPredicate { type_, bounds, .. } = wp {
+            matches!(type_, Type::Generic(g) if g == "F")
+                && bounds.iter().any(|b| {
+                    matches!(b, GenericBound::TraitBound { generic_params, .. }
+                        if !generic_params.is_empty())
+                })
+        } else {
+            false
+        }
+    });
+    assert!(
+        has_hrtb_trait_bound,
+        "encoded where_predicates must contain a TraitBound with non-empty generic_params \
+         for `for<'a> Fn(&'a ())`, got: {:?}",
+        f.generics.where_predicates
     );
 }

@@ -429,6 +429,20 @@
           "findings": [],
           "hash": "rvw1:sha256:d1cd68992a263639c73e0d8193e24973c2debad376374ce17adf9dedf8d3b529",
           "at": "2026-05-19T15:10:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73d0cf1b245a10826fa245b1c339a57d5493c913f765e94843969359105f9813",
+          "at": "2026-05-19T15:22:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73d0cf1b245a10826fa245b1c339a57d5493c913f765e94843969359105f9813",
+          "at": "2026-05-19T15:30:10Z"
         }
       ]
     },
@@ -656,6 +670,35 @@
           "findings": [],
           "hash": "rvw1:sha256:cd519b06f1b318b4c838146a0577a183c1329ce3e9558c1a2c17926001e92a57",
           "at": "2026-05-19T15:02:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Dropping `validate_supported_bound` makes `use<...>` look accepted at the codec boundary, but the value still round-trips as a placeholder `GenericBound::TraitBound` with path `use<U>`. Phase 1.5/1.6 treats any unresolved local `ResolvedPath` as an unresolved type reference and will raise `UnresolvedTypeRef`, so this does not actually support precise-capture bounds end-to-end. The new tests only assert `encode()` succeeds, which misses that downstream failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 751,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:09826770a38cde91cbc5a5bea2a5679326bfd22cc78ad1e0b5008f3365055ad9",
+          "at": "2026-05-19T15:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a995a176b7d0899946f6e7a252dd3600d0a13bb903e1ad2616107bf3a6cf0533",
+          "at": "2026-05-19T15:28:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a995a176b7d0899946f6e7a252dd3600d0a13bb903e1ad2616107bf3a6cf0533",
+          "at": "2026-05-19T15:31:19Z"
         }
       ]
     }

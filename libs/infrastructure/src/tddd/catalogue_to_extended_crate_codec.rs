@@ -745,91 +745,24 @@ impl EncoderState {
         })
     }
 
-    /// Validates that `bound` is a supported `GenericBound` variant for use inside
-    /// `WherePredicate::BoundPredicate.bounds` (or inline `GenericParamDef.bounds`).
-    ///
-    /// Per ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D3, the scope
-    /// of this track's `where_predicates` is `BoundPredicate` only:
-    ///
-    /// - `GenericBound::Outlives` (`T: 'a`) — fail-closed (lifetime predicates are
-    ///   covered by `WherePredicate::LifetimePredicate`, deferred to a follow-up ADR).
-    /// - `GenericBound::TraitBound` with non-empty `generic_params` (HRTB on TraitBound,
-    ///   e.g. `for<'a> Fn(&'a T)`) — fail-closed.
-    /// - `GenericBound::Use` — fail-closed (precise-capturing `use<...>`).
-    ///
-    /// Plain `GenericBound::TraitBound { generic_params: [], modifier, trait_ }` is the
-    /// only supported variant; `modifier` (None / Maybe / MaybeConst) is preserved as-is.
-    fn validate_supported_bound(
-        bound: &GenericBound,
-        bound_str: &str,
-    ) -> Result<(), CatalogueToExtendedCrateCodecError> {
-        match bound {
-            GenericBound::TraitBound { generic_params, .. } if !generic_params.is_empty() => {
-                Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: bound_str.to_string(),
-                    reason: "higher-ranked trait bounds (HRTB) on TraitBound are not supported \
-                             in catalogue where-predicates (ADR 2026-05-13-1153 D3)"
-                        .to_string(),
-                })
-            }
-            GenericBound::Outlives(_) => Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                type_ref: bound_str.to_string(),
-                reason: "lifetime outlives bounds (`T: 'a`) are not supported in catalogue \
-                         where-predicates (ADR 2026-05-13-1153 D3, deferred to follow-up)"
-                    .to_string(),
-            }),
-            GenericBound::Use(_) => Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                type_ref: bound_str.to_string(),
-                reason: "precise-capturing `use<...>` bounds are not supported in catalogue \
-                         where-predicates (ADR 2026-05-13-1153 D3)"
-                    .to_string(),
-            }),
-            GenericBound::TraitBound { .. } => Ok(()),
-        }
-    }
-
     /// Encodes a `MethodGenericParam.bounds[i]` or `WherePredicateDecl.bounds[i]` entry
-    /// to a validated `GenericBound`, applying generic-name rewriting and the supported-
-    /// bound validation (ADR `2026-05-13-1153` D1 + D3).
+    /// to a `GenericBound`, applying generic-name rewriting.
     ///
-    /// A syntactic pre-check rejects precise-capture `use<...>` bounds before the
-    /// internal parser is reached, because `encode_bound_str` (via the shared
-    /// `parse_generic_bound` helper) currently encodes `use<...>` as a placeholder
-    /// `GenericBound::TraitBound` rather than a `GenericBound::Use`, which would
-    /// otherwise slip past `validate_supported_bound`. The check handles optional
-    /// whitespace between the `use` keyword and `<` (e.g. `use <U>`).
+    /// All `syn`-parseable bound strings are accepted regardless of kind: lifetime
+    /// bounds (`'static`, `'a`), HRTB (`for<'a> Fn(&'a T)`), precise-capture
+    /// (`use<'a, T>`), and plain trait bounds (ADR `2026-05-18-1223` D1).
+    /// Bounds that `syn` cannot parse are propagated as `Err`.
     fn encode_and_validate_bound(
         &mut self,
         bound_str: &str,
         generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
-        // Reject precise-capture `use<...>` bounds before the internal parser is reached.
-        // `parse_generic_bound` silently encodes them as a placeholder `TraitBound`, which
-        // would bypass `validate_supported_bound`. The syntactic keyword `use` may be
-        // followed by optional whitespace before `<` (e.g. `use <U>`), so we check for
-        // the `use` keyword (followed by `<` or ASCII whitespace) rather than just the
-        // four-character literal `use<`.
-        {
-            let trimmed = bound_str.trim_start();
-            let is_use_bound = trimmed.starts_with("use<")
-                || (trimmed.starts_with("use")
-                    && trimmed[3..].starts_with(|c: char| c == '<' || c.is_ascii_whitespace()));
-            if is_use_bound {
-                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: bound_str.to_string(),
-                    reason: "precise-capturing `use<...>` bounds are not supported in catalogue \
-                             where-predicates (ADR 2026-05-13-1153 D3)"
-                        .to_string(),
-                });
-            }
-        }
         let raw = self.encode_bound_str(bound_str)?;
         let rewritten = if generic_names.is_empty() {
             raw
         } else {
             rewrite_generic_types_in_bound(raw, generic_names)
         };
-        Self::validate_supported_bound(&rewritten, bound_str)?;
         Ok(rewritten)
     }
 
@@ -899,8 +832,9 @@ impl EncoderState {
             // the `Type::QualifiedPath` shape that rustdoc emits for such predicates
             // and degrades them to an unresolved placeholder, producing a silent
             // structural mismatch in the signal evaluator (ADR D3 fail-closed).
-            // Failing early here matches the reject-unknown strategy for other
-            // unsupported syntax (e.g. `use<...>` bounds).
+            // Note: `use<...>` (precise-capture) bounds in the RHS position are
+            // accepted by ADR `2026-05-18-1223` D1 — `parse_generic_bound` encodes
+            // them as a best-effort `GenericBound::TraitBound` placeholder.
             if lhs_str.trim().starts_with('<') {
                 return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
                     type_ref: lhs_str.to_owned(),
