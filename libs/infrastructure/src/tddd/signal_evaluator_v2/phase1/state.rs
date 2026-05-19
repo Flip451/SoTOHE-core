@@ -2,14 +2,12 @@
 
 use std::collections::{BTreeMap, HashMap};
 
-use domain::tddd::catalogue_v2::ItemAction;
-use rustdoc_types::{Id, Item, ItemKind, ItemSummary};
-
-use super::super::item_kind_from_inner;
 use super::child_items::{
     collect_impl_child_ids, copy_non_impl_children_to_d, move_impl_children_to_d,
     patch_impl_for_ids, patch_impl_trait_ids, remove_child_items_from_s,
 };
+use domain::tddd::catalogue_v2::ItemAction;
+use rustdoc_types::{Id, Item, ItemKind, ItemSummary};
 
 // ---------------------------------------------------------------------------
 // Phase 1 state
@@ -44,6 +42,19 @@ pub(super) struct Phase1State {
     /// that is independent from all A-sourced Ids.  Used by
     /// `insert_b_item_tree_into_s` and the B-function / orphan-impl insertion passes.
     pub(super) b_id_remap: HashMap<Id, Id>,
+    /// Pre-built remap for every A-side Id → fresh S Id (T008, IN-10).
+    ///
+    /// Symmetric counterpart of `b_id_remap`.  Populated once after `b_id_remap`
+    /// is built and before any A-side insertion begins, so that every A item
+    /// (type, function, child, impl block) lands at a fresh S Id that is
+    /// independent from all B-sourced Ids.  Used by
+    /// `insert_a_item_tree_into_s`, `remap_and_copy_a_children_to_s`, and the
+    /// A-function / orphan-impl insertion passes.
+    ///
+    /// `Id(0)` is excluded from the remap for the same reasons as in `b_id_remap`:
+    ///   1. It is the A-side root module, which is never inserted into S.
+    ///   2. Rustdoc uses `Id(0)` as a `Self`-type sentinel inside impl blocks.
+    pub(super) a_id_remap: HashMap<Id, Id>,
 }
 
 impl Phase1State {
@@ -66,6 +77,7 @@ impl Phase1State {
             d_type_name_to_id: BTreeMap::new(),
             d_fn_path_to_id: BTreeMap::new(),
             b_id_remap: HashMap::new(),
+            a_id_remap: HashMap::new(),
         }
     }
 
@@ -73,30 +85,6 @@ impl Phase1State {
         let id = Id(self.next_id);
         self.next_id += 1;
         id
-    }
-
-    /// Inserts a type/trait item into S with a fresh Id.
-    /// Returns the newly allocated Id.
-    pub(super) fn insert_s_type(
-        &mut self,
-        item: Item,
-        action: ItemAction,
-        path: Option<Vec<String>>,
-    ) -> Id {
-        let new_id = self.alloc_id();
-        let name = item.name.clone().unwrap_or_default();
-        let kind = item_kind_from_inner(&item.inner);
-        let mut new_item = item;
-        new_item.id = new_id;
-        self.s_index.insert(new_id, new_item);
-        if let Some(p) = path {
-            self.s_paths.insert(new_id, ItemSummary { crate_id: 0, path: p, kind });
-        }
-        self.s_actions.insert(new_id, action);
-        if !name.is_empty() {
-            self.s_type_name_to_id.insert(name, new_id);
-        }
-        new_id
     }
 
     /// Inserts a type/trait item into S at a *specific* Id (for Modify: keep same Id position).
@@ -109,27 +97,6 @@ impl Phase1State {
         if !name.is_empty() {
             self.s_type_name_to_id.insert(name, id);
         }
-    }
-
-    /// Inserts a function item into S with a fresh Id.
-    pub(super) fn insert_s_fn(
-        &mut self,
-        item: Item,
-        fn_path: String,
-        action: ItemAction,
-        path: Option<Vec<String>>,
-    ) -> Id {
-        let new_id = self.alloc_id();
-        let mut new_item = item;
-        new_item.id = new_id;
-        self.s_index.insert(new_id, new_item);
-        if let Some(p) = path {
-            self.s_paths
-                .insert(new_id, ItemSummary { crate_id: 0, path: p, kind: ItemKind::Function });
-        }
-        self.s_actions.insert(new_id, action);
-        self.s_fn_path_to_id.insert(fn_path, new_id);
-        new_id
     }
 
     /// Inserts a function item into S at a *specific* Id.

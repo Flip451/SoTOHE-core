@@ -168,6 +168,38 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     let a_types = build_type_trait_identity_map(&a_krate);
     let a_fns = build_function_identity_map(&a_krate);
 
+    // --- Pre-step (A-side): Build A-wide Id remap (T008, IN-10) ---
+    //
+    // Symmetric counterpart of the B-side b_id_remap pre-step above.  Allocate a
+    // fresh S Id for every entry in a_krate.index BEFORE any A-side insertion so
+    // that both A-sourced and B-sourced items occupy the same "fresh" Id space in
+    // s_index, with no overlap.  Action-specific insertion passes (Add / Modify /
+    // Reference / Delete) use this map to look up pre-allocated fresh S Ids and to
+    // rewrite intra-A `Type::ResolvedPath.id` references (via
+    // `rewrite_type_ref_ids_in_item`) in a single unified pass.
+    //
+    // `Id(0)` is excluded from the remap for the same reasons as in b_id_remap:
+    //   1. It is the A-side root module, which is never inserted into S.
+    //   2. Rustdoc uses `Id(0)` as a `Self`-type sentinel inside impl blocks.
+    //      Remapping `Id(0)` would turn that sentinel into a fresh S id that is
+    //      never inserted into `s_index`, causing Phase 1.6 to report spurious
+    //      `DanglingId` errors.
+    //
+    // NOTE (T008 / T009 transition):  In T008 the remap is built and stored in
+    // `state.a_id_remap`; action-specific passes now look up pre-allocated Ids from
+    // this map instead of calling `state.alloc_id()` per item.  The existing
+    // `patch_impl_for_ids` / `patch_impl_trait_ids` calls are intentionally left in
+    // place during T008 to maintain an equivalent intermediate state — T009 will
+    // remove them once `rewrite_type_ref_ids_in_item` + `a_id_remap` is confirmed
+    // to cover all `for_` / `trait_` rewriting without fallback.
+    {
+        let mut a_keys: Vec<Id> = a_krate.index.keys().filter(|id| id.0 != 0).copied().collect();
+        a_keys.sort_by_key(|id| id.0);
+        let a_remap: HashMap<Id, Id> =
+            a_keys.into_iter().map(|old_id| (old_id, state.alloc_id())).collect();
+        state.a_id_remap = a_remap;
+    }
+
     // --- Step 4 & 5: Process A items by action ---
 
     // Process A types/traits.
@@ -296,7 +328,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                     )));
                 }
                 let path = a_krate.paths.get(a_id).map(|ps| ps.path.clone());
-                state.insert_s_fn(a_item, fn_path_str.clone(), ItemAction::Add, path);
+                // Use the pre-allocated S Id from a_id_remap (T008) instead of alloc_id().
+                let fn_s_id =
+                    state.a_id_remap.get(a_id).copied().unwrap_or_else(|| state.alloc_id());
+                state.insert_s_fn_at(fn_s_id, a_item, fn_path_str.clone(), ItemAction::Add, path);
             }
             ItemAction::Modify => {
                 if !in_b {

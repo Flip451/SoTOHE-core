@@ -175,8 +175,20 @@ pub(super) fn remap_child_ids_in_item(mut item: Item, id_remap: &HashMap<Id, Id>
 // Insert / copy helpers for A-sourced and B-sourced items
 // ---------------------------------------------------------------------------
 
-/// Inserts an A-sourced item tree into S, allocating fresh Ids for ALL
-/// descendant children and remapping intra-item child-Id references.
+/// Inserts an A-sourced item tree into S, using the pre-built `state.a_id_remap`
+/// (T008, IN-10) to resolve all fresh S Ids for the root and all descendant
+/// children, remapping intra-item child-Id references accordingly.
+///
+/// Before T008, this function built a local `id_remap` per call by invoking
+/// `state.alloc_id()` for every descendant.  After T008, `state.a_id_remap` holds
+/// a comprehensive A-id → fresh-S-id table pre-built at the start of Phase 1
+/// (symmetric to `state.b_id_remap`).  The local remap is now derived from
+/// `state.a_id_remap` rather than allocated on-the-fly.
+///
+/// Note (T008 / T009 transition): `patch_impl_for_ids` / `patch_impl_trait_ids`
+/// are intentionally kept here during T008 as a fallback.  T009 will remove
+/// them once `rewrite_type_ref_ids_in_item` + `a_id_remap` is confirmed to
+/// cover all `for_` / `trait_` rewriting without additional patching.
 pub(super) fn insert_a_item_tree_into_s(
     state: &mut Phase1State,
     root_item: Item,
@@ -184,6 +196,8 @@ pub(super) fn insert_a_item_tree_into_s(
     path: Option<Vec<String>>,
     source_index: &HashMap<Id, Item>,
 ) -> Id {
+    let old_root_id = root_item.id;
+
     // Identify which direct children are impl blocks BEFORE remapping, so we
     // can patch their `for_` / `trait_` ids after the root gets a fresh S id.
     let is_trait = matches!(root_item.inner, ItemEnum::Trait(_));
@@ -194,10 +208,17 @@ pub(super) fn insert_a_item_tree_into_s(
         })
         .collect();
 
-    // Build a complete old→new Id remap for the entire subtree.
+    // Build the subtree id_remap from `state.a_id_remap` (pre-allocated in the
+    // A-side pre-step).  Fall back to `state.alloc_id()` for any id not present in
+    // the map (should not occur in normal usage, but be safe).
     let subtree_ids = collect_all_subtree_ids(&root_item, source_index);
-    let id_remap: HashMap<Id, Id> =
-        subtree_ids.iter().map(|&old_id| (old_id, state.alloc_id())).collect();
+    let id_remap: HashMap<Id, Id> = subtree_ids
+        .iter()
+        .map(|&old_id| {
+            let new_id = state.a_id_remap.get(&old_id).copied().unwrap_or_else(|| state.alloc_id());
+            (old_id, new_id)
+        })
+        .collect();
 
     // Insert all descendant items with their new Ids.
     // Impl blocks inherit the parent's action so that Phase 2 evaluates them with
@@ -205,12 +226,31 @@ pub(super) fn insert_a_item_tree_into_s(
     // under an added type).
     insert_remapped_children(state, &root_item, source_index, &id_remap, action);
 
-    // Remap the root item's child references, then insert it with a fresh top-level Id.
+    // Remap the root item's child references using the subtree id_remap.
     let remapped_root = remap_child_ids_in_item(root_item, &id_remap);
-    let new_s_id = state.insert_s_type(remapped_root, action, path);
+
+    // Resolve the root's fresh S Id from `state.a_id_remap`.
+    let new_s_id = state.a_id_remap.get(&old_root_id).copied().unwrap_or_else(|| state.alloc_id());
+
+    // Insert the root at the pre-allocated S Id.
+    let name = remapped_root.name.clone().unwrap_or_default();
+    let kind = super::super::item_kind_from_inner(&remapped_root.inner);
+    let mut stored_root = remapped_root;
+    stored_root.id = new_s_id;
+    state.s_index.entry(new_s_id).or_insert(stored_root);
+    if let Some(p) = path {
+        state.s_paths.insert(new_s_id, ItemSummary { crate_id: 0, path: p, kind });
+    }
+    state.s_actions.insert(new_s_id, action);
+    if !name.is_empty() {
+        state.s_type_name_to_id.insert(name, new_s_id);
+    }
 
     // Patch the impl blocks' self-type / trait reference to the fresh S root id.
-    // Use the remapped impl ids (each old impl id was reassigned a fresh id).
+    // Use the remapped impl ids (each old impl id maps to a fresh S id via id_remap).
+    // NOTE (T008): patch_impl_for_ids / patch_impl_trait_ids are kept here as a
+    // fallback; T009 will remove them once rewrite_type_ref_ids_in_item + a_id_remap
+    // covers all for_ / trait_ rewriting.
     let new_impl_ids: Vec<Id> =
         old_impl_ids.iter().filter_map(|id| id_remap.get(id)).copied().collect();
     if is_trait {
@@ -560,7 +600,12 @@ pub(super) fn patch_impl_trait_ids(
 }
 
 /// Copies A-sourced child items (for Modify) into S at a specific root Id,
-/// allocating fresh Ids for all children and remapping child-Id references.
+/// using the pre-built `state.a_id_remap` (T008, IN-10) to resolve fresh S Ids
+/// for all children and remapping child-Id references accordingly.
+///
+/// Before T008, this function built a local `id_remap` per call via
+/// `state.alloc_id()`.  After T008, `state.a_id_remap` holds the comprehensive
+/// A-id → fresh-S-id table, so the local remap is derived from it.
 ///
 /// `parent_action` is forwarded to `insert_remapped_children` so that impl-block
 /// children inherit the parent's action rather than defaulting to `Reference`.
@@ -571,8 +616,13 @@ pub(super) fn remap_and_copy_a_children_to_s(
     parent_action: domain::tddd::catalogue_v2::ItemAction,
 ) -> Item {
     let subtree_ids = collect_all_subtree_ids(root_item, source_index);
-    let id_remap: HashMap<Id, Id> =
-        subtree_ids.iter().map(|&old_id| (old_id, state.alloc_id())).collect();
+    let id_remap: HashMap<Id, Id> = subtree_ids
+        .iter()
+        .map(|&old_id| {
+            let new_id = state.a_id_remap.get(&old_id).copied().unwrap_or_else(|| state.alloc_id());
+            (old_id, new_id)
+        })
+        .collect();
     insert_remapped_children(state, root_item, source_index, &id_remap, parent_action);
     remap_child_ids_in_item(root_item.clone(), &id_remap)
 }

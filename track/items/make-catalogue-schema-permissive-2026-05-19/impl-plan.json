@@ -38,12 +38,12 @@
     {
       "id": "T007",
       "description": "D2-codec-evaluator: A-codec と信号評価器を更新して InherentImplDeclV2 / TraitImplDeclV2.impl_generics / TraitEntry.generics を rustdoc の対応レベルのジェネリックと対称比較できるようにする (IN-09)。A-codec 側: (a) rustdoc の inherent impl ブロックレベルのジェネリックを InherentImplDeclV2.impl_generics / impl_where_predicates に正しく配置する encode ロジックを実装する。(b) rustdoc の trait impl ブロックレベルのジェネリックを TraitImplDeclV2.impl_generics / impl_where_predicates に配置する。(c) rustdoc のトレイト宣言レベルのジェネリックを TraitEntry.generics / where_predicates に配置する。信号評価器側: 各レベルのジェネリック (impl ブロック・トレイト宣言) の比較を rustdoc 側と catalogue 側で対称に行う比較ロジックを追加する。CN-02 のアーキテクチャ制約に従い、評価器内部の rustdoc 解析・codec・比較ロジックは libs/infrastructure/ に実装する (signal evaluator の orchestration は libs/usecase/ が担う)。既存 catalogue JSON (新フィールドなし) に対して信号評価結果が変化しないことを確認するテストを追加する (AC-08)。unit test: impl<L: Left, R: Right, W: Write> Foo<L, R, W> の InherentImplDeclV2 が A 側で正しくエンコードされ C 側 rustdoc と Blue 一致することを確認。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T008",
       "description": "D3-pre-step: A 側に B 側と対称な Pre-step を追加し、全 A Item に fresh S id を一括 pre-allocate する (IN-10)。libs/infrastructure の signal_evaluator_v2/phase1/builder.rs に `build_a_id_remap` 関数 (または同等のロジック) を追加し、B 側 `b_id_remap` 構築と対称なアルゴリズムで `a_id_remap: HashMap<old_a_id, new_s_id>` を一括構築する。action 別処理 (Add / Modify / Reference / Delete) の各ブランチで id 解決に `a_id_remap` を参照するよう修正する。この変更のみで CI が通ることを確認する (T009 の patch_impl_for_ids 削除は次タスク)。unit test を追加する: (a) A 側 id と B 側 id が衝突する fixture で renumber 後も S アイテムが正しく参照される、(b) a_id_remap 構築後に action 別処理が id_map に親型 mapping を持つ状態になる。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T009",

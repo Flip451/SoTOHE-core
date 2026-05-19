@@ -1628,6 +1628,441 @@ fn test_t037_no_spurious_signals_with_overlapping_a_b_ids() {
 }
 
 // -----------------------------------------------------------------------
+// T008 regression: A-side pre-step — build_a_id_remap (IN-10)
+// -----------------------------------------------------------------------
+
+/// T008 (a): When A-side Ids and B-side Ids share the same numeric values,
+/// `a_id_remap` pre-allocates a fresh S Id for every A item before action
+/// processing begins.  After Phase 1, every A-sourced item must reside at a
+/// fresh S Id that does NOT collide with any B-sourced item's S Id.
+///
+/// Fixture:
+///   A: `Foo` (Add) at Id(1), impl block at Id(2) whose `for_` points to Id(1).
+///   B: `Bar` at Id(1) (same numeric Id as A's Foo), impl block at Id(2).
+///
+/// Expected: Foo and Bar are at *distinct* fresh S Ids.  The impl block for
+/// Foo must have its `for_.id` pointing to the new S Id of Foo (not Bar's Id
+/// and not the original A-side Id(1)).
+#[test]
+#[allow(clippy::panic)]
+fn test_t008_a_id_remap_resolves_collisions() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+
+    // --- B: `Bar` at Id(1), impl at Id(2) ---
+    let b_bar_id = Id(1);
+    let b_impl_id = Id(2);
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+    b_index.insert(root_id, root_module_item(root_id, crate_name, vec![b_bar_id, b_impl_id]));
+    b_index.insert(
+        b_bar_id,
+        make_item(
+            b_bar_id,
+            Some("Bar"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![b_impl_id],
+            }),
+        ),
+    );
+    b_index.insert(
+        b_impl_id,
+        make_item(
+            b_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Bar".to_string(),
+                    id: b_bar_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    b_paths.insert(
+        b_bar_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let b = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // --- A: `Foo` (Add) at Id(1) — same numeric Id as B's Bar.
+    //       impl at Id(2) whose for_ points to Id(1) (A's Foo). ---
+    let a_foo_id = Id(1); // collides numerically with b_bar_id
+    let a_impl_id = Id(2); // collides numerically with b_impl_id
+    let mut a_index = HashMap::new();
+    let mut a_paths = HashMap::new();
+    a_index.insert(root_id, root_module_item(root_id, crate_name, vec![a_foo_id, a_impl_id]));
+    a_index.insert(
+        a_foo_id,
+        make_item(
+            a_foo_id,
+            Some("Foo"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![a_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_impl_id,
+        make_item(
+            a_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Foo".to_string(),
+                    id: a_foo_id, // references A's Foo at Id(1) — will be remapped
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    a_paths.insert(
+        a_foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let a_krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: a_index,
+        paths: a_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let mut a_actions = BTreeMap::new();
+    a_actions.insert(a_foo_id, ItemAction::Add);
+    let a = ExtendedCrate::new(a_krate, a_actions);
+
+    // --- Run Phase 1 ---
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // --- Verify: Foo and Bar are at distinct fresh S Ids ---
+    let foo_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Foo"))
+        .expect("Foo must be in S (Add action)");
+    let bar_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Bar"))
+        .expect("Bar must be in S (B-side Reference)");
+
+    let foo_s_id = foo_item.id;
+    let bar_s_id = bar_item.id;
+    assert_ne!(
+        foo_s_id, bar_s_id,
+        "T008: Foo and Bar must occupy distinct S Ids; got the same Id {foo_s_id:?}"
+    );
+    // Both must be at fresh Ids (not the original A/B Id(1)).
+    assert_ne!(
+        foo_s_id,
+        Id(1),
+        "T008: Foo's S Id must be a fresh Id (not the original A-side Id(1))"
+    );
+    assert_ne!(
+        bar_s_id,
+        Id(1),
+        "T008: Bar's S Id must be a fresh Id (not the original B-side Id(1))"
+    );
+
+    // --- Verify: the impl block for Foo has for_.id pointing to Foo's S Id ---
+    // The impl block associated with Foo (A-sourced) must have its for_.id
+    // updated to foo_s_id so that Phase 1.6 / Phase 2 finds a valid parent.
+    let foo_impl = s.krate().index.values().find(|item| {
+        if let ItemEnum::Impl(impl_) = &item.inner {
+            if let Type::ResolvedPath(p) = &impl_.for_ { p.path == "Foo" } else { false }
+        } else {
+            false
+        }
+    });
+    assert!(foo_impl.is_some(), "T008: an Impl with for_=Foo must be present in S");
+    let foo_impl_inner = match &foo_impl.unwrap().inner {
+        ItemEnum::Impl(i) => i,
+        _ => panic!("expected Impl"),
+    };
+    let for_id = match &foo_impl_inner.for_ {
+        Type::ResolvedPath(p) => p.id,
+        _ => panic!("expected ResolvedPath for_"),
+    };
+    assert_eq!(
+        for_id, foo_s_id,
+        "T008: Foo's impl block for_.id must point to Foo's fresh S Id {foo_s_id:?}, got {for_id:?}"
+    );
+}
+
+/// T008 (b): After the A-side pre-step (`a_id_remap`) is built and action processing
+/// runs, the id_map for both Add and Modify actions must contain a mapping entry
+/// for the parent type's A-side Id.  This confirms that `rewrite_type_ref_ids_in_item`
+/// can remap `for_.id` and other local type refs without needing `patch_impl_for_ids`
+/// as a fallback.
+///
+/// Fixture:
+///   A: `Foo` (Add) at Id(1) + `Bar` (Modify, also in B) at Id(2).
+///   B: `Bar` at Id(1).
+///
+/// Expected:
+///   - Foo (Add): its impl's for_.id resolves to Foo's S Id (a_id_remap applied).
+///   - Bar (Modify): its impl's for_.id resolves to Bar's S Id (same as B-seeded Id).
+#[test]
+#[allow(clippy::panic)]
+fn test_t008_a_id_remap_built_after_pre_step_includes_parent_types() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+
+    // --- B: `Bar` at Id(1) ---
+    let b_bar_id = Id(1);
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+    b_index.insert(root_id, root_module_item(root_id, crate_name, vec![b_bar_id]));
+    b_index.insert(b_bar_id, struct_item(b_bar_id, "Bar"));
+    b_paths.insert(
+        b_bar_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let b = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // --- A: `Foo` (Add) at Id(1), `Bar` (Modify) at Id(2), each with an impl block ---
+    let a_foo_id = Id(1);
+    let a_foo_impl_id = Id(3);
+    let a_bar_id = Id(2);
+    let a_bar_impl_id = Id(4);
+    let mut a_index = HashMap::new();
+    let mut a_paths = HashMap::new();
+
+    a_index.insert(
+        root_id,
+        root_module_item(
+            root_id,
+            crate_name,
+            vec![a_foo_id, a_bar_id, a_foo_impl_id, a_bar_impl_id],
+        ),
+    );
+    // Foo (Add) with an impl block pointing to a_foo_id.
+    a_index.insert(
+        a_foo_id,
+        make_item(
+            a_foo_id,
+            Some("Foo"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![a_foo_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_foo_impl_id,
+        make_item(
+            a_foo_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Foo".to_string(),
+                    id: a_foo_id, // references A's Foo — must be remapped via a_id_remap
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    // Bar (Modify) with an impl block pointing to a_bar_id.
+    a_index.insert(
+        a_bar_id,
+        make_item(
+            a_bar_id,
+            Some("Bar"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![a_bar_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_bar_impl_id,
+        make_item(
+            a_bar_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Bar".to_string(),
+                    id: a_bar_id, // references A's Bar — must be remapped via a_id_remap
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    a_paths.insert(
+        a_foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    a_paths.insert(
+        a_bar_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let a_krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: a_index,
+        paths: a_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let mut a_actions = BTreeMap::new();
+    a_actions.insert(a_foo_id, ItemAction::Add);
+    a_actions.insert(a_bar_id, ItemAction::Modify);
+    let a = ExtendedCrate::new(a_krate, a_actions);
+
+    // --- Run Phase 1 ---
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // --- Verify Foo (Add) impl: for_.id must point to Foo's S Id ---
+    let foo_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Foo"))
+        .expect("Foo must be in S");
+    let foo_s_id = foo_item.id;
+
+    let foo_impl = s.krate().index.values().find(|item| {
+        if let ItemEnum::Impl(impl_) = &item.inner {
+            if let Type::ResolvedPath(p) = &impl_.for_ { p.path == "Foo" } else { false }
+        } else {
+            false
+        }
+    });
+    assert!(foo_impl.is_some(), "T008(b): impl for Foo must be in S");
+    let foo_impl_for_id = match &foo_impl.unwrap().inner {
+        ItemEnum::Impl(i) => match &i.for_ {
+            Type::ResolvedPath(p) => p.id,
+            _ => panic!("expected ResolvedPath"),
+        },
+        _ => panic!("expected Impl"),
+    };
+    assert_eq!(
+        foo_impl_for_id, foo_s_id,
+        "T008(b) Add: impl for Foo must have for_.id = Foo's S Id {foo_s_id:?} (via a_id_remap); \
+         got {foo_impl_for_id:?}"
+    );
+
+    // --- Verify Bar (Modify) impl: for_.id must point to Bar's S Id ---
+    let bar_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Bar"))
+        .expect("Bar must be in S");
+    let bar_s_id = bar_item.id;
+
+    let bar_impl = s.krate().index.values().find(|item| {
+        if let ItemEnum::Impl(impl_) = &item.inner {
+            if let Type::ResolvedPath(p) = &impl_.for_ { p.path == "Bar" } else { false }
+        } else {
+            false
+        }
+    });
+    assert!(bar_impl.is_some(), "T008(b): impl for Bar must be in S");
+    let bar_impl_for_id = match &bar_impl.unwrap().inner {
+        ItemEnum::Impl(i) => match &i.for_ {
+            Type::ResolvedPath(p) => p.id,
+            _ => panic!("expected ResolvedPath"),
+        },
+        _ => panic!("expected Impl"),
+    };
+    assert_eq!(
+        bar_impl_for_id, bar_s_id,
+        "T008(b) Modify: impl for Bar must have for_.id = Bar's S Id {bar_s_id:?} (via a_id_remap); \
+         got {bar_impl_for_id:?}"
+    );
+}
+
+// -----------------------------------------------------------------------
 // T038 regression: A-side TypeAlias orphan-impl pass (Symptom B / IN-31)
 // -----------------------------------------------------------------------
 
