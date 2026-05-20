@@ -12,13 +12,15 @@
 |------|------|--------|---------|--------|----------|
 | InherentImplDeclV2 | value_object | — | — | 🔵 | 🔵 |
 | TraitEntry | value_object | modify | — | 🔵 | 🔵 |
-| TraitImplDeclV2 | value_object | modify | — | 🟡 | 🔵 |
+| TraitImplDeclV2 | value_object | modify | — | 🔵 | 🔵 |
+| TypeEntry | value_object | modify | — | 🔵 | 🔵 |
 | WherePredicateDecl | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| GenericArgsError | error_type | delete | Empty, StartsWithAngleBracket, UnbalancedAngleBrackets | 🔵 | 🔵 |
 | NewTypeGraphCodecError | error_type | reference | InvalidTypeRef, AmbiguousTypeName | 🔵 | 🔵 |
 
 ## Aggregate Roots

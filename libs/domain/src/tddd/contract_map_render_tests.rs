@@ -52,7 +52,6 @@ fn doc_with_type(crate_name: &str, type_name: &str) -> CatalogueDocument {
             typestate: None,
         },
         methods: vec![],
-        trait_impls: vec![],
         module_path: ModulePath::root(),
         docs: None,
         spec_refs: vec![],

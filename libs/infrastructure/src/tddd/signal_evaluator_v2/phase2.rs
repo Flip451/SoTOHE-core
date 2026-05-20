@@ -26,9 +26,15 @@ pub(super) fn phase2_evaluate(s: &ExtendedCrate, d: &Crate, c: &Crate) -> ThreeW
     // domain contract (item_name = short name for types/traits; FunctionPath for functions).
     let s_types = build_type_trait_identity_map(s_krate);
     let s_fns = build_function_identity_map(s_krate);
+
     // S inherits B-seeded impl blocks whose trait paths are in rustdoc format
     // (`my_crate::MyTrait`). Pass `crate_name` so those are normalized to short
     // names that match C-side keys.
+    //
+    // The former `priority_ids` (s_a_side_ids) band-aid has been removed (T015 /
+    // ADR `2026-05-20-0048` D4): action-driven insertion in Phase 1 (builder.rs)
+    // now places each TraitImplDeclV2 into S according to its own declared action,
+    // so B-side impls cannot shadow A-side impls for the same identity key.
     let s_impls = build_impl_identity_map(s_krate, crate_name);
     let d_types = build_type_trait_identity_map(d);
     let d_fns = build_function_identity_map(d);

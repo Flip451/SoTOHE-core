@@ -13,9 +13,6 @@
         "typestate": null
       },
       "methods": [],
-      "trait_impls": [
-        { "trait_name": "ReviewCheckApprovedService", "origin_crate": "usecase" }
-      ],
       "module_path": "review_v2::check_approved",
       "docs": "Concrete struct implementing ReviewCheckApprovedService. All fields are private (has_stripped_fields). action:modify with methods:[] so A's empty method list enters S; the evaluator skips method comparison when A.methods is empty, avoiding the asymmetric strip_outlives false-positive that fires for action:reference (B's item seeds S with 'static bounds while C_stripped lacks them). Not modified in this track — action:modify is a workaround for evaluator asymmetry (see Open Questions).",
       "spec_refs": [],
@@ -36,9 +33,6 @@
         "typestate": null
       },
       "methods": [],
-      "trait_impls": [
-        { "trait_name": "TaskOperationService", "origin_crate": "usecase" }
-      ],
       "module_path": "task_ops",
       "docs": "Concrete generic struct implementing TaskOperationService. Generic over S satisfying TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync. All fields are private (has_stripped_fields). action:modify with methods:[] so A's empty method list enters S; the evaluator skips method comparison when A.methods is empty, avoiding the asymmetric strip_outlives false-positive (same as ReviewCheckApprovedInteractor). Not modified in this track — action:modify is a workaround for evaluator asymmetry (see Open Questions).",
       "spec_refs": [],
@@ -135,5 +129,9 @@
       "informal_grounds": []
     }
   },
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "ReviewCheckApprovedService", "for_type": "ReviewCheckApprovedInteractor" },
+    { "action": "reference", "trait_ref": "TaskOperationService", "for_type": "TaskOperationInteractor" }
+  ]
 }

@@ -52,7 +52,6 @@ const CATALOGUE_EMPTY_METHODS: &str = r#"{
       "role": "ValueObject",
       "kind": {"kind": "plain_struct", "fields": [], "has_stripped_fields": false},
       "methods": [],
-      "trait_impls": [],
       "module_path": "",
       "spec_refs": [],
       "informal_grounds": []
@@ -77,7 +76,6 @@ const CATALOGUE_WITH_METHODS: &str = r#"{
       "methods": [
         {"name": "validate", "receiver": "&self", "params": [], "returns": "()", "is_async": false}
       ],
-      "trait_impls": [],
       "module_path": "",
       "spec_refs": [],
       "informal_grounds": []

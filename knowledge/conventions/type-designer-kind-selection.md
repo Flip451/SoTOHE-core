@@ -31,12 +31,12 @@
 
 > **v3 schema (schema_version=3) の対応**: v3 catalogue では `TypeDefinitionKind` 単一 enum が廃止され、**role 軸 × kind 軸** の 2 軸構造に変わった。type-designer は v3 format で `<layer>-types.json` を起草する。本マトリクスの「kind」列は v3 における **role フィールドの値** に対応する (`DataRole` / `ContractRole` / `FunctionRole` の variant 名)。type-designer は role と layer の組合せを本マトリクスで確認する。
 >
-> - v3 wire format: `schema_version: 3`, `crate_name`, `layer`, `types: {}` (TypeEntry), `traits: {}` (TraitEntry), `functions: {}` (FunctionEntry) のトップレベル構造
+> - v3 wire format: `schema_version: 3`, `crate_name`, `layer`, `types: {}` (TypeEntry), `traits: {}` (TraitEntry), `functions: {}` (FunctionEntry), `inherent_impls: []` / `trait_impls: []` の 2 つの top-level array のトップレベル構造。`trait_impls` は `action` / `trait_ref` / `for_type` を持つ独立 entry (`TraitImplDeclV2`); `inherent_impls` は `action` を持たず `type_name` / `impl_generics` / `impl_where_predicates` / `methods` を持つ (`InherentImplDeclV2`。action はなく target type への帰属で識別される)。JSON 上の top-level 配置は共通だが、`action` の有無・フィールド構造は異なる
 > - v3 roles: `types` エントリは `role: DataRole` (13 値: `ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `Specification` / `Factory` / `UseCase` / `Interactor` / `Command` / `Query` / `Dto` / `ErrorType` / `SecondaryAdapter`)、`traits` エントリは `role: ContractRole` (3 値: `SpecificationPort` / `ApplicationService` / `SecondaryPort`)、`functions` エントリは `role: FunctionRole` (2 値: `FreeFunction` / `UseCaseFunction`)
 > - v3 kind (構造軸): `types` は `kind: { "kind": "struct" | "enum" | "type_alias", ... }` で記述する
 > - 旧 v2 の `type_definitions` / `TypeDefinitionKind` は廃止済み (ADR `knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md`)
 >
-> 本マトリクスは **層配置** の制約のみを規定する。各 role / entry に必要な具体的フィールド (`kind`, `methods`, `trait_impls` 等) の定義は `libs/domain/src/tddd/catalogue_v2/entries.rs` の `TypeEntry` / `TraitEntry` / `FunctionEntry` を正本とする。
+> 本マトリクスは **層配置** の制約のみを規定する。各 role / entry に必要な具体的フィールド (`kind`, `methods` 等) および top-level の `trait_impls` / `inherent_impls` (impl block を独立 entry として持つ array) の定義は `libs/domain/src/tddd/catalogue_v2/` の `TypeEntry` / `TraitEntry` / `FunctionEntry` / `TraitImplDeclV2` / `InherentImplDeclV2` / `CatalogueDocument` を正本とする。
 
 | role (v3) | domain | usecase | infrastructure | 配置根拠 |
 |---|---|---|---|---|
@@ -63,7 +63,7 @@
 
 `✗` または **ONLY** を破る role × layer 選択は、`bin/sotp track type-signals` の signal 評価以前に **role 違反** として draft 段階で却下する。
 
-R7 (Cross-Track Port Reference) も参照すること: `SecondaryAdapter` の trait_impls が参照する port が当該 track の catalogue に未 declare の場合、`-.impl.->` edge が silently skip される。
+R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` のうち `for_type` が `SecondaryAdapter` 型を指す entry の `trait_ref` が参照する port が当該 track の catalogue に未 declare の場合、`-.impl.->` edge が silently skip される。
 
 ### R2. Free Function Preference (stateless behavior は FreeFunction)
 
@@ -153,13 +153,13 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 
 ### R7. Cross-Track Port Reference (SecondaryAdapter が参照する port は当該 track catalogue に declare する)
 
-`role: SecondaryAdapter` の `trait_impls[]` で参照する trait は、当該 track の `<layer>-types.json` のいずれかに `role: SecondaryPort` の `traits` エントリとして存在することが必須である。
+top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照する trait (port) は、当該 track の `<layer>-types.json` のいずれかに `role: SecondaryPort` の `traits` エントリとして存在することが必須である。
 
 当該 track で改変しない baseline 由来の port は `action: "reference"` で declare する。declare 漏れは contract-map renderer の `port_index` lookup が unmatched となり、`SecondaryAdapter -.impl.-> port` edge が silently skip される。
 
 #### declare 義務
 
-- `role: SecondaryAdapter` の `trait_impls[]` に `trait_name` を書いた以上、対応する `role: SecondaryPort` entry を当該 track の catalogue に作成する責任は type-designer に帰属する
+- top-level `trait_impls[]` に `for_type: <SecondaryAdapter 型>` + `trait_ref: <port>` の entry を書いた以上、対応する `role: SecondaryPort` entry を当該 track の catalogue に作成する責任は type-designer に帰属する
 - 当該 track で変更しない baseline 由来の port は `action: "reference"` で declare し catalogue への exposure を確保する
 
 #### `action: "reference"` の semantics
@@ -234,7 +234,7 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 - [ ] field + behavior を持つ domain struct が `role: DomainService` (R6) で起草されているか (`role: ValueObject` / `role: Interactor` への誤分類がないか)
 - [ ] role 起草前に偵察 (R4) を実施したか (近接 track の role 分布を確認したか)
 - [ ] catch-all として `role: ValueObject` / `role: UseCase` を選んでいないか (R5)
-- [ ] `role: SecondaryAdapter` の `trait_impls[]` で参照するすべての trait が当該 track の catalogue に `role: SecondaryPort` の `traits` エントリとして declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
+- [ ] top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照するすべての trait (port) が当該 track の catalogue に `role: SecondaryPort` の `traits` エントリとして declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
 - [ ] `methods[].returns` / `methods[].params[].ty` (TypeEntry / TraitEntry) および FunctionEntry の `returns` / `params[].ty` に bare wrapper 名のみの宣言 (`Result` / `Option` / `Vec` / `Box` / `Arc` / `Rc` / `Cow` / `BTreeMap` / `HashMap` / `HashSet` / `BTreeSet`) がないか (R8)
 - [ ] R1〜R8 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
 

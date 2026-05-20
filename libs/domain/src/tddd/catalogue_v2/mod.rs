@@ -57,7 +57,7 @@ pub use methods::{
 
 pub use roles::{ContractRole, DataRole, FunctionRole, ItemAction, SelfReceiver};
 
-pub use traits::{GenericArgsError, TraitImplDeclV2};
+pub use traits::TraitImplDeclV2;
 
 pub use variants::{FieldDecl, VariantDecl, VariantPayload};
 

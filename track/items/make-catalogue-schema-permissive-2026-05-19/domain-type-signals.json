@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-19T18:44:14Z",
-  "declaration_hash": "a1c24fd0311c40a5afc31f633a7ff65d70e423ff791757be818cf7d36b2b6888",
+  "generated_at": "2026-05-20T12:38:32Z",
+  "declaration_hash": "10197bd5fa61a51cf3f437703acfa73ac486d8b91bc7ee30955f6105619fb36f",
   "signals": [
     {
       "type_name": "BoundOp",
@@ -21,13 +21,7 @@
       "type_name": "CatalogueDocument",
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
-      ]
+      "found_type": true
     },
     {
       "type_name": "InherentImplDeclV2",
@@ -45,38 +39,31 @@
       "type_name": "TraitEntry",
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
-      ]
+      "found_type": true
     },
     {
       "type_name": "TraitImplDeclV2",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": true,
-      "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug",
-        "core::fmt::Display"
-      ]
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "WherePredicateDecl",
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
-      ]
+      "found_type": true
+    },
+    {
+      "type_name": "GenericArgsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "NewTypeGraphCodecError",

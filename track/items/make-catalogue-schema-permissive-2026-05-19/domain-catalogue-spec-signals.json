@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a1c24fd0311c40a5afc31f633a7ff65d70e423ff791757be818cf7d36b2b6888",
+  "catalogue_declaration_hash": "10197bd5fa61a51cf3f437703acfa73ac486d8b91bc7ee30955f6105619fb36f",
   "signals": [
     {
       "type_name": "BoundOp",
@@ -8,6 +8,10 @@
     },
     {
       "type_name": "CatalogueDocument",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GenericArgsError",
       "signal": "blue"
     },
     {
@@ -24,6 +28,10 @@
     },
     {
       "type_name": "TraitImplDeclV2",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeEntry",
       "signal": "blue"
     },
     {

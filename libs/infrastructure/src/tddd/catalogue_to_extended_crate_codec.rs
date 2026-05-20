@@ -35,7 +35,7 @@ use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
     BoundOp, CatalogueDocument, CrateName, FunctionPath, MethodDeclaration, MethodGenericParam,
-    ModulePath, SelfReceiver, TraitImplDeclV2, TraitName, TypeKindV2, TypeName, WherePredicateDecl,
+    ModulePath, SelfReceiver, TraitName, TypeKindV2, TypeName, WherePredicateDecl,
 };
 use domain::tddd::extended_crate::ExtendedCrate;
 use rustdoc_types::{
@@ -190,17 +190,53 @@ impl Encoder {
         Ok(())
     }
 
-    /// Pre-pass: register external crates from `TraitImplDeclV2::origin_crate`.
+    /// Pre-pass: register external crates from top-level `trait_impls` (ADR `2026-05-20-0048` D1/D2).
+    ///
+    /// Both `trait_ref` and `for_type` may contain crate-prefixed type references.
+    /// Extracts the first path segment (the crate name) from each string using
+    /// AST-aware extraction: the `::` is only searched in the prefix before the
+    /// first `<` so that generic arguments like `"Foo<serde::Serialize>"` do not
+    /// produce a spurious `"Foo<serde"` crate registration.
+    ///
+    /// Rust path-keyword segments (`crate`, `self`, `super`) and the self-crate name
+    /// are skipped — they are not real external crates.
     fn collect_external_from_trait_impls(&mut self) {
         let self_crate_name = self.doc.crate_name.as_str().to_string();
-        let origin_crates: Vec<String> = self
-            .doc
-            .types
-            .values()
-            .flat_map(|e| e.trait_impls.iter().map(|ti| ti.origin_crate.as_str().to_string()))
-            .filter(|cn| *cn != self_crate_name)
-            .collect();
-        for cn in origin_crates {
+        // Reserved Rust path keywords that must not be registered as external crates.
+        const PATH_KEYWORDS: &[&str] = &["crate", "self", "super"];
+
+        // Returns the crate-name prefix of `type_str` if it looks like an
+        // external-crate path (`first_seg::rest`), excluding Rust path keywords
+        // and the self-crate name.
+        let extract_crate = |type_str: &str| -> Option<String> {
+            // Truncate at the first `<` to avoid matching `::` inside generic args.
+            let angle_pos = type_str.find('<').unwrap_or(type_str.len());
+            let base = &type_str[..angle_pos];
+            let colon_pos = base.find("::")?;
+            let first_seg = base[..colon_pos].trim();
+            // Reject empty first segment (e.g. absolute paths starting with `::`)
+            // and Rust path keywords / self-crate names.
+            if first_seg.is_empty()
+                || first_seg == self_crate_name.as_str()
+                || PATH_KEYWORDS.contains(&first_seg)
+            {
+                return None;
+            }
+            Some(first_seg.to_string())
+        };
+
+        let mut crate_names: Vec<String> = Vec::new();
+        for ti in &self.doc.trait_impls {
+            // Extract crate prefix from trait_ref (e.g. "core" from "core::convert::From<X>").
+            if let Some(cn) = extract_crate(ti.trait_ref.as_str()) {
+                crate_names.push(cn);
+            }
+            // Extract crate prefix from for_type (e.g. "std" from "std::vec::Vec<i32>").
+            if let Some(cn) = extract_crate(ti.for_type.as_str()) {
+                crate_names.push(cn);
+            }
+        }
+        for cn in crate_names {
             self.state.ensure_external_crate(cn);
         }
     }
@@ -288,6 +324,86 @@ impl Encoder {
             let action = entry.action;
             state.encode_function(fn_id, fn_path, entry)?;
             item_actions.insert(fn_id, action);
+        }
+
+        // Encode top-level `trait_impls` (ADR `2026-05-20-0048` D1 / D2 / D4).
+        //
+        // `CatalogueDocument::trait_impls` is a Vec of `TraitImplDeclV2` entries, each
+        // representing one `impl Trait for Type` block as a STANDALONE catalogue-level
+        // independent entry — symmetric with `CatalogueDocument::inherent_impls` (D2).
+        //
+        // Per ADR D1, impl blocks are peers of TypeEntry/TraitEntry with NO "parent type"
+        // relationship. Self-crate types and external-crate types are handled symmetrically:
+        //
+        // - `trait_ref`: parsed via syn; self-crate traits resolved via `local_name_to_id`,
+        //   external traits via `ext_name_to_id` / `ensure_external_type_id`.
+        //
+        // - `for_type`: parsed via `parse_type_ref_str` (which includes Pass 3
+        //   `resolve_external_type_ids` internally). Per ADR `2026-05-20-0048` D2, a
+        //   self-crate type's `for_type` is its bare short name (e.g. `"SelfType"`),
+        //   so `parse_type_ref` resolves it via `resolve_local` to the pre-assigned
+        //   local id. An external type uses a fully-qualified crate-prefixed path
+        //   (e.g. `"std::vec::Vec<i32>"`), resolved to a synthetic external item id.
+        //
+        // IMPORTANT (ADR D4): The resulting `Impl` items are NOT attached to any type's
+        // `Struct.impls` / `Enum.impls` list. Each `Impl` item is a STANDALONE entry in
+        // the index with its own `item_actions` entry. The unified A-side impl insertion
+        // loop in Phase 1 (builder.rs) inserts these impls into S directly via their own
+        // action, with no parent-type traversal needed.
+        for ti in &doc.trait_impls {
+            let impl_id = state.alloc_id();
+            // Read action from the TraitImplDeclV2 entry (CN-04: ItemAction::Add must NOT be
+            // hardcoded — the codec must use entry.action to mirror TypeEntry/TraitEntry handling).
+            let action = ti.action;
+
+            // Build the rustdoc `Type` for the impl's `for_` field.
+            //
+            // `parse_type_ref_str` handles both cases under ADR D2:
+            // - Bare self-crate name (e.g. `"SelfType"`) → single segment → `resolve_local`
+            //   → pre-assigned local id, path `"SelfType"`.
+            // - Fully-qualified external path (e.g. `"std::vec::Vec<i32>"`) → multi-segment
+            //   with non-keyword first segment → external, synthetic id via Pass 3
+            //   `resolve_external_type_ids`.
+            // The redundant manual workaround (normalize_local_short_name / is_possibly_local_path
+            // / match override) is removed: parse_type_ref_str alone produces the correct Type.
+            //
+            // After parsing, normalize the `for_` path to the last segment (short name) so
+            // that A-origin `for_path_raw` (the secondary tiebreaker in `build_impl_identity_map`)
+            // matches the form rustdoc emits for `impl.for_` (e.g. `"Vec"` not
+            // `"std::vec::Vec"`).  This normalization applies ONLY to the `for_` type —
+            // NOT to the trait path (which needs its fully-qualified form for identity-key
+            // disambiguation in `build_impl_identity_map`).
+            let for_type_resolved =
+                normalize_impl_for_type_path(state.parse_type_ref_str(ti.for_type.as_str())?);
+
+            // Resolve trait_ref: parse and resolve via parse_type_ref_str so that
+            // nested type references in generic args are fully resolved.
+            let trait_path = state.resolve_trait_ref_for_top_level(ti.trait_ref.as_str())?;
+
+            // Encode impl-block-level generics.
+            let impl_generic_names: Vec<&str> =
+                ti.impl_generics.iter().map(|g| g.name.as_str()).collect();
+            let impl_generics = state.build_where_form_generics(
+                &ti.impl_generics,
+                &ti.impl_where_predicates,
+                &impl_generic_names,
+            )?;
+            let impl_inner = Impl {
+                is_unsafe: false,
+                generics: impl_generics,
+                provided_trait_methods: vec![],
+                trait_: Some(trait_path),
+                for_: for_type_resolved,
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            };
+            // Insert as a STANDALONE index entry. Per ADR D1/D4, the impl is NOT attached
+            // to any type's `Struct.impls` / `Enum.impls` — it is a top-level independent
+            // entry discovered by the unified A-side impl insertion loop in Phase 1.
+            state.index.insert(impl_id, make_item(impl_id, None, None, ItemEnum::Impl(impl_inner)));
+            item_actions.insert(impl_id, action);
         }
 
         // Encode `inherent_impls` (IN-05 / IN-08, ADR `2026-05-18-1223` D2).
@@ -945,23 +1061,14 @@ impl EncoderState {
                         .to_owned(),
                 });
             }
-            // Reject qualified-path LHS forms (`<T as Trait>::Item`) before they
-            // reach `parse_type_ref_str`. `parse_type_ref_str` cannot reconstruct
-            // the `Type::QualifiedPath` shape that rustdoc emits for such predicates
-            // and degrades them to an unresolved placeholder, producing a silent
-            // structural mismatch in the signal evaluator (ADR D3 fail-closed).
-            // Note: `use<...>` (precise-capture) bounds in the RHS position are
-            // accepted by ADR `2026-05-18-1223` D1 — `parse_generic_bound` encodes
-            // them as a best-effort `GenericBound::TraitBound` placeholder.
-            if lhs_str.trim().starts_with('<') {
-                return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                    type_ref: lhs_str.to_owned(),
-                    reason: "qualified-path where-predicate LHS (`<T as Trait>::Assoc`) is not \
-                             yet supported in catalogue where-predicates — use simple \
-                             associated-type projection (`T::Assoc`) instead"
-                        .to_owned(),
-                });
-            }
+            // Permissive principle (ADR `2026-05-20-0048`): accept any syn-parseable LHS,
+            // including qualified-path forms such as `<T as Trait>::Assoc`.  The type-ref
+            // parser cannot reconstruct the exact `Type::QualifiedPath` shape that rustdoc
+            // emits for such predicates (it falls back to an unresolved placeholder), but
+            // this is acceptable under the permissive principle — syntactic validity is the
+            // acceptance gate, not shape faithfulness.  The decoder accepts these forms via
+            // `validate_type_ref_str` (syn::Type), so the encoder must also accept them to
+            // preserve round-trip symmetry.
             let lhs_type =
                 if !generic_names.is_empty() && is_bare_generic_name(lhs_str, generic_names) {
                     // Simple bare generic: `T` → `Type::Generic("T")`
@@ -1009,24 +1116,11 @@ impl EncoderState {
                             ),
                         });
                     }
-                    // Mirror the JSON decoder's Equal-LHS invariant: the LHS must be an
-                    // associated-type projection (e.g. `T::Assoc`).  A bare type parameter
-                    // such as `"T"` would produce `WherePredicate::EqPredicate` for
-                    // `where T = U`, which is not valid Rust.  Catching this here prevents
-                    // domain values constructed outside the JSON codec path from generating
-                    // nonsensical `ExtendedCrate` representations.
-                    if !lhs_str.contains("::") {
-                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                            type_ref: lhs_str.to_owned(),
-                            reason: format!(
-                                "Equal where-predicate lhs '{}' is not a supported projection \
-                                 form; expected a path with at least one '::' segment \
-                                 (e.g. `T::Assoc`) — bare type parameters cannot appear as \
-                                 the LHS of a `where T = U` equality constraint",
-                                lhs_str
-                            ),
-                        });
-                    }
+                    // Permissive principle (ADR `2026-05-18-1223` / `2026-05-20-0048`):
+                    // accept any syn-parseable LHS for Equal predicates, including bare
+                    // type parameters (`T = U`).  The `lhs_type` has already been computed
+                    // via `parse_type_ref_str` / `is_bare_generic_name` above; no additional
+                    // shape validation is applied here.
                     // Safe: len == 1 asserted above.
                     let rhs_entry = w.rhs.first().ok_or_else(|| {
                         CatalogueToExtendedCrateCodecError::InvalidTypeRef {
@@ -1036,18 +1130,10 @@ impl EncoderState {
                         }
                     })?;
                     let rhs_str = rhs_entry.as_str();
-                    // Reject qualified-path RHS forms (`<T as Trait>::Assoc`).
-                    // `parse_type_ref_str` cannot reconstruct the correct `Type::QualifiedPath`
-                    // shape and silently produces an unresolved placeholder, breaking round-trip.
-                    if rhs_str.trim().starts_with('<') {
-                        return Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                            type_ref: rhs_str.to_owned(),
-                            reason: "qualified-path Equal predicate RHS \
-                                     (`<T as Trait>::Assoc`) is not supported — \
-                                     use a simple type expression instead"
-                                .to_owned(),
-                        });
-                    }
+                    // Permissive principle (ADR `2026-05-20-0048`): accept any syn-parseable
+                    // RHS, including qualified-path forms like `<T as Trait>::Assoc`.  The
+                    // parser falls back to an unresolved placeholder for forms it cannot encode
+                    // exactly, which is acceptable — syntactic validity is the gate.
                     let rhs_type = if !generic_names.is_empty()
                         && is_bare_generic_name(rhs_str, generic_names)
                     {
@@ -1143,14 +1229,6 @@ impl EncoderState {
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
         );
 
-        // Trait impl blocks.
-        let trait_impls: Vec<TraitImplDeclV2> = entry.trait_impls.clone();
-        let trait_impl_ids =
-            self.encode_trait_impl_blocks(type_id, type_name.as_str(), &trait_impls)?;
-
-        let mut all_impl_ids = vec![impl_id];
-        all_impl_ids.extend(trait_impl_ids);
-
         let struct_item = make_item(
             type_id,
             Some(type_name.as_str().to_string()),
@@ -1158,7 +1236,7 @@ impl EncoderState {
             ItemEnum::Struct(Struct {
                 kind: StructKind::Unit,
                 generics: empty_generics(),
-                impls: all_impl_ids,
+                impls: vec![impl_id],
             }),
         );
         self.index.insert(type_id, struct_item);
@@ -1217,13 +1295,6 @@ impl EncoderState {
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
         );
 
-        let trait_impls: Vec<TraitImplDeclV2> = entry.trait_impls.clone();
-        let trait_impl_ids =
-            self.encode_trait_impl_blocks(type_id, type_name.as_str(), &trait_impls)?;
-
-        let mut all_impl_ids = vec![impl_id];
-        all_impl_ids.extend(trait_impl_ids);
-
         let struct_item = make_item(
             type_id,
             Some(type_name.as_str().to_string()),
@@ -1231,7 +1302,7 @@ impl EncoderState {
             ItemEnum::Struct(Struct {
                 kind: struct_kind,
                 generics: empty_generics(),
-                impls: all_impl_ids,
+                impls: vec![impl_id],
             }),
         );
         self.index.insert(type_id, struct_item);
@@ -1286,13 +1357,6 @@ impl EncoderState {
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
         );
 
-        let trait_impls: Vec<TraitImplDeclV2> = entry.trait_impls.clone();
-        let trait_impl_ids =
-            self.encode_trait_impl_blocks(type_id, type_name.as_str(), &trait_impls)?;
-
-        let mut all_impl_ids = vec![impl_id];
-        all_impl_ids.extend(trait_impl_ids);
-
         let struct_item = make_item(
             type_id,
             Some(type_name.as_str().to_string()),
@@ -1300,7 +1364,7 @@ impl EncoderState {
             ItemEnum::Struct(Struct {
                 kind: struct_kind,
                 generics: empty_generics(),
-                impls: all_impl_ids,
+                impls: vec![impl_id],
             }),
         );
         self.index.insert(type_id, struct_item);
@@ -1351,15 +1415,6 @@ impl EncoderState {
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
         );
 
-        // Trait impl blocks.
-        let trait_impls: Vec<TraitImplDeclV2> = entry.trait_impls.clone();
-        let trait_impl_ids =
-            self.encode_trait_impl_blocks(type_id, type_name.as_str(), &trait_impls)?;
-
-        // Build the full impls list: inherent impl first, then trait impls.
-        let mut all_impl_ids = vec![impl_id];
-        all_impl_ids.extend(trait_impl_ids);
-
         // Enum item.
         let enum_item = make_item(
             type_id,
@@ -1368,7 +1423,7 @@ impl EncoderState {
             ItemEnum::Enum(rustdoc_types::Enum {
                 generics: empty_generics(),
                 variants: variant_ids,
-                impls: all_impl_ids,
+                impls: vec![impl_id],
                 has_stripped_variants: false,
             }),
         );
@@ -1400,13 +1455,6 @@ impl EncoderState {
             impl_id,
             make_item(impl_id, None, None, ItemEnum::Impl(make_impl(for_type, None, method_ids))),
         );
-
-        // Trait impl blocks.
-        let trait_impls: Vec<TraitImplDeclV2> = entry.trait_impls.clone();
-        // `TypeAlias` has no `impls` field in rustdoc_types; trait impl items are
-        // recorded in the index but cannot be referenced from the alias item directly.
-        let _trait_impl_ids =
-            self.encode_trait_impl_blocks(type_id, type_name.as_str(), &trait_impls)?;
 
         let alias_item = make_item(
             type_id,
@@ -1767,178 +1815,89 @@ impl EncoderState {
         Ok(ids)
     }
 
-    /// Encodes `TraitImplDeclV2` entries as identity-only `Impl` items.
+    /// Resolves a `trait_ref` TypeRef string to a rustdoc `Path` for use in the
+    /// top-level `trait_impls` encoding loop (ADR `2026-05-20-0048` D2/D4).
     ///
-    /// Returns the list of allocated `Impl` item ids so callers can attach them
-    /// to the owning type's `impls` field (ADR 2 D12).
-    fn encode_trait_impl_blocks(
+    /// The `trait_ref` is the full TypeRef string from `TraitImplDeclV2.trait_ref`,
+    /// e.g. `"core::convert::From<MyError>"`, `"serde::Serialize"`, `"MyLocalTrait"`,
+    /// or `"my_crate::MyLocalTrait"` (self-crate prefix form).
+    ///
+    /// Strategy:
+    ///
+    /// 1. If `trait_ref_str` starts with `"{crate_name}::"`, strip the self-crate prefix
+    ///    so that the trait resolves as a local catalogue entry (crate_id = 0) rather than
+    ///    being spuriously registered as an external crate.  The last segment of the base
+    ///    path is used as the normalized short name (e.g. `"my_crate::module::MyTrait"` →
+    ///    `"MyTrait"`); generic args (if any) are re-appended verbatim.
+    /// 2. Pass the (possibly normalized) string to `parse_type_ref_str` to validate and
+    ///    resolve it, registering any newly-discovered external crates in generic args.
+    /// 3. Return the parsed `Path` verbatim: `Path.path` is the canonical base path and
+    ///    `Path.args` carries the structured generic args (ADR `2026-05-20-0048` D2).
+    ///
+    /// # Errors
+    ///
+    /// Returns `InvalidTypeRef` if `trait_ref_str` cannot be parsed as a valid type-ref
+    /// path (caught by `parse_type_ref_str` / syn), or if the result is not a
+    /// `ResolvedPath` (e.g. a primitive or reference type).
+    fn resolve_trait_ref_for_top_level(
         &mut self,
-        type_id: Id,
-        type_name: &str,
-        trait_impls: &[TraitImplDeclV2],
-    ) -> Result<Vec<Id>, CatalogueToExtendedCrateCodecError> {
-        let mut impl_ids = vec![];
-        for ti in trait_impls {
-            let impl_id = self.alloc_id();
-            let for_type = resolved_path_type(type_id, type_name);
-
-            // `Path.id` is an item id, not a crate id.
-            // * Local traits: use the pre-assigned item id from the pre-pass.
-            //   Only use the local id when `origin_crate` matches this crate; a
-            //   coincidental name match (e.g. a local `Display` vs `std::fmt::Display`)
-            //   must not hijack the external trait's path entry.
-            // * External traits: allocate a fresh item id and register a `paths` entry
-            //   so downstream consumers (e.g. `schema_export`) can recover the trait's
-            //   origin crate via `krate.paths[trait_id].crate_id`.
-            let is_local_trait = ti.origin_crate.as_str() == self.crate_name.as_str();
-            let trait_id = if is_local_trait {
-                // Local trait: must have been indexed in the pre-pass. Missing entry is an
-                // internal error (the catalogue declares an impl before the trait's own entry).
-                self.local_name_to_id.get(ti.trait_name.as_str()).copied().ok_or_else(|| {
-                    CatalogueToExtendedCrateCodecError::InvalidTypeRef {
-                        type_ref: ti.trait_name.as_str().to_string(),
-                        reason: "trait declared as local but not found in pre-pass index"
-                            .to_string(),
-                    }
-                })?
+        trait_ref_str: &str,
+    ) -> Result<Path, CatalogueToExtendedCrateCodecError> {
+        // Normalize self-crate-prefixed trait refs to their short name before parsing,
+        // so that `my_crate::MyTrait` resolves as a local catalogue entry (crate_id = 0)
+        // rather than being spuriously registered as an external crate reference.
+        //
+        // Without this step, `parse_type_ref_str("my_crate::MyTrait")` sees a
+        // multi-segment path whose first segment is not a Rust path keyword (`crate` /
+        // `self` / `super`), so it calls `emit_external_crate("my_crate")` and eventually
+        // produces a `Path.id` that ends up in `krate.paths` with `crate_id != 0`.
+        // `build_impl_identity_map` then treats it as an external trait and keeps the full
+        // `"my_crate::MyTrait"` in the identity key, while the C-side rustdoc entry has
+        // `crate_id == 0` (local trait) and emits the bare short name `"MyTrait"`.  The
+        // resulting key mismatch causes Reference / Modify / Delete entries to miss their
+        // B-side counterpart and Add entries to collide with existing B-side impls.
+        //
+        // Algorithm:
+        //   1. If `trait_ref_str` starts with `"{crate_name}::"`, strip that prefix.
+        //   2. Separate base path from generic args (first `<`).
+        //   3. Take the last `::` segment of the remaining base (handles sub-module paths
+        //      like `my_crate::module::MyTrait` → `MyTrait`).
+        //   4. Rejoin with the generic-arg suffix.
+        //
+        // The resulting normalized string (e.g. `"MyTrait"` or `"MyTrait<Foo>"`) is then
+        // resolved via `parse_type_ref_str` → `resolve_local("MyTrait")` → local id.
+        //
+        // For non-self-crate trait refs (external crates or bare names already without
+        // a crate prefix), `trait_ref_str` is passed through unchanged.
+        //
+        // The parsed `Path` is returned verbatim: `path` is the canonical base path and
+        // `args` carries the structured generic args (ADR `2026-05-20-0048` D2).
+        let crate_prefix = format!("{}::", self.crate_name.as_str());
+        let normalized_owned: Option<String> =
+            if let Some(after_prefix) = trait_ref_str.strip_prefix(crate_prefix.as_str()) {
+                // Separate base path from generic args to avoid splitting on `::` inside `<>`.
+                let angle_pos = after_prefix.find('<').unwrap_or(after_prefix.len());
+                let base = &after_prefix[..angle_pos];
+                let args = &after_prefix[angle_pos..];
+                // Last segment of the base (strips sub-module path if present).
+                let last_seg = base.rsplit("::").next().unwrap_or(base);
+                Some(format!("{last_seg}{args}"))
             } else {
-                let cn = ti.origin_crate.as_str().to_string();
-                let ext_crate_id = self.ensure_external_crate(cn.clone());
-
-                // Allocate a synthetic item id for this external trait so it has a
-                // unique `paths` entry (multiple external traits must not share one id).
-                let synthetic_trait_id = self.alloc_id();
-
-                // Build the canonical path segments for this external trait.
-                // These segments are used by downstream consumers (e.g. `schema_export`)
-                // to recover the trait's origin crate via `krate.paths[trait_id].crate_id`.
-                // They are NOT used for impl-identity key matching (which goes through
-                // `trait_path_str` + `normalize_impl_trait_path`).
-                // For std/core traits, use the known full module path (e.g.
-                // `std::fmt::Display`, `core::convert::From`) for accurate path metadata.
-                // For other crates, fall back to `[crate_name, trait_name]`.
-                let trait_path_segments: Vec<String> = if cn == "std" {
-                    let canonical =
-                        crate::tddd::type_ref_parser::std_canonical_path(ti.trait_name.as_str());
-                    canonical.split("::").map(str::to_string).collect()
-                } else if cn == "core" {
-                    let canonical =
-                        crate::tddd::type_ref_parser::core_canonical_path(ti.trait_name.as_str());
-                    canonical.split("::").map(str::to_string).collect()
-                } else {
-                    vec![cn, ti.trait_name.as_str().to_string()]
-                };
-                self.paths.insert(
-                    synthetic_trait_id,
-                    ItemSummary {
-                        crate_id: ext_crate_id,
-                        path: trait_path_segments.clone(),
-                        kind: ItemKind::Trait,
-                    },
-                );
-                synthetic_trait_id
+                None
             };
+        let normalized_str: &str = normalized_owned.as_deref().unwrap_or(trait_ref_str);
 
-            // Build the trait path using the canonical full path string for external traits,
-            // or the short name for local traits (which are looked up by id in the index).
-            //
-            // `normalize_impl_trait_path` (used by `build_impl_identity_map` on S, D, and C)
-            // keeps external-crate paths verbatim and strips local-crate prefixes to the
-            // short name.  S-side paths must therefore match the C-side rustdoc format:
-            //
-            // * std traits: `std_canonical_path` returns the full module path
-            //   (e.g. `std::fmt::Display`), which rustdoc also uses verbatim.
-            // * Non-std external traits (e.g. `serde`, `core`, `futures`): rustdoc emits
-            //   the full path `"{crate_name}::{trait_name}"` (e.g. `serde::Serialize`).
-            //   Using only the bare short name here would produce an unresolved local-path
-            //   key (e.g. `"Serialize"`) that `normalize_impl_trait_path` cannot distinguish
-            //   from a local trait, causing an identity-key mismatch and missed evaluation.
-            // * Local traits: use the bare short name (no `::` prefix) so that
-            //   `normalize_impl_trait_path` correctly identifies it as a local-unresolved
-            //   path and strips it to the short name on both S and C sides.
-            //
-            // When `generic_args` is present (e.g. `"CatalogueLoaderError"` for a specific
-            // `#[from]` variant), append them in angle-bracket notation so the generated
-            // identity key matches the C-side rustdoc key exactly (e.g. `From<CatalogueLoaderError>`).
-            let trait_path_str = {
-                let is_external = ti.origin_crate.as_str() != self.crate_name.as_str();
-                let base = if is_external {
-                    let cn = ti.origin_crate.as_str();
-                    if cn == "std" {
-                        crate::tddd::type_ref_parser::std_canonical_path(ti.trait_name.as_str())
-                    } else if cn == "core" {
-                        // `core` traits: emit the fully-qualified canonical path
-                        // (e.g. `"core::convert::From"`, `"core::fmt::Display"`).
-                        //
-                        // `build_impl_identity_map` uses `krate.paths` to resolve C-side
-                        // impl trait paths to their canonical qualified form, so S-side and
-                        // C-side both produce `"core::convert::From"` as the identity key.
-                        // This correctly disambiguates `core::fmt::Display` from a
-                        // user-defined local `Display` trait (which would have `crate_id == 0`
-                        // in `krate.paths` and would be stripped to its short name).
-                        crate::tddd::type_ref_parser::core_canonical_path(ti.trait_name.as_str())
-                    } else if cn == "domain" || cn == "usecase" {
-                        // `domain`/`usecase` workspace traits: use the bare short name.
-                        //
-                        // Rustdoc may or may not include these cross-workspace traits in
-                        // `krate.paths`.  When the ID is absent from `krate.paths`, the C-side
-                        // `build_impl_identity_map` falls back to the bare `trait_path.path`
-                        // string, which rustdoc may emit as just `"CatalogueLoader"` (no crate
-                        // prefix).  Using the bare name on the S-side as well ensures both
-                        // sides produce the same identity key regardless of whether the C-side
-                        // rustdoc includes a `krate.paths` entry for the trait.
-                        //
-                        // `build_impl_identity_map` strips `domain::` / `usecase::` prefixes
-                        // to the short name when they appear in multi-segment `krate.paths`
-                        // entries, so the C-side path through `krate.paths` also produces the
-                        // bare short name.
-                        ti.trait_name.as_str().to_string()
-                    } else {
-                        // For all other external crates, build a two-segment path
-                        // `{crate_name}::{trait_name}` (e.g. `serde::Serialize`).
-                        // `build_impl_identity_map` uses `krate.paths.join("::")` which
-                        // produces `"serde::Serialize"` for a `serde` origin trait — matching
-                        // this two-segment form.
-                        format!("{cn}::{}", ti.trait_name.as_str())
-                    }
-                } else {
-                    ti.trait_name.as_str().to_string()
-                };
-                match ti.generic_args() {
-                    Some(args) => format!("{base}<{args}>"),
-                    None => base,
-                }
-            };
-            let trait_path = Path { path: trait_path_str, id: trait_id, args: None };
-
-            // Encode impl-block-level generics (IN-06, ADR `2026-05-18-1223` D2).
-            // `TraitImplDeclV2.impl_generics` holds type parameters on the impl block itself
-            // (e.g. `impl<L, R, W> Trait for Foo<L, R, W>`). The names are collected so that
-            // type references inside bounds resolve to `Type::Generic` correctly.
-            // Empty Vec (old catalogues / non-generic impls) produces `empty_generics()`.
-            let impl_generic_names: Vec<&str> =
-                ti.impl_generics.iter().map(|g| g.name.as_str()).collect();
-            let impl_generics = self.build_where_form_generics(
-                &ti.impl_generics,
-                &ti.impl_where_predicates,
-                &impl_generic_names,
-            )?;
-
-            let impl_inner = Impl {
-                is_unsafe: false,
-                generics: impl_generics,
-                provided_trait_methods: vec![],
-                trait_: Some(trait_path),
-                for_: for_type,
-                items: vec![],
-                is_synthetic: false,
-                is_negative: false,
-                blanket_impl: None,
-            };
-            self.index.insert(impl_id, make_item(impl_id, None, None, ItemEnum::Impl(impl_inner)));
-            impl_ids.push(impl_id);
+        let parsed_ty = self.parse_type_ref_str(normalized_str)?;
+        match parsed_ty {
+            Type::ResolvedPath(p) => Ok(p),
+            other => Err(CatalogueToExtendedCrateCodecError::InvalidTypeRef {
+                type_ref: trait_ref_str.to_string(),
+                reason: format!(
+                    "trait_ref must resolve to a path type, got {:?}",
+                    std::mem::discriminant(&other)
+                ),
+            }),
         }
-        Ok(impl_ids)
     }
 
     /// Encodes a `VariantPayload` into `rustdoc_types::VariantKind`.
@@ -2017,6 +1976,47 @@ fn make_item_with_crate_id(
         attrs: vec![],
         deprecation: None,
         inner,
+    }
+}
+
+/// Normalizes the `path` field of a `Type::ResolvedPath` inside an `impl.for_` type
+/// to its last path segment (short name).
+///
+/// Rustdoc emits the short name (e.g. `"Vec"`) in `impl.for_.path` for external types,
+/// not the fully-qualified form (e.g. `"std::vec::Vec"`).  The catalogue codec must emit
+/// the same short-name form so that the `for_path_raw` secondary sort key in
+/// `build_impl_identity_map` is consistent between A-origin (catalogue) and C-side
+/// (rustdoc) impls, preventing spurious Phase 2 structural-equality mismatches.
+///
+/// Applies only to `Type::ResolvedPath`; container types (Tuple, Slice, etc.) are
+/// recursed into so that generic args like `Vec<LocalError>` are also normalized.
+/// All other type variants are returned unchanged.
+///
+/// This normalization applies ONLY to the `for_` field of impl blocks.  The trait
+/// path (from `resolve_trait_ref_for_top_level`) must keep its fully-qualified form
+/// so `build_impl_identity_map` can disambiguate external traits by qualified name.
+fn normalize_impl_for_type_path(ty: Type) -> Type {
+    match ty {
+        Type::ResolvedPath(p) => {
+            let short_path = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
+            Type::ResolvedPath(Path { path: short_path, id: p.id, args: p.args })
+        }
+        Type::Tuple(elems) => {
+            Type::Tuple(elems.into_iter().map(normalize_impl_for_type_path).collect())
+        }
+        Type::Slice(inner) => Type::Slice(Box::new(normalize_impl_for_type_path(*inner))),
+        Type::Array { type_, len } => {
+            Type::Array { type_: Box::new(normalize_impl_for_type_path(*type_)), len }
+        }
+        Type::BorrowedRef { lifetime, is_mutable, type_ } => Type::BorrowedRef {
+            lifetime,
+            is_mutable,
+            type_: Box::new(normalize_impl_for_type_path(*type_)),
+        },
+        Type::RawPointer { is_mutable, type_ } => {
+            Type::RawPointer { is_mutable, type_: Box::new(normalize_impl_for_type_path(*type_)) }
+        }
+        other => other,
     }
 }
 

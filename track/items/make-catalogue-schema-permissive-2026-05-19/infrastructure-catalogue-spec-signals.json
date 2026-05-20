@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "417ba463b81b83e1651d4f37f4447de5322572c1ef3ab3e873fe639ae4d2e06b",
+  "catalogue_declaration_hash": "b9bfa999a7b659b1affda21bb0366ff0e794c9c5b8ce7c659ff0bdcadff2c17f",
   "signals": [
     {
       "type_name": "CatalogueToExtendedCrateCodec",

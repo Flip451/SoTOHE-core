@@ -7,10 +7,12 @@ flowchart LR
     subgraph domain [domain]
         %% type: BoundOp
         %% type: CatalogueDocument
+        %% type: GenericArgsError
         %% type: InherentImplDeclV2
         %% type: NewTypeGraphCodecError
         %% type: TraitEntry
         %% type: TraitImplDeclV2
+        %% type: TypeEntry
         %% type: WherePredicateDecl
     end
     subgraph usecase [usecase]

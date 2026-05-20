@@ -20,7 +20,19 @@
           "anchor": "D3"
         },
         {
-          "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
           "anchor": "D4"
         }
       ]
@@ -30,7 +42,7 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "WherePredicateDecl スキーマを lhs / rhs / operator の 3 フィールド構造 (single struct + BoundOp enum) に拡張する。lhs は HRTB バインダーを含む任意の Rust where 句の左辺、rhs は '+' 連結された複数の境界を格納する Vec<TypeRef>、operator は Bound (':') か Equal ('=') を示す BoundOp。WherePredicateDecl でカバーするのは Rust where 句として現れる制約 (ライフタイム境界 / HRTB on where 句 / where 句ライフタイム境界制約 / where 句等価制約 / トレイト境界以外の任意境界種類) である。HRTB on トレイト境界は where 句の lhs に HRTB バインダーを文字列として組み込む。精密捕捉 (use<'a, T>) は where 句でなく impl Trait 返却型の修飾子であり、WherePredicateDecl ではなく MethodGenericParam.bounds 文字列として保持し、IN-02 の codec 寛容化によって accept する",
+        "text": "WherePredicateDecl スキーマを lhs / rhs / operator の 3 フィールド構造 (single struct + BoundOp enum) に拡張する。lhs は HRTB バインダーを含む任意の Rust where 句の左辺、rhs は '+' 連結された複数の境界を格納する Vec<TypeRef>、operator は Bound (':') か Equal ('=') を示す BoundOp。WherePredicateDecl でカバーするのは Rust where 句として現れる制約 (ライフタイム境界 / HRTB on where 句 / where 句ライフタイム境界制約 / where 句等価制約 / トレイト境界以外の任意境界種類) である。HRTB on where 句の場合、HRTB バインダー (`for<'a>`) は lhs 文字列の先頭に組み込む (例: `lhs: \"for<'a> T::Item<'a>\"`、`lhs: \"for<'a, 'b: 'a> T\"`)。HRTB on トレイト境界 (ジェネリックパラメータ位置での `F: for<'a> Fn(&'a ())` 等) は where 句ではなくジェネリックパラメータ境界であり、MethodGenericParam.bounds の文字列要素 (例: `\"for<'a> Fn(&'a ())\"`）として保持する。精密捕捉 (use<'a, T>) は where 句でなく impl Trait 返却型の修飾子であり、WherePredicateDecl ではなく MethodGenericParam.bounds 文字列として保持し、IN-02 の codec 寛容化によって accept する",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
@@ -158,10 +170,40 @@
       },
       {
         "id": "IN-13",
-        "text": "信号評価器 C 側の build_impl_identity_map 内にある for_is_external filter (for_ 型の crate_id をチェックして外部型を指す impl を c_impls から除外する処理) を撤廃し、cross-crate impl も c_impls に含める。B 側 orphan impl 挿入処理 (phase1/builder.rs) は現状維持 (filter なしで全 impl を S に挿入する既存の挙動)。結果として両側に cross-crate impl が含まれる状態になり、fingerprint が対称に生成されて Blue が得られる。また、cross-crate impl を catalogue で declare できるようにするため、TraitImplDeclV2 に for_ フィールド (Option<String>、serde default None) を追加する (CN-01 の後方互換設計)。for_ には self-type の fully-qualified path (例: domain::tddd::new_typegraph_codec_error::NewTypeGraphCodecError) を記述し、A-codec は fully-qualified path を parse して外部クレートを判定し、external_crates および paths に登録する。for_ が None の場合は従来通り親 TypeEntry の型が for_ として使用される",
+        "text": "信号評価器 C 側の build_impl_identity_map 内にある for_is_external filter (for_ 型の crate_id をチェックして外部型を指す impl を c_impls から除外する処理) を撤廃し、cross-crate impl も c_impls に含める。B 側 orphan impl 挿入処理 (phase1/builder.rs) は現状維持 (filter なしで全 impl を S に挿入する既存の挙動)。結果として両側に cross-crate impl が含まれる状態になり、fingerprint が対称に生成されて Blue が得られる。この filter 撤廃は新 ADR 2026-05-20-0048-tddd-trait-impl-top-level-promotion.md D3 で TraitImplDeclV2 の top-level 化 (同 ADR D1) と一体の設計として位置づけられる",
         "adr_refs": [
           {
-            "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+            "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-14",
+        "text": "CatalogueDocument に top-level trait_impls: Vec<TraitImplDeclV2> フィールドを導入し、TypeEntry.trait_impls を廃止する。impl block を catalogue の独立 entry として inherent_impls (IN-05) と対称に扱う。catalogue ファイルは新 schema で記述する (旧 schema 互換経路は実装しない)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-15",
+        "text": "TraitImplDeclV2 を action: ItemAction + trait_ref: TypeRef + for_type: TypeRef の構造に再構築する。action フィールドは TraitImplDeclV2 が top-level 独立 entry となり親 TypeEntry を持たないため、TypeEntry / TraitEntry / FunctionEntry と同様に自身が action を宣言する (serde default は Add)。旧 trait_name / origin_crate / generic_args の 3 フィールドは廃止し trait_ref: TypeRef に統合する。trait_ref / for_type は ADR 2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md D5 / D11 の crate prefix 慣習に従い、自 crate type は短名、外部 crate type は crate prefix 付き fully-qualified path で記述する。A-codec は両 TypeRef を syn でパースし D5 自動 build で external_crates に登録する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-16",
+        "text": "A-codec と signal evaluator Phase 1 の両コンポーネントで CatalogueDocument.trait_impls の top-level loop に移行する。A-codec (T014) は trait_impl entries を top-level loop でエンコードし entry.action を TypeGraph A に保持する。signal evaluator Phase 1 (T015) は TypeGraph A の action を参照し、各 TraitImplDeclV2 を Add / Modify / Reference / Delete のセマンティクスで S に挿入する (TypeEntry 等と同一)。A 側 orphan-impl 検出処理 (TypeAlias など impls フィールドを持たない型の impl を別途拾う pass) は不要化する。A/B の id 空間衝突を回避する id 再割り当て機構 (旧 ADR 2026-05-18-1223-make-catalogue-schema-permissive.md D3 で確立) は維持する。A-codec が entry.action を参照せず ItemAction::Add を固定で使用することは禁止する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
             "anchor": "D4"
           }
         ]
@@ -190,7 +232,7 @@
       },
       {
         "id": "OS-03",
-        "text": "信号評価器の Phase 1 (S 構築 + D 構築) における action 別処理の意味論変更。D3 は id 管理の Pre-step 追加のみを変更対象とし、Add / Modify / Reference / Delete の各 action がどう id を扱うかは旧 ADR 2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md の決定通りとする",
+        "text": "TypeEntry / TraitEntry / FunctionEntry など既存の action 宣言 entry 種別の action 別処理の意味論変更。旧 ADR 2026-05-18-1223-make-catalogue-schema-permissive.md D3 は id 管理の Pre-step 追加のみを変更対象とし、これら既存 entry 種別の Add / Modify / Reference / Delete がどう id を扱うかは旧 ADR 2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md の決定通りとする。なお InherentImplDeclV2 は action フィールドを持たない (親 TypeEntry.action を継承) ため本 OS の対象外。TraitImplDeclV2 の action-driven 挿入 (新設) は IN-16 で in-scope として扱う",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
@@ -200,11 +242,11 @@
       },
       {
         "id": "OS-04",
-        "text": "catalogue スキーマの version 番号の bump。D1/D2/D3/D4 の変更はいずれも serde default での後方互換拡張とし、既存 catalogue ファイルは無修正でロードできる",
+        "text": "catalogue schema は新 schema 一本で運用する。旧 schema との互換維持および migration はスコープ外 (catalogue は新 schema で記述し直す)",
         "adr_refs": [
           {
-            "file": "knowledge/adr/2026-05-13-1153-tddd-where-form-generics-normalization.md",
-            "anchor": "D2"
+            "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+            "anchor": "D1"
           }
         ]
       }
@@ -213,7 +255,7 @@
   "constraints": [
     {
       "id": "CN-01",
-      "text": "本トラックで追加するすべての省略可能フィールド (Vec フィールド: impl_generics / impl_where_predicates / generics / where_predicates 等、および Option フィールド: TraitImplDeclV2.for_ 等) は serde default で空 Vec / None をデフォルト値とし、既存の catalogue ファイルが無修正でロードできる後方互換設計を維持する。type_name などの必須識別子フィールドは serde default の対象外とし、deserialize 時に常に存在が要求される",
+      "text": "本トラックで追加する省略可能 Vec フィールド (impl_generics / impl_where_predicates / generics / where_predicates / CatalogueDocument.trait_impls / inherent_impls 等) は serde default で空 Vec を初期値とする (空 Vec は legal な構造状態)。type_name などの必須識別子フィールドは serde default の対象外とし、deserialize 時に常に存在が要求される",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-13-1153-tddd-where-form-generics-normalization.md",
@@ -242,6 +284,16 @@
         {
           "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
           "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "A-codec は TraitImplDeclV2 を処理する際に ItemAction::Add を固定で使用してはならない。entry.action を参照して TypeEntry 等と同一のセマンティクスで TypeGraph A へのエンコードを行い、各エントリの S への挿入方式を確定させる (action-driven Phase-1 挿入の実行は signal evaluator が担う)。旧設計の「A-codec は常に Add として挿入」という暗黙の動作は D4 により明示的に廃止される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D4"
         }
       ]
     }
@@ -319,7 +371,7 @@
     },
     {
       "id": "AC-08",
-      "text": "既存の catalogue ファイル (impl_generics / impl_where_predicates / TraitEntry.generics / TraitImplDeclV2.for_ フィールドが存在しないもの) が無修正でロードでき、信号評価の結果が変化しない",
+      "text": "impl_generics / impl_where_predicates / TraitEntry.generics フィールドが省略された catalogue エントリで信号評価器が空 Vec として扱い、D1/D2/D3 の変更による signal 評価結果が想定通りである",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-13-1153-tddd-where-form-generics-normalization.md",
@@ -339,7 +391,7 @@
     },
     {
       "id": "AC-10",
-      "text": "patch_impl_for_ids 関数および patch_impl_trait_ids 関数が削除され、for_ の remap が rewrite_type_ref_ids_in_item + a_id_remap / b_id_remap の 1 経路に統一される。外部クレート型を対象とする impl (例: impl From<MyError> for OtherCrateError) の for_ が誤って自クレート親型 id に上書きされなくなる (remap 経路の安定化保証。for_is_external filter の撤廃は D4 / AC-12 が担う)",
+      "text": "patch_impl_for_ids 関数および patch_impl_trait_ids 関数が削除され、for_ の remap が rewrite_type_ref_ids_in_item + a_id_remap / b_id_remap の 1 経路に統一される。外部クレート型を対象とする impl (例: impl From<MyError> for OtherCrateError) の for_ が誤って自クレート親型 id に上書きされなくなる (remap 経路の安定化保証。for_is_external filter の撤廃は D3 / AC-12 が担う)",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
@@ -363,10 +415,48 @@
     },
     {
       "id": "AC-12",
-      "text": "build_impl_identity_map の for_is_external filter が撤廃され、cross-crate impl (例: impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError) が c_impls に含まれる。B 側 (s_impls) と C 側 (c_impls) の両側に cross-crate impl が対称に含まれることで fingerprint が一致し、SMinusC_Reference 扱いで false-positive Red になるパターンが解消される。cross-crate impl を catalogue に declare する場合、TraitImplDeclV2.for_ に fully-qualified path を記述することで A-codec が外部クレートを正しく判定し external_crates および paths に登録する",
+      "text": "build_impl_identity_map の for_is_external filter が撤廃され、cross-crate impl (例: impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError) が c_impls に含まれる。B 側 (s_impls) と C 側 (c_impls) の両側に cross-crate impl が対称に含まれることで fingerprint が一致し、SMinusC_Reference 扱いで false-positive Red になるパターンが解消される。Add action の新規 cross-crate impl (self type が外部 crate 型の場合を含む) も TraitImplDeclV2 の 2 軸対称構造で declare 可能となり Blue 化する",
       "adr_refs": [
         {
-          "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "catalogue ファイルの trait impl が CatalogueDocument.trait_impls (top-level Vec) で declare されている。TypeEntry.trait_impls フィールドは現行 schema に存在しない (廃止)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "TraitImplDeclV2 が action: ItemAction + trait_ref: TypeRef + for_type: TypeRef の構造を持つ。unit test: (a) impl MyTrait for std::vec::Vec<i32> のような外部 self type を持つ Add action impl が catalogue で declare 可能、A-codec で正しく encode、signal evaluator で Blue 化することを確認する。(b) action フィールドを省略した catalogue エントリで serde default が Add として機能することを確認する。(c) Modify / Reference の各 action が TraitImplDeclV2 エントリで指定でき、A-codec が action を固定 Add とせず entry.action を参照して処理することを確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-15",
+      "text": "A-codec の trait_impl 処理が top-level loop に統一され (T014)、かつ signal evaluator Phase 1 が action-driven S-insertion を実行する (T015)。test: (a) 自 crate type / 外部 crate type の両方の trait impl が同一の top-level 経路で S に挿入され Blue 化することを確認する。(b) Add action でかつ baseline (B) に同一 identity が既に存在する場合に action contradiction が報告されることを確認する。(c) A-codec の実装中に ItemAction::Add を固定で使用するコードパス (entry.action を参照しない旧実装) が存在しないことを確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
           "anchor": "D4"
         }
       ]
@@ -395,7 +485,7 @@
     }
   ],
   "signals": {
-    "blue": 33,
+    "blue": 40,
     "yellow": 0,
     "red": 0
   }

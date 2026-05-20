@@ -2366,7 +2366,6 @@ const DOMAIN_TYPES_WITH_ENUM_VARIANTS: &str = r#"{
           "role": "ValueObject",
           "kind": {"kind": "plain_struct", "fields": [], "has_stripped_fields": false},
           "methods": [],
-          "trait_impls": [],
           "module_path": "",
           "spec_refs": [],
           "informal_grounds": []
@@ -2382,7 +2381,6 @@ const DOMAIN_TYPES_WITH_ENUM_VARIANTS: &str = r#"{
             ]
           },
           "methods": [],
-          "trait_impls": [],
           "module_path": "",
           "spec_refs": [],
           "informal_grounds": []

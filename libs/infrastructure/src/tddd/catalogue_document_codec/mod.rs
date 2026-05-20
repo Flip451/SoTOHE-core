@@ -615,7 +615,6 @@ mod tests {
       "role": "ValueObject",
       "kind": { "kind": "tuple_struct", "fields": ["String"] },
       "methods": [],
-      "trait_impls": [],
       "module_path": ""
     }
   },
@@ -664,7 +663,8 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_trait_impl_with_generic_args_present() {
+    fn test_decode_top_level_trait_impls_with_generic_args_in_trait_ref() {
+        // ADR `2026-05-20-0048` D1/D2: trait_impls are top-level; trait_ref encodes generic args.
         let json = r#"{
   "schema_version": 3,
   "crate_name": "usecase",
@@ -673,54 +673,61 @@ mod tests {
     "RenderContractMapError": {
       "action": "modify",
       "role": "ErrorType",
-      "kind": { "kind": "enum", "variants": [] },
-      "trait_impls": [
-        { "trait_name": "From", "origin_crate": "core", "generic_args": "CatalogueLoaderError" },
-        { "trait_name": "From", "origin_crate": "core", "generic_args": "ContractMapWriterError" },
-        { "trait_name": "Display", "origin_crate": "core" }
-      ]
+      "kind": { "kind": "enum", "variants": [] }
     }
   },
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    { "trait_ref": "core::convert::From<CatalogueLoaderError>", "for_type": "RenderContractMapError" },
+    { "trait_ref": "core::convert::From<ContractMapWriterError>", "for_type": "RenderContractMapError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "RenderContractMapError" }
+  ]
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
-        let entry = doc.types.values().next().unwrap();
-        assert_eq!(entry.trait_impls.len(), 3);
-        assert_eq!(entry.trait_impls[0].generic_args(), Some("CatalogueLoaderError"));
-        assert_eq!(entry.trait_impls[1].generic_args(), Some("ContractMapWriterError"));
-        assert_eq!(entry.trait_impls[2].generic_args(), None);
+        assert_eq!(doc.trait_impls.len(), 3);
+        assert_eq!(
+            doc.trait_impls[0].trait_ref.as_str(),
+            "core::convert::From<CatalogueLoaderError>"
+        );
+        assert_eq!(
+            doc.trait_impls[1].trait_ref.as_str(),
+            "core::convert::From<ContractMapWriterError>"
+        );
+        assert_eq!(doc.trait_impls[2].trait_ref.as_str(), "core::fmt::Display");
+        for ti in &doc.trait_impls {
+            assert_eq!(ti.for_type.as_str(), "RenderContractMapError");
+        }
     }
 
     #[test]
-    fn test_decode_trait_impl_missing_generic_args_defaults_to_none() {
-        // Catalogues that predate generic_args omit the field; default to None for compat.
+    fn test_decode_top_level_trait_impl_without_generic_args() {
+        // trait_ref without angle brackets (no generic args) decodes correctly.
         let json = r#"{
   "schema_version": 3,
   "crate_name": "domain",
   "layer": "domain",
   "types": {
-    "OldErrorType": {
+    "MyType": {
       "action": "add",
       "role": "ErrorType",
-      "kind": { "kind": "enum", "variants": [] },
-      "trait_impls": [
-        { "trait_name": "From", "origin_crate": "core" }
-      ]
+      "kind": { "kind": "enum", "variants": [] }
     }
   },
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    { "trait_ref": "core::convert::From", "for_type": "MyType" }
+  ]
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        let entry = doc.types.values().next().unwrap();
-        assert_eq!(entry.trait_impls.len(), 1);
-        assert_eq!(entry.trait_impls[0].trait_name.as_str(), "From");
-        assert_eq!(entry.trait_impls[0].generic_args(), None);
+        assert_eq!(doc.trait_impls.len(), 1);
+        assert_eq!(doc.trait_impls[0].trait_ref.as_str(), "core::convert::From");
+        assert_eq!(doc.trait_impls[0].for_type.as_str(), "MyType");
     }
 
     #[test]
-    fn test_encode_decode_round_trip_preserves_generic_args() {
+    fn test_encode_decode_round_trip_preserves_top_level_trait_impls() {
         let json = r#"{
   "schema_version": 3,
   "crate_name": "usecase",
@@ -729,28 +736,28 @@ mod tests {
     "MyError": {
       "action": "add",
       "role": "ErrorType",
-      "kind": { "kind": "enum", "variants": [] },
-      "trait_impls": [
-        { "trait_name": "From", "origin_crate": "core", "generic_args": "IoError" },
-        { "trait_name": "Display", "origin_crate": "core" }
-      ]
+      "kind": { "kind": "enum", "variants": [] }
     }
   },
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    { "trait_ref": "core::convert::From<IoError>", "for_type": "MyError" },
+    { "trait_ref": "core::fmt::Display", "for_type": "MyError" }
+  ]
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
         assert_eq!(doc, doc2);
-        let entry = doc2.types.values().next().unwrap();
-        assert_eq!(entry.trait_impls[0].generic_args(), Some("IoError"));
-        assert_eq!(entry.trait_impls[1].generic_args(), None);
+        assert_eq!(doc2.trait_impls[0].trait_ref.as_str(), "core::convert::From<IoError>");
+        assert_eq!(doc2.trait_impls[1].trait_ref.as_str(), "core::fmt::Display");
     }
 
     #[test]
-    fn test_decode_trait_impl_with_empty_generic_args_returns_invalid_entry_error() {
-        // `generic_args: ""` must be rejected — empty string is not a valid type argument.
+    fn test_decode_old_schema_type_entry_trait_impls_is_rejected() {
+        // Old schema (TypeEntry-level trait_impls) must be rejected by deny_unknown_fields.
+        // ADR `2026-05-20-0048`: catalogues must be completely rewritten; no backward compat.
         let json = r#"{
   "schema_version": 3,
   "crate_name": "domain",
@@ -770,36 +777,27 @@ mod tests {
 }"#;
         let result = CatalogueDocumentCodec::decode(json, "domain");
         assert!(
-            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
-            "expected InvalidEntry for empty generic_args, got: {result:?}"
+            result.is_err(),
+            "old TypeEntry-level trait_impls must be rejected (deny_unknown_fields), got: {result:?}"
         );
     }
 
     #[test]
-    fn test_decode_trait_impl_with_angle_bracketed_generic_args_returns_invalid_entry_error() {
-        // `generic_args: "<T>"` must be rejected — the caller must pass the bare type name.
+    fn test_decode_top_level_trait_impl_with_empty_trait_ref_returns_error() {
+        // An empty trait_ref string must be rejected (TypeRef::new validates non-empty).
         let json = r#"{
   "schema_version": 3,
   "crate_name": "domain",
   "layer": "domain",
-  "types": {
-    "BadError": {
-      "action": "add",
-      "role": "ErrorType",
-      "kind": { "kind": "enum", "variants": [] },
-      "trait_impls": [
-        { "trait_name": "From", "origin_crate": "core", "generic_args": "<T>" }
-      ]
-    }
-  },
+  "types": {},
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    { "trait_ref": "", "for_type": "MyType" }
+  ]
 }"#;
         let result = CatalogueDocumentCodec::decode(json, "domain");
-        assert!(
-            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
-            "expected InvalidEntry for angle-bracketed generic_args, got: {result:?}"
-        );
+        assert!(result.is_err(), "empty trait_ref must be rejected, got: {result:?}");
     }
 
     #[test]
@@ -910,8 +908,7 @@ mod tests {
           "returns": "()",
           "generics": [{{"name": "{bad_name}", "bounds": []}}]
         }}
-      ],
-      "trait_impls": []
+      ]
     }}
   }},
   "traits": {{}},
@@ -1940,9 +1937,10 @@ mod tests {
     }
 
     #[test]
-    fn test_encode_where_predicate_equal_with_bare_type_param_lhs_returns_invalid_entry_error() {
-        // `where_predicate_decl_to_dto` (encode.rs) must reject Equal predicates with a bare
-        // type param LHS (no `::`) to mirror the decoder invariant and preserve round-trip.
+    fn test_encode_where_predicate_equal_with_bare_type_param_lhs_succeeds() {
+        // Permissive principle (ADR make-catalogue-schema-permissive): Equal predicates
+        // with a bare type param LHS (no `::`) must be accepted. Shape validation was
+        // reverted; any syn-parseable LHS is valid at the codec boundary.
         use domain::tddd::LayerId;
         use domain::tddd::catalogue_v2::entries::FunctionEntry;
         use domain::tddd::catalogue_v2::identifiers::{CrateName, FunctionName, FunctionPath};
@@ -1950,7 +1948,7 @@ mod tests {
         use domain::tddd::catalogue_v2::roles::FunctionRole;
         use domain::tddd::catalogue_v2::{CatalogueDocument, TypeRef, WherePredicateDecl};
 
-        let bad_predicate = WherePredicateDecl {
+        let predicate = WherePredicateDecl {
             lhs: TypeRef::new("T".to_string()).unwrap(),
             rhs: vec![TypeRef::new("u32".to_string()).unwrap()],
             operator: BoundOp::Equal,
@@ -1962,7 +1960,7 @@ mod tests {
             returns: TypeRef::new("()".to_string()).unwrap(),
             is_async: false,
             generics: vec![],
-            where_predicates: vec![bad_predicate],
+            where_predicates: vec![predicate],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
@@ -1970,24 +1968,24 @@ mod tests {
         let crate_name = CrateName::new("usecase".to_string()).unwrap();
         let layer = LayerId::try_new("usecase").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
-        let fn_name = FunctionName::new("bad_bare_lhs_eq_fn").unwrap();
+        let fn_name = FunctionName::new("bare_lhs_eq_fn").unwrap();
         let path = FunctionPath::at_root(crate_name, fn_name);
         doc.functions.insert(path, entry);
 
         let result = CatalogueDocumentCodec::encode(&doc);
         assert!(
-            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
-            "expected InvalidEntry when encoding Equal WherePredicateDecl with bare type param \
-             lhs (no '::'), got: {result:?}"
+            result.is_ok(),
+            "permissive principle: bare type param lhs for Equal predicate must be accepted, \
+             got: {result:?}"
         );
     }
 
     #[test]
-    fn test_decode_where_predicate_equal_with_bare_type_param_lhs_returns_invalid_entry_error() {
-        // ADR 2026-05-18-1223 D1: an `Equal` predicate LHS must be an associated-type
-        // projection (e.g. `T::Assoc`).  A bare type parameter like `"T"` maps to
-        // `where T = U`, which is not valid Rust, and must be rejected at decode time
-        // so it cannot become a nonsensical `EqPredicate` in the `ExtendedCrate`.
+    fn test_decode_where_predicate_equal_with_bare_type_param_lhs_succeeds() {
+        // Permissive principle (ADR make-catalogue-schema-permissive): a bare type parameter
+        // like `"T"` as the LHS of an Equal where-predicate must be accepted at decode time.
+        // Shape validation (requiring `::`) was reverted; any syn-parseable expression is valid.
+        use domain::tddd::catalogue_v2::methods::BoundOp;
         let json = r#"{
   "schema_version": 3,
   "crate_name": "usecase",
@@ -1995,7 +1993,7 @@ mod tests {
   "types": {},
   "traits": {},
   "functions": {
-    "usecase::bad_fn": {
+    "usecase::bare_lhs_fn": {
       "action": "add",
       "role": "FreeFunction",
       "params": [],
@@ -2009,9 +2007,15 @@ mod tests {
 }"#;
         let result = CatalogueDocumentCodec::decode(json, "usecase");
         assert!(
-            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
-            "expected InvalidEntry for bare type param as Equal predicate lhs, got: {result:?}"
+            result.is_ok(),
+            "permissive principle: bare type param as Equal predicate lhs must be accepted, \
+             got: {result:?}"
         );
+        let doc = result.unwrap();
+        let fn_entry = doc.functions.values().next().expect("expected one function entry");
+        assert_eq!(fn_entry.where_predicates.len(), 1);
+        assert_eq!(fn_entry.where_predicates[0].lhs.as_str(), "T");
+        assert_eq!(fn_entry.where_predicates[0].operator, BoundOp::Equal);
     }
 
     // -----------------------------------------------------------------------
@@ -2211,8 +2215,8 @@ mod tests {
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_decode_trait_impl_with_impl_generics_and_where_predicates_succeeds() {
-        // AC-06: `impl<L, R, W> Trait for Foo<L, R, W> where L: Send` must round-trip.
+    fn test_decode_top_level_trait_impl_with_impl_generics_and_where_predicates_succeeds() {
+        // ADR `2026-05-20-0048` D1/D2: top-level trait_impls; `impl<L, R, W> Trait for Foo<L, R, W> where L: Send`.
         let json = r#"{
   "schema_version": 3,
   "crate_name": "domain",
@@ -2221,31 +2225,31 @@ mod tests {
     "Foo": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "plain_struct", "fields": [] },
-      "trait_impls": [
-        {
-          "trait_name": "MyTrait",
-          "origin_crate": "domain",
-          "impl_generics": [
-            { "name": "L", "bounds": [] },
-            { "name": "R", "bounds": [] },
-            { "name": "W", "bounds": [] }
-          ],
-          "impl_where_predicates": [
-            { "lhs": "L", "rhs": ["Send"], "operator": "Bound" }
-          ]
-        }
-      ]
+      "kind": { "kind": "plain_struct", "fields": [] }
     }
   },
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    {
+      "trait_ref": "MyTrait",
+      "for_type": "Foo",
+      "impl_generics": [
+        { "name": "L", "bounds": [] },
+        { "name": "R", "bounds": [] },
+        { "name": "W", "bounds": [] }
+      ],
+      "impl_where_predicates": [
+        { "lhs": "L", "rhs": ["Send"], "operator": "Bound" }
+      ]
+    }
+  ]
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        let entry = doc.types.values().next().unwrap();
-        assert_eq!(entry.trait_impls.len(), 1);
-        let impl_decl = &entry.trait_impls[0];
-        assert_eq!(impl_decl.trait_name.as_str(), "MyTrait");
+        assert_eq!(doc.trait_impls.len(), 1);
+        let impl_decl = &doc.trait_impls[0];
+        assert_eq!(impl_decl.trait_ref.as_str(), "MyTrait");
+        assert_eq!(impl_decl.for_type.as_str(), "Foo");
         assert_eq!(impl_decl.impl_generics.len(), 3);
         assert_eq!(impl_decl.impl_generics[0].name.as_str(), "L");
         assert_eq!(impl_decl.impl_generics[1].name.as_str(), "R");
@@ -2256,42 +2260,35 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_trait_impl_without_impl_generics_field_defaults_to_empty() {
-        // Catalogues that predate IN-06 omit impl_generics; serde default must produce
-        // an empty Vec for backward compatibility (CN-01).
+    fn test_decode_top_level_trait_impl_without_impl_generics_defaults_to_empty() {
+        // Omitting impl_generics/impl_where_predicates must default to empty Vec (serde default).
         let json = r#"{
   "schema_version": 3,
   "crate_name": "domain",
   "layer": "domain",
-  "types": {
-    "OldType": {
-      "action": "add",
-      "role": "ValueObject",
-      "kind": { "kind": "unit_struct" },
-      "trait_impls": [
-        { "trait_name": "Display", "origin_crate": "core" }
-      ]
-    }
-  },
+  "types": {},
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Display", "for_type": "MyType" }
+  ]
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        let entry = doc.types.values().next().unwrap();
-        let impl_decl = &entry.trait_impls[0];
+        let impl_decl = &doc.trait_impls[0];
         assert!(
             impl_decl.impl_generics.is_empty(),
-            "omitted impl_generics must default to empty Vec (CN-01 backward compat)"
+            "omitted impl_generics must default to empty Vec"
         );
         assert!(
             impl_decl.impl_where_predicates.is_empty(),
-            "omitted impl_where_predicates must default to empty Vec (CN-01 backward compat)"
+            "omitted impl_where_predicates must default to empty Vec"
         );
     }
 
     #[test]
-    fn test_encode_decode_round_trip_preserves_trait_impl_impl_generics_and_where_predicates() {
-        // AC-06 round-trip: decode → encode → decode must be stable.
+    fn test_encode_decode_round_trip_preserves_top_level_trait_impl_generics_and_where_predicates()
+    {
+        // ADR `2026-05-20-0048` D1/D2 round-trip: decode → encode → decode must be stable.
         use domain::tddd::catalogue_v2::methods::BoundOp;
 
         let json = r#"{
@@ -2302,36 +2299,37 @@ mod tests {
     "Foo": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "plain_struct", "fields": [] },
-      "trait_impls": [
-        {
-          "trait_name": "MyTrait",
-          "origin_crate": "domain",
-          "impl_generics": [
-            { "name": "L", "bounds": ["Send"] },
-            { "name": "R", "bounds": [] }
-          ],
-          "impl_where_predicates": [
-            { "lhs": "L", "rhs": ["Clone"], "operator": "Bound" }
-          ]
-        },
-        {
-          "trait_name": "Display",
-          "origin_crate": "core"
-        }
-      ]
+      "kind": { "kind": "plain_struct", "fields": [] }
     }
   },
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    {
+      "trait_ref": "MyTrait",
+      "for_type": "Foo",
+      "impl_generics": [
+        { "name": "L", "bounds": ["Send"] },
+        { "name": "R", "bounds": [] }
+      ],
+      "impl_where_predicates": [
+        { "lhs": "L", "rhs": ["Clone"], "operator": "Bound" }
+      ]
+    },
+    {
+      "trait_ref": "core::fmt::Display",
+      "for_type": "Foo"
+    }
+  ]
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, doc2, "encode-decode round-trip must be stable for impl_generics/where");
 
-        let entry = doc2.types.values().next().unwrap();
-        let generic_impl = &entry.trait_impls[0];
+        let generic_impl = &doc2.trait_impls[0];
+        assert_eq!(generic_impl.trait_ref.as_str(), "MyTrait");
+        assert_eq!(generic_impl.for_type.as_str(), "Foo");
         assert_eq!(generic_impl.impl_generics.len(), 2);
         assert_eq!(generic_impl.impl_generics[0].name.as_str(), "L");
         assert_eq!(generic_impl.impl_generics[0].bounds[0].as_str(), "Send");
@@ -2342,31 +2340,25 @@ mod tests {
         assert_eq!(generic_impl.impl_where_predicates[0].operator, BoundOp::Bound);
 
         // The second trait impl (Display) must have empty impl_generics/where_predicates.
-        let display_impl = &entry.trait_impls[1];
+        let display_impl = &doc2.trait_impls[1];
         assert!(display_impl.impl_generics.is_empty());
         assert!(display_impl.impl_where_predicates.is_empty());
     }
 
     #[test]
-    fn test_encode_trait_impl_with_empty_impl_generics_omits_field() {
+    fn test_encode_top_level_trait_impl_with_empty_impl_generics_omits_field() {
         // `skip_serializing_if = "Vec::is_empty"` must suppress impl_generics and
-        // impl_where_predicates from the encoded JSON so legacy catalogues stay byte-stable.
+        // impl_where_predicates from the encoded JSON when they are empty.
         let json = r#"{
   "schema_version": 3,
   "crate_name": "domain",
   "layer": "domain",
-  "types": {
-    "Simple": {
-      "action": "add",
-      "role": "ValueObject",
-      "kind": { "kind": "unit_struct" },
-      "trait_impls": [
-        { "trait_name": "Display", "origin_crate": "core" }
-      ]
-    }
-  },
+  "types": {},
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Display", "for_type": "Simple" }
+  ]
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();

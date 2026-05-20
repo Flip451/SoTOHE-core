@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "38c67d790a1ec6d6a028debc2ddc16cdd5a5ea845116e8b5e70b631a93206dee",
+  "catalogue_declaration_hash": "1ebaccef979208fbed26781ec301142c478c4d4cb129ac9bddffc7a3cc31f45c",
   "signals": [
     {
       "type_name": "ReviewCheckApprovedInteractor",

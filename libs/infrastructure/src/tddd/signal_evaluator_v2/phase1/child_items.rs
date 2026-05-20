@@ -500,6 +500,26 @@ pub(super) fn remove_b_children_from_s(
     remove_child_items_from_s(s_index, s_actions, b_item);
 }
 
+/// Moves all child items of a standalone impl (methods, assoc items) from `s_index`
+/// to `d_index`, preserving their existing Ids.
+///
+/// Used by the `Delete` branch of the standalone-impl processing loop to transfer the
+/// impl's children (method items, associated-type items) alongside the root impl node
+/// itself, keeping D internally consistent (all `impl.items` Ids are present in D).
+///
+/// This is the standalone-impl counterpart to `move_impl_children_to_d`, which operates
+/// on impl children of a **type** (Struct/Enum) parent.  For standalone impls the caller
+/// already handles moving the root impl node to D; this function only moves the subtree
+/// of children so the root's `items` list does not dangle.
+pub(super) fn move_standalone_impl_children_to_d(
+    s_index: &mut HashMap<Id, Item>,
+    s_actions: &mut BTreeMap<Id, ItemAction>,
+    d_index: &mut HashMap<Id, Item>,
+    impl_item: &Item,
+) {
+    move_subtree_to_d(s_index, s_actions, d_index, impl_item);
+}
+
 /// Collects the Ids of direct `ItemEnum::Impl` children of `parent` that are
 /// currently present in `s_index`.
 ///

@@ -44,6 +44,8 @@ pub(super) fn domain_to_dto(
         .collect::<Result<_, _>>()?;
     let inherent_impls =
         doc.inherent_impls.iter().map(inherent_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let trait_impls =
+        doc.trait_impls.iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(CatalogueDocumentDto {
         schema_version: doc.schema_version,
         crate_name: doc.crate_name.as_str().to_owned(),
@@ -52,6 +54,7 @@ pub(super) fn domain_to_dto(
         traits,
         functions,
         inherent_impls,
+        trait_impls,
     })
 }
 
@@ -63,14 +66,11 @@ pub(super) fn type_entry_to_dto(
     entry: &TypeEntry,
 ) -> Result<TypeEntryDto, CatalogueDocumentCodecError> {
     let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
-    let trait_impls =
-        entry.trait_impls.iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(TypeEntryDto {
         action: entry.action.to_string(),
         role: entry.role.to_string(),
         kind: type_kind_to_dto(&entry.kind),
         methods,
-        trait_impls,
         module_path: entry.module_path.to_string(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
@@ -169,9 +169,7 @@ pub(super) fn method_decl_to_dto(
 /// `where_predicates_from_dtos`).
 ///
 /// Returns `CatalogueDocumentCodecError::InvalidEntry` for `Equal` predicates
-/// when `w.rhs.len() != 1` or when `w.lhs` is not an associated-type projection
-/// (i.e., does not contain `"::"`). The decoder enforces these same invariants so
-/// the encoder mirrors them to prevent round-trip breakage.
+/// when `w.rhs.len() != 1`.
 fn where_predicate_decl_to_dto(
     w: &WherePredicateDecl,
 ) -> Result<WherePredicateDeclDto, CatalogueDocumentCodecError> {
@@ -199,23 +197,6 @@ fn where_predicate_decl_to_dto(
                     ),
                 });
             }
-            // Mirror the decoder's Equal-LHS invariant: the LHS must be an
-            // associated-type projection (e.g. `T::Assoc`, `<T as Trait>::Assoc`).
-            // A bare type parameter (`"T"`) encodes to JSON that the decoder then
-            // rejects, breaking the round-trip guarantee.
-            let lhs_str = w.lhs.as_str();
-            if !lhs_str.contains("::") {
-                return Err(CatalogueDocumentCodecError::InvalidEntry {
-                    entry_name: lhs_str.to_owned(),
-                    reason: format!(
-                        "Equal where-predicate lhs '{}' is not a supported projection form; \
-                         expected a path with at least one '::' segment (e.g. `T::Assoc`, \
-                         `<T as Trait>::Assoc`) — bare type parameters cannot appear as the \
-                         LHS of a `where T = U` equality constraint",
-                        lhs_str
-                    ),
-                });
-            }
             BoundOpDto::Equal
         }
     };
@@ -230,16 +211,34 @@ fn param_decl_to_dto(p: &ParamDeclaration) -> ParamDto {
     ParamDto { name: p.name.as_str().to_owned(), ty: p.ty.as_str().to_owned() }
 }
 
+/// Encodes a top-level `TraitImplDeclV2` to its DTO form (ADR `2026-05-20-0048` D2).
+///
+/// Emits `action`, `trait_ref`, and `for_type` fields. Validates `trait_ref` as a
+/// Rust path expression (not a reference, slice, or tuple) and validates both
+/// `trait_ref` and `for_type` as syn-parseable type expressions to guarantee
+/// encode/decode round-trip consistency for in-memory `TraitImplDeclV2` values
+/// that were not originally constructed via the JSON decoder.
 fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocumentCodecError> {
+    let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: t.trait_ref.as_str().to_owned(),
+        reason,
+    };
+    super::decode::validate_type_ref_str(t.trait_ref.as_str())
+        .map_err(|e| err(format!("invalid trait_ref syntax: {e}")))?;
+    // Mirror the decode-path path-type constraint: trait_ref must be a path, not a reference etc.
+    super::decode::validate_trait_ref_is_path(t.trait_ref.as_str())
+        .map_err(|e| err(format!("invalid trait_ref (must be a path): {e}")))?;
+    super::decode::validate_type_ref_str(t.for_type.as_str())
+        .map_err(|e| err(format!("invalid for_type syntax: {e}")))?;
     let impl_where_predicates = t
         .impl_where_predicates
         .iter()
         .map(where_predicate_decl_to_dto)
         .collect::<Result<Vec<_>, _>>()?;
     Ok(TraitImplDto {
-        trait_name: t.trait_name.as_str().to_owned(),
-        origin_crate: t.origin_crate.as_str().to_owned(),
-        generic_args: t.generic_args().map(str::to_owned),
+        action: t.action.to_string(),
+        trait_ref: t.trait_ref.as_str().to_owned(),
+        for_type: t.for_type.as_str().to_owned(),
         impl_generics: t
             .impl_generics
             .iter()

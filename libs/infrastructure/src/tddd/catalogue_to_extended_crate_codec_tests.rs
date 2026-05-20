@@ -43,7 +43,7 @@ fn test_encode_returns_ambiguous_identifier_when_type_and_trait_share_name() {
             role: DataRole::ValueObject,
             kind: TypeKindV2::Enum { variants: vec![] },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -110,7 +110,7 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
                 where_predicates: vec![],
                 docs: None,
             }],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -151,7 +151,7 @@ fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -191,7 +191,7 @@ fn test_encode_enum_variants_are_promoted_to_variant_items() {
                 ],
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -240,7 +240,7 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
                     None,
                 ),
             ],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -283,7 +283,7 @@ fn test_encode_paths_includes_module_path_segments() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::from_segments(vec!["review".to_string()]).unwrap(),
             docs: None,
             spec_refs: vec![],
@@ -315,7 +315,7 @@ fn test_encode_paths_crate_root_type_has_two_segment_path() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -354,7 +354,7 @@ fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -390,7 +390,7 @@ fn test_encode_std_prelude_type_creates_std_external_crate_entry() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -424,7 +424,7 @@ fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -457,7 +457,7 @@ fn test_encode_item_actions_contains_declared_action() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -488,16 +488,17 @@ fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![TraitImplDeclV2::new(
-                TraitName::new("Serialize").unwrap(),
-                CrateName::new("serde").unwrap(),
-            )],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
         },
     );
+    // ADR `2026-05-20-0048` D1: trait_impls are top-level on CatalogueDocument.
+    doc.trait_impls.push(TraitImplDeclV2::new(
+        TypeRef::new("serde::Serialize").unwrap(),
+        TypeRef::new("Foo").unwrap(),
+    ));
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let has_serde = ec.krate().external_crates.values().any(|e| e.name == "serde");
@@ -550,7 +551,7 @@ fn test_encode_type_alias_produces_type_alias_item() {
                 target: TypeRef::new("Result<User, DomainError>").unwrap(),
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -577,15 +578,17 @@ fn test_encode_empty_catalogue_produces_root_module() {
 }
 
 // -----------------------------------------------------------------------
-// generic_args in TraitImplDeclV2 → trait_path_str includes <X>
+// generic_args in TraitImplDeclV2 → structured trait_.args (ADR 2026-05-20-0048 D2)
 // -----------------------------------------------------------------------
 
 #[test]
-fn test_encode_trait_impl_with_generic_args_produces_impl_with_parameterised_trait_path() {
-    // When `generic_args` is Some, the Impl item's trait path must be
-    // `"From<CatalogueLoaderError>"` so that `build_impl_identity_map` produces
-    // the key `"RenderContractMapError: From<CatalogueLoaderError>"`, matching
-    // the C-side rustdoc key exactly.
+fn test_encode_trait_impl_with_generic_args_produces_impl_with_structured_trait_args() {
+    // Per ADR `2026-05-20-0048` D2, the encoded Impl item's trait path is the canonical
+    // BASE path (`"core::convert::From"`) and the generic args are carried structurally
+    // in `trait_.args` — NOT re-inlined into the path string.  `build_impl_identity_map`
+    // renders the structured args via `format_generic_args` at key-construction time,
+    // producing `"RenderContractMapError: core::convert::From<CatalogueLoaderError>"` on
+    // both the S-side (this codec) and the C-side (rustdoc).
     let mut doc = make_doc("usecase");
     doc.types.insert(
         TypeName::new("RenderContractMapError").unwrap(),
@@ -594,55 +597,71 @@ fn test_encode_trait_impl_with_generic_args_produces_impl_with_parameterised_tra
             role: DataRole::ErrorType,
             kind: TypeKindV2::Enum { variants: vec![] },
             methods: vec![],
-            trait_impls: vec![
-                TraitImplDeclV2::new_with_generic_args(
-                    TraitName::new("From").unwrap(),
-                    CrateName::new("core").unwrap(),
-                    "CatalogueLoaderError".to_string(),
-                )
-                .unwrap(),
-                TraitImplDeclV2::new_with_generic_args(
-                    TraitName::new("From").unwrap(),
-                    CrateName::new("core").unwrap(),
-                    "ContractMapWriterError".to_string(),
-                )
-                .unwrap(),
-            ],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
         },
     );
+    // ADR `2026-05-20-0048` D1/D2: trait_impls are top-level; generic args in trait_ref string.
+    doc.trait_impls.push(TraitImplDeclV2::new(
+        TypeRef::new("core::convert::From<CatalogueLoaderError>").unwrap(),
+        TypeRef::new("RenderContractMapError").unwrap(),
+    ));
+    doc.trait_impls.push(TraitImplDeclV2::new(
+        TypeRef::new("core::convert::From<ContractMapWriterError>").unwrap(),
+        TypeRef::new("RenderContractMapError").unwrap(),
+    ));
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let krate = ec.krate();
 
-    // Collect trait impl paths from all Impl items that have a trait.
-    let trait_paths: Vec<String> = krate
+    // Collect (base_path, structured_args) from all Impl items that have a trait.
+    let from_impls: Vec<(String, String)> = krate
         .index
         .values()
         .filter_map(|item| {
             if let ItemEnum::Impl(impl_) = &item.inner {
-                impl_.trait_.as_ref().map(|tp| tp.path.clone())
+                let tp = impl_.trait_.as_ref()?;
+                let args_joined = match tp.args.as_deref() {
+                    Some(rustdoc_types::GenericArgs::AngleBracketed { args, .. }) => args
+                        .iter()
+                        .filter_map(|a| match a {
+                            rustdoc_types::GenericArg::Type(Type::ResolvedPath(p)) => {
+                                Some(p.path.clone())
+                            }
+                            _ => None,
+                        })
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                    _ => String::new(),
+                };
+                Some((tp.path.clone(), args_joined))
             } else {
                 None
             }
         })
         .collect();
 
-    // `core::From` with generic_args: emit the fully-qualified `core::convert::From`
-    // path with generic args appended.  `build_impl_identity_map` resolves C-side via
-    // `krate.paths`, obtaining `"core::convert::From"` as the canonical qualified form.
-    // S-side uses `core_canonical_path("From")` = `"core::convert::From"` so both
-    // sides produce the same identity key.
+    // ADR D2: the trait path is the bare base form — no inline generic args.
     assert!(
-        trait_paths.iter().any(|p| p == "core::convert::From<CatalogueLoaderError>"),
-        "expected impl trait path 'core::convert::From<CatalogueLoaderError>', got: {trait_paths:?}"
+        from_impls.iter().all(|(path, _)| !path.contains('<')),
+        "trait path must be the bare base form with no inline generic args, got: {from_impls:?}"
+    );
+    // The generic args are carried structurally in `trait_.args`.
+    assert!(
+        from_impls
+            .iter()
+            .any(|(path, args)| path == "core::convert::From"
+                && args.contains("CatalogueLoaderError")),
+        "expected impl with base path 'core::convert::From' and structured arg 'CatalogueLoaderError', got: {from_impls:?}"
     );
     assert!(
-        trait_paths.iter().any(|p| p == "core::convert::From<ContractMapWriterError>"),
-        "expected impl trait path 'core::convert::From<ContractMapWriterError>', got: {trait_paths:?}"
+        from_impls
+            .iter()
+            .any(|(path, args)| path == "core::convert::From"
+                && args.contains("ContractMapWriterError")),
+        "expected impl with base path 'core::convert::From' and structured arg 'ContractMapWriterError', got: {from_impls:?}"
     );
 }
 
@@ -661,16 +680,17 @@ fn test_encode_trait_impl_without_generic_args_produces_impl_with_qualified_core
             role: DataRole::ErrorType,
             kind: TypeKindV2::Enum { variants: vec![] },
             methods: vec![],
-            trait_impls: vec![TraitImplDeclV2::new(
-                TraitName::new("From").unwrap(),
-                CrateName::new("core").unwrap(),
-            )],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
         },
     );
+    // ADR `2026-05-20-0048` D1/D2: trait_impls are top-level; full qualified path in trait_ref.
+    doc.trait_impls.push(TraitImplDeclV2::new(
+        TypeRef::new("core::convert::From").unwrap(),
+        TypeRef::new("SomeError").unwrap(),
+    ));
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let krate = ec.krate();
@@ -715,7 +735,7 @@ fn test_encode_enum_struct_variant_produces_named_struct_field_items() {
                 )],
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -768,7 +788,7 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
                 typestate: None,
             },
             methods: vec![method],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -922,7 +942,7 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
                 typestate: None,
             },
             methods: vec![method],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -1149,12 +1169,12 @@ fn test_encode_function_with_use_capture_bound_with_space_succeeds() {
 }
 
 /// A `WherePredicateDecl` whose `lhs` is a qualified-path form
-/// (`<T as Trait>::Assoc`) must be rejected at encode time. The A-codec
-/// cannot reconstruct the `Type::QualifiedPath` shape that rustdoc emits for
-/// such predicates — `parse_type_ref_str` degrades it to an unresolved
-/// placeholder which silently breaks structural equality.
+/// (`<T as Trait>::Assoc`) must be accepted at encode time under the permissive
+/// principle (ADR `2026-05-20-0048`): any syn-parseable input is accepted.
+/// The A-codec falls back to an unresolved placeholder for the qualified-path shape
+/// it cannot reconstruct exactly — this is acceptable under the permissive principle.
 #[test]
-fn test_encode_function_with_qualified_path_lhs_in_where_predicate_returns_error() {
+fn test_encode_function_with_qualified_path_lhs_in_where_predicate_succeeds() {
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
@@ -1164,7 +1184,7 @@ fn test_encode_function_with_qualified_path_lhs_in_where_predicate_returns_error
 
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
-    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bad_qpath_lhs").unwrap());
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("qpath_lhs_fn").unwrap());
     let entry = FunctionEntry {
         action: ItemAction::Add,
         role: FunctionRole::FreeFunction,
@@ -1173,7 +1193,7 @@ fn test_encode_function_with_qualified_path_lhs_in_where_predicate_returns_error
         is_async: false,
         generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
         where_predicates: vec![WherePredicateDecl {
-            // Qualified-path LHS: `<T as Iterator>::Item`.
+            // Qualified-path LHS: `<T as Iterator>::Item` — syn-parseable, accepted permissively.
             lhs: TypeRef::new("<T as Iterator>::Item").unwrap(),
             rhs: vec![TypeRef::new("Clone").unwrap()],
             operator: BoundOp::Bound,
@@ -1184,10 +1204,12 @@ fn test_encode_function_with_qualified_path_lhs_in_where_predicate_returns_error
     };
     doc.functions.insert(fn_path, entry);
 
+    // Permissive: encoding must succeed (no shape validation rejection).
     let result = CatalogueToExtendedCrateCodec::new().encode(doc);
     assert!(
-        matches!(result, Err(NewTypeGraphCodecError::InvalidTypeRef(_))),
-        "expected InvalidTypeRef for `<T as Trait>::Assoc` LHS, got: {result:?}"
+        result.is_ok(),
+        "expected Ok for syn-parseable `<T as Trait>::Assoc` LHS under permissive principle, \
+         got: {result:?}"
     );
 }
 
@@ -1444,21 +1466,23 @@ fn test_encode_function_with_equal_predicate_multiple_rhs_returns_error() {
 }
 
 /// A `FunctionEntry` with a `BoundOp::Equal` predicate whose LHS is a bare type
-/// parameter (no `::`) must be rejected by `CatalogueToExtendedCrateCodec::encode`
-/// with an error.  `where T = u32` is not valid Rust; the LHS must be an
-/// associated-type projection such as `T::Assoc`.
+/// parameter (no `::`) must be accepted by `CatalogueToExtendedCrateCodec::encode`
+/// (permissive principle, ADR `2026-05-20-0048`).  The JSON codec no longer enforces
+/// the `::` invariant on Equal-predicate LHS values, so the encoder must match.
+/// The resulting `WherePredicate::EqPredicate` carries a `Type::Generic("T")` LHS.
 #[test]
-fn test_encode_function_with_equal_predicate_bare_type_param_lhs_returns_error() {
+fn test_encode_function_with_equal_predicate_bare_type_param_lhs_succeeds() {
     use domain::tddd::catalogue_v2::FunctionName;
     use domain::tddd::catalogue_v2::entries::FunctionEntry;
     use domain::tddd::catalogue_v2::identifiers::FunctionPath;
     use domain::tddd::catalogue_v2::methods::{BoundOp, MethodGenericParam, WherePredicateDecl};
     use domain::tddd::catalogue_v2::roles::FunctionRole;
     use domain::tddd::catalogue_v2::{ParamName, TypeRef};
+    use rustdoc_types::{Term, Type, WherePredicate};
 
     let mut doc = make_doc("domain");
     let crate_n = CrateName::new("domain").unwrap();
-    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bad_bare_lhs_eq_fn").unwrap());
+    let fn_path = FunctionPath::at_root(crate_n, FunctionName::new("bare_lhs_eq_fn").unwrap());
     let entry = FunctionEntry {
         action: ItemAction::Add,
         role: FunctionRole::FreeFunction,
@@ -1466,7 +1490,7 @@ fn test_encode_function_with_equal_predicate_bare_type_param_lhs_returns_error()
         returns: TypeRef::new("()").unwrap(),
         is_async: false,
         generics: vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
-        // Invalid: Equal predicate with bare type parameter as LHS (`where T = u32`).
+        // Permissive: bare type parameter as Equal-predicate LHS (`where T = u32`).
         where_predicates: vec![WherePredicateDecl {
             lhs: TypeRef::new("T").unwrap(),
             rhs: vec![TypeRef::new("u32").unwrap()],
@@ -1478,11 +1502,29 @@ fn test_encode_function_with_equal_predicate_bare_type_param_lhs_returns_error()
     };
     doc.functions.insert(fn_path, entry);
 
-    let result = CatalogueToExtendedCrateCodec::new().encode(doc);
+    let ec = CatalogueToExtendedCrateCodec::new()
+        .encode(doc)
+        .expect("bare type param LHS must succeed under permissive principle");
+    let fn_item = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("bare_lhs_eq_fn")
+                && matches!(item.inner, ItemEnum::Function(_))
+        })
+        .expect("expected Function item for bare_lhs_eq_fn");
+    let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
+    assert_eq!(f.generics.where_predicates.len(), 1);
+    // LHS must be Type::Generic("T"); RHS must be Term::Type.
+    let WherePredicate::EqPredicate { ref lhs, ref rhs } = f.generics.where_predicates[0] else {
+        panic!("expected EqPredicate, got {:?}", f.generics.where_predicates[0]);
+    };
     assert!(
-        result.is_err(),
-        "Equal predicate with bare type param LHS must return an error, got: {result:?}"
+        matches!(lhs, Type::Generic(n) if n == "T"),
+        "expected Type::Generic(\"T\"), got {lhs:?}"
     );
+    assert!(matches!(rhs, Term::Type(_)), "expected Term::Type, got {rhs:?}");
 }
 
 // -----------------------------------------------------------------------
@@ -1819,8 +1861,11 @@ fn test_trait_impl_block_generics_encoded_correctly() {
     use rustdoc_types::{GenericParamDefKind, WherePredicate};
 
     let mut doc = make_doc("domain");
-    let mut trait_impl =
-        TraitImplDeclV2::new(TraitName::new("Send").unwrap(), CrateName::new("std").unwrap());
+    // ADR `2026-05-20-0048` D1/D2: top-level trait_impls; new API: (trait_ref, for_type).
+    let mut trait_impl = TraitImplDeclV2::new(
+        TypeRef::new("std::marker::Send").unwrap(),
+        TypeRef::new("Foo").unwrap(),
+    );
     trait_impl.impl_generics = vec![MethodGenericParam {
         name: ParamName::new("T").unwrap(),
         bounds: vec![TypeRef::new("Clone").unwrap()],
@@ -1843,13 +1888,13 @@ fn test_trait_impl_block_generics_encoded_correctly() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![trait_impl],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
         },
     );
+    doc.trait_impls.push(trait_impl);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
     let krate = ec.krate();
@@ -1916,7 +1961,7 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],

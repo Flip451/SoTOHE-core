@@ -51,7 +51,7 @@ A draft that violates any convention rule must be self-rejected before the orche
 Translate the track's ADR (design decisions) and spec.json (behavioral contract) into **per-layer TDDD catalogue entries** (`<layer>-types.json`). For each type the spec and ADR require:
 
 - Pick the correct `role` value (from the per-section role space — see the **v3 Schema Reference** below) and the `kind` discriminator (`unit_struct` / `tuple_struct` / `plain_struct` / `enum` / `type_alias`)
-- Author kind-specific fields (`methods`, `trait_impls`, `kind.fields`, `kind.variants`, `kind.typestate`, `generics`, `where_predicates`, `params`, `returns`)
+- Author entry fields (`methods`, `kind.fields`, `kind.variants`, `kind.typestate`, `generics`, `where_predicates`, `params`, `returns`) and top-level impl entries (`trait_impls`, `inherent_impls`)
 - Set `action` (add / modify / reference / delete) against the existing baseline
 - Cite upstream SoT via structured refs (`spec_refs[]` for spec elements, `informal_grounds[]` for unpersisted grounds that still need promotion before merge)
 - Ensure in-crate type references use **last-segment names only** (e.g., `TrackId`, not `<this-crate>::track::TrackId`) — paths that lack a `crate::` / `self::` / `super::` prefix but contain `::` are treated by the A-codec as cross-crate FQNs; using a bare multi-segment path for an in-crate type produces an unresolved cross-crate reference instead of resolving locally. Cross-crate references use FQN with `::` (e.g., `<other-crate>::module::TypeName`), where `<other-crate>` is the workspace crate name from `architecture-rules.json`. Standard-library types not in the A-codec auto-resolve set (e.g. `std::path::PathBuf`) must use their full path even when the usage context is within the same crate — they are NOT in-crate types.
@@ -213,22 +213,26 @@ Do NOT emit Rust code, module trees, or inline trait signatures outside the cata
 
 ## v3 Schema Reference (concise)
 
-Catalogue files for this workspace use **`schema_version: 3`** — a 2-axis structure that separates the architectural **role** (DDD / Clean Architecture intent) from the language-level **kind** (Rust syntactic form). The top-level document is **3 BTreeMaps**, one per item kind:
+Catalogue files for this workspace use **`schema_version: 3`** — a 2-axis structure that separates the architectural **role** (DDD / Clean Architecture intent) from the language-level **kind** (Rust syntactic form). The top-level document is **3 BTreeMaps** (one per item kind) plus **2 top-level arrays** that hold impl blocks as independent entries:
 
 ```json
 {
   "schema_version": 3,
   "crate_name": "<this-crate>",
   "layer":       "<this-crate>",
-  "types":       { "<TypeName>":     <TypeEntry>     },
-  "traits":      { "<TraitName>":    <TraitEntry>    },
-  "functions":   { "<FunctionPath>": <FunctionEntry> }
+  "types":          { "<TypeName>":     <TypeEntry>     },
+  "traits":         { "<TraitName>":    <TraitEntry>    },
+  "functions":      { "<FunctionPath>": <FunctionEntry> },
+  "inherent_impls": [<InherentImplDeclV2>, ...],
+  "trait_impls":    [<TraitImplDeclV2>,    ...]
 }
 ```
 
+`inherent_impls` / `trait_impls` are **top-level arrays**, not fields of `TypeEntry`. Each entry is an independent catalogue entry — it is NOT attached to the `TypeEntry` of the implementing type. For `trait_impls` (trait impl blocks, `impl Trait for Type`), the entry uses `for_type` to name the implementing type and `trait_ref` to name the trait; the symmetry lets cross-crate impls whose self type is external (e.g. `impl MyTrait for std::vec::Vec<i32>`) be declared even though no `TypeEntry` exists for the external self type. For `inherent_impls` (inherent impl blocks, `impl Type`), the entry uses `type_name` to identify the implementing struct.
+
 `<this-crate>` is one of the crate names listed in `architecture-rules.json` (e.g. one of this workspace's layered crates) — substitute it at draft time. By convention `crate_name == layer` for tracked workspace catalogues.
 
-This section IS the SSoT for the v3 catalogue schema fields enumerated below — there is no separate source-code citation. If you suspect this reference is out of step with what `bin/sotp` actually accepts, raise it as an Open Question rather than guessing.
+This section is a derived reference for the v3 catalogue schema fields enumerated below. The canonical SSoT is the source code under `libs/domain/src/tddd/catalogue_v2/` — specifically `CatalogueDocument`, `TypeEntry`, `TraitEntry`, `FunctionEntry`, `TraitImplDeclV2`, and `InherentImplDeclV2`. If you suspect this reference is out of step with what `bin/sotp` actually accepts, read the source definitions and raise it as an Open Question rather than guessing.
 
 ### TypeEntry (under `types: { ... }`)
 
@@ -238,7 +242,6 @@ This section IS the SSoT for the v3 catalogue schema fields enumerated below —
   "role":   "<type-section role value>",
   "kind":   { "kind": "<unit_struct|tuple_struct|plain_struct|enum|type_alias>", ... },
   "methods":           [<MethodDeclaration>, ...],
-  "trait_impls":       [<TraitImplDecl>,    ...],
   "module_path":       "<path::segments>",
   "docs":              "<optional docstring>" | null,
   "spec_refs":         [<SpecRef>, ...],
@@ -248,28 +251,60 @@ This section IS the SSoT for the v3 catalogue schema fields enumerated below —
 
 `role` MUST be one of the **13 type-section role values**: `ValueObject` | `Entity` | `AggregateRoot` | `DomainService` | `Specification` | `Factory` | `UseCase` | `Interactor` | `Command` | `Query` | `Dto` | `ErrorType` | `SecondaryAdapter`. Using a trait-section or function-section role here is a parse-time error.
 
-`TraitImplDecl` shape (each element of `trait_impls`):
+`TraitImplDeclV2` shape (each element of the top-level `trait_impls` array):
 
 ```json
 {
-  "trait_name":   "<TraitName>",
-  "origin_crate": "<CrateName>"
+  "action":    "add" | "modify" | "reference" | "delete",
+  "trait_ref": "<TypeRef>",
+  "for_type":  "<TypeRef>"
 }
 ```
 
-or with generic args:
+or with impl-block-level generics:
 
 ```json
 {
-  "trait_name":   "<TraitName>",
-  "origin_crate": "<CrateName>",
-  "generic_args": "<TypeRef>"
+  "action":                "add" | "modify" | "reference" | "delete",
+  "trait_ref":             "<TypeRef>",
+  "for_type":              "<TypeRef>",
+  "impl_generics":         [<MethodGenericParam>, ...],
+  "impl_where_predicates": [<WherePredicateDecl>, ...]
 }
 ```
 
-- `trait_name` — last-segment trait name (e.g. `"AdrFilePort"`, `"From"`)
-- `origin_crate` — crate that defines the trait. Workspace crates use the names from `architecture-rules.json`; external crates use their published name (e.g. `"core"`, `"std"`, `"serde"`)
-- `generic_args` — optional string field; the inner type argument **without** surrounding `<>` (e.g. `"CatalogueLoaderError"` for `From<CatalogueLoaderError>`). **Omit the field** when the trait has no generic instantiation that needs disambiguation — this is the canonical wire format (the DTO uses `#[serde(skip_serializing_if = "Option::is_none")]`). The decoder also accepts `"generic_args": null` as equivalent to absent, but omission is preferred.
+- `action` — the TDDD operation for this impl entry (`"add"` / `"modify"` / `"reference"` / `"delete"`). **Defaults to `"add"`** (the codec uses `#[serde(default = "default_action")]`), so it may be omitted when `Add` is intended (the common case for new impls). Every `trait_impls` entry carries its own `action` — as a top-level independent entry with no parent `TypeEntry`, the action is not inherited.
+- `trait_ref` — the trait reference as a TypeRef string, **including** the generic args if any (e.g. `"core::convert::From<MyError>"`, `"std::fmt::Display"`, `"FnOnce<(A,), B>"`). Self-crate traits use the bare short name (`"MyTrait"`); external crate traits use a crate-prefixed fully-qualified path. The crate-prefix convention is the same as for any TypeRef (external crate items carry a crate prefix; self-crate items do not), so the A-codec resolves the trait crate via the standard `external_crates` auto-build.
+- `for_type` — the self type of the impl (the `Type` in `impl Trait for Type`) as a TypeRef string. Self-crate types use the bare short name (e.g. `"SelfType"`); external crate types use a crate-prefixed fully-qualified path (e.g. `"std::vec::Vec<i32>"`). Because the impl is a top-level entry (not attached to a `TypeEntry`), an external self type needs no `TypeEntry` to be declared.
+- `impl_generics` — optional array of impl-block-level generic type parameters (`impl<L, R> Trait for Foo<L, R>` → entries for `L`, `R`). **Omit when empty** (DTO uses `#[serde(default, skip_serializing_if = "Vec::is_empty")]`).
+- `impl_where_predicates` — optional array of impl-block-level where-clause predicates on `impl_generics`. **Omit when empty.**
+
+`InherentImplDeclV2` shape (each element of the top-level `inherent_impls` array):
+
+```json
+{
+  "type_name":  "<TypeName>",
+  "methods":    [<MethodDeclaration>, ...]
+}
+```
+
+or with impl-block-level generics:
+
+```json
+{
+  "type_name":             "<TypeName>",
+  "impl_generics":         [<MethodGenericParam>, ...],
+  "impl_where_predicates": [<WherePredicateDecl>, ...],
+  "methods":               [<MethodDeclaration>, ...]
+}
+```
+
+- `type_name` — the name of the type this impl block belongs to. Multiple `InherentImplDeclV2` entries sharing the same `type_name` represent multiple inherent `impl` blocks for one struct in the source.
+- `methods` — method declarations inside this impl block. **Omit or set to `[]` when empty.**
+- `impl_generics` — optional impl-block-level generic type parameters. **Omit when empty.**
+- `impl_where_predicates` — optional impl-block-level where-clause predicates. **Omit when empty.**
+
+**Key difference from `trait_impls`**: `InherentImplDeclV2` has **no `action` field**. The DTO uses `#[serde(deny_unknown_fields)]`, so writing `"action": "add"` on an `inherent_impls` entry will be rejected by the codec. Do not add `action` to inherent impl entries.
 
 ### TraitEntry (under `traits: { ... }`)
 
@@ -442,7 +477,7 @@ Pre-condition: the entry is **NOT in baseline (B)**. This track introduces it.
 
 - `methods` (for traits and structs — `TraitEntry.methods` AND `TypeEntry.methods` for inherent impls), `fields` (for plain_struct / tuple_struct), `params` / `returns` (for functions / methods)
 - `has_default_impl` on each `MethodDeclaration` in a `TraitEntry`: `true` for trait methods with a default body, `false` for required methods (for inherent methods in `TypeEntry` the codec always sets `has_body: true` regardless of `has_default_impl` — inherent methods always have a body in Rust; write `has_default_impl: false`)
-- `trait_impls` (for `TypeEntry` — Phase 2 compares impl identity; incomplete `trait_impls` causes impl-drift signals → 🟡 / 🔴)
+- `trait_impls` / `inherent_impls` (**top-level arrays**, not `TypeEntry` fields — Phase 2 compares impl identity; an impl whose `for_type` (for `trait_impls`) or `type_name` (for `inherent_impls`) names this entry must be declared as a top-level entry; incomplete declarations cause impl-drift signals → 🟡 / 🔴)
 - `supertrait_bounds` (for `TraitEntry` — Phase 2 compares these; omitting or misdeclaring them produces `Mismatch`)
 - `generics` / `where_predicates` on the entry or its methods
 - `is_async` on `FunctionEntry` and on each `MethodDeclaration` that is async
@@ -463,7 +498,7 @@ Pre-condition: the entry **IS in baseline (B)** and **this track will change its
 - **trait AND struct must declare ALL methods** (`TypeEntry.methods` for inherent impls, `TraitEntry.methods` for trait methods; partial enumeration produces `len(a.methods) != len(b.methods)` → `Mismatch_Modify` → 🟡)
 - **for `TraitEntry` methods: `MethodDeclaration.has_default_impl` must reflect the post-modification state** — `true` if the trait method has a default body, `false` if it is required. A trait method that flips between required and default changes the structural equality; wrong value → `Mismatch_Modify` → 🟡. For `TypeEntry` inherent methods, the codec always sets `has_body: true` regardless of `has_default_impl` (inherent methods always have a body); always write `has_default_impl: false`
 - **trait must declare correct `supertrait_bounds`** (Phase 2 compares bounds; wrong or missing bounds → `Mismatch_Modify` → 🟡)
-- **struct must declare ALL `trait_impls`** (incomplete impl declarations produce impl-drift signals → 🟡 / 🔴)
+- **all impl blocks for the struct must be declared** as top-level `trait_impls` entries (using `for_type`) and `inherent_impls` entries (using `type_name`) naming the struct (incomplete impl declarations produce impl-drift signals → 🟡 / 🔴)
 - **struct must declare ALL fields** in `kind.fields` (partial fields → length mismatch → 🟡)
 - **enum must declare ALL variants** in `kind.variants`, each with the correct `payload` shape (missing variant or wrong payload → 🟡)
 - **type alias must restate the correct `kind.target`** — the post-modification target type (wrong target → 🟡)
@@ -551,7 +586,6 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
           "where_predicates": []
         }
       ],
-      "trait_impls": [],
       "module_path": "adr",
       "docs": "Typestate for a newly drafted decision awaiting review.",
       "spec_refs": [],
@@ -578,7 +612,6 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
           "where_predicates": []
         }
       ],
-      "trait_impls": [],
       "module_path": "adr",
       "docs": "Typestate for a decision that has been accepted.",
       "spec_refs": [], "informal_grounds": []
@@ -595,7 +628,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
         "has_stripped_fields": false,
         "typestate": { "state_name": "AdrDecisionLifecycle", "transition_methods": [] }
       },
-      "methods": [], "trait_impls": [],
+      "methods": [],
       "module_path": "adr",
       "docs": "Typestate for a decision that has been implemented.",
       "spec_refs": [], "informal_grounds": []
@@ -612,7 +645,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
         "has_stripped_fields": false,
         "typestate": { "state_name": "AdrDecisionLifecycle", "transition_methods": [] }
       },
-      "methods": [], "trait_impls": [],
+      "methods": [],
       "module_path": "adr",
       "docs": "Terminal typestate for a decision replaced by a later decision.",
       "spec_refs": [], "informal_grounds": []
@@ -626,7 +659,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
         "has_stripped_fields": false,
         "typestate": { "state_name": "AdrDecisionLifecycle", "transition_methods": [] }
       },
-      "methods": [], "trait_impls": [],
+      "methods": [],
       "module_path": "adr",
       "docs": "Terminal typestate for a deprecated decision.",
       "spec_refs": [], "informal_grounds": []
@@ -644,7 +677,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
           { "name": "Deprecated",   "payload": { "kind": "tuple", "fields": ["DeprecatedDecision"] } }
         ]
       },
-      "methods": [], "trait_impls": [],
+      "methods": [],
       "module_path": "adr",
       "docs": "Enum wrapper for heterogeneous Vec<AdrDecisionEntry> membership.",
       "spec_refs": [], "informal_grounds": []
@@ -670,7 +703,7 @@ Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a 
       "has_stripped_fields": false,
       "typestate": null
     },
-    "methods": [], "trait_impls": [],
+    "methods": [],
     "module_path": "result", "docs": null, "spec_refs": [], "informal_grounds": []
   },
   "SomeResult": {
@@ -683,7 +716,7 @@ Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a 
         { "name": "Failure", "payload": { "kind": "tuple", "fields": ["FailureDetail"] } }
       ]
     },
-    "methods": [], "trait_impls": [],
+    "methods": [],
     "module_path": "result", "docs": null, "spec_refs": [], "informal_grounds": []
   }
 }
@@ -691,7 +724,7 @@ Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a 
 
 ### Pattern 3: Hexagonal port + adapter pair (cross-crate references)
 
-The core-tier crate declares the port + error type; an adapter-tier crate declares the adapter that implements it. The adapter's `trait_impls` entry references the port via `trait_name` + `origin_crate` so the cross-crate edge is resolvable.
+The core-tier crate declares the port + error type; an adapter-tier crate declares the adapter that implements it. The adapter side puts a **top-level `trait_impls` entry** whose `trait_ref` references the port via a crate-prefixed fully-qualified path and whose `for_type` names the adapter, so the cross-crate edge is resolvable.
 
 ```jsonc
 // <core-crate>-types.json
@@ -710,7 +743,7 @@ The core-tier crate declares the port + error type; an adapter-tier crate declar
           { "name": "ReadFile",  "payload": { "kind": "tuple", "fields": ["std::path::PathBuf", "String"] } }
         ]
       },
-      "methods": [], "trait_impls": [],
+      "methods": [],
       "module_path": "adr::port", "docs": null, "spec_refs": [], "informal_grounds": []
     }
   },
@@ -741,7 +774,7 @@ The core-tier crate declares the port + error type; an adapter-tier crate declar
 ```
 
 ```jsonc
-// <adapter-crate>-types.json — adapter side; cross-crate refs use trait_name + origin_crate
+// <adapter-crate>-types.json — adapter side; the impl is a top-level trait_impls entry
 {
   "schema_version": 3,
   "crate_name": "<adapter-crate>",
@@ -757,25 +790,25 @@ The core-tier crate declares the port + error type; an adapter-tier crate declar
         "typestate": null
       },
       "methods": [],
-      "trait_impls": [
-        {
-          "trait_name":   "AdrFilePort",
-          "origin_crate": "<core-crate>"
-        }
-      ],
       "module_path": "adr::fs",
       "docs": "Filesystem adapter implementing AdrFilePort.",
       "spec_refs": [], "informal_grounds": []
     }
   },
   "traits": {},
-  "functions": {}
+  "functions": {},
+  "trait_impls": [
+    {
+      "trait_ref": "<core-crate>::adr::port::AdrFilePort",
+      "for_type":  "FsAdrFileAdapter"
+    }
+  ]
 }
 ```
 
 Notes:
 - Cross-crate references in `params[].ty` / `returns` use **FQN** (e.g. `<core-crate>::adr::port::AdrFilePort`). The A-codec's `external_crates` auto-build resolves the prefix to an `ExternalCrate` entry.
-- `trait_impls` entries use `trait_name` (last-segment, e.g. `"AdrFilePort"`) + `origin_crate` (workspace crate name from `architecture-rules.json`, e.g. `"<core-crate>"`) — NOT a `trait_path` FQN field.
+- `trait_impls` is a **top-level array** (not a `TypeEntry` field). Each entry uses `action` (defaults to `"add"` when omitted) + `trait_ref` (the trait reference as a TypeRef — a crate-prefixed FQN for a cross-crate port, e.g. `"<core-crate>::adr::port::AdrFilePort"`; a bare short name for a self-crate trait) + `for_type` (the implementing self type — a bare short name for a self-crate type, e.g. `"FsAdrFileAdapter"`).
 - In-crate references (within the same `crate_name`) use **last-segment names** (e.g. `AdrFrontMatter`). Standard-library types not in the auto-resolve set (e.g. `std::path::PathBuf`) use their full path.
 - Object-safety: prefer owned types (`std::path::PathBuf`) over unsized borrowed types (`&std::path::Path`) in port method signatures so `Arc<dyn Port>` works without lifetime gymnastics.
 
@@ -866,7 +899,7 @@ A `type_alias` entry is for a genuine Rust `pub type` declaration — a named al
     "action": "add",
     "role":   "Dto",
     "kind":   { "kind": "type_alias", "target": "Result<TrackId, TrackError>" },
-    "methods": [], "trait_impls": [],
+    "methods": [],
     "module_path": "track", "docs": null, "spec_refs": [], "informal_grounds": []
   }
 }
@@ -882,7 +915,7 @@ The `kind` field MUST match the deleted type's ACTUAL kind from the baseline (e.
     "action": "delete",
     "role":   "Dto",
     "kind":   { "kind": "plain_struct", "fields": [{ "name": "value", "ty": "String" }], "has_stripped_fields": false, "typestate": null },
-    "methods": [], "trait_impls": [],
+    "methods": [],
     "module_path": "legacy",
     "docs": "Superseded by ConfigV2 in this track (ADR …).",
     "spec_refs": [], "informal_grounds": []

@@ -22,7 +22,6 @@ use crate::tddd::catalogue_v2::methods::{
 // `MethodDeclaration`, `InherentImplDeclV2`, and now also `TraitEntry`
 // (ADR `2026-05-18-1223` D2 / IN-07).
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
-use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
 
 // ---------------------------------------------------------------------------
 // TypeEntry — entry in CatalogueDocument::types
@@ -46,8 +45,6 @@ pub struct TypeEntry {
     pub kind: TypeKindV2,
     /// Inherent methods declared on this type.
     pub methods: Vec<MethodDeclaration>,
-    /// Trait implementations declared for this type.
-    pub trait_impls: Vec<TraitImplDeclV2>,
     /// Module path within the crate (empty = crate root). Serde default = empty.
     pub module_path: ModulePath,
     /// Optional documentation string.
@@ -217,7 +214,7 @@ pub struct InherentImplDeclV2 {
 mod tests {
     use super::*;
     use crate::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef,
+        CrateName, FieldName, MethodName, ModulePath, ParamName, TypeName, TypeRef,
     };
     use crate::tddd::catalogue_v2::roles::SelfReceiver;
     use crate::tddd::catalogue_v2::variants::FieldDecl;
@@ -238,7 +235,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -262,7 +258,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: Some("A domain entity.".to_string()),
             spec_refs: vec![],
@@ -277,27 +272,6 @@ mod tests {
             _ => panic!("expected PlainStruct kind"),
         }
         assert_eq!(entry.docs, Some("A domain entity.".to_string()));
-    }
-
-    #[test]
-    fn test_type_entry_with_trait_impls() {
-        let trait_impl = TraitImplDeclV2::new(
-            TraitName::new("Display").unwrap(),
-            CrateName::new("std").unwrap(),
-        );
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::ValueObject,
-            kind: TypeKindV2::Enum { variants: vec![] },
-            methods: vec![],
-            trait_impls: vec![trait_impl.clone()],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.trait_impls.len(), 1);
-        assert_eq!(entry.trait_impls[0], trait_impl);
     }
 
     #[test]
@@ -316,7 +290,6 @@ mod tests {
             role: DataRole::ValueObject,
             kind: TypeKindV2::TupleStruct { fields: vec![field_ty], has_stripped_fields: false },
             methods: vec![method.clone()],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -339,7 +312,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: module_path.clone(),
             docs: None,
             spec_refs: vec![],
@@ -377,7 +349,6 @@ mod tests {
                     typestate: None,
                 },
                 methods: vec![],
-                trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
                 spec_refs: vec![],
@@ -797,7 +768,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![spec_ref.clone()],
