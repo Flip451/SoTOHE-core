@@ -14,16 +14,14 @@
 
 use crate::plan_ref::{InformalGroundRef, SpecRef};
 use crate::tddd::catalogue_v2::composite::TypeKindV2;
-use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeRef};
+use crate::tddd::catalogue_v2::identifiers::{ModulePath, TypeName, TypeRef};
 use crate::tddd::catalogue_v2::methods::{
     MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
 };
-// Note: `WherePredicateDecl` is used by `FunctionEntry.where_predicates` and
-// `MethodDeclaration.where_predicates`. `TraitEntry` does not currently carry
-// where-predicates (ADR `2026-05-13-1153` IN-30 scope: trait-level generic
-// parameter declarations are not yet schematized).
+// `MethodGenericParam` and `WherePredicateDecl` are used by `FunctionEntry`,
+// `MethodDeclaration`, `InherentImplDeclV2`, and now also `TraitEntry`
+// (ADR `2026-05-18-1223` D2 / IN-07).
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
-use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
 
 // ---------------------------------------------------------------------------
 // TypeEntry — entry in CatalogueDocument::types
@@ -47,8 +45,6 @@ pub struct TypeEntry {
     pub kind: TypeKindV2,
     /// Inherent methods declared on this type.
     pub methods: Vec<MethodDeclaration>,
-    /// Trait implementations declared for this type.
-    pub trait_impls: Vec<TraitImplDeclV2>,
     /// Module path within the crate (empty = crate root). Serde default = empty.
     pub module_path: ModulePath,
     /// Optional documentation string.
@@ -90,6 +86,17 @@ pub struct TraitEntry {
     /// `TypeRef::new` rejects empty strings at construction time, so any stored bound is
     /// guaranteed to be a non-empty type/trait reference string.
     pub supertrait_bounds: Vec<TypeRef>,
+    /// Trait-level generic type parameters (e.g. `[T]` for `trait Foo<T>`).
+    ///
+    /// Default empty Vec for backward compatibility with catalogues that predate this field.
+    /// Reuses `MethodGenericParam` — no new type needed (ADR `2026-05-18-1223` D2 / IN-07).
+    pub generics: Vec<MethodGenericParam>,
+    /// Trait-level `where`-clause bound predicates (e.g. `[{ lhs: "T", rhs: ["Clone"] }]`
+    /// for `trait Foo<T> where T: Clone`).
+    ///
+    /// Default empty Vec for backward compatibility.
+    /// Reuses `WherePredicateDecl` — no new type needed (ADR `2026-05-18-1223` D2 / IN-07).
+    pub where_predicates: Vec<WherePredicateDecl>,
     /// Module path within the crate (empty = crate root). Serde default = empty.
     pub module_path: ModulePath,
     /// Optional documentation string.
@@ -154,6 +161,51 @@ pub struct FunctionEntry {
 }
 
 // ---------------------------------------------------------------------------
+// InherentImplDeclV2 — a single inherent impl block for a named type
+// ---------------------------------------------------------------------------
+
+/// A single inherent `impl` block for a named type (ADR D2, IN-05 / IN-08).
+///
+/// One struct may have multiple `impl` blocks in Rust source code. Each is
+/// represented as a separate `InherentImplDeclV2` entry in
+/// `CatalogueDocument::inherent_impls`. The `type_name` field identifies the
+/// target struct; multiple entries sharing the same `type_name` represent
+/// multiple impl blocks for that struct.
+///
+/// ## Scope
+///
+/// - `impl_generics`: type parameters only (lifetime / const parameters are out of scope).
+/// - `impl_where_predicates`: where-clause predicates on the impl-block-level generics.
+/// - `methods`: all methods declared in this impl block.
+///
+/// No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
+/// the domain layer is serialization-free. The infrastructure codec handles JSON.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InherentImplDeclV2 {
+    /// The name of the type this impl block belongs to.
+    ///
+    /// Multiple `InherentImplDeclV2` entries with the same `type_name` represent
+    /// multiple inherent impl blocks for that single struct in the source.
+    pub type_name: TypeName,
+
+    /// Impl-block-level generic type parameters (type parameters only; lifetimes
+    /// and const parameters are out of scope per D2 / IN-05).
+    ///
+    /// Empty Vec when the impl block is not generic (the common case).
+    pub impl_generics: Vec<MethodGenericParam>,
+
+    /// Impl-block-level where-clause predicates applied to `impl_generics`.
+    ///
+    /// Empty Vec when there are no impl-level where predicates.
+    pub impl_where_predicates: Vec<WherePredicateDecl>,
+
+    /// Method declarations inside this impl block.
+    ///
+    /// Empty Vec when the impl block contains no methods.
+    pub methods: Vec<MethodDeclaration>,
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -162,7 +214,7 @@ pub struct FunctionEntry {
 mod tests {
     use super::*;
     use crate::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, MethodName, ModulePath, ParamName, TraitName, TypeRef,
+        CrateName, FieldName, MethodName, ModulePath, ParamName, TypeName, TypeRef,
     };
     use crate::tddd::catalogue_v2::roles::SelfReceiver;
     use crate::tddd::catalogue_v2::variants::FieldDecl;
@@ -183,7 +235,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -207,7 +258,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: Some("A domain entity.".to_string()),
             spec_refs: vec![],
@@ -222,27 +272,6 @@ mod tests {
             _ => panic!("expected PlainStruct kind"),
         }
         assert_eq!(entry.docs, Some("A domain entity.".to_string()));
-    }
-
-    #[test]
-    fn test_type_entry_with_trait_impls() {
-        let trait_impl = TraitImplDeclV2::new(
-            TraitName::new("Display").unwrap(),
-            CrateName::new("std").unwrap(),
-        );
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::ValueObject,
-            kind: TypeKindV2::Enum { variants: vec![] },
-            methods: vec![],
-            trait_impls: vec![trait_impl.clone()],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        assert_eq!(entry.trait_impls.len(), 1);
-        assert_eq!(entry.trait_impls[0], trait_impl);
     }
 
     #[test]
@@ -261,7 +290,6 @@ mod tests {
             role: DataRole::ValueObject,
             kind: TypeKindV2::TupleStruct { fields: vec![field_ty], has_stripped_fields: false },
             methods: vec![method.clone()],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -284,7 +312,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: module_path.clone(),
             docs: None,
             spec_refs: vec![],
@@ -322,7 +349,6 @@ mod tests {
                     typestate: None,
                 },
                 methods: vec![],
-                trait_impls: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
                 spec_refs: vec![],
@@ -344,6 +370,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![],
             supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -370,6 +398,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![save_method.clone()],
             supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: Some("User repository port.".to_string()),
             spec_refs: vec![],
@@ -389,6 +419,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![],
             supertrait_bounds: vec![send.clone(), sync.clone()],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -412,6 +444,8 @@ mod tests {
                 role,
                 methods: vec![],
                 supertrait_bounds: vec![],
+                generics: vec![],
+                where_predicates: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
                 spec_refs: vec![],
@@ -419,6 +453,118 @@ mod tests {
             };
             assert_eq!(entry.role, role);
         }
+    }
+
+    #[test]
+    fn test_trait_entry_new_has_empty_generics_by_default() {
+        // AC-07: TraitEntry must carry a generics field defaulting to empty Vec.
+        let entry = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert!(entry.generics.is_empty());
+    }
+
+    #[test]
+    fn test_trait_entry_new_has_empty_where_predicates_by_default() {
+        // AC-07: TraitEntry must carry a where_predicates field defaulting to empty Vec.
+        let entry = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert!(entry.where_predicates.is_empty());
+    }
+
+    #[test]
+    fn test_trait_entry_generics_and_where_predicates_for_generic_trait_decl() {
+        // AC-07 primary: `trait Foo<T> where T: Clone` can be represented.
+        use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+        let entry = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![],
+            }],
+            where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        assert_eq!(entry.generics.len(), 1);
+        assert_eq!(entry.generics[0].name.as_str(), "T");
+        assert_eq!(entry.where_predicates.len(), 1);
+        assert_eq!(entry.where_predicates[0].lhs.as_str(), "T");
+        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Clone");
+    }
+
+    #[test]
+    fn test_trait_entry_generics_participates_in_equality() {
+        // generics field must participate in PartialEq (derive-level guarantee).
+        let base = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let mut with_generic = base.clone();
+        with_generic.generics =
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        assert_ne!(base, with_generic, "generics field must participate in equality");
+    }
+
+    #[test]
+    fn test_trait_entry_where_predicates_participates_in_equality() {
+        // where_predicates field must participate in PartialEq.
+        use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+        let base = TraitEntry {
+            action: ItemAction::Add,
+            role: ContractRole::SecondaryPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        };
+        let mut with_pred = base.clone();
+        with_pred.where_predicates = vec![WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
+        }];
+        assert_ne!(base, with_pred, "where_predicates field must participate in equality");
     }
 
     // -----------------------------------------------------------------------
@@ -551,9 +697,10 @@ mod tests {
 
     #[test]
     fn test_function_entry_with_where_predicates_stores_them() {
-        // ADR 2026-05-13-1153 D2: FunctionEntry carries explicit where_predicates so
+        // ADR 2026-05-18-1223 D1: FunctionEntry carries explicit where_predicates so
         // catalogue authors can express constraints whose LHS is a type expression
         // (e.g. `where Vec<T>: Bound`) that the inline form cannot represent.
+        use crate::tddd::catalogue_v2::methods::BoundOp;
         let entry = FunctionEntry {
             action: ItemAction::Add,
             role: FunctionRole::FreeFunction,
@@ -562,20 +709,22 @@ mod tests {
             is_async: false,
             generics: vec![],
             where_predicates: vec![WherePredicateDecl {
-                type_: TypeRef::new("Vec<T>").unwrap(),
-                bounds: vec![TypeRef::new("Send").unwrap()],
+                lhs: TypeRef::new("Vec<T>").unwrap(),
+                rhs: vec![TypeRef::new("Send").unwrap()],
+                operator: BoundOp::Bound,
             }],
             docs: None,
             spec_refs: vec![],
             informal_grounds: vec![],
         };
         assert_eq!(entry.where_predicates.len(), 1);
-        assert_eq!(entry.where_predicates[0].type_.as_str(), "Vec<T>");
-        assert_eq!(entry.where_predicates[0].bounds[0].as_str(), "Send");
+        assert_eq!(entry.where_predicates[0].lhs.as_str(), "Vec<T>");
+        assert_eq!(entry.where_predicates[0].rhs[0].as_str(), "Send");
     }
 
     #[test]
     fn test_function_entry_where_predicates_distinguish_otherwise_equal_entries() {
+        use crate::tddd::catalogue_v2::methods::BoundOp;
         let base = FunctionEntry {
             action: ItemAction::Add,
             role: FunctionRole::FreeFunction,
@@ -590,8 +739,9 @@ mod tests {
         };
         let mut with_where = base.clone();
         with_where.where_predicates = vec![WherePredicateDecl {
-            type_: TypeRef::new("T").unwrap(),
-            bounds: vec![TypeRef::new("Clone").unwrap()],
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
         }];
         assert_ne!(base, with_where, "where_predicates field participates in equality");
     }
@@ -618,7 +768,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![spec_ref.clone()],
@@ -641,6 +790,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![],
             supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -682,6 +833,160 @@ mod tests {
         assert_eq!(entry.spec_refs[0], spec_ref);
         assert_eq!(entry.informal_grounds.len(), 1);
         assert_eq!(entry.informal_grounds[0], ground);
+    }
+
+    // -----------------------------------------------------------------------
+    // InherentImplDeclV2
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_inherent_impl_decl_v2_one_struct_multiple_impl_blocks() {
+        // Verifies the primary design constraint: 1 struct can have N impl blocks
+        // represented as N separate `InherentImplDeclV2` entries in the Vec.
+        let type_name = TypeName::new("Email").unwrap();
+
+        let method_a = MethodDeclaration::new(
+            MethodName::new("as_str").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("str").unwrap(),
+            false,
+            None,
+        );
+        let method_b = MethodDeclaration::new(
+            MethodName::new("validate").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Result<(), DomainError>").unwrap(),
+            false,
+            None,
+        );
+
+        let impl_block_a = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_a.clone()],
+        };
+        let impl_block_b = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![method_b.clone()],
+        };
+
+        // Both blocks share the same type_name, representing two inherent impl blocks
+        // for `Email` in the source code.
+        assert_eq!(impl_block_a.type_name, type_name);
+        assert_eq!(impl_block_b.type_name, type_name);
+        assert_eq!(impl_block_a.methods.len(), 1);
+        assert_eq!(impl_block_b.methods.len(), 1);
+        assert_eq!(impl_block_a.methods[0].name.as_str(), "as_str");
+        assert_eq!(impl_block_b.methods[0].name.as_str(), "validate");
+
+        // A Vec of two entries represents the two impl blocks for one struct.
+        let inherent_impls = [impl_block_a, impl_block_b];
+        assert_eq!(inherent_impls.len(), 2);
+        assert_eq!(inherent_impls[0].type_name, inherent_impls[1].type_name);
+    }
+
+    #[test]
+    fn test_inherent_impl_decl_v2_with_generics_and_where_predicates() {
+        use crate::tddd::catalogue_v2::methods::{BoundOp, WherePredicateDecl};
+
+        let type_name = TypeName::new("Container").unwrap();
+        let generic_param = MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Clone").unwrap()],
+        };
+        let where_pred = WherePredicateDecl {
+            lhs: TypeRef::new("Vec<T>").unwrap(),
+            rhs: vec![TypeRef::new("Send").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        let impl_block = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![generic_param],
+            impl_where_predicates: vec![where_pred],
+            methods: vec![],
+        };
+
+        assert_eq!(impl_block.type_name, type_name);
+        assert_eq!(impl_block.impl_generics.len(), 1);
+        assert_eq!(impl_block.impl_generics[0].name.as_str(), "T");
+        assert_eq!(impl_block.impl_where_predicates.len(), 1);
+        assert_eq!(impl_block.impl_where_predicates[0].lhs.as_str(), "Vec<T>");
+        assert!(impl_block.methods.is_empty());
+    }
+
+    #[test]
+    fn test_inherent_impl_decl_v2_default_fields_are_empty_vecs() {
+        let type_name = TypeName::new("Foo").unwrap();
+        let impl_block = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        };
+        assert!(impl_block.impl_generics.is_empty());
+        assert!(impl_block.impl_where_predicates.is_empty());
+        assert!(impl_block.methods.is_empty());
+    }
+
+    #[test]
+    fn test_inherent_impl_decl_v2_equality_by_all_fields() {
+        let type_name = TypeName::new("Foo").unwrap();
+        let a = InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        };
+        let b = a.clone();
+        assert_eq!(a, b);
+    }
+
+    // -----------------------------------------------------------------------
+    // CatalogueDocument.inherent_impls
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_catalogue_document_inherent_impls_defaults_to_empty() {
+        use crate::tddd::catalogue_v2::document::CatalogueDocument;
+        use crate::tddd::layer_id::LayerId;
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let doc = CatalogueDocument::new(3, crate_name, layer);
+        assert!(doc.inherent_impls.is_empty());
+    }
+
+    #[test]
+    fn test_catalogue_document_inherent_impls_stores_multiple_entries_for_one_type() {
+        use crate::tddd::catalogue_v2::document::CatalogueDocument;
+        use crate::tddd::layer_id::LayerId;
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+
+        let type_name = TypeName::new("Email").unwrap();
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        });
+        doc.inherent_impls.push(InherentImplDeclV2 {
+            type_name: type_name.clone(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![],
+            methods: vec![],
+        });
+
+        assert_eq!(doc.inherent_impls.len(), 2);
+        assert_eq!(doc.inherent_impls[0].type_name, type_name);
+        assert_eq!(doc.inherent_impls[1].type_name, type_name);
     }
 
     // -----------------------------------------------------------------------

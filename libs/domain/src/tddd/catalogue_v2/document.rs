@@ -26,8 +26,11 @@
 
 use std::collections::BTreeMap;
 
-use crate::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use crate::tddd::catalogue_v2::entries::{
+    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+};
 use crate::tddd::catalogue_v2::identifiers::{CrateName, FunctionPath, TraitName, TypeName};
+use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
 use crate::tddd::layer_id::LayerId;
 
 // ---------------------------------------------------------------------------
@@ -92,6 +95,13 @@ pub enum CatalogueDocumentError {
 /// - `types`: BTreeMap of type name → `TypeEntry` (Language = DataType).
 /// - `traits`: BTreeMap of trait name → `TraitEntry` (Language = Contract).
 /// - `functions`: BTreeMap of function path → `FunctionEntry` (Language = Function).
+/// - `inherent_impls`: Vec of `InherentImplDeclV2` (inherent impl block declarations).
+///   Multiple entries with the same `type_name` represent multiple impl blocks for
+///   one struct. Default empty Vec for backward compatibility.
+/// - `trait_impls`: Vec of `TraitImplDeclV2` (trait impl block declarations, top-level).
+///   ADR `2026-05-20-0048` D1: each entry is an independent `impl Trait for Type` block
+///   with `trait_ref` + `for_type` fields. Both self-crate and external-crate types are
+///   supported symmetrically. Default empty Vec.
 ///
 /// ## Validation
 ///
@@ -104,7 +114,7 @@ pub enum CatalogueDocumentError {
 /// - identifier format validation (via `FromStr` / `TryFrom`)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CatalogueDocument {
-    /// Format version; currently `2` for the v2 schema.
+    /// Format version; currently `3` for the v2 schema.
     pub schema_version: u32,
     /// The crate this catalogue describes.
     pub crate_name: CrateName,
@@ -116,6 +126,21 @@ pub struct CatalogueDocument {
     pub traits: BTreeMap<TraitName, TraitEntry>,
     /// Function entries (free function declarations).
     pub functions: BTreeMap<FunctionPath, FunctionEntry>,
+    /// Inherent impl block declarations (one entry per impl block).
+    ///
+    /// Multiple entries sharing the same `type_name` represent multiple inherent
+    /// `impl` blocks for one struct. Default empty Vec — catalogues predating
+    /// this field decode as if they had no inherent impl blocks.
+    pub inherent_impls: Vec<InherentImplDeclV2>,
+
+    /// Trait impl block declarations (top-level, ADR `2026-05-20-0048` D1).
+    ///
+    /// Each entry represents one `impl Trait for Type` block. Unlike the old design
+    /// where these were embedded in `TypeEntry::trait_impls`, top-level placement
+    /// enables declaring impls for external-crate self types (Case B orphan impls).
+    ///
+    /// Default empty Vec — catalogues predating this field decode without trait impl blocks.
+    pub trait_impls: Vec<TraitImplDeclV2>,
 }
 
 impl CatalogueDocument {
@@ -129,6 +154,8 @@ impl CatalogueDocument {
             types: BTreeMap::new(),
             traits: BTreeMap::new(),
             functions: BTreeMap::new(),
+            inherent_impls: Vec::new(),
+            trait_impls: Vec::new(),
         }
     }
 
@@ -187,7 +214,6 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -366,6 +392,48 @@ mod tests {
     // -----------------------------------------------------------------------
     // 1-crate-per-file invariant documentation
     // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // CatalogueDocument.trait_impls (ADR 0048 D1)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_catalogue_document_trait_impls_defaults_to_empty() {
+        // AC-13: CatalogueDocument must have top-level trait_impls defaulting to empty.
+        use crate::tddd::catalogue_v2::identifiers::CrateName;
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let doc = CatalogueDocument::new(3, crate_name, layer);
+        assert!(doc.trait_impls.is_empty());
+    }
+
+    #[test]
+    fn test_catalogue_document_trait_impls_stores_entries() {
+        use crate::tddd::catalogue_v2::identifiers::{CrateName, TypeRef};
+        use crate::tddd::catalogue_v2::traits::TraitImplDeclV2;
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer);
+
+        // Case A: external trait + self-crate type
+        let impl_a = TraitImplDeclV2::new(
+            TypeRef::new("std::fmt::Display").unwrap(),
+            TypeRef::new("SelfType").unwrap(),
+        );
+        // Case B: self-crate trait + external type
+        let impl_b = TraitImplDeclV2::new(
+            TypeRef::new("MyTrait").unwrap(),
+            TypeRef::new("std::vec::Vec<i32>").unwrap(),
+        );
+
+        doc.trait_impls.push(impl_a.clone());
+        doc.trait_impls.push(impl_b.clone());
+
+        assert_eq!(doc.trait_impls.len(), 2);
+        assert_eq!(doc.trait_impls[0], impl_a);
+        assert_eq!(doc.trait_impls[1], impl_b);
+    }
 
     #[test]
     fn test_catalogue_document_one_crate_per_layer_structural_invariant() {

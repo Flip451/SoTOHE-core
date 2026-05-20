@@ -1,0 +1,2825 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 gives `InherentImplDeclV2` its own entry type and simultaneously says `TypeEntry` must not carry impl data, but it never says where the new entry is stored in `CatalogueDocument`. In the current catalogue shape the only impl carrier is `TypeEntry.trait_impls`, so this leaves inherent impl blocks without a serialization/evaluation home.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 79,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The same D2 section reuses `MethodGenericParam` for impl- and trait-declaration generics, but that type only models a parameter name plus bounds for type parameters. It cannot represent lifetime or const generic parameters, so the advertised support for impl/trait generic declarations is narrower than the Rust syntax the ADR claims to cover.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 87,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:5d0e2f4679cafcc736df45ee74992093454b96357a6c2cf8a33e46de51bd7436",
+          "at": "2026-05-19T08:09:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d0e2f4679cafcc736df45ee74992093454b96357a6c2cf8a33e46de51bd7436",
+          "at": "2026-05-19T08:11:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 says the catalogue will model impl-block and trait-declaration generics, but the proposed fields reuse `Vec<MethodGenericParam>`. That type only represents a named type parameter plus bounds; it cannot encode lifetime parameters like `<'a>` or const parameters like `<const N: usize>`. As written, the plan still cannot represent valid Rust impl/trait generic declarations despite claiming to make this level of the schema Rust-syntax-permissive.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 87,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:5d0e2f4679cafcc736df45ee74992093454b96357a6c2cf8a33e46de51bd7436",
+          "at": "2026-05-19T08:14:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2's TraitEntry example models `trait Iterator<Item: Clone>` as a generic parameter (`generics: [{ name: \"Item\", ... }]`), but `Iterator::Item` is an associated type, not a trait type parameter. This puts an associated-type declaration in the trait-generic field and contradicts the stated D2 purpose of representing declarations like `trait Foo<T> where T: ...`; an implementer following the example would add the wrong schema surface for this Rust construct.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 151,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:d00bcc3b3e36df1aa42756fe14f053eb937a71ffd43f97d68376ef25181fe790",
+          "at": "2026-05-19T08:19:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be91fca4df58b9f2e2aac2922cf13765e7b3ed572e5ce87afaa2cd1e5192df36",
+          "at": "2026-05-19T08:21:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` assigns T007-T009 signal-evaluator comparison/pre-step work to `Layer: infrastructure` (see lines 34, 42-43), but `spec.md` line 37 / CN-02 says signal evaluator orchestration must live in `libs/usecase/` and infrastructure is only for rustdoc parsing/codec. The layer assignment is inconsistent with the declared architecture.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 34,
+              "category": "contradiction"
+            },
+            {
+              "message": "`task-coverage.json` line 36 omits `T007` from `AC-08`, but `impl-plan.json` line 34 and `plan.md` line 34 explicitly tie T007 to the 'existing catalogue JSON does not change signal evaluation' check. The acceptance-coverage matrix no longer matches the implementation plan.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/task-coverage.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6bf3a132d147861ed3f5bc6bbcfe5d646c654d785f08a526fc7b79de75a1c977",
+          "at": "2026-05-19T10:01:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This contract-map is still only a placeholder: it explicitly suppresses node shapes and edges, so it does not render the cross-layer type relationships that the briefing says must be captured in this artifact. The `IN-24 / OS-07` deferral note is also a stray cross-reference for this track’s spec set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/contract-map.md",
+              "line": 2,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:cdf9b6220baff157efbcd7d46a3d1f3fde697efc5b476d01b408151fcad6f07a",
+          "at": "2026-05-19T10:05:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` is still a placeholder rather than a rendered contract map: it explicitly says no node shapes or edges are emitted, so the file does not satisfy the scope requirement that this view express the inter-layer type relationships in mermaid form.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/contract-map.md",
+              "line": 2,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cdf9b6220baff157efbcd7d46a3d1f3fde697efc5b476d01b408151fcad6f07a",
+          "at": "2026-05-19T10:07:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 contradiction: `IN-01` claims the new `WherePredicateDecl` shape can also declare precise capture (`use<'a, T>`), but the same item only models `BoundOp` as `:` or `=`. With no `Use`/equivalent variant or alternate representation, the schema cannot satisfy the acceptance criterion as written.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 29,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cdf9b6220baff157efbcd7d46a3d1f3fde697efc5b476d01b408151fcad6f07a",
+          "at": "2026-05-19T10:10:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rendered view mismatch: `/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.md` marks `BoundOp` and `InherentImplDeclV2` as `—`, but the source `/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json` sets both to `action: \"add\"`. The markdown view therefore contradicts the generated JSON and obscures the intended add-vs-modify status.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.md",
+              "line": 7,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1c37b9bdbc4208777b2948367553da054acd816d8c90d0596dd647d1d501f140",
+          "at": "2026-05-19T10:16:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 claims `#[serde(default)]` is enough to keep old `type_/bounds` catalogue JSON loadable after renaming the fields to `lhs/rhs/operator`, but defaulting missing fields does not preserve the old values. As written, existing documents would deserialize with empty predicates unless the plan also requires `alias`/`rename` handling or a migration layer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 13,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:1c37b9bdbc4208777b2948367553da054acd816d8c90d0596dd647d1d501f140",
+          "at": "2026-05-19T10:20:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's compatibility claim is incomplete: it only aliases the legacy `type_`/`bounds` fields to `lhs`/`rhs`, but does not provide any legacy mapping or default for the new `operator` field. As written, older `WherePredicateDecl` records still cannot deserialize into the new shape, so the stated backward-compatibility path is not actually sufficient.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 13,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:f537b0196454e5c034292582d25706ad2df53d8f6e51d3117cde301e634632b2",
+          "at": "2026-05-19T10:24:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d8e4fbec00ed6236f62f213246f65cf4c30e6e9cf6292ca3a93a85db19ac165",
+          "at": "2026-05-19T10:25:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 requires SignalEvaluatorV2 to add symmetric comparison logic for IN-09, but the SignalEvaluatorV2 type declaration only lists the D1 and D3 changes and its spec_refs stop at IN-03/IN-04/IN-10/IN-11. This makes the infrastructure type plan contradict the implementation plan: the evaluator change needed for impl-block and trait-declaration generics is not declared in the type artifact.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json",
+              "line": 109,
+              "category": "contradiction"
+            },
+            {
+              "message": "T004 lists `type_name: TypeName` as a required field for the new InherentImplDeclV2 entry, then says every new field should use `#[serde(default)]` with an empty Vec default. That instruction is semantically invalid for `type_name` and would either be unimplementable as written or allow an inherent impl entry without its target type; only the collection fields or the enclosing document collection should default.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "line": 24,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "The domain type artifact declares the new InherentImplDeclV2 entry, but it does not declare the companion CatalogueDocument modification needed to make that entry appear in catalogue documents, even though T004 explicitly requires adding `CatalogueDocument`'s `inherent_impls` entry. As written, the plan artifacts disagree on whether the document schema itself changes, which undermines AC-05's claim that InherentImplDeclV2 can be declared in a catalogue.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4d8e4fbec00ed6236f62f213246f65cf4c30e6e9cf6292ca3a93a85db19ac165",
+          "at": "2026-05-19T10:30:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T011` is the integration checkpoint, but the `tasks` array still orders it before `T012`, even though `T011` says it validates the D4/orphan-guard fix from `T012` and AC-12. Any consumer that follows the JSON task order will schedule integration before the dependent fix exists, which makes the plan ordering internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "line": 65,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:a9b14c7e2d04a3cbc0c419d5d701b607783b349cc39850a45ca4996a8b97376c",
+          "at": "2026-05-19T11:26:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 says every new field on `InherentImplDeclV2` / `TraitImplDeclV2` / `TraitEntry` uses an empty `Vec`/array default, but the same plan introduces non-collection fields such as `WherePredicateDecl.operator` and `InherentImplDeclV2.type_name` with different defaults. As written, the constraint conflicts with the schema changes it is meant to govern.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 215,
+              "category": "contradiction"
+            },
+            {
+              "message": "S2 claims T004-T006 can be started in parallel, but T004 and T006 both touch `libs/domain/.../entries.rs` (`InherentImplDeclV2`/`CatalogueDocument.inherent_impls` vs `TraitEntry.generics`/`where_predicates`). That is not a disjoint write set, so the parallelism claim is infeasible as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 22,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b3dc76b1d0aad6249297baf4305f3c227583c8732bcf4acc1ab3b26d9f8b573b",
+          "at": "2026-05-19T11:29:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T011 is only gated on T001-T010 here, but the same plan says the remaining infrastructure red is resolved by D4/T012. As written, the integration step can start before the orphan-guard fix it is meant to verify, so the task order is internally inconsistent; T011 should depend on T012 as well.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 50,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:66832bfd5036cc5fcfe08e76a02a7b5d56f25d7688570a9369893e6907c18738",
+          "at": "2026-05-19T11:32:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:475f6ea0623b6d1505b87216d8f73d902f13a8927bca52fd5d4c177c0d033382",
+          "at": "2026-05-19T11:34:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T012 / IN-13 / AC-12 rely on a `TraitImplDeclV2.for_` field that can carry a fully-qualified self-type path, but `domain-types.json` only declares `trait_name`, `origin_crate`, `generic_args`, `impl_generics`, and `impl_where_predicates` for `TraitImplDeclV2`. As written, the D4 cross-crate impl cannot be represented in the catalogue, so the task is infeasible unless the schema adds a target-type field or redefines an existing one.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 45,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f55ebb0fd64b56c92c532266895e8a698a4cd6f7d3b4aa595166605cca608585",
+          "at": "2026-05-19T12:41:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1f60b2ec1a3da5e9784a90d56c8a498499d8af161c6d00182c15cd976dafda9a",
+          "at": "2026-05-19T12:50:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-13`/`T012` require the A-codec to parse `TraitImplDeclV2.for_` as a fully-qualified external self-type and register `external_crates`/`paths`, but the `CatalogueToExtendedCrateCodec` type declaration only records D1/D2 work (`IN-02`, `IN-09`) and its docs say the public shape is otherwise unchanged. The component that must implement the D4 codec behavior is therefore not declared against `IN-13`, while `SignalEvaluatorV2` is. This leaves the D4 plan internally incomplete: the track can declare the new field and remove the evaluator filter while the required codec behavior is missing from the infrastructure type contract.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json",
+              "line": 31,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AC-10` still requires the external-target `for_is_external` flag to be correctly determined, but `AC-12`/`T012` require deleting the `build_impl_identity_map` `for_is_external` filter block, and `T011` validates all acceptance criteria together. As written, the final plan asks implementers to both keep/test a flag-specific behavior and remove the filter that computes it. Scope `AC-10` to the stable remap guarantee (external `for_` is not overwritten) or mark the flag check as pre-D4 only.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.md",
+              "line": 51,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1f60b2ec1a3da5e9784a90d56c8a498499d8af161c6d00182c15cd976dafda9a",
+          "at": "2026-05-19T13:10:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D4 says cross-crate impl declarations can be supported “catalogue schema を変更せず” within the existing `TraitImplDeclV2` structure, but the plan/spec require adding a new `TraitImplDeclV2.for_` field for the same D4 work (`IN-13`/`T012`). That is a semantic contradiction: implementers cannot tell whether D4 is meant to preserve the schema or modify the domain/DTO schema with a new field.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 196,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6d3b467dcbf56047ed0be1a857b80413c849456d0e697da9c88e0c9ac36df732",
+          "at": "2026-05-19T13:15:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4/T012 is not wired into the backward-compatibility and architecture constraint coverage. The spec/plan says T012 adds `TraitImplDeclV2.for_` with `serde default None` and updates the A-codec/signal evaluator, so it is subject to CN-01 and CN-02, but `task-coverage.json` lists CN-01 only for T001/T004/T005/T006 and CN-02 only for T002/T003/T007/T008/T009. That lets the D4 schema/evaluator work be tracked as complete without the stated compatibility/layering constraints being applied to it. Add T012 to the relevant constraint coverage, and likely AC-08 if existing catalogues without `for_` are part of the no-version-bump guarantee.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/task-coverage.json",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:98266d4a7f909aa2ef80175c0faadfb2e760dfa6160c7dfc8d4e6c05e1abf779",
+          "at": "2026-05-19T13:18:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-13/T012 add `TraitImplDeclV2.for_` as an `Option<String>` with `serde default None` and describe it as part of the backward-compatible/no-version-bump design, but the spec’s compatibility guardrails still only cover D1/D2/D3 or new `Vec` fields. OS-04 omits D4, CN-01 is worded only for `Vec` fields, and AC-08 lists missing `impl_generics`/`impl_where_predicates`/`TraitEntry.generics` but not missing `for_`, while those same entries map to T012. This leaves the D4 schema addition outside the stated compatibility criteria it is supposed to satisfy.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.md",
+              "line": 34,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:27570ae51802e47581a0e8b7181d52028e9459f6961116a5aec93dde14acd689",
+          "at": "2026-05-19T13:21:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e801928900556cf84bf785b0641bc372c991686a7a9fed36276eaf5f03b02969",
+          "at": "2026-05-19T13:25:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T012` is marked `done` here even though the same plan still says it must start only after `T009` completes, and `T009` is still `todo`. That makes the artifact internally inconsistent: a downstream task is shown finished while its stated prerequisite is not.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:116b13a62d23314cf38156b6cad27c939dcdc8d659f9de981feff2b171247664",
+          "at": "2026-05-19T14:26:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This scope was described as a track-transition where only T001 should move to `in_progress`, with all other task statuses left unchanged. Instead, the source data now marks T012 as `done` and the rendered plan shows `1/12 resolved`, which overstates progress for this review scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4f61ee4d7b08fe79724633af22f6a7a01028fd408e8c5ee085822727035bb807",
+          "at": "2026-05-19T14:28:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:116b13a62d23314cf38156b6cad27c939dcdc8d659f9de981feff2b171247664",
+          "at": "2026-05-19T14:43:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:116b13a62d23314cf38156b6cad27c939dcdc8d659f9de981feff2b171247664",
+          "at": "2026-05-19T14:51:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1cd68992a263639c73e0d8193e24973c2debad376374ce17adf9dedf8d3b529",
+          "at": "2026-05-19T15:08:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1cd68992a263639c73e0d8193e24973c2debad376374ce17adf9dedf8d3b529",
+          "at": "2026-05-19T15:10:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73d0cf1b245a10826fa245b1c339a57d5493c913f765e94843969359105f9813",
+          "at": "2026-05-19T15:22:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73d0cf1b245a10826fa245b1c339a57d5493c913f765e94843969359105f9813",
+          "at": "2026-05-19T15:30:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfe84a3e682275c3c31f931661882af013fb2fdff811b63732304fbe26e5e3ff",
+          "at": "2026-05-19T15:43:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfe84a3e682275c3c31f931661882af013fb2fdff811b63732304fbe26e5e3ff",
+          "at": "2026-05-19T15:46:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3054fc9d78d577561898fd1b16a5f2659a60ce5fe105750d6407b065a3542fcb",
+          "at": "2026-05-19T15:56:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3054fc9d78d577561898fd1b16a5f2659a60ce5fe105750d6407b065a3542fcb",
+          "at": "2026-05-19T15:59:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1840c7e33ba0e0e5304ecad052e9b8626b628f5f4d3a930efaf03f5d01957d4",
+          "at": "2026-05-19T16:04:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1840c7e33ba0e0e5304ecad052e9b8626b628f5f4d3a930efaf03f5d01957d4",
+          "at": "2026-05-19T16:06:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e561683ffdc0544a5d084e5c875898a8f315aa512b223eb518328be52608fcc",
+          "at": "2026-05-19T16:17:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e561683ffdc0544a5d084e5c875898a8f315aa512b223eb518328be52608fcc",
+          "at": "2026-05-19T16:18:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:311c0037fc34d5fb81b15a0d242551338e2fda4e52a05f67b336115325774386",
+          "at": "2026-05-19T16:32:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:311c0037fc34d5fb81b15a0d242551338e2fda4e52a05f67b336115325774386",
+          "at": "2026-05-19T16:34:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78737ed64aa1a25cd31ba419172a9ce9f3f0818e217600bc2e800baeb6f8163a",
+          "at": "2026-05-19T16:40:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7115bd7f27cd89c20a4b9adc026eec1768edc2c0acd25b373170660d72389d18",
+          "at": "2026-05-19T16:53:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7115bd7f27cd89c20a4b9adc026eec1768edc2c0acd25b373170660d72389d18",
+          "at": "2026-05-19T16:55:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cc78679cc6c8ca61f31d24833625830a62ef0070ed605b1b1b1d6621b7a4cf8",
+          "at": "2026-05-19T18:00:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cc78679cc6c8ca61f31d24833625830a62ef0070ed605b1b1b1d6621b7a4cf8",
+          "at": "2026-05-19T18:02:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f52d464026286e1cd4fe54d0069cfd260a00d20554faa85af18401059fbccbde",
+          "at": "2026-05-19T18:29:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f52d464026286e1cd4fe54d0069cfd260a00d20554faa85af18401059fbccbde",
+          "at": "2026-05-19T18:31:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4a5070864625fd3b71879bf05d6032f4385492586129004389ee66b0ed07671",
+          "at": "2026-05-19T18:41:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4a5070864625fd3b71879bf05d6032f4385492586129004389ee66b0ed07671",
+          "at": "2026-05-19T18:43:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T012` still instructs the implementer to add `TraitImplDeclV2.for_` and teach A-codec to parse it, but the updated `spec.json`/ADR now explicitly say D4 does not introduce a new schema field and instead uses the existing `trait_name` / `generic_args` TypeRef-prefix convention. That leaves the plan internally contradictory and can send the next implementation step toward reintroducing a field the current spec forbids.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "line": 61,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:12169e33bf4b68a35763f60c6132295fdfc9e944233860e6435eae19723212d6",
+          "at": "2026-05-19T23:57:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The S4 summary still describes T012 as adding `TraitImplDeclV2.for_` and parsing `for_ Some`, but the T012 task line below says the opposite: no new schema field is added. `impl-plan.json` carries the same stale S4 wording. The plan is internally contradictory about whether D4 introduces `for_` or keeps the schema unchanged.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 40,
+              "category": "contradiction"
+            },
+            {
+              "message": "`TraitImplDeclV2` now lists only `trait_name`, `origin_crate`, `impl_generics`, and `impl_where_predicates`, but its docstring still says cross-crate impls are expressed via `trait_name / generic_args`. That leaves the schema and its own docs disagreeing about whether `generic_args` exists, and the same convention is still repeated in the spec/plan text.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json",
+              "line": 199,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:62466079085827a3a5e2208737b89a500d33d56578679ca32a7cf5c1ee7f87e3",
+          "at": "2026-05-20T00:01:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b47800b0868f061adb25e74000b6dd0498cd3a0adf963c0d9a55ac70680be666",
+          "at": "2026-05-20T00:04:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-13 tells catalogue authors to put crate-prefixed fully-qualified paths into `TraitImplDeclV2.trait_name`, treating it as part of the TypeRef convention. But the scoped catalogue declares `trait_name` as `TraitName` with `origin_crate` as the separate crate field; only `generic_args` is the raw type-argument string. This makes the documented D4 convention semantically wrong: following it would require a path-like trait name instead of using `origin_crate` for the trait crate and TypeRef prefixes only inside generic args. The same wording is repeated in the ADR/plan docs, so the plan is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 161,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:b47800b0868f061adb25e74000b6dd0498cd3a0adf963c0d9a55ac70680be666",
+          "at": "2026-05-20T00:08:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 still uses `impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError` as the cross-crate case, but the new declaration rule only carries external paths through `TraitImplDeclV2.generic_args`. That encodes the trait's type arguments, not the impl self type after `for`; with `for_` removed, this plan no longer explains how to declare the cited external-self-type impl in catalogue, so the revised D4/AC-12 path is semantically incomplete.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 366,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:cd9f9637ef0c1b4652686dd2c38288cb08841e9ae7bafa93aabe279c158ddcec",
+          "at": "2026-05-20T00:12:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-13/AC-12 claims that a cross-crate impl whose self type is external can be omitted from the catalogue because B-side orphan insertion and C-side filter removal keep both sides symmetric. That is only true for impls already present in the baseline B. For a newly introduced self-external impl, B will not seed it into S, while C will contain it after filter removal, and the plan has rejected the only described way (`for_`) to declare the external self type. This leaves a Rust shape that the plan says is handled but is still not representable for new changes.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 161,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-08 still requires existing catalogue files to load with unchanged signal results, but AC-12 requires the existing cross-crate impl false-positive Red to change to Blue after removing `for_is_external`. These acceptance criteria conflict unless AC-08 is scoped to exclude the intended D4 signal change; as written, an implementation cannot satisfy both unchanged signal output and the Red-to-Blue transition.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 322,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb32640d0e895fe327f485061c4bea0daa640ceccb593b6336587f7acab4b700",
+          "at": "2026-05-20T00:18:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-04 still states that the D1/D2/D3/D4 changes are all serde-default backward-compatible schema extensions, but the updated D4 intent in IN-13 and the ADR explicitly says D4 adds no schema field and only maintains the existing schema. This leaves the spec internally inconsistent about whether D4 is a schema extension or a schema-preserving evaluator change; OS-04 should distinguish the schema-extending parts from D4.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 203,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:00ea22555fdf770537b75cfc2967f3ed59a296819841923cc49a28aa43d6ec5b",
+          "at": "2026-05-20T00:22:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueToExtendedCrateCodec` is the A-side codec, but its D4 docs now describe removing the C-side `build_impl_identity_map` `for_is_external` filter. IN-13/AC-12 assign that behavior to the signal evaluator, and `SignalEvaluatorV2` already carries the corresponding contract later in this same file, so this misplaces the D4 implementation responsibility onto the codec catalogue entry.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json",
+              "line": 31,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:85d0438b8620580694cf9cf985065ad7de080423713f5778b8011b36569324a6",
+          "at": "2026-05-20T00:27:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 still says catalogue authors can declare cross-crate impls by relying on `generic_args`, immediately after narrowing self-type-external `action: add` impls out of scope. For the motivating shape (`impl From<CatalogueToExtendedCrateCodecError> for NewTypeGraphCodecError`), `generic_args` can only describe the trait argument, not the external self type that `for_` would have carried. As written, the plan overstates what remains declarable without `for_` and conflicts with its own out-of-scope limit.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 366,
+              "category": "contradiction"
+            },
+            {
+              "message": "T012 is still labeled `Layer: domain + infrastructure`, but the revised task explicitly says no schema field is added and the concrete implementation work is only removing the `for_is_external` filter in `libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs`. This leaves the task's layer placement semantically stale after the `for_` rollback; it should no longer claim domain-layer implementation work.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "line": 61,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:e61436e16b1fb95ea17c4ecc1e66a3ddd2876f576ae9aaa0e05b0285d2e1f6e5",
+          "at": "2026-05-20T00:31:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3468b34e8508eb00a6429a05d12b23cfb797c8adf3aa4a067a515110d80d51b3",
+          "at": "2026-05-20T00:36:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-10 still says the `for_is_external` filter removal is handled by D4/AC-12, but the updated ADR moved that decision to D3. That leaves the spec pointing at the wrong decision owner and makes the D3/D4 split inconsistent with the rest of the track. The same stale D4 label also remains in [domain-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json):108 and [infrastructure-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json):25,97.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 384,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:55287493b1a5f23b8bd585e72aa0a87ac41b4d0c0a9545f07db1c2be106a2eed",
+          "at": "2026-05-20T03:38:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55287493b1a5f23b8bd585e72aa0a87ac41b4d0c0a9545f07db1c2be106a2eed",
+          "at": "2026-05-20T03:40:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T016 is still marked `todo`, but the scoped catalogue artifacts already show the post-T016 schema: for example `domain-types.json` has top-level `trait_impls` entries using `trait_ref`/`for_type`. This contradicts the task status and leaves AC-13 completion ambiguous for later integration gating.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "line": 83,
+              "category": "contradiction"
+            },
+            {
+              "message": "`GenericArgsError` is documented as deleted because `generic_args` was abolished by ADR 2026-05-20-0048 D2, but its only `spec_refs` anchor is `IN-06`, which is about adding `impl_generics`/`impl_where_predicates`. The semantic reference should point at the requirement that removes `generic_args` (`IN-15`), otherwise traceability for this deletion is broken.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json",
+              "line": 157,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:55287493b1a5f23b8bd585e72aa0a87ac41b4d0c0a9545f07db1c2be106a2eed",
+          "at": "2026-05-20T03:44:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T016 is marked complete even though the same plan says T013 is the prerequisite for T016 and that the work order is schema change (T013) before catalogue rewrite (T016). With T013/T014/T015 still unchecked, the plan is claiming the catalogue has already been rewritten to a schema that the implementation plan says does not exist yet, making the execution state internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 68,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-12 now includes the Add-action external self-type case being declareable and Blue via the new two-axis TraitImplDeclV2 structure, but the task mapping still assigns AC-12 only to T012. T012 is explicitly a temporary `for_` implementation and says the `trait_ref`/`for_type` structure is introduced by T013, with encoding/evaluator work in T014/T015, so the AC coverage is semantically wrong.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.md",
+              "line": 56,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bd6ce47b3dd984dfccf7409571466afa2d06b099886302ae211616ee6f345e6c",
+          "at": "2026-05-20T03:49:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1-D3 are still marked `status: proposed` even though this redesign keeps those earlier decisions as accepted while only D4 is superseded. Leaving the active decisions proposed makes the ADR lifecycle inconsistent with the rest of the plan, which treats D1-D3 as binding requirements.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "The catalogue docs attribute the A-codec top-level `CatalogueDocument.trait_impls` loop to `IN-13`, but the spec defines `IN-13` as only the C-side `for_is_external` filter removal; top-level A-codec processing belongs to IN-15/IN-16. This broken traceability means the type catalogue is claiming coverage under the wrong requirement.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json",
+              "line": 25,
+              "category": "broken_reference"
+            },
+            {
+              "message": "T016 is still unchecked and says the three catalogue files still need to be rewritten after T013, but the scoped catalogue artifacts already use top-level `trait_impls` with `trait_ref`/`for_type`. Since T016 is the task mapped to IN-14/AC-13 for that rewrite, the plan state contradicts the artifacts it is tracking.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 68,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eba56721b28b749ee67b76f3fa881c94029ddd3ac04da5b4b770cc97e1fef7c6",
+          "at": "2026-05-20T03:54:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T016 is marked complete even though the same plan says T013 is the prerequisite for T016 and that the work should run in the order T013 -> T014 -> T015 -> T016. This makes the task state/order internally inconsistent: either the catalogue rewrite is allowed to happen during the type-design phase before T013, or T016 should not be checked off while T013 remains todo.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 68,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ca36430645e3030cbc2999701362fb579f6affb0ec8e000293ff869608db5e2b",
+          "at": "2026-05-20T03:58:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The task ordering contradicts the task status for T016: S6 states that T013 is a prerequisite for T016 and that the sequence is T013 -> T014 -> T015 -> T016, but T016 is already marked done later in the same plan while T013-T015 remain todo. This makes the execution state ambiguous and can cause the integration gate to treat catalogue rewrite as complete before the schema/code tasks it is declared to depend on.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 56,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bdeb98db5ee5c76aed09bae934bf1a8515726cff870ce0a50842e396448e48da",
+          "at": "2026-05-20T04:01:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan still frames early tasks as backward-compatibility work and cites OS-04 for that, e.g. T001 says to preserve old `type_`/`bounds` input via serde aliases. This contradicts the updated spec OS-04, which explicitly says old schema compatibility and migration are out of scope and catalogues are rewritten to the new schema. As written, implementers are told both to avoid and to build old-schema compatibility paths.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "line": 101,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:630107c7e7381f49d84615da5bcee98f6a2e5107d9b343bbfcee7978a4eef201",
+          "at": "2026-05-20T04:04:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 first defines `lhs` as `TypeRef` and `rhs` as `Vec<TypeRef>`, but later in the same task says to apply serde defaults to the Vec fields `lhs` / `rhs`. That makes `lhs` both a required scalar field and an optional/defaulted Vec field in the plan, which is a semantic schema contradiction for `WherePredicateDecl`.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "line": 13,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-16/AC-15 and T015 require the signal evaluator to move trait impl processing onto the new top-level `CatalogueDocument.trait_impls` path and remove the A-side orphan-impl path, but the `SignalEvaluatorV2` catalogue entry still says the track modifies it only by the five old changes ending at IN-13. The infrastructure catalogue therefore omits the new required IN-16 behavior for the very component tasked with implementing it.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json",
+              "line": 97,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:99324c071f6e6e9ceb7bdf97a010e7f1799a646e7a12fd628a15589c04841f60",
+          "at": "2026-05-20T04:09:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR's context says `D2` introduced `InherentImplDeclV2` as `CatalogueDocument.inherent_impls`, but this same ADR's D2 is the `trait_ref`/`for_type` redesign. The inherent-impl decision is the older 2026-05-18 ADR D2, so this is a broken decision reference in the narrative.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+              "line": 32,
+              "category": "broken_reference"
+            },
+            {
+              "message": "AC-10 still says `for_is_external` filter removal is handled by `D4 / AC-12`, while IN-13/AC-12 and the new ADR assign that filter removal to new ADR D3. New ADR D4 is the orphan/top-level path integration, so this leaves the D3/D4 split internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 384,
+              "category": "contradiction"
+            },
+            {
+              "message": "The domain catalogue's new-schema entries describe TypeEntry.trait_impls removal and TraitImplDeclV2's `trait_ref`/`for_type` redesign, but their `spec_refs` still point to old requirements (`TypeEntry` to IN-05, `TraitImplDeclV2` only to IN-06). Those semantic refs should cover IN-14 and IN-15 respectively; as written, traceability for the new ADR schema changes is broken.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json",
+              "line": 219,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:196a074c8eba6a095e96ac3750a9fa22bb0fb7f080834a0516fccd2558952f35",
+          "at": "2026-05-20T04:13:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 routes `HRTB on トレイト境界` into the `WherePredicateDecl` lhs, but the ADR it cites separates these cases: method/type parameter bounds such as `F: for<'a> Fn(&'a ())` remain strings in `MethodGenericParam.bounds`, while only where-predicate lhs values get the `for<'a> ...` prefix. As written, the spec gives implementers the wrong schema location for non-where HRTB trait bounds, contradicting ADR D1 and risking an unrepresentable catalogue declaration.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 45,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7d63a3195c59f26f2e66ac7c7aba65d0ddb93a67f142f2e0b0c73f7f0160c1ac",
+          "at": "2026-05-20T04:19:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58f95df2d31a3e440357103b1542f1ebb51143fef1e9c044fed35b2203162d89",
+          "at": "2026-05-20T04:23:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62b48333f8e8a8129db1086a42f9ce0cc17cbc9559f820040e068c67df1b039d",
+          "at": "2026-05-20T09:33:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ADR makes `TraitImplDeclV2.action` semantically significant: omitted actions default to `Add`, and D4 says an `Add` impl whose identity already exists in baseline must be reported as an action contradiction. This catalogue rewrites all trait impls into the top-level array without an `action`, so existing/reference impls such as `NewTypeGraphCodecError`'s derived/error impls are now declared as `Add`. That contradicts the plan's expected Blue outcome and effectively reintroduces the hardcoded-Add behavior the ADR is trying to remove. The trait_impl entries need explicit per-impl actions, or the plan must narrow which omissions are valid Add entries.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json",
+              "line": 277,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:62b48333f8e8a8129db1086a42f9ce0cc17cbc9559f820040e068c67df1b039d",
+          "at": "2026-05-20T09:37:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`OS-03` lists `InherentImplDeclV2` among entry kinds whose Add/Modify/Reference/Delete action semantics are out of scope, but ADR 2026-05-20-0048 explicitly says `InherentImplDeclV2` has no `action` and inherits `TypeEntry.action`. This is a semantic contradiction in the plan artifacts and can misdirect implementation toward preserving action handling for a type that should not have it.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.md",
+              "line": 36,
+              "category": "contradiction"
+            },
+            {
+              "message": "The D4 frontmatter says it is superseded by only `2026-05-20-0048...#D1`, while the D4 note immediately below says the replacement is the new ADR's D1-D4 set. Since old D4's filter/action behavior is reconstructed by multiple new decisions, anchoring `superseded_by` to D1 alone is a broken design-decision reference.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 19,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:9d60c656ecb07b52c590071a20ed4bffa9363dad25eb145f5f78ae9828d3b13c",
+          "at": "2026-05-20T09:49:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e9d8a588827f68c904f155f51f83f6e49300595cbb6fb2cddf14124b4615376",
+          "at": "2026-05-20T10:41:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure-types.json` describes the A-codec as already processing `CatalogueDocument.trait_impls` in a top-level loop and, later, `SignalEvaluatorV2` as already using the unified S-insertion path. But `impl-plan.json` still marks T014 and T015, which are the tasks that implement exactly those changes, as `todo`. This is a semantic task-state contradiction in the plan artifacts: either the catalogue docs are claiming future behavior as current behavior, or the implementation tasks/statuses are stale.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0e9d8a588827f68c904f155f51f83f6e49300595cbb6fb2cddf14124b4615376",
+          "at": "2026-05-20T10:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan assigns action-driven S insertion to `CatalogueToExtendedCrateCodec`/A-codec, but the same artifacts define that component as only converting `CatalogueDocument` to TypeGraph A, while Phase 1 S construction belongs to the signal evaluator and is also separately assigned to T015. This is a semantic layer/responsibility conflict: T014/CN-04 tell the codec to decide Add/Modify/Reference/Delete S insertion, which would duplicate or misplace the Phase 1 action semantics planned for `signal_evaluator_v2`. Keep T014 to resolving/encoding top-level `trait_impls` into A, and leave S insertion/action contradiction semantics to T015.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.md",
+              "line": 31,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e4f511aa75ef0379803a79e38d32121b0928ce0b246b3761c53fd864721b68f3",
+          "at": "2026-05-20T10:50:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04 now assigns actual S insertion for trait impl actions to signal evaluator Phase 1, but the referenced ADR D4 still says the A-codec top-level trait_impl loop must read `entry.action` and perform S insertion. This leaves T014/T015 with conflicting responsibilities: implementers cannot tell whether T014 only encodes TypeGraph A or must also apply Add/Modify/Reference/Delete insertion semantics. Align ADR D4/consequences with the split described in IN-16/CN-04, or keep the spec/plan consistent with the ADR.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.md",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:75d2776fe0aa308b4f4d0e4b82d85dade02666c069d51a610478529214c48c2e",
+          "at": "2026-05-20T10:58:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04 still assigns S-insertion semantics to the A-codec: it says the codec should use `entry.action` to decide insertion into S. The plan now explicitly splits responsibilities so T014 only encodes TypeGraph A with `entry.action` preserved, while T015/signal evaluator executes Phase-1 Add/Modify/Reference/Delete S insertion. This contradiction can send implementation back into the old wrong layer boundary or duplicate action handling between T014 and T015.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.md",
+              "line": 43,
+              "category": "contradiction"
+            },
+            {
+              "message": "The frontmatter says old D4 is superseded by the new ADR only via `(D1/D3/D4)`, but the D4 note below says the replacement is the new ADR `(D1-D4)`, and the new schema's essential `trait_ref`/`for_type`/`action` decision lives in new D2. This is a broken cross-ADR reference for the supersession mapping.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "line": 19,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:92d71aad2bf1bee767308ab733f20fd0cc4e8d430807528c813ccaa30e31f3f2",
+          "at": "2026-05-20T11:04:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D4 still assigns S insertion to the A-codec: it says the A-codec top-level trait_impl loop must apply action semantics and insert into S, while spec.md:31/CN-04 and plan.md:56/62 now split the design so T014 only encodes/preserves action in TypeGraph A and T015 signal evaluator Phase 1 performs S insertion. This leaves two conflicting implementation contracts for the same D4/CN-04 behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+              "line": 150,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:57e7b553a490cff9dfb2df8b11eec8ed7aee8d562e0322bed87dab0c6cd6ffcc",
+          "at": "2026-05-20T11:10:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-15 still says the unified A-codec/signal-evaluator loop inserts each TraitImplDeclV2 into S according to entry.action. That conflicts with the updated IN-16/CN-04/ADR split where A-codec only preserves entry.action in TypeGraph A and signal evaluator Phase 1 performs S insertion. Leaving the acceptance criterion this way can drive verification or implementation back toward the rejected A-codec-as-S-inserter model; update AC-15 to name the A-codec encoding step and the Phase-1 S insertion step separately.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.md",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8b8fff0a22d09776220ceefe1f1fcbb5587ac62d80058cc27309e1544ace9e4a",
+          "at": "2026-05-20T11:13:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NewTypeGraphCodecError` still documents the cross-crate filter fix as `D4 (IN-13)` and says the infra type-signals Red 1 is an accepted deviation until T012 lands. The current plan/spec place IN-13 under the new ADR's D3/T012, with D4 reserved for top-level/action-driven insertion, so this is a stale broken design reference in the plan artifact.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json",
+              "line": 113,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d88e4f8a07d526891eb5d1ea3cc36f35dafbb4020a54dd57a0eeeccc7be886ac",
+          "at": "2026-05-20T11:16:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac06d400928fa45dac6b4c4ab8c17f7934d6d1bb3f08954b42344dc3beb208e",
+          "at": "2026-05-20T11:23:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T016` is simultaneously treated as required work for `AC-13` and classified as out-of-scope in the coverage map. `spec.md` ties `AC-13` to `T016`, `plan.md` marks `T016` as the catalogue-schema rewrite task, but `task-coverage.json` lists the same task under `OS-04`. That makes the scope gate self-contradictory: the acceptance criterion depends on work declared out of scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/task-coverage.json",
+              "line": 25,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ebfc8b0f55e080ab25dc036c36a337003da18185d385af2aa2770b9eb78cc4fc",
+          "at": "2026-05-20T12:22:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f532b4a3325369f4ef06432273c9813ca1b99d6e4d5849a0ebb4bc9632f7c02c",
+          "at": "2026-05-20T12:27:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `Delete` semantics for top-level trait impls are contradictory: this line says S insertion is omitted, but also that the B-side entry remains in S. A Delete action must remove the baseline item from S and track it as deleted; leaving the B impl in S makes it behave like a reference and can suppress the expected delete signal. The same wording is repeated in T015, so the implementation plan is likely to encode the wrong behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+              "line": 119,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f532b4a3325369f4ef06432273c9813ca1b99d6e4d5849a0ebb4bc9632f7c02c",
+          "at": "2026-05-20T12:32:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f182d5dc3cd7a13269415ec8c0899f9c29479c787941c3a9043c33c1af08d846",
+          "at": "2026-05-20T12:36:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11cd822bcccbfda27f035459757a95692e22161936817d2d3c5c50ae8782ef90",
+          "at": "2026-05-20T13:30:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11cd822bcccbfda27f035459757a95692e22161936817d2d3c5c50ae8782ef90",
+          "at": "2026-05-20T13:32:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` marks both interactor rows as Cat-Spec Blue, but the updated `usecase-types.json` docs still say those `new` methods should stay Yellow until IN-19/IN-20 land. The generated summary is therefore overstating the current catalogue-spec state and conflicts with the planning narrative.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/usecase-types.md",
+              "line": 14,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:c088cc4d700e9c0355e9c431ff9a8aa5e235f8bf6f3e2ae10a0dfa187718f85e",
+          "at": "2026-05-20T15:26:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 overstates the required representation for inherent methods: it says every affected struct must stop having `methods: []`, but T018 explicitly allows declaring the method either via `InherentImplDeclV2` or via `TypeEntry.methods`. The current usecase catalogue follows the `InherentImplDeclV2` path for `TaskOperationInteractor` (`methods` is still empty while `inherent_impls` carries `new`), so AC-17 as written would mark a valid plan shape as failing. Tighten AC-17 to the chosen schema path or make it explicitly accept `InherentImplDeclV2`.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 541,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d8c51fa204ea950ee5a355c442553eeebb7116d21d1b0529977d697d076dac73",
+          "at": "2026-05-20T15:30:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.json` says both interactor entries are already Cat-Spec Blue and justifies that with `IN-18` alone, but `spec.json` AC-19 makes their Blue state contingent on both `IN-18` and the HRTB evaluator work in `IN-19`/`IN-20`. That makes the grounding text semantically wrong: the interactors are not fully justified by the anchor set they cite, and the generated summary in `usecase-types.md` repeats the same overstatement.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/usecase-types.json",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2a4e3efc4e6a6ec1b5ba17411ad9e6bc7c1fe01f455b8dea486d951d18c708f7",
+          "at": "2026-05-20T15:34:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:029c142f7e2a3b326c545a661b02109d5c6939bf48958729e9f9a7b32bac0eb6",
+          "at": "2026-05-20T15:38:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplDeclV2` now declares the `action` field and `impl-plan.json`/`plan.md` mark T013-T015 done at `f048be4`, but this docs string still says the action field and DTO action are not in code and that catalogue/code drift is expected. That is a direct contradiction in the plan artifacts and makes the current schema status ambiguous for readers of the catalogue.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json",
+              "line": 235,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:029c142f7e2a3b326c545a661b02109d5c6939bf48958729e9f9a7b32bac0eb6",
+          "at": "2026-05-20T15:42:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 assigns T018 the requirement that catalogue method declarations alone make every entry Blue, but AC-19 says the two usecase interactors only become genuine Blue after both IN-18/T018 and IN-19/IN-20/T019 are present. This makes T018's success condition impossible if T019 has not already landed, and contradicts the later dependency model. Either scope AC-17/T018 to method-declaration coverage or make T018 depend on T019 for the all-Blue verification.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 542,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3d3820d5287bbc3c99935018d35743b844419ee3ee1342633809351775a28220",
+          "at": "2026-05-20T15:46:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e690f6cf30a02f34614a334fff5f2c582090a21a11755199c202c7ba06c4bfeb",
+          "at": "2026-05-20T15:51:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d984e2accaf42cd58dd7de4759f3ef1f8a6fc174a284a368fa9660246823a956",
+          "at": "2026-05-20T17:30:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d984e2accaf42cd58dd7de4759f3ef1f8a6fc174a284a368fa9660246823a956",
+          "at": "2026-05-20T17:31:59Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc0cb08830fa0d84c73b364b08fc86729f838a2b3969ce7597e1700ab7fd3aab",
+          "at": "2026-05-20T03:35:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc0cb08830fa0d84c73b364b08fc86729f838a2b3969ce7597e1700ab7fd3aab",
+          "at": "2026-05-20T03:37:19Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fe66193ead83b50de25fdadacffea715f78a6572d75eb978fc30dd82c48b425",
+          "at": "2026-05-19T14:44:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fe66193ead83b50de25fdadacffea715f78a6572d75eb978fc30dd82c48b425",
+          "at": "2026-05-19T14:51:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3e963170a0ac78013e90d0aeb0706f4d618165a72b57b53b293deec01b5321",
+          "at": "2026-05-19T15:57:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3e963170a0ac78013e90d0aeb0706f4d618165a72b57b53b293deec01b5321",
+          "at": "2026-05-19T16:00:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a961dfcaddf47b36cb6eca8f649b486528057f5219da091f4cbc16c18cd7b9",
+          "at": "2026-05-19T16:17:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a961dfcaddf47b36cb6eca8f649b486528057f5219da091f4cbc16c18cd7b9",
+          "at": "2026-05-19T16:19:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d9cd173137b41e312b851b835143684ff3c860c847acac0f0b7874e5e54454e",
+          "at": "2026-05-19T16:33:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d9cd173137b41e312b851b835143684ff3c860c847acac0f0b7874e5e54454e",
+          "at": "2026-05-19T16:35:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1ff65984c71a932c7036f5d8d2caf6fd5d5bad34af8e38af6d9cee53f205c9a",
+          "at": "2026-05-19T23:56:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1ff65984c71a932c7036f5d8d2caf6fd5d5bad34af8e38af6d9cee53f205c9a",
+          "at": "2026-05-19T23:58:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3c659fe8e9518640e60b36c65276cd09cba33f51809f0c83775c53c7df09bba",
+          "at": "2026-05-20T03:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3c659fe8e9518640e60b36c65276cd09cba33f51809f0c83775c53c7df09bba",
+          "at": "2026-05-20T03:40:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ac7103998b87b4a5d9ffb66e060434b265ab68fb6bbc9e18af3a824b3570261",
+          "at": "2026-05-20T09:33:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ac7103998b87b4a5d9ffb66e060434b265ab68fb6bbc9e18af3a824b3570261",
+          "at": "2026-05-20T09:36:25Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
+          "at": "2026-05-20T03:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new guidance applies `for_type` to both `trait_impls` and `inherent_impls`, but the actual `InherentImplDeclV2` wire shape uses required `type_name`; only `TraitImplDeclV2` has `for_type`. Following this doc can make type-designer emit `inherent_impls` entries with an unknown `for_type` key and no `type_name`, which the strict codec will reject. Update this paragraph and the related add/modify bullets to distinguish `inherent_impls[].type_name` from `trait_impls[].for_type`.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 231,
+              "category": "schema"
+            },
+            {
+              "message": "This convention still documents the old type kind shape as `kind: { \"kind\": \"struct\" ... }` and later repeats typestate examples using a `pattern` payload. The current v3 codec accepts `unit_struct`, `tuple_struct`, `plain_struct`, `enum`, and `type_alias`, with typestate under `plain_struct.typestate`; `struct`/`pattern` catalogues will be rejected. Update this line and the downstream examples around R3/R8 to the current `TypeKindV2` JSON shape.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 36,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
+          "at": "2026-05-20T03:40:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This groups `inherent_impls` with `trait_impls` and says the impl entry is keyed by `for_type`, but only `TraitImplDeclV2` has `for_type`; `InherentImplDeclV2` uses `type_name`. The same wording repeats in the requirements below, so following this doc for inherent impls would generate JSON with an unknown `for_type` field and no required `type_name`, which the DTO rejects. Split the guidance so `trait_impls` use `for_type` and `inherent_impls` use `type_name`.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 231,
+              "category": "schema-correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
+          "at": "2026-05-20T03:41:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08974f65468da9fb440d1ccc0e4657c6be5c5b2e6584b7159ee55472bb02c71e",
+          "at": "2026-05-20T03:45:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The canonical `TraitImplDecl` schema shown here omits the required `action` field, even though the domain type (`TraitImplDeclV2`) includes `action: ItemAction` and the rest of this document tells authors to set `action` on every catalogue entry. The later adapter example repeats the same omission, so a reader following this guide will emit malformed top-level impl declarations.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 254,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b7b2bb4a4284c463729fca87e9f24ba6f3c1c260f3cd04804e97b23ae3c723c4",
+          "at": "2026-05-20T09:32:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new top-level impl schema still uses the obsolete name `TraitImplDecl` here, but the canonical domain type in the repo is `TraitImplDeclV2`. That stale identifier will mislead authors and makes the `trait_impls` section inconsistent with the documented SSoT.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 227,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:05d125b3e323037090f1aa0dbdedc6f5ba1579e4ad541a31564e7eb82519cb41",
+          "at": "2026-05-20T09:36:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03b6439c564f43105eea11c09908b2849a43c1fba1fe229e1bbea62d62b2fead",
+          "at": "2026-05-20T09:38:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated v3 schema reference still claims this agent doc is the SSoT and that there is no source-code citation. The briefing/ADR intent says the canonical schema is `libs/domain/src/tddd/catalogue_v2/` and these docs are derived explanations with references. Leaving this sentence makes future type-designer runs treat the doc, not the code, as authoritative for fields like top-level `trait_impls`/`inherent_impls`, which is exactly the schema-drift risk this change is meant to prevent.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 235,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:03b6439c564f43105eea11c09908b2849a43c1fba1fe229e1bbea62d62b2fead",
+          "at": "2026-05-20T09:44:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The schema reference now introduces `inherent_impls` as a top-level array, but the reference never defines the `InherentImplDeclV2` wire shape. The only impl shape documented below is `TraitImplDeclV2`; in the actual DTO, `inherent_impls` entries require `type_name`, optional `impl_generics` / `impl_where_predicates`, and `methods`, and they do not accept `action`. This leaves the type-designer without enough schema guidance to author valid inherent impl entries.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 226,
+              "category": "correctness"
+            },
+            {
+              "message": "This wording treats `inherent_impls` and `trait_impls` as the same kind of independent entry. That is only true for top-level trait impls: `TraitImplDeclV2` carries its own `action` and is encoded as a standalone impl, while `InherentImplDeclV2` has no `action`, must target a local declared type, and is attached to that struct/enum's impl list by the codec. The convention should distinguish top-level JSON placement from independent action/identity semantics, otherwise reviewers and type-designer can apply trait-impl rules to inherent impls incorrectly.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 34,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:72f4c905fb276ed85a88b808348930284e882d580664757300957787c4bddb80",
+          "at": "2026-05-20T09:47:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5a085e84a17e1b017d7eb6627d31f13963522fb80c733680f37fa2749a37d45",
+          "at": "2026-05-20T09:51:15Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:32:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:33:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
+          "at": "2026-05-20T03:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
+          "at": "2026-05-20T03:39:12Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fccf6f562fd4d261f7c9e8bd259055857f62d574253bbceb7ec56dd2ea9b821a",
+          "at": "2026-05-19T13:09:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing the external-`for_` filter admits cross-crate impls into a key space that still uses only the bare `for_` short name. If a crate has both a local type and an external type with the same last path segment implementing the same trait (for example, `impl Printable for Error` and `impl Printable for std::error::Error`), the `BTreeMap<String, Id>` will silently collapse one impl and phase 2 can evaluate the wrong impl set.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 369,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9422caf6c2b6719e0fb49cafe6ea6b15b74973080780784241b6f9d77b0a5afe",
+          "at": "2026-05-19T13:23:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [mod.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs#L389) The new `for_path_raw` tiebreaker assumes the raw `Type::ResolvedPath.path` is identical on S and C, but this map also contains A-sourced impls whose `for_.path` is synthesized from catalogue short names rather than rustdoc’s original module-qualified path. On a same-key collision that mixes A-sourced and rustdoc-sourced impls, S and C can still sort different winners and produce a false `CMinusSUnionD` red.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 389,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: [tests.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L2716) The new collision regression test does not exercise the changed behavior: both competing impl fixtures use the same `for_.path` (`\"MyError\"`), so the assertion only checks the final `Id` fallback. A regression in the new path-based ordering would still pass this test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 2716,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:6f27f12b3d13494a1a7c5232918c5c0274b7cf08fdc85aed1c637ec8b584deed",
+          "at": "2026-05-19T13:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `(key, for_path_raw, id)` tiebreaker relies on the verbatim `Type::ResolvedPath.path` string, but this field is not canonicalized anywhere in the function. If C-side rustdoc and the S-side/orphan-impl data spell the same type differently (for example `Foo` vs `ext_crate::Foo`), the surviving impl for a colliding key can still differ between sides, which reintroduces the false `CMinusSUnionD` mismatch this change is meant to eliminate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 405,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e1c15aaaba788332e92566461c6c05e9aac5fdfcd459665599847a77401b7d9",
+          "at": "2026-05-19T13:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b5239ca77aeb2355e0ce0234d8af4f6d082ca5b748c21131c6733a2e2deb9a0",
+          "at": "2026-05-19T13:54:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b5239ca77aeb2355e0ce0234d8af4f6d082ca5b748c21131c6733a2e2deb9a0",
+          "at": "2026-05-19T13:58:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BoundOp::Equal` is still being dropped here: every `WherePredicateDecl` is emitted as `WherePredicate::BoundPredicate`, and the `operator` field is only read to silence the warning. That means a catalogue decoded from `\"operator\": \"Equal\"` will silently turn back into a `:` predicate when it is converted to the extended crate, which breaks round-tripping and changes semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 938,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `operator` field is not validated for `Equal` predicates. This boundary only rejects empty `rhs`, so `operator = Equal` with zero or multiple RHS entries is still accepted and then re-serialized by the encoder, leaving illegal domain states representable even though `WherePredicateDecl` documents `Equal` as a single-RHS form.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 398,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:e58f6239be64735b8ac59c5c7bc5ad3fd72fc839636384abc74f90e7884d65ce",
+          "at": "2026-05-19T14:27:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`rhs` is still validated with `validate_bound_str()`, which parses `TypeParamBound`. That rejects valid equality RHS values like `u32`, so the new `operator: \"Equal\"` form cannot actually be decoded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 425,
+              "category": "correctness"
+            },
+            {
+              "message": "`BoundOp::Equal` is serialized without enforcing `rhs.len() == 1`, so a malformed in-memory predicate can round-trip into invalid JSON, and the extended-crate codec will silently drop every RHS entry after the first. This is a data-loss regression for the new schema.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 951,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3b56f636f0c084d90fb5a78cebe9533234a467e8a52271a47cccbdef783bc442",
+          "at": "2026-05-19T14:33:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueToExtendedCrateCodec` now handles `BoundOp::Equal`, but it never re-validates that the domain value actually has exactly one RHS element. The branch at [catalogue_to_extended_crate_codec.rs:946](./libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L946) takes `.first()` and silently drops any extra entries, so an in-memory `WherePredicateDecl { operator: Equal, rhs: [U, V] }` is corrupted into `where ... = U` instead of failing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 946,
+              "category": "correctness"
+            },
+            {
+              "message": "The new `Equal` branch accepts any RHS string that parses as a `TypeRef`, but it does not reject RHS forms that `parse_type_ref_str` cannot preserve, such as qualified paths (`<T as Trait>::Assoc`). `decode.rs` will accept those inputs via `validate_type_ref_str` at [decode.rs:434](./libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs#L434), and `catalogue_to_extended_crate_codec.rs` then silently degrades them to unresolved placeholders at [catalogue_to_extended_crate_codec.rs:968](./libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L968), breaking round-trip fidelity.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 968,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:109f8f2a82ba1a2cd51a39c6b65a389ca737a94bec881399f38c7764fc5f59c0",
+          "at": "2026-05-19T14:37:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `BoundOp::Equal` path is not exercised by any regression test. The added codec tests cover legacy decode, new-format decode, and Bound-only JSON emission, but they never verify `where_predicate_decl_to_dto` or the `EqPredicate` branch in `CatalogueToExtendedCrateCodec`, so a break in single-RHS equality serialization would slip past CI.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1195,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:35f71d4d837ba6e6355f3264f6684eca3f8d14e70a33db5c6e8f9feb39b80ed3",
+          "at": "2026-05-19T14:42:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bb74af39862f9e56e45e896bce3c3b9504f1d11722da225aace245ba9725076a",
+          "at": "2026-05-19T14:49:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`operator: Equal` only validates that `rhs.len() == 1`; it does not validate that `lhs` is an associated-type projection. A catalogue entry such as `{ \"lhs\": \"T\", \"rhs\": [\"U\"], \"operator\": \"Equal\" }` decodes successfully even though `where T = U` is not valid Rust, and the extended-crate encoder will emit an `EqPredicate` with a bare `Type::Generic` LHS. Please reject Equal predicates whose LHS is not a supported projection form such as `T::Assoc`, so invalid external input cannot become a nonsensical `ExtendedCrate`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 407,
+              "category": "input-validation"
+            }
+          ],
+          "hash": "rvw1:sha256:bb74af39862f9e56e45e896bce3c3b9504f1d11722da225aace245ba9725076a",
+          "at": "2026-05-19T14:52:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BoundOp::Equal` only checks `rhs.len() == 1` before serializing. The decoder added an additional invariant that Equal predicates must have a projection LHS such as `T::Assoc`, so a domain value constructed directly with `lhs = \"T\"`, `rhs = [\"u32\"]`, `operator = Equal` will encode successfully to JSON that this same codec rejects on decode. This breaks the advertised round-trip behavior for domain-to-DTO conversion; mirror the decoder's Equal-LHS validation here before returning `BoundOpDto::Equal`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 175,
+              "category": "correctness"
+            },
+            {
+              "message": "The ExtendedCrate encoder has the same missing Equal-LHS validation for in-memory domain values. A direct `WherePredicateDecl { lhs: \"T\", rhs: [\"u32\"], operator: Equal }` passes this branch and emits an `EqPredicate` corresponding to invalid Rust (`where T = u32`), even though the JSON decoder rejects that shape. Since this public adapter already defensively validates Equal RHS cardinality for direct domain inputs, it should also reject non-projection Equal LHS values before emitting `WherePredicate::EqPredicate`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 946,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:065cee86ae45cb5c4663d99959a9b4414cdb8eed502e79f94dfa59cbfacd3249",
+          "at": "2026-05-19T14:57:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd519b06f1b318b4c838146a0577a183c1329ce3e9558c1a2c17926001e92a57",
+          "at": "2026-05-19T15:02:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Dropping `validate_supported_bound` makes `use<...>` look accepted at the codec boundary, but the value still round-trips as a placeholder `GenericBound::TraitBound` with path `use<U>`. Phase 1.5/1.6 treats any unresolved local `ResolvedPath` as an unresolved type reference and will raise `UnresolvedTypeRef`, so this does not actually support precise-capture bounds end-to-end. The new tests only assert `encode()` succeeds, which misses that downstream failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 751,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:09826770a38cde91cbc5a5bea2a5679326bfd22cc78ad1e0b5008f3365055ad9",
+          "at": "2026-05-19T15:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a995a176b7d0899946f6e7a252dd3600d0a13bb903e1ad2616107bf3a6cf0533",
+          "at": "2026-05-19T15:28:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a995a176b7d0899946f6e7a252dd3600d0a13bb903e1ad2616107bf3a6cf0533",
+          "at": "2026-05-19T15:31:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61cff238d823248ba9f8462ec7fa8c0afb0f12f57ce496e16d82a393920ba76a",
+          "at": "2026-05-19T15:45:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61cff238d823248ba9f8462ec7fa8c0afb0f12f57ce496e16d82a393920ba76a",
+          "at": "2026-05-19T15:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fcb489a61551d740d76e4250a3eafcd0d80087d1a574798b76be9d26f3b69a4",
+          "at": "2026-05-19T15:57:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fcb489a61551d740d76e4250a3eafcd0d80087d1a574798b76be9d26f3b69a4",
+          "at": "2026-05-19T16:01:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3952b0404d6ef2a65b4285e104f360169af836a19a7c25e8ff7b38a4a5fb5859",
+          "at": "2026-05-19T16:19:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3952b0404d6ef2a65b4285e104f360169af836a19a7c25e8ff7b38a4a5fb5859",
+          "at": "2026-05-19T16:22:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9795a6870dccf658b057916733bab6b4c6f05bba40a9e2e211fc2b336075f806",
+          "at": "2026-05-19T16:33:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9795a6870dccf658b057916733bab6b4c6f05bba40a9e2e211fc2b336075f806",
+          "at": "2026-05-19T16:37:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run()` now hard-fails on an `InherentImplDeclV2` whose `type_name` is not in `local_name_to_id`, but the design note in this same block says these entries should be skipped defensively. As written, one stray or external inherent impl will abort the whole codec run instead of being ignored.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 313,
+              "category": "correctness"
+            },
+            {
+              "message": "The new evaluator tests only assert `!is_red()` at both [signal_evaluator_v2/tests.rs:3177](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3177) and [signal_evaluator_v2/tests.rs:3368](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3368). That leaves room for a Yellow regression to pass, even though the brief says these cases should stay Blue.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 3177,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:3edadc56ee0d080b9de95081911fe2eedd20064d7344d336c3d948c373d5c317",
+          "at": "2026-05-19T16:58:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new inherent-impl path calls `encode_method_items` without passing the enclosing impl generics, and `encode_method_items` itself only rewrites types against `method.generics`. Any method inside `impl<T> ...` or `trait Foo<T>` that mentions an outer `T` will be encoded as an unresolved path instead of `Type::Generic`, so generic methods will miscompare in phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 359,
+              "category": "correctness"
+            },
+            {
+              "message": "The inherent-impl loop silently skips entries whose `type_name` is missing from `local_name_to_id`. That drops catalogue data without surfacing an error, so a malformed `inherent_impls` entry can disappear from the output and the caller never learns the codec input was inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 313,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:de9f40d1237473b2e809d215cc4c826a3522b2ea91a9ca06317e686c62691834",
+          "at": "2026-05-19T17:03:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`encode_trait` now records trait-level generics on the trait item, but it still calls `encode_method_items(..., &[])`. That means any trait method that mentions a trait parameter, e.g. `trait Foo<T> { fn get(&self) -> T; }`, will encode `T` as an unresolved type in the method signature and fail A/C structural comparison for valid generic traits.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1423,
+              "category": "correctness"
+            },
+            {
+              "message": "`encode_method_items` now uses outer impl generic names for parameter/return parsing, but `build_where_form_generics` still receives only `method_generic_names`. For valid methods like `impl<T> Foo<T> { fn make<U: Into<T>>() {} }`, the `T` inside `U`'s bound will still be encoded as an unresolved type instead of an in-scope generic, so the encoded `Function.generics` will not match rustdoc.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1697,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:51830f37c98080113948eaa05a33fc1ca5877ea3e4feec07d8d6970eb47cbf66",
+          "at": "2026-05-19T17:11:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These new end-to-end cases only cover the happy path (`impl<T: Clone>` on both sides) plus the legacy empty-A case. They never assert that a changed `Impl.generics` shape becomes non-Blue, so a regression that keeps ignoring impl-block generics would still pass this suite. Add a negative mismatch case here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 2994,
+              "category": "testing"
+            },
+            {
+              "message": "The codec tests verify generic-parameter counts and names, but they do not check the actual bound payloads emitted by `build_where_form_generics`. For example, `test_trait_decl_generics_encoded_correctly` would still pass if the inline `Clone` bound or the explicit `where T: Send` predicate were dropped. That leaves the new generic/where-form encoding insufficiently covered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1724,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:b8c904f3a2ebd7b48990d1d243c5fe76f266a18c5ad676c618424cc5d369a5a8",
+          "at": "2026-05-19T17:19:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`inherent_impls` are accepted for any `TypeName`, but the append logic only handles `Struct` and `Enum` items. If a catalogue points an inherent impl at a `TypeAlias` (or any future non-struct/enum type), the codec silently leaves the impl orphaned instead of rejecting it. That produces an impossible Rust item in the output and can skew downstream signal evaluation; this should fail closed with an error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 389,
+              "category": "missing validation"
+            }
+          ],
+          "hash": "rvw1:sha256:b8c904f3a2ebd7b48990d1d243c5fe76f266a18c5ad676c618424cc5d369a5a8",
+          "at": "2026-05-19T17:23:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `encode_trait` still serializes `supertrait_bounds` with `encode_bound_str` at [libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs:1461](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L1461), so trait generics are not in scope there. A valid declaration like `trait Foo<T>: Into<T>` will encode `T` as an unresolved/path type instead of `Type::Generic`, which breaks the new trait-generic support for any generic supertrait bounds.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1461,
+              "category": "bug"
+            },
+            {
+              "message": "P1: The new coverage does not actually pin down the new impl-linking behavior. The inherent-impl test at [libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs:1948](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs#L1948) only checks that some generic `Impl` exists; it never asserts that the generated impl id was appended to the owning type's `impls` list. Likewise, the signal tests at [libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3177](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L3177) and [libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3369](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L3369) only assert that the final signal is Blue, which would still pass even if the codec stopped emitting `impl_generics`. That leaves the critical Phase-1 linkage path unprotected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1948,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7e9b6b93ffdd677a25fd68eb733736473b2e4601289034718fc2235afb2b2710",
+          "at": "2026-05-19T17:28:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new inherent-impl codec test only checks `generics.params` and linkage into `Struct.impls`; it never asserts `impl_inner.generics.where_predicates`. A regression in `InherentImplDeclV2.impl_where_predicates` translation would still pass this test, so the new public path is not actually covered end-to-end.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "line": 1901,
+              "category": "testing"
+            },
+            {
+              "message": "P1: The backward-compat test for legacy trait impls only asserts the evaluator returns Blue. It does not verify the A-side `Impl` still encodes empty `generics.params` / `where_predicates`, and the evaluator intentionally ignores impl-block generics in structural comparison. That means this regression test would still pass even if old catalogues started emitting impl generics again.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "line": 3228,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1eaa3eccc21218d80a6dcd267dc8db08f289b461da7ad1c8b4d9bd43ded63104",
+          "at": "2026-05-19T17:37:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9f001d25bbbf0b72a35224c045da4e4f226e6e85d5d86fbfcf9aae55b8f60cc",
+          "at": "2026-05-19T17:42:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9f001d25bbbf0b72a35224c045da4e4f226e6e85d5d86fbfcf9aae55b8f60cc",
+          "at": "2026-05-19T17:45:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:addf29607f6b708e94cc3863cd9d83f48a4a67c34eb4083a84a3a4f42cd63caa",
+          "at": "2026-05-19T18:03:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:addf29607f6b708e94cc3863cd9d83f48a4a67c34eb4083a84a3a4f42cd63caa",
+          "at": "2026-05-19T18:08:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b6571866f347352fab29fddc574a6150f8540f1c095f82f60a03f4c6f54129",
+          "at": "2026-05-19T18:14:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3334c0ebb6bf594ed72e49ff678ed3878c71be027b8c94b11bd3d7d27198b683",
+          "at": "2026-05-19T18:32:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3334c0ebb6bf594ed72e49ff678ed3878c71be027b8c94b11bd3d7d27198b683",
+          "at": "2026-05-19T18:36:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Equal` where-predicate validation is still shape-restrictive: `validate_equal_predicate_lhs` rejects any LHS without `::`, and the matching encode path and tests still enforce the same rule. That means the permissive revert described in the briefing did not actually land for inputs like `where T = U` even though `syn` can parse them, so these catalogue documents still fail to round-trip.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 350,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:76b21e5bdab2e035617eb0bd9a79ec4915e10c336d9d94cc24390cef0df3b925",
+          "at": "2026-05-19T23:58:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfcfe626d0dd38671f48be5ab744cea2cf957a33df97906c1d55aa28ae47add3",
+          "at": "2026-05-20T00:03:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfcfe626d0dd38671f48be5ab744cea2cf957a33df97906c1d55aa28ae47add3",
+          "at": "2026-05-20T00:05:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Equal where-predicates that are now accepted by the JSON codec (for example `where T = U`) still fail here because `build_where_form_generics` rejects any `lhs` without `::`. That breaks the new permissive round-trip when the same `CatalogueDocument` is fed into `CatalogueToExtendedCrateCodec::encode`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1108,
+              "category": "correctness"
+            },
+            {
+              "message": "The A-side orphan-impl pass only imports impls whose parent type action is `Add`. Top-level trait impls for external self types have no `a_item_actions` entry for `impl_.for_.id`, so valid cases like `impl MyTrait for std::vec::Vec<i32>` are skipped and never reach S.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 456,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5234108765a1a8197aee0edaeed2c17184f278e92a6fafeb5d65ece69fb40b93",
+          "at": "2026-05-20T03:39:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_external_from_trait_impls` is still doing raw `find(\"::\")` on the whole `trait_ref` / `for_type` string. That misclassifies valid syn-parseable inputs with generic arguments or relative prefixes, e.g. `Foo<serde::Serialize>` or `crate::Foo`, and can register bogus external crates (`Foo<serde`, `crate`) before the real parse runs. The encoder then emits spurious `external_crates` entries and can mis-normalize impl metadata. This needs AST-based crate extraction, not string slicing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 193,
+              "category": "correctness"
+            },
+            {
+              "message": "`v3_type_entry_details` now returns `—` for every non-typestate/non-enum entry, so `SecondaryAdapter` no longer renders its declared trait impls at all. That is a user-visible regression in the generated type catalogue: the Details column loses the only signal that an adapter implements traits, even though the surrounding docs still describe `SecondaryAdapter` as showing `impl Trait1, impl Trait2`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 336,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6e1ab96d5f29cac65035a4aaf040e444d32164da4d8d65b435d6b41c2761c057",
+          "at": "2026-05-20T03:48:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_trait_ref_for_top_level` only treats bare single-segment names as local. Valid local impl paths such as `crate::MyTrait`, `self::MyTrait`, `super::MyTrait`, or `my_crate::MyTrait` fall into the external-crate branch, which synthesizes an external crate entry and produces the wrong impl identity for a local trait.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1866,
+              "category": "correctness"
+            },
+            {
+              "message": "The self-type attachment check still keys off `!s.contains(\"::\")`. A local impl written as `crate::Foo` or `my_crate::Foo` parses to the local `Foo` id, but this code leaves the impl orphaned instead of pushing it onto `Foo.impls`, so Phase 1 no longer sees it as part of the type tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 354,
+              "category": "correctness"
+            },
+            {
+              "message": "The details renderer compares `ti.for_type.as_str()` to the raw `type_name`. That misses the same qualified local forms (`crate::Foo`, `self::Foo`, `my_crate::Foo`), so SecondaryAdapter trait impls can disappear from the table even though they belong to that type. The comparison needs normalization, not raw string equality.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 363,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f8ecb3bbd51524c4640385b2bd05b4ddff267d11bbfce670ac9f37a38a87bb5e",
+          "at": "2026-05-20T03:57:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `trait_impl_to_dto` now copies `trait_ref` and `for_type` verbatim without any syntactic validation, so `CatalogueDocumentCodec::encode` can emit JSON that `decode` immediately rejects for malformed `TypeRef` values. That breaks the encode/decode round-trip for any in-memory `TraitImplDeclV2` built with a non-`syn`-parseable string.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs",
+              "line": 214,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: top-level `for_type` handling still misclassifies self-crate-qualified paths like `my_crate::Foo`. `normalize_local_short_name` is only used for the local-type lookup, but `parse_type_ref_str` has already turned the same string into an external crate named after the current crate, so the impl is attached to the local `Foo` entry while its `for_` path/id points at an external type. That produces a wrong `Impl` identity and can also pollute `external_crates` with the self crate name.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 349,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9fd9472cafdfe615084aef6697fca0b86bb4a18ff94b77183735029b1b9e93a5",
+          "at": "2026-05-20T04:06:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `SecondaryAdapter` details now filters top-level `trait_impls` by `for_type_bare_name(...) == type_name`, but `for_type_bare_name` only strips `crate::`/`self::`/`super::` and never removes generic arguments or the self-crate prefix. As a result, valid entries like `impl Trait for Foo<T>` or `impl Trait for my_crate::Foo` will not match the `Foo` row and will render as `—`, so the new schema can silently hide declared impls in the type catalogue view.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 322,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d3703e15016d401ddc767356a259fb68931eca9f5d4767a1a97893d7ae2d016d",
+          "at": "2026-05-20T04:14:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `v3_type_entry_details` now associates top-level impls with a type by comparing only the bare `for_type` name, so an external self type like `std::vec::Vec<i32>` will be rendered on any local `Vec` row. The new schema explicitly allows external self types, so this can produce incorrect `domain-types.md` output whenever a local type shares a name with an external impl target.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 395,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8a9e13cce4eed206573cef18c2072edfe1e4a124337e95c38f0e234a7db2f970",
+          "at": "2026-05-20T04:21:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Local self types with generic arguments are misclassified as non-local, so their trait impls are not attached to the owning type. `normalize_local_short_name` does not strip `<...>` before the `local_name_to_id` lookup, which means valid inputs like `Foo<T>` or `crate::Foo<T>` end up encoded as orphan impls instead of being appended to the type's `impls` list.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 582,
+              "category": "correctness"
+            },
+            {
+              "message": "`trait_ref` is never parsed or validated as syntax in the top-level trait-impl encoder. The code only splits on the first `<` and fabricates a canonical string, so malformed non-empty inputs can produce bogus `Impl` items instead of an error, and type references nested inside trait generic args are never resolved through the type parser.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1897,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:f07cf91974e4798fcb524736e197af4384527c0953ae47acbb2f903a363db99d",
+          "at": "2026-05-20T04:26:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Top-level `trait_impls` are now encoded independently, but this orphan-impl pass still gates insertion on the owning type's action. For a `Modify` local type, `parent_action` becomes `Modify`, so `effective_action != Some(Add)` and the impl is skipped entirely. That drops valid impls from S and will produce false missing-impl deltas in Phase 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 464,
+              "category": "correctness"
+            },
+            {
+              "message": "Removing the `Equal`-lhs shape check makes the decoder accept catalogues that the encoder still rejects. A DTO like `where <T as Trait>::Assoc = U` now deserializes successfully here, but `CatalogueToExtendedCrateCodec::encode` later errors on the qualified-path LHS, so round-tripping the new schema can fail after a successful decode.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 423,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:946b4bec65219d77456f468428eb4f5dc918db4207401a1d480c788dcf358192",
+          "at": "2026-05-20T04:33:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The local-self-type fast path discards the original `for_type` syntax whenever it matches a local type id: `impl Trait for Foo<Vec<T>>` is encoded as `Foo` because this branch jumps straight to `resolved_path_type(local_id, for_type_short)`. That loses valid generic arguments and nested refs on the self type, so the new top-level trait-impl schema is no longer lossless for permissive inputs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 351,
+              "category": "correctness"
+            },
+            {
+              "message": "`resolve_trait_ref_for_top_level` validates the trait reference, then returns `Path { ..., args: None }` after splicing the generic suffix into `path`. That makes any refs inside `trait_ref` generic args invisible to later traversals, including unresolved-marker checks and ref collection, so impls like `impl From<CatalogueLoaderError> for ...` can silently drop dependencies from Phase 1.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1892,
+              "category": "correctness"
+            },
+            {
+              "message": "The v3 renderer only treats bare names plus `crate::`/`self::`/`super::` as local self types. The new codec also accepts self-crate-qualified forms such as `my_crate::Foo`, but those now fall through as external and disappear from the `SecondaryAdapter` details column, so rendered catalogues can omit valid impls.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 329,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:86efb12844276580425c721be9ed5b135c4a8a7864bb8f8f2c7d18fcf7ecaff3",
+          "at": "2026-05-20T04:41:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [type_catalogue_render.rs:330](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs:330) / [type_catalogue_render.rs:406](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs:406) still classify impls from the raw `for_type` string. That means supported external self-types are either misattributed or lost in the markdown view: fully-qualified externals like `std::vec::Vec<i32>` never match any local `SecondaryAdapter` row, while bare prelude names like `Vec` are treated as local even though the codec resolves them as external std types.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 330,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: [catalogue_to_extended_crate_codec.rs:378](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs:378) preserves external self-type spellings verbatim. Because the later impl-identity code uses the raw `for_` path as a collision tiebreaker, the new external-self-type support can pick different winners on S vs C when a local type and an external type share the same short name but the catalogue spelling does not exactly match rustdoc's spelling.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 378,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1b4a3c26a953606f11d141a485ccf86cbcbf3494980758a1aba2a6d9e7eb01cc",
+          "at": "2026-05-20T04:52:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new external-crate prepass is still string-slicing the raw trait/self-type text. A valid absolute path like `::core::fmt::Display` makes `first_seg` empty, so `ensure_external_crate(\"\")` can register a phantom blank crate and shift external-crate ids in the output. This needs to be derived from the parsed `syn` path, not `find(\"::\")` on the raw string.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 211,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: `resolve_trait_ref_for_top_level` reassembles the trait path by splicing the original substring after the first `<` back onto the parsed base path. That preserves arbitrary whitespace and qualifier formatting inside generic args instead of canonicalizing them from the parsed AST, so syntactically valid inputs like `From< CatalogueLoaderError >` or `From<crate::Foo>` can produce identity keys that do not match rustdoc's canonical form.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 1943,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa6e2a64b67bd712d3e81e3c9a3f74e403f49cfa831dd7e17e626391c89e8e6",
+          "at": "2026-05-20T05:01:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 in [catalogue_to_extended_crate_codec.rs:353](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L353) and [catalogue_to_extended_crate_codec.rs:600](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L600): `normalize_local_short_name` strips every `for_type` down to its last path segment before deciding whether it is local. A qualified external self type such as `std::vec::Vec<i32>` will therefore be treated as local `Vec` whenever the crate has a local `Vec`, so the codec encodes the impl against the wrong self type. That can corrupt Phase 1/2 matching for valid cross-crate impls.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 353,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:e72c141ede4218a399585f75f18c56ccf01ee0c1af4dadd96fe9050beae7587a",
+          "at": "2026-05-20T06:52:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:906592e7027c0e807fd15758b5a9a7c6a29e93c05f257ecaad6cd07fd3154ae0",
+          "at": "2026-05-20T06:57:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:906592e7027c0e807fd15758b5a9a7c6a29e93c05f257ecaad6cd07fd3154ae0",
+          "at": "2026-05-20T07:04:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`for_type_local_bare_name` treats every bare `for_type` as local, so a valid top-level impl that the codec resolves from a bare std-prelude name like `Vec`/`Option` will be filtered out here and never show up in the rendered catalogue. That makes the new top-level `trait_impls` rendering diverge from the underlying document for accepted inputs without an explicit crate prefix.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 319,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0216db997f640dada3d4cf45364456f917092a5044344e4b088932eb732f84ff",
+          "at": "2026-05-20T07:25:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Standalone `trait_impls` are now always inserted into S as `Add` items, but the identity map keeps the first candidate for each `trait + for_type` key. If A and B both contain the same impl identity and only the impl generics or where-clause changed, the earlier B-side entry wins and the updated A-side impl is never the one compared against C. That can hide real impl changes or compare C against stale baseline data instead of the current catalogue shape.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 414,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e6e9cb0d1b72e2ade3d6a380d8e753a5d93549e9c025a9b1716e25a5712392d8",
+          "at": "2026-05-20T07:38:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65914bc0fa0a60fb0941cb73fc151598eea3f93b8f836ab76459554f54c957ef",
+          "at": "2026-05-20T07:53:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new impl identity sort key is not actually stable across the S/C split for external self-types. A-side `parse_type_ref_str` preserves the fully qualified `for_type` path (`std::vec::Vec<i32>`), while rustdoc can surface the same impl with a bare `Vec` path; because `build_impl_identity_map` sorts by `for_path_raw` before de-duplicating, duplicate-key impls can be resolved differently on S and C and the signal can flip even when the logical impls match.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "line": 423,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3212deb5c365af816054c8a824881a6f5d73f7f1c5c8fb15106445e54b18b0a0",
+          "at": "2026-05-20T09:49:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplDto` is now accepted as any syntactically valid `TypeRef`, but the rest of the pipeline only knows how to encode/decode a path-like trait reference. `trait_impl_from_dto` only checks `syn::Type` syntax, while `resolve_trait_ref_for_top_level` later rejects anything that is not `Type::ResolvedPath`, so JSON such as `{\"trait_ref\":\"&Foo\", ...}` can enter `CatalogueDocument` and then fail downstream instead of being rejected at the codec boundary. Tighten the DTO validation to the same path-only invariant the encoder expects.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 529,
+              "category": "error handling"
+            },
+            {
+              "message": "The new standalone-impl `Modify`/`Delete` handling only removes or moves the root `Impl` item. It does not transfer the impl subtree (`Impl.items`) the way the existing impl helpers do, so any baseline method/assoc-item children can be left orphaned in `S` or missing from `D`. That leaves the impl graph internally inconsistent and can leak stale items into later passes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 502,
+              "category": "logic error"
+            }
+          ],
+          "hash": "rvw1:sha256:2af13b168783672721f62b6e68945fdf9068e15987cd83fe73fee4341e75db68",
+          "at": "2026-05-20T10:45:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [builder.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs#L391) builds the baseline impl identity map with `crate_name = \"\"`, even though `build_impl_identity_map` only documents the empty-string fallback for A-side codec maps. If rustdoc omits a local trait id from `krate.paths`, this disables the real crate-name fallback and can mis-key the B-side impl, which in turn causes false `Modify`/`Delete` contradictions or missed `Reference`/reinsertion matching.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 391,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: [type_catalogue_render.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs#L319) assumes every bare `for_type` string is local. The codec still resolves bare prelude names such as `Vec`, `Option`, or `Result` to external std types when no local type matches, so those valid trait impls will disappear from the rendered catalogue instead of being shown on the correct row.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "line": 319,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e93d4d5c874cd8a2a0413c1b607fb6ff6de9cda3cc5cd6c05a8964a1468562a6",
+          "at": "2026-05-20T10:57:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `validate_for_type_not_bare_prelude` rejects any bare prelude name, even when it is a legitimate self-crate type. That breaks decode/encode round-trips for valid catalogues that happen to define local types named like `Vec` or `Option`, which the render path still treats as valid local names ([decode.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs#L559), [encode.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs#L235), [type_catalogue_render.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs#L1087)).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 559,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: The same guard does not actually catch the common turbofish spelling of a bare prelude type. `Vec::<T>`/`Option::<T>` splits to a `base` ending in `::`, so the `contains(\"::\")` early return lets it through unchanged; the ambiguity this change is meant to remove still survives for that syntax.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "line": 561,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:12e104bd945a0833709887a4ff63a927cd94b1edd717d68ca05ae9de36515053",
+          "at": "2026-05-20T11:12:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Modify` now removes B-seeded impl subtrees from `S` before the standalone-impl pass runs, but the `Delete` branch still only moves an impl when `state.s_index` already contains its root. If a deleted impl was evicted by that earlier parent-`Modify` cleanup, this branch becomes a no-op and the impl disappears from both `S` and `D`, which can suppress the expected delete signal / leave `D` incomplete.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 526,
+              "category": "logic error"
+            }
+          ],
+          "hash": "rvw1:sha256:ac507e6465531c30ccc23736509959bd5098777e68ad06f6f7559a7df3815e38",
+          "at": "2026-05-20T11:21:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Delete eviction path rebuilds the impl root and then inserts each child under a freshly allocated `child_d_id`, but `root.items` still points at the ids produced by `remap_child_ids_in_item(..., &state.b_id_remap)`. Those ids are not updated to the new D-side ids, so the reconstructed impl in D has dangling child references and an inconsistent subtree.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 658,
+              "category": "data corruption"
+            }
+          ],
+          "hash": "rvw1:sha256:85b6e833c78d4812eff1fe19ff6073844cc2e7521c18c38b84bc012e2692abdd",
+          "at": "2026-05-20T11:26:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new B-side crate-name normalization is not applied symmetrically on the A-side key builder. `b_impl_map` now strips `my_crate::MyTrait` to `MyTrait` when `krate.paths` is incomplete, but `a_impl_map` still uses `\"\"`, so an A-side `trait_ref` written with an explicit crate prefix can produce a different identity key than the baseline and be misclassified as Add / trigger a false contradiction. This is especially likely because the codec preserves the user-supplied path verbatim.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 395,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f8e0c7b2b80519823f8bb01a3e4834507ecd1f485470bdd3e7c304ec3fe3503d",
+          "at": "2026-05-20T11:32:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `Delete` fallback reconstructs an impl from `B` whenever it is missing from `s_index`, but that can happen after `move_type_to_d` has already moved the same impl subtree into `d_index` while processing the parent type/trait. In that case this branch creates a second D-side copy of the impl (and its children), and the reconstructed copy still uses the S-side remapped parent ids instead of the D-side ids patched by `move_type_to_d`. That can duplicate Phase 2 keys and leave D with dangling references for impls that are both top-level `Delete` entries and child impls of a modified/deleted type.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "line": 661,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e7f6767d38c66cdd3b89dac652060a05f14b86682ea3583f25aa874d52c2cec8",
+          "at": "2026-05-20T11:39:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36de001208d1b5d0af35453e68230034e26c259e80096c1f213b8769192676f4",
+          "at": "2026-05-20T11:44:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Self-crate-qualified local trait refs are still encoded as external paths. `resolve_trait_ref_for_top_level` passes `ti.trait_ref` straight through `parse_type_ref_str`; that parser treats any multi-segment path whose first segment is not `crate`, `self`, or `super` as an external crate. So a catalogue entry like `trait_ref: \"my_crate::MyTrait\"` gets a synthetic external path and the A/S impl identity key remains `Foo: my_crate::MyTrait`, while rustdoc B/C normalize the local trait to `Foo: MyTrait`. Reference/Modify/Delete entries then fail the baseline lookup, and Add entries can produce spurious signals for an impl that already exists. Normalize the current crate prefix before parsing, or make this call path resolve `{doc.crate_name}::Trait` as local.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 381,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:36de001208d1b5d0af35453e68230034e26c259e80096c1f213b8769192676f4",
+          "at": "2026-05-20T11:50:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26233d160223fb2fc9b8e4178e1fe187b405938d5a3fc4880a986538b384f871",
+          "at": "2026-05-20T12:05:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bound_lifetimes_to_generic_params()` now stores lifetime binder names as `\"'a\"`, but the rest of the codebase still treats `GenericParamDef.name` as a bare identifier and prefixes `'` at render time. That will double-quote parsed HRTB binders (`''a`) in function-pointer / trait-bound formatting, and the same file still has other lifetime-bearing conversions that emit bare identifiers (`DynTrait::lifetime`, `GenericArg::Lifetime`, `impl Trait` outlives bounds), so the lifetime normalization is internally inconsistent.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 750,
+              "category": "correctness"
+            },
+            {
+              "message": "Lifetime-only HRTB support currently drops the binder entirely instead of encoding the normalized binder positions the comment describes. As written, distinct signatures with different binder arity or lifetime relationships can still collapse to the same fingerprint, e.g. `for<'a> Foo<&'a str>` vs `for<'a,'b> Foo<&'a str>`, which can produce false Blue results.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1363,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:73ab379dddd2b2a4f3b316e17a64d40ea9f53edf2d8c6f611d4a69e6a2b3959b",
+          "at": "2026-05-20T15:27:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The apostrophe normalization is only applied in `parse_generic_bound` / `bound_lifetimes_to_generic_params`; other lifetime-producing paths in this parser still emit bare identifiers (`convert_impl_trait`, `convert_generic_args`, and `angle_bracketed_to_generic_args` still use `lt.ident.to_string()`). That leaves `impl Trait + 'static`, `Vec<'a>`, and nested lifetime constraints encoded inconsistently with rustdoc, so the regression is not fully fixed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 1134,
+              "category": "correctness"
+            },
+            {
+              "message": "This HRTB support is still too coarse: the fingerprint only distinguishes binder arity, while lifetime annotations inside borrowed references are stripped earlier. As a result, distinct same-arity HRTBs can still collapse to the same string, e.g. `for<'a,'b> Fn(&'a str, &'b str)` vs `for<'a,'b> Fn(&'a str, &'a str)`, which can produce false Blue comparisons.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1391,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:482fe7e84e6fe1104fefd64ce3ab9406bc3c6a049538cf98a28163f6e0beefbf",
+          "at": "2026-05-20T15:39:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_type_strip_type_params` / `format_generic_args_strip_type_params` still decide whether to strip lifetime params by comparing the bare name (`lt.trim_start_matches('\\'')`) against `type_params`, but `type_ref_parser` now stores lifetime generic-param names as `\"'a\"` / `\"'static\"`. That means impl-block lifetime params stop being stripped from method/impl identity keys, which can flip otherwise equal items into mismatches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1059,
+              "category": "correctness"
+            },
+            {
+              "message": "The new HRTB support never canonicalizes `GenericArg::Lifetime`: `format_generic_args_with_canon` still returns the raw lifetime string, so only borrowed-reference lifetimes participate in the positional canon map. Equivalent bounds like `for<'a> Foo<'a>` and `for<'b> Foo<'b>` will still fingerprint differently even though lifetime-only HRTBs are now meant to compare equal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 474,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aba527d5d1cf6b4bdc1d53a50560db300e7d86558fadfaf8d4f6351111848435",
+          "at": "2026-05-20T15:51:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `format_generic_bounds_with_canon` now supports lifetime-only HRTB binders, but it keys the binder map off `hp.name` verbatim. This module already accepts both bare (`\"a\"`) and apostrophe-prefixed (`\"'a\"`) lifetime names elsewhere, and `GenericArg::Lifetime` / `BorrowedRef` lifetimes are still stored with a leading apostrophe. On a bare-name binder, the new HRTB path will miss the lookup and the comparison will still false-negative instead of treating the binders as equivalent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1416,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: The new HRTB support is not mirrored in the strip-aware formatter used by impl comparison. `format_generic_bounds_strip_type_params` still renders HRTB binders via `format_hrtb_type_params`, which drops lifetime binders entirely, and `items_structurally_equal` uses the stripped `for_` fingerprint for impls. That means a nested lifetime-only HRTB inside a generic arg/constraint can collapse to the same stripped key as the non-HRTB form, causing distinct impls to compare equal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1262,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2b627dacfac9a6feac1c293e8a29b77364d9eb7ae58913ead8c6aa1754c34c2e",
+          "at": "2026-05-20T16:01:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new lifetime-only HRTB support still erases any borrowed-reference lifetime that is not one of the binder lifetimes. Because `bounds_supported()` now lets these bounds through, supported cases can silently compare concrete lifetimes as if they were elided. For example, `for<'a,'b> Fn(&'static str)` and `for<'a,'b> Fn(&str)` both collapse to the same fingerprint here, which turns a real mismatch into a false Blue instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 293,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2c0ffddd603b31758353da867362795f1bb9b3e8f2848607020f9dc410007559",
+          "at": "2026-05-20T16:11:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b1107a4fb58ae7056c0bc746c4710333c318207cfa9bbe356acf42a3c43acd3",
+          "at": "2026-05-20T16:18:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_generic_bounds_with_canon` only installs `@BR:` lifetime mappings when an HRTB has two or more lifetime binders, and `format_type_with_canon` drops every borrowed-reference lifetime in the 0/1-binder case. That preserves `Fn(&str)` == `for<'_> Fn(&'_ str)`, but it also makes a single-binder HRTB with a concrete non-binder lifetime compare equal to the binder lifetime form, e.g. `for<'a> Fn(&'static str)` and `for<'a> Fn(&'a str)` both fingerprint as `Fn<(&str)->()>`. Since `bounds_supported` now admits these bounds, this can produce a false Blue for a real signature change. Preserve concrete lifetimes (and only erase/map the actual binder lifetime/elided `'_`) in the one-binder path as well.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1516,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9b1107a4fb58ae7056c0bc746c4710333c318207cfa9bbe356acf42a3c43acd3",
+          "at": "2026-05-20T16:24:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Concrete borrowed lifetimes are still erased whenever the trait bound has no HRTB binder because `@BR:` is only installed for `lt_count >= 1`. That means a catalogue bound like `Fn(&'static str)` formats as `Fn<(&str)->()>` and can compare equal to `for<'a> Fn(&'a str)` / `Fn(&str)`, even though `'static` versus any-lifetime input is a real API difference. The new D5 relaxation now lets that mismatch become a false Blue; preserve concrete lifetimes for no-binder trait-bound arguments too, or otherwise distinguish this case.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 315,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:28741244628522b30d93afd86f816924d56c25356782d0ec580e7fe1af3a57a9",
+          "at": "2026-05-20T16:30:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The one-lifetime HRTB path maps the binder lifetime to an empty string in the same canon map used for `GenericArg::Lifetime`, so angle-bracketed uses of the binder are erased. For example, `F: for<'a> Foo<'a>` formats the same as `F: Foo` because the `'a` argument becomes `\"\"` and the empty rendered args remove the brackets; similarly, non-Fn trait bounds using the binder can falsely compare Blue against a non-HRTB/elided form. The D5 normalization only needs to drop borrowed-reference lifetimes for the rustdoc `Fn(&str)` desugaring case, so `GenericArg::Lifetime` should retain a positional marker or the formatter should otherwise keep single-binder HRTB distinct when the binder appears outside that specific borrowed-ref elision case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1537,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:80304794b47fb7dd602a3b7112313afddb1aa16758b0c5e743b5f7a5d87d7b36",
+          "at": "2026-05-20T16:41:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The single-lifetime HRTB normalization erases the only binder (`lt_count <= 1` gets no prefix, and `@BR:` maps the binder reference to an empty string), so a supported bound like `for<'a> Foo<&'a str>` formats the same as `Foo<&str>`. Since `bounds_supported` now allows lifetime-only HRTB, `generics_structurally_equal` will return true for that real contract change, producing a false Blue. The 0-vs-1 binder equivalence should be limited to rustdoc's `Fn(&str)` parenthesized desugaring, or non-Fn trait bounds need to retain an HRTB marker.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1481,
+              "category": "correctness"
+            },
+            {
+              "message": "Borrowed references now emit literal lifetime names unless they are HRTB binder entries, but the normal generic canon map still excludes lifetime parameters. That makes ordinary alpha-renames compare unequal: `fn f<'a>(x: &'a str)` formats differently from `fn f<'b>(x: &'b str)` even though `generics_structurally_equal` deliberately ignores lifetime parameter names. This can create false Yellow results for catalogue/source signatures that differ only in lifetime binder names; lifetime params should be canonicalized or only concrete lifetimes such as `'static` should be preserved literally.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 312,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c17c717025111e3ead66a974c8f24c63e9bfe1a9608cb8bae7e006af66b76a05",
+          "at": "2026-05-20T16:48:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The one-binder parenthesized HRTB path drops every borrowed-ref use of the binder lifetime, so an explicit shared-lifetime bound like `for<'a> Fn(&'a str, &'a str)` fingerprints the same as catalogue `Fn(&str, &str)`. Those are not structurally equivalent because elided input lifetimes are independent; this can produce a false Blue for changed callback contracts. Retain the positional label when the single binder lifetime is used more than once, or otherwise distinguish explicit shared-lifetime HRTBs from elided Fn sugar.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1564,
+              "category": "logic"
+            },
+            {
+              "message": "`bounds_supported` now accepts any lifetime-only HRTB binder, including lifetime params with `outlives` constraints, but the formatter only records binder names/arity and drops those constraints. As a result, bounds such as `for<'a: 'b> Foo<&'a T>` and `for<'a> Foo<&'a T>` can compare equal instead of failing closed or producing distinct fingerprints. Either reject lifetime binders with non-empty `outlives` here or include the normalized outlives constraints in the HRTB fingerprint.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs",
+              "line": 235,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:44a6b9752fb2d4c0637f3b7fccb86ffa2fee63986354ceae3b81a0b34b38ab4e",
+          "at": "2026-05-20T16:57:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`count_binder_lifetime_in_type` stops at `ResolvedPath`/generic-arg containers, so the single-binder Fn drop can erase shared lifetimes nested inside inputs. For example, `for<'a> Fn(Vec<&'a str>, Vec<&'a str>)` counts as zero binder uses, maps `@BR:'a` to `\"\"`, and formats the same as `Fn(Vec<&str>, Vec<&str>)`, producing a false Blue even though the explicit HRTB requires one shared lifetime across both inputs. The walker needs to recurse through resolved-path args and other type containers before deciding the binder is single-use.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1448,
+              "category": "logic"
+            },
+            {
+              "message": "The formatter only rejects type/const HRTB binders here and never emits an unsupported sentinel for lifetime binders with `outlives` constraints. Top-level bounds with `for<'a: 'static>` are caught by `bounds_supported`, but nested associated-type constraints are formatted recursively without that check, so `Iterator<Item: for<'a: 'static> Foo<&'a str>>` and `Iterator<Item: for<'a> Foo<&'a str>>` collapse to the same fingerprint instead of failing closed. This can hide a real bound change as Blue.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1490,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:7fca2e718a17ee9194441ade80f8beb6ec5b4c23efa7818dfb9e10460cd35d32",
+          "at": "2026-05-20T17:06:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The HRTB normalization only drops the C-side binder for the single-lifetime case. For a catalogue bound like `Fn(&str, &str)`, the A side has no binder and formats both refs without lifetime labels, while rustdoc desugars the same Rust signature into a two-lifetime HRTB such as `for<'a, 'b> Fn(&'a str, &'b str)`. With this branch, the C side keeps `#L2:` and `#L0/#L1` labels, so structurally identical two-argument callbacks will compare unequal and produce false Yellow signals. The no-binder parenthesized Fn path needs equivalent elided-lifetime normalization for multiple independent input lifetimes, while still distinguishing the shared-lifetime `for<'a> Fn(&'a, &'a)` case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1614,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dde252555be5408d5f42168ea36a72a25b3606ebb13e3edbc344cd5c2489810b",
+          "at": "2026-05-20T17:11:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The HRTB Fn-desugaring check only counts binder lifetime uses in the parenthesized inputs, even though the formatter later drops binder lifetimes in both inputs and output. As a result, `for<'a> Fn(&'a str) -> &'a str` and `for<'a,'b> Fn(&'a str) -> &'b str` both get treated as elided/desugared and can collapse to the same fingerprint, despite the output lifetime relationship being structurally different. Include the output when deciding whether each binder is single-use/desugaring-eligible.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1586,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:80b97a374b5f59c0db7f9edb26dd42c6d1da964f7681b8f969814f2f7348a6b7",
+          "at": "2026-05-20T17:17:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6442bc82a8dee75064bd5afb68c58de5676ded374f2b610e62139934731ca87",
+          "at": "2026-05-20T17:23:12Z"
+        }
+      ]
+    }
+  }
+}

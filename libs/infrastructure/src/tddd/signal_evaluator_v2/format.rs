@@ -280,9 +280,62 @@ pub(super) fn format_type_with_canon(ty: &Type, canon: &HashMap<String, String>)
             }
         }
         Type::Primitive(name) => name.clone(),
-        Type::BorrowedRef { is_mutable, type_: inner, .. } => {
+        Type::BorrowedRef { lifetime, is_mutable, type_: inner } => {
             let mut_str = if *is_mutable { "mut " } else { "" };
-            format!("&{mut_str}{}", format_type_with_canon(inner, canon))
+            // For HRTB binders (1 or more lifetime params), the canon map contains
+            // `@BR:lt_name` entries (added by `format_generic_bounds_with_canon`).
+            // Three cases:
+            //
+            //  1. Binder lifetime: `@BR:{lt}` is in the map.
+            //     - 2+-binder: value is `"#L{i}"` (non-empty) → emit positional label.
+            //       Distinguishes which binder param each reference uses, preventing
+            //       `for<'a,'b> Fn(&'a str, &'b str)` and `for<'a,'b> Fn(&'a str, &'a str)`
+            //       from collapsing.
+            //     - 1-binder: value is `""` (empty) → drop.  Preserves A-side ≡ C-side
+            //       symmetry for Fn-trait desugaring: A-side has no lifetime annotation
+            //       (`None`, handled above), C-side has the binder lifetime `'_` or `'a`
+            //       (dropped here so both sides produce the same fingerprint).
+            //
+            //  2. Concrete lifetime (e.g. `'static`) in an HRTB context: `@BR:{lt}` is
+            //     NOT in the map, but `@BR:` sentinel IS present.  Emit the literal
+            //     lifetime string so that `&'static str` and binder-lifetime references
+            //     produce distinct fingerprints, preventing false Blue.
+            //
+            //  3. No HRTB context (no `@BR:` sentinel): only `'static` is semantically
+            //     distinct from "no lifetime annotation".  Named lifetime params like
+            //     `'a` and `'b` are alpha-equivalent (`generics_structurally_equal`
+            //     ignores lifetime param names), so they are dropped.  `'_` (elided) is
+            //     also dropped as equivalent to `None`.  This prevents false mismatches
+            //     for signatures that differ only in lifetime parameter names
+            //     (e.g. `fn f<'a>(&'a str)` vs `fn f<'b>(&'b str)`).
+            let in_hrtb_ctx = canon.contains_key("@BR:");
+            let lt_str = match lifetime.as_deref() {
+                None => String::new(),
+                Some(lt) => {
+                    if let Some(pos) = canon.get(&format!("@BR:{lt}")) {
+                        // Case 1: binder lifetime → positional label (or drop when empty).
+                        // For 2+-binder HRTBs, `pos` is `"#L{i}"` (non-empty) → emit label.
+                        // For 1-binder Fn-desugaring HRTBs, `pos` is `""` (empty) → drop
+                        // (A-side ≡ C-side symmetry: A has no lifetime, C has `'_`/`'a`).
+                        // For 1-binder non-Fn HRTBs, `pos` is `"#L{i}"` (non-empty) → emit.
+                        if pos.is_empty() { String::new() } else { format!("{pos} ") }
+                    } else if in_hrtb_ctx {
+                        // Case 2: concrete (non-binder) lifetime in HRTB context.
+                        // Emit verbatim so `&'static str` and `&'a str` (binder ref) are
+                        // distinguished — preventing false Blue for `for<'a> Fn(&'static str)`
+                        // vs `for<'a> Fn(&'a str)`.
+                        format!("{lt} ")
+                    } else {
+                        // Case 3: no HRTB context (no `@BR:` sentinel).
+                        // Only `'static` is semantically distinct from "no lifetime"; emit
+                        // it verbatim.  All other named lifetimes (`'a`, `'b`, `'_`, etc.)
+                        // are alpha-equivalent and dropped so that `fn f<'a>(&'a str)` and
+                        // `fn f<'b>(&'b str)` produce the same fingerprint.
+                        if lt == "'static" { format!("{lt} ") } else { String::new() }
+                    }
+                }
+            };
+            format!("&{lt_str}{mut_str}{}", format_type_with_canon(inner, canon))
         }
         Type::Slice(inner) => format!("[{}]", format_type_with_canon(inner, canon)),
         Type::Array { type_: inner, len } => {
@@ -458,7 +511,14 @@ fn format_generic_args_with_canon(args: &GenericArgs, canon: &HashMap<String, St
                 .iter()
                 .map(|arg| match arg {
                     GenericArg::Type(t) => format_type_with_canon(t, canon),
-                    GenericArg::Lifetime(lt) => lt.clone(),
+                    // When the canon map contains a binder-lifetime entry (added for HRTB
+                    // binders with 2+ params), normalize the lifetime to its positional label
+                    // so that `for<'a> Foo<'a>` and `for<'b> Foo<'b>` produce the same
+                    // fingerprint.  For the 0/1-binder elision case no entry exists, so the
+                    // raw lifetime value is emitted (and sorted/deduped at a higher level).
+                    GenericArg::Lifetime(lt) => {
+                        canon.get(lt.as_str()).cloned().unwrap_or_else(|| lt.clone())
+                    }
                     // Apply the canon map to const generic argument expressions so that
                     // a const param rename (e.g. `N` → `M` in `trait A<const N>: Foo<N>`)
                     // does not produce a false structural mismatch.  The expression is
@@ -718,7 +778,13 @@ pub(super) fn format_type(ty: &Type) -> String {
                     .iter()
                     .filter_map(|p| {
                         if matches!(p.kind, GenericParamDefKind::Lifetime { .. }) {
-                            Some(format!("'{}", p.name))
+                            // Normalize lifetime names to always carry exactly one leading `'`.
+                            // rustdoc stores lifetime names WITH the `'` (e.g. `"'a"`), while
+                            // older or hand-crafted `GenericParamDef` values may omit it
+                            // (e.g. `"a"`).  Using `strip_prefix('\'').unwrap_or(&p.name)`
+                            // then re-prepending `'` ensures both forms produce `"'a"`.
+                            let bare = p.name.strip_prefix('\'').unwrap_or(&p.name);
+                            Some(format!("'{bare}"))
                         } else {
                             None
                         }
@@ -777,9 +843,12 @@ pub(super) fn format_type(ty: &Type) -> String {
 ///
 /// Stripping rules applied to `AngleBracketed` generic arg lists:
 /// - `GenericArg::Type(Type::Generic(name))` where `name ∈ type_params` → removed.
-/// - `GenericArg::Lifetime(lt)` where `lt` without its leading `'` is in `type_params`
-///   → removed (impl-block lifetime params are identity-neutral).  Concrete lifetimes
-///   such as `'static` whose bare name is NOT in `type_params` are preserved.
+/// - `GenericArg::Lifetime(lt)` where `lt ∈ type_params` OR `lt.trim_start_matches('\'') ∈
+///   type_params` → removed (impl-block lifetime params are identity-neutral).  Both forms
+///   are checked because `GenericArg::Lifetime` always includes the leading `'` (e.g.
+///   `"'a"`), while `GenericParamDef::name` may or may not (rustdoc C-side omits it, the
+///   A-codec via `type_ref_parser` includes it).  Concrete lifetimes like `'static` are
+///   preserved because neither form appears in `type_params`.
 /// - `GenericArg::Type(t)` for composite types — recurse with
 ///   `format_type_strip_type_params(t, type_params)` so nested impl-block type params
 ///   inside `Vec<S>`, tuples, or borrowed refs are also stripped.
@@ -961,7 +1030,10 @@ pub(super) fn format_type_strip_type_params(ty: &Type, type_params: &BTreeSet<St
                     .iter()
                     .filter_map(|p| {
                         if matches!(p.kind, GenericParamDefKind::Lifetime { .. }) {
-                            Some(format!("'{}", p.name))
+                            // Normalize lifetime names: strip any leading `'` then re-prepend,
+                            // so both `"a"` and `"'a"` produce `"'a"` (avoids `"''a"`).
+                            let bare = p.name.strip_prefix('\'').unwrap_or(&p.name);
+                            Some(format!("'{bare}"))
                         } else {
                             None
                         }
@@ -1028,15 +1100,20 @@ fn format_generic_args_strip_type_params(
                     {
                         None
                     }
-                    // Strip impl-block lifetime params only.  A lifetime arg `'lt`
-                    // in rustdoc stores the name WITH the leading `'`, while
-                    // `GenericParamDef::name` stores it WITHOUT (e.g. `"a"` for
-                    // `'a`).  Strip when the bare name (after removing `'`) is in
-                    // `type_params`.  Concrete lifetimes like `'static` are
-                    // preserved because they are not in `type_params`.
+                    // Strip impl-block lifetime params only.  `GenericArg::Lifetime` values
+                    // always carry the leading `'` (e.g. `"'a"`).  `GenericParamDef::name`
+                    // may carry `'` (A-codec via `type_ref_parser`) or may omit it (rustdoc
+                    // C-side), so `type_params` can contain either `"'a"` or `"a"`.  Check
+                    // both forms so that the strip is robust to whichever convention produced
+                    // the `type_params` set.  Concrete lifetimes like `'static` are preserved
+                    // because they are not in `type_params`.
                     GenericArg::Lifetime(lt) => {
                         let bare = lt.trim_start_matches('\'');
-                        if type_params.contains(bare) { None } else { Some(lt.clone()) }
+                        if type_params.contains(lt.as_str()) || type_params.contains(bare) {
+                            None
+                        } else {
+                            Some(lt.clone())
+                        }
                     }
                     // Recurse into composite types so nested impl-block type params
                     // (e.g. `S` inside `Vec<S>`) are also stripped.
@@ -1220,6 +1297,10 @@ pub(super) fn format_generic_bounds(bounds: &[GenericBound]) -> String {
 /// args so that impl-block type parameters that appear inside constraint bounds
 /// such as `Foo<Assoc: Bar<T>>` are stripped from the rendered string.
 ///
+/// For lifetime-only HRTB binders (D5 support), emits a `#L{count}:` arity
+/// prefix so that `for<'a> Bar` and `Bar` produce distinct strings, preventing
+/// false equality between HRTB-qualified and non-HRTB constraint bounds.
+///
 /// Lifetime bounds (`Outlives`) and use-capture (`Use`) bounds are passed
 /// through unchanged (same as `format_generic_bounds`).
 fn format_generic_bounds_strip_type_params(
@@ -1245,8 +1326,25 @@ fn format_generic_bounds_strip_type_params(
                     TraitBoundModifier::Maybe => "?",
                     TraitBoundModifier::MaybeConst => "~const ",
                 };
-                let hrtb_str = format_hrtb_type_params(generic_params);
-                Some(format!("{modifier_str}{short}{args_str}{hrtb_str}"))
+                // For type-param binders, use format_hrtb_type_params (pre-D5 path).
+                // For lifetime-only binders (D5), emit an arity prefix `#L{n}:` so that
+                // `for<'a> Bar` and `Bar` (and `for<'a,'b> Bar`) produce distinct strings.
+                let has_type_binders = generic_params.iter().any(|hp| {
+                    matches!(
+                        hp.kind,
+                        GenericParamDefKind::Type { .. } | GenericParamDefKind::Const { .. }
+                    )
+                });
+                let binder_str = if has_type_binders {
+                    format_hrtb_type_params(generic_params)
+                } else {
+                    let lt_count = generic_params
+                        .iter()
+                        .filter(|hp| matches!(hp.kind, GenericParamDefKind::Lifetime { .. }))
+                        .count();
+                    if lt_count >= 1 { format!("#L{lt_count}:") } else { String::new() }
+                };
+                Some(format!("{binder_str}{modifier_str}{short}{args_str}"))
             }
             GenericBound::Outlives(lt) => Some(lt.clone()),
             GenericBound::Use(use_bounds) => {
@@ -1315,18 +1413,96 @@ pub(super) fn format_where_predicate_with_canon(
     }
 }
 
+/// Counts how many `BorrowedRef::lifetime` values in `types` match any name in
+/// `binder_names` (with or without the leading `'`).
+///
+/// Used to determine whether a single-binder HRTB lifetime appears more than once in
+/// the Parenthesized Fn-trait args: if the count is > 1 the binder introduces a
+/// shared-lifetime constraint (semantically distinct from elided independent lifetimes)
+/// and must be retained rather than dropped.
+fn count_binder_lifetime_in_types(types: &[Type], binder_names: &[&str]) -> usize {
+    types.iter().map(|t| count_binder_lifetime_in_type(t, binder_names)).sum()
+}
+
+fn count_binder_lifetime_in_type(ty: &Type, binder_names: &[&str]) -> usize {
+    match ty {
+        Type::BorrowedRef { lifetime, type_: inner, .. } => {
+            let matched = lifetime.as_deref().is_some_and(|lt| {
+                binder_names.iter().any(|name| {
+                    // Compare with and without leading `'` to handle both conventions.
+                    *name == lt
+                        || name.strip_prefix('\'') == Some(lt)
+                        || lt.strip_prefix('\'') == Some(*name)
+                })
+            });
+            (matched as usize) + count_binder_lifetime_in_type(inner, binder_names)
+        }
+        Type::Slice(inner)
+        | Type::Array { type_: inner, .. }
+        | Type::RawPointer { type_: inner, .. } => {
+            count_binder_lifetime_in_type(inner, binder_names)
+        }
+        Type::Tuple(tys) => {
+            tys.iter().map(|t| count_binder_lifetime_in_type(t, binder_names)).sum()
+        }
+        // Recurse into generic args of resolved paths so that
+        // `for<'a> Fn(Vec<&'a str>, Vec<&'a str>)` is counted as 2 binder uses (not 0),
+        // preventing the single-binder drop from producing a false Blue.
+        Type::ResolvedPath(path) => {
+            if let Some(args) = path.args.as_deref() {
+                count_binder_lifetime_in_generic_args(args, binder_names)
+            } else {
+                0
+            }
+        }
+        _ => 0,
+    }
+}
+
+/// Counts binder lifetime occurrences in angle-bracketed `GenericArgs`.
+/// Used by `count_binder_lifetime_in_type` to recurse into resolved-path args.
+fn count_binder_lifetime_in_generic_args(args: &GenericArgs, binder_names: &[&str]) -> usize {
+    match args {
+        GenericArgs::AngleBracketed { args, .. } => args
+            .iter()
+            .map(|arg| match arg {
+                GenericArg::Type(t) => count_binder_lifetime_in_type(t, binder_names),
+                _ => 0,
+            })
+            .sum(),
+        GenericArgs::Parenthesized { inputs, output } => {
+            let in_count: usize =
+                inputs.iter().map(|t| count_binder_lifetime_in_type(t, binder_names)).sum();
+            let out_count =
+                output.as_ref().map_or(0, |t| count_binder_lifetime_in_type(t, binder_names));
+            in_count + out_count
+        }
+        // ReturnTypeNotation and other future variants contain no embedded types.
+        _ => 0,
+    }
+}
+
 /// Canon-aware variant of [`format_generic_bounds`]. Applies `canon` to inner
 /// `Type::Generic` occurrences inside trait-bound generic args so that bounds
 /// like `Into<T>` and `Into<U>` (with `canon["T"] = "#0"`, `canon["U"] = "#0"`)
 /// produce the same string.
 ///
-/// D3 scope:
+/// D5 scope (ADR 2026-05-18-1223 D5):
 /// - `TraitBound { generic_params: empty }` — fully supported, formatted verbatim.
+/// - `TraitBound { generic_params: lifetime-only }` (HRTB-on-TraitBound) — supported;
+///   binder lifetime names are normalized so that the A-side (no binder) and C-side
+///   (elision `'_` or explicit `'a`) produce the same fingerprint for the binder-introduced
+///   lifetime references.  Concrete non-binder lifetimes (e.g. `'static`) in BorrowedRef
+///   positions are preserved verbatim (even in 1-binder context) to prevent false Blue for
+///   `for<'a> Fn(&'static str)` vs `for<'a> Fn(&'a str)`.  For 2+-binder HRTBs, binder
+///   lifetimes are mapped to positional labels (`#L0`, `#L1`) to distinguish which binder
+///   param each reference annotation uses.  A `#L{n}:` arity prefix distinguishes binder
+///   arities ≥ 2 from each other.
+/// - `TraitBound { generic_params: contains type params }` (HRTB with type binders) —
+///   outside D5 scope; returned as `<UNSUPPORTED:HRTB>` (same as before D5).
 /// - `Outlives(lt)` — supported: rendered as the lifetime string (e.g. `"'static"`),
 ///   enabling `F: 'static + Fn(...)` to compare correctly on both sides.
-/// - `TraitBound { generic_params: non_empty }` (HRTB binder) — outside D3 scope,
-///   returned as `<UNSUPPORTED:HRTB>`.
-/// - `Use` — outside D3 scope, returned as `<UNSUPPORTED:Use>`.
+/// - `Use` — outside D5 scope, returned as `<UNSUPPORTED:Use>`.
 pub(super) fn format_generic_bounds_with_canon(
     bounds: &[GenericBound],
     canon: &HashMap<String, String>,
@@ -1335,22 +1511,161 @@ pub(super) fn format_generic_bounds_with_canon(
         .iter()
         .map(|b| match b {
             GenericBound::TraitBound { trait_, modifier, generic_params } => {
-                // D3 fail-closed: `TraitBound` with a non-empty HRTB binder
-                // (`for<'a>` / `for<T: Foo>`) is outside ADR `2026-05-13-1153` D3 scope.
-                // Return a sentinel so bounds containing HRTB binders produce a unique
-                // non-matching string (including when they appear inside associated-type
-                // constraints such as `Iterator<Item: for<'a> Foo<&'a str>>`).  Without
-                // this check, `format_hrtb_type_params` silently drops lifetime params,
-                // causing `for<'a> Foo<&'a str>` to compare equal to `Foo<&str>`.
-                if !generic_params.is_empty() {
+                // D5 (ADR 2026-05-18-1223): HRTB-on-TraitBound with lifetime-only binder
+                // params is now supported. Rustdoc desugars elided-lifetime Fn trait bounds
+                // (`Fn(&str)`) into HRTB form (`for<'_> Fn(&'_ str)`), so C-side always
+                // has a non-empty `generic_params` while A-side (catalogue) has none.
+                // Normalizing the binder lifetimes positionally makes both sides compare
+                // equal.
+                //
+                // HRTB with type-param binders (`for<T: Foo>`) remains unsupported —
+                // keep the sentinel for that case.
+                let has_type_binders = generic_params.iter().any(|hp| {
+                    matches!(
+                        hp.kind,
+                        GenericParamDefKind::Type { .. } | GenericParamDefKind::Const { .. }
+                    )
+                });
+                if has_type_binders {
                     return "<UNSUPPORTED:HRTB>".to_owned();
                 }
+                // Lifetime binders with `outlives` constraints (e.g. `for<'a: 'b>`) are
+                // outside D5 scope: the formatter does not represent the outlives constraint
+                // in the fingerprint, so accepting such binders would silently discard the
+                // constraint and risk false Blue for `for<'a: 'b> Foo<&'a T>` vs
+                // `for<'a> Foo<&'a T>`.  Emit the unsupported sentinel so that any bound
+                // containing `for<'a: ...>` never falsely compares equal.
+                let has_outlives_binder = generic_params.iter().any(|hp| match &hp.kind {
+                    GenericParamDefKind::Lifetime { outlives } => !outlives.is_empty(),
+                    _ => false,
+                });
+                if has_outlives_binder {
+                    return "<UNSUPPORTED:HRTB>".to_owned();
+                }
+                // Collect binder lifetime params in declaration order.
+                let binder_lifetimes: Vec<&str> = generic_params
+                    .iter()
+                    .filter(|hp| matches!(hp.kind, GenericParamDefKind::Lifetime { .. }))
+                    .map(|hp| hp.name.as_str())
+                    .collect();
+                let lt_count = binder_lifetimes.len();
+                // Detect whether the trait's args use the Parenthesized (Fn-trait) form
+                // and extract the inputs and output.  Both are needed for Fn-desugaring
+                // analysis: the output may also carry binder lifetimes (e.g. `Fn(&'a str) ->
+                // &'a str`), so counting only inputs would miss shared-use via the output.
+                let parenthesized_parts: Option<(&[Type], Option<&Type>)> =
+                    match trait_.args.as_deref() {
+                        Some(GenericArgs::Parenthesized { inputs, output }) => {
+                            // `output` is `&Option<Box<Type>>`; convert to `Option<&Type>`.
+                            // Matching on `output` deref-coerces `&Box<Type>` → `&Type`.
+                            let out: Option<&Type> = match output {
+                                Some(b) => Some(b),
+                                None => None,
+                            };
+                            Some((inputs.as_slice(), out))
+                        }
+                        _ => None,
+                    };
+                // Keep the inputs-only slice for the existing `parenthesized_inputs` usage.
+                let parenthesized_inputs: Option<&[Type]> =
+                    parenthesized_parts.map(|(inputs, _)| inputs);
+                let is_parenthesized = parenthesized_inputs.is_some();
+                // Fn-desugaring normalization (D5):
+                //
+                // rustdoc desugars `Fn(&str)` (A-side, no binder) into `for<'_> Fn(&'_ str)`
+                // (C-side, 1 binder) and `Fn(&str, &str)` into `for<'a,'b> Fn(&'a str, &'b str)`
+                // (C-side, 2 independent binders), etc.
+                //
+                // A binder lifetime is "desugaring-eligible" in a Parenthesized context when it
+                // appears exactly once in the inputs (and output) — it is an independent elided
+                // lifetime.  When all binder lifetimes are desugaring-eligible:
+                //  - `binder_prefix` is `""` (treat as if no binder, same as A-side).
+                //  - `@BR:binder_lt → ""` (drop each binder lifetime so `&'_ str` → `&str`).
+                //
+                // When any binder lifetime appears more than once (shared-lifetime constraint):
+                //  - This is NOT a Fn-desugaring; retain positional labels.
+                //  - `binder_prefix` follows the arity rule: `""` for ≤1, `"#L{n}:"` for 2+.
+                //
+                // For AngleBracketed or no args, always retain positional labels (HRTB present).
+                //
+                // For all `lt_count >= 1` cases, the sentinel `@BR:` key is set so that
+                // `format_type_with_canon` emits concrete non-binder lifetimes (e.g. `'static`)
+                // verbatim, preventing false Blue for `for<'a> Fn(&'static str)` vs
+                // `for<'a> Fn(&'a str)`.
+                let fn_desugar = if is_parenthesized && lt_count >= 1 {
+                    // Count per-binder usage across BOTH inputs and output so that
+                    // `for<'a> Fn(&'a str) -> &'a str` (shared-use via output) is NOT
+                    // treated as desugaring-eligible and retains its positional label.
+                    let (inputs, output) = parenthesized_parts.unwrap_or((&[], None));
+                    binder_lifetimes.iter().all(|lt| {
+                        let in_count = count_binder_lifetime_in_types(inputs, &[lt]);
+                        let out_count =
+                            output.map_or(0, |o| count_binder_lifetime_in_type(o, &[lt]));
+                        in_count + out_count <= 1
+                    })
+                } else {
+                    false
+                };
+                // Binder-arity prefix: empty when fn_desugar (all-single-use Parenthesized),
+                // empty for 0/1-binder non-desugar, "#L{n}:" for 2+-binder non-desugar.
+                let binder_prefix = if fn_desugar || lt_count <= 1 {
+                    String::new()
+                } else {
+                    format!("#L{lt_count}:")
+                };
+                // Build a positional canon map for binder lifetimes.
+                //
+                // Two key-spaces:
+                //  "lt_name"      → "#L{i}"  (for GenericArg::Lifetime in AngleBracketed)
+                //  "@BR:lt_name"  → label     (for BorrowedRef::lifetime)
+                //
+                // GenericArg::Lifetime: always positional `#L{i}` regardless of context.
+                //   Keeps `for<'a> Foo<'a>` distinct from `Foo` (no args).
+                //
+                // BorrowedRef `@BR:`:
+                //   fn_desugar → `""` (drop): A/C symmetry for Fn-desugaring elision.
+                //   non-desugar → `"#L{i}"` (retain): HRTB presence observable in fingerprint.
+                //   Sentinel `@BR:` (value `""`) always set for 1+ binders so concrete lifetimes
+                //   (e.g. `'static`) are emitted verbatim and not silently dropped.
+                let args_canon: std::borrow::Cow<HashMap<String, String>> = if lt_count >= 1 {
+                    let mut merged = canon.clone();
+                    for (i, lt_name) in binder_lifetimes.iter().enumerate() {
+                        let positional_label = format!("#L{i}");
+                        // Binder lifetime names may be stored with the leading `'`
+                        // (`"'a"` from A-codec via `type_ref_parser`) or without it
+                        // (`"a"` from rustdoc C-side).  Insert both forms so lookups succeed.
+                        let apostrophe_name: String;
+                        let (bare, apostrophized) = if let Some(b) = lt_name.strip_prefix('\'') {
+                            apostrophe_name = (*lt_name).to_owned();
+                            (b, apostrophe_name.as_str())
+                        } else {
+                            apostrophe_name = format!("'{lt_name}");
+                            (*lt_name, apostrophe_name.as_str())
+                        };
+                        // GenericArg::Lifetime lookup: always positional.
+                        merged.insert(bare.to_owned(), positional_label.clone());
+                        merged.insert(apostrophized.to_owned(), positional_label.clone());
+                        // BorrowedRef `@BR:` lookup.
+                        let br_label = if fn_desugar {
+                            String::new() // Fn-desugaring: drop binder lifetime
+                        } else {
+                            positional_label.clone() // retain: HRTB observable
+                        };
+                        merged.insert(format!("@BR:{bare}"), br_label.clone());
+                        merged.insert(format!("@BR:{apostrophized}"), br_label);
+                    }
+                    // Sentinel: signals HRTB context to `format_type_with_canon`'s BorrowedRef arm.
+                    merged.insert("@BR:".to_owned(), String::new());
+                    std::borrow::Cow::Owned(merged)
+                } else {
+                    std::borrow::Cow::Borrowed(canon)
+                };
                 let short = trait_.path.rsplit("::").next().unwrap_or(&trait_.path).to_string();
                 let args_str = trait_
                     .args
                     .as_deref()
                     .map(|a| {
-                        let s = format_generic_args_with_canon(a, canon);
+                        let s = format_generic_args_with_canon(a, &args_canon);
                         if s.is_empty() { String::new() } else { format!("<{s}>") }
                     })
                     .unwrap_or_default();
@@ -1360,13 +1675,13 @@ pub(super) fn format_generic_bounds_with_canon(
                     TraitBoundModifier::Maybe => "?",
                     TraitBoundModifier::MaybeConst => "~const ",
                 };
-                format!("{modifier_str}{short}{args_str}")
+                format!("{binder_prefix}{modifier_str}{short}{args_str}")
             }
             // Outlives bounds (e.g. `'static`, `'a`) are formatted verbatim so that
             // `F: 'static + Fn(...)` produces matching fingerprints on both A-codec
             // and C-side (rustdoc) paths.
             GenericBound::Outlives(lt) => lt.clone(),
-            // Use is outside D3 scope.
+            // Use is outside D5 scope.
             GenericBound::Use(_) => "<UNSUPPORTED:Use>".to_owned(),
         })
         .collect();
@@ -1518,6 +1833,191 @@ mod tests {
         assert_eq!(
             result, "LEN=16",
             "concrete const value in equality binding must not be stripped; got: {result}"
+        );
+    }
+
+    // --- format_generic_bounds_with_canon: HRTB 2-binder arity distinguishes lifetime usage ---
+
+    #[test]
+    fn test_hrtb_two_binder_lifetimes_distinct_usage_produces_different_fingerprints() {
+        use std::collections::HashMap;
+
+        use rustdoc_types::{
+            GenericBound, GenericParamDef, GenericParamDefKind, Id, Path, TraitBoundModifier,
+        };
+
+        use super::format_generic_bounds_with_canon;
+
+        fn lt_param(name: &str) -> GenericParamDef {
+            GenericParamDef {
+                name: name.to_owned(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }
+        }
+
+        // for<'a,'b> Fn(&'a str, &'b str)
+        let bound_ab = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_owned(),
+                id: Id(0),
+                args: Some(Box::new(rustdoc_types::GenericArgs::Parenthesized {
+                    inputs: vec![
+                        Type::BorrowedRef {
+                            lifetime: Some("'a".to_owned()),
+                            is_mutable: false,
+                            type_: Box::new(Type::Primitive("str".to_owned())),
+                        },
+                        Type::BorrowedRef {
+                            lifetime: Some("'b".to_owned()),
+                            is_mutable: false,
+                            type_: Box::new(Type::Primitive("str".to_owned())),
+                        },
+                    ],
+                    output: None,
+                })),
+            },
+            generic_params: vec![lt_param("'a"), lt_param("'b")],
+            modifier: TraitBoundModifier::None,
+        };
+
+        // for<'a,'b> Fn(&'a str, &'a str) — same arity but both params use 'a
+        let bound_aa = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_owned(),
+                id: Id(0),
+                args: Some(Box::new(rustdoc_types::GenericArgs::Parenthesized {
+                    inputs: vec![
+                        Type::BorrowedRef {
+                            lifetime: Some("'a".to_owned()),
+                            is_mutable: false,
+                            type_: Box::new(Type::Primitive("str".to_owned())),
+                        },
+                        Type::BorrowedRef {
+                            lifetime: Some("'a".to_owned()),
+                            is_mutable: false,
+                            type_: Box::new(Type::Primitive("str".to_owned())),
+                        },
+                    ],
+                    output: None,
+                })),
+            },
+            generic_params: vec![lt_param("'a"), lt_param("'b")],
+            modifier: TraitBoundModifier::None,
+        };
+
+        let canon: HashMap<String, String> = HashMap::new();
+        let fp_ab = format_generic_bounds_with_canon(&[bound_ab], &canon);
+        let fp_aa = format_generic_bounds_with_canon(&[bound_aa], &canon);
+        assert_ne!(
+            fp_ab, fp_aa,
+            "D5: `for<'a,'b> Fn(&'a str, &'b str)` and \
+             `for<'a,'b> Fn(&'a str, &'a str)` must produce distinct fingerprints \
+             to avoid false Blue comparisons; got: fp_ab={fp_ab:?} fp_aa={fp_aa:?}"
+        );
+    }
+
+    #[test]
+    fn test_hrtb_one_binder_different_name_same_fingerprint() {
+        // `for<'a> Foo<'a>` and `for<'b> Foo<'b>` should produce the same fingerprint
+        // because the binder lifetime name is insignificant.
+        use std::collections::HashMap;
+
+        use rustdoc_types::{
+            GenericArg, GenericArgs, GenericBound, GenericParamDef, GenericParamDefKind, Id, Path,
+            TraitBoundModifier,
+        };
+
+        use super::format_generic_bounds_with_canon;
+
+        let make_bound = |binder_name: &str, arg_lt: &str| GenericBound::TraitBound {
+            trait_: Path {
+                path: "Foo".to_owned(),
+                id: Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![GenericArg::Lifetime(arg_lt.to_owned())],
+                    constraints: vec![],
+                })),
+            },
+            generic_params: vec![GenericParamDef {
+                name: binder_name.to_owned(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+
+        let canon: HashMap<String, String> = HashMap::new();
+        let fp_a = format_generic_bounds_with_canon(&[make_bound("'a", "'a")], &canon);
+        let fp_b = format_generic_bounds_with_canon(&[make_bound("'b", "'b")], &canon);
+        assert_eq!(
+            fp_a, fp_b,
+            "D5: `for<'a> Foo<'a>` and `for<'b> Foo<'b>` must produce the same fingerprint \
+             (binder lifetime name is insignificant); got: fp_a={fp_a:?} fp_b={fp_b:?}"
+        );
+    }
+
+    #[test]
+    fn test_hrtb_two_binder_concrete_lifetime_not_equal_to_elided() {
+        // `for<'a,'b> Fn(&'static str)` and `for<'a,'b> Fn(&str)` must produce distinct
+        // fingerprints because `'static` is a concrete (non-binder) lifetime.
+        use std::collections::HashMap;
+
+        use rustdoc_types::{
+            GenericBound, GenericParamDef, GenericParamDefKind, Id, Path, TraitBoundModifier,
+        };
+
+        use super::format_generic_bounds_with_canon;
+
+        fn lt_param(name: &str) -> GenericParamDef {
+            GenericParamDef {
+                name: name.to_owned(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }
+        }
+
+        // for<'a,'b> Fn(&'static str) — concrete 'static lifetime in arg
+        let bound_static = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_owned(),
+                id: Id(0),
+                args: Some(Box::new(rustdoc_types::GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: Some("'static".to_owned()),
+                        is_mutable: false,
+                        type_: Box::new(Type::Primitive("str".to_owned())),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![lt_param("'a"), lt_param("'b")],
+            modifier: TraitBoundModifier::None,
+        };
+
+        // for<'a,'b> Fn(&str) — elided (no) lifetime in arg
+        let bound_elided = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_owned(),
+                id: Id(0),
+                args: Some(Box::new(rustdoc_types::GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: None,
+                        is_mutable: false,
+                        type_: Box::new(Type::Primitive("str".to_owned())),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![lt_param("'a"), lt_param("'b")],
+            modifier: TraitBoundModifier::None,
+        };
+
+        let canon: HashMap<String, String> = HashMap::new();
+        let fp_static = format_generic_bounds_with_canon(&[bound_static], &canon);
+        let fp_elided = format_generic_bounds_with_canon(&[bound_elided], &canon);
+        assert_ne!(
+            fp_static, fp_elided,
+            "D5: `for<'a,'b> Fn(&'static str)` and `for<'a,'b> Fn(&str)` must produce \
+             distinct fingerprints (concrete vs elided lifetime in 2+-binder context); \
+             got: fp_static={fp_static:?} fp_elided={fp_elided:?}"
         );
     }
 

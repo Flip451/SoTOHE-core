@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e159c226fb96724929e4f27bc8e2335c5f122b941688e1ec0e1b66099ade271f",
+  "signals": [
+    {
+      "type_name": "BoundOp",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueDocument",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GenericArgsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "InherentImplDeclV2",
+      "signal": "blue"
+    },
+    {
+      "type_name": "NewTypeGraphCodecError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "WherePredicateDecl",
+      "signal": "blue"
+    }
+  ]
+}

@@ -41,6 +41,14 @@ pub(super) struct CatalogueDocumentDto {
     pub(super) types: BTreeMap<String, TypeEntryDto>,
     pub(super) traits: BTreeMap<String, TraitEntryDto>,
     pub(super) functions: BTreeMap<String, FunctionEntryDto>,
+    /// Inherent impl block declarations. Omitted from JSON when empty
+    /// (`skip_serializing_if`) so legacy catalogues stay byte-stable.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) inherent_impls: Vec<InherentImplDeclDto>,
+    /// Top-level trait impl block declarations (ADR `2026-05-20-0048` D1).
+    /// Omitted from JSON when empty so catalogues without trait impls stay byte-stable.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) trait_impls: Vec<TraitImplDto>,
 }
 
 /// Manual `Deserialize` for [`CatalogueDocumentDto`] that uses [`StrictMap`]
@@ -62,6 +70,8 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
             Types,
             Traits,
             Functions,
+            InherentImpls,
+            TraitImpls,
             #[serde(other)]
             Unknown,
         }
@@ -85,6 +95,8 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                 let mut types: Option<StrictMap<String, TypeEntryDto>> = None;
                 let mut traits: Option<StrictMap<String, TraitEntryDto>> = None;
                 let mut functions: Option<StrictMap<String, FunctionEntryDto>> = None;
+                let mut inherent_impls: Option<Vec<InherentImplDeclDto>> = None;
+                let mut trait_impls: Option<Vec<TraitImplDto>> = None;
 
                 while let Some(key) = map.next_key()? {
                     match key {
@@ -124,6 +136,18 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                             }
                             functions = Some(map.next_value()?);
                         }
+                        Field::InherentImpls => {
+                            if inherent_impls.is_some() {
+                                return Err(de::Error::duplicate_field("inherent_impls"));
+                            }
+                            inherent_impls = Some(map.next_value()?);
+                        }
+                        Field::TraitImpls => {
+                            if trait_impls.is_some() {
+                                return Err(de::Error::duplicate_field("trait_impls"));
+                            }
+                            trait_impls = Some(map.next_value()?);
+                        }
                         Field::Unknown => {
                             // Consume the value so the deserializer is in a clean
                             // state, then reject the unknown field to fail closed.
@@ -144,6 +168,10 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                 let types = types.ok_or_else(|| de::Error::missing_field("types"))?;
                 let traits = traits.ok_or_else(|| de::Error::missing_field("traits"))?;
                 let functions = functions.ok_or_else(|| de::Error::missing_field("functions"))?;
+                // `inherent_impls` defaults to empty Vec when absent (backward compat).
+                let inherent_impls = inherent_impls.unwrap_or_default();
+                // `trait_impls` defaults to empty Vec when absent (new field, ADR 0048 D1).
+                let trait_impls = trait_impls.unwrap_or_default();
 
                 Ok(CatalogueDocumentDto {
                     schema_version,
@@ -152,12 +180,22 @@ impl<'de> Deserialize<'de> for CatalogueDocumentDto {
                     types: types.0,
                     traits: traits.0,
                     functions: functions.0,
+                    inherent_impls,
+                    trait_impls,
                 })
             }
         }
 
-        const FIELDS: &[&str] =
-            &["schema_version", "crate_name", "layer", "types", "traits", "functions"];
+        const FIELDS: &[&str] = &[
+            "schema_version",
+            "crate_name",
+            "layer",
+            "types",
+            "traits",
+            "functions",
+            "inherent_impls",
+            "trait_impls",
+        ];
         deserializer.deserialize_struct("CatalogueDocumentDto", FIELDS, DtoVisitor)
     }
 }
@@ -175,8 +213,6 @@ pub(super) struct TypeEntryDto {
     pub(super) kind: TypeKindDto,
     #[serde(default)]
     pub(super) methods: Vec<MethodDeclarationDto>,
-    #[serde(default)]
-    pub(super) trait_impls: Vec<TraitImplDto>,
     #[serde(default)]
     pub(super) module_path: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -293,6 +329,17 @@ pub(super) struct TraitEntryDto {
     /// Default empty for backward compatibility with catalogues that predate this field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub(super) supertrait_bounds: Vec<String>,
+    /// Trait-level generic type parameters (e.g. `[{ name: "T", bounds: ["Clone"] }]`
+    /// for `trait Foo<T: Clone>`).
+    /// Default empty for backward compatibility (CN-01 / OS-04).
+    /// (ADR `2026-05-18-1223-make-catalogue-schema-permissive` D2 / IN-07)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) generics: Vec<MethodGenericParamDto>,
+    /// Trait-level `where`-clause bound predicates.
+    /// Default empty for backward compatibility (CN-01 / OS-04).
+    /// (ADR `2026-05-18-1223-make-catalogue-schema-permissive` D2 / IN-07)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) where_predicates: Vec<WherePredicateDeclDto>,
     #[serde(default)]
     pub(super) module_path: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -352,16 +399,34 @@ pub(super) struct MethodGenericParamDto {
 
 /// JSON-shape mirror of `domain::tddd::catalogue_v2::WherePredicateDecl`.
 ///
-/// On the wire the field is named `"type"` (a reserved Rust keyword), so the
-/// struct field is `type_` with `#[serde(rename = "type")]`.
-/// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
+/// Wire format uses `"lhs"` / `"rhs"` / `"operator"` fields.
+/// Legacy catalogues that used `"type"` / `"bounds"` are supported via
+/// `#[serde(alias)]` for backward compatibility (CN-01 / OS-04).
+/// The `"operator"` field defaults to `"Bound"` when absent.
+///
+/// (ADR `2026-05-18-1223-make-catalogue-schema-permissive` D1 — supersedes
+/// the 2-field form from `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(super) struct WherePredicateDeclDto {
-    #[serde(rename = "type")]
-    pub(super) type_: String,
+    /// Left-hand side of the where predicate. Legacy alias: `"type"`.
+    #[serde(alias = "type")]
+    pub(super) lhs: String,
+    /// Right-hand side bounds. Legacy alias: `"bounds"`.
+    #[serde(default, alias = "bounds")]
+    pub(super) rhs: Vec<String>,
+    /// The predicate operator. Defaults to `"Bound"` when absent.
     #[serde(default)]
-    pub(super) bounds: Vec<String>,
+    pub(super) operator: BoundOpDto,
+}
+
+/// Serde-serializable mirror of `domain::tddd::catalogue_v2::BoundOp`.
+#[derive(Debug, Serialize, Deserialize, Default, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "PascalCase")]
+pub(super) enum BoundOpDto {
+    #[default]
+    Bound,
+    Equal,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -400,16 +465,66 @@ pub(super) struct ParamDto {
     pub(super) ty: String,
 }
 
+/// Wire format for top-level `TraitImplDeclV2` entries (ADR `2026-05-20-0048` D1 / D2).
+///
+/// Located at `CatalogueDocument.trait_impls` (top-level Vec, not inside TypeEntry).
+///
+/// Fields:
+/// - `action`: TDDD operation for this impl entry (Add / Modify / Reference / Delete).
+///   Defaults to `"add"` (serde default) to mirror `TypeEntryDto.action` and allow
+///   existing catalogue JSON that omits the field to be decoded as `Add` (IN-15 / CN-04).
+/// - `trait_ref`: fully-qualified trait reference including any generic args
+///   (e.g. `"core::convert::From<MyError>"`, `"std::fmt::Display"`, `"MyTrait"`).
+/// - `for_type`: self type of the impl (e.g. `"SelfType"` or `"std::vec::Vec<i32>"`).
+/// - `impl_generics`: impl-block-level generic type parameters. Omitted when empty.
+/// - `impl_where_predicates`: impl-block-level where-clause predicates. Omitted when empty.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(super) struct TraitImplDto {
-    pub(super) trait_name: String,
-    pub(super) origin_crate: String,
-    /// Generic argument string (e.g. `"CatalogueLoaderError"` for `From<CatalogueLoaderError>`).
-    /// Optional — absent in catalogues that predate the `generic_args` field extension.
-    /// Defaults to `None` for backward compatibility.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub(super) generic_args: Option<String>,
+    /// TDDD action for this impl entry. Defaults to `"add"` (serde default = Add).
+    /// Mirrors `TypeEntryDto.action` / `TraitEntryDto.action` (IN-15 / CN-04).
+    #[serde(default = "default_action")]
+    pub(super) action: String,
+    /// The trait reference (fully-qualified path + generic args if any).
+    pub(super) trait_ref: String,
+    /// The self type of the impl.
+    pub(super) for_type: String,
+    /// Impl-block-level generic type parameters (type parameters only).
+    /// Default empty for non-generic impls (the common case).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) impl_generics: Vec<MethodGenericParamDto>,
+    /// Impl-block-level where-clause predicates on `impl_generics`. Default empty.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) impl_where_predicates: Vec<WherePredicateDeclDto>,
+}
+
+// ---------------------------------------------------------------------------
+// InherentImplDeclV2 DTO
+// ---------------------------------------------------------------------------
+
+/// Wire format for `InherentImplDeclV2`.
+///
+/// Represents one inherent `impl` block for a named type. Multiple entries
+/// with the same `type_name` represent multiple inherent impl blocks for one
+/// struct (the primary design constraint of IN-05 / IN-08).
+///
+/// `type_name` is required (no `serde(default)`). All `Vec` fields default
+/// to empty when absent for backward compatibility.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct InherentImplDeclDto {
+    /// The name of the type this impl block belongs to (required).
+    pub(super) type_name: String,
+    /// Impl-block-level generic type parameters (type parameters only).
+    /// Default empty for catalogues that have no impl-level generics.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) impl_generics: Vec<MethodGenericParamDto>,
+    /// Impl-block-level where-clause predicates. Default empty.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(super) impl_where_predicates: Vec<WherePredicateDeclDto>,
+    /// Method declarations inside this impl block. Default empty.
+    #[serde(default)]
+    pub(super) methods: Vec<MethodDeclarationDto>,
 }
 
 pub(super) fn default_action() -> String {

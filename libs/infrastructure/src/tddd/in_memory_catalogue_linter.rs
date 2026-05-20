@@ -500,7 +500,7 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -526,7 +526,7 @@ mod tests {
                 typestate: None,
             },
             methods: vec![method],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -548,6 +548,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![method],
             supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -561,6 +563,8 @@ mod tests {
             role: ContractRole::SecondaryPort,
             methods: vec![],
             supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -578,7 +582,7 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -806,7 +810,7 @@ mod tests {
                 typestate: None,
             },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],
@@ -836,7 +840,7 @@ mod tests {
             role: DataRole::ErrorType,
             kind: TypeKindV2::Enum { variants: vec![] },
             methods: vec![],
-            trait_impls: vec![],
+
             module_path: ModulePath::root(),
             docs: None,
             spec_refs: vec![],

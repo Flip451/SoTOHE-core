@@ -1,0 +1,153 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "CatalogueToExtendedCrateCodec": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "unit_struct"
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::catalogue_to_extended_crate_codec",
+      "docs": "Stateless codec converting CatalogueDocument to ExtendedCrate (TypeGraph A). Modified in this track: (1) validate_supported_bound private method is removed and the codec accepts all syn-parseable bound strings without rejection (ADR D1 / IN-02; T002 done); (2) rustdoc impl-block and trait-declaration level generics are placed into the correct catalogue fields (ADR D2 / IN-09; T007 done); (3) CatalogueDocument.trait_impls top-level Vec is processed in a top-level loop in run(), resolving each trait_ref and for_type and encoding each entry into TypeGraph A with entry.action preserved (ADR 2026-05-20-0048 D1/D4 / IN-15 / IN-16; T013-T014 planned). The actual action-driven S-insertion (Add/Modify/Reference/Delete semantics) is performed by signal evaluator Phase 1 (T015). The public shape (unit_struct + encode via port) is unchanged.",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-02",
+          "hash": "2c62654771b39330967d6046ea0cd28a445a8c95b4fa8f3f9b28ed7d1f14439b"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-09",
+          "hash": "5923e030387937a8faf0e1bd01896fecd13fcede3c3ef2a1b98ab05b99f924df"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-16",
+          "hash": "24372933b0908ca38eb919068a6cd395d9aa965bfc033f2245c6d2f353ca7b3c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueToExtendedCrateCodecError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTypeRef",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "type_ref", "ty": "String" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "AmbiguousIdentifier",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "name", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_to_extended_crate_codec_error",
+      "docs": "Infrastructure error for CatalogueToExtendedCrateCodec. Carried for edge exposure; not modified in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SignalEvaluatorV2": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "unit_struct"
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::signal_evaluator_v2",
+      "docs": "Stateless secondary adapter implementing SignalEvaluatorPort. Modified in this track by six changes: (1) strip_outlives_from_index removed and fingerprint generation updated for {lhs, rhs, operator} structure (ADR D1 / IN-03 / IN-04; T003 done); (2) symmetric comparison logic added for impl-block and trait-declaration generics (InherentImplDeclV2.impl_generics / TraitImplDeclV2.impl_generics / TraitEntry.generics vs rustdoc counterparts) (ADR D2 / IN-09; T007 done); (3) a_id_remap Pre-step added to Phase 1 builder (ADR D3 / IN-10; T008 done); (4) patch_impl_for_ids and patch_impl_trait_ids deleted from Phase 1 (ADR D3 / IN-11; T009 done); (5) C-side build_impl_identity_map for_is_external filter removed so cross-crate impls are included in c_impls symmetrically (ADR 2026-05-20-0048 D3 / IN-13; T012 done); (6) A-side orphan-impl detection path to be unified into CatalogueDocument.trait_impls top-level loop; all trait impls to be processed via single action-driven S-insertion path (ADR 2026-05-20-0048 D4 / IN-16; T015 planned). The public shape (unit_struct + evaluate via port) is unchanged.",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-03",
+          "hash": "437b0f678dcaf45301523ddca44f948cedebb62e50626d90edfb4aebd063a531"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-04",
+          "hash": "54d05ae285c75d2be07513e2e8b8a59ebfd38863cc3d489d41cfe57d56902f12"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-09",
+          "hash": "5923e030387937a8faf0e1bd01896fecd13fcede3c3ef2a1b98ab05b99f924df"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-10",
+          "hash": "86fd68e157fb051a10bb622f83c8c09916c40399601cb1b640a7d31356f33572"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-11",
+          "hash": "2e91f4274a4572df8bfd97e1fd191857408c234755040196d5a0937f5cd7a353"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-13",
+          "hash": "439577d6bbdee79a4cbb2ac7e4891d80ee896ccc59958911bc862aead083c014"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-16",
+          "hash": "24372933b0908ca38eb919068a6cd395d9aa965bfc033f2245c6d2f353ca7b3c"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "trait_impls": [
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "CatalogueToExtendedCrateCodec" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "CatalogueToExtendedCrateCodec" },
+    { "action": "reference", "trait_ref": "core::default::Default", "for_type": "CatalogueToExtendedCrateCodec" },
+    { "action": "reference", "trait_ref": "domain::tddd::CatalogueToExtendedCratePort", "for_type": "CatalogueToExtendedCrateCodec" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "CatalogueToExtendedCrateCodecError" },
+    { "action": "reference", "trait_ref": "core::fmt::Display", "for_type": "CatalogueToExtendedCrateCodecError" },
+    { "action": "reference", "trait_ref": "core::error::Error", "for_type": "CatalogueToExtendedCrateCodecError" },
+    { "action": "reference", "trait_ref": "core::fmt::Debug", "for_type": "SignalEvaluatorV2" },
+    { "action": "reference", "trait_ref": "core::clone::Clone", "for_type": "SignalEvaluatorV2" },
+    { "action": "reference", "trait_ref": "core::default::Default", "for_type": "SignalEvaluatorV2" },
+    { "action": "reference", "trait_ref": "domain::tddd::SignalEvaluatorPort", "for_type": "SignalEvaluatorV2" }
+  ]
+}

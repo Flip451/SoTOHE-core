@@ -324,7 +324,7 @@ where
     fn convert_reference(&mut self, type_ref: &syn::TypeReference) -> Type {
         let inner = self.convert_type(&type_ref.elem);
         let is_mutable = type_ref.mutability.is_some();
-        let lifetime = type_ref.lifetime.as_ref().map(|lt| lt.ident.to_string());
+        let lifetime = type_ref.lifetime.as_ref().map(|lt| format!("'{}", lt.ident));
         Type::BorrowedRef { lifetime, is_mutable, type_: Box::new(inner) }
     }
 
@@ -414,7 +414,7 @@ where
                 }
                 syn::TypeParamBound::Lifetime(lt) => {
                     if lifetime.is_none() {
-                        lifetime = Some(lt.ident.to_string());
+                        lifetime = Some(format!("'{}", lt.ident));
                     }
                 }
                 _ => {}
@@ -440,7 +440,7 @@ where
                     });
                 }
                 syn::TypeParamBound::Lifetime(lt) => {
-                    bounds.push(GenericBound::Outlives(lt.ident.to_string()));
+                    bounds.push(GenericBound::Outlives(format!("'{}", lt.ident)));
                 }
                 _ => {}
             }
@@ -560,7 +560,7 @@ where
                                         })
                                     }
                                     syn::TypeParamBound::Lifetime(lt) => {
-                                        Some(GenericBound::Outlives(lt.ident.to_string()))
+                                        Some(GenericBound::Outlives(format!("'{}", lt.ident)))
                                     }
                                     _ => None,
                                 })
@@ -599,7 +599,9 @@ where
     fn convert_generic_arg(&mut self, arg: &syn::GenericArgument) -> Option<GenericArg> {
         match arg {
             syn::GenericArgument::Type(ty) => Some(GenericArg::Type(self.convert_type(ty))),
-            syn::GenericArgument::Lifetime(lt) => Some(GenericArg::Lifetime(lt.ident.to_string())),
+            syn::GenericArgument::Lifetime(lt) => {
+                Some(GenericArg::Lifetime(format!("'{}", lt.ident)))
+            }
             // `Const` args (e.g. `ArrayVec<u8, 32>`): encode as `GenericArg::Const` using
             // the stringified expression. We cannot evaluate the expression, but we preserve
             // the textual form for downstream consumers.
@@ -665,7 +667,7 @@ where
                             })
                         }
                         syn::TypeParamBound::Lifetime(lt) => {
-                            Some(GenericBound::Outlives(lt.ident.to_string()))
+                            Some(GenericBound::Outlives(format!("'{}", lt.ident)))
                         }
                         _ => None,
                     })
@@ -741,10 +743,13 @@ fn bound_lifetimes_to_generic_params(
         .iter()
         .filter_map(|param| {
             if let syn::GenericParam::Lifetime(lt_param) = param {
+                // `syn::Lifetime.ident` omits the leading apostrophe; rustdoc stores
+                // lifetime strings WITH the apostrophe (e.g. `"'a"`, `"'_"`).
+                // Re-prepend `'` so A-codec GenericParamDef names match C-side names.
                 let outlives: Vec<String> =
-                    lt_param.bounds.iter().map(|lt| lt.ident.to_string()).collect();
+                    lt_param.bounds.iter().map(|lt| format!("'{}", lt.ident)).collect();
                 Some(GenericParamDef {
-                    name: lt_param.lifetime.ident.to_string(),
+                    name: format!("'{}", lt_param.lifetime.ident),
                     kind: GenericParamDefKind::Lifetime { outlives },
                 })
             } else {
@@ -1124,7 +1129,11 @@ where
     let mut ctx = ParseCtx { resolve_local, external_crate_ids, emit_external_crate };
 
     match syn_bound {
-        syn::TypeParamBound::Lifetime(lt) => Ok(GenericBound::Outlives(lt.ident.to_string())),
+        // `syn::Lifetime.ident` is the identifier part WITHOUT the leading apostrophe
+        // (e.g. `'static` → `ident = "static"`).  `rustdoc_types::GenericBound::Outlives`
+        // stores the full lifetime string WITH the apostrophe (e.g. `"'static"`, `"'a"`).
+        // Re-prepend `'` so that A-codec Outlives strings compare equal to C-side strings.
+        syn::TypeParamBound::Lifetime(lt) => Ok(GenericBound::Outlives(format!("'{}", lt.ident))),
         syn::TypeParamBound::Trait(tb) => {
             let modifier = match tb.modifier {
                 syn::TraitBoundModifier::None => TraitBoundModifier::None,

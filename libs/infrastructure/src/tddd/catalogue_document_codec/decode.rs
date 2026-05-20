@@ -8,12 +8,14 @@ use std::str::FromStr;
 
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker, TypestateTransitions};
-use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use domain::tddd::catalogue_v2::entries::{
+    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+};
 use domain::tddd::catalogue_v2::identifiers::{FieldName, VariantName};
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, FunctionPath, FunctionRole, GenericArgsError, ItemAction,
+    BoundOp, CatalogueDocument, CrateName, FunctionPath, FunctionRole, ItemAction,
     MethodDeclaration, MethodGenericParam, MethodName, ModulePath, ParamDeclaration, ParamName,
     SelfReceiver, TraitImplDeclV2, TraitName, TypeName, TypeRef, WherePredicateDecl,
 };
@@ -22,9 +24,10 @@ use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_
 
 use super::CatalogueDocumentCodecError;
 use super::dto::{
-    CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto, ParamDto,
-    TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto,
-    VariantPayloadDto,
+    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
+    MethodDeclarationDto, MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto,
+    TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
+    WherePredicateDeclDto,
 };
 
 // ---------------------------------------------------------------------------
@@ -79,6 +82,18 @@ pub(super) fn dto_to_domain(
         doc.functions.insert(fn_path, entry);
     }
 
+    // InherentImpls
+    for impl_dto in dto.inherent_impls {
+        let impl_decl = inherent_impl_from_dto(impl_dto)?;
+        doc.inherent_impls.push(impl_decl);
+    }
+
+    // TraitImpls (top-level, ADR `2026-05-20-0048` D1)
+    for ti_dto in dto.trait_impls {
+        let ti = trait_impl_from_dto(ti_dto)?;
+        doc.trait_impls.push(ti);
+    }
+
     Ok(doc)
 }
 
@@ -109,12 +124,6 @@ pub(super) fn type_entry_from_dto(
         .map(|m| method_decl_from_dto(name, m))
         .collect::<Result<Vec<_>, _>>()?;
 
-    let trait_impls = dto
-        .trait_impls
-        .into_iter()
-        .map(|t| trait_impl_from_dto(name, t))
-        .collect::<Result<Vec<_>, _>>()?;
-
     let module_path = if dto.module_path.is_empty() {
         ModulePath::root()
     } else {
@@ -140,7 +149,6 @@ pub(super) fn type_entry_from_dto(
         role,
         kind,
         methods,
-        trait_impls,
         module_path,
         docs: dto.docs,
         spec_refs,
@@ -302,17 +310,20 @@ fn validate_bound_str(bound_str: &str) -> Result<(), String> {
 /// Validates that `type_str` is syntactically well-formed as a Rust type expression
 /// using `syn::parse_str::<syn::Type>`.
 ///
-/// Used to validate `WherePredicateDecl.type_` at the codec boundary so that malformed
+/// Used to validate `WherePredicateDecl.lhs` at the codec boundary so that malformed
 /// type syntax (e.g. `"Vec<"`, `"T U"`, `"<invalid>"`) is rejected at decode time
 /// rather than failing later inside `CatalogueToExtendedCrateCodec`.
 /// `TypeRef::new` only rejects empty strings and does not validate syntax; this
 /// function provides the stronger structural check for where-predicate LHS values.
 ///
+/// Note: HRTB-prefixed LHS strings (e.g. `"for<'a> T"`) are accepted by `syn::Type`
+/// because they parse as `syn::Type::TraitObject` or similar constructs.
+///
 /// # Errors
 ///
 /// Returns an error string with the `syn` parse error message if `type_str` is not
 /// a valid Rust type expression.
-fn validate_type_ref_str(type_str: &str) -> Result<(), String> {
+pub(super) fn validate_type_ref_str(type_str: &str) -> Result<(), String> {
     syn::parse_str::<syn::Type>(type_str)
         .map(|_| ())
         .map_err(|e| format!("invalid type syntax '{}': {e}", type_str))
@@ -322,7 +333,7 @@ fn validate_type_ref_str(type_str: &str) -> Result<(), String> {
 /// into validated `MethodGenericParam` values, rejecting duplicate names.
 fn method_generics_from_dtos(
     entry_name: &str,
-    dtos: Vec<crate::tddd::catalogue_document_codec::dto::MethodGenericParamDto>,
+    dtos: Vec<MethodGenericParamDto>,
 ) -> Result<Vec<MethodGenericParam>, CatalogueDocumentCodecError> {
     let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
         entry_name: entry_name.to_owned(),
@@ -371,14 +382,15 @@ fn method_generics_from_dtos(
 }
 
 /// Convert a Vec of `WherePredicateDeclDto` (shared by Method, Function, and Trait entries)
-/// into validated `WherePredicateDecl` values, rejecting empty `type_` or bound entries.
+/// into validated `WherePredicateDecl` values, rejecting empty `lhs` or `rhs` entries.
 ///
-/// A `WherePredicateDeclDto` with an empty `bounds` vector is rejected because `where T:`
-/// (no bound after the colon) is syntactically invalid in Rust and would produce a
-/// `WherePredicate::BoundPredicate { bounds: vec![] }` in the extended crate representation.
+/// A `WherePredicateDeclDto` with an empty `rhs` vector and `BoundOp::Bound` operator is
+/// rejected because `where T:` (no bound after the colon) is syntactically invalid in Rust
+/// and would produce a `WherePredicate::BoundPredicate { bounds: vec![] }` in the extended
+/// crate representation.  For `BoundOp::Equal` predicates an empty `rhs` is also rejected.
 fn where_predicates_from_dtos(
     entry_name: &str,
-    dtos: Vec<crate::tddd::catalogue_document_codec::dto::WherePredicateDeclDto>,
+    dtos: Vec<WherePredicateDeclDto>,
 ) -> Result<Vec<WherePredicateDecl>, CatalogueDocumentCodecError> {
     let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
         entry_name: entry_name.to_owned(),
@@ -387,31 +399,57 @@ fn where_predicates_from_dtos(
     dtos.into_iter()
         .map(|w| {
             // Validate non-empty first (TypeRef::new check), then validate Rust type syntax.
-            let type_ = TypeRef::new(w.type_.clone())
-                .map_err(|e| err(format!("invalid where predicate type '{}': {e}", w.type_)))?;
-            validate_type_ref_str(w.type_.as_str())
-                .map_err(|e| err(format!("invalid where predicate type syntax: {e}")))?;
-            if w.bounds.is_empty() {
+            let lhs = TypeRef::new(w.lhs.clone())
+                .map_err(|e| err(format!("invalid where predicate lhs '{}': {e}", w.lhs)))?;
+            validate_type_ref_str(w.lhs.as_str())
+                .map_err(|e| err(format!("invalid where predicate lhs syntax: {e}")))?;
+            if w.rhs.is_empty() {
                 return Err(err(format!(
-                    "where predicate for '{}' has no bounds (expected at least one bound \
-                     after the colon; `where T:` is not valid Rust)",
-                    w.type_
+                    "where predicate for '{}' has no rhs bounds (expected at least one bound; \
+                     `where T:` or `where T =` without rhs is invalid)",
+                    w.lhs
                 )));
             }
-            let bounds = w
-                .bounds
+            let operator = match w.operator {
+                BoundOpDto::Bound => BoundOp::Bound,
+                BoundOpDto::Equal => {
+                    // `Equal` predicates (`where T::Assoc = U`) require exactly one RHS entry.
+                    // Multiple RHS entries would be invalid Rust syntax for an equality constraint.
+                    if w.rhs.len() != 1 {
+                        return Err(err(format!(
+                            "where predicate for '{}' with operator Equal must have exactly one \
+                             rhs entry (got {}); `where T::Assoc = U` accepts a single RHS only",
+                            w.lhs,
+                            w.rhs.len()
+                        )));
+                    }
+                    BoundOp::Equal
+                }
+            };
+            let rhs = w
+                .rhs
                 .into_iter()
                 .enumerate()
-                .map(|(idx, bound)| {
-                    validate_bound_str(&bound)
-                        .map_err(|e| err(format!("invalid where predicate bound[{idx}]: {e}")))?;
-                    TypeRef::new(bound.clone())
-                        .map_err(|e| err(format!("invalid bound type ref '{bound}': {e}")))
+                .map(|(idx, entry)| {
+                    // `Bound` RHS entries are trait bounds (e.g. `Clone`, `Iterator<Item = u32>`);
+                    // use `validate_bound_str` (parses `syn::TypeParamBound`).
+                    // `Equal` RHS entries are type expressions (e.g. `u32`, `Vec<T>`);
+                    // use `validate_type_ref_str` (parses `syn::Type`) because
+                    // `validate_bound_str` rejects plain types like `u32`.
+                    match operator {
+                        BoundOp::Bound => validate_bound_str(&entry)
+                            .map_err(|e| err(format!("invalid where predicate rhs[{idx}]: {e}")))?,
+                        BoundOp::Equal => validate_type_ref_str(&entry)
+                            .map_err(|e| err(format!("invalid where predicate rhs[{idx}]: {e}")))?,
+                    }
+                    TypeRef::new(entry.clone())
+                        .map_err(|e| err(format!("invalid rhs type ref '{entry}': {e}")))
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             Ok::<WherePredicateDecl, CatalogueDocumentCodecError>(WherePredicateDecl {
-                type_,
-                bounds,
+                lhs,
+                rhs,
+                operator,
             })
         })
         .collect()
@@ -473,24 +511,74 @@ fn param_decl_from_dto(
     Ok(ParamDeclaration::new(name, ty))
 }
 
-fn trait_impl_from_dto(
-    entry_name: &str,
-    dto: TraitImplDto,
-) -> Result<TraitImplDeclV2, CatalogueDocumentCodecError> {
+/// Validates that `trait_ref_str` is a Rust path expression (i.e. parseable as
+/// `syn::Path`), rejecting non-path types such as `&Foo`, `[u8]`, `(A, B)`.
+///
+/// A trait reference must be a bare path (optionally with generic args), never a
+/// reference, slice, tuple, or pointer.  The downstream codec
+/// (`resolve_trait_ref_for_top_level`) enforces the same invariant by matching only
+/// on `Type::ResolvedPath`; rejecting non-path forms here surfaces the error at the
+/// DTO decode boundary with a clearer message.
+///
+/// # Errors
+///
+/// Returns an error string with the `syn` parse error message if `trait_ref_str`
+/// is not a valid `syn::Path` expression.
+pub(super) fn validate_trait_ref_is_path(trait_ref_str: &str) -> Result<(), String> {
+    // `syn::parse_str::<syn::Path>` accepts angle-bracket generic args (e.g. `A<B>`)
+    // natively, so no pre-stripping of generic args is needed.
+    syn::parse_str::<syn::Path>(trait_ref_str).map(|_| ()).map_err(|e| {
+        format!(
+            "trait_ref '{}' is not a valid path (must be a plain type path, not a reference, \
+             slice, or other non-path type): {e}",
+            trait_ref_str
+        )
+    })
+}
+
+/// Converts a top-level `TraitImplDto` into a `TraitImplDeclV2` (ADR `2026-05-20-0048` D2).
+///
+/// Decodes `action`, validates `trait_ref` as a Rust path (not an arbitrary type),
+/// validates both `trait_ref` and `for_type` as non-empty `TypeRef` values and as
+/// valid Rust type expressions via `syn::parse_str`. Round-trips the `action` field
+/// through `ItemAction::from_str` (mirrors `type_entry_from_dto`).
+fn trait_impl_from_dto(dto: TraitImplDto) -> Result<TraitImplDeclV2, CatalogueDocumentCodecError> {
     let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
-        entry_name: entry_name.to_owned(),
+        entry_name: dto.trait_ref.clone(),
         reason,
     };
 
-    let trait_name = TraitName::new(&dto.trait_name)
-        .map_err(|e| err(format!("invalid trait name '{}': {e}", dto.trait_name)))?;
-    let origin_crate = CrateName::new(&dto.origin_crate)
-        .map_err(|e| err(format!("invalid origin_crate '{}': {e}", dto.origin_crate)))?;
-    match dto.generic_args {
-        None => Ok(TraitImplDeclV2::new(trait_name, origin_crate)),
-        Some(args) => TraitImplDeclV2::new_with_generic_args(trait_name, origin_crate, args)
-            .map_err(|e: GenericArgsError| err(format!("invalid generic_args: {e}"))),
-    }
+    // Decode action (mirrors TypeEntryDto / TraitEntryDto action handling).
+    let action = ItemAction::from_str(&dto.action)
+        .map_err(|e| err(format!("invalid action '{}': {e}", dto.action)))?;
+
+    // Validate and construct trait_ref
+    let trait_ref = TypeRef::new(dto.trait_ref.clone())
+        .map_err(|e| err(format!("invalid trait_ref '{}': {e}", dto.trait_ref)))?;
+    // Validate as a general type expression first (non-empty, parseable Rust type).
+    validate_type_ref_str(trait_ref.as_str())
+        .map_err(|e| err(format!("invalid trait_ref syntax: {e}")))?;
+    // Then tighten: trait_ref must be a path type, not a reference / slice / tuple.
+    // This mirrors the invariant enforced by `resolve_trait_ref_for_top_level` in the
+    // downstream codec, surfacing invalid forms early at the DTO boundary.
+    validate_trait_ref_is_path(trait_ref.as_str())
+        .map_err(|e| err(format!("invalid trait_ref (must be a path): {e}")))?;
+
+    // Validate and construct for_type
+    let for_type = TypeRef::new(dto.for_type.clone())
+        .map_err(|e| err(format!("invalid for_type '{}': {e}", dto.for_type)))?;
+    validate_type_ref_str(for_type.as_str())
+        .map_err(|e| err(format!("invalid for_type syntax: {e}")))?;
+
+    let entry_name = dto.trait_ref.clone();
+    let impl_generics = method_generics_from_dtos(&entry_name, dto.impl_generics)?;
+    let impl_where_predicates = where_predicates_from_dtos(&entry_name, dto.impl_where_predicates)?;
+
+    let mut decl = TraitImplDeclV2::new(trait_ref, for_type);
+    decl.action = action;
+    decl.impl_generics = impl_generics;
+    decl.impl_where_predicates = impl_where_predicates;
+    Ok(decl)
 }
 
 pub(super) fn trait_entry_from_dto(
@@ -536,6 +624,9 @@ pub(super) fn trait_entry_from_dto(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
+    let generics = method_generics_from_dtos(name, dto.generics)?;
+    let where_predicates = where_predicates_from_dtos(name, dto.where_predicates)?;
+
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs).map_err(|e| {
         CatalogueDocumentCodecError::InvalidEntry {
             entry_name: name.to_owned(),
@@ -554,11 +645,40 @@ pub(super) fn trait_entry_from_dto(
         role,
         methods,
         supertrait_bounds,
+        generics,
+        where_predicates,
         module_path,
         docs: dto.docs,
         spec_refs,
         informal_grounds,
     })
+}
+
+pub(super) fn inherent_impl_from_dto(
+    dto: InherentImplDeclDto,
+) -> Result<InherentImplDeclV2, CatalogueDocumentCodecError> {
+    let err = |name: &str, reason: String| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: name.to_owned(),
+        reason,
+    };
+
+    // Keep a str reference alive for the error context closures below.
+    let type_name_str = dto.type_name.as_str();
+
+    let type_name = TypeName::new(type_name_str)
+        .map_err(|e| err(type_name_str, format!("invalid type_name: {e}")))?;
+
+    let impl_generics = method_generics_from_dtos(type_name_str, dto.impl_generics)?;
+    let impl_where_predicates =
+        where_predicates_from_dtos(type_name_str, dto.impl_where_predicates)?;
+
+    let methods = dto
+        .methods
+        .into_iter()
+        .map(|m| method_decl_from_dto(type_name_str, m))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(InherentImplDeclV2 { type_name, impl_generics, impl_where_predicates, methods })
 }
 
 pub(super) fn function_entry_from_dto(

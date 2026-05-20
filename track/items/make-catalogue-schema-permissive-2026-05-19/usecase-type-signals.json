@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-20T17:26:05Z",
+  "declaration_hash": "2d2f1b584b4222ea5543386bb74ec6dd48d7eb29adae13b47ba52b7cb360063b",
+  "signals": [
+    {
+      "type_name": "ReviewCheckApprovedInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewCheckApprovedService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskOperationService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

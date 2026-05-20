@@ -211,18 +211,39 @@ fn build_where_form_view(
     (param_sigs, where_form, unsupported_raw)
 }
 
-/// Returns `true` if every bound in `bounds` is either:
+/// Returns `true` if every bound in `bounds` is within D5 supported scope:
 /// - A `GenericBound::TraitBound` with an empty `generic_params` (no HRTB), or
+/// - A `GenericBound::TraitBound` with a lifetime-only `generic_params` binder
+///   (HRTB-on-TraitBound, e.g. `for<'_> Fn(&'_ str)`).  Rustdoc desugars elided
+///   Fn trait bounds into this form; the binder is normalized away in
+///   `format_generic_bounds_with_canon` so both sides compare equal.
+///   Type-param binders (`for<T: Foo>`) are still outside scope (fail-closed).
+///   Lifetime binders with `outlives` constraints (e.g. `for<'a: 'b>`) are outside
+///   scope (fail-closed): the outlives constraint is not represented in the fingerprint,
+///   so accepting such binders would silently discard the constraint and risk false Blue.
 /// - A `GenericBound::Outlives` (lifetime bound, e.g. `'static` or `'a`).
 ///
 /// Outlives bounds are compared verbatim by their lifetime string so that
 /// `F: 'static + Fn(...)` correctly produces the same fingerprint on both the
 /// A-codec side and the C-side rustdoc output.
 ///
-/// Any other bound shape (Use, HRTB-on-TraitBound) triggers fail-closed.
+/// Any other bound shape (Use, HRTB-on-TraitBound with type or const binders, or
+/// HRTB-on-TraitBound with lifetime binders carrying `outlives` constraints) triggers
+/// fail-closed.
+///
+/// (ADR 2026-05-18-1223 D5)
 fn bounds_supported(bounds: &[GenericBound]) -> bool {
     bounds.iter().all(|b| match b {
-        GenericBound::TraitBound { generic_params, .. } => generic_params.is_empty(),
+        GenericBound::TraitBound { generic_params, .. } => {
+            // Allow empty binder (no HRTB) or lifetime-only binder (HRTB-on-TraitBound)
+            // where each lifetime param has no `outlives` constraints.
+            // Reject if any binder param is a Type or Const param, or if any lifetime
+            // binder param carries non-empty `outlives` constraints.
+            generic_params.iter().all(|hp| match &hp.kind {
+                GenericParamDefKind::Lifetime { outlives } => outlives.is_empty(),
+                GenericParamDefKind::Type { .. } | GenericParamDefKind::Const { .. } => false,
+            })
+        }
         GenericBound::Outlives(_) => true,
         _ => false,
     })
@@ -832,10 +853,17 @@ mod tests {
         );
     }
 
-    /// Two identical HRTB-on-TraitBound entries (`for<'a> Fn(&'a str)`) must compare
-    /// unequal (D3 fail-closed: HRTB on TraitBound has non-empty `generic_params`).
+    /// D5 (ADR 2026-05-18-1223): Two identical HRTB-on-TraitBound entries with
+    /// lifetime-only binders (`for<'a> Fn(&'a str)`) must now compare EQUAL.
+    ///
+    /// Rustdoc desugars elided-lifetime Fn bounds (`Fn(&str)`) into HRTB form
+    /// (`for<'_> Fn(&'_ str)`), so both A-side and C-side should produce the same
+    /// fingerprint when their logical Fn signatures are identical.
+    ///
+    /// This test replaces the former `test_hrtb_on_trait_bound_is_fail_closed` which
+    /// protected the old D3 fail-closed behavior for HRTB-on-TraitBound.
     #[test]
-    fn test_hrtb_on_trait_bound_is_fail_closed() {
+    fn test_hrtb_on_trait_bound_lifetime_only_compares_equal() {
         let hrtb_bound = GenericBound::TraitBound {
             trait_: Path {
                 path: "Fn".to_string(),
@@ -860,8 +888,93 @@ mod tests {
             where_predicates: vec![],
         };
         assert!(
+            generics_structurally_equal(&make(), &make()),
+            "identical HRTB-on-TraitBound with lifetime-only binder must compare equal \
+             (D5: HRTB binder lifetime names normalized; for<'a> Fn(&'a str) == for<'a> Fn(&'a str))"
+        );
+    }
+
+    /// D5 (ADR 2026-05-18-1223): HRTB-on-TraitBound with elision form (`'_`) must
+    /// compare equal to HRTB-on-TraitBound with explicit form (`'a`).
+    ///
+    /// This models the A-side vs C-side asymmetry: A-side has `Fn(&str)` (no binder,
+    /// `generic_params: []`), C-side has `for<'_> Fn(&'_ str)` (binder with `'_`).
+    /// Both must produce the same fingerprint.
+    #[test]
+    fn test_hrtb_elision_vs_explicit_binder_compares_equal() {
+        // A-side: no HRTB binder (as produced by A-codec from catalogue string `Fn(&str)`).
+        let no_binder = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: None,
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        };
+        // C-side: HRTB binder with `'_` (as rustdoc desugars `Fn(&str)`).
+        let elided_binder = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: Some("'_".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![GenericParamDef {
+                name: "'_".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        let a_generics =
+            Generics { params: vec![type_param("F", vec![no_binder])], where_predicates: vec![] };
+        let c_generics = Generics {
+            params: vec![type_param("F", vec![elided_binder])],
+            where_predicates: vec![],
+        };
+        assert!(
+            generics_structurally_equal(&a_generics, &c_generics),
+            "A-side Fn(&str) (no binder) must equal C-side for<'_> Fn(&'_ str) (elided binder) \
+             (D5: HRTB lifetime binder normalized away; both produce same fingerprint)"
+        );
+    }
+
+    /// D5 (ADR 2026-05-18-1223): HRTB-on-TraitBound with TYPE binders (`for<T: Foo>`)
+    /// remains outside D5 scope and must still trigger fail-closed.
+    #[test]
+    fn test_hrtb_on_trait_bound_type_binder_is_fail_closed() {
+        let hrtb_type_binder = GenericBound::TraitBound {
+            trait_: Path { path: "Fn".to_string(), id: rustdoc_types::Id(0), args: None },
+            generic_params: vec![GenericParamDef {
+                name: "T".to_string(),
+                kind: GenericParamDefKind::Type {
+                    bounds: vec![],
+                    default: None,
+                    is_synthetic: false,
+                },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        let make = || Generics {
+            params: vec![type_param("F", vec![hrtb_type_binder.clone()])],
+            where_predicates: vec![],
+        };
+        assert!(
             !generics_structurally_equal(&make(), &make()),
-            "identical HRTB-on-TraitBound must still return false (D3 fail-closed)"
+            "HRTB-on-TraitBound with type binder must still be fail-closed (outside D5 scope)"
         );
     }
 
@@ -969,17 +1082,16 @@ mod tests {
         );
     }
 
-    /// `where T: Iterator<Item: for<'a> Foo<&'a str>>` — an HRTB binder appears
-    /// as a nested constraint bound inside an associated-type argument (not at the
-    /// top-level `BoundPredicate`). Both sides are identical, yet the comparison
-    /// must return `false` (D3 fail-closed for HRTB bounds in any position).
+    /// D5 (ADR 2026-05-18-1223): `where T: Iterator<Item: for<'a> Foo<&'a str>>` —
+    /// an HRTB binder appears as a nested constraint bound inside an associated-type
+    /// argument.  Since D5 relaxes `format_generic_bounds_with_canon` for
+    /// lifetime-only HRTB binders, two identical such bounds compare equal.
     ///
-    /// Without the `!generic_params.is_empty()` sentinel in
-    /// `format_generic_bounds_with_canon`, `format_hrtb_type_params` would silently
-    /// drop the `for<'a>` lifetime, causing `for<'a> Foo<&'a str>` to compare equal
-    /// to `Foo<&str>`.
+    /// The binder lifetime is normalized away (D5: lifetime binders stripped from
+    /// fingerprint), so `for<'a> Foo<&'a str>` and `Foo<&str>` produce the same
+    /// fingerprint — which is the desired behavior for Fn trait desugaring symmetry.
     #[test]
-    fn test_hrtb_inside_assoc_type_constraint_is_fail_closed() {
+    fn test_hrtb_inside_assoc_type_constraint_lifetime_only_compares_equal() {
         use rustdoc_types::{AssocItemConstraint, AssocItemConstraintKind, GenericArg};
 
         let hrtb_bound = GenericBound::TraitBound {
@@ -995,7 +1107,7 @@ mod tests {
                     constraints: vec![],
                 })),
             },
-            // Non-empty generic_params = HRTB binder `for<'a>`.
+            // Lifetime-only HRTB binder — D5 normalizes this away.
             generic_params: vec![GenericParamDef {
                 name: "'a".to_string(),
                 kind: GenericParamDefKind::Lifetime { outlives: vec![] },
@@ -1031,8 +1143,9 @@ mod tests {
             }],
         };
         assert!(
-            !generics_structurally_equal(&make(), &make()),
-            "HRTB bound inside associated-type constraint must still return false (D3 fail-closed)"
+            generics_structurally_equal(&make(), &make()),
+            "D5: identical HRTB-on-TraitBound with lifetime-only binder inside assoc-type \
+             constraint must compare equal (lifetime binder normalized away)"
         );
     }
 
@@ -1114,6 +1227,553 @@ mod tests {
         assert!(
             !traits_structurally_equal(&trait_u32, &trait_u64, &idx, &idx),
             "`trait A<T>: From<u32>` must NOT equal `trait A<T>: From<u64>`"
+        );
+    }
+
+    // ---------------------------------------------------------------------------
+    // T003 (ADR 2026-05-18-1223 D1): strip_outlives_from_index removal + fingerprint
+    // ---------------------------------------------------------------------------
+
+    /// (a) T003: `T: 'static` Outlives bound retained on both A-side and C-side produces
+    /// identical fingerprints via `build_generics_fingerprint_with_combined_canon`.
+    ///
+    /// Since `strip_outlives_from_index` has been removed (T003), both sides now retain
+    /// `GenericBound::Outlives` bounds. When A-side (catalogue) and C-side (rustdoc)
+    /// both declare `T: 'static`, they must produce the same fingerprint and compare Blue.
+    #[test]
+    fn test_t003_outlives_bound_retained_both_sides_produces_equal_fingerprint() {
+        let static_bound = GenericBound::Outlives("'static".to_string());
+        let generics_with_static = Generics {
+            params: vec![type_param("T", vec![static_bound])],
+            where_predicates: vec![],
+        };
+        // Build a simple (non-combined) canon map: T → #0.
+        let mut canon = HashMap::new();
+        canon.insert("T".to_string(), "#0".to_string());
+
+        let fp_a =
+            super::build_generics_fingerprint_with_combined_canon(&generics_with_static, &canon);
+        let fp_c =
+            super::build_generics_fingerprint_with_combined_canon(&generics_with_static, &canon);
+
+        assert_eq!(
+            fp_a, fp_c,
+            "both-sides-retained `T: 'static` must produce identical fingerprints (T003)"
+        );
+        // The fingerprint must include the Outlives bound (not an empty string).
+        assert!(
+            !fp_a.is_empty(),
+            "fingerprint for `T: 'static` must be non-empty (Outlives is retained)"
+        );
+    }
+
+    /// (b) T003: `T: A + B` and `T: B + A` must produce the same fingerprint.
+    ///
+    /// `format_generic_bounds_with_canon` sorts rhs elements so that bound order is
+    /// irrelevant. This test verifies the invariant holds when bounds are specified in
+    /// opposite orders, ensuring `T: A + B` and `T: B + A` are treated identically.
+    #[test]
+    fn test_t003_bound_order_independent_fingerprint() {
+        // `T: A + B` (A first, then B).
+        let generics_ab = Generics {
+            params: vec![type_param("T", vec![trait_bound("A"), trait_bound("B")])],
+            where_predicates: vec![],
+        };
+        // `T: B + A` (B first, then A).
+        let generics_ba = Generics {
+            params: vec![type_param("T", vec![trait_bound("B"), trait_bound("A")])],
+            where_predicates: vec![],
+        };
+        let mut canon = HashMap::new();
+        canon.insert("T".to_string(), "#0".to_string());
+
+        let fp_ab = super::build_generics_fingerprint_with_combined_canon(&generics_ab, &canon);
+        let fp_ba = super::build_generics_fingerprint_with_combined_canon(&generics_ba, &canon);
+
+        assert_eq!(
+            fp_ab, fp_ba,
+            "`T: A + B` and `T: B + A` must produce the same fingerprint (rhs is order-independent)"
+        );
+    }
+
+    /// (c) T003 updated by D5 (ADR 2026-05-18-1223): HRTB-on-TraitBound with
+    /// lifetime-only binders (`for<'a>`) is now SUPPORTED and two identical such
+    /// bounds must compare equal.
+    ///
+    /// Previously (T003 pre-D5), this was fail-closed.  D5 changes `bounds_supported`
+    /// to allow lifetime-only HRTB binders so that rustdoc's desugared Fn trait bounds
+    /// (`for<'_> Fn(&'_ str)`) can compare symmetrically with the catalogue's
+    /// `Fn(&str)` form (no binder).  Two identical HRTB-on-TraitBound forms with
+    /// lifetime-only binders must now compare equal.
+    #[test]
+    fn test_t003_hrtb_lifetime_only_binder_is_now_supported_and_equal() {
+        // Build a `GenericBound::TraitBound` with a lifetime-only HRTB binder — now
+        // supported per D5 (`bounds_supported` relaxed).
+        let hrtb_bound = GenericBound::TraitBound {
+            trait_: Path { path: "Fn".to_string(), id: Id(0), args: None },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        let make_hrtb_generics = || Generics {
+            params: vec![type_param("F", vec![hrtb_bound.clone()])],
+            where_predicates: vec![],
+        };
+        // D5: two identical HRTB-on-TraitBound with lifetime-only binder must compare equal.
+        assert!(
+            generics_structurally_equal(&make_hrtb_generics(), &make_hrtb_generics()),
+            "D5: HRTB-on-TraitBound with lifetime-only binder (`for<'a>`) is now supported; \
+             two identical such bounds must compare equal (IN-19/AC-18)"
+        );
+    }
+
+    /// D5 (ADR 2026-05-18-1223): HRTB-on-TraitBound with 2-lifetime binder
+    /// (`for<'a,'b>`) must NOT compare equal to a 1-lifetime binder (`for<'a>`),
+    /// because the binder arity differs and the fingerprint encodes a distinguishing
+    /// `#L{n}:` prefix when n ≥ 2.  This prevents false Blue when both produce the
+    /// same inner arg fingerprint (after lifetime-annotation stripping) but differ
+    /// structurally in binder shape.
+    #[test]
+    fn test_hrtb_on_trait_bound_two_binder_lifetimes_not_equal_to_one() {
+        let one_lifetime_binder = GenericBound::TraitBound {
+            trait_: Path { path: "Fn".to_string(), id: Id(0), args: None },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        let two_lifetime_binder = GenericBound::TraitBound {
+            trait_: Path { path: "Fn".to_string(), id: Id(0), args: None },
+            generic_params: vec![
+                GenericParamDef {
+                    name: "'a".to_string(),
+                    kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+                },
+                GenericParamDef {
+                    name: "'b".to_string(),
+                    kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+                },
+            ],
+            modifier: TraitBoundModifier::None,
+        };
+        let one_binder_generics = Generics {
+            params: vec![type_param("F", vec![one_lifetime_binder])],
+            where_predicates: vec![],
+        };
+        let two_binder_generics = Generics {
+            params: vec![type_param("F", vec![two_lifetime_binder])],
+            where_predicates: vec![],
+        };
+        assert!(
+            !generics_structurally_equal(&one_binder_generics, &two_binder_generics),
+            "D5: HRTB-on-TraitBound with 1-lifetime binder must NOT equal 2-lifetime binder \
+             (binder arity >= 2 adds a distinguishing #L{{n}} prefix to the fingerprint)"
+        );
+    }
+
+    /// D5 correctness: `for<'a> Fn(&'static str)` must NOT compare equal to
+    /// `for<'a> Fn(&'a str)`.
+    ///
+    /// A false Blue here would mean a real signature change (a function that
+    /// accepts any-lifetime references vs one that only accepts `'static`
+    /// references) is not detected by the evaluator.
+    ///
+    /// The fix: concrete non-binder lifetimes (`'static`) in BorrowedRef position
+    /// are preserved verbatim even in the 1-binder context, while the binder
+    /// lifetime (`'a`) is dropped (A-side ≡ C-side symmetry for binder references).
+    #[test]
+    fn test_hrtb_one_binder_concrete_lifetime_not_equal_to_binder_lifetime() {
+        // `for<'a> Fn(&'static str)` — the reference carries `'static` (concrete,
+        // non-binder), not the HRTB binder lifetime.
+        let static_ref_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: Some("'static".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        // `for<'a> Fn(&'a str)` — the reference carries the HRTB binder lifetime `'a`.
+        let binder_ref_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: Some("'a".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        let static_generics = Generics {
+            params: vec![type_param("F", vec![static_ref_bound])],
+            where_predicates: vec![],
+        };
+        let binder_generics = Generics {
+            params: vec![type_param("F", vec![binder_ref_bound])],
+            where_predicates: vec![],
+        };
+        assert!(
+            !generics_structurally_equal(&static_generics, &binder_generics),
+            "D5 correctness: `for<'a> Fn(&'static str)` must NOT equal `for<'a> Fn(&'a str)` \
+             (concrete lifetime preserved verbatim; binder lifetime dropped for A/C symmetry)"
+        );
+    }
+
+    /// No-binder case: `Fn(&'static str)` (A-side, concrete lifetime) must NOT compare
+    /// equal to `Fn(&str)` (A-side, no lifetime annotation).
+    ///
+    /// Concrete named lifetimes in BorrowedRef position must be emitted verbatim even
+    /// in the no-HRTB-binder context so that catalogue-declared `Fn(&'static str)` is
+    /// distinguishable from `Fn(&str)`.
+    ///
+    /// This was a pre-existing correctness gap: the old Case 3 ("no HRTB context → drop
+    /// lifetime") silently erased concrete lifetimes like `'static`, making these two
+    /// distinct API signatures produce the same fingerprint.
+    #[test]
+    fn test_no_binder_static_lifetime_not_equal_to_no_lifetime() {
+        // `Fn(&'static str)` — concrete `'static` lifetime in BorrowedRef, no HRTB binder.
+        let static_ref_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: Some("'static".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        };
+        // `Fn(&str)` — no lifetime annotation in BorrowedRef, no HRTB binder.
+        let no_lifetime_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: None,
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        };
+        let static_generics = Generics {
+            params: vec![type_param("F", vec![static_ref_bound])],
+            where_predicates: vec![],
+        };
+        let no_lt_generics = Generics {
+            params: vec![type_param("F", vec![no_lifetime_bound])],
+            where_predicates: vec![],
+        };
+        assert!(
+            !generics_structurally_equal(&static_generics, &no_lt_generics),
+            "no-binder `Fn(&'static str)` must NOT equal `Fn(&str)` \
+             (concrete `'static` lifetime must be preserved verbatim)"
+        );
+    }
+
+    /// D5 correctness: `for<'a> Foo<&'a str>` (1-binder, AngleBracketed) must NOT
+    /// compare equal to `Foo<&str>` (no binder).
+    ///
+    /// The 1-binder drop (`@BR:binder_lt → ""`) applies ONLY for Fn-trait Parenthesized
+    /// args (rustdoc desugaring of `Fn(&str)`).  For non-Fn AngleBracketed args the
+    /// binder lifetime must be retained so that the presence of the HRTB binder is
+    /// observable in the fingerprint.
+    #[test]
+    fn test_hrtb_one_binder_angle_bracketed_not_equal_to_no_binder() {
+        // `for<'a> Foo<&'a str>` — AngleBracketed arg with binder lifetime, 1 binder.
+        let hrtb_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Foo".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![rustdoc_types::GenericArg::Type(Type::BorrowedRef {
+                        lifetime: Some("'a".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    })],
+                    constraints: vec![],
+                })),
+            },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        // `Foo<&str>` — AngleBracketed arg with no lifetime, no binder.
+        let no_binder_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Foo".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![rustdoc_types::GenericArg::Type(Type::BorrowedRef {
+                        lifetime: None,
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    })],
+                    constraints: vec![],
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        };
+        let hrtb_generics =
+            Generics { params: vec![type_param("F", vec![hrtb_bound])], where_predicates: vec![] };
+        let no_binder_generics = Generics {
+            params: vec![type_param("F", vec![no_binder_bound])],
+            where_predicates: vec![],
+        };
+        assert!(
+            !generics_structurally_equal(&hrtb_generics, &no_binder_generics),
+            "D5 correctness: `for<'a> Foo<&'a str>` (AngleBracketed) must NOT equal \
+             `Foo<&str>` (1-binder drop applies only to Fn-trait Parenthesized desugaring)"
+        );
+    }
+
+    /// Non-HRTB lifetime alpha-rename: `fn f<'a>(&'a str)` must compare equal to
+    /// `fn f<'b>(&'b str)`.
+    ///
+    /// Named lifetime params in function/method generics are alpha-equivalent —
+    /// `generics_structurally_equal` ignores their names.  The BorrowedRef formatter
+    /// must drop non-static named lifetimes in the non-HRTB context so that signatures
+    /// differing only in lifetime param names produce the same fingerprint.
+    #[test]
+    fn test_non_hrtb_lifetime_alpha_rename_compares_equal() {
+        // `F: Foo<&'a str>` with lifetime param `'a` on the outer generics (no HRTB binder
+        // on the TraitBound).  The `'a` in `&'a str` is a named param, not an HRTB binder.
+        let bound_a = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Foo".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![rustdoc_types::GenericArg::Type(Type::BorrowedRef {
+                        lifetime: Some("'a".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    })],
+                    constraints: vec![],
+                })),
+            },
+            generic_params: vec![], // no HRTB binder on the TraitBound
+            modifier: TraitBoundModifier::None,
+        };
+        // Same but `'b` — alpha-rename of the lifetime param.
+        let bound_b = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Foo".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![rustdoc_types::GenericArg::Type(Type::BorrowedRef {
+                        lifetime: Some("'b".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    })],
+                    constraints: vec![],
+                })),
+            },
+            generic_params: vec![], // no HRTB binder on the TraitBound
+            modifier: TraitBoundModifier::None,
+        };
+        let gen_a = Generics {
+            params: vec![
+                GenericParamDef {
+                    name: "'a".to_string(),
+                    kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+                },
+                type_param("F", vec![bound_a]),
+            ],
+            where_predicates: vec![],
+        };
+        let gen_b = Generics {
+            params: vec![
+                GenericParamDef {
+                    name: "'b".to_string(),
+                    kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+                },
+                type_param("F", vec![bound_b]),
+            ],
+            where_predicates: vec![],
+        };
+        assert!(
+            generics_structurally_equal(&gen_a, &gen_b),
+            "non-HRTB lifetime alpha-rename: `F: Foo<&'a str>` must equal `F: Foo<&'b str>` \
+             (named lifetime params are alpha-equivalent; only `'static` is preserved verbatim)"
+        );
+    }
+
+    /// D5 correctness: `for<'a> Fn(&'a str, &'a str)` (1-binder, shared lifetime) must NOT
+    /// compare equal to `Fn(&str, &str)` (no binder, independent lifetimes).
+    ///
+    /// The 1-binder Fn-desugaring drop is only correct when the binder lifetime appears at
+    /// most once in the inputs.  When it appears more than once it expresses a shared-lifetime
+    /// constraint that is semantically distinct from independent elision.
+    #[test]
+    fn test_hrtb_one_binder_shared_lifetime_not_equal_to_no_binder() {
+        // `for<'a> Fn(&'a str, &'a str)` — shared binder lifetime, Parenthesized.
+        let shared_lt_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![
+                        Type::BorrowedRef {
+                            lifetime: Some("'a".to_string()),
+                            is_mutable: false,
+                            type_: Box::new(ty("str")),
+                        },
+                        Type::BorrowedRef {
+                            lifetime: Some("'a".to_string()),
+                            is_mutable: false,
+                            type_: Box::new(ty("str")),
+                        },
+                    ],
+                    output: None,
+                })),
+            },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        // `Fn(&str, &str)` — no binder, independent lifetimes (both `lifetime: None`).
+        let no_binder_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![
+                        Type::BorrowedRef {
+                            lifetime: None,
+                            is_mutable: false,
+                            type_: Box::new(ty("str")),
+                        },
+                        Type::BorrowedRef {
+                            lifetime: None,
+                            is_mutable: false,
+                            type_: Box::new(ty("str")),
+                        },
+                    ],
+                    output: None,
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        };
+        let shared_lt_generics = Generics {
+            params: vec![type_param("F", vec![shared_lt_bound])],
+            where_predicates: vec![],
+        };
+        let no_binder_generics = Generics {
+            params: vec![type_param("F", vec![no_binder_bound])],
+            where_predicates: vec![],
+        };
+        assert!(
+            !generics_structurally_equal(&shared_lt_generics, &no_binder_generics),
+            "D5 correctness: `for<'a> Fn(&'a str, &'a str)` must NOT equal `Fn(&str, &str)` \
+             (shared lifetime is semantically distinct from independent elision)"
+        );
+    }
+
+    /// D5 correctness: HRTB-on-TraitBound with a lifetime binder carrying `outlives`
+    /// constraints (e.g. `for<'a: 'b>`) must be fail-closed.
+    ///
+    /// The formatter only records binder names/arity and does not encode `outlives`
+    /// constraints.  Accepting such binders would silently discard the constraint and
+    /// risk false Blue for `for<'a: 'b> Foo<&'a T>` vs `for<'a> Foo<&'a T>`.
+    #[test]
+    fn test_hrtb_lifetime_binder_with_outlives_is_fail_closed() {
+        // `for<'a: 'static> Fn(&'a str)` — binder lifetime with `outlives: ['static]`.
+        let outlives_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: Some("'a".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec!["'static".to_string()] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        // `for<'a> Fn(&'a str)` — same but without `outlives` constraint.
+        let plain_binder_bound = GenericBound::TraitBound {
+            trait_: Path {
+                path: "Fn".to_string(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::Parenthesized {
+                    inputs: vec![Type::BorrowedRef {
+                        lifetime: Some("'a".to_string()),
+                        is_mutable: false,
+                        type_: Box::new(ty("str")),
+                    }],
+                    output: None,
+                })),
+            },
+            generic_params: vec![GenericParamDef {
+                name: "'a".to_string(),
+                kind: GenericParamDefKind::Lifetime { outlives: vec![] },
+            }],
+            modifier: TraitBoundModifier::None,
+        };
+        // Both sides with the outlives binder — should be fail-closed (not equal) because
+        // the outlives constraint is outside the supported scope.
+        let outlives_generics = Generics {
+            params: vec![type_param("F", vec![outlives_bound.clone()])],
+            where_predicates: vec![],
+        };
+        let plain_generics = Generics {
+            params: vec![type_param("F", vec![plain_binder_bound])],
+            where_predicates: vec![],
+        };
+        assert!(
+            !generics_structurally_equal(&outlives_generics, &outlives_generics.clone()),
+            "D5 fail-closed: HRTB binder with `outlives` constraints must not compare equal \
+             (even to itself — the constraint is not represented in the fingerprint)"
+        );
+        assert!(
+            !generics_structurally_equal(&outlives_generics, &plain_generics),
+            "D5 fail-closed: `for<'a: 'static> Fn(&'a str)` must NOT equal `for<'a> Fn(&'a str)` \
+             (outlives constraint is outside D5 scope)"
         );
     }
 }

@@ -1,19 +1,23 @@
 //! Domain → DTO conversions for [`CatalogueDocument`] (encode path).
 
 use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker};
-use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
+use domain::tddd::catalogue_v2::entries::{
+    FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
+};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, MethodDeclaration, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
+    BoundOp, CatalogueDocument, MethodDeclaration, ParamDeclaration, TraitImplDeclV2,
+    WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
 
 use super::CatalogueDocumentCodecError;
 use super::dto::{
-    CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, MethodDeclarationDto,
-    MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto, TypeEntryDto, TypeKindDto,
-    TypestateMarkerDto, VariantDeclDto, VariantPayloadDto, WherePredicateDeclDto,
+    BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
+    MethodDeclarationDto, MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto,
+    TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
+    WherePredicateDeclDto,
 };
 
 // ---------------------------------------------------------------------------
@@ -38,6 +42,10 @@ pub(super) fn domain_to_dto(
         .iter()
         .map(|(k, v)| function_entry_to_dto(v).map(|dto| (k.to_string(), dto)))
         .collect::<Result<_, _>>()?;
+    let inherent_impls =
+        doc.inherent_impls.iter().map(inherent_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let trait_impls =
+        doc.trait_impls.iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(CatalogueDocumentDto {
         schema_version: doc.schema_version,
         crate_name: doc.crate_name.as_str().to_owned(),
@@ -45,6 +53,8 @@ pub(super) fn domain_to_dto(
         types,
         traits,
         functions,
+        inherent_impls,
+        trait_impls,
     })
 }
 
@@ -61,7 +71,6 @@ pub(super) fn type_entry_to_dto(
         role: entry.role.to_string(),
         kind: type_kind_to_dto(&entry.kind),
         methods,
-        trait_impls: entry.trait_impls.iter().map(trait_impl_to_dto).collect(),
         module_path: entry.module_path.to_string(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
@@ -153,24 +162,48 @@ pub(super) fn method_decl_to_dto(
 ///
 /// # Errors
 ///
-/// Returns `CatalogueDocumentCodecError::InvalidEntry` when `w.bounds` is
-/// empty. An empty bound list cannot round-trip through the codec because the
-/// decoder rejects `where T:` (a bare where-predicate with no RHS is invalid
-/// Rust and is rejected by `where_predicates_from_dtos`).
+/// Returns `CatalogueDocumentCodecError::InvalidEntry` when `w.rhs` is
+/// empty. An empty rhs list cannot round-trip through the codec because the
+/// decoder rejects predicates with no RHS (a bare `where T:` or `where T =`
+/// without a right-hand side is invalid and is rejected by
+/// `where_predicates_from_dtos`).
+///
+/// Returns `CatalogueDocumentCodecError::InvalidEntry` for `Equal` predicates
+/// when `w.rhs.len() != 1`.
 fn where_predicate_decl_to_dto(
     w: &WherePredicateDecl,
 ) -> Result<WherePredicateDeclDto, CatalogueDocumentCodecError> {
-    if w.bounds.is_empty() {
+    if w.rhs.is_empty() {
         return Err(CatalogueDocumentCodecError::InvalidEntry {
-            entry_name: w.type_.as_str().to_owned(),
-            reason: "where predicate has no bounds — empty bounds cannot round-trip through \
+            entry_name: w.lhs.as_str().to_owned(),
+            reason: "where predicate has no rhs — empty rhs cannot round-trip through \
                      the catalogue JSON codec (decoder rejects bare `where T:` predicates)"
                 .to_owned(),
         });
     }
+    let operator = match w.operator {
+        BoundOp::Bound => BoundOpDto::Bound,
+        BoundOp::Equal => {
+            // `Equal` predicates (`where T::Assoc = U`) must have exactly one RHS.
+            // Multiple RHS entries are syntactically invalid and would silently drop
+            // entries after the first in the extended-crate codec.
+            if w.rhs.len() != 1 {
+                return Err(CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: w.lhs.as_str().to_owned(),
+                    reason: format!(
+                        "where predicate with operator Equal must have exactly one rhs entry \
+                         (got {}); `where T::Assoc = U` accepts a single RHS only",
+                        w.rhs.len()
+                    ),
+                });
+            }
+            BoundOpDto::Equal
+        }
+    };
     Ok(WherePredicateDeclDto {
-        type_: w.type_.as_str().to_owned(),
-        bounds: w.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+        lhs: w.lhs.as_str().to_owned(),
+        rhs: w.rhs.iter().map(|b| b.as_str().to_owned()).collect(),
+        operator,
     })
 }
 
@@ -178,27 +211,94 @@ fn param_decl_to_dto(p: &ParamDeclaration) -> ParamDto {
     ParamDto { name: p.name.as_str().to_owned(), ty: p.ty.as_str().to_owned() }
 }
 
-fn trait_impl_to_dto(t: &TraitImplDeclV2) -> TraitImplDto {
-    TraitImplDto {
-        trait_name: t.trait_name.as_str().to_owned(),
-        origin_crate: t.origin_crate.as_str().to_owned(),
-        generic_args: t.generic_args().map(str::to_owned),
-    }
+/// Encodes a top-level `TraitImplDeclV2` to its DTO form (ADR `2026-05-20-0048` D2).
+///
+/// Emits `action`, `trait_ref`, and `for_type` fields. Validates `trait_ref` as a
+/// Rust path expression (not a reference, slice, or tuple) and validates both
+/// `trait_ref` and `for_type` as syn-parseable type expressions to guarantee
+/// encode/decode round-trip consistency for in-memory `TraitImplDeclV2` values
+/// that were not originally constructed via the JSON decoder.
+fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocumentCodecError> {
+    let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: t.trait_ref.as_str().to_owned(),
+        reason,
+    };
+    super::decode::validate_type_ref_str(t.trait_ref.as_str())
+        .map_err(|e| err(format!("invalid trait_ref syntax: {e}")))?;
+    // Mirror the decode-path path-type constraint: trait_ref must be a path, not a reference etc.
+    super::decode::validate_trait_ref_is_path(t.trait_ref.as_str())
+        .map_err(|e| err(format!("invalid trait_ref (must be a path): {e}")))?;
+    super::decode::validate_type_ref_str(t.for_type.as_str())
+        .map_err(|e| err(format!("invalid for_type syntax: {e}")))?;
+    let impl_where_predicates = t
+        .impl_where_predicates
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(TraitImplDto {
+        action: t.action.to_string(),
+        trait_ref: t.trait_ref.as_str().to_owned(),
+        for_type: t.for_type.as_str().to_owned(),
+        impl_generics: t
+            .impl_generics
+            .iter()
+            .map(|g| MethodGenericParamDto {
+                name: g.name.as_str().to_owned(),
+                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+            })
+            .collect(),
+        impl_where_predicates,
+    })
 }
 
 pub(super) fn trait_entry_to_dto(
     entry: &TraitEntry,
 ) -> Result<TraitEntryDto, CatalogueDocumentCodecError> {
     let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let where_predicates =
+        entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
     Ok(TraitEntryDto {
         action: entry.action.to_string(),
         role: entry.role.to_string(),
         methods,
         supertrait_bounds: entry.supertrait_bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+        generics: entry
+            .generics
+            .iter()
+            .map(|g| MethodGenericParamDto {
+                name: g.name.as_str().to_owned(),
+                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+            })
+            .collect(),
+        where_predicates,
         module_path: entry.module_path.to_string(),
         docs: entry.docs.clone(),
         spec_refs: spec_refs_to_dtos(&entry.spec_refs),
         informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
+    })
+}
+
+pub(super) fn inherent_impl_to_dto(
+    decl: &InherentImplDeclV2,
+) -> Result<InherentImplDeclDto, CatalogueDocumentCodecError> {
+    let impl_where_predicates = decl
+        .impl_where_predicates
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<Vec<_>, _>>()?;
+    let methods = decl.methods.iter().map(method_decl_to_dto).collect::<Result<Vec<_>, _>>()?;
+    Ok(InherentImplDeclDto {
+        type_name: decl.type_name.as_str().to_owned(),
+        impl_generics: decl
+            .impl_generics
+            .iter()
+            .map(|g| MethodGenericParamDto {
+                name: g.name.as_str().to_owned(),
+                bounds: g.bounds.iter().map(|b| b.as_str().to_owned()).collect(),
+            })
+            .collect(),
+        impl_where_predicates,
+        methods,
     })
 }
 

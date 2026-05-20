@@ -16,11 +16,12 @@ use super::super::external_crates::{
     build_external_crates_for_scope, patch_paths_crate_ids, patch_paths_crate_ids_extra,
 };
 use super::super::resolution::resolve_unresolved_in_item;
-use super::super::{build_function_identity_map, build_type_trait_identity_map};
+use super::super::{
+    build_function_identity_map, build_impl_identity_map, build_type_trait_identity_map,
+};
 use super::child_items::{
-    collect_child_ids, insert_a_item_tree_into_s, insert_b_item_tree_into_s, patch_impl_for_ids,
-    patch_impl_trait_ids, remap_and_copy_a_children_to_s, remap_child_ids_in_item,
-    remove_b_children_from_s,
+    insert_a_item_tree_into_s, insert_b_item_tree_into_s, move_standalone_impl_children_to_d,
+    remap_and_copy_a_children_to_s, remap_child_ids_in_item, remove_b_children_from_s,
 };
 use super::state::Phase1State;
 
@@ -168,6 +169,35 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
     let a_types = build_type_trait_identity_map(&a_krate);
     let a_fns = build_function_identity_map(&a_krate);
 
+    // --- Pre-step (A-side): Build A-wide Id remap (T008, IN-10) ---
+    //
+    // Symmetric counterpart of the B-side b_id_remap pre-step above.  Allocate a
+    // fresh S Id for every entry in a_krate.index BEFORE any A-side insertion so
+    // that both A-sourced and B-sourced items occupy the same "fresh" Id space in
+    // s_index, with no overlap.  Action-specific insertion passes (Add / Modify /
+    // Reference / Delete) use this map to look up pre-allocated fresh S Ids and to
+    // rewrite intra-A `Type::ResolvedPath.id` references (via
+    // `rewrite_type_ref_ids_in_item`) in a single unified pass.
+    //
+    // `Id(0)` is excluded from the remap for the same reasons as in b_id_remap:
+    //   1. It is the A-side root module, which is never inserted into S.
+    //   2. Rustdoc uses `Id(0)` as a `Self`-type sentinel inside impl blocks.
+    //      Remapping `Id(0)` would turn that sentinel into a fresh S id that is
+    //      never inserted into `s_index`, causing Phase 1.6 to report spurious
+    //      `DanglingId` errors.
+    //
+    // After T009 (IN-11): `patch_impl_for_ids` / `patch_impl_trait_ids` are fully
+    // removed.  All `for_` / `trait_` id rewriting in impl blocks goes through
+    // `rewrite_type_ref_ids_in_item` + `a_id_remap` (Phase 1.45) as the single
+    // unified path.
+    {
+        let mut a_keys: Vec<Id> = a_krate.index.keys().filter(|id| id.0 != 0).copied().collect();
+        a_keys.sort_by_key(|id| id.0);
+        let a_remap: HashMap<Id, Id> =
+            a_keys.into_iter().map(|old_id| (old_id, state.alloc_id())).collect();
+        state.a_id_remap = a_remap;
+    }
+
     // --- Step 4 & 5: Process A items by action ---
 
     // Process A types/traits.
@@ -214,7 +244,6 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                         "action=Modify: '{a_name}' expected in S but not found (internal error)"
                     ))
                 })?;
-                let is_trait = matches!(a_item.inner, ItemEnum::Trait(_));
                 if let Some(b_item_in_s) = state.s_index.get(&s_id).cloned() {
                     remove_b_children_from_s(
                         &mut state.s_index,
@@ -230,25 +259,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                     &a_krate.index,
                     ItemAction::Modify,
                 );
-                // Collect new impl child Ids (from the remapped item) before inserting,
-                // so we can patch their impl.for_ / impl.trait_ references afterwards.
-                let new_impl_ids: Vec<rustdoc_types::Id> = collect_child_ids(&remapped_a_item)
-                    .into_iter()
-                    .filter(|id| {
-                        state
-                            .s_index
-                            .get(id)
-                            .is_some_and(|item| matches!(item.inner, ItemEnum::Impl(_)))
-                    })
-                    .collect();
+                // T009 (IN-11): `patch_impl_for_ids` / `patch_impl_trait_ids` calls are removed.
+                // `rewrite_type_ref_ids_in_item` + `a_id_remap` (applied in Phase 1.45) is the
+                // sole path for remapping `for_` / `trait_` ids in Modify impl blocks.
                 state.insert_s_type_at(s_id, remapped_a_item, ItemAction::Modify);
-                // Patch the impl blocks' self-type / trait reference to point at the preserved
-                // S-side parent id.  This is the same step performed in the Add path.
-                if is_trait {
-                    patch_impl_trait_ids(&mut state.s_index, &new_impl_ids, s_id);
-                } else {
-                    patch_impl_for_ids(&mut state.s_index, &new_impl_ids, s_id);
-                }
             }
             ItemAction::Reference => {
                 // Reference: identity must exist in B.
@@ -296,7 +310,10 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
                     )));
                 }
                 let path = a_krate.paths.get(a_id).map(|ps| ps.path.clone());
-                state.insert_s_fn(a_item, fn_path_str.clone(), ItemAction::Add, path);
+                // Use the pre-allocated S Id from a_id_remap (T008) instead of alloc_id().
+                let fn_s_id =
+                    state.a_id_remap.get(a_id).copied().unwrap_or_else(|| state.alloc_id());
+                state.insert_s_fn_at(fn_s_id, a_item, fn_path_str.clone(), ItemAction::Add, path);
             }
             ItemAction::Modify => {
                 if !in_b {
@@ -339,43 +356,70 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
         }
     }
 
-    // --- Step 5.5: A-side orphan-impl pass (Symptom B fix, T038 / IN-31) ---
+    // --- Step 5.5: A-side unified trait-impl insertion loop (ADR `2026-05-20-0048` D4) ---
     //
-    // Some A-side types (notably `TypeAlias`) have no `impls` field in `rustdoc_types`,
-    // so trait-impl items generated by `encode_type_alias` / `encode_trait_impl_blocks`
-    // are recorded as standalone entries in `a_krate.index` and are NOT reached by
-    // the A type-processing loop above (which traverses parents via `collect_child_ids`
-    // → `Struct.impls` / `Enum.impls` / `Trait.implementations`).  Phase 2's
-    // `build_impl_identity_map` does find them in C (walking the whole index), so
-    // omitting them from S for the `Add` case would produce spurious `CMinusSUnionD`
-    // (Red) signals.
+    // Per ADR D1, `CatalogueDocument::trait_impls` entries are STANDALONE top-level items in
+    // `a_krate.index` with NO parent-type attachment (the codec does NOT push their ids onto
+    // any `Struct.impls` / `Enum.impls` list).  Consequently, the A-side type-processing loop
+    // in Step 4 (which traverses parents via `collect_child_ids` → `Struct.impls` / `Enum.impls`)
+    // does NOT reach them.  Phase 2's `build_impl_identity_map` does find them in C (walking
+    // the whole index), so omitting them from S would produce spurious `CMinusSUnionD` (Red).
     //
-    // Symmetric to the B-side orphan-impl pass earlier in this function.  Detection
-    // rule: an `Impl` item in `a_krate.index` is "orphan" iff it is NOT in the
-    // `impls` / `implementations` list of any `Struct` / `Enum` / `Trait` in
-    // `a_krate.index`.  Apply the same Id-renumber rule as T037: insert via
-    // `insert_a_item_tree_into_s` so the orphan and its method/assoc-item children
-    // get fresh S Ids, action propagates through the subtree, and Phase 1.45
-    // rewrites the impl's `for_.id` / `trait_.id` via the standard A-side remap.
+    // Action-driven insertion (ADR D4 / IN-16 / T015):
     //
-    // Action coverage: this pass inserts only when the implementing type's
-    // catalogue action is `Add`.  Other actions are intentionally skipped:
+    // Each standalone impl is inserted into S (or moved to D for Delete) according to its own
+    // `action` in `a_item_actions` — mirroring the TypeEntry / FunctionEntry action semantics
+    // in Step 4 / Step 5:
     //
-    // - `Reference`: the implementing type exists in B unchanged; B's rustdoc emits
-    //   the same trait-impls, which the earlier B-side orphan-impl pass already
-    //   inserted into S with Reference action.  Inserting again from A would
-    //   duplicate the impl in S.
-    // - `Delete`: the B-side orphan-impl pass inserts B's impl into S, and
-    //   `state.move_type_to_d` (called for the parent type in Step 4/5) scans
-    //   `s_index` for impls whose `for_.id` points at the deleted parent and
-    //   moves them to D.  Inserting A's mirror would corrupt this hand-off.
-    // - `Modify`: TypeAlias with modified trait-impls is a rare edge case where
-    //   B's old impls (already in S via the B-side pass) provide a baseline that
-    //   Phase 2 can match against.  Replacing them with A's new impls is a
-    //   follow-up task; the current pass leaves them as B-sourced Reference.
+    // - Add:       Insert into S.  B must NOT have this impl (action contradiction if it does).
+    // - Modify:    Replace B's impl in S with A's version.  B must have this impl.
+    // - Reference: B's impl is already in S as Reference (B-seeded).  B must have this impl.
+    //              No change to S needed.
+    // - Delete:    Move B's impl from S to D.  B must have this impl.
+    //
+    // For Modify / Reference / Delete, the matching B-side impl is found via
+    // `build_impl_identity_map` on the B crate (using the same empty-string crate_name
+    // as Phase 2's C-side call, giving consistent key normalization), then the
+    // corresponding S-side Id is obtained via `b_id_remap`.
+    //
+    // The identity key of each A-side standalone impl is obtained by running
+    // `build_impl_identity_map` on the A krate (empty crate_name for consistency).
     {
+        // Build B-side impl identity map to find matching B impls for Modify/Reference/Delete.
+        // Pass the real crate name so that when rustdoc omits a local trait from `krate.paths`
+        // and the fallback `normalize_impl_trait_path` runs, `my_crate::MyTrait` is stripped
+        // to `MyTrait` — consistent with Phase 2's S/D/C maps (which also pass `crate_name`).
+        // This matches the Phase 2 convention for C-side `build_impl_identity_map` calls and
+        // ensures A-side standalone impl identity keys (which use short names) can find their
+        // B-side counterparts even when `krate.paths` is incomplete.
+        let b_impl_map = build_impl_identity_map(b, &crate_name);
+        // Invert: B identity key → corresponding S-side Id (after b_id_remap renumbering).
+        // Used to look up the already-seeded S impl when processing Modify/Reference/Delete.
+        let b_key_to_s_id: std::collections::BTreeMap<&str, Id> = b_impl_map
+            .iter()
+            .filter_map(|(key, &b_id)| {
+                // b_id_remap maps each B-side Id to its fresh S-side Id.  Fall back to the
+                // raw B id only if remap is missing (shouldn't happen in normal operation).
+                let s_id = state.b_id_remap.get(&b_id).copied().or(Some(b_id))?;
+                Some((key.as_str(), s_id))
+            })
+            .collect();
+
+        // Build A-side impl identity map to get each standalone A impl's identity key.
+        // Pass the real crate name so that if rustdoc omits a local trait from
+        // `krate.paths` and the fallback `normalize_impl_trait_path` runs, the crate
+        // prefix is stripped from A-side keys (e.g. `my_crate::MyTrait` → `MyTrait`),
+        // matching the same stripping applied to B-side keys in `b_impl_map` above.
+        // Without symmetric crate-name normalization, an A-side trait_ref written with
+        // an explicit crate prefix produces a different key than the B-side entry and
+        // is misclassified as a new Add instead of matching the existing B impl.
+        let a_impl_map = build_impl_identity_map(&a_krate, &crate_name);
+        // Invert A map: A-side Id → identity key string.
+        let a_id_to_key: std::collections::HashMap<Id, String> =
+            a_impl_map.into_iter().map(|(key, id)| (id, key)).collect();
+
         // Collect impl Ids that are reachable via A-side type/trait subtree traversal
-        // in Step 4.  An impl is "reachable" (not orphan) iff it is listed in the
+        // in Step 4.  An impl is "reachable" (already in S) iff it is listed in the
         // `impls` field of a Struct or Enum (which `collect_child_ids` always follows),
         // OR it is listed in `Trait.implementations` for a Trait whose own action is
         // `Add` or `Modify` (only those trait subtrees are traversed in Step 4;
@@ -408,7 +452,14 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
             })
             .collect();
 
-        let a_orphan_impls: Vec<Id> = a_krate
+        // Collect all standalone A-side Impl items: those in `a_krate.index` with crate_id == 0
+        // that are NOT already reachable via type/trait subtree traversal (i.e. not already in S).
+        // After ADR D1 (codec no longer attaches trait impls to `Struct.impls` / `Enum.impls`),
+        // ALL catalogue-declared trait impl items are standalone and none are in
+        // `a_referenced_impl_ids` from `Struct.impls` / `Enum.impls`.  Inherent impl items
+        // (from `InherentImplDeclV2`) ARE attached to `Struct.impls` and thus already in S via
+        // Step 4 type traversal — they are excluded here by `a_referenced_impl_ids`.
+        let mut a_standalone_impls: Vec<Id> = a_krate
             .index
             .iter()
             .filter(|(id, item)| {
@@ -418,32 +469,258 @@ pub(in crate::tddd::signal_evaluator_v2) fn phase1_build_s_and_d(
             })
             .map(|(id, _)| *id)
             .collect();
+        // Sort for deterministic processing order.
+        a_standalone_impls.sort_by_key(|id| id.0);
 
-        for orphan_id in a_orphan_impls {
-            let impl_item = match a_krate.index.get(&orphan_id) {
+        for standalone_id in a_standalone_impls {
+            let impl_item = match a_krate.index.get(&standalone_id) {
                 Some(it) => it.clone(),
                 None => continue,
             };
 
-            // Inherit action from the implementing type via `impl.for_.id` → `a_item_actions`.
-            let parent_action = if let ItemEnum::Impl(impl_) = &impl_item.inner {
-                if let Type::ResolvedPath(p) = &impl_.for_ {
-                    a_item_actions.get(&p.id).copied()
-                } else {
-                    None
+            // Use the impl's OWN action from `a_item_actions`.
+            //
+            // Per ADR D4 (T015), top-level catalogue trait impl items have their own action
+            // recorded in `a_item_actions` (set from TraitImplDeclV2.action by the codec).
+            // There is no parent-action fallback: impls are independent top-level entries with
+            // no "parent type" relationship (ADR `2026-05-20-0048` D1 / IN-16).
+            let own_action = a_item_actions.get(&standalone_id).copied().unwrap_or(ItemAction::Add);
+
+            // Compute the identity key for this A-side impl (used to find its B-side counterpart
+            // for Modify / Reference / Delete).
+            let impl_key = a_id_to_key.get(&standalone_id).map(String::as_str).unwrap_or("");
+            // Look up whether this impl exists in B (by matching the identity key).
+            let in_b = !impl_key.is_empty() && b_key_to_s_id.contains_key(impl_key);
+
+            match own_action {
+                ItemAction::Add => {
+                    // Add: identity must NOT exist in B (action contradiction if it does).
+                    if in_b {
+                        return Err(Phase1Error::ActionContradiction(format!(
+                            "action=Add declared for trait impl '{impl_key}' but it already exists in baseline"
+                        )));
+                    }
+                    let path = a_krate.paths.get(&standalone_id).map(|ps| ps.path.clone());
+                    insert_a_item_tree_into_s(
+                        &mut state,
+                        impl_item,
+                        ItemAction::Add,
+                        path,
+                        &a_krate.index,
+                    );
                 }
-            } else {
-                None
-            };
-
-            // Only `Add` is inserted by this pass; see the comment block above for why
-            // Reference / Delete / Modify are handled elsewhere (or deferred).
-            if parent_action != Some(ItemAction::Add) {
-                continue;
+                ItemAction::Modify => {
+                    // Modify: identity must exist in B.  Replace B's impl in S with A's version.
+                    if !in_b {
+                        return Err(Phase1Error::ActionContradiction(format!(
+                            "action=Modify declared for trait impl '{impl_key}' but it does not exist in baseline"
+                        )));
+                    }
+                    let s_id = match b_key_to_s_id.get(impl_key).copied() {
+                        Some(id) => id,
+                        None => {
+                            return Err(Phase1Error::ActionContradiction(format!(
+                                "action=Modify: trait impl '{impl_key}' expected in S but not found (internal error)"
+                            )));
+                        }
+                    };
+                    // Replace B's impl item in S with A's version.
+                    // First remove the B-seeded entry AND its children from S so that no
+                    // B-seeded child items (method/assoc-item nodes in Impl.items) are left
+                    // orphaned after the root is replaced by A's version (which for catalogue-
+                    // generated impls has zero children per ADR D12).
+                    if let Some(b_seeded) = state.s_index.get(&s_id).cloned() {
+                        remove_b_children_from_s(
+                            &mut state.s_index,
+                            &mut state.s_actions,
+                            &b_seeded,
+                        );
+                    }
+                    state.s_index.remove(&s_id);
+                    state.s_actions.remove(&s_id);
+                    let path = a_krate.paths.get(&standalone_id).map(|ps| ps.path.clone());
+                    insert_a_item_tree_into_s(
+                        &mut state,
+                        impl_item,
+                        ItemAction::Modify,
+                        path,
+                        &a_krate.index,
+                    );
+                }
+                ItemAction::Reference => {
+                    // Reference: B's impl is already seeded in S as Reference. B must have it.
+                    if !in_b {
+                        return Err(Phase1Error::ActionContradiction(format!(
+                            "action=Reference declared for trait impl '{impl_key}' but it does not exist in baseline"
+                        )));
+                    }
+                    // S should have B's impl as Reference (from the B-seeded orphan pass or
+                    // type child-subtree insertion in Step 2).  However, if the parent type
+                    // had `action=Modify`, `remove_b_children_from_s` (Step 4) will have
+                    // purged ALL B-side child impl blocks for that type — including derive
+                    // impls (Debug, Clone, etc.) and trait impls (e.g. `impl Port for Adapter`)
+                    // that this Reference entry declares as unchanged.
+                    //
+                    // Detect the eviction: if the pre-allocated S-id is absent from s_index,
+                    // re-insert B's impl from `b.index` at the same pre-allocated S-id using
+                    // the same remapping pipeline as the B-seeded orphan pass
+                    // (`rewrite_type_ref_ids_in_item` + `remap_child_ids_in_item`).
+                    // This restores the impl in S with `action=Reference` so Phase 2 finds it
+                    // in the S-impl identity map and emits the correct Blue/Reference signal.
+                    if let Some(&s_id) = b_key_to_s_id.get(impl_key) {
+                        if !state.s_index.contains_key(&s_id) {
+                            // The impl was evicted by Modify's remove_b_children_from_s.
+                            // Re-insert B's impl at its pre-allocated S-id.
+                            if let Some(&b_id) = b_impl_map.get(impl_key) {
+                                if let Some(b_impl_item) = b.index.get(&b_id).cloned() {
+                                    let rewritten = rewrite_type_ref_ids_in_item(
+                                        b_impl_item.clone(),
+                                        &state.b_id_remap,
+                                    );
+                                    let remapped =
+                                        remap_child_ids_in_item(rewritten, &state.b_id_remap);
+                                    let mut stored = remapped;
+                                    stored.id = s_id;
+                                    state.s_index.insert(s_id, stored);
+                                    state.s_actions.insert(s_id, ItemAction::Reference);
+                                    // Re-insert children (methods, assoc items) of this impl.
+                                    if let ItemEnum::Impl(ref impl_inner) = b_impl_item.inner {
+                                        for &child_id in &impl_inner.items {
+                                            if let Some(child) = b.index.get(&child_id) {
+                                                let new_child_s_id = state
+                                                    .b_id_remap
+                                                    .get(&child_id)
+                                                    .copied()
+                                                    .unwrap_or_else(|| state.alloc_id());
+                                                let rewritten_child = rewrite_type_ref_ids_in_item(
+                                                    child.clone(),
+                                                    &state.b_id_remap,
+                                                );
+                                                let remapped_child = remap_child_ids_in_item(
+                                                    rewritten_child,
+                                                    &state.b_id_remap,
+                                                );
+                                                let mut stored_child = remapped_child;
+                                                stored_child.id = new_child_s_id;
+                                                state
+                                                    .s_index
+                                                    .entry(new_child_s_id)
+                                                    .or_insert(stored_child);
+                                                state
+                                                    .s_actions
+                                                    .insert(new_child_s_id, ItemAction::Reference);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // Otherwise S already has B's impl as Reference — no change needed.
+                    // The action is already ItemAction::Reference from step 2.
+                }
+                ItemAction::Delete => {
+                    // Delete: identity must exist in B. Move B's impl from S to D.
+                    if !in_b {
+                        return Err(Phase1Error::ActionContradiction(format!(
+                            "action=Delete declared for trait impl '{impl_key}' but it does not exist in baseline"
+                        )));
+                    }
+                    let s_id = match b_key_to_s_id.get(impl_key).copied() {
+                        Some(id) => id,
+                        None => {
+                            return Err(Phase1Error::ActionContradiction(format!(
+                                "action=Delete: trait impl '{impl_key}' expected in S but not found (internal error)"
+                            )));
+                        }
+                    };
+                    // Move B's impl from S to D (omit from S, expose only in D).
+                    //
+                    // Three cases for the location of the impl at this point:
+                    //
+                    // 1. Normal: impl is in `s_index` → move children to D, then root to D.
+                    //
+                    // 2. Evicted-by-Modify: the parent-type `action=Modify` already ran
+                    //    `remove_b_children_from_s` and removed this impl from S.  The impl
+                    //    is in neither S nor D.  Reconstruct from B and insert directly into D.
+                    //    (Mirrors the Reference eviction-recovery logic at line ~564.)
+                    //
+                    // 3. Already-in-D: a parent-type `action=Delete` (via `move_type_to_d`)
+                    //    already moved the impl into `d_index` at `s_id`.  The impl is present
+                    //    in D; do not create a second copy.
+                    if state.s_index.contains_key(&s_id) {
+                        // Case 1: impl is in S. Move children to D first, then root.
+                        if let Some(s_impl) = state.s_index.get(&s_id).cloned() {
+                            move_standalone_impl_children_to_d(
+                                &mut state.s_index,
+                                &mut state.s_actions,
+                                &mut state.d_index,
+                                &s_impl,
+                            );
+                        }
+                        if let Some(mut root) = state.s_index.remove(&s_id) {
+                            let d_id = state.alloc_id();
+                            root.id = d_id;
+                            state.d_index.insert(d_id, root);
+                            if let Some(ps) = state.s_paths.remove(&s_id) {
+                                state.d_paths.insert(d_id, ps);
+                            }
+                        }
+                    } else if state.d_index.contains_key(&s_id) {
+                        // Case 3: impl already moved into D by a parent-type Delete pass.
+                        // No action needed — the D entry is already correct.
+                        // s_actions cleanup below handles any lingering S action entry.
+                    } else if let Some(&b_id) = b_impl_map.get(impl_key) {
+                        // Case 2: evicted from S by parent-type Modify. Reconstruct from B.
+                        //
+                        // The impl root gets a fresh D id (same as the normal path's
+                        // `state.alloc_id()` for the D root).  Children must be stored at
+                        // their pre-allocated B-remap ids (values of `state.b_id_remap`)
+                        // because `remap_child_ids_in_item(..., &state.b_id_remap)` writes
+                        // those ids into `impl.items` of the root — any other id assignment
+                        // would leave the root with dangling child references in D.
+                        if let Some(b_impl_item) = b.index.get(&b_id).cloned() {
+                            let rewritten = rewrite_type_ref_ids_in_item(
+                                b_impl_item.clone(),
+                                &state.b_id_remap,
+                            );
+                            let remapped = remap_child_ids_in_item(rewritten, &state.b_id_remap);
+                            let d_id = state.alloc_id();
+                            let mut root = remapped;
+                            root.id = d_id;
+                            state.d_index.insert(d_id, root);
+                            // Store children at their B-remap ids (same ids that
+                            // `remap_child_ids_in_item` placed into `root.items` above).
+                            // Mirrors the Reference eviction path (line ~584).
+                            if let ItemEnum::Impl(ref impl_inner) = b_impl_item.inner {
+                                for &child_id in &impl_inner.items {
+                                    if let Some(child) = b.index.get(&child_id) {
+                                        let child_d_id = state
+                                            .b_id_remap
+                                            .get(&child_id)
+                                            .copied()
+                                            .unwrap_or_else(|| state.alloc_id());
+                                        let rewritten_child = rewrite_type_ref_ids_in_item(
+                                            child.clone(),
+                                            &state.b_id_remap,
+                                        );
+                                        let remapped_child = remap_child_ids_in_item(
+                                            rewritten_child,
+                                            &state.b_id_remap,
+                                        );
+                                        let mut stored_child = remapped_child;
+                                        stored_child.id = child_d_id;
+                                        state.d_index.insert(child_d_id, stored_child);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // Ensure the s_actions entry is removed (may have been set by step 2 or
+                    // the B-seeded orphan pass even when the impl was later evicted).
+                    state.s_actions.remove(&s_id);
+                }
             }
-
-            let path = a_krate.paths.get(&orphan_id).map(|ps| ps.path.clone());
-            insert_a_item_tree_into_s(&mut state, impl_item, ItemAction::Add, path, &a_krate.index);
         }
     }
 

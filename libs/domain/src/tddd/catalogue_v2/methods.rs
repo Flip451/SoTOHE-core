@@ -49,43 +49,74 @@ pub struct MethodGenericParam {
 }
 
 // ---------------------------------------------------------------------------
-// WherePredicateDecl — generic where-clause predicate (BoundPredicate scope)
+// BoundOp — the operator in a where-clause predicate
 // ---------------------------------------------------------------------------
 
-/// A single `where` clause bound predicate (`type_: bound1 + bound2 + ...`).
+/// The operator in a `where` clause predicate.
 ///
-/// Mirrors rustdoc `WherePredicate::BoundPredicate` for the catalogue side.
-/// Unlike [`MethodGenericParam`] (whose `name` is a single identifier), the
-/// `type_` here is an arbitrary type expression and can describe predicates
-/// that inline `<>` bounds cannot — for example `where Vec<T>: Clone`,
-/// `where T::Item: Send`, or `where Hoge<Fuga>: Piyo`.
+/// Corresponds to the two forms of Rust where-clause predicates:
+/// - `Bound` — the `:` operator (e.g. `T: Clone + Send`)
+/// - `Equal` — the `=` operator (e.g. `T::Assoc = U`)
+///
+/// Used in [`WherePredicateDecl::operator`].
+///
+/// (ADR `2026-05-18-1223-make-catalogue-schema-permissive` D1)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum BoundOp {
+    /// The `:` operator. `rhs` is a list of trait / lifetime bounds.
+    #[default]
+    Bound,
+    /// The `=` operator. `rhs` must contain exactly one element.
+    Equal,
+}
+
+// ---------------------------------------------------------------------------
+// WherePredicateDecl — generic where-clause predicate (lhs / rhs / operator)
+// ---------------------------------------------------------------------------
+
+/// A single `where` clause predicate in `lhs operator rhs` form.
+///
+/// Represents the essential structure of a Rust where clause: a left-hand side
+/// type expression, an operator (`:` or `=`), and one or more right-hand side
+/// bounds.
+///
+/// - `lhs` — the left-hand side type expression.  May be a bare identifier (`T`),
+///   a parameterised type (`Vec<T>`, `Hoge<Fuga>`), a projection (`T::Item`), or
+///   an HRTB-prefixed expression (`for<'a> T::Item<'a>`).
+/// - `rhs` — the right-hand side bounds.  For `Bound` predicates this is the
+///   `+`-separated list of trait / lifetime bounds (`[Clone, Send]` for
+///   `T: Clone + Send`).  For `Equal` predicates this is a single-element Vec
+///   (`[U]` for `T::Assoc = U`).
+/// - `operator` — the predicate operator (`BoundOp::Bound` or `BoundOp::Equal`).
 ///
 /// Used in [`MethodDeclaration::where_predicates`] and
 /// [`crate::tddd::catalogue_v2::entries::FunctionEntry::where_predicates`].
-/// `TraitEntry` does not yet carry a `where_predicates` field — trait-level
-/// generic parameter declarations are out of scope for this ADR (D3 / IN-30 scope).
 ///
-/// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
-///
-/// Scope is `BoundPredicate` only — rustdoc's `LifetimePredicate` and
-/// `EqPredicate` are intentionally out of scope (ADR D3). Bound encoding rejects
-/// `?Sized`-style relaxations, HRTB on `TraitBound`, and `Use` variants
-/// fail-closed at the codec boundary.
+/// (ADR `2026-05-18-1223-make-catalogue-schema-permissive` D1 — supersedes
+/// the earlier 2-field structure from `2026-05-13-1153-tddd-where-form-generics-normalization` D2)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WherePredicateDecl {
     /// The left-hand side type expression of the where predicate.
     ///
-    /// May be a bare identifier (`R`), a parameterised type (`Vec<T>`,
-    /// `Hoge<Fuga>`), or a projection (`T::Item`). The codec validates this
-    /// as a non-empty `TypeRef`; full Rust type-expression syntax checking
-    /// happens during A-codec encoding (`parse_type_ref_str`).
-    pub type_: TypeRef,
-    /// The trait bounds imposed on `type_` (e.g. `[Clone]`, `[Send + Sync]`).
+    /// May be a bare identifier (`T`), a parameterised type (`Vec<T>`,
+    /// `Hoge<Fuga>`), a projection (`T::Item`), or an HRTB-prefixed
+    /// expression (`for<'a> T::Item<'a>`).  The codec validates this as a
+    /// non-empty string; full Rust type-expression syntax checking happens
+    /// during A-codec encoding.
+    pub lhs: TypeRef,
+    /// The right-hand side bounds of the where predicate.
     ///
-    /// Each entry is a non-empty trait reference validated via
-    /// `syn::TypeParamBound` at the codec boundary, identical to
-    /// [`MethodGenericParam::bounds`].
-    pub bounds: Vec<TypeRef>,
+    /// For `BoundOp::Bound` predicates: the `+`-separated list of trait /
+    /// lifetime bounds (e.g. `[Clone, Send]` for `T: Clone + Send`).
+    /// For `BoundOp::Equal` predicates: a single-element Vec (e.g. `[U]`
+    /// for `T::Assoc = U`).
+    ///
+    /// Each element is a non-empty string validated at the codec boundary.
+    pub rhs: Vec<TypeRef>,
+    /// The predicate operator.
+    ///
+    /// Defaults to `BoundOp::Bound` (the `:` operator).
+    pub operator: BoundOp,
 }
 
 // ---------------------------------------------------------------------------
@@ -292,9 +323,11 @@ impl MethodDeclaration {
                 .where_predicates
                 .iter()
                 .map(|w| {
-                    let bounds_str =
-                        w.bounds.iter().map(|b| b.as_str()).collect::<Vec<_>>().join(" + ");
-                    format!("{}: {}", w.type_.as_str(), bounds_str)
+                    let rhs_str = w.rhs.iter().map(|b| b.as_str()).collect::<Vec<_>>().join(" + ");
+                    match w.operator {
+                        BoundOp::Bound => format!("{}: {}", w.lhs.as_str(), rhs_str),
+                        BoundOp::Equal => format!("{} = {}", w.lhs.as_str(), rhs_str),
+                    }
                 })
                 .collect();
             format!(" where {}", preds.join(", "))
@@ -623,20 +656,99 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // WherePredicateDecl / MethodDeclaration.where_predicates (ADR 2026-05-13-1153)
+    // BoundOp — operator enum (ADR 2026-05-18-1223 D1)
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_where_predicate_decl_stores_type_and_bounds() {
-        let w = WherePredicateDecl {
-            type_: TypeRef::new("Vec<T>").unwrap(),
-            bounds: vec![TypeRef::new("Send").unwrap(), TypeRef::new("Sync").unwrap()],
-        };
-        assert_eq!(w.type_.as_str(), "Vec<T>");
-        assert_eq!(w.bounds.len(), 2);
-        assert_eq!(w.bounds[0].as_str(), "Send");
-        assert_eq!(w.bounds[1].as_str(), "Sync");
+    fn test_bound_op_default_is_bound() {
+        let op = BoundOp::default();
+        assert_eq!(op, BoundOp::Bound, "BoundOp::default() must be BoundOp::Bound");
     }
+
+    #[test]
+    fn test_bound_op_bound_and_equal_are_distinct() {
+        assert_ne!(BoundOp::Bound, BoundOp::Equal);
+    }
+
+    // -----------------------------------------------------------------------
+    // WherePredicateDecl — 3-field structure (ADR 2026-05-18-1223 D1)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_where_predicate_decl_stores_lhs_rhs_operator_bound() {
+        let w = WherePredicateDecl {
+            lhs: TypeRef::new("Vec<T>").unwrap(),
+            rhs: vec![TypeRef::new("Send").unwrap(), TypeRef::new("Sync").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        assert_eq!(w.lhs.as_str(), "Vec<T>");
+        assert_eq!(w.rhs.len(), 2);
+        assert_eq!(w.rhs[0].as_str(), "Send");
+        assert_eq!(w.rhs[1].as_str(), "Sync");
+        assert_eq!(w.operator, BoundOp::Bound);
+    }
+
+    #[test]
+    fn test_where_predicate_decl_stores_lhs_rhs_operator_equal() {
+        let w = WherePredicateDecl {
+            lhs: TypeRef::new("T::Assoc").unwrap(),
+            rhs: vec![TypeRef::new("u32").unwrap()],
+            operator: BoundOp::Equal,
+        };
+        assert_eq!(w.lhs.as_str(), "T::Assoc");
+        assert_eq!(w.rhs.len(), 1);
+        assert_eq!(w.rhs[0].as_str(), "u32");
+        assert_eq!(w.operator, BoundOp::Equal);
+    }
+
+    #[test]
+    fn test_where_predicate_decl_equality_depends_on_all_three_fields() {
+        let base = WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        let different_operator = WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Equal,
+        };
+        let different_lhs = WherePredicateDecl {
+            lhs: TypeRef::new("U").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        let different_rhs = WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Send").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        let equal = WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        assert_eq!(base, equal);
+        assert_ne!(base, different_operator);
+        assert_ne!(base, different_lhs);
+        assert_ne!(base, different_rhs);
+    }
+
+    #[test]
+    fn test_where_predicate_decl_hrtb_lhs_is_supported() {
+        // HRTB バインダーは lhs 先頭に組み込む (ADR D1)
+        let w = WherePredicateDecl {
+            lhs: TypeRef::new("for<'a> T::Item<'a>").unwrap(),
+            rhs: vec![TypeRef::new("Send").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        assert_eq!(w.lhs.as_str(), "for<'a> T::Item<'a>");
+        assert_eq!(w.operator, BoundOp::Bound);
+    }
+
+    // -----------------------------------------------------------------------
+    // WherePredicateDecl / MethodDeclaration.where_predicates
+    // -----------------------------------------------------------------------
 
     #[test]
     fn test_method_declaration_new_defaults_where_predicates_to_empty() {
@@ -655,18 +767,35 @@ mod tests {
     }
 
     #[test]
-    fn test_method_declaration_where_predicates_render_in_signature_string() {
+    fn test_method_declaration_where_predicates_render_in_signature_string_bound() {
         let name = MethodName::new("collect").unwrap();
         let returns = TypeRef::new("Vec<T>").unwrap();
         let mut decl = MethodDeclaration::associated_function(name, vec![], returns);
         decl.generics =
             vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
         decl.where_predicates = vec![WherePredicateDecl {
-            type_: TypeRef::new("T").unwrap(),
-            bounds: vec![TypeRef::new("Clone").unwrap()],
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap()],
+            operator: BoundOp::Bound,
         }];
         let sig = decl.signature_string();
         assert!(sig.contains(" where T: Clone"), "sig={sig}");
+    }
+
+    #[test]
+    fn test_method_declaration_where_predicates_render_in_signature_string_equal() {
+        let name = MethodName::new("project").unwrap();
+        let returns = TypeRef::new("()").unwrap();
+        let mut decl = MethodDeclaration::associated_function(name, vec![], returns);
+        decl.generics =
+            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+        decl.where_predicates = vec![WherePredicateDecl {
+            lhs: TypeRef::new("T::Assoc").unwrap(),
+            rhs: vec![TypeRef::new("u32").unwrap()],
+            operator: BoundOp::Equal,
+        }];
+        let sig = decl.signature_string();
+        assert!(sig.contains(" where T::Assoc = u32"), "sig={sig}");
     }
 
     #[test]
@@ -683,12 +812,31 @@ mod tests {
         );
         let mut constrained = unconstrained.clone();
         constrained.where_predicates = vec![WherePredicateDecl {
-            type_: TypeRef::new("T").unwrap(),
-            bounds: vec![TypeRef::new("Send").unwrap()],
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Send").unwrap()],
+            operator: BoundOp::Bound,
         }];
         assert_ne!(
             unconstrained, constrained,
             "where_predicates participates in MethodDeclaration equality"
         );
+    }
+
+    #[test]
+    fn test_where_predicate_decl_round_trip_equality() {
+        // Domain round-trip test: construct → clone → compare (ADR 2026-05-18-1223 D1)
+        let pred = WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("Clone").unwrap(), TypeRef::new("Send").unwrap()],
+            operator: BoundOp::Bound,
+        };
+        let pred2 = pred.clone();
+        assert_eq!(pred, pred2, "WherePredicateDecl must satisfy clone equality");
+        // field accessors work correctly after clone
+        assert_eq!(pred2.lhs.as_str(), "T");
+        assert_eq!(pred2.rhs.len(), 2);
+        assert_eq!(pred2.rhs[0].as_str(), "Clone");
+        assert_eq!(pred2.rhs[1].as_str(), "Send");
+        assert_eq!(pred2.operator, BoundOp::Bound);
     }
 }

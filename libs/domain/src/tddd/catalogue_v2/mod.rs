@@ -44,18 +44,20 @@ pub use composite::{TypeKindV2, TypestateMarker, TypestateTransitions};
 
 pub use document::{CatalogueDocument, CatalogueDocumentError};
 
-pub use entries::{FunctionEntry, TraitEntry, TypeEntry};
+pub use entries::{FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry};
 
 pub use identifiers::{
     CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError, MethodName,
     ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
 };
 
-pub use methods::{MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl};
+pub use methods::{
+    BoundOp, MethodDeclaration, MethodGenericParam, ParamDeclaration, WherePredicateDecl,
+};
 
 pub use roles::{ContractRole, DataRole, FunctionRole, ItemAction, SelfReceiver};
 
-pub use traits::{GenericArgsError, TraitImplDeclV2};
+pub use traits::TraitImplDeclV2;
 
 pub use variants::{FieldDecl, VariantDecl, VariantPayload};
 

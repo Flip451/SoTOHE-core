@@ -1628,18 +1628,457 @@ fn test_t037_no_spurious_signals_with_overlapping_a_b_ids() {
 }
 
 // -----------------------------------------------------------------------
-// T038 regression: A-side TypeAlias orphan-impl pass (Symptom B / IN-31)
+// T008 regression: A-side pre-step — build_a_id_remap (IN-10)
+// -----------------------------------------------------------------------
+
+/// T008 (a): When A-side Ids and B-side Ids share the same numeric values,
+/// `a_id_remap` pre-allocates a fresh S Id for every A item before action
+/// processing begins.  After Phase 1, every A-sourced item must reside at a
+/// fresh S Id that does NOT collide with any B-sourced item's S Id.
+///
+/// Fixture:
+///   A: `Foo` (Add) at Id(1), impl block at Id(2) whose `for_` points to Id(1).
+///   B: `Bar` at Id(1) (same numeric Id as A's Foo), impl block at Id(2).
+///
+/// Expected: Foo and Bar are at *distinct* fresh S Ids.  The impl block for
+/// Foo must have its `for_.id` pointing to the new S Id of Foo (not Bar's Id
+/// and not the original A-side Id(1)).
+#[test]
+#[allow(clippy::panic)]
+fn test_t008_a_id_remap_resolves_collisions() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+
+    // --- B: `Bar` at Id(1), impl at Id(2) ---
+    let b_bar_id = Id(1);
+    let b_impl_id = Id(2);
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+    b_index.insert(root_id, root_module_item(root_id, crate_name, vec![b_bar_id, b_impl_id]));
+    b_index.insert(
+        b_bar_id,
+        make_item(
+            b_bar_id,
+            Some("Bar"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![b_impl_id],
+            }),
+        ),
+    );
+    b_index.insert(
+        b_impl_id,
+        make_item(
+            b_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Bar".to_string(),
+                    id: b_bar_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    b_paths.insert(
+        b_bar_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let b = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // --- A: `Foo` (Add) at Id(1) — same numeric Id as B's Bar.
+    //       impl at Id(2) whose for_ points to Id(1) (A's Foo). ---
+    let a_foo_id = Id(1); // collides numerically with b_bar_id
+    let a_impl_id = Id(2); // collides numerically with b_impl_id
+    let mut a_index = HashMap::new();
+    let mut a_paths = HashMap::new();
+    a_index.insert(root_id, root_module_item(root_id, crate_name, vec![a_foo_id, a_impl_id]));
+    a_index.insert(
+        a_foo_id,
+        make_item(
+            a_foo_id,
+            Some("Foo"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![a_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_impl_id,
+        make_item(
+            a_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Foo".to_string(),
+                    id: a_foo_id, // references A's Foo at Id(1) — will be remapped
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    a_paths.insert(
+        a_foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let a_krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: a_index,
+        paths: a_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let mut a_actions = BTreeMap::new();
+    a_actions.insert(a_foo_id, ItemAction::Add);
+    let a = ExtendedCrate::new(a_krate, a_actions);
+
+    // --- Run Phase 1 ---
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // --- Verify: Foo and Bar are at distinct fresh S Ids ---
+    let foo_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Foo"))
+        .expect("Foo must be in S (Add action)");
+    let bar_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Bar"))
+        .expect("Bar must be in S (B-side Reference)");
+
+    let foo_s_id = foo_item.id;
+    let bar_s_id = bar_item.id;
+    assert_ne!(
+        foo_s_id, bar_s_id,
+        "T008: Foo and Bar must occupy distinct S Ids; got the same Id {foo_s_id:?}"
+    );
+    // Both must be at fresh Ids (not the original A/B Id(1)).
+    assert_ne!(
+        foo_s_id,
+        Id(1),
+        "T008: Foo's S Id must be a fresh Id (not the original A-side Id(1))"
+    );
+    assert_ne!(
+        bar_s_id,
+        Id(1),
+        "T008: Bar's S Id must be a fresh Id (not the original B-side Id(1))"
+    );
+
+    // --- Verify: the impl block for Foo has for_.id pointing to Foo's S Id ---
+    // The impl block associated with Foo (A-sourced) must have its for_.id
+    // updated to foo_s_id so that Phase 1.6 / Phase 2 finds a valid parent.
+    let foo_impl = s.krate().index.values().find(|item| {
+        if let ItemEnum::Impl(impl_) = &item.inner {
+            if let Type::ResolvedPath(p) = &impl_.for_ { p.path == "Foo" } else { false }
+        } else {
+            false
+        }
+    });
+    assert!(foo_impl.is_some(), "T008: an Impl with for_=Foo must be present in S");
+    let foo_impl_inner = match &foo_impl.unwrap().inner {
+        ItemEnum::Impl(i) => i,
+        _ => panic!("expected Impl"),
+    };
+    let for_id = match &foo_impl_inner.for_ {
+        Type::ResolvedPath(p) => p.id,
+        _ => panic!("expected ResolvedPath for_"),
+    };
+    assert_eq!(
+        for_id, foo_s_id,
+        "T008: Foo's impl block for_.id must point to Foo's fresh S Id {foo_s_id:?}, got {for_id:?}"
+    );
+}
+
+/// T008 (b): After the A-side pre-step (`a_id_remap`) is built and action processing
+/// runs, the id_map for both Add and Modify actions must contain a mapping entry
+/// for the parent type's A-side Id.  This confirms that `rewrite_type_ref_ids_in_item`
+/// can remap `for_.id` and other local type refs without needing `patch_impl_for_ids`
+/// as a fallback.
+///
+/// Fixture:
+///   A: `Foo` (Add) at Id(1) + `Bar` (Modify, also in B) at Id(2).
+///   B: `Bar` at Id(1).
+///
+/// Expected:
+///   - Foo (Add): its impl's for_.id resolves to Foo's S Id (a_id_remap applied).
+///   - Bar (Modify): its impl's for_.id resolves to Bar's S Id (same as B-seeded Id).
+#[test]
+#[allow(clippy::panic)]
+fn test_t008_a_id_remap_built_after_pre_step_includes_parent_types() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+
+    // --- B: `Bar` at Id(1) ---
+    let b_bar_id = Id(1);
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+    b_index.insert(root_id, root_module_item(root_id, crate_name, vec![b_bar_id]));
+    b_index.insert(b_bar_id, struct_item(b_bar_id, "Bar"));
+    b_paths.insert(
+        b_bar_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let b = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // --- A: `Foo` (Add) at Id(1), `Bar` (Modify) at Id(2), each with an impl block ---
+    let a_foo_id = Id(1);
+    let a_foo_impl_id = Id(3);
+    let a_bar_id = Id(2);
+    let a_bar_impl_id = Id(4);
+    let mut a_index = HashMap::new();
+    let mut a_paths = HashMap::new();
+
+    a_index.insert(
+        root_id,
+        root_module_item(
+            root_id,
+            crate_name,
+            vec![a_foo_id, a_bar_id, a_foo_impl_id, a_bar_impl_id],
+        ),
+    );
+    // Foo (Add) with an impl block pointing to a_foo_id.
+    a_index.insert(
+        a_foo_id,
+        make_item(
+            a_foo_id,
+            Some("Foo"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![a_foo_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_foo_impl_id,
+        make_item(
+            a_foo_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Foo".to_string(),
+                    id: a_foo_id, // references A's Foo — must be remapped via a_id_remap
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    // Bar (Modify) with an impl block pointing to a_bar_id.
+    a_index.insert(
+        a_bar_id,
+        make_item(
+            a_bar_id,
+            Some("Bar"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![a_bar_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_bar_impl_id,
+        make_item(
+            a_bar_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Bar".to_string(),
+                    id: a_bar_id, // references A's Bar — must be remapped via a_id_remap
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    a_paths.insert(
+        a_foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    a_paths.insert(
+        a_bar_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Bar".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let a_krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: a_index,
+        paths: a_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let mut a_actions = BTreeMap::new();
+    a_actions.insert(a_foo_id, ItemAction::Add);
+    a_actions.insert(a_bar_id, ItemAction::Modify);
+    let a = ExtendedCrate::new(a_krate, a_actions);
+
+    // --- Run Phase 1 ---
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // --- Verify Foo (Add) impl: for_.id must point to Foo's S Id ---
+    let foo_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Foo"))
+        .expect("Foo must be in S");
+    let foo_s_id = foo_item.id;
+
+    let foo_impl = s.krate().index.values().find(|item| {
+        if let ItemEnum::Impl(impl_) = &item.inner {
+            if let Type::ResolvedPath(p) = &impl_.for_ { p.path == "Foo" } else { false }
+        } else {
+            false
+        }
+    });
+    assert!(foo_impl.is_some(), "T008(b): impl for Foo must be in S");
+    let foo_impl_for_id = match &foo_impl.unwrap().inner {
+        ItemEnum::Impl(i) => match &i.for_ {
+            Type::ResolvedPath(p) => p.id,
+            _ => panic!("expected ResolvedPath"),
+        },
+        _ => panic!("expected Impl"),
+    };
+    assert_eq!(
+        foo_impl_for_id, foo_s_id,
+        "T008(b) Add: impl for Foo must have for_.id = Foo's S Id {foo_s_id:?} (via a_id_remap); \
+         got {foo_impl_for_id:?}"
+    );
+
+    // --- Verify Bar (Modify) impl: for_.id must point to Bar's S Id ---
+    let bar_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("Bar"))
+        .expect("Bar must be in S");
+    let bar_s_id = bar_item.id;
+
+    let bar_impl = s.krate().index.values().find(|item| {
+        if let ItemEnum::Impl(impl_) = &item.inner {
+            if let Type::ResolvedPath(p) = &impl_.for_ { p.path == "Bar" } else { false }
+        } else {
+            false
+        }
+    });
+    assert!(bar_impl.is_some(), "T008(b): impl for Bar must be in S");
+    let bar_impl_for_id = match &bar_impl.unwrap().inner {
+        ItemEnum::Impl(i) => match &i.for_ {
+            Type::ResolvedPath(p) => p.id,
+            _ => panic!("expected ResolvedPath"),
+        },
+        _ => panic!("expected Impl"),
+    };
+    assert_eq!(
+        bar_impl_for_id, bar_s_id,
+        "T008(b) Modify: impl for Bar must have for_.id = Bar's S Id {bar_s_id:?} (via a_id_remap); \
+         got {bar_impl_for_id:?}"
+    );
+}
+
+// -----------------------------------------------------------------------
+// T038 regression: A-side standalone impl insertion loop (TypeAlias case)
 // -----------------------------------------------------------------------
 
 /// T038 regression: A-side `TypeAlias` trait-impls that are standalone in
 /// `a_krate.index` (not referenced by any `Struct.impls` / `Enum.impls`) must be
-/// imported into S by the A-side orphan-impl pass.
+/// imported into S by the A-side unified impl insertion loop (ADR `2026-05-20-0048` D4).
 ///
-/// Before T038, only the B-side orphan-impl pass existed; A-side standalone
-/// `Impl` items (generated by `encode_type_alias` because `TypeAlias` has no
-/// `impls` field) were not reached by the type-processing loop, so Phase 2's
-/// `build_impl_identity_map` found them only in C and produced spurious
-/// `CMinusSUnionD` (Red) signals.
+/// Per ADR D1, all catalogue-declared trait impl items are top-level independent entries
+/// with their OWN `Add` action in `a_item_actions` (set by the codec's `trait_impls`
+/// encoding loop). The TypeAlias case is now handled by the same unified loop as all
+/// other trait impls — no parent-action inheritance is needed.
+///
+/// Before T038, only the B-side pass existed; A-side standalone `Impl` items were
+/// not reached by the type-processing loop (Step 4 follows `Struct.impls` / `Enum.impls`,
+/// which TypeAlias does not have), so Phase 2 found them only in C and produced
+/// spurious `CMinusSUnionD` (Red) signals.
 #[test]
 fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
     use super::phase1::phase1_build_s_and_d;
@@ -1648,14 +2087,15 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
     let crate_name = "my_crate";
     let root_id = Id(0);
     let alias_id = Id(1);
-    let orphan_impl_id = Id(2);
+    let standalone_impl_id = Id(2);
 
     // A: TypeAlias `MyAlias` (Add) + standalone Impl for MyAlias not referenced
     // by any Struct/Enum `impls` field (TypeAlias has no `impls` field at all).
     let mut a_index = HashMap::new();
     let mut a_paths = HashMap::new();
 
-    a_index.insert(root_id, root_module_item(root_id, crate_name, vec![alias_id, orphan_impl_id]));
+    a_index
+        .insert(root_id, root_module_item(root_id, crate_name, vec![alias_id, standalone_impl_id]));
     a_index.insert(
         alias_id,
         make_item(
@@ -1669,7 +2109,7 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
             }),
         ),
     );
-    // Id used for the external trait `MyTrait` in the orphan impl.  Must be in
+    // Id used for the external trait `MyTrait` in the standalone impl.  Must be in
     // a_paths with crate_id != 0 so Phase 1.45 remaps it to a fresh S id and
     // Phase 1.6 validates it as "A-side external — valid".
     let my_trait_id = Id(98);
@@ -1690,8 +2130,8 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
         },
     );
 
-    // The orphan Impl: `impl MyTrait for MyAlias`.
-    let orphan_impl_inner = Impl {
+    // The standalone Impl: `impl MyTrait for MyAlias`.
+    let standalone_impl_inner = Impl {
         is_unsafe: false,
         generics: empty_generics(),
         provided_trait_methods: vec![],
@@ -1702,14 +2142,17 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
         is_negative: false,
         blanket_impl: None,
     };
-    a_index
-        .insert(orphan_impl_id, make_item(orphan_impl_id, None, ItemEnum::Impl(orphan_impl_inner)));
-    // NOTE: no `a_paths` entry for the orphan impl — impls typically have no path entry.
+    a_index.insert(
+        standalone_impl_id,
+        make_item(standalone_impl_id, None, ItemEnum::Impl(standalone_impl_inner)),
+    );
+    // NOTE: no `a_paths` entry for the standalone impl — impls typically have no path entry.
 
     let mut a_actions = BTreeMap::new();
     a_actions.insert(alias_id, ItemAction::Add);
-    // No action entry for orphan_impl_id — the pass inherits action from the
-    // parent type (alias_id → Add).
+    // Per ADR `2026-05-20-0048` D4: the impl has its OWN `Add` action — no parent inheritance.
+    // The codec always assigns `ItemAction::Add` to each top-level `trait_impls` entry.
+    a_actions.insert(standalone_impl_id, ItemAction::Add);
 
     let a_krate = Crate {
         root: root_id,
@@ -1730,8 +2173,7 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
     let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
 
     // Assert: an Impl item with trait "MyTrait" must be in S (imported by the
-    // A-side orphan-impl pass).  Before T038, this Impl would be absent from S
-    // even though Phase 2 finds it in C, producing spurious CMinusSUnionD.
+    // A-side unified impl insertion loop, ADR D4).
     let s_impl = s.krate().index.values().find(|item| {
         if let ItemEnum::Impl(impl_) = &item.inner {
             impl_.trait_.as_ref().map(|p| p.path.as_str()) == Some("MyTrait")
@@ -1741,7 +2183,7 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
     });
     assert!(
         s_impl.is_some(),
-        "T038: orphan A-side Impl for MyAlias must be imported into S; \
+        "T038: standalone A-side Impl for MyAlias must be imported into S via the unified loop; \
          S Impls: {:?}",
         s.krate()
             .index
@@ -1756,12 +2198,12 @@ fn test_t038_a_side_orphan_impl_pass_imports_typealias_trait_impl_into_s() {
             .collect::<Vec<_>>()
     );
 
-    // Assert: the imported orphan impl carries the parent TypeAlias's action (Add).
+    // Assert: the imported impl carries its OWN action (Add) from a_item_actions.
     let s_impl_id = s_impl.expect("checked above").id;
     assert_eq!(
         s.action_for(&s_impl_id),
         Some(ItemAction::Add),
-        "T038: orphan Impl must inherit the parent TypeAlias's action (Add)"
+        "T038: standalone Impl must carry its own Add action (no parent inheritance)"
     );
 }
 
@@ -2247,6 +2689,670 @@ fn test_t043_generic_in_parenthesized_and_fn_pointer_positions_stripped() {
     );
 }
 
+// -----------------------------------------------------------------------
+// T012 regression: cross-crate impl (for_ is external type) included in identity map
+// -----------------------------------------------------------------------
+
+/// Helper: build a `rustdoc_types::Crate` that contains a local type `local_type_name` and an
+/// `impl local_trait_name for ExternalType` block, where `ExternalType` lives in an external crate
+/// (`crate_id != 0`).
+///
+/// `external_crate_name` is registered in `krate.external_crates` (external_crate_id = 2).
+/// The external type's `crate_id` in `krate.index` is set to 2 so that
+/// `build_impl_identity_map`'s loop skips the type item itself (crate_id != 0) but still
+/// processes the Impl item (the impl item itself always has crate_id == 0 because the impl
+/// was declared in THIS crate).
+///
+/// This fixture models `impl LocalTrait for ExternalType` — a "cross-crate target" impl where
+/// the impl is defined in the local crate but the implementing type (`for_`) is external.
+fn crate_with_cross_crate_target_impl(
+    crate_name: &str,
+    local_trait_name: &str,
+    external_type_name: &str,
+    external_crate_name: &str,
+) -> Crate {
+    use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
+
+    let root_id = Id(0);
+    let local_trait_id = Id(1);
+    let impl_id = Id(2);
+    // The external type's item is in the index but with crate_id != 0.
+    let external_type_id = Id(3);
+    let external_type_crate_id: u32 = 2;
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+    let mut external_crates = HashMap::new();
+
+    // Root module references the local trait and the impl.
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![local_trait_id, impl_id]));
+
+    // Local trait item (crate_id == 0).
+    index.insert(
+        local_trait_id,
+        make_item(
+            local_trait_id,
+            Some(local_trait_name),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    paths.insert(
+        local_trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), local_trait_name.to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // External type entry in the index with crate_id != 0 — so the type item is skipped by the
+    // `crate_id != 0` loop guard, but the Impl item (which has crate_id == 0) is still processed.
+    let mut external_type_item = make_item(
+        external_type_id,
+        Some(external_type_name),
+        ItemEnum::Struct(Struct {
+            kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+            generics: empty_generics(),
+            impls: vec![],
+        }),
+    );
+    external_type_item.crate_id = external_type_crate_id; // mark as external
+    index.insert(external_type_id, external_type_item);
+    // The external type appears in krate.paths with crate_id != 0.
+    paths.insert(
+        external_type_id,
+        ItemSummary {
+            crate_id: external_type_crate_id,
+            path: vec![external_crate_name.to_string(), external_type_name.to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    // Register the external crate.
+    external_crates.insert(
+        external_type_crate_id,
+        ExternalCrate {
+            name: external_crate_name.to_string(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+
+    // The impl `impl LocalTrait for ExternalType` — the Impl item itself has crate_id == 0
+    // (it was declared in THIS crate).
+    let cross_crate_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath {
+            path: local_trait_name.to_string(),
+            id: local_trait_id, // local trait — in krate.paths with crate_id == 0
+            args: None,
+        }),
+        for_: Type::ResolvedPath(RdPath {
+            path: external_type_name.to_string(),
+            id: external_type_id, // external type
+            args: None,
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(impl_id, make_item(impl_id, None, ItemEnum::Impl(cross_crate_impl)));
+
+    Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates,
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    }
+}
+
+/// T012 (new behavior, ADR D4): `impl LocalTrait for ExternalType` where `ExternalType` is an
+/// external type (`for_` has `crate_id != 0` in `krate.paths`) must be included in
+/// `build_impl_identity_map`.
+///
+/// Before T012, a `for_is_external` guard filtered these out.  After T012, the guard is removed
+/// per ADR D4 (catalogue-schema-permissive): both C-side and S-side (B-side orphan-impl pass)
+/// include cross-crate impls symmetrically so that fingerprints match and no spurious
+/// `CMinusSUnionD` signal is generated.
+///
+/// This test validates the **new behavior** (inclusion).
+#[test]
+fn test_t012_cross_crate_target_impl_included_in_identity_map() {
+    use super::build_impl_identity_map;
+
+    let crate_name = "my_crate";
+    let krate = crate_with_cross_crate_target_impl(
+        crate_name,
+        "MyLocalTrait",
+        "ExternalType",
+        "external_crate",
+    );
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    // The identity key is formed as "{for_name}: {trait_str}".
+    // `for_name` = `format_type(&impl_.for_)` = last path segment of `ExternalType` = "ExternalType".
+    // `trait_str` = normalized local trait = "MyLocalTrait" (local trait → stripped to short name).
+    let expected_key = "ExternalType: MyLocalTrait";
+    assert!(
+        map.contains_key(expected_key),
+        "T012: cross-crate target impl `impl MyLocalTrait for ExternalType` must be included \
+         in build_impl_identity_map after D4 filter removal; \
+         all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+}
+
+/// T012 (local-crate target regression): `impl LocalTrait for LocalType` (both `for_` and `trait_`
+/// are local, `crate_id == 0`) must continue to be included in `build_impl_identity_map`.
+///
+/// This is a regression guard: the D4 filter removal must not break the existing behavior
+/// for ordinary same-crate impls.
+#[test]
+fn test_t012_local_crate_target_impl_still_included_in_identity_map() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let struct_id = Id(1);
+    let trait_id = Id(2);
+    let impl_id = Id(3);
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+
+    index
+        .insert(root_id, root_module_item(root_id, crate_name, vec![struct_id, trait_id, impl_id]));
+    index.insert(struct_id, struct_item(struct_id, "LocalType"));
+    index.insert(
+        trait_id,
+        make_item(
+            trait_id,
+            Some("LocalTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    paths.insert(
+        struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "LocalType".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "LocalTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // `impl LocalTrait for LocalType` — both sides are local.
+    let local_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "LocalTrait".to_string(), id: trait_id, args: None }),
+        for_: Type::ResolvedPath(RdPath {
+            path: "LocalType".to_string(),
+            id: struct_id,
+            args: None,
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(impl_id, make_item(impl_id, None, ItemEnum::Impl(local_impl)));
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    // Both `for_` (local → short name "LocalType") and `trait_` (local → short name "LocalTrait")
+    // produce the key "LocalType: LocalTrait".
+    let expected_key = "LocalType: LocalTrait";
+    assert!(
+        map.contains_key(expected_key),
+        "T012 regression: local-crate impl `impl LocalTrait for LocalType` must still be included \
+         in build_impl_identity_map; all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+}
+
+/// T012 (excluded by inherent/negative/synthetic/blanket filter): cross-crate target impls that
+/// are inherent (no trait), negative, synthetic, or blanket must still be excluded —
+/// the D4 change only removed the `for_is_external` guard, not the other guards.
+///
+/// Validates that the non-`for_`-based exclusion guards are intact after T012.
+#[test]
+fn test_t012_excluded_impl_variants_still_excluded() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let struct_id = Id(1);
+    let trait_id = Id(2);
+    // external_type for `for_` — crate_id != 0.
+    let external_type_id = Id(3);
+    let external_type_crate_id: u32 = 2;
+
+    // --- Inherent impl with external `for_` (no trait_ → excluded) ---
+    {
+        let mut index = HashMap::new();
+        let mut paths = HashMap::new();
+        let mut external_crates = HashMap::new();
+
+        index.insert(root_id, root_module_item(root_id, crate_name, vec![struct_id]));
+        index.insert(struct_id, struct_item(struct_id, "LocalHelper"));
+        paths.insert(
+            struct_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "LocalHelper".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let mut ext_item = make_item(
+            external_type_id,
+            Some("ExtType"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        );
+        ext_item.crate_id = external_type_crate_id;
+        index.insert(external_type_id, ext_item);
+        paths.insert(
+            external_type_id,
+            ItemSummary {
+                crate_id: external_type_crate_id,
+                path: vec!["ext".to_string(), "ExtType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        external_crates.insert(
+            external_type_crate_id,
+            rustdoc_types::ExternalCrate {
+                name: "ext".to_string(),
+                html_root_url: None,
+                path: std::path::PathBuf::new(),
+            },
+        );
+
+        // Inherent impl (no trait_) — must be excluded regardless of D4.
+        let inherent_impl_id = Id(10);
+        let inherent_impl = Impl {
+            is_unsafe: false,
+            generics: empty_generics(),
+            provided_trait_methods: vec![],
+            trait_: None, // inherent impl — excluded
+            for_: Type::ResolvedPath(RdPath {
+                path: "ExtType".to_string(),
+                id: external_type_id,
+                args: None,
+            }),
+            items: vec![],
+            is_synthetic: false,
+            is_negative: false,
+            blanket_impl: None,
+        };
+        index.insert(
+            inherent_impl_id,
+            make_item(inherent_impl_id, None, ItemEnum::Impl(inherent_impl)),
+        );
+
+        let krate = Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates,
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+        let map = build_impl_identity_map(&krate, crate_name);
+        assert!(
+            map.is_empty(),
+            "T012: inherent impl (no trait) must be excluded; keys: {:?}",
+            map.keys().collect::<Vec<_>>()
+        );
+    }
+
+    // --- Negative impl with external `for_` — must be excluded ---
+    {
+        let mut index = HashMap::new();
+        let mut paths = HashMap::new();
+        let mut external_crates = HashMap::new();
+
+        index.insert(root_id, root_module_item(root_id, crate_name, vec![trait_id]));
+        index.insert(
+            trait_id,
+            make_item(
+                trait_id,
+                Some("LocalTrait"),
+                ItemEnum::Trait(rustdoc_types::Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        paths.insert(
+            trait_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "LocalTrait".to_string()],
+                kind: ItemKind::Trait,
+            },
+        );
+
+        let mut ext_item = make_item(
+            external_type_id,
+            Some("ExtType"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![],
+            }),
+        );
+        ext_item.crate_id = external_type_crate_id;
+        index.insert(external_type_id, ext_item);
+        paths.insert(
+            external_type_id,
+            ItemSummary {
+                crate_id: external_type_crate_id,
+                path: vec!["ext".to_string(), "ExtType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        external_crates.insert(
+            external_type_crate_id,
+            rustdoc_types::ExternalCrate {
+                name: "ext".to_string(),
+                html_root_url: None,
+                path: std::path::PathBuf::new(),
+            },
+        );
+
+        let neg_impl_id = Id(11);
+        let neg_impl = Impl {
+            is_unsafe: false,
+            generics: empty_generics(),
+            provided_trait_methods: vec![],
+            trait_: Some(RdPath { path: "LocalTrait".to_string(), id: trait_id, args: None }),
+            for_: Type::ResolvedPath(RdPath {
+                path: "ExtType".to_string(),
+                id: external_type_id,
+                args: None,
+            }),
+            items: vec![],
+            is_synthetic: false,
+            is_negative: true, // negative impl — excluded
+            blanket_impl: None,
+        };
+        index.insert(neg_impl_id, make_item(neg_impl_id, None, ItemEnum::Impl(neg_impl)));
+
+        let krate = Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates,
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+        let map = build_impl_identity_map(&krate, crate_name);
+        assert!(
+            map.is_empty(),
+            "T012: negative impl must be excluded; keys: {:?}",
+            map.keys().collect::<Vec<_>>()
+        );
+    }
+}
+
+/// T012 (collision tiebreaker): when two impls produce the same short-name key because two
+/// different `for_` path strings share the same last segment (e.g., `"MyError"` and
+/// `"ext_crate::MyError"` both produce short name `"MyError"`), `build_impl_identity_map`
+/// must resolve the collision *deterministically using the raw `for_` path string* — not by
+/// raw `Id` value.
+///
+/// The raw `for_` path string (`Type::ResolvedPath.path`) is preserved identically in
+/// B-origin orphan impls and C-side rustdoc output, making the tiebreaker consistent across
+/// both sides and preventing a spurious structural mismatch in Phase 2.
+///
+/// The test is structured so that the `for_path_raw` tiebreaker is decisive: the impl whose
+/// `for_.path` sorts lexicographically *earlier* (`"MyError"` < `"ext_crate::MyError"`) has a
+/// **larger** Id than its competitor.  An id-only sort would pick the wrong impl.
+#[test]
+fn test_t012_collision_tiebreaker_uses_for_path_not_id() {
+    use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
+
+    use super::build_impl_identity_map;
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+    let trait_id = Id(1);
+    // Local struct whose impl.for_.path will be the SHORT form "MyError".
+    let local_error_id = Id(2);
+    // External struct whose impl.for_.path will be the QUALIFIED form "ext_crate::MyError".
+    // format_type() takes the last segment of both → both produce the short name "MyError"
+    // → same identity key → collision.
+    let ext_error_id = Id(3);
+    let ext_crate_id: u32 = 2;
+
+    // Id assignment: the impl whose for_path_raw sorts earlier ("MyError") gets the LARGER id
+    // (10).  An id-only sort would incorrectly keep the impl with id 4 (ext impl,
+    // for_path_raw = "ext_crate::MyError").  The for_path_raw tiebreaker corrects this.
+    let impl_short_path_id = Id(10); // large id — for_path_raw = "MyError" (sorts first)
+    let impl_qualified_path_id = Id(4); // small id — for_path_raw = "ext_crate::MyError" (sorts second)
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+    let mut external_crates = HashMap::new();
+
+    index.insert(root_id, root_module_item(root_id, crate_name, vec![trait_id, local_error_id]));
+
+    // Trait (local).
+    index.insert(
+        trait_id,
+        make_item(
+            trait_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    paths.insert(
+        trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // Local struct. impl.for_.path will use the short form "MyError".
+    index.insert(local_error_id, struct_item(local_error_id, "MyError"));
+    paths.insert(
+        local_error_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyError".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    // External struct. impl.for_.path will use the qualified form "ext_crate::MyError"
+    // (rustdoc sometimes emits module-qualified paths for external types in impl.for_).
+    // format_type() strips to "MyError" → same key → collision.
+    let mut ext_item = make_item(
+        ext_error_id,
+        Some("MyError"),
+        ItemEnum::Struct(Struct {
+            kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+            generics: empty_generics(),
+            impls: vec![],
+        }),
+    );
+    ext_item.crate_id = ext_crate_id;
+    index.insert(ext_error_id, ext_item);
+    paths.insert(
+        ext_error_id,
+        ItemSummary {
+            crate_id: ext_crate_id,
+            path: vec!["ext_crate".to_string(), "MyError".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    external_crates.insert(
+        ext_crate_id,
+        ExternalCrate {
+            name: "ext_crate".to_string(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+
+    // impl MyTrait for local MyError — for_.path = "MyError" (short form).
+    // Assigned impl_short_path_id = Id(10) — the LARGER id.
+    let short_path_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "MyTrait".to_string(), id: trait_id, args: None }),
+        for_: Type::ResolvedPath(RdPath {
+            path: "MyError".to_string(), // short form — for_path_raw = "MyError"
+            id: local_error_id,
+            args: None,
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(
+        impl_short_path_id,
+        make_item(impl_short_path_id, None, ItemEnum::Impl(short_path_impl)),
+    );
+
+    // impl MyTrait for ext_crate::MyError — for_.path = "ext_crate::MyError" (qualified form,
+    // as rustdoc might emit for external types).  Assigned impl_qualified_path_id = Id(4) — the
+    // SMALLER id.  An id-only sort would keep THIS impl; the for_path_raw sort must override it.
+    let qualified_path_impl = Impl {
+        is_unsafe: false,
+        generics: empty_generics(),
+        provided_trait_methods: vec![],
+        trait_: Some(RdPath { path: "MyTrait".to_string(), id: trait_id, args: None }),
+        for_: Type::ResolvedPath(RdPath {
+            path: "ext_crate::MyError".to_string(), // qualified form — for_path_raw = "ext_crate::MyError"
+            id: ext_error_id,
+            args: None,
+        }),
+        items: vec![],
+        is_synthetic: false,
+        is_negative: false,
+        blanket_impl: None,
+    };
+    index.insert(
+        impl_qualified_path_id,
+        make_item(impl_qualified_path_id, None, ItemEnum::Impl(qualified_path_impl)),
+    );
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates,
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    // Both impls produce the same short-name key "MyError: MyTrait" (collision).
+    // The map must contain exactly one entry.
+    assert_eq!(
+        map.len(),
+        1,
+        "T012 collision tiebreaker: exactly one impl must survive; all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+    assert!(
+        map.contains_key("MyError: MyTrait"),
+        "T012 collision tiebreaker: the surviving key must be \"MyError: MyTrait\"; \
+         all keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+
+    // The for_path_raw tiebreaker must pick the impl with the lexicographically smaller
+    // path string regardless of Id ordering:
+    //   "MyError" < "ext_crate::MyError"  → impl_short_path_id (Id 10) wins
+    // Without the tiebreaker, impl_qualified_path_id (Id 4, the SMALLER id) would win instead.
+    let surviving_id = map["MyError: MyTrait"];
+    assert_eq!(
+        surviving_id, impl_short_path_id,
+        "T012 collision tiebreaker: the impl with the lexicographically smaller for_path_raw \
+         must win, regardless of Id ordering. Expected impl_short_path_id={:?} \
+         (for_path_raw=\"MyError\"), got {:?}. \
+         An id-only sort would have kept impl_qualified_path_id={:?} (Id 4, smaller).",
+        impl_short_path_id, surviving_id, impl_qualified_path_id
+    );
+}
+
 /// T043 (f): HRTB binders on `FunctionPointer` must be preserved (not collapsed to
 /// `<UNSUPPORTED:FunctionPointer>`).
 ///
@@ -2313,5 +3419,1128 @@ fn test_t043_hrtb_function_pointer_binders_preserved() {
         !rendered.contains('S'),
         "T043(f): impl-block param 'S' must be stripped inside the HRTB fn pointer; \
          got: {rendered:?}"
+    );
+}
+
+// -----------------------------------------------------------------------
+// T007: impl-block-level / trait-decl-level generics symmetric comparison
+// (IN-09, AC-08)
+// -----------------------------------------------------------------------
+
+/// T007 (a): When both A-side (catalogue) and C-side (rustdoc) carry the same
+/// impl-block-level generics on a trait impl, the signal must be Blue (Match).
+///
+/// Uses the CatalogueToExtendedCrateCodec to build the A side so the test
+/// verifies the full A-codec → evaluator pipeline.
+#[test]
+fn test_impl_block_generics_symmetric_compare_blue() {
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::TypeEntry;
+    use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CrateName, ModulePath, ParamName, TraitName, TypeName, TypeRef,
+    };
+    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
+    use rustdoc_types::{
+        GenericBound, GenericParamDef, GenericParamDefKind, Impl, Path, TraitBoundModifier,
+        WherePredicate,
+    };
+
+    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+
+    let crate_name = "my_crate";
+    let mut doc = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new("domain").expect("static"),
+    );
+
+    // A-side: `impl<T: Clone> MyTrait for Foo` — impl_generics: [T: Clone]
+    // ADR `2026-05-20-0048` D1/D2: top-level trait_impls; new API: (trait_ref, for_type).
+    let mut trait_impl =
+        TraitImplDeclV2::new(TypeRef::new("MyTrait").unwrap(), TypeRef::new("Foo").unwrap());
+    trait_impl.impl_generics = vec![MethodGenericParam {
+        name: ParamName::new("T").unwrap(),
+        bounds: vec![TypeRef::new("Clone").unwrap()],
+    }];
+
+    doc.types.insert(
+        TypeName::new("Foo").unwrap(),
+        TypeEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+    doc.trait_impls.push(trait_impl);
+    // Also register the local trait "MyTrait" (needed for local trait id resolution).
+    use domain::tddd::catalogue_v2::entries::TraitEntry;
+    doc.traits.insert(
+        TraitName::new("MyTrait").unwrap(),
+        TraitEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+
+    // Verify A-side actually encoded impl_generics: the codec must emit a trait Impl item
+    // with non-empty `generics.params` — a Blue signal alone cannot prove this because the
+    // evaluator's `items_structurally_equal` treats an empty A-side as "not encoded yet"
+    // and skips the comparison rather than diffing. Without this check the test would pass
+    // even if the codec silently emitted `empty_generics()`.
+    {
+        let a_krate = a.krate();
+        // Use filter_map to both locate and downcast the trait Impl item in one pass,
+        // avoiding `let-else { panic! }` which triggers clippy::panic in non-test scopes.
+        let a_impl_inner = a_krate
+            .index
+            .values()
+            .filter_map(|item| {
+                if let ItemEnum::Impl(i) = &item.inner {
+                    if i.trait_.is_some() { Some(i) } else { None }
+                } else {
+                    None
+                }
+            })
+            .next()
+            .expect("A-side must contain a trait Impl item for `impl<T: Clone> MyTrait for Foo`");
+        assert!(
+            !a_impl_inner.generics.params.is_empty(),
+            "A-side Impl must have non-empty generics.params (impl_generics encoded from \
+             TraitImplDeclV2.impl_generics:[T:Clone]), got: {:?}",
+            a_impl_inner.generics.params
+        );
+        assert_eq!(
+            a_impl_inner.generics.params[0].name, "T",
+            "A-side Impl first generic param must be 'T'"
+        );
+    }
+
+    // B = empty (Add action, B has nothing).
+    let b = empty_crate();
+
+    // C-side: crate with "Foo" (Struct) + "MyTrait" (Trait) + impl<T: Clone> MyTrait for Foo.
+    let root_id = Id(0);
+    let foo_id = Id(1);
+    let my_trait_id = Id(2);
+    let impl_id = Id(3);
+
+    let mut c_index = HashMap::new();
+    let mut c_paths = HashMap::new();
+
+    c_index.insert(root_id, root_module_item(root_id, crate_name, vec![foo_id, my_trait_id]));
+
+    // Struct "Foo"
+    c_index.insert(
+        foo_id,
+        make_item(
+            foo_id,
+            Some("Foo"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                impls: vec![impl_id],
+            }),
+        ),
+    );
+    c_paths.insert(
+        foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    // Trait "MyTrait"
+    c_index.insert(
+        my_trait_id,
+        make_item(
+            my_trait_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    c_paths.insert(
+        my_trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // `impl<T: Clone> MyTrait for Foo`
+    // C-side rustdoc: generics.params = [T (type param)], where_predicates = [T: Clone]
+    let t_param = GenericParamDef {
+        name: "T".to_string(),
+        kind: GenericParamDefKind::Type { bounds: vec![], default: None, is_synthetic: false },
+    };
+    let clone_bound = GenericBound::TraitBound {
+        trait_: Path { path: "Clone".to_string(), id: Id(999), args: None },
+        generic_params: vec![],
+        modifier: TraitBoundModifier::None,
+    };
+    let t_where = WherePredicate::BoundPredicate {
+        type_: Type::Generic("T".to_string()),
+        bounds: vec![clone_bound],
+        generic_params: vec![],
+    };
+    c_index.insert(
+        impl_id,
+        make_item(
+            impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: Generics { params: vec![t_param], where_predicates: vec![t_where] },
+                provided_trait_methods: vec![],
+                trait_: Some(Path { path: "MyTrait".to_string(), id: my_trait_id, args: None }),
+                for_: Type::ResolvedPath(Path { path: "Foo".to_string(), id: foo_id, args: None }),
+                items: vec![],
+                is_negative: false,
+                is_synthetic: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+
+    let c = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: c_index,
+        paths: c_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, b, c).unwrap();
+
+    // The "Foo: MyTrait" impl signal must be Blue: both A-side and C-side have the same
+    // generics shape (impl<T: Clone>), so the evaluator must report Match (Blue), not Mismatch
+    // (Yellow) and not CMinusSUnionD (Red).
+    let impl_signal =
+        report.iter().find(|s| s.item_name().contains("Foo") && s.item_name().contains("MyTrait"));
+    assert!(
+        impl_signal.is_some(),
+        "must find a signal for Foo: MyTrait impl, got signals: {:?}",
+        report.iter().map(|s| s.item_name()).collect::<Vec<_>>()
+    );
+    assert!(
+        impl_signal.unwrap().signal().is_blue(),
+        "Foo: MyTrait signal must be Blue when both sides declare the same impl_generics; \
+         got region={:?}",
+        impl_signal.unwrap().region()
+    );
+}
+
+/// T007 (b): When A-side declares `impl_generics: []` (empty, old catalogue) and
+/// C-side has `impl<T: Clone> MyTrait for Foo`, the existing behaviour is preserved:
+/// the signal must not regress (backward compat).
+///
+/// With the current design, impl-block generics from empty A-side are not compared
+/// so the existing Blue evaluation is retained.
+#[test]
+fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CrateName, ModulePath, TraitName, TypeName,
+    };
+    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
+    use rustdoc_types::{
+        GenericBound, GenericParamDef, GenericParamDefKind, Impl, Path, TraitBoundModifier,
+        WherePredicate,
+    };
+
+    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+
+    let crate_name = "my_crate";
+    let mut doc = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new("domain").expect("static"),
+    );
+
+    // A-side: `impl MyTrait for Foo` — impl_generics: [] (no impl generics).
+    // ADR `2026-05-20-0048` D1/D2: top-level trait_impls; new API: (trait_ref, for_type).
+    use domain::tddd::catalogue_v2::TypeRef as CatTypeRef;
+    let trait_impl =
+        TraitImplDeclV2::new(CatTypeRef::new("MyTrait").unwrap(), CatTypeRef::new("Foo").unwrap());
+
+    doc.types.insert(
+        TypeName::new("Foo").unwrap(),
+        TypeEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+    doc.trait_impls.push(trait_impl);
+    doc.traits.insert(
+        TraitName::new("MyTrait").unwrap(),
+        TraitEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+
+    // Verify A-side emits empty generics for old catalogue (impl_generics: []).
+    // Without this check the test would pass even if the codec started emitting non-empty
+    // generics for old catalogues (breaking backward compatibility).
+    {
+        let a_krate = a.krate();
+        let a_impl_inner = a_krate
+            .index
+            .values()
+            .filter_map(|item| {
+                if let ItemEnum::Impl(i) = &item.inner {
+                    if i.trait_.is_some() { Some(i) } else { None }
+                } else {
+                    None
+                }
+            })
+            .next()
+            .expect("A-side must contain a trait Impl item for `impl MyTrait for Foo`");
+        assert!(
+            a_impl_inner.generics.params.is_empty(),
+            "A-side Impl with impl_generics:[] must have empty generics.params (backward \
+             compat: old catalogues must not produce impl-level generics), got: {:?}",
+            a_impl_inner.generics.params
+        );
+        assert!(
+            a_impl_inner.generics.where_predicates.is_empty(),
+            "A-side Impl with impl_generics:[] must have empty where_predicates, got: {:?}",
+            a_impl_inner.generics.where_predicates
+        );
+    }
+
+    let b = empty_crate();
+
+    // C-side: `impl<T: Clone> MyTrait for Foo` (C has impl generics but A declares none).
+    let root_id = Id(0);
+    let foo_id = Id(1);
+    let my_trait_id = Id(2);
+    let impl_id = Id(3);
+
+    let mut c_index = HashMap::new();
+    let mut c_paths = HashMap::new();
+
+    c_index.insert(root_id, root_module_item(root_id, crate_name, vec![foo_id, my_trait_id]));
+    c_index.insert(
+        foo_id,
+        make_item(
+            foo_id,
+            Some("Foo"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                impls: vec![impl_id],
+            }),
+        ),
+    );
+    c_paths.insert(
+        foo_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Foo".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    c_index.insert(
+        my_trait_id,
+        make_item(
+            my_trait_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: Generics { params: vec![], where_predicates: vec![] },
+                bounds: vec![],
+                implementations: vec![],
+            }),
+        ),
+    );
+    c_paths.insert(
+        my_trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+    // C-side impl with generics
+    let t_param = GenericParamDef {
+        name: "T".to_string(),
+        kind: GenericParamDefKind::Type { bounds: vec![], default: None, is_synthetic: false },
+    };
+    let clone_bound = GenericBound::TraitBound {
+        trait_: Path { path: "Clone".to_string(), id: Id(999), args: None },
+        generic_params: vec![],
+        modifier: TraitBoundModifier::None,
+    };
+    let t_where = WherePredicate::BoundPredicate {
+        type_: Type::Generic("T".to_string()),
+        bounds: vec![clone_bound],
+        generic_params: vec![],
+    };
+    c_index.insert(
+        impl_id,
+        make_item(
+            impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: Generics { params: vec![t_param], where_predicates: vec![t_where] },
+                provided_trait_methods: vec![],
+                trait_: Some(Path { path: "MyTrait".to_string(), id: my_trait_id, args: None }),
+                for_: Type::ResolvedPath(Path { path: "Foo".to_string(), id: foo_id, args: None }),
+                items: vec![],
+                is_negative: false,
+                is_synthetic: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    let c = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: c_index,
+        paths: c_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, b, c).unwrap();
+
+    // When A-side declares no impl_generics (empty Vec = old catalogue) and C-side has
+    // impl<T: Clone>, the identity keys still match ("Foo: MyTrait"), so the signal must
+    // be Blue (Match_Add) — backward compat: old catalogues must not regress to Yellow or Red.
+    let impl_signal =
+        report.iter().find(|s| s.item_name().contains("Foo") && s.item_name().contains("MyTrait"));
+    assert!(impl_signal.is_some(), "must find a signal for Foo: MyTrait impl");
+    assert!(
+        impl_signal.unwrap().signal().is_blue(),
+        "old catalogue (impl_generics: []) must produce Blue when C has impl<T> generics; \
+         identity keys must still match; got region={:?}",
+        impl_signal.unwrap().region()
+    );
+}
+
+// -----------------------------------------------------------------------
+// T009: patch_impl_for_ids / patch_impl_trait_ids removal (AC-10 / IN-11)
+// -----------------------------------------------------------------------
+
+/// T009 (a): For an external-crate impl (`impl SomeTrait for MyStruct` where the
+/// trait is external), the `for_` field of the impl block in S must point to
+/// MyStruct's fresh S Id and must NOT be overwritten by `patch_impl_for_ids`.
+///
+/// Before T009, `patch_impl_for_ids` was called after `insert_b_item_tree_into_s`
+/// and `insert_a_item_tree_into_s` and unconditionally set `for_.id` to the
+/// parent's S id. For an external-crate impl (where `for_` references an external
+/// type, not the local parent), this would have silently corrupted the `for_.id`.
+/// After T009 these functions are removed; `rewrite_type_ref_ids_in_item` +
+/// `a_id_remap` / `b_id_remap` is the sole remap path and only rewrites ids that
+/// are present in the map; external-crate ids are not in the local remap and are
+/// left unchanged.
+///
+/// Fixture (B-sourced): B has `MyStruct` at Id(1) with an impl at Id(2).
+/// The impl's `for_` is `MyStruct` (local, Id(1)) — simulates a normal local-type
+/// impl. After Phase 1 the impl's for_.id must equal MyStruct's fresh S Id (i.e.
+/// the b_id_remap result), not the original B-side Id(1).
+///
+/// This test verifies that the remap goes through `rewrite_type_ref_ids_in_item`
+/// (inside `insert_b_item_tree_into_s`) and NOT through a post-insertion patch.
+#[test]
+#[allow(clippy::panic)]
+fn test_t009_for_remap_unified_through_id_map() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{Impl, Path as RdPath};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+
+    // B: `MyStruct` at Id(1) with impl at Id(2) whose for_ → Id(1).
+    let b_struct_id = Id(1);
+    let b_impl_id = Id(2);
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+
+    b_index.insert(root_id, root_module_item(root_id, crate_name, vec![b_struct_id, b_impl_id]));
+    b_index.insert(
+        b_struct_id,
+        make_item(
+            b_struct_id,
+            Some("MyStruct"),
+            ItemEnum::Struct(rustdoc_types::Struct {
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
+                generics: empty_generics(),
+                impls: vec![b_impl_id],
+            }),
+        ),
+    );
+    b_index.insert(
+        b_impl_id,
+        make_item(
+            b_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: None,
+                // for_ references the local type MyStruct at the B-side Id.
+                for_: Type::ResolvedPath(RdPath {
+                    path: "MyStruct".to_string(),
+                    id: b_struct_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    b_paths.insert(
+        b_struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyStruct".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let b = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // A: empty (no catalogue entries — all B items become Reference in S).
+    let a_root = root_module_item(root_id, crate_name, vec![]);
+    let mut a_index = HashMap::new();
+    a_index.insert(root_id, a_root);
+    let a_krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: a_index,
+        paths: HashMap::new(),
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let a = ExtendedCrate::new(a_krate, BTreeMap::new());
+
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // MyStruct is in S — find its fresh S Id.
+    let my_struct_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("MyStruct"))
+        .expect("T009: MyStruct must be in S (B-side Reference)");
+    let my_struct_s_id = my_struct_item.id;
+
+    // The impl block's for_.id must equal MyStruct's fresh S Id (remapped via b_id_remap,
+    // not via patch_impl_for_ids — the remap path must be the sole mechanism).
+    let impl_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| matches!(&item.inner, ItemEnum::Impl(i) if matches!(&i.for_, Type::ResolvedPath(p) if p.path == "MyStruct")))
+        .expect("T009: impl for MyStruct must be in S");
+    let impl_for_id = match &impl_item.inner {
+        ItemEnum::Impl(i) => match &i.for_ {
+            Type::ResolvedPath(p) => p.id,
+            _ => panic!("T009: impl.for_ must be ResolvedPath"),
+        },
+        _ => panic!("T009: expected Impl item"),
+    };
+
+    assert_eq!(
+        impl_for_id, my_struct_s_id,
+        "T009: impl.for_.id must equal MyStruct's fresh S Id {my_struct_s_id:?} \
+         (via b_id_remap / rewrite_type_ref_ids_in_item, not patch_impl_for_ids); \
+         got {impl_for_id:?}"
+    );
+    // Verify that the fresh S Id is NOT the original B-side Id (it must be renumbered).
+    assert_ne!(
+        my_struct_s_id,
+        Id(1),
+        "T009: MyStruct's S Id must be a fresh Id (renumbered from B-side Id(1))"
+    );
+}
+
+/// T009 (b): A-side Add item with a trait impl block must have its `for_.id`
+/// correctly remapped to the parent type's fresh S Id via `a_id_remap` +
+/// `rewrite_type_ref_ids_in_item` (Phase 1.45), without `patch_impl_for_ids`.
+///
+/// This is the A-side counterpart of T009(a).  The fixture uses B with existing
+/// items so that `first_fresh_id` is pushed above the A-side Id range, confirming
+/// that the remap is applied and the resulting S Ids are distinct from the
+/// original A-side Ids.
+///
+/// Also verifies that the trait impl (for trait-parent) has its `trait_.id`
+/// correctly remapped, confirming `patch_impl_trait_ids` is also superseded.
+#[test]
+#[allow(clippy::panic)]
+fn test_t009_for_external_impl_for_is_not_overwritten_with_self_crate_id() {
+    use super::phase1::phase1_build_s_and_d;
+    use rustdoc_types::{Impl, Path as RdPath, Trait};
+
+    let crate_name = "my_crate";
+    let root_id = Id(0);
+
+    // B: `Existing` at Id(1) so first_fresh_id starts at 2 (B max = 1, first_fresh = 2).
+    // This pushes A-side allocations above A's own Id range (1..3), so S Ids ≠ A Ids.
+    let b_existing_id = Id(1);
+    let mut b_index = HashMap::new();
+    let mut b_paths = HashMap::new();
+    b_index.insert(root_id, root_module_item(root_id, crate_name, vec![b_existing_id]));
+    b_index.insert(b_existing_id, struct_item(b_existing_id, "Existing"));
+    b_paths.insert(
+        b_existing_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "Existing".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let b = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: b_index,
+        paths: b_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    // A: `MyTrait` (Add) at Id(1), `MyStruct` (Add) at Id(2).
+    //    impl MyTrait for MyStruct at Id(3): trait_.id → Id(1), for_.id → Id(2).
+    //    The impl is listed in MyStruct.impls and in MyTrait.implementations.
+    let a_trait_id = Id(1);
+    let a_struct_id = Id(2);
+    let a_impl_id = Id(3);
+
+    let mut a_index = HashMap::new();
+    let mut a_paths = HashMap::new();
+
+    a_index.insert(
+        root_id,
+        root_module_item(root_id, crate_name, vec![a_trait_id, a_struct_id, a_impl_id]),
+    );
+    a_index.insert(
+        a_trait_id,
+        make_item(
+            a_trait_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![a_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_struct_id,
+        make_item(
+            a_struct_id,
+            Some("MyStruct"),
+            ItemEnum::Struct(rustdoc_types::Struct {
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
+                generics: empty_generics(),
+                impls: vec![a_impl_id],
+            }),
+        ),
+    );
+    a_index.insert(
+        a_impl_id,
+        make_item(
+            a_impl_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                // trait_.id → A-side MyTrait id; must be remapped to MyTrait's S id.
+                trait_: Some(RdPath { path: "MyTrait".to_string(), id: a_trait_id, args: None }),
+                // for_.id → A-side MyStruct id; must be remapped to MyStruct's S id.
+                for_: Type::ResolvedPath(RdPath {
+                    path: "MyStruct".to_string(),
+                    id: a_struct_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+    a_paths.insert(
+        a_trait_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+    a_paths.insert(
+        a_struct_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyStruct".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    let a_krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: a_index,
+        paths: a_paths,
+        external_crates: HashMap::new(),
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+    let mut a_actions = BTreeMap::new();
+    a_actions.insert(a_trait_id, ItemAction::Add);
+    a_actions.insert(a_struct_id, ItemAction::Add);
+    let a = ExtendedCrate::new(a_krate, a_actions);
+
+    let (s, _d) = phase1_build_s_and_d(a, &b).expect("phase 1 should succeed");
+
+    // Find MyStruct and MyTrait in S.
+    let my_struct_s_id = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("MyStruct"))
+        .expect("T009: MyStruct must be in S")
+        .id;
+    let my_trait_s_id = s
+        .krate()
+        .index
+        .values()
+        .find(|item| item.name.as_deref() == Some("MyTrait"))
+        .expect("T009: MyTrait must be in S")
+        .id;
+
+    // Find the impl block.
+    let impl_item = s
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            if let ItemEnum::Impl(i) = &item.inner {
+                i.trait_.is_some()
+                    && matches!(&i.for_, Type::ResolvedPath(p) if p.path == "MyStruct")
+            } else {
+                false
+            }
+        })
+        .expect("T009: impl MyTrait for MyStruct must be in S");
+
+    let (impl_for_id, impl_trait_id) = match &impl_item.inner {
+        ItemEnum::Impl(i) => {
+            let for_id = match &i.for_ {
+                Type::ResolvedPath(p) => p.id,
+                _ => panic!("T009: impl.for_ must be ResolvedPath"),
+            };
+            let trait_id = match &i.trait_ {
+                Some(p) => p.id,
+                None => panic!("T009: impl.trait_ must be Some"),
+            };
+            (for_id, trait_id)
+        }
+        _ => panic!("T009: expected Impl item"),
+    };
+
+    assert_eq!(
+        impl_for_id, my_struct_s_id,
+        "T009: impl.for_.id must equal MyStruct's S Id {my_struct_s_id:?} \
+         (via a_id_remap + rewrite_type_ref_ids_in_item, not patch_impl_for_ids); \
+         got {impl_for_id:?}"
+    );
+    assert_eq!(
+        impl_trait_id, my_trait_s_id,
+        "T009: impl.trait_.id must equal MyTrait's S Id {my_trait_s_id:?} \
+         (via a_id_remap + rewrite_type_ref_ids_in_item, not patch_impl_trait_ids); \
+         got {impl_trait_id:?}"
+    );
+    // All S Ids must be fresh (not original A-side Ids).
+    assert_ne!(my_struct_s_id, Id(2), "T009: MyStruct S Id must be fresh (not A-side Id(2))");
+    assert_ne!(my_trait_s_id, Id(1), "T009: MyTrait S Id must be fresh (not A-side Id(1))");
+}
+
+// -----------------------------------------------------------------------
+// ADR `2026-05-20-0048` Reassess When #1: cross-crate impl Add/Modify/Reference → Blue
+// -----------------------------------------------------------------------
+
+/// ADR `2026-05-20-0048` Reassess-When #1 (Case B + Case A):
+/// Cross-crate impl Add action must evaluate Blue when C has the same impl.
+///
+/// Case B: `impl MyTrait for std::vec::Vec<i32>` — self-crate trait + external self type.
+/// Case A: `impl core::fmt::Display for SelfType`   — external trait + self-crate type.
+///
+/// After ADR D1 (top-level trait_impls) and D4 (unified insertion loop), both cases
+/// must reach S via the standalone impl insertion loop in builder.rs and produce a
+/// Blue signal when the impl is also present in C (via the B-side orphan-impl pass
+/// or C-side identity map).
+///
+/// This test uses the CatalogueToExtendedCrateCodec to build the A side (full pipeline),
+/// validating that the codec, Phase 1 insertion, and Phase 2 identity matching all work
+/// end-to-end for the cross-crate case.
+#[test]
+#[allow(clippy::panic)]
+fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
+    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
+    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+    use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CrateName, ModulePath, TraitName, TypeName, TypeRef,
+    };
+    use domain::tddd::{CatalogueToExtendedCratePort, LayerId};
+    use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
+
+    use crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+
+    let crate_name = "my_crate";
+    let mut doc = CatalogueDocument::new(
+        2,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new("domain").expect("static"),
+    );
+
+    // Declare `MyTrait` (self-crate trait, Add).
+    doc.traits.insert(
+        TraitName::new("MyTrait").unwrap(),
+        TraitEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: ContractRole::SpecificationPort,
+            methods: vec![],
+            supertrait_bounds: vec![],
+            generics: vec![],
+            where_predicates: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    // Declare `SelfType` (self-crate type, Add).
+    doc.types.insert(
+        TypeName::new("SelfType").unwrap(),
+        TypeEntry {
+            action: domain::tddd::catalogue_v2::ItemAction::Add,
+            role: DataRole::ValueObject,
+            kind: TypeKindV2::PlainStruct {
+                fields: vec![],
+                has_stripped_fields: false,
+                typestate: None,
+            },
+            methods: vec![],
+            module_path: ModulePath::root(),
+            docs: None,
+            spec_refs: vec![],
+            informal_grounds: vec![],
+        },
+    );
+
+    // Case B: `impl MyTrait for std::vec::Vec<i32>` — external self type.
+    doc.trait_impls.push(TraitImplDeclV2::new(
+        TypeRef::new("MyTrait").unwrap(),
+        TypeRef::new("std::vec::Vec<i32>").unwrap(),
+    ));
+
+    // Case A: `impl core::fmt::Display for SelfType` — external trait.
+    doc.trait_impls.push(TraitImplDeclV2::new(
+        TypeRef::new("core::fmt::Display").unwrap(),
+        TypeRef::new("SelfType").unwrap(),
+    ));
+
+    let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+
+    // B: empty baseline.
+    let b = empty_crate();
+
+    // C-side: rustdoc output for the crate.
+    // Contains `MyTrait`, `SelfType`, and both impl blocks.
+    let root_id = Id(0);
+    let my_trait_c_id = Id(1);
+    let self_type_c_id = Id(2);
+    let vec_c_id = Id(3); // external Vec<i32>
+    let display_c_id = Id(4); // external core::fmt::Display
+    let impl_b_id = Id(5); // impl MyTrait for Vec<i32>
+    let impl_a_id = Id(6); // impl Display for SelfType
+    let std_crate_id: u32 = 1;
+    let core_crate_id: u32 = 2;
+
+    let mut c_index = HashMap::new();
+    let mut c_paths = HashMap::new();
+    let mut c_ext_crates = HashMap::new();
+
+    c_ext_crates.insert(
+        std_crate_id,
+        ExternalCrate { name: "std".to_string(), html_root_url: None, path: Default::default() },
+    );
+    c_ext_crates.insert(
+        core_crate_id,
+        ExternalCrate { name: "core".to_string(), html_root_url: None, path: Default::default() },
+    );
+
+    c_index.insert(
+        root_id,
+        root_module_item(root_id, crate_name, vec![my_trait_c_id, self_type_c_id]),
+    );
+
+    // MyTrait (local trait)
+    c_index.insert(
+        my_trait_c_id,
+        make_item(
+            my_trait_c_id,
+            Some("MyTrait"),
+            ItemEnum::Trait(rustdoc_types::Trait {
+                is_auto: false,
+                is_unsafe: false,
+                is_dyn_compatible: true,
+                items: vec![],
+                generics: empty_generics(),
+                bounds: vec![],
+                implementations: vec![impl_b_id],
+            }),
+        ),
+    );
+    c_paths.insert(
+        my_trait_c_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "MyTrait".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // SelfType (local struct)
+    c_index.insert(
+        self_type_c_id,
+        make_item(
+            self_type_c_id,
+            Some("SelfType"),
+            ItemEnum::Struct(Struct {
+                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                generics: empty_generics(),
+                impls: vec![impl_a_id],
+            }),
+        ),
+    );
+    c_paths.insert(
+        self_type_c_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "SelfType".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+
+    // External paths
+    c_paths.insert(
+        vec_c_id,
+        ItemSummary {
+            crate_id: std_crate_id,
+            path: vec!["std".to_string(), "vec".to_string(), "Vec".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    c_paths.insert(
+        display_c_id,
+        ItemSummary {
+            crate_id: core_crate_id,
+            path: vec!["core".to_string(), "fmt".to_string(), "Display".to_string()],
+            kind: ItemKind::Trait,
+        },
+    );
+
+    // Case B impl: `impl MyTrait for Vec<i32>` (external self type, orphan in C's index).
+    // The C-side `for_` carries the generic arg `<i32>` in `args` (rustdoc native form),
+    // so `format_type` produces `"Vec<i32>"` — matching the S-side key produced by the
+    // codec encoding `"std::vec::Vec<i32>"` via `parse_type_ref_str`.
+    let i32_arg = rustdoc_types::GenericArgs::AngleBracketed {
+        args: vec![rustdoc_types::GenericArg::Type(Type::Primitive("i32".to_string()))],
+        constraints: vec![],
+    };
+    c_index.insert(
+        impl_b_id,
+        make_item(
+            impl_b_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: Some(RdPath { path: "MyTrait".to_string(), id: my_trait_c_id, args: None }),
+                for_: Type::ResolvedPath(RdPath {
+                    path: "Vec".to_string(),
+                    id: vec_c_id,
+                    args: Some(Box::new(i32_arg)),
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+
+    // Case A impl: `impl Display for SelfType` (external trait, local self type)
+    c_index.insert(
+        impl_a_id,
+        make_item(
+            impl_a_id,
+            None,
+            ItemEnum::Impl(Impl {
+                is_unsafe: false,
+                generics: empty_generics(),
+                provided_trait_methods: vec![],
+                trait_: Some(RdPath { path: "Display".to_string(), id: display_c_id, args: None }),
+                for_: Type::ResolvedPath(RdPath {
+                    path: "SelfType".to_string(),
+                    id: self_type_c_id,
+                    args: None,
+                }),
+                items: vec![],
+                is_synthetic: false,
+                is_negative: false,
+                blanket_impl: None,
+            }),
+        ),
+    );
+
+    let c = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index: c_index,
+        paths: c_paths,
+        external_crates: c_ext_crates,
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let evaluator = SignalEvaluatorV2::new();
+    let report = evaluator.evaluate(a, b, c).unwrap();
+
+    // Case B: `Vec<i32>: MyTrait` impl must be Blue (Add match).
+    let case_b_signal = report.iter().find(|s| {
+        let name = s.item_name();
+        (name.contains("Vec") || name.contains("vec")) && name.contains("MyTrait")
+    });
+    assert!(
+        case_b_signal.is_some(),
+        "ADR0048 Reassess-When #1 (Case B): must find signal for Vec: MyTrait impl; \
+         all signals: {:?}",
+        report.iter().map(|s| s.item_name().to_string()).collect::<Vec<_>>()
+    );
+    assert!(
+        case_b_signal.unwrap().signal().is_blue(),
+        "ADR0048 Reassess-When #1 (Case B): `impl MyTrait for Vec<i32>` with Add action \
+         must evaluate Blue when C has the same impl; got region={:?}",
+        case_b_signal.unwrap().region()
+    );
+
+    // Case A: `SelfType: Display` impl must be Blue (Add match).
+    let case_a_signal = report.iter().find(|s| {
+        let name = s.item_name();
+        name.contains("SelfType") && (name.contains("Display") || name.contains("display"))
+    });
+    assert!(
+        case_a_signal.is_some(),
+        "ADR0048 Reassess-When #1 (Case A): must find signal for SelfType: Display impl; \
+         all signals: {:?}",
+        report.iter().map(|s| s.item_name().to_string()).collect::<Vec<_>>()
+    );
+    assert!(
+        case_a_signal.unwrap().signal().is_blue(),
+        "ADR0048 Reassess-When #1 (Case A): `impl core::fmt::Display for SelfType` with Add \
+         action must evaluate Blue when C has the same impl; got region={:?}",
+        case_a_signal.unwrap().region()
     );
 }
