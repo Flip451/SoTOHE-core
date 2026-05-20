@@ -204,28 +204,27 @@ fn structs_structurally_equal(
     }
     // Compare inherent method signatures so that adding, removing, or changing an
     // inherent method (TypeEntry.methods in the catalogue) registers as a mismatch.
+    //
+    // Symmetric comparison: build C-side method map unconditionally and compare both
+    // sides, regardless of whether A-side declares any methods.  This matches
+    // `enums_structurally_equal` behaviour and closes the TDDD-BUG-03 skip opt-out hole
+    // (ADR 2026-05-20-0413 D1).
+    //
+    // Both A-side (catalogue) and C-side (rustdoc) retain Outlives bounds in their
+    // method generics.  Since ADR `2026-05-18-1223` D1, the A-codec no longer rejects
+    // Outlives bounds (`validate_supported_bound` removed in T002) and
+    // `strip_outlives_from_index` has been removed (T003).  Catalogue authors can now
+    // declare `<F: Fn(...) + Send + Sync + 'static>` directly; both sides carry the
+    // same lifetime bounds and produce symmetric fingerprints via
+    // `generics_structurally_equal` / `build_generics_fingerprint_with_combined_canon`.
     let (a_methods, a_methods_unsupported) = build_inherent_method_map(&a.impls, a_index);
-    // When the catalogue declares `methods: []`, A-side inherent method map is empty.
-    // This means the catalogue intentionally opted out of method-level comparison for
-    // this struct (e.g. a fully-thinned generic struct).  Skip method comparison.
-    if a_methods.is_empty() {
-        // Skip: no inherent methods declared in the catalogue.
-    } else {
-        // Both A-side (catalogue) and C-side (rustdoc) retain Outlives bounds in
-        // their method generics.  Since ADR `2026-05-18-1223` D1, the A-codec no
-        // longer rejects Outlives bounds (`validate_supported_bound` removed in T002)
-        // and `strip_outlives_from_index` has been removed (T003).  Catalogue authors
-        // can now declare `<F: Fn(...) + Send + Sync + 'static>` directly; both sides
-        // carry the same lifetime bounds and produce symmetric fingerprints via
-        // `generics_structurally_equal` / `build_generics_fingerprint_with_combined_canon`.
-        let (b_methods, b_methods_unsupported) = build_inherent_method_map(&b.impls, b_index);
-        // D3 fail-closed: any method with unsupported generics on either side.
-        if a_methods_unsupported || b_methods_unsupported {
-            return false;
-        }
-        if a_methods != b_methods {
-            return false;
-        }
+    let (b_methods, b_methods_unsupported) = build_inherent_method_map(&b.impls, b_index);
+    // D3 fail-closed: any method with unsupported generics on either side.
+    if a_methods_unsupported || b_methods_unsupported {
+        return false;
+    }
+    if a_methods != b_methods {
+        return false;
     }
     use rustdoc_types::StructKind;
     match (&a.kind, &b.kind) {
@@ -962,14 +961,17 @@ mod tests {
         );
     }
 
-    /// T044 regression: A-side struct with `methods: []` (no inherent method decls in
-    /// the catalogue) must compare equal to C-side struct that has inherent methods.
+    /// ADR 2026-05-20-0413 D1: A-side struct with `methods: []` (no inherent method
+    /// decls in the catalogue) must NOT compare equal to C-side struct that has
+    /// inherent methods.  This replaces the former T044 regression test
+    /// (`test_plain_struct_empty_a_side_methods_matches_c_side_with_methods`) which
+    /// protected the now-removed skip opt-out.
     ///
-    /// Before the fix, `a_methods == {}` while `b_methods = {new: sig, ...}` produced
-    /// a spurious Yellow signal for thinned structs like `TaskOperationInteractor`.
+    /// With symmetric comparison, `a_methods == {}` vs `b_methods = {new: sig}`
+    /// correctly detects a method-drift mismatch (Yellow signal).
     #[test]
-    fn test_plain_struct_empty_a_side_methods_matches_c_side_with_methods() {
-        // A-side (A-codec): no inherent methods declared (methods: []).
+    fn test_plain_struct_empty_a_side_methods_does_not_match_c_side_with_methods() {
+        // A-side (catalogue): no inherent methods declared (methods: []).
         let a_struct = make_plain_struct_stripped(empty_generics(), vec![]);
         let a_index = HashMap::new();
 
@@ -984,9 +986,52 @@ mod tests {
         let c_struct = make_plain_struct_stripped(empty_generics(), vec![impl_id]);
 
         assert!(
+            !structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
+            "A-side with no inherent methods must NOT match C-side with methods \
+             (symmetric comparison; method drift must produce Yellow — ADR 2026-05-20-0413 D1)"
+        );
+    }
+
+    /// ADR 2026-05-20-0413 D1 (AC-16a): A `methods:[]` + C-side has no methods → equal (Blue).
+    /// Pure data struct with no inherent methods on either side — must still compare equal.
+    #[test]
+    fn test_plain_struct_empty_methods_both_sides_compares_equal() {
+        let a_struct = make_plain_struct_stripped(empty_generics(), vec![]);
+        let a_index = HashMap::new();
+        let c_struct = make_plain_struct_stripped(empty_generics(), vec![]);
+        let c_index = HashMap::new();
+
+        assert!(
             structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
-            "A-side with no inherent methods must match C-side with methods \
-             (catalogue methods: [] means no method contract declared; T044 regression)"
+            "Both sides with no inherent methods must compare equal (AC-16c)"
+        );
+    }
+
+    /// ADR 2026-05-20-0413 D1 (AC-16b): A `[f]` + C `[f]` → equal (Blue).
+    /// Both sides declare the same method.
+    #[test]
+    fn test_plain_struct_same_methods_both_sides_compares_equal() {
+        let fn_id_a = Id(10);
+        let impl_id_a = Id(5);
+        let fn_item_a = make_fn_item_with_generics(fn_id_a, "new", empty_generics());
+        let impl_item_a = make_inherent_impl_item(impl_id_a, "Foo", vec![fn_id_a]);
+        let mut a_index = HashMap::new();
+        a_index.insert(fn_id_a, fn_item_a);
+        a_index.insert(impl_id_a, impl_item_a);
+        let a_struct = make_plain_struct_stripped(empty_generics(), vec![impl_id_a]);
+
+        let fn_id_c = Id(20);
+        let impl_id_c = Id(15);
+        let fn_item_c = make_fn_item_with_generics(fn_id_c, "new", empty_generics());
+        let impl_item_c = make_inherent_impl_item(impl_id_c, "Foo", vec![fn_id_c]);
+        let mut c_index = HashMap::new();
+        c_index.insert(fn_id_c, fn_item_c);
+        c_index.insert(impl_id_c, impl_item_c);
+        let c_struct = make_plain_struct_stripped(empty_generics(), vec![impl_id_c]);
+
+        assert!(
+            structs_structurally_equal(&a_struct, &c_struct, &a_index, &c_index),
+            "Both sides with same inherent method must compare equal (AC-16b)"
         );
     }
 

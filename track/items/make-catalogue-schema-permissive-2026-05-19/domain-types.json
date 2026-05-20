@@ -75,9 +75,36 @@
         "has_stripped_fields": false,
         "typestate": null
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "crate_name", "ty": "CrateName" },
+            { "name": "layer", "ty": "LayerId" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "validate_filename",
+          "receiver": "&self",
+          "params": [
+            { "name": "filename_stem", "ty": "&str" }
+          ],
+          "returns": "Result<(), CatalogueDocumentError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
       "module_path": "tddd::catalogue_v2::document",
-      "docs": "Top-level catalogue document. Modified in this track to add inherent_impls: Vec<InherentImplDeclV2> (ADR D2/IN-05) and trait_impls: Vec<TraitImplDeclV2> (ADR 2026-05-20-0048 D1/IN-14). TypeEntry no longer carries trait_impls; all impl Trait for Type declarations are top-level on CatalogueDocument.",
+      "docs": "Top-level catalogue document. Modified in this track to add inherent_impls: Vec<InherentImplDeclV2> (ADR D2/IN-05) and trait_impls: Vec<TraitImplDeclV2> (ADR 2026-05-20-0048 D1/IN-14). TypeEntry no longer carries trait_impls; all impl Trait for Type declarations are top-level on CatalogueDocument. Real inherent methods (new, validate_filename) declared per IN-18 for symmetric comparison (IN-17).",
       "spec_refs": [
         {
           "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
@@ -88,6 +115,11 @@
           "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
           "anchor": "IN-14",
           "hash": "1ce9c326607200232ab3946fb939603f92f1dbda52da62bed1e74d6a796d423a"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-18",
+          "hash": "45cbeb94e85ffccaccc1d9d65cc5992a4f7ecde3de5b8796167c2cd433d9be49"
         }
       ],
       "informal_grounds": []
@@ -184,9 +216,23 @@
         "has_stripped_fields": false,
         "typestate": null
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "trait_ref", "ty": "TypeRef" },
+            { "name": "for_type", "ty": "TypeRef" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
       "module_path": "tddd::catalogue_v2::traits",
-      "docs": "Top-level trait implementation record (ADR 2026-05-20-0048 D1/D2). action: ItemAction declares the TDDD operation for this impl entry (Add/Modify/Reference/Delete); serde default is Add so the field may be omitted in JSON when Add is intended. trait_ref (TypeRef, full path with generics) and for_type (TypeRef, implementing type) replace old trait_name/origin_crate/generic_args/for_ fields. impl_generics and impl_where_predicates carry impl-block-level type parameters and constraints (IN-06). Instances live top-level on CatalogueDocument.trait_impls (D1), not per-TypeEntry. Implementation pending: action field and DTO TraitImplDto.action not yet in code (IN-15/IN-16); catalogue is ahead of code — design-vs-code drift expected until implementation phase.",
+      "docs": "Top-level trait implementation record (ADR 2026-05-20-0048 D1/D2). action: ItemAction declares the TDDD operation for this impl entry (Add/Modify/Reference/Delete); serde default is Add so the field may be omitted in JSON when Add is intended. trait_ref (TypeRef, full path with generics) and for_type (TypeRef, implementing type) replace old trait_name/origin_crate/generic_args/for_ fields. impl_generics and impl_where_predicates carry impl-block-level type parameters and constraints (IN-06). Instances live top-level on CatalogueDocument.trait_impls (D1), not per-TypeEntry. action field and DTO TraitImplDto.action implemented at f048be4 (T013/T014/T015 done). Real inherent new() method declared per IN-18 for symmetric comparison (IN-17).",
       "spec_refs": [
         {
           "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
@@ -202,6 +248,11 @@
           "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
           "anchor": "IN-16",
           "hash": "24372933b0908ca38eb919068a6cd395d9aa965bfc033f2245c6d2f353ca7b3c"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-18",
+          "hash": "45cbeb94e85ffccaccc1d9d65cc5992a4f7ecde3de5b8796167c2cd433d9be49"
         }
       ],
       "informal_grounds": []

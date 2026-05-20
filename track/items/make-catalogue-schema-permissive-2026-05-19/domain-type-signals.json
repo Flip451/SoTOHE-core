@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-20T13:33:49Z",
-  "declaration_hash": "10197bd5fa61a51cf3f437703acfa73ac486d8b91bc7ee30955f6105619fb36f",
+  "generated_at": "2026-05-20T17:26:05Z",
+  "declaration_hash": "e159c226fb96724929e4f27bc8e2335c5f122b941688e1ec0e1b66099ade271f",
   "signals": [
     {
       "type_name": "BoundOp",

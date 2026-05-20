@@ -34,6 +34,10 @@
         {
           "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
           "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md",
+          "anchor": "D1"
         }
       ]
     }
@@ -207,6 +211,58 @@
             "anchor": "D4"
           }
         ]
+      },
+      {
+        "id": "IN-17",
+        "text": "structs_structurally_equal の a_methods.is_empty() による inherent method 比較 skip (TDDD-BUG-03) を撤廃し、A/C 両側の inherent method マップを build して対称比較する。enums_structurally_equal と同一の比較経路に統一し、catalogue が methods: [] と記述しても C 側 method が存在すれば不一致として Yellow を返す。skip 挙動を保護していた regression テスト (test_plain_struct_empty_a_side_methods_matches_c_side_with_methods) は本決定と矛盾するため削除または修正する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-18",
+        "text": "IN-17 の対称比較実装により、catalogue に methods: [] と宣言していた struct エントリ (domain の modify ValueObject、usecase の Interactor 等) は Yellow になる。本トラックの catalogue ファイルを新 schema で記述し直す際、これらの struct エントリに実 inherent method を宣言して Blue に戻す。method の宣言内容は当該 struct の実コードと structurally identical にする (TDDD 原則: catalogue は実コードと structurally identical)",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-19",
+        "text": "generics_eq.rs::bounds_supported の HRTB-on-TraitBound unsupported 判定を撤廃する。現在は TraitBound.generic_params が非空であることを ADR 2026-05-08-0305 D3 の fail-closed 対象として扱い、両側が同一の HRTB-on-TraitBound を持つ場合でも generics_structurally_equal を false にしている。本変更では TraitBound.generic_params 非空 (HRTB-on-TraitBound) を supported 境界として扱い、build_where_form_view の unsupported_raw に積まれないようにする。スコープはジェネリックパラメータ位置の TraitBound に付いた HRTB バインダー (F: for<'_> Fn(&'_ str) 形) のみとし、BoundPredicate.generic_params 非空 (where 句レベルの HRTB) は D1 の WherePredicateDecl.lhs 設計でカバー済みのため本変更の対象外とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-20",
+        "text": "HRTB-on-TraitBound のフィンガープリント生成において、バインダーのライフタイム名を正規化する。rustdoc は elided-lifetime の Fn trait bound (Fn(&str)) を HRTB 形 (for<'_> Fn(&'_ str)) に desugar するため、C 側の generic_params に elision 形式のライフタイム名 ('_) が出現する。A 側 catalogue は明示形式 ('a 等) で宣言することがある。両者を同一視できるよう、HRTB バインダーのライフタイム名を positional 正規化 (例: 1 番目のバインダーライフタイムを #lt0、2 番目を #lt1 のように置換) したうえで TraitBound 全体を文字列化し、フィンガープリントに組み込む。これにより elision 形式と明示形式の違いがフィンガープリント差異に反映されなくなり、両側が genuine Blue になる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+            "anchor": "D5"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -246,6 +302,16 @@
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "他トラックおよび過去 catalogue ファイルの更新は対象外。struct inherent method の対称比較を実装するトラック (本トラック) のみが新 schema で catalogue を記述し直す。他トラックの catalogue は CI の signal 評価対象外であり、本決定では触らない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md",
             "anchor": "D1"
           }
         ]
@@ -460,6 +526,58 @@
           "anchor": "D4"
         }
       ]
+    },
+    {
+      "id": "AC-16",
+      "text": "structs_structurally_equal が A/C 両側の inherent method マップを build して対称比較する。unit test: (a) A 側 methods: [] かつ C 側 methods: [f] のケースで Yellow (不一致) が返される (旧動作は Blue)。(b) A 側 methods: [] かつ C 側 methods: [] のケース (純粋 data struct) で Blue のまま変化しない。(c) A 側 methods: [f] かつ C 側 methods: [f] のケースで Blue のまま変化しない。regression テスト test_plain_struct_empty_a_side_methods_matches_c_side_with_methods が削除または修正されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-17",
+      "text": "本トラックの catalogue ファイルにおいて、実 inherent method を持つ struct エントリ (domain の modify ValueObject 等、HRTB-on-TraitBound bound を持たない constructor を持つ型) が実 method を宣言した状態で Blue になる。method の宣言は TypeEntry.methods フィールドでも InherentImplDeclV2 エントリ (impl ブロックレベルのジェネリックが必要な場合) でも可とする。C 側 method が存在するにもかかわらず TypeEntry.methods: [] かつ対応する InherentImplDeclV2 エントリも存在しない struct エントリがゼロである。なお HRTB-on-TraitBound bound 付き constructor を持つ interactor (ReviewCheckApprovedInteractor / TaskOperationInteractor) は method 宣言 (IN-18) のみでは Blue に到達できず、IN-19/IN-20 (evaluator HRTB 対称比較) と合わせて AC-19 で別途確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-18",
+      "text": "bounds_supported が HRTB-on-TraitBound (TraitBound.generic_params 非空) を supported として扱い、generics_structurally_equal が両側に同一の HRTB-on-TraitBound を持つ場合に true を返す。unit test: (a) for<'_> Fn(&'_ str) 形の HRTB-on-TraitBound を両側に持つ Generics が generics_structurally_equal で true になる (D5 前は false だった — 既存テスト test_hrtb_on_trait_bound_is_fail_closed は本変更と矛盾するため削除または修正する)。(b) elision 形式 for<'_> と明示形式 for<'a> のバインダーライフタイム名が positional 正規化によって同一視され、両側の fingerprint が一致する。(c) 異なる TraitBound path (例: for<'_> Fn(&'_ str) と for<'_> FnMut(&'_ str)) を持つ場合は generics_structurally_equal が false になる (構造的不一致は依然として検出できる)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-08-0305-tddd-signal-evaluator-three-way-diff.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-19",
+      "text": "usecase の 2 つの interactor (ReviewCheckApprovedInteractor / TaskOperationInteractor) が、Fn closure bound 付きコンストラクタを持つ struct として catalogue に実 inherent method を宣言した状態で genuine Blue になる。IN-19 / IN-20 (evaluator HRTB-on-TraitBound 対称比較) と IN-18 (catalogue method 宣言) の両方が揃った状態でのみ達成される。D5 実装前の構造的 false-Yellow (両側に同一 HRTB-on-TraitBound があっても generics_structurally_equal が false を返す) が解消されていることを確認する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -485,7 +603,7 @@
     }
   ],
   "signals": {
-    "blue": 40,
+    "blue": 49,
     "yellow": 0,
     "red": 0
   }

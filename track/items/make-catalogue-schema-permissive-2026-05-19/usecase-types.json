@@ -12,16 +12,45 @@
         "has_stripped_fields": true,
         "typestate": null
       },
-      "methods": [],
-      "module_path": "review_v2::check_approved",
-      "docs": "Concrete struct implementing ReviewCheckApprovedService. All fields are private (has_stripped_fields). action:modify with methods:[] so A's empty method list enters S; the evaluator skips method comparison when A.methods is empty, avoiding the asymmetric strip_outlives false-positive that fires for action:reference (B's item seeds S with 'static bounds while C_stripped lacks them). Not modified in this track — action:modify is a workaround for evaluator asymmetry (see Open Questions).",
-      "spec_refs": [],
-      "informal_grounds": [
+      "methods": [
         {
-          "kind": "user_directive",
-          "summary": "action:modify workaround for evaluator asymmetric strip_outlives false-positive: action:reference with methods in B causes SMinusC_Reference_Red; action:modify with empty methods skips method comparison. Not modified in this track's scope."
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "build_fn", "ty": "F" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [
+            {
+              "name": "F",
+              "bounds": [
+                "Fn(&str, &std::path::Path) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>",
+                "Send",
+                "Sync",
+                "'static"
+              ]
+            }
+          ],
+          "has_default_impl": false,
+          "where_predicates": []
         }
-      ]
+      ],
+      "module_path": "review_v2::check_approved",
+      "docs": "Concrete struct implementing ReviewCheckApprovedService. All fields are private (has_stripped_fields). The sole inherent method new<F>() carries an Fn closure bound (Fn(&str, &Path)->Result<...>) that rustdoc desugars to a for<'_> HRTB TraitBound on the C-side. The method is declared here (IN-18) and the evaluator HRTB-on-TraitBound symmetric comparison (IN-19/IN-20) together achieve genuine Blue per AC-19.",
+      "spec_refs": [
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-18",
+          "hash": "45cbeb94e85ffccaccc1d9d65cc5992a4f7ecde3de5b8796167c2cd433d9be49"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-19",
+          "hash": "b1547c5bf0d9ab03fa25dd2611fc169437f356c92cca2a4c30f2c961b904641f"
+        }
+      ],
+      "informal_grounds": []
     },
     "TaskOperationInteractor": {
       "action": "modify",
@@ -34,14 +63,20 @@
       },
       "methods": [],
       "module_path": "task_ops",
-      "docs": "Concrete generic struct implementing TaskOperationService. Generic over S satisfying TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync. All fields are private (has_stripped_fields). action:modify with methods:[] so A's empty method list enters S; the evaluator skips method comparison when A.methods is empty, avoiding the asymmetric strip_outlives false-positive (same as ReviewCheckApprovedInteractor). Not modified in this track — action:modify is a workaround for evaluator asymmetry (see Open Questions).",
-      "spec_refs": [],
-      "informal_grounds": [
+      "docs": "Concrete generic struct implementing TaskOperationService. Generic over S satisfying TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync. All fields are private (has_stripped_fields). The public inherent method new<F>(store, schema_version, branch_reader) is declared in inherent_impls (impl<S> block) to carry the impl-level S generics. new<F>() carries an Fn closure bound (Fn(&Path)->Result<String,String>+Send+Sync+'static) that rustdoc desugars to a for<'_> HRTB TraitBound on the C-side. The method is declared here (IN-18) and the evaluator HRTB-on-TraitBound symmetric comparison (IN-19/IN-20) together achieve genuine Blue per AC-19.",
+      "spec_refs": [
         {
-          "kind": "user_directive",
-          "summary": "action:modify workaround for evaluator asymmetric strip_outlives false-positive: action:reference with methods in B causes SMinusC_Reference_Red; action:modify with empty methods skips method comparison. Not modified in this track's scope."
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-18",
+          "hash": "45cbeb94e85ffccaccc1d9d65cc5992a4f7ecde3de5b8796167c2cd433d9be49"
+        },
+        {
+          "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+          "anchor": "IN-19",
+          "hash": "b1547c5bf0d9ab03fa25dd2611fc169437f356c92cca2a4c30f2c961b904641f"
         }
-      ]
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -130,6 +165,51 @@
     }
   },
   "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TaskOperationInteractor",
+      "impl_generics": [
+        {
+          "name": "S",
+          "bounds": [
+            "domain::TrackReader",
+            "domain::TrackWriter",
+            "domain::ImplPlanReader",
+            "domain::ImplPlanWriter",
+            "Send",
+            "Sync"
+          ]
+        }
+      ],
+      "impl_where_predicates": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "store", "ty": "std::sync::Arc<S>" },
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "branch_reader", "ty": "F" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [
+            {
+              "name": "F",
+              "bounds": [
+                "Fn(&std::path::Path) -> Result<String, String>",
+                "Send",
+                "Sync",
+                "'static"
+              ]
+            }
+          ],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
   "trait_impls": [
     { "action": "reference", "trait_ref": "ReviewCheckApprovedService", "for_type": "ReviewCheckApprovedInteractor" },
     { "action": "reference", "trait_ref": "TaskOperationService", "for_type": "TaskOperationInteractor" }

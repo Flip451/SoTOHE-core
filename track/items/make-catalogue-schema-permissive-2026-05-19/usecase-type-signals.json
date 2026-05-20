@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-20T13:33:50Z",
-  "declaration_hash": "1ebaccef979208fbed26781ec301142c478c4d4cb129ac9bddffc7a3cc31f45c",
+  "generated_at": "2026-05-20T17:26:05Z",
+  "declaration_hash": "2d2f1b584b4222ea5543386bb74ec6dd48d7eb29adae13b47ba52b7cb360063b",
   "signals": [
     {
       "type_name": "ReviewCheckApprovedInteractor",

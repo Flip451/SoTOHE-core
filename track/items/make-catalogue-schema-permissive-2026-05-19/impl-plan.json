@@ -53,7 +53,8 @@
     {
       "id": "T010",
       "description": "ADR-supersede: 旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 の frontmatter status を superseded に更新し、superseded_by フィールドに 2026-05-18-1223-make-catalogue-schema-permissive.md への参照を追加する (IN-12 / AC-11)。D1 (BoundPredicate 正規化) は引き続き有効のため status は変更しない。`cargo make ci` が通ることを確認する (verify-adr-signals を含む)。Layer: documentation。",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": null
     },
     {
       "id": "T012",
@@ -64,20 +65,20 @@
     {
       "id": "T013",
       "description": "新 ADR D1 + D2: domain schema の全面再構築 — CatalogueDocument.trait_impls top-level 化 + TraitImplDeclV2 の action / trait_ref / for_type 3 軸構造への移行 (IN-14 / IN-15 / CN-04)。(1) domain 層: libs/domain の catalogue_v2/traits.rs の `TraitImplDeclV2` struct を以下の構造に再構築する — `action: ItemAction` (serde default = Add、top-level 独立 entry のため自身が action を宣言する)、`trait_ref: TypeRef`、`for_type: TypeRef`、`impl_generics: Vec<MethodGenericParam>`、`impl_where_predicates: Vec<WherePredicateDecl>`。旧フィールド trait_name / origin_crate / generic_args / for_ を廃止し trait_ref に統合する (新 ADR D2)。impl_generics / impl_where_predicates は T005 で追加済みのため維持する。GenericArgsError 型を削除する (action 追加・generic_args 廃止により不要)。libs/domain の catalogue_v2/entries.rs の `TypeEntry` struct から trait_impls フィールドを削除する。libs/domain の catalogue_v2/document.rs (または同等のモジュール) の `CatalogueDocument` struct に `trait_impls: Vec<TraitImplDeclV2>` を top-level フィールドとして追加し `#[serde(default)]` で空 Vec をデフォルト値とする (新 ADR D1 / CN-01)。inherent_impls との対称性を確認する。(2) infrastructure 層: catalogue_document_codec の DTO / decode / encode を新 schema に対応させる。TraitImplDto を `action: ItemAction` (serde default = Add) + `trait_ref` + `for_type` 構造に更新する。`deny_unknown_fields` が既存 DTO に適用されている場合、action フィールドの serde default 設定と両立することを確認する。TypeEntry DTO から trait_impls を削除し、CatalogueDocument DTO に top-level trait_impls DTO フィールドを追加する。(3) TDD: domain unit test で CatalogueDocument.trait_impls の round-trip テスト + TypeEntry に trait_impls が存在しないことの確認 + ケース A (外部 trait + 自 crate type) / ケース B (自 crate trait + 外部 type) のどちらも TraitImplDeclV2 で declare できることを示す。action フィールドが省略された JSON エントリで serde default が Add として機能することを確認する unit test を追加する (AC-14(b))。codec unit test も追加。`cargo make ci-rust` が通ることを確認する。Layer: domain + infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "f048be46027c5ec2ff3769b7cb8d7feb948337dc"
     },
     {
       "id": "T014",
       "description": "新 ADR D2 + D4: A-codec を CatalogueDocument.trait_impls top-level loop に移行し、entry.action を参照した TypeGraph A エンコードを実装する (IN-15 / IN-16 / CN-04)。T013 完了後に着手する。libs/infrastructure の catalogue_to_extended_crate_codec.rs を更新し、`CatalogueDocument.trait_impls` の top-level Vec を loop で処理する encode ロジックを実装する。各 impl の trait_ref を `syn::parse_str::<syn::Type>` でパースして外部 crate trait を external_crates に登録する (ADR 2026-05-08-0258 D5 自動 build)。for_type も同様に parse して外部 crate type を external_crates に登録する。自 crate 型は catalogue 内 lookup で解決する。旧 TypeEntry.trait_impls を辿る encode 経路を削除する。TypeAlias など impls フィールドを持たない型の impl を別途拾う orphan pass を不要化し、top-level loop に統合する (新 ADR D4)。重要: entry.action を読み取り、TypeEntry 等と同一の action セマンティクスで TypeGraph A へのエンコードを行い、各エントリの S への挿入方式を確定させる (action-driven Phase-1 挿入の実行は T015 / signal evaluator が担う)。ItemAction::Add を固定で使用するコードパスを削除し、entry.action を参照する実装に置き換える (CN-04)。A/B id 衝突回避の id 再割り当て機構 (T008/T009 で確立) は維持する。TDD: unit test で (a) 外部 crate trait を持つ impl が external_crates に正しく登録される、(b) 外部 crate type を for_type に持つ impl が encode される、(c) TypeAlias に対する impl が top-level loop で正しく処理される (orphan pass 廃止後)、(d) Modify action および Reference action を持つ TraitImplDeclV2 エントリが entry.action に従って処理される (AC-14(c))、(e) ItemAction::Add を固定で参照するコードパスが存在しないことを確認する。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "f048be46027c5ec2ff3769b7cb8d7feb948337dc"
     },
     {
       "id": "T015",
       "description": "新 ADR D4: signal evaluator を top-level trait_impls loop に統合し、action-driven Phase-1 挿入と priority_ids 帯域幅回避策の撤廃を実装する (IN-16 / CN-04)。T014 完了後に着手する。libs/infrastructure の signal_evaluator_v2/phase1/builder.rs から TypeAlias 等 impls フィールドを持たない型の impl を別途処理する A 側 orphan-impl 検出処理 (Step 5.5 または同等箇所) を削除する。CatalogueDocument.trait_impls の top-level loop で全 impl を S に挿入する単一経路に統合する。action-driven 挿入ロジックを実装する: (Add) S にまだ存在しない identity (trait_ref + for_type) として挿入する、baseline (B) に同一 identity が既に存在する場合は action contradiction として報告する。(Modify) B 側に同一 identity が存在することを前提に挿入する、B 側に存在しない場合は action contradiction。(Reference) B の impl を参照する形で S に挿入する、shape 差分があれば Red の根拠となる。(Delete) A 側エントリは S へ挿入しない。B 側の同一 identity エントリを S から D (削除セット) へ移動する。B 側に存在しない場合は action contradiction。priority_ids 帯域幅回避策の撤廃: signal_evaluator_v2/mod.rs の build_impl_identity_map 内にある `priority_ids` バンドエイド (build_impl_identity_map の always-Add duplication workaround として追加) および signal_evaluator_v2/phase2.rs の対応箇所を削除する。action-driven 挿入により always-Add の重複問題は構造的に解消されるため、priority_ids による後処理は不要になる。A/B の id 空間衝突を回避する id 再割り当て機構 (T008/T009 で確立) は維持する。TraitImplDeclV2 の trait_ref / for_type は A-codec (T014) が解決済みの TypeRef を参照するため、signal evaluator 側では trait_ref / for_type の TypeRef を id で照合する。TDD: unit test で (a) 自 crate type への trait impl と外部 crate type への trait impl が同一の top-level loop 経路で S に挿入され Blue 化する (AC-15(a))、(b) Add action でかつ baseline (B) に同一 identity が既に存在する場合に action contradiction が報告される (AC-15(b))、(c) A-codec の実装中に ItemAction::Add を固定で使用するコードパスが存在しないことを確認する (AC-15(c))、(d) impl MyTrait for std::vec::Vec<i32> のような外部 self type を持つ Add action impl が Blue 化する (AC-14(a))、(e) priority_ids 削除後も trait impl の identity 解決が正しく動作する。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "f048be46027c5ec2ff3769b7cb8d7feb948337dc"
     },
     {
       "id": "T016",
@@ -86,8 +87,26 @@
       "commit_hash": null
     },
     {
+      "id": "T017",
+      "description": "struct symmetric-compare: structs_structurally_equal の a_methods.is_empty() skip を撤廃し、A/C 両側の inherent method マップを build して対称比較する (IN-17 / AC-16)。libs/infrastructure の signal_evaluator_v2/structural_eq.rs の `structs_structurally_equal` 関数内にある `if a_methods.is_empty() { /* skip */ }` ブランチを削除する。A 側が空の場合でも C 側 method マップを build し、method 不一致を Yellow として報告するよう変更する。enums_structurally_equal と同一の比較経路に統一する。regression テスト `test_plain_struct_empty_a_side_methods_matches_c_side_with_methods` を削除または修正する (ADR 2026-05-20-0413 D1 と矛盾するため)。unit test を追加する: (a) A 側 methods: [] かつ C 側 methods: [f] で Yellow が返される (旧動作は Blue)、(b) A 側 methods: [] かつ C 側 methods: [] で Blue のまま変化しない (純粋 data struct)、(c) A 側 methods: [f] かつ C 側 methods: [f] で Blue のまま変化しない。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T018",
+      "description": "catalogue method 宣言 (struct エントリ): 本トラックの catalogue ファイルにおいて、T017 の対称比較実装により Yellow になる struct エントリ (domain の modify ValueObject、usecase の Interactor 等) に実 inherent method を宣言して Blue に戻す (IN-18 / AC-17)。method 宣言内容は当該 struct の実コードと structurally identical にする。InherentImplDeclV2 エントリを追加するか、TypeEntry.methods フィールドに実 method を宣言するかは catalogue スキーマの設計に従う。他トラックの catalogue および過去 catalogue は対象外 (OS-05)。T017 完了後に着手する (Yellow が確定してから対処する)。`cargo make ci-rust` (format + clippy + nextest) が通ること、および `bin/sotp verify` のシグナルが全エントリ Blue になることを確認する。Layer: catalogue (type-design 連動)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T019",
+      "description": "HRTB-on-TraitBound evaluator support: generics_eq.rs::bounds_supported の HRTB-on-TraitBound unsupported 判定を撤廃し (IN-19)、HRTB バインダーのライフタイム名を positional 正規化してフィンガープリントを生成する (IN-20 / AC-18)。(1) bounds_supported の `GenericBound::TraitBound { generic_params, .. } => generic_params.is_empty()` 条件を変更し、generic_params が非空 (HRTB-on-TraitBound) でも supported として扱うようにする。(2) HRTB-on-TraitBound のフィンガープリント生成において、バインダーのライフタイム名を positional 正規化する: 1 番目のバインダーライフタイムを `#lt0`、2 番目を `#lt1` のように置換してから TraitBound 全体を文字列化しフィンガープリントに組み込む。elision 形式 `'_` と明示形式 `'a` が同じ positional index で同じ正規化名 (`#lt0`) になるため、両側の fingerprint が一致する。(3) build_where_form_view 内の HRTB-on-TraitBound 分岐 (unsupported_raw への追加) を削除または条件変更する。既存テスト `test_hrtb_on_trait_bound_is_fail_closed` を削除または修正する (IN-19 の実装後は fail-closed ではなくなるため)。unit test: (a) `for<'_> Fn(&'_ str)` 形 HRTB-on-TraitBound を両側に持つ Generics が generics_structurally_equal で true になる (D5 前は false)、(b) elision 形式 `for<'_>` と明示形式 `for<'a>` のバインダーが同一視される、(c) 異なる TraitBound path (`for<'_> Fn` と `for<'_> FnMut`) を持つ場合は false になる。スコープはジェネリックパラメータ位置の TraitBound のみ (BoundPredicate.generic_params 非空の where 句 HRTB は D1 の WherePredicateDecl.lhs 設計でカバー済みのため対象外)。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
       "id": "T011",
-      "description": "統合確認: bin/sotp を rebuild し (cargo make build-sotp)、本トラックの type-signals / catalogue-spec-signals を全 3 layer で再生成する。track-sync-views で rendered view を再生成する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。T001-T010 / T012-T016 のすべてが完了した後に着手する。domain layer の Phase 2 Yellow が Blue 化することを確認する。usecase / infrastructure layer の false-positive Red が解消していることを確認する。AC-01〜AC-15 の充足確認をコメントとして残す: AC-13 (top-level trait_impls 記述確認) / AC-14 (外部 self type Add action Blue 化 + action serde default 確認 + Modify/Reference action 確認) / AC-15 (top-level loop 統合 + 全 layer Blue 化 + Add action 固定コードパス不在確認) を含む。priority_ids 削除後も全 layer で期待通りの signal が得られることを確認する。Layer: integration。",
+      "description": "統合確認: bin/sotp を rebuild し (cargo make build-sotp)、本トラックの type-signals / catalogue-spec-signals を全 3 layer で再生成する。track-sync-views で rendered view を再生成する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。T001-T010 / T012-T019 のすべてが完了した後に着手する。domain / usecase / infrastructure 全 layer の signal が genuine Blue になることを確認する。AC-01〜AC-19 の充足確認をコメントとして残す。特に AC-16 (struct 対称比較確認) / AC-17 (catalogue struct method 宣言確認) / AC-18 (HRTB-on-TraitBound 両側 Blue 確認) / AC-19 (ReviewCheckApprovedInteractor / TaskOperationInteractor の genuine Blue 確認) を含む。priority_ids 削除後も全 layer で期待通りの signal が得られることを確認する。Layer: integration。",
       "status": "todo"
     }
   ],
@@ -155,7 +174,7 @@
         "id": "S5",
         "title": "ADR 更新",
         "description": [
-          "T010 は旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 を superseded に更新する (IN-12 / AC-11)。"
+          "T010 は旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 を superseded に更新する (IN-12 / AC-11)。ADR frontmatter の D2 / D3 ステータスはすでに superseded に更新済み (verified)。"
         ],
         "task_ids": [
           "T010"
@@ -168,7 +187,7 @@
           "T013 は domain schema の全面再構築を担う。CatalogueDocument.trait_impls を top-level Vec として導入し (新 ADR D1)、TypeEntry.trait_impls を廃止する。TraitImplDeclV2 を action: ItemAction (serde default = Add) + trait_ref: TypeRef + for_type: TypeRef の 3 軸構造に再構築し (新 ADR D2)、旧フィールド trait_name / origin_crate / generic_args / for_ を廃止する。GenericArgsError 型も削除する。infrastructure DTO / codec も同期更新する。action フィールドの serde default が deny_unknown_fields と両立することを確認する。S4 (T012) が完了した後に着手し、T012 の暫定 for_ フィールドをこのタスクで置き換える。",
           "T014 は A-codec の top-level loop 移行を実装する。entry.action を読み取って TypeGraph A エンコードを action セマンティクスで行い、S への挿入方式を確定させる (Phase-1 挿入実行は T015 / signal evaluator が担う)。ItemAction::Add 固定コードパスを削除する (CN-04)。orphan pass 不要化 (IN-16)。",
           "T015 は signal evaluator の top-level loop 統合 + action-driven Phase-1 挿入 (Add/Modify/Reference/Delete セマンティクス + action contradiction 検出) + priority_ids 帯域幅回避策の撤廃を実装する。priority_ids は action-driven 挿入により always-Add の重複問題が構造的に解消されるため不要になる (IN-16 / CN-04)。",
-          "S6 は S4 (T012 完了) 後に着手する。T013 は S6 の起点となる最重要タスクであり、T014・T015 の前提である。T016 (catalogue ファイル記述し直し) は type-design フェーズ (Phase 2) で先行完了済みのため S6 と並行。",
+          "T013-T015 は commit f048be46027c5ec2ff3769b7cb8d7feb948337dc にて実装済み。",
           "各タスクは <500 行/commit を目安とし、schema 変更 (T013) → A-codec (T014) → signal evaluator (T015) の順に分割している。"
         ],
         "task_ids": [
@@ -190,10 +209,35 @@
       },
       {
         "id": "S8",
+        "title": "ADR 2026-05-20-0413 D1: struct inherent method 対称比較 + catalogue method 宣言",
+        "description": [
+          "T017 は structs_structurally_equal の a_methods.is_empty() skip を撤廃し、enums_structurally_equal と同一の対称比較経路に統一する (IN-17 / AC-16)。skip 挙動を保護していた regression テスト test_plain_struct_empty_a_side_methods_matches_c_side_with_methods を削除または修正する。",
+          "T018 は T017 完了後に Yellow になる struct エントリ (domain modify ValueObject、usecase Interactor 等) の catalogue に実 inherent method を宣言して Blue に戻す (IN-18 / AC-17)。他トラックの catalogue は対象外 (OS-05)。",
+          "T017 → T018 の順序依存がある。T017 が完了して初めてどの struct エントリが Yellow になるか確定するため、T018 は T017 完了後に着手する。"
+        ],
+        "task_ids": [
+          "T017",
+          "T018"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "ADR 2026-05-18-1223 D5: HRTB-on-TraitBound evaluator サポート",
+        "description": [
+          "T019 は bounds_supported の HRTB-on-TraitBound unsupported 判定を撤廃し (IN-19)、バインダーのライフタイム名を positional 正規化してフィンガープリントを生成する (IN-20 / AC-18)。",
+          "これにより ReviewCheckApprovedInteractor / TaskOperationInteractor (Fn closure bound 付きコンストラクタを持つ struct) の genuine Blue 化を達成する (AC-19)。T018 と T019 は独立して着手できる (ともに evaluator / catalogue 変更で依存なし)。ただし AC-19 の確認は T018 (catalogue method 宣言) と T019 (evaluator HRTB 対応) の両方が完了した後に初めて可能。",
+          "既存テスト test_hrtb_on_trait_bound_is_fail_closed を削除または修正する (IN-19 実装後は fail-closed ではなくなるため)。"
+        ],
+        "task_ids": [
+          "T019"
+        ]
+      },
+      {
+        "id": "S10",
         "title": "統合確認",
         "description": [
-          "T011 は bin/sotp rebuild + 全 layer type-signals / catalogue-spec-signals 再生成 + cargo make ci 通過確認を行う統合タスク。T001-T010 / T012-T016 のすべてが完了した後に着手する。",
-          "AC-01〜AC-15 の充足確認を行う。特に新 ADR 由来の AC-13 (top-level trait_impls 記述) / AC-14 (外部 self type Add action Blue 化 + serde default 確認 + Modify/Reference action 確認) / AC-15 (top-level loop 統合 Blue 化 + action contradiction 検出 + ItemAction::Add 固定コードパス不在確認) を確認する。priority_ids 削除後も全 layer で期待通りの signal が得られることを確認する。"
+          "T011 は bin/sotp rebuild + 全 layer type-signals / catalogue-spec-signals 再生成 + cargo make ci 通過確認を行う統合タスク。T001-T010 / T012-T019 のすべてが完了した後に着手する。",
+          "AC-01〜AC-19 の充足確認を行う。特に新規追加 AC-16 (struct 対称比較 + regression テスト削除確認) / AC-17 (catalogue struct method 宣言 + 全エントリ Blue 確認) / AC-18 (HRTB-on-TraitBound generics_structurally_equal 確認) / AC-19 (ReviewCheckApprovedInteractor / TaskOperationInteractor genuine Blue 確認) を確認する。priority_ids 削除後も全 layer で期待通りの signal が得られることを確認する。"
         ],
         "task_ids": [
           "T011"

@@ -1593,18 +1593,20 @@ fn test_encode_function_with_lifetime_bound_static_succeeds() {
     let ItemEnum::Function(ref f) = fn_item.inner else { panic!("expected Function") };
 
     // All bounds are lifted to where form (ADR 2026-05-13-1153 D1).
-    // The BoundPredicate for `F` must contain a GenericBound::Outlives("static").
+    // The BoundPredicate for `F` must contain a GenericBound::Outlives("'static").
+    // The apostrophe is included so that A-codec Outlives strings match the C-side
+    // rustdoc representation (rustdoc stores `"'static"` not `"static"`).
     let has_static_outlives = f.generics.where_predicates.iter().any(|wp| {
         if let WherePredicate::BoundPredicate { type_, bounds, .. } = wp {
             matches!(type_, Type::Generic(g) if g == "F")
-                && bounds.iter().any(|b| matches!(b, GenericBound::Outlives(lt) if lt == "static"))
+                && bounds.iter().any(|b| matches!(b, GenericBound::Outlives(lt) if lt == "'static"))
         } else {
             false
         }
     });
     assert!(
         has_static_outlives,
-        "encoded where_predicates must contain Outlives(\"static\") for `F: 'static`, \
+        "encoded where_predicates must contain Outlives(\"'static\") for `F: 'static`, \
          got: {:?}",
         f.generics.where_predicates
     );
@@ -1650,7 +1652,9 @@ fn test_encode_function_with_lifetime_bound_named_succeeds() {
         "named lifetime bound `'a` must be accepted without error, got: {result:?}"
     );
 
-    // The BoundPredicate for `T` must contain a GenericBound::Outlives("a").
+    // The BoundPredicate for `T` must contain a GenericBound::Outlives("'a").
+    // The apostrophe is included so that A-codec Outlives strings match the C-side
+    // rustdoc representation (rustdoc stores `"'a"` not `"a"`).
     let ec = result.unwrap();
     let fn_item = ec
         .krate()
@@ -1665,14 +1669,14 @@ fn test_encode_function_with_lifetime_bound_named_succeeds() {
     let has_named_outlives = f.generics.where_predicates.iter().any(|wp| {
         if let WherePredicate::BoundPredicate { type_, bounds, .. } = wp {
             matches!(type_, Type::Generic(g) if g == "T")
-                && bounds.iter().any(|b| matches!(b, GenericBound::Outlives(lt) if lt == "a"))
+                && bounds.iter().any(|b| matches!(b, GenericBound::Outlives(lt) if lt == "'a"))
         } else {
             false
         }
     });
     assert!(
         has_named_outlives,
-        "encoded where_predicates must contain Outlives(\"a\") for `T: 'a`, \
+        "encoded where_predicates must contain Outlives(\"'a\") for `T: 'a`, \
          got: {:?}",
         f.generics.where_predicates
     );

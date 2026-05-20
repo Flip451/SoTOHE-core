@@ -19,6 +19,108 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fe66193ead83b50de25fdadacffea715f78a6572d75eb978fc30dd82c48b425",
+          "at": "2026-05-19T14:44:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fe66193ead83b50de25fdadacffea715f78a6572d75eb978fc30dd82c48b425",
+          "at": "2026-05-19T14:51:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3e963170a0ac78013e90d0aeb0706f4d618165a72b57b53b293deec01b5321",
+          "at": "2026-05-19T15:57:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3e963170a0ac78013e90d0aeb0706f4d618165a72b57b53b293deec01b5321",
+          "at": "2026-05-19T16:00:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a961dfcaddf47b36cb6eca8f649b486528057f5219da091f4cbc16c18cd7b9",
+          "at": "2026-05-19T16:17:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04a961dfcaddf47b36cb6eca8f649b486528057f5219da091f4cbc16c18cd7b9",
+          "at": "2026-05-19T16:19:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d9cd173137b41e312b851b835143684ff3c860c847acac0f0b7874e5e54454e",
+          "at": "2026-05-19T16:33:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d9cd173137b41e312b851b835143684ff3c860c847acac0f0b7874e5e54454e",
+          "at": "2026-05-19T16:35:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1ff65984c71a932c7036f5d8d2caf6fd5d5bad34af8e38af6d9cee53f205c9a",
+          "at": "2026-05-19T23:56:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1ff65984c71a932c7036f5d8d2caf6fd5d5bad34af8e38af6d9cee53f205c9a",
+          "at": "2026-05-19T23:58:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3c659fe8e9518640e60b36c65276cd09cba33f51809f0c83775c53c7df09bba",
+          "at": "2026-05-20T03:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3c659fe8e9518640e60b36c65276cd09cba33f51809f0c83775c53c7df09bba",
+          "at": "2026-05-20T03:40:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ac7103998b87b4a5d9ffb66e060434b265ab68fb6bbc9e18af3a824b3570261",
+          "at": "2026-05-20T09:33:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ac7103998b87b4a5d9ffb66e060434b265ab68fb6bbc9e18af3a824b3570261",
+          "at": "2026-05-20T09:36:25Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -1190,140 +1292,95 @@
           "findings": [],
           "hash": "rvw1:sha256:11cd822bcccbfda27f035459757a95692e22161936817d2d3c5c50ae8782ef90",
           "at": "2026-05-20T13:32:45Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
-          "at": "2026-05-19T16:32:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
-          "at": "2026-05-19T16:33:56Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
-          "at": "2026-05-20T03:36:07Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` marks both interactor rows as Cat-Spec Blue, but the updated `usecase-types.json` docs still say those `new` methods should stay Yellow until IN-19/IN-20 land. The generated summary is therefore overstating the current catalogue-spec state and conflicts with the planning narrative.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/usecase-types.md",
+              "line": 14,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:c088cc4d700e9c0355e9c431ff9a8aa5e235f8bf6f3e2ae10a0dfa187718f85e",
+          "at": "2026-05-20T15:26:13Z"
         },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
-          "at": "2026-05-20T03:39:12Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2fe66193ead83b50de25fdadacffea715f78a6572d75eb978fc30dd82c48b425",
-          "at": "2026-05-19T14:44:53Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 overstates the required representation for inherent methods: it says every affected struct must stop having `methods: []`, but T018 explicitly allows declaring the method either via `InherentImplDeclV2` or via `TypeEntry.methods`. The current usecase catalogue follows the `InherentImplDeclV2` path for `TaskOperationInteractor` (`methods` is still empty while `inherent_impls` carries `new`), so AC-17 as written would mark a valid plan shape as failing. Tighten AC-17 to the chosen schema path or make it explicitly accept `InherentImplDeclV2`.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 541,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d8c51fa204ea950ee5a355c442553eeebb7116d21d1b0529977d697d076dac73",
+          "at": "2026-05-20T15:30:38Z"
         },
         {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2fe66193ead83b50de25fdadacffea715f78a6572d75eb978fc30dd82c48b425",
-          "at": "2026-05-19T14:51:06Z"
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.json` says both interactor entries are already Cat-Spec Blue and justifies that with `IN-18` alone, but `spec.json` AC-19 makes their Blue state contingent on both `IN-18` and the HRTB evaluator work in `IN-19`/`IN-20`. That makes the grounding text semantically wrong: the interactors are not fully justified by the anchor set they cite, and the generated summary in `usecase-types.md` repeats the same overstatement.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/usecase-types.json",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2a4e3efc4e6a6ec1b5ba17411ad9e6bc7c1fe01f455b8dea486d951d18c708f7",
+          "at": "2026-05-20T15:34:09Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2c3e963170a0ac78013e90d0aeb0706f4d618165a72b57b53b293deec01b5321",
-          "at": "2026-05-19T15:57:24Z"
+          "hash": "rvw1:sha256:029c142f7e2a3b326c545a661b02109d5c6939bf48958729e9f9a7b32bac0eb6",
+          "at": "2026-05-20T15:38:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TraitImplDeclV2` now declares the `action` field and `impl-plan.json`/`plan.md` mark T013-T015 done at `f048be4`, but this docs string still says the action field and DTO action are not in code and that catalogue/code drift is expected. That is a direct contradiction in the plan artifacts and makes the current schema status ambiguous for readers of the catalogue.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json",
+              "line": 235,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:029c142f7e2a3b326c545a661b02109d5c6939bf48958729e9f9a7b32bac0eb6",
+          "at": "2026-05-20T15:42:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 assigns T018 the requirement that catalogue method declarations alone make every entry Blue, but AC-19 says the two usecase interactors only become genuine Blue after both IN-18/T018 and IN-19/IN-20/T019 are present. This makes T018's success condition impossible if T019 has not already landed, and contradicts the later dependency model. Either scope AC-17/T018 to method-declaration coverage or make T018 depend on T019 for the all-Blue verification.",
+              "severity": "P1",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "line": 542,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3d3820d5287bbc3c99935018d35743b844419ee3ee1342633809351775a28220",
+          "at": "2026-05-20T15:46:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2c3e963170a0ac78013e90d0aeb0706f4d618165a72b57b53b293deec01b5321",
-          "at": "2026-05-19T16:00:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04a961dfcaddf47b36cb6eca8f649b486528057f5219da091f4cbc16c18cd7b9",
-          "at": "2026-05-19T16:17:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:04a961dfcaddf47b36cb6eca8f649b486528057f5219da091f4cbc16c18cd7b9",
-          "at": "2026-05-19T16:19:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d9cd173137b41e312b851b835143684ff3c860c847acac0f0b7874e5e54454e",
-          "at": "2026-05-19T16:33:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d9cd173137b41e312b851b835143684ff3c860c847acac0f0b7874e5e54454e",
-          "at": "2026-05-19T16:35:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1ff65984c71a932c7036f5d8d2caf6fd5d5bad34af8e38af6d9cee53f205c9a",
-          "at": "2026-05-19T23:56:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1ff65984c71a932c7036f5d8d2caf6fd5d5bad34af8e38af6d9cee53f205c9a",
-          "at": "2026-05-19T23:58:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c3c659fe8e9518640e60b36c65276cd09cba33f51809f0c83775c53c7df09bba",
-          "at": "2026-05-20T03:36:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c3c659fe8e9518640e60b36c65276cd09cba33f51809f0c83775c53c7df09bba",
-          "at": "2026-05-20T03:40:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ac7103998b87b4a5d9ffb66e060434b265ab68fb6bbc9e18af3a824b3570261",
-          "at": "2026-05-20T09:33:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ac7103998b87b4a5d9ffb66e060434b265ab68fb6bbc9e18af3a824b3570261",
-          "at": "2026-05-20T09:36:25Z"
+          "hash": "rvw1:sha256:e690f6cf30a02f34614a334fff5f2c582090a21a11755199c202c7ba06c4bfeb",
+          "at": "2026-05-20T15:51:17Z"
         }
       ]
     },
@@ -2321,6 +2378,264 @@
           "findings": [],
           "hash": "rvw1:sha256:26233d160223fb2fc9b8e4178e1fe187b405938d5a3fc4880a986538b384f871",
           "at": "2026-05-20T12:05:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bound_lifetimes_to_generic_params()` now stores lifetime binder names as `\"'a\"`, but the rest of the codebase still treats `GenericParamDef.name` as a bare identifier and prefixes `'` at render time. That will double-quote parsed HRTB binders (`''a`) in function-pointer / trait-bound formatting, and the same file still has other lifetime-bearing conversions that emit bare identifiers (`DynTrait::lifetime`, `GenericArg::Lifetime`, `impl Trait` outlives bounds), so the lifetime normalization is internally inconsistent.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 750,
+              "category": "correctness"
+            },
+            {
+              "message": "Lifetime-only HRTB support currently drops the binder entirely instead of encoding the normalized binder positions the comment describes. As written, distinct signatures with different binder arity or lifetime relationships can still collapse to the same fingerprint, e.g. `for<'a> Foo<&'a str>` vs `for<'a,'b> Foo<&'a str>`, which can produce false Blue results.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1363,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:73ab379dddd2b2a4f3b316e17a64d40ea9f53edf2d8c6f611d4a69e6a2b3959b",
+          "at": "2026-05-20T15:27:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The apostrophe normalization is only applied in `parse_generic_bound` / `bound_lifetimes_to_generic_params`; other lifetime-producing paths in this parser still emit bare identifiers (`convert_impl_trait`, `convert_generic_args`, and `angle_bracketed_to_generic_args` still use `lt.ident.to_string()`). That leaves `impl Trait + 'static`, `Vec<'a>`, and nested lifetime constraints encoded inconsistently with rustdoc, so the regression is not fully fixed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser.rs",
+              "line": 1134,
+              "category": "correctness"
+            },
+            {
+              "message": "This HRTB support is still too coarse: the fingerprint only distinguishes binder arity, while lifetime annotations inside borrowed references are stripped earlier. As a result, distinct same-arity HRTBs can still collapse to the same string, e.g. `for<'a,'b> Fn(&'a str, &'b str)` vs `for<'a,'b> Fn(&'a str, &'a str)`, which can produce false Blue comparisons.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1391,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:482fe7e84e6fe1104fefd64ce3ab9406bc3c6a049538cf98a28163f6e0beefbf",
+          "at": "2026-05-20T15:39:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_type_strip_type_params` / `format_generic_args_strip_type_params` still decide whether to strip lifetime params by comparing the bare name (`lt.trim_start_matches('\\'')`) against `type_params`, but `type_ref_parser` now stores lifetime generic-param names as `\"'a\"` / `\"'static\"`. That means impl-block lifetime params stop being stripped from method/impl identity keys, which can flip otherwise equal items into mismatches.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1059,
+              "category": "correctness"
+            },
+            {
+              "message": "The new HRTB support never canonicalizes `GenericArg::Lifetime`: `format_generic_args_with_canon` still returns the raw lifetime string, so only borrowed-reference lifetimes participate in the positional canon map. Equivalent bounds like `for<'a> Foo<'a>` and `for<'b> Foo<'b>` will still fingerprint differently even though lifetime-only HRTBs are now meant to compare equal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 474,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aba527d5d1cf6b4bdc1d53a50560db300e7d86558fadfaf8d4f6351111848435",
+          "at": "2026-05-20T15:51:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `format_generic_bounds_with_canon` now supports lifetime-only HRTB binders, but it keys the binder map off `hp.name` verbatim. This module already accepts both bare (`\"a\"`) and apostrophe-prefixed (`\"'a\"`) lifetime names elsewhere, and `GenericArg::Lifetime` / `BorrowedRef` lifetimes are still stored with a leading apostrophe. On a bare-name binder, the new HRTB path will miss the lookup and the comparison will still false-negative instead of treating the binders as equivalent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1416,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: The new HRTB support is not mirrored in the strip-aware formatter used by impl comparison. `format_generic_bounds_strip_type_params` still renders HRTB binders via `format_hrtb_type_params`, which drops lifetime binders entirely, and `items_structurally_equal` uses the stripped `for_` fingerprint for impls. That means a nested lifetime-only HRTB inside a generic arg/constraint can collapse to the same stripped key as the non-HRTB form, causing distinct impls to compare equal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1262,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2b627dacfac9a6feac1c293e8a29b77364d9eb7ae58913ead8c6aa1754c34c2e",
+          "at": "2026-05-20T16:01:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new lifetime-only HRTB support still erases any borrowed-reference lifetime that is not one of the binder lifetimes. Because `bounds_supported()` now lets these bounds through, supported cases can silently compare concrete lifetimes as if they were elided. For example, `for<'a,'b> Fn(&'static str)` and `for<'a,'b> Fn(&str)` both collapse to the same fingerprint here, which turns a real mismatch into a false Blue instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 293,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2c0ffddd603b31758353da867362795f1bb9b3e8f2848607020f9dc410007559",
+          "at": "2026-05-20T16:11:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b1107a4fb58ae7056c0bc746c4710333c318207cfa9bbe356acf42a3c43acd3",
+          "at": "2026-05-20T16:18:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_generic_bounds_with_canon` only installs `@BR:` lifetime mappings when an HRTB has two or more lifetime binders, and `format_type_with_canon` drops every borrowed-reference lifetime in the 0/1-binder case. That preserves `Fn(&str)` == `for<'_> Fn(&'_ str)`, but it also makes a single-binder HRTB with a concrete non-binder lifetime compare equal to the binder lifetime form, e.g. `for<'a> Fn(&'static str)` and `for<'a> Fn(&'a str)` both fingerprint as `Fn<(&str)->()>`. Since `bounds_supported` now admits these bounds, this can produce a false Blue for a real signature change. Preserve concrete lifetimes (and only erase/map the actual binder lifetime/elided `'_`) in the one-binder path as well.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1516,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9b1107a4fb58ae7056c0bc746c4710333c318207cfa9bbe356acf42a3c43acd3",
+          "at": "2026-05-20T16:24:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Concrete borrowed lifetimes are still erased whenever the trait bound has no HRTB binder because `@BR:` is only installed for `lt_count >= 1`. That means a catalogue bound like `Fn(&'static str)` formats as `Fn<(&str)->()>` and can compare equal to `for<'a> Fn(&'a str)` / `Fn(&str)`, even though `'static` versus any-lifetime input is a real API difference. The new D5 relaxation now lets that mismatch become a false Blue; preserve concrete lifetimes for no-binder trait-bound arguments too, or otherwise distinguish this case.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 315,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:28741244628522b30d93afd86f816924d56c25356782d0ec580e7fe1af3a57a9",
+          "at": "2026-05-20T16:30:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The one-lifetime HRTB path maps the binder lifetime to an empty string in the same canon map used for `GenericArg::Lifetime`, so angle-bracketed uses of the binder are erased. For example, `F: for<'a> Foo<'a>` formats the same as `F: Foo` because the `'a` argument becomes `\"\"` and the empty rendered args remove the brackets; similarly, non-Fn trait bounds using the binder can falsely compare Blue against a non-HRTB/elided form. The D5 normalization only needs to drop borrowed-reference lifetimes for the rustdoc `Fn(&str)` desugaring case, so `GenericArg::Lifetime` should retain a positional marker or the formatter should otherwise keep single-binder HRTB distinct when the binder appears outside that specific borrowed-ref elision case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1537,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:80304794b47fb7dd602a3b7112313afddb1aa16758b0c5e743b5f7a5d87d7b36",
+          "at": "2026-05-20T16:41:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The single-lifetime HRTB normalization erases the only binder (`lt_count <= 1` gets no prefix, and `@BR:` maps the binder reference to an empty string), so a supported bound like `for<'a> Foo<&'a str>` formats the same as `Foo<&str>`. Since `bounds_supported` now allows lifetime-only HRTB, `generics_structurally_equal` will return true for that real contract change, producing a false Blue. The 0-vs-1 binder equivalence should be limited to rustdoc's `Fn(&str)` parenthesized desugaring, or non-Fn trait bounds need to retain an HRTB marker.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1481,
+              "category": "correctness"
+            },
+            {
+              "message": "Borrowed references now emit literal lifetime names unless they are HRTB binder entries, but the normal generic canon map still excludes lifetime parameters. That makes ordinary alpha-renames compare unequal: `fn f<'a>(x: &'a str)` formats differently from `fn f<'b>(x: &'b str)` even though `generics_structurally_equal` deliberately ignores lifetime parameter names. This can create false Yellow results for catalogue/source signatures that differ only in lifetime binder names; lifetime params should be canonicalized or only concrete lifetimes such as `'static` should be preserved literally.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 312,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c17c717025111e3ead66a974c8f24c63e9bfe1a9608cb8bae7e006af66b76a05",
+          "at": "2026-05-20T16:48:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The one-binder parenthesized HRTB path drops every borrowed-ref use of the binder lifetime, so an explicit shared-lifetime bound like `for<'a> Fn(&'a str, &'a str)` fingerprints the same as catalogue `Fn(&str, &str)`. Those are not structurally equivalent because elided input lifetimes are independent; this can produce a false Blue for changed callback contracts. Retain the positional label when the single binder lifetime is used more than once, or otherwise distinguish explicit shared-lifetime HRTBs from elided Fn sugar.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1564,
+              "category": "logic"
+            },
+            {
+              "message": "`bounds_supported` now accepts any lifetime-only HRTB binder, including lifetime params with `outlives` constraints, but the formatter only records binder names/arity and drops those constraints. As a result, bounds such as `for<'a: 'b> Foo<&'a T>` and `for<'a> Foo<&'a T>` can compare equal instead of failing closed or producing distinct fingerprints. Either reject lifetime binders with non-empty `outlives` here or include the normalized outlives constraints in the HRTB fingerprint.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs",
+              "line": 235,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:44a6b9752fb2d4c0637f3b7fccb86ffa2fee63986354ceae3b81a0b34b38ab4e",
+          "at": "2026-05-20T16:57:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`count_binder_lifetime_in_type` stops at `ResolvedPath`/generic-arg containers, so the single-binder Fn drop can erase shared lifetimes nested inside inputs. For example, `for<'a> Fn(Vec<&'a str>, Vec<&'a str>)` counts as zero binder uses, maps `@BR:'a` to `\"\"`, and formats the same as `Fn(Vec<&str>, Vec<&str>)`, producing a false Blue even though the explicit HRTB requires one shared lifetime across both inputs. The walker needs to recurse through resolved-path args and other type containers before deciding the binder is single-use.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1448,
+              "category": "logic"
+            },
+            {
+              "message": "The formatter only rejects type/const HRTB binders here and never emits an unsupported sentinel for lifetime binders with `outlives` constraints. Top-level bounds with `for<'a: 'static>` are caught by `bounds_supported`, but nested associated-type constraints are formatted recursively without that check, so `Iterator<Item: for<'a: 'static> Foo<&'a str>>` and `Iterator<Item: for<'a> Foo<&'a str>>` collapse to the same fingerprint instead of failing closed. This can hide a real bound change as Blue.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1490,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:7fca2e718a17ee9194441ade80f8beb6ec5b4c23efa7818dfb9e10460cd35d32",
+          "at": "2026-05-20T17:06:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The HRTB normalization only drops the C-side binder for the single-lifetime case. For a catalogue bound like `Fn(&str, &str)`, the A side has no binder and formats both refs without lifetime labels, while rustdoc desugars the same Rust signature into a two-lifetime HRTB such as `for<'a, 'b> Fn(&'a str, &'b str)`. With this branch, the C side keeps `#L2:` and `#L0/#L1` labels, so structurally identical two-argument callbacks will compare unequal and produce false Yellow signals. The no-binder parenthesized Fn path needs equivalent elided-lifetime normalization for multiple independent input lifetimes, while still distinguishing the shared-lifetime `for<'a> Fn(&'a, &'a)` case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1614,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dde252555be5408d5f42168ea36a72a25b3606ebb13e3edbc344cd5c2489810b",
+          "at": "2026-05-20T17:11:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The HRTB Fn-desugaring check only counts binder lifetime uses in the parenthesized inputs, even though the formatter later drops binder lifetimes in both inputs and output. As a result, `for<'a> Fn(&'a str) -> &'a str` and `for<'a,'b> Fn(&'a str) -> &'b str` both get treated as elided/desugared and can collapse to the same fingerprint, despite the output lifetime relationship being structurally different. Include the output when deciding whether each binder is single-use/desugaring-eligible.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 1586,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:80b97a374b5f59c0db7f9edb26dd42c6d1da964f7681b8f969814f2f7348a6b7",
+          "at": "2026-05-20T17:17:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6442bc82a8dee75064bd5afb68c58de5676ded374f2b610e62139934731ca87",
+          "at": "2026-05-20T17:23:12Z"
         }
       ]
     },
@@ -2457,6 +2772,38 @@
           "findings": [],
           "hash": "rvw1:sha256:f5a085e84a17e1b017d7eb6627d31f13963522fb80c733680f37fa2749a37d45",
           "at": "2026-05-20T09:51:15Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:32:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:33:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
+          "at": "2026-05-20T03:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
+          "at": "2026-05-20T03:39:12Z"
         }
       ]
     }

@@ -11,6 +11,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ReviewCheckApprovedInteractor | interactor | modify | — | 🔵 | 🟡 |
-| TaskOperationInteractor | interactor | modify | — | 🔵 | 🟡 |
+| ReviewCheckApprovedInteractor | interactor | modify | — | 🔵 | 🔵 |
+| TaskOperationInteractor | interactor | modify | — | 🔵 | 🔵 |
 
