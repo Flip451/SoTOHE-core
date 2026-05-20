@@ -1,171 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
-          "at": "2026-05-19T16:32:43Z"
+          "hash": "rvw1:sha256:dc0cb08830fa0d84c73b364b08fc86729f838a2b3969ce7597e1700ab7fd3aab",
+          "at": "2026-05-20T03:35:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
-          "at": "2026-05-19T16:33:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
-          "at": "2026-05-20T03:36:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
-          "at": "2026-05-20T03:39:12Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
-          "at": "2026-05-20T03:36:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new guidance applies `for_type` to both `trait_impls` and `inherent_impls`, but the actual `InherentImplDeclV2` wire shape uses required `type_name`; only `TraitImplDeclV2` has `for_type`. Following this doc can make type-designer emit `inherent_impls` entries with an unknown `for_type` key and no `type_name`, which the strict codec will reject. Update this paragraph and the related add/modify bullets to distinguish `inherent_impls[].type_name` from `trait_impls[].for_type`.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 231,
-              "category": "schema"
-            },
-            {
-              "message": "This convention still documents the old type kind shape as `kind: { \"kind\": \"struct\" ... }` and later repeats typestate examples using a `pattern` payload. The current v3 codec accepts `unit_struct`, `tuple_struct`, `plain_struct`, `enum`, and `type_alias`, with typestate under `plain_struct.typestate`; `struct`/`pattern` catalogues will be rejected. Update this line and the downstream examples around R3/R8 to the current `TypeKindV2` JSON shape.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 36,
-              "category": "schema"
-            }
-          ],
-          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
-          "at": "2026-05-20T03:40:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This groups `inherent_impls` with `trait_impls` and says the impl entry is keyed by `for_type`, but only `TraitImplDeclV2` has `for_type`; `InherentImplDeclV2` uses `type_name`. The same wording repeats in the requirements below, so following this doc for inherent impls would generate JSON with an unknown `for_type` field and no required `type_name`, which the DTO rejects. Split the guidance so `trait_impls` use `for_type` and `inherent_impls` use `type_name`.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 231,
-              "category": "schema-correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
-          "at": "2026-05-20T03:41:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08974f65468da9fb440d1ccc0e4657c6be5c5b2e6584b7159ee55472bb02c71e",
-          "at": "2026-05-20T03:45:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The canonical `TraitImplDecl` schema shown here omits the required `action` field, even though the domain type (`TraitImplDeclV2`) includes `action: ItemAction` and the rest of this document tells authors to set `action` on every catalogue entry. The later adapter example repeats the same omission, so a reader following this guide will emit malformed top-level impl declarations.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 254,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b7b2bb4a4284c463729fca87e9f24ba6f3c1c260f3cd04804e97b23ae3c723c4",
-          "at": "2026-05-20T09:32:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new top-level impl schema still uses the obsolete name `TraitImplDecl` here, but the canonical domain type in the repo is `TraitImplDeclV2`. That stale identifier will mislead authors and makes the `trait_impls` section inconsistent with the documented SSoT.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
-              "line": 227,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:05d125b3e323037090f1aa0dbdedc6f5ba1579e4ad541a31564e7eb82519cb41",
-          "at": "2026-05-20T09:36:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03b6439c564f43105eea11c09908b2849a43c1fba1fe229e1bbea62d62b2fead",
-          "at": "2026-05-20T09:38:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated v3 schema reference still claims this agent doc is the SSoT and that there is no source-code citation. The briefing/ADR intent says the canonical schema is `libs/domain/src/tddd/catalogue_v2/` and these docs are derived explanations with references. Leaving this sentence makes future type-designer runs treat the doc, not the code, as authoritative for fields like top-level `trait_impls`/`inherent_impls`, which is exactly the schema-drift risk this change is meant to prevent.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 235,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:03b6439c564f43105eea11c09908b2849a43c1fba1fe229e1bbea62d62b2fead",
-          "at": "2026-05-20T09:44:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The schema reference now introduces `inherent_impls` as a top-level array, but the reference never defines the `InherentImplDeclV2` wire shape. The only impl shape documented below is `TraitImplDeclV2`; in the actual DTO, `inherent_impls` entries require `type_name`, optional `impl_generics` / `impl_where_predicates`, and `methods`, and they do not accept `action`. This leaves the type-designer without enough schema guidance to author valid inherent impl entries.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 226,
-              "category": "correctness"
-            },
-            {
-              "message": "This wording treats `inherent_impls` and `trait_impls` as the same kind of independent entry. That is only true for top-level trait impls: `TraitImplDeclV2` carries its own `action` and is encoded as a standalone impl, while `InherentImplDeclV2` has no `action`, must target a local declared type, and is attached to that struct/enum's impl list by the codec. The convention should distinguish top-level JSON placement from independent action/identity semantics, otherwise reviewers and type-designer can apply trait-impl rules to inherent impls incorrectly.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 34,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:72f4c905fb276ed85a88b808348930284e882d580664757300957787c4bddb80",
-          "at": "2026-05-20T09:47:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f5a085e84a17e1b017d7eb6627d31f13963522fb80c733680f37fa2749a37d45",
-          "at": "2026-05-20T09:51:15Z"
+          "hash": "rvw1:sha256:dc0cb08830fa0d84c73b364b08fc86729f838a2b3969ce7597e1700ab7fd3aab",
+          "at": "2026-05-20T03:37:19Z"
         }
       ]
     },
@@ -1326,6 +1176,52 @@
           "findings": [],
           "hash": "rvw1:sha256:f182d5dc3cd7a13269415ec8c0899f9c29479c787941c3a9043c33c1af08d846",
           "at": "2026-05-20T12:36:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11cd822bcccbfda27f035459757a95692e22161936817d2d3c5c50ae8782ef90",
+          "at": "2026-05-20T13:30:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11cd822bcccbfda27f035459757a95692e22161936817d2d3c5c50ae8782ef90",
+          "at": "2026-05-20T13:32:45Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:32:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:782f9d63955b9cba944027e40ebcfdd5f1d3d23d630539a21dec5c7993b7d27a",
+          "at": "2026-05-19T16:33:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
+          "at": "2026-05-20T03:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bab4f6a762de4ea7ad05d06e6ed37b8f2b58bb1cbcbf4d64a665669d24316fa",
+          "at": "2026-05-20T03:39:12Z"
         }
       ]
     },
@@ -1428,24 +1324,6 @@
           "findings": [],
           "hash": "rvw1:sha256:8ac7103998b87b4a5d9ffb66e060434b265ab68fb6bbc9e18af3a824b3570261",
           "at": "2026-05-20T09:36:25Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dc0cb08830fa0d84c73b364b08fc86729f838a2b3969ce7597e1700ab7fd3aab",
-          "at": "2026-05-20T03:35:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dc0cb08830fa0d84c73b364b08fc86729f838a2b3969ce7597e1700ab7fd3aab",
-          "at": "2026-05-20T03:37:19Z"
         }
       ]
     },
@@ -2443,6 +2321,142 @@
           "findings": [],
           "hash": "rvw1:sha256:26233d160223fb2fc9b8e4178e1fe187b405938d5a3fc4880a986538b384f871",
           "at": "2026-05-20T12:05:39Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
+          "at": "2026-05-20T03:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new guidance applies `for_type` to both `trait_impls` and `inherent_impls`, but the actual `InherentImplDeclV2` wire shape uses required `type_name`; only `TraitImplDeclV2` has `for_type`. Following this doc can make type-designer emit `inherent_impls` entries with an unknown `for_type` key and no `type_name`, which the strict codec will reject. Update this paragraph and the related add/modify bullets to distinguish `inherent_impls[].type_name` from `trait_impls[].for_type`.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 231,
+              "category": "schema"
+            },
+            {
+              "message": "This convention still documents the old type kind shape as `kind: { \"kind\": \"struct\" ... }` and later repeats typestate examples using a `pattern` payload. The current v3 codec accepts `unit_struct`, `tuple_struct`, `plain_struct`, `enum`, and `type_alias`, with typestate under `plain_struct.typestate`; `struct`/`pattern` catalogues will be rejected. Update this line and the downstream examples around R3/R8 to the current `TypeKindV2` JSON shape.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 36,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
+          "at": "2026-05-20T03:40:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This groups `inherent_impls` with `trait_impls` and says the impl entry is keyed by `for_type`, but only `TraitImplDeclV2` has `for_type`; `InherentImplDeclV2` uses `type_name`. The same wording repeats in the requirements below, so following this doc for inherent impls would generate JSON with an unknown `for_type` field and no required `type_name`, which the DTO rejects. Split the guidance so `trait_impls` use `for_type` and `inherent_impls` use `type_name`.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 231,
+              "category": "schema-correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9ba3fcf246b6740bf42969f2f254e40fc4ef170ecd9878025084d810b6f7e1fc",
+          "at": "2026-05-20T03:41:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08974f65468da9fb440d1ccc0e4657c6be5c5b2e6584b7159ee55472bb02c71e",
+          "at": "2026-05-20T03:45:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The canonical `TraitImplDecl` schema shown here omits the required `action` field, even though the domain type (`TraitImplDeclV2`) includes `action: ItemAction` and the rest of this document tells authors to set `action` on every catalogue entry. The later adapter example repeats the same omission, so a reader following this guide will emit malformed top-level impl declarations.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 254,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b7b2bb4a4284c463729fca87e9f24ba6f3c1c260f3cd04804e97b23ae3c723c4",
+          "at": "2026-05-20T09:32:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new top-level impl schema still uses the obsolete name `TraitImplDecl` here, but the canonical domain type in the repo is `TraitImplDeclV2`. That stale identifier will mislead authors and makes the `trait_impls` section inconsistent with the documented SSoT.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "line": 227,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:05d125b3e323037090f1aa0dbdedc6f5ba1579e4ad541a31564e7eb82519cb41",
+          "at": "2026-05-20T09:36:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03b6439c564f43105eea11c09908b2849a43c1fba1fe229e1bbea62d62b2fead",
+          "at": "2026-05-20T09:38:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated v3 schema reference still claims this agent doc is the SSoT and that there is no source-code citation. The briefing/ADR intent says the canonical schema is `libs/domain/src/tddd/catalogue_v2/` and these docs are derived explanations with references. Leaving this sentence makes future type-designer runs treat the doc, not the code, as authoritative for fields like top-level `trait_impls`/`inherent_impls`, which is exactly the schema-drift risk this change is meant to prevent.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 235,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:03b6439c564f43105eea11c09908b2849a43c1fba1fe229e1bbea62d62b2fead",
+          "at": "2026-05-20T09:44:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The schema reference now introduces `inherent_impls` as a top-level array, but the reference never defines the `InherentImplDeclV2` wire shape. The only impl shape documented below is `TraitImplDeclV2`; in the actual DTO, `inherent_impls` entries require `type_name`, optional `impl_generics` / `impl_where_predicates`, and `methods`, and they do not accept `action`. This leaves the type-designer without enough schema guidance to author valid inherent impl entries.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 226,
+              "category": "correctness"
+            },
+            {
+              "message": "This wording treats `inherent_impls` and `trait_impls` as the same kind of independent entry. That is only true for top-level trait impls: `TraitImplDeclV2` carries its own `action` and is encoded as a standalone impl, while `InherentImplDeclV2` has no `action`, must target a local declared type, and is attached to that struct/enum's impl list by the codec. The convention should distinguish top-level JSON placement from independent action/identity semantics, otherwise reviewers and type-designer can apply trait-impl rules to inherent impls incorrectly.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 34,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:72f4c905fb276ed85a88b808348930284e882d580664757300957787c4bddb80",
+          "at": "2026-05-20T09:47:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5a085e84a17e1b017d7eb6627d31f13963522fb80c733680f37fa2749a37d45",
+          "at": "2026-05-20T09:51:15Z"
         }
       ]
     }
