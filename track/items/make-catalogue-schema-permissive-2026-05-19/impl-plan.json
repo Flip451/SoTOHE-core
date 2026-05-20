@@ -53,8 +53,7 @@
     {
       "id": "T010",
       "description": "ADR-supersede: 旧 ADR 2026-05-13-1153-tddd-where-form-generics-normalization.md の D2 と D3 の frontmatter status を superseded に更新し、superseded_by フィールドに 2026-05-18-1223-make-catalogue-schema-permissive.md への参照を追加する (IN-12 / AC-11)。D1 (BoundPredicate 正規化) は引き続き有効のため status は変更しない。`cargo make ci` が通ることを確認する (verify-adr-signals を含む)。Layer: documentation。",
-      "status": "done",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T012",
@@ -83,31 +82,27 @@
     {
       "id": "T016",
       "description": "catalogue ファイルの新 schema 記述し直し: domain-types.json / usecase-types.json / infrastructure-types.json を新 schema (CatalogueDocument.trait_impls top-level + TraitImplDeclV2 の action / trait_ref / for_type 3 軸構造) で記述し直す (IN-14 / AC-13)。各 catalogue の TypeEntry から trait_impls フィールドを削除する。各 catalogue の CatalogueDocument トップレベルに trait_impls: [...] フィールドを追加し、TraitImplDeclV2 を action + trait_ref + for_type 形式で記述する。action フィールドは各エントリの TDDD 意図 (Add / Modify / Reference / Delete) に従って明示する (serde default を活用した省略も可能だが、明示を推奨)。migration code は書かない。新 schema 形式のみで記述する (OS-04 — 後方互換経路はスコープ外)。catalogue ファイルは type-design フェーズ (Phase 2) で新 schema に記述し直し済み。実装タスク T013-T015 (domain schema code + A-codec + signal evaluator) は別途進行する。Layer: catalogue (type-design 連動)。",
-      "status": "done",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T017",
       "description": "struct symmetric-compare: structs_structurally_equal の a_methods.is_empty() skip を撤廃し、A/C 両側の inherent method マップを build して対称比較する (IN-17 / AC-16)。libs/infrastructure の signal_evaluator_v2/structural_eq.rs の `structs_structurally_equal` 関数内にある `if a_methods.is_empty() { /* skip */ }` ブランチを削除する。A 側が空の場合でも C 側 method マップを build し、method 不一致を Yellow として報告するよう変更する。enums_structurally_equal と同一の比較経路に統一する。regression テスト `test_plain_struct_empty_a_side_methods_matches_c_side_with_methods` を削除または修正する (ADR 2026-05-20-0413 D1 と矛盾するため)。unit test を追加する: (a) A 側 methods: [] かつ C 側 methods: [f] で Yellow が返される (旧動作は Blue)、(b) A 側 methods: [] かつ C 側 methods: [] で Blue のまま変化しない (純粋 data struct)、(c) A 側 methods: [f] かつ C 側 methods: [f] で Blue のまま変化しない。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T018",
       "description": "catalogue method 宣言 (struct エントリ): 本トラックの catalogue ファイルにおいて、T017 の対称比較実装により Yellow になる struct エントリ (domain の modify ValueObject、usecase の Interactor 等) に実 inherent method を宣言して Blue に戻す (IN-18 / AC-17)。method 宣言内容は当該 struct の実コードと structurally identical にする。InherentImplDeclV2 エントリを追加するか、TypeEntry.methods フィールドに実 method を宣言するかは catalogue スキーマの設計に従う。他トラックの catalogue および過去 catalogue は対象外 (OS-05)。T017 完了後に着手する (Yellow が確定してから対処する)。`cargo make ci-rust` (format + clippy + nextest) が通ること、および `bin/sotp verify` のシグナルが全エントリ Blue になることを確認する。Layer: catalogue (type-design 連動)。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T019",
       "description": "HRTB-on-TraitBound evaluator support: generics_eq.rs::bounds_supported の HRTB-on-TraitBound unsupported 判定を撤廃し (IN-19)、HRTB バインダーのライフタイム名を positional 正規化してフィンガープリントを生成する (IN-20 / AC-18)。(1) bounds_supported の `GenericBound::TraitBound { generic_params, .. } => generic_params.is_empty()` 条件を変更し、generic_params が非空 (HRTB-on-TraitBound) でも supported として扱うようにする。(2) HRTB-on-TraitBound のフィンガープリント生成において、バインダーのライフタイム名を positional 正規化する: 1 番目のバインダーライフタイムを `#lt0`、2 番目を `#lt1` のように置換してから TraitBound 全体を文字列化しフィンガープリントに組み込む。elision 形式 `'_` と明示形式 `'a` が同じ positional index で同じ正規化名 (`#lt0`) になるため、両側の fingerprint が一致する。(3) build_where_form_view 内の HRTB-on-TraitBound 分岐 (unsupported_raw への追加) を削除または条件変更する。既存テスト `test_hrtb_on_trait_bound_is_fail_closed` を削除または修正する (IN-19 の実装後は fail-closed ではなくなるため)。unit test: (a) `for<'_> Fn(&'_ str)` 形 HRTB-on-TraitBound を両側に持つ Generics が generics_structurally_equal で true になる (D5 前は false)、(b) elision 形式 `for<'_>` と明示形式 `for<'a>` のバインダーが同一視される、(c) 異なる TraitBound path (`for<'_> Fn` と `for<'_> FnMut`) を持つ場合は false になる。スコープはジェネリックパラメータ位置の TraitBound のみ (BoundPredicate.generic_params 非空の where 句 HRTB は D1 の WherePredicateDecl.lhs 設計でカバー済みのため対象外)。`cargo make ci-rust` が通ることを確認する。Layer: infrastructure。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T011",
       "description": "統合確認: bin/sotp を rebuild し (cargo make build-sotp)、本トラックの type-signals / catalogue-spec-signals を全 3 layer で再生成する。track-sync-views で rendered view を再生成する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを確認する。T001-T010 / T012-T019 のすべてが完了した後に着手する。domain / usecase / infrastructure 全 layer の signal が genuine Blue になることを確認する。AC-01〜AC-19 の充足確認をコメントとして残す。特に AC-16 (struct 対称比較確認) / AC-17 (catalogue struct method 宣言確認) / AC-18 (HRTB-on-TraitBound 両側 Blue 確認) / AC-19 (ReviewCheckApprovedInteractor / TaskOperationInteractor の genuine Blue 確認) を含む。priority_ids 削除後も全 layer で期待通りの signal が得られることを確認する。Layer: integration。",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
