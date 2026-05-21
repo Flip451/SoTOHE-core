@@ -458,14 +458,25 @@ mod tests {
         );
     }
 
-    /// E2E: load a v3 catalogue with two types and verify the T003 wiring-chain
-    /// placeholder renderer returns a valid `ContractMapContent`.
+    /// E2E: load a v3 catalogue with two types and verify the full render pipeline
+    /// (T004–T009) returns a valid `ContractMapContent` with the expected mermaid output.
     ///
-    /// Full mermaid subgraph/node rendering is deferred to T004–T009.
-    /// This test exercises the load → render → content path using
-    /// `ContractMapRendererAdapter` with a minimal valid style config.
+    /// This test exercises the load → render → content path end-to-end using
+    /// `ContractMapRendererAdapter` with a full style config (all [edge.*] sections
+    /// required, since the catalogue has a TupleStruct with non-empty fields).
     #[test]
     fn test_e2e_v3_catalogue_renders_t003_placeholder() {
+        let full_style_config = concat!(
+            "[edge.method_param]\narrow = \"--o\"\n",
+            "[edge.method_returns]\narrow = \"-->\"\n",
+            "[edge.transition]\narrow = \"==>\"\nlabel = \"transitions_to\"\n",
+            "[edge.trait_impl]\narrow = \"-.impl.->\"\n",
+            "[edge.variant_payload]\narrow = \"--o\"\n",
+            "[edge.field]\narrow = \"--o\"\n",
+            "[edge.alias]\narrow = \"---\"\nlabel = \"alias_of\"\n",
+            "[filter]\ninclude_function_roles = []\n",
+        );
+
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let rules_path = root.join("architecture-rules.json");
@@ -484,16 +495,17 @@ mod tests {
         // v3-native: 2 types loaded directly from CatalogueDocument.
         assert_eq!(domain_doc.types.len(), 2, "expected 2 type entries from v3 doc");
 
-        // Write a minimal style config and render via the new adapter (T003).
+        // Write a full style config and render via the adapter (T004–T009 pipeline).
         let style_path = root.join("contract-map-style.toml");
-        write(&style_path, "[filter]\ninclude_function_roles = []\n");
+        write(&style_path, full_style_config);
         let adapter = ContractMapRendererAdapter::new(style_path);
         let catalogues_vec: Vec<_> = catalogues.values().cloned().collect();
         let opts = ContractMapRenderOptions::default();
         let content = adapter.render(&catalogues_vec, &layer_order, &opts).unwrap();
         let text = content.as_ref();
         assert!(text.contains("flowchart LR"), "render must contain flowchart LR; got:\n{text}");
-        // T003 placeholder: no subgraphs yet (T004–T009 will add them).
-        assert!(!text.contains("-->|"), "T003 placeholder must not emit edges");
+        // T004–T009: both types must appear in the output.
+        assert!(text.contains("UserId"), "UserId must appear in output: {text}");
+        assert!(text.contains("User"), "User must appear in output: {text}");
     }
 }

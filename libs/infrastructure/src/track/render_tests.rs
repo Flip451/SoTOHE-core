@@ -2423,8 +2423,8 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
     // This test proves that:
     // 1. `sync_rendered_views` produces a `contract-map.md` even when the
     //    track status is `done` (all tasks in impl-plan.json are done).
-    // 2. The rendered contract-map contains `flowchart LR` (T003 wiring-chain
-    //    placeholder — full mermaid rendering deferred to T004–T009).
+    // 2. The rendered contract-map contains `flowchart LR` and catalogue entries
+    //    (full T004–T009 mermaid rendering pipeline).
     //
     // NOTE: T003 adapter requires `.harness/config/contract-map-style.toml`.
     // A minimal style config is written to the temp workspace root here.
@@ -2440,14 +2440,24 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
     std::fs::write(dir.path().join("architecture-rules.json"), ARCH_RULES_DOMAIN_ONLY).unwrap();
 
     // .harness/config/contract-map-style.toml — required by ContractMapRendererAdapter.
-    // Absent config causes fail-closed error, which render_contract_map_view
-    // handles as a non-fatal warning (skips rendering). Provide a minimal config
-    // so the render actually runs and produces contract-map.md.
+    // Absent config causes fail-closed error (CN-02), which render_contract_map_view
+    // handles as a non-fatal warning (skips rendering). Provide a full style config
+    // (all [edge.*] sections) so the render actually runs and produces contract-map.md.
+    // The catalogue below includes enum tuple variants that require [edge.variant_payload].
     let harness_config_dir = dir.path().join(".harness/config");
     std::fs::create_dir_all(&harness_config_dir).unwrap();
     std::fs::write(
         harness_config_dir.join("contract-map-style.toml"),
-        "[filter]\ninclude_function_roles = []\n",
+        concat!(
+            "[edge.method_param]\narrow = \"--o\"\n",
+            "[edge.method_returns]\narrow = \"-->\"\n",
+            "[edge.transition]\narrow = \"==>\"\nlabel = \"transitions_to\"\n",
+            "[edge.trait_impl]\narrow = \"-.impl.->\"\n",
+            "[edge.variant_payload]\narrow = \"--o\"\n",
+            "[edge.field]\narrow = \"--o\"\n",
+            "[edge.alias]\narrow = \"---\"\nlabel = \"alias_of\"\n",
+            "[filter]\ninclude_function_roles = []\n",
+        ),
     )
     .unwrap();
 
@@ -2476,15 +2486,17 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
         "contract-map.md must be rendered for done tracks; changed: {changed:?}"
     );
 
-    // T003 placeholder: the rendered contract-map must contain flowchart LR.
-    // Full v3 rendering (subgraphs, edges) is deferred to T004–T009.
+    // T004–T009: the rendered contract-map must contain flowchart LR and catalogue entries.
     let cmap = std::fs::read_to_string(track_dir.join("contract-map.md")).unwrap();
     assert!(
         cmap.contains("flowchart LR"),
         "flowchart LR must appear in contract-map.md; got:\n{cmap}"
     );
-    // T003 placeholder must not emit mermaid edge arrows.
-    assert!(!cmap.contains("-->|"), "T003 placeholder must not emit mermaid edges; got:\n{cmap}");
+    // Enum entries from the catalogue must appear in the output.
+    assert!(
+        cmap.contains("MemberDeclaration"),
+        "MemberDeclaration must appear in contract-map.md; got:\n{cmap}"
+    );
 }
 
 /// CN-02 / AC-11 fail-closed: `sync_rendered_views` must propagate a hard error when
