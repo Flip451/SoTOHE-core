@@ -1,436 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
-          "at": "2026-05-21T14:11:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
-          "at": "2026-05-21T14:13:15Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ContractMapRendererAdapter` does not actually fail closed on style-config input: the TOML DTOs are permissive `Deserialize` structs with no `deny_unknown_fields`, so typoed/extra keys are silently accepted, and `load_style_config()` maps every read error to `StyleConfigNotFound` instead of distinguishing unreadable or malformed files. That lets a broken `.harness/config/contract-map-style.toml` be treated as if it were merely absent.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
-              "line": 44,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:a4ce080a82d287f68049cf295c829485e3f4531e222854d4fbbe0eba88fa8d60",
-          "at": "2026-05-21T14:10:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Swallowing `ContractMapRenderer::render` errors here turns `StyleConfigNotFound` / `StyleConfigInvalid` into a silent no-op, so `sync_rendered_views` can return success while leaving a stale or missing `contract-map.md` behind. That defeats the new fail-closed contract-map style loading behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
-              "line": 1236,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:5304e6df29da693115d2637cf1476bfbe3de1a8b20f7c17e001b25833ebf0800",
-          "at": "2026-05-21T14:14:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Renderer failures are downgraded to a warning and treated as success, so a missing or invalid `.harness/config/contract-map-style.toml` leaves any existing `contract-map.md` untouched and the sync pass reports success. That violates the new fail-closed contract and can silently ship stale output.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
-              "line": 1236,
-              "category": "error-handling"
-            },
-            {
-              "message": "The style-config DTOs deserialize permissively. Because `StyleConfig` and the nested structs do not use `deny_unknown_fields`, typos or stray keys/sections in `contract-map-style.toml` are ignored instead of producing `StyleConfigInvalid`. Malformed configs can therefore pass validation and render with defaults.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
-              "line": 41,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:5304e6df29da693115d2637cf1476bfbe3de1a8b20f7c17e001b25833ebf0800",
-          "at": "2026-05-21T14:20:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The style-config schema is only strict at the top level. Nested tables such as `[role.*]`, `[edge.*]`, and `[filter]` still use serde's default unknown-field behavior, so typos inside those sections are silently accepted and the adapter returns `Ok` instead of `StyleConfigInvalid`. That breaks the fail-closed CN-02 / AC-11 contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
-              "line": 47,
-              "category": "correctness"
-            },
-            {
-              "message": "The style config is read directly with `std::fs::read_to_string` and never passed through the shared symlink guard. A symlinked `.harness/config/contract-map-style.toml` will be followed and parsed instead of rejected, so the fail-closed 'symlinked' case described in `track/render.rs` is not actually enforced.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
-              "line": 172,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:116efb8272409abc6bde8cfdb4016c6b1354fa202a7fc6603dec5d759c7ed3fd",
-          "at": "2026-05-21T14:26:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sync_rendered_views` now has a fail-closed path for missing/invalid contract-map style config, but the updated tests only cover the success case with a present config. There is no integration test that leaves `.harness/config/contract-map-style.toml` absent while still providing a catalogue, so the new `StyleConfigNotFound -> RenderError::Io` wiring in `render.rs` can regress without CI coverage.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render_tests.rs",
-              "line": 2429,
-              "category": "test coverage"
-            },
-            {
-              "message": "The adapter’s public contract includes symlink rejection (`StyleConfigInvalid`), but the new unit tests only cover absent, invalid TOML, and valid config. A symlinked `contract-map-style.toml` is not exercised anywhere here, so a regression in the symlink guard would go undetected.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
-              "line": 273,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:739871f4dbcf04741a50947cdabacc98c6252693fa7a965d65c53e706ee7496f",
-          "at": "2026-05-21T14:31:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load_style_config` only checks `symlink_metadata` on the final config path and then re-opens the file with `read_to_string`. That leaves the fail-closed guard bypassable via a symlinked parent directory or a swap between the metadata check and the read, so the adapter can still follow an attacker-controlled path instead of rejecting it. Use the existing full-path symlink guard (`reject_symlinks_below` or equivalent no-follow open) before reading the style config.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
-              "line": 183,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:7280c6bc9be4cd7dde783687585195848e2354fddf2911de56c10f699f93ddeb",
-          "at": "2026-05-21T14:34:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
-          "at": "2026-05-21T14:42:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This path is now hard-required and `StyleConfigNotFound` is propagated as an error, but the tracked diff does not add `.harness/config/contract-map-style.toml` (it is only untracked in the working tree). After merge/CI checkout, any `sync_rendered_views` call for a track with loadable catalogues will fail instead of rendering. The T003 contract calls for a committed default style config, so the default needs to be included with the change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 1236,
-              "category": "contract"
-            }
-          ],
-          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
-          "at": "2026-05-21T14:48:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
-          "at": "2026-05-21T14:58:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The renderer emits edges to raw `sanitize(...)` strings for type refs instead of the synthesized ids used when the corresponding type entries are rendered. That means field/param/return/alias edges will land on ghost nodes instead of the actual `T...` subgraphs for internal types. See `emit.rs` at line 92, and the same pattern at lines 100, 154, 171, 237, and 240.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
-              "line": 92,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: Trait-impl resolution loses the crate dimension. `build_trait_index` keys by `(crate_name, trait_name)`, but `resolve_trait_subgraph` compares only against the raw `trait_ref` string. In a workspace with duplicate local trait names, impl edges can point to the wrong crate's trait; and a generic local trait ref like `Foo<T>` will never resolve. See `render/mod.rs` at lines 218 and 239, and the call site at 445.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 239,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4cb92e78d3e8298ace4fdcd03975f5159bbb60b907cb8925ffc3cb9a5c44a8e5",
-          "at": "2026-05-21T15:55:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Valid local `TypeRef` strings with a qualifier (`crate::Foo`, `self::Foo`, `super::Foo`, or a workspace-qualified path) never hit the index because `contains(\"::\")` forces a sanitize fallback. That means field/param/return/variant/type-alias edges will point at ghost nodes instead of the rendered item whenever upstream emits a qualified local ref.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 296,
-              "category": "correctness"
-            },
-            {
-              "message": "The new node index keys only on bare name, so the last catalogue that defines `Foo` overwrites earlier ones. Edge resolution is therefore order-dependent and can attach to the wrong crate/layer when two rendered catalogues share a short name, which breaks the collision-free requirement in the brief.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 262,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:12bcc6478458cca69d5b84f18a0d437cdc61c54e3dbf6423fb629a999bf70a6e",
-          "at": "2026-05-21T16:04:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_node_index` indexes both `TypeEntry` and `TraitEntry` names, but `resolve_type_ref_node_id` is used for field/param/return/type-alias edges, which should target type nodes only. As written, a `TypeRef` that matches only a trait name will now connect to that trait subgraph, and a name shared by a type and a trait becomes ambiguous and falls back to a ghost node, breaking an otherwise valid type edge.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 296,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1f0c58f653270e6541a2bef379bc67937442d76b376b3ddcd6ecf12b7d72efb0",
-          "at": "2026-05-21T16:09:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`strip_generics()` truncates at the first `<`, so valid references like `<T as Iterator>::Item` or `for<'a> Fn(&'a ())` collapse to `\"\"`/`\"for\"`. `resolve_type_ref_node_id()` then falls back to `sanitize(\"\")`, which can emit empty or malformed edge targets and break mermaid output for valid `TypeRef` forms.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 323,
-              "category": "correctness"
-            },
-            {
-              "message": "Bare `TypeRef`s are resolved only when the name is globally unique across all catalogues. In a workspace with the same short type name in multiple crates, a reference that should point to the current crate's node now falls back to `sanitize()` and renders a ghost edge instead of the real node. This regresses common multi-crate cases because `resolve_type_ref_node_id()` has no current-crate fallback.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 64,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:fa7d2e1a3edb64687bb03509bd579978128c77167260442ded6d5e8027975f9c",
-          "at": "2026-05-21T16:12:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_trait_subgraph` checks `contains(\"::\")` on the raw string before removing generic arguments, so valid self-crate trait refs with qualified generic args (for example `MyTrait<std::vec::Vec<T>>`) are classified as external and silently skipped. That drops legitimate trait-impl edges.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 373,
-              "category": "correctness"
-            },
-            {
-              "message": "`resolve_trait_subgraph` returns the first short-name match across all catalogues and never uses the owning crate as a tie-breaker. In a workspace where two crates define the same trait short name, an impl in crate A can be attached to crate B's trait subgraph depending on map order, producing the wrong edge.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 379,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b0a92199b4e0461b892bce50ca73143ea641f8918671b3faf58bf636b6603a3f",
-          "at": "2026-05-21T16:19:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Bare `TypeRef` resolution is now workspace-global when the name is unique: if the current crate has no local match, `ids.len() == 1` returns another crate's node. That can silently wire a bare ref or generic param like `T`/`Self` to the wrong type graph node, even though bare refs are meant to denote self-crate names.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 88,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b0a92199b4e0461b892bce50ca73143ea641f8918671b3faf58bf636b6603a3f",
-          "at": "2026-05-21T16:24:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Trait-impl rendering still skips every external `for_type` here. A valid impl like `impl MyTrait for std::vec::Vec<i32>` hits `continue`, so the graph drops the `-.impl.->` edge entirely even though the v3 schema explicitly allows external self types.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 560,
-              "category": "correctness"
-            },
-            {
-              "message": "`Self` is never mapped to the enclosing entry's node id in this resolver, so method signatures such as `fn clone(&self) -> Self` still render a ghost `Self` node instead of wiring back to the current type subgraph. That leaves a common valid `TypeRef` unresolved in the new pipeline.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 342,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:25ae9e1179d0e575612093d66c31da5df044b57c7b42452cc37122b6da8b2fea",
-          "at": "2026-05-21T16:28:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`NodeIndex::resolve` only matches bare names against `current_crate::Name` and does an exact lookup for the qualified branch, so valid self-crate paths like `crate::Foo`, `self::Bar`, `super::Baz`, or `crate::module::Type` never resolve to the rendered type node and fall back to `sanitize(...)`. That breaks edges for any field/param/return/alias/trait_impl source expressed as a local path instead of a bare name.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 63,
-              "category": "correctness"
-            },
-            {
-              "message": "`resolve_trait_subgraph` checks `contains(\"::\")` before stripping generic arguments, so a valid internal trait ref such as `MyTrait<crate::Foo>` is treated as external and silently skipped. The new generic stripping only works when the generic arguments themselves are unqualified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 364,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7d1ee2896f30790be8fda59f67a6f697ecdadf2f13004596dedf1513b06a3629",
-          "at": "2026-05-21T16:34:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d388cb76e364d96ded2c69512a3e90a9836c3581da3396797ac3d9a657d17bbf",
-          "at": "2026-05-21T16:40:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`strip_generics` uses a string slice (`&name[..idx]`) in production code. This repository denies `clippy::indexing_slicing` at the workspace level and the review rules explicitly forbid slice indexing outside `#[cfg(test)]`, so this change will fail the required clippy/no-panic gate. Use a non-indexing API such as `split_once('<').map_or(name, |(head, _)| head)` instead.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 347,
-              "category": "clippy"
-            }
-          ],
-          "hash": "rvw1:sha256:d388cb76e364d96ded2c69512a3e90a9836c3581da3396797ac3d9a657d17bbf",
-          "at": "2026-05-21T16:43:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Workspace-internal qualified trait refs are skipped as if they were external. Current catalogues use refs like `domain::tddd::ContractMapRenderer` for infrastructure adapters implementing domain ports, but `resolve_trait_subgraph` returns `None` for any trait ref containing `::`, and `render_mermaid` silently drops the impl edge. This violates AC-06/J-2 for cross-catalogue trait impl rendering; the resolver needs to distinguish workspace catalogue traits from true external traits before skipping.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 387,
-              "category": "correctness"
-            },
-            {
-              "message": "Module-qualified workspace TypeRefs fall back to ghost node IDs instead of the actual rendered subgraph IDs. `build_node_index` only stores keys as `crate_name::TypeName`, but `NodeIndex::resolve` exact-lookups full paths such as `domain::verify::VerifyOutcome`; those never match the index and become `sanitize(type_ref_str)`, so method/field/return edges point at auto-created nodes rather than the D-2 `T<len>_...` type subgraphs. This breaks internal TypeRef edges for generated catalogues that contain module-qualified refs.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 92,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d388cb76e364d96ded2c69512a3e90a9836c3581da3396797ac3d9a657d17bbf",
-          "at": "2026-05-21T16:46:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Bare `trait_ref` values are documented by `TraitImplDeclV2` as self-crate traits, but `resolve_trait_subgraph` searches every catalogue by trait name and returns the first BTreeMap match. If two crates both declare `MyTrait`, an impl in the later crate with `trait_ref = \"MyTrait\"` is rendered to the earlier crate's trait subgraph, producing an incorrect contract map edge. This should be scoped to the current crate for bare names, with qualified refs still using the global lookup.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 423,
-              "category": "correctness"
-            },
-            {
-              "message": "The renderer silently supplies hard-coded edge styles when a required `[edge.*]` entry is absent from the loaded style config. CN-02 and the briefing require no code defaults/hard-coded fallback styling; a missing or misspelled edge key should fail closed instead of rendering with built-in arrows/labels.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 285,
-              "category": "spec"
-            }
-          ],
-          "hash": "rvw1:sha256:201ca77f8ba1a7e9027fb6cd11e734e22b2916c72e68349108fa7b607c8bce24",
-          "at": "2026-05-21T16:53:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`strip_generics` uses direct string slicing (`&name[..idx]`) in library code. This repo denies `clippy::indexing_slicing` and the briefing explicitly forbids slice indexing outside `#[cfg(test)]`, so this will fail the required clippy gate. Use a non-indexing API such as `split_once('<').map_or(name, |(head, _)| head)` instead.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
-              "line": 365,
-              "category": "panic-safety"
-            }
-          ],
-          "hash": "rvw1:sha256:1e995f29931d353656c8e53b42e22aa420f704f2ea0894fa97a2a883cbe454c6",
-          "at": "2026-05-21T17:09:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74ac3918010255548993718a25930f36f8992a87dc7bc5cec7556448831a14b2",
-          "at": "2026-05-21T17:13:22Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8d56baf8db356c310622f204d3957bb47a3df997c3caa4b7d1a95e684e402b27",
-          "at": "2026-05-21T14:08:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8d56baf8db356c310622f204d3957bb47a3df997c3caa4b7d1a95e684e402b27",
-          "at": "2026-05-21T14:11:06Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -831,24 +401,6 @@
           "findings": [],
           "hash": "rvw1:sha256:7ed54ce6514c07492462ce33fe8dc23acd8d88846122d1e6a6473fe5958665be",
           "at": "2026-05-21T14:14:16Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
-          "at": "2026-05-21T14:09:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
-          "at": "2026-05-21T14:10:41Z"
         }
       ]
     },
@@ -1528,6 +1080,468 @@
           "findings": [],
           "hash": "rvw1:sha256:9455a43380735e40bf5744ef9f3d1d511b33ae3802313092a63f73bc3f7f4d7d",
           "at": "2026-05-21T15:53:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8614f512c78bf72eee2a7a2c1285d370487e5dd7bd4619217bfdb499061c66f0",
+          "at": "2026-05-21T17:20:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8614f512c78bf72eee2a7a2c1285d370487e5dd7bd4619217bfdb499061c66f0",
+          "at": "2026-05-21T17:22:09Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
+          "at": "2026-05-21T14:11:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
+          "at": "2026-05-21T14:13:15Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ContractMapRendererAdapter` does not actually fail closed on style-config input: the TOML DTOs are permissive `Deserialize` structs with no `deny_unknown_fields`, so typoed/extra keys are silently accepted, and `load_style_config()` maps every read error to `StyleConfigNotFound` instead of distinguishing unreadable or malformed files. That lets a broken `.harness/config/contract-map-style.toml` be treated as if it were merely absent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 44,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:a4ce080a82d287f68049cf295c829485e3f4531e222854d4fbbe0eba88fa8d60",
+          "at": "2026-05-21T14:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Swallowing `ContractMapRenderer::render` errors here turns `StyleConfigNotFound` / `StyleConfigInvalid` into a silent no-op, so `sync_rendered_views` can return success while leaving a stale or missing `contract-map.md` behind. That defeats the new fail-closed contract-map style loading behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 1236,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5304e6df29da693115d2637cf1476bfbe3de1a8b20f7c17e001b25833ebf0800",
+          "at": "2026-05-21T14:14:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Renderer failures are downgraded to a warning and treated as success, so a missing or invalid `.harness/config/contract-map-style.toml` leaves any existing `contract-map.md` untouched and the sync pass reports success. That violates the new fail-closed contract and can silently ship stale output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 1236,
+              "category": "error-handling"
+            },
+            {
+              "message": "The style-config DTOs deserialize permissively. Because `StyleConfig` and the nested structs do not use `deny_unknown_fields`, typos or stray keys/sections in `contract-map-style.toml` are ignored instead of producing `StyleConfigInvalid`. Malformed configs can therefore pass validation and render with defaults.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 41,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:5304e6df29da693115d2637cf1476bfbe3de1a8b20f7c17e001b25833ebf0800",
+          "at": "2026-05-21T14:20:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The style-config schema is only strict at the top level. Nested tables such as `[role.*]`, `[edge.*]`, and `[filter]` still use serde's default unknown-field behavior, so typos inside those sections are silently accepted and the adapter returns `Ok` instead of `StyleConfigInvalid`. That breaks the fail-closed CN-02 / AC-11 contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 47,
+              "category": "correctness"
+            },
+            {
+              "message": "The style config is read directly with `std::fs::read_to_string` and never passed through the shared symlink guard. A symlinked `.harness/config/contract-map-style.toml` will be followed and parsed instead of rejected, so the fail-closed 'symlinked' case described in `track/render.rs` is not actually enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 172,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:116efb8272409abc6bde8cfdb4016c6b1354fa202a7fc6603dec5d759c7ed3fd",
+          "at": "2026-05-21T14:26:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sync_rendered_views` now has a fail-closed path for missing/invalid contract-map style config, but the updated tests only cover the success case with a present config. There is no integration test that leaves `.harness/config/contract-map-style.toml` absent while still providing a catalogue, so the new `StyleConfigNotFound -> RenderError::Io` wiring in `render.rs` can regress without CI coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
+              "line": 2429,
+              "category": "test coverage"
+            },
+            {
+              "message": "The adapter’s public contract includes symlink rejection (`StyleConfigInvalid`), but the new unit tests only cover absent, invalid TOML, and valid config. A symlinked `contract-map-style.toml` is not exercised anywhere here, so a regression in the symlink guard would go undetected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 273,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:739871f4dbcf04741a50947cdabacc98c6252693fa7a965d65c53e706ee7496f",
+          "at": "2026-05-21T14:31:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_style_config` only checks `symlink_metadata` on the final config path and then re-opens the file with `read_to_string`. That leaves the fail-closed guard bypassable via a symlinked parent directory or a swap between the metadata check and the read, so the adapter can still follow an attacker-controlled path instead of rejecting it. Use the existing full-path symlink guard (`reject_symlinks_below` or equivalent no-follow open) before reading the style config.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 183,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7280c6bc9be4cd7dde783687585195848e2354fddf2911de56c10f699f93ddeb",
+          "at": "2026-05-21T14:34:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
+          "at": "2026-05-21T14:42:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This path is now hard-required and `StyleConfigNotFound` is propagated as an error, but the tracked diff does not add `.harness/config/contract-map-style.toml` (it is only untracked in the working tree). After merge/CI checkout, any `sync_rendered_views` call for a track with loadable catalogues will fail instead of rendering. The T003 contract calls for a committed default style config, so the default needs to be included with the change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 1236,
+              "category": "contract"
+            }
+          ],
+          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
+          "at": "2026-05-21T14:48:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
+          "at": "2026-05-21T14:58:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The renderer emits edges to raw `sanitize(...)` strings for type refs instead of the synthesized ids used when the corresponding type entries are rendered. That means field/param/return/alias edges will land on ghost nodes instead of the actual `T...` subgraphs for internal types. See `emit.rs` at line 92, and the same pattern at lines 100, 154, 171, 237, and 240.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
+              "line": 92,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: Trait-impl resolution loses the crate dimension. `build_trait_index` keys by `(crate_name, trait_name)`, but `resolve_trait_subgraph` compares only against the raw `trait_ref` string. In a workspace with duplicate local trait names, impl edges can point to the wrong crate's trait; and a generic local trait ref like `Foo<T>` will never resolve. See `render/mod.rs` at lines 218 and 239, and the call site at 445.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 239,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4cb92e78d3e8298ace4fdcd03975f5159bbb60b907cb8925ffc3cb9a5c44a8e5",
+          "at": "2026-05-21T15:55:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Valid local `TypeRef` strings with a qualifier (`crate::Foo`, `self::Foo`, `super::Foo`, or a workspace-qualified path) never hit the index because `contains(\"::\")` forces a sanitize fallback. That means field/param/return/variant/type-alias edges will point at ghost nodes instead of the rendered item whenever upstream emits a qualified local ref.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 296,
+              "category": "correctness"
+            },
+            {
+              "message": "The new node index keys only on bare name, so the last catalogue that defines `Foo` overwrites earlier ones. Edge resolution is therefore order-dependent and can attach to the wrong crate/layer when two rendered catalogues share a short name, which breaks the collision-free requirement in the brief.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 262,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:12bcc6478458cca69d5b84f18a0d437cdc61c54e3dbf6423fb629a999bf70a6e",
+          "at": "2026-05-21T16:04:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_node_index` indexes both `TypeEntry` and `TraitEntry` names, but `resolve_type_ref_node_id` is used for field/param/return/type-alias edges, which should target type nodes only. As written, a `TypeRef` that matches only a trait name will now connect to that trait subgraph, and a name shared by a type and a trait becomes ambiguous and falls back to a ghost node, breaking an otherwise valid type edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 296,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1f0c58f653270e6541a2bef379bc67937442d76b376b3ddcd6ecf12b7d72efb0",
+          "at": "2026-05-21T16:09:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`strip_generics()` truncates at the first `<`, so valid references like `<T as Iterator>::Item` or `for<'a> Fn(&'a ())` collapse to `\"\"`/`\"for\"`. `resolve_type_ref_node_id()` then falls back to `sanitize(\"\")`, which can emit empty or malformed edge targets and break mermaid output for valid `TypeRef` forms.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 323,
+              "category": "correctness"
+            },
+            {
+              "message": "Bare `TypeRef`s are resolved only when the name is globally unique across all catalogues. In a workspace with the same short type name in multiple crates, a reference that should point to the current crate's node now falls back to `sanitize()` and renders a ghost edge instead of the real node. This regresses common multi-crate cases because `resolve_type_ref_node_id()` has no current-crate fallback.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 64,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fa7d2e1a3edb64687bb03509bd579978128c77167260442ded6d5e8027975f9c",
+          "at": "2026-05-21T16:12:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_trait_subgraph` checks `contains(\"::\")` on the raw string before removing generic arguments, so valid self-crate trait refs with qualified generic args (for example `MyTrait<std::vec::Vec<T>>`) are classified as external and silently skipped. That drops legitimate trait-impl edges.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 373,
+              "category": "correctness"
+            },
+            {
+              "message": "`resolve_trait_subgraph` returns the first short-name match across all catalogues and never uses the owning crate as a tie-breaker. In a workspace where two crates define the same trait short name, an impl in crate A can be attached to crate B's trait subgraph depending on map order, producing the wrong edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 379,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b0a92199b4e0461b892bce50ca73143ea641f8918671b3faf58bf636b6603a3f",
+          "at": "2026-05-21T16:19:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Bare `TypeRef` resolution is now workspace-global when the name is unique: if the current crate has no local match, `ids.len() == 1` returns another crate's node. That can silently wire a bare ref or generic param like `T`/`Self` to the wrong type graph node, even though bare refs are meant to denote self-crate names.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 88,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b0a92199b4e0461b892bce50ca73143ea641f8918671b3faf58bf636b6603a3f",
+          "at": "2026-05-21T16:24:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Trait-impl rendering still skips every external `for_type` here. A valid impl like `impl MyTrait for std::vec::Vec<i32>` hits `continue`, so the graph drops the `-.impl.->` edge entirely even though the v3 schema explicitly allows external self types.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 560,
+              "category": "correctness"
+            },
+            {
+              "message": "`Self` is never mapped to the enclosing entry's node id in this resolver, so method signatures such as `fn clone(&self) -> Self` still render a ghost `Self` node instead of wiring back to the current type subgraph. That leaves a common valid `TypeRef` unresolved in the new pipeline.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 342,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:25ae9e1179d0e575612093d66c31da5df044b57c7b42452cc37122b6da8b2fea",
+          "at": "2026-05-21T16:28:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NodeIndex::resolve` only matches bare names against `current_crate::Name` and does an exact lookup for the qualified branch, so valid self-crate paths like `crate::Foo`, `self::Bar`, `super::Baz`, or `crate::module::Type` never resolve to the rendered type node and fall back to `sanitize(...)`. That breaks edges for any field/param/return/alias/trait_impl source expressed as a local path instead of a bare name.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 63,
+              "category": "correctness"
+            },
+            {
+              "message": "`resolve_trait_subgraph` checks `contains(\"::\")` before stripping generic arguments, so a valid internal trait ref such as `MyTrait<crate::Foo>` is treated as external and silently skipped. The new generic stripping only works when the generic arguments themselves are unqualified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 364,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7d1ee2896f30790be8fda59f67a6f697ecdadf2f13004596dedf1513b06a3629",
+          "at": "2026-05-21T16:34:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d388cb76e364d96ded2c69512a3e90a9836c3581da3396797ac3d9a657d17bbf",
+          "at": "2026-05-21T16:40:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`strip_generics` uses a string slice (`&name[..idx]`) in production code. This repository denies `clippy::indexing_slicing` at the workspace level and the review rules explicitly forbid slice indexing outside `#[cfg(test)]`, so this change will fail the required clippy/no-panic gate. Use a non-indexing API such as `split_once('<').map_or(name, |(head, _)| head)` instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 347,
+              "category": "clippy"
+            }
+          ],
+          "hash": "rvw1:sha256:d388cb76e364d96ded2c69512a3e90a9836c3581da3396797ac3d9a657d17bbf",
+          "at": "2026-05-21T16:43:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Workspace-internal qualified trait refs are skipped as if they were external. Current catalogues use refs like `domain::tddd::ContractMapRenderer` for infrastructure adapters implementing domain ports, but `resolve_trait_subgraph` returns `None` for any trait ref containing `::`, and `render_mermaid` silently drops the impl edge. This violates AC-06/J-2 for cross-catalogue trait impl rendering; the resolver needs to distinguish workspace catalogue traits from true external traits before skipping.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 387,
+              "category": "correctness"
+            },
+            {
+              "message": "Module-qualified workspace TypeRefs fall back to ghost node IDs instead of the actual rendered subgraph IDs. `build_node_index` only stores keys as `crate_name::TypeName`, but `NodeIndex::resolve` exact-lookups full paths such as `domain::verify::VerifyOutcome`; those never match the index and become `sanitize(type_ref_str)`, so method/field/return edges point at auto-created nodes rather than the D-2 `T<len>_...` type subgraphs. This breaks internal TypeRef edges for generated catalogues that contain module-qualified refs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 92,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d388cb76e364d96ded2c69512a3e90a9836c3581da3396797ac3d9a657d17bbf",
+          "at": "2026-05-21T16:46:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Bare `trait_ref` values are documented by `TraitImplDeclV2` as self-crate traits, but `resolve_trait_subgraph` searches every catalogue by trait name and returns the first BTreeMap match. If two crates both declare `MyTrait`, an impl in the later crate with `trait_ref = \"MyTrait\"` is rendered to the earlier crate's trait subgraph, producing an incorrect contract map edge. This should be scoped to the current crate for bare names, with qualified refs still using the global lookup.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 423,
+              "category": "correctness"
+            },
+            {
+              "message": "The renderer silently supplies hard-coded edge styles when a required `[edge.*]` entry is absent from the loaded style config. CN-02 and the briefing require no code defaults/hard-coded fallback styling; a missing or misspelled edge key should fail closed instead of rendering with built-in arrows/labels.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 285,
+              "category": "spec"
+            }
+          ],
+          "hash": "rvw1:sha256:201ca77f8ba1a7e9027fb6cd11e734e22b2916c72e68349108fa7b607c8bce24",
+          "at": "2026-05-21T16:53:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`strip_generics` uses direct string slicing (`&name[..idx]`) in library code. This repo denies `clippy::indexing_slicing` and the briefing explicitly forbids slice indexing outside `#[cfg(test)]`, so this will fail the required clippy gate. Use a non-indexing API such as `split_once('<').map_or(name, |(head, _)| head)` instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 365,
+              "category": "panic-safety"
+            }
+          ],
+          "hash": "rvw1:sha256:1e995f29931d353656c8e53b42e22aa420f704f2ea0894fa97a2a883cbe454c6",
+          "at": "2026-05-21T17:09:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74ac3918010255548993718a25930f36f8992a87dc7bc5cec7556448831a14b2",
+          "at": "2026-05-21T17:13:22Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
+          "at": "2026-05-21T14:09:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
+          "at": "2026-05-21T14:10:41Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d56baf8db356c310622f204d3957bb47a3df997c3caa4b7d1a95e684e402b27",
+          "at": "2026-05-21T14:08:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d56baf8db356c310622f204d3957bb47a3df997c3caa4b7d1a95e684e402b27",
+          "at": "2026-05-21T14:11:06Z"
         }
       ]
     }
