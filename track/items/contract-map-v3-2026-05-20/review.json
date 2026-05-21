@@ -1,0 +1,323 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Decision D` and `Decision U` are not injective in the plan’s own `1 layer N crate` model. The ADR explicitly allows multiple crates per layer ([A](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L140)), but Type/Trait node IDs are built only from `sanitized_layer` + short name ([D](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L171)), and the top-module subgraph ID also omits `crate_name` ([U](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L281)). In a layer with two crates that reuse the same short type/trait name or top-level module segment, unrelated items will collapse into the same rendered node/subgraph.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 140,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ee97db96b214d8b0ca26f7450ad699e748dafdee0b2c47dccfddc1fd5676713e",
+          "at": "2026-05-20T23:34:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision O describes a \"global trait index\" being built from `doc.trait_impls`, but the cache it defines is keyed by `(CrateName, TraitName)` and stores `trait_subgraph_id`s. As written, the source data is the wrong layer of the model: impl records do not provide a complete trait index, so this conflates trait lookup with impl-edge traversal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 265,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ee97db96b214d8b0ca26f7450ad699e748dafdee0b2c47dccfddc1fd5676713e",
+          "at": "2026-05-20T23:36:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The follow-up says D1–D6 were superseded by the new ADR, but the next sentence says D6's Reality View role split is still inherited. Those statements conflict on whether D6 was replaced or preserved.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 411,
+              "category": "contradiction"
+            },
+            {
+              "message": "The renderer is allowed to take multiple `CatalogueDocument`s per layer, but the Type/Trait node IDs only encode `layer` and `name`. That omits crate/module identity, so same-named entries in different crates or modules within one layer will collide and the stated injective scheme is false for the input model.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 171,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:55ea459f3e5beb1a994f9566f2b871d626184daec83c595ac9f0c0f81e8ffd5a",
+          "at": "2026-05-20T23:39:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79382e64e797263f25b11148fcf3a647a197e6d632e92416702f609debf6fbb6",
+          "at": "2026-05-20T23:41:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision U drops `crate_name` from module subgraph identity even though Decision A explicitly supports `1 layer N crate`. With `subgraph id: <sanitized_layer>_module_<sanitized_module_path_first_segment>`, two crates in the same layer that both have a top-level module like `review` will generate the same Mermaid subgraph id, merging unrelated entries and making class attachment ambiguous. The module grouping needs to include the crate dimension, matching the node-id design in Decision D.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 282,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision D's function node-id specification is internally inconsistent: the Function template uses `sanitized_full_path`, but the `<len>` definition is only `sanitized_layer + '_' + sanitized_crate + '_' + sanitized_name` and the injectivity explanation only covers Type/Trait names. As written, implementers do not have a coherent length-prefix rule for FunctionPath ids, so the claimed injective id scheme is underspecified for one of the three node kinds.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 175,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:79382e64e797263f25b11148fcf3a647a197e6d632e92416702f609debf6fbb6",
+          "at": "2026-05-20T23:45:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e3169b94e388b3c97eca4d26e977097a415144da403c7502f978a479b5d867b",
+          "at": "2026-05-20T23:50:04Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Steps 3 and 6 call `/track:commit` without a commit-message argument. Per `.claude/commands/track/commit.md`, empty arguments take the interactive candidate-message path, so this orchestrator will pause for user input and violate its own 'Fully autonomous' constraint.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 17,
+              "category": "logic"
+            },
+            {
+              "message": "Step 4 delegates to `/track:plan`, but `.claude/commands/track/plan.md` can stop at termination and ask the user to accept/revert/manual-edit/abort when the ADR working tree differs from HEAD. This file never defines an automatic policy for that decision, so the chain is not actually autonomous end-to-end.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 18,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:89f83ca61549aa2e47aa5a8903ab03ebf0852da0080cc6445d385ed87255a417",
+          "at": "2026-05-20T23:33:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 is not executable as written: `/track:plan` always runs Phase 0 first (`.claude/commands/track/plan.md:61-70`), and `/track:init` stops unless the current branch is `main` (`.claude/commands/track/init.md:10-15`). After step 1 the orchestrator is already on `track/<id>`, so this step will fail instead of running only Phase 1-3.",
+              "severity": "P0",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 18,
+              "category": "workflow"
+            },
+            {
+              "message": "The documented autonomy guarantee is not actually satisfied. `/track:plan` still pauses for a user decision whenever the ADR working tree differs from `HEAD` (`.claude/commands/track/plan.md:112-117`), but this orchestrator never defines a no-prompt path for that termination branch. That leaves the chain stuck waiting for confirmation at step 4 despite the \"Fully autonomous\" constraint.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 38,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:89f83ca61549aa2e47aa5a8903ab03ebf0852da0080cc6445d385ed87255a417",
+          "at": "2026-05-20T23:35:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 bypasses `/track:plan`, but it does not re-specify the red/yellow/ERROR re-invocation rules that `/track:plan` owns. The referenced phase commands are single-shot wrappers, so the instruction to handle escalation via the phase commands' own rules is inaccurate and can leave unresolved signals stuck before step 8.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 32,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f33be141ca17ae9def2505ea3bf82e0e73678ca7ee85b3555dbdcbaa1c76dd82",
+          "at": "2026-05-20T23:39:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `/track:commit` steps are invoked with no staging step in between. The canonical commit flow requires staging the post-review worktree first (`cargo make add-all` or `track-add-paths`), and `track-commit-message` only commits already staged files. As written, the first and second commits can fail on an empty index or leave generated files / ADR edits uncommitted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 17,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f221a792b92d6172462315ef6a4cd585a6072aa6261f55a7866871e1406d2458",
+          "at": "2026-05-20T23:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 5 says the plan artifacts are committed at step 7, but the actual commit step is 8 and step 7 is staging. That internal mismatch makes the execution order ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 19,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ef48a91cedb8428f45c5671d6eb87b8dff7a5ea20eadcd5b353a46ae11ae9e23",
+          "at": "2026-05-20T23:47:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This command re-encodes `/track:plan`'s phase-loop semantics instead of delegating to the canonical subcommands, which makes `adr2pr` a second source of truth for retry and escalation behavior. If the canonical commands change, this doc can drift into a different state machine than the one it claims to orchestrate.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 19,
+              "category": "architecture"
+            },
+            {
+              "message": "The copied Phase 1/2 loop summary is not faithful to the canonical behavior: it only mentions direct re-invocation of `spec-design` / `type-design`, but `/track:plan`'s Phase 1 red path can escalate to `adr-editor` or a user pause, and Phase 2 red must re-evaluate Phase 1 before retrying Phase 2. Following this text literally can skip required upstream escalation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 34,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:767f8c9b1e060adf6884f742330db39fdc56cd5860859d2f5e64192b3e83bf5f",
+          "at": "2026-05-20T23:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Yellow handling is internally inconsistent. This step says to follow `/track:plan`'s Phase 1-3 loops exactly, but the referenced Phase 1 loop allows 🟡 to advance, while this file separately requires every 🟡 to be resolved at the phase where it appears. A phase that returns yellow has no single valid action under the current wording.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 42,
+              "category": "contradiction"
+            },
+            {
+              "message": "The rationale for not invoking `/track:plan` overstates its termination behavior. `/track:plan` only pauses in Termination when the ADR working tree differs from HEAD; it does not unconditionally pause for a user decision. The justification at this line is therefore factually incorrect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 34,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ae6d4fbac2914b3404d184f3ce870c9218186df1cf936c14708476c2afc87d8d",
+          "at": "2026-05-20T23:51:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Steps 4 and 8 invoke `/track:commit` with no arguments, but `.claude/commands/track/commit.md` explicitly stops and asks the user to choose or edit a commit message when `$ARGUMENTS` is empty. That makes the workflow non-autonomous and violates the command's own Constraint 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 18,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:a7abcc9595d0621e02ce7f5fd0f9144874decd5daca5bc6583019eb16f03d809",
+          "at": "2026-05-20T23:53:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:review` is scheduled here before `spec.md` exists. `track/review.md` Step 0 expects the current track's `spec.md`, and `track/init.md` says `spec.md` is created later in Phase 1 and is not required for the first commit, so this step order is internally inconsistent and can make the initial baseline-review stage fail.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 16,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:85b963c8cbf7ad0503afbae44827a7a215050752f3ebd60db6a606cc1c089056",
+          "at": "2026-05-20T23:56:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:pr-review` is the terminal step in this chain, but this rule says a \"PR merge gate\" at step 10 enforces yellow-resolution. That enforcement point does not exist here because the chain explicitly forbids merge, so the rationale conflicts with the no-merge constraint and misstates how the requirement is enforced.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 42,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2d75281ed68c632667cd61f7758a7644f64edafc6c258fe76f8dd6052ea13f98",
+          "at": "2026-05-20T23:59:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The first `/track:review` is scheduled before `spec.md` exists, but `track/review.md` Step 0 requires the current track's `spec.md`, `plan.md`, and `metadata.json` and does not document a fallback path. On a fresh track this makes the baseline-review stage potentially fail before the first commit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 16,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:359e47240497a7fded50b5e83c2d8162afa0c17a88a4588de12662540c26ed00",
+          "at": "2026-05-21T00:01:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7038cb301b92a6c719ad9bac388971420ad81436a1a4a328160f56d70072e7",
+          "at": "2026-05-21T00:03:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 instructs running `/track:review` before Phase 1 and explicitly says `spec.md` does not exist yet, but the canonical `/track:review` Step 0 requires reading the current track's `spec.md` along with `plan.md` and `metadata.json`. As written, the orchestrator can drive into a sub-command whose documented preconditions/context reads are unavailable, so the ADR-baseline review path may fail instead of reaching the first guarded commit.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 16,
+              "category": "harness-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:eb7038cb301b92a6c719ad9bac388971420ad81436a1a4a328160f56d70072e7",
+          "at": "2026-05-21T00:10:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5175ffba114f347be678269267bc19a024c340ec4795538723c49f5f4cf89a1c",
+          "at": "2026-05-21T00:13:42Z"
+        }
+      ]
+    }
+  }
+}
