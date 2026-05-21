@@ -1,0 +1,134 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "ContractMapRendererAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "style_config_path", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "style_config_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::contract_map_renderer_adapter",
+      "docs": "Infrastructure adapter implementing ContractMapRenderer port. Performs full v3 mermaid rendering: syn-based TypeRef parse + `.harness/config/contract-map-style.toml` style configuration. Style config DTO types are private (Decision P-3, CN-11). Constructor receives style_config_path and loads config on first render call. (Decision P-1 + IN-21)",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-21",
+          "hash": "a3a2f4a82482849421f46a1cbbcce4614da83ff628acaf5d34b20501e3cbc094"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "AC-11",
+          "hash": "eff8c6d97d4e52ceb8dda0767eefda7530164288c786d1302b7836743aa51a03"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FsCatalogueLoader": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_root", "ty": "std::path::PathBuf" },
+          { "name": "rules_path", "ty": "std::path::PathBuf" },
+          { "name": "trusted_root", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "track_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_path", "ty": "std::path::PathBuf" },
+            { "name": "trusted_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::contract_map_adapter",
+      "docs": "Carried for R7 edge exposure so FsCatalogueLoader -.impl.-> CatalogueLoader edge is visible in the contract-map.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FsContractMapWriter": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_root", "ty": "std::path::PathBuf" },
+          { "name": "trusted_root", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "track_root", "ty": "std::path::PathBuf" },
+            { "name": "trusted_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::contract_map_adapter",
+      "docs": "Carried for R7 edge exposure so FsContractMapWriter -.impl.-> ContractMapWriter edge is visible in the contract-map.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "domain::tddd::ContractMapRenderer",
+      "for_type": "ContractMapRendererAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "domain::tddd::catalogue_ports::CatalogueLoader",
+      "for_type": "FsCatalogueLoader"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "domain::tddd::catalogue_ports::ContractMapWriter",
+      "for_type": "FsContractMapWriter"
+    }
+  ]
+}

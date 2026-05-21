@@ -1,0 +1,154 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "RenderContractMapCommand": {
+      "action": "reference",
+      "role": "Command",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_id", "ty": "String" },
+          { "name": "layer_filter", "ty": "Option<Vec<String>>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "contract_map_workflow",
+      "docs": "Carried for edge exposure. Unchanged from baseline — no structural modification in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RenderContractMapError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "CatalogueLoaderFailed", "payload": { "kind": "tuple", "fields": ["domain::tddd::catalogue_ports::CatalogueLoaderError"] } },
+          { "name": "ContractMapWriterFailed", "payload": { "kind": "tuple", "fields": ["domain::tddd::catalogue_ports::ContractMapWriterError"] } },
+          { "name": "EmptyCatalogue", "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }] } },
+          { "name": "LayerNotFound", "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }, { "name": "layer_id", "ty": "String" }] } },
+          { "name": "InvalidTrackId", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "RendererFailed", "payload": { "kind": "tuple", "fields": ["domain::tddd::ContractMapRendererError"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "contract_map_workflow",
+      "docs": "Error variants for RenderContractMap::execute. Modified in this track: gains RendererFailed(ContractMapRendererError) when RenderContractMapInteractor is updated to inject the R: ContractMapRenderer generic (Decision P-5 + IN-23).",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-23",
+          "hash": "796969afbdc727888bd4fab0a5ae155c59c75d22b7a1891487553a60bfae3d7c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RenderContractMapInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "contract_map_workflow",
+      "docs": "Interactor implementing RenderContractMap. Modified in this track (Decision P-5 + IN-23): generic parameter R (ContractMapRenderer) is added. The interactor now injects ContractMapRenderer and calls self.renderer.render(catalogues, layer_order, opts) instead of the deleted domain free function render_contract_map. Fields are private (has_stripped_fields: true). Constructor new(loader: L, renderer: R, writer: W) declared in source code.",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-23",
+          "hash": "796969afbdc727888bd4fab0a5ae155c59c75d22b7a1891487553a60bfae3d7c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RenderContractMapOutput": {
+      "action": "reference",
+      "role": "Dto",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "rendered_layer_count", "ty": "usize" },
+          { "name": "total_entry_count", "ty": "usize" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "contract_map_workflow",
+      "docs": "Output DTO returned by RenderContractMap::execute. Unchanged from baseline.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "RenderContractMap": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RenderContractMapCommand" }
+          ],
+          "returns": "Result<RenderContractMapOutput, RenderContractMapError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "contract_map_workflow",
+      "docs": "Primary port (ApplicationService) for the contract-map render workflow. Carried for edge exposure so RenderContractMapInteractor impl edges are visible.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "RenderContractMap",
+      "for_type": "RenderContractMapInteractor"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::convert::From<domain::tddd::catalogue_ports::CatalogueLoaderError>",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::convert::From<domain::tddd::catalogue_ports::ContractMapWriterError>",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<domain::tddd::ContractMapRendererError>",
+      "for_type": "RenderContractMapError"
+    }
+  ]
+}

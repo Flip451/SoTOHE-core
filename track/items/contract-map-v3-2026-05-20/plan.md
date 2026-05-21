@@ -1,4 +1,74 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # contract-map renderer の catalogue schema v3 対応
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Tasks (0/10 resolved)
+
+### S1 — Domain layer: port + error type + free function deletion
+
+> Establish the ContractMapRenderer port trait and ContractMapRendererError in the domain layer, and remove the obsolete render_contract_map free function.
+> This section keeps the domain layer free of serde/TOML dependencies (Decision P-4 / CN-03).
+
+- [ ] **T001**: domain 層の変更を実施する: (1) domain 自由関数 `render_contract_map` (libs/domain/src/tddd/contract_map_render.rs) を削除し、その呼び出しサイトをすべて更新する (IN-19 / Decision P-2)。(2) `ContractMapRenderer` port trait を domain 層に新設する (IN-01 / IN-22 / Decision A-3' / E-3c / P-4)。trait signature: `fn render(&self, catalogues: &[CatalogueDocument], layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> Result<ContractMapContent, ContractMapRendererError>` + Send + Sync supertrait bounds。配置先: `libs/domain/src/tddd/` (例: `contract_map_renderer.rs`)。(3) `ContractMapRendererError` enum を domain 層に追加する (IN-22 / Decision P-4)。variants: StyleConfigNotFound { path: PathBuf } / StyleConfigInvalid { path: PathBuf, reason: String } / RenderFailed { reason: String }。Debug / Display / std::error::Error を実装する (derive(Debug) + 手書き Display + Error impl)。domain 層に serde / TOML 依存を追加しない (CN-03 / Decision P-4)。unit test: ContractMapRendererError の Display 出力が各 variant で適切なメッセージを返すことを確認する。
+
+### S2 — Usecase layer: interactor generic refactor + error variant
+
+> Wire RenderContractMapInteractor to the new ContractMapRenderer port via a generic parameter R, and extend RenderContractMapError with the RendererFailed variant.
+> Keeps the usecase layer free of any direct infrastructure dependency (hexagonal constraint).
+
+- [ ] **T002**: usecase 層の変更を実施する: (1) `RenderContractMapInteractor` に generic parameter `R: ContractMapRenderer` を追加し、`renderer: R` フィールドを持つよう修正する (IN-23 / Decision P-5)。constructor `new(loader: L, renderer: R, writer: W)` を更新し、削除された domain 自由関数の代わりに `self.renderer.render(catalogues_slice, layer_order, opts)` を呼ぶよう execute メソッドを書き換える。`CatalogueLoader.load_all` は `BTreeMap<LayerId, CatalogueDocument>` (reference — 変更なし) を返し、現行 contract は 1 layer = 1 doc に限定される。インタラクタは BTreeMap の各値を `catalogues.values().cloned().collect::<Vec<_>>()` でフラットな `Vec<CatalogueDocument>` に変換し、renderer に渡す。なお 1 layer に複数 crate が存在するシナリオ (catalogue schema v3 の理論的拡張) は `CatalogueLoader` が BTreeMap<LayerId, CatalogueDocument> を返す限り当 usecase workflow では未サポートとなる; 将来そのシナリオが必要になった場合は CatalogueLoader の return type 変更 (例: BTreeMap<LayerId, Vec<CatalogueDocument>>) と対応するインタラクタの更新が必要。本 track では現行 loader の 1-doc-per-layer contract の範囲で動作することを前提とする。なお layer フィルタリングはインタラクタが担う: execute は `CatalogueLoader` からトポロジカルソート済み `layer_order` を取得した後、`RenderContractMapCommand.layer_filter` が Some の場合はその値で `layer_order` を絞り込んでから `render(catalogues_slice, filtered_layer_order, opts)` を呼ぶ。`ContractMapRenderOptions.layers` フィールドはインタラクタが読まず、opts の値はコマンドから直接渡す (forward-compatibility stub として維持)。(2) `RenderContractMapError` に `RendererFailed(ContractMapRendererError)` variant を追加し (IN-23)、`impl From<ContractMapRendererError> for RenderContractMapError` を追加する。Debug / Display / Error の既存実装を新 variant に対応させる。unit test: renderer が `ContractMapRendererError` を返した場合に `RenderContractMapError::RendererFailed` に変換されることを確認する。
+
+### S3 — Infrastructure: adapter scaffold + style-config loading (fail-closed)
+
+> Add the ContractMapRendererAdapter struct, private TOML style-config DTO types, and fail-closed config loading logic.
+> Covers Decision P-1/P-3 and the fail-closed constraint (CN-02/AC-11).
+> Also adds .harness/config/contract-map-style.toml to the repo as the committed default (Decision L-8/L-10).
+
+- [ ] **T003**: infrastructure 層に `ContractMapRendererAdapter` の骨格を実装する (IN-21 / Decision P-1 / P-3)。(1) `ContractMapRendererAdapter { style_config_path: PathBuf }` struct を `libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs` に追加する。`new(style_config_path: PathBuf) -> Self` constructor を実装する。(2) `.harness/config/contract-map-style.toml` の全 section 構造 ([role.<RoleName>] / [node.<NodeCategory>] / [pattern.<PatternName>] / [class.<ClassName>] / [edge.<EdgeKind>] / [filter]) を表す非公開 TOML schema DTO 群を同モジュール内に定義する (Decision L-1 / CN-11)。toml crate + serde で deserialize する。(3) `ContractMapRenderer` port の実装骨格 (`impl ContractMapRenderer for ContractMapRendererAdapter`) を追加し、render メソッドの先頭でスタイル設定ファイルを読み込む: ファイル不在なら `ContractMapRendererError::StyleConfigNotFound { path }` を返す (fail-closed, CN-02); TOML parse 失敗なら `StyleConfigInvalid { path, reason }` を返す。(4) `.harness/config/contract-map-style.toml` ファイルを repo に追加し、全 section のデフォルト値を定義する (L-8 / L-10 の repo-committed default)。unit test: ファイル不在の場合に StyleConfigNotFound が返ること、TOML 不正の場合に StyleConfigInvalid が返ることを確認する (AC-11)。(5) CLI 層の composition 変更: `apps/cli` の `sotp track contract-map` コマンドハンドラが `RenderContractMapInteractor` を構築する箇所を更新し、`ContractMapRendererAdapter::new(style_config_path)` を生成して interactor の `renderer` 引数として渡す。`style_config_path` は `.harness/config/contract-map-style.toml` への絶対パス (または設定から取得したパス) とする。これにより `ContractMapRendererAdapter` が `StyleConfigNotFound` / `StyleConfigInvalid` を返した場合のエラーが `RenderContractMapError::RendererFailed` を経由して CLI がエラー終了する (fail-closed、AC-11)。
+
+### S4 — Infrastructure: core data structures (CatalogueNode, node_id, global trait index)
+
+> Internal data structures that all rendering steps depend on.
+> CatalogueNode enum (B-1) enables match-based dispatch, node_id scheme (D-2) guarantees injectivity across N crates per layer, and the global trait index (O) enables cross-catalogue trait impl edge resolution.
+
+- [ ] **T004**: レンダリング前処理のコアデータ構造を実装する (adapter 内部): (1) `CatalogueNode<'a>` enum (B-1: Type / Trait / Function の 3 variant) を adapter の内部型として定義し、match で種別ごとのレンダリングロジックを分岐できる構造にする。(2) node_id 生成関数を実装する (Decision D-2): Type は `T<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>`、Trait は `R<len>_...`、Function は `F<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_full_path>`。sanitize は mermaid node_id 用 (英数字・アンダースコア以外を `_` に置換)。len は sanitized_layer + `_` + sanitized_crate + `_` + sanitized_name (Function は full_path) の文字列長。unit test: 同 layer に 2 crate が存在し同名 Type / Trait を宣言している構成で node_id が衝突しないことを確認する (AC-09)。(3) global trait index 構築関数を実装する (Decision O-2/O-3): `&[CatalogueDocument]` を一度走査して `BTreeMap<(CrateName, TraitName), subgraph_id: String>` を構築する。trait index の source は各 doc の `traits` BTreeMap エントリ (TraitEntry)。per-render-call 構築で long-lived index は持たない (CN-05)。unit test: 複数 catalogue にまたがる trait が正しく index されることを確認する。
+
+### S5 — Infrastructure: subgraph / node placement (entries, modules, layers)
+
+> Rendering of the subgraph nesting structure: layer subgraphs → top-module subgraphs (U-6d-iii) → entry subgraphs (F-2+b2-ii) → standalone FunctionEntry nodes (F-2+d1/I-1).
+> Implements the layer-agnostic invariant (CN-01/GO-03): layer labels come from layer_order, not hardcoded strings.
+
+- [ ] **T005**: サブグラフ・ノード配置ロジックを実装する (adapter 内部): (1) layer subgraph を layer_order の順に生成する。各 layer subgraph の label は layer_order で渡された LayerId 文字列をそのまま使用し、ハードコードしない (CN-01 / GO-03)。(2) (crate_name, module_path[0]) ペアで entry を最上位 module 1 段 subgraph に集約する (U-6d-iii)。subgraph id: `<sanitized_layer>_<sanitized_crate>_module_<sanitized_module_path_first_segment>`。subgraph label: `<crate_name>::<module_path_first_segment>`。(3) TypeEntry / TraitEntry はそれぞれ entry subgraph として描画する (F-2+b2-ii)。methods 0 個でも空 subgraph を生成する (AC-02)。entry subgraph の label に sub-module path を含める (例: `team::manager::TeamManager`)。(4) FunctionEntry は standalone callable node として top-module subgraph に直接配置する (F-2+d1 / I-1)。subgraph 化しない。FunctionPath alphabetical 順で配置する。(5) crate root entry (module_path = []) は module subgraph 外、layer subgraph 直下に配置する。(6) nesting 構造: layer → top-module → entry → method = 4 重 (TypeEntry/TraitEntry)、layer → top-module → FunctionEntry = 3 重。BTreeMap iteration = alphabetical by name (CN-08)。unit test: module_path = [] の entry が layer 直下に配置されること、module_path あり entry が module subgraph 内に配置されること。
+
+### S6 — Infrastructure: method nodes, inherent_impls aggregation, typestate transition edges
+
+> Render method nodes inside entry subgraphs, aggregate methods from doc.inherent_impls into the corresponding Type subgraph (IN-07/AC-04), and apply the typestate transition edge style (G-2'b/IN-08) for transition_methods.
+
+- [ ] **T006**: method node レンダリング + inherent_impls 集約 + typestate transition edge を実装する (adapter 内部): (1) TypeEntry.methods の各 MethodDeclaration を entry subgraph 内の node として描画する (F-2+b2-ii / IN-20)。method node から param type へ `--o` edge、returns type へ `-->` edge を引く。(2) doc.inherent_impls の各 InherentImplDeclV2 の methods を type_name で対応する Type subgraph に紐付け、subgraph 内に method node として追加する (IN-07 / F の schema-delta 補記)。1 type に複数 InherentImplDeclV2 が存在する場合はすべての methods を集約して配置する (AC-04)。(3) TypeKindV2::PlainStruct の typestate: Some(TypestateMarker { ... }) のとき、transitions.transition_methods() の各 method の returns edge を `==>|transitions_to|` に変更する (Decision G-2'b / IN-08 / IN-20)。通常の returns edge `-->` と視覚的に区別する。style は設定ファイル [edge.transition] から読む。unit test: typestate あり PlainStruct の transition method の returns edge が `==>|transitions_to|` になることを確認する (AC-03)。inherent_impls の集約 (2 つの InherentImplDeclV2 が同 type_name を持つ場合) が正しく動作することを確認する (AC-04)。
+
+### S7 — Infrastructure: enum variant nodes, TypeAlias edge, struct field edges
+
+> Render enum variant nodes with payload-based edges (H-3/IN-09/AC-05), TypeAlias undirected alias_of edge (N-1'/IN-15/AC-08), PlainStruct field edges and TupleStruct positional-index edges (K-2+(d)/IN-13/AC-07).
+
+- [ ] **T007**: enum variant / TypeAlias / struct field のレンダリングを実装する (adapter 内部): (1) TypeKindV2::Enum の variants の各 VariantDecl を entry subgraph 内に node 化する (Decision H-3 / IN-09)。VariantPayload::Tuple → 各 TypeRef へ `--o` (無 label)、VariantPayload::Struct → 各 FieldDecl の name を label に `--o|field_name|`、VariantPayload::Unit → edge なし (AC-05)。VariantDecl は Vec declaration order でレンダリングする (CN-08)。(2) TypeKindV2::TypeAlias を空 subgraph として描画し、target type subgraph への無向 edge `---|alias_of|` を引く (Decision N-1' / IN-15 / AC-08)。(3) TypeKindV2::PlainStruct の fields: entry subgraph から field type subgraph へ `--o|field_name|` edge (K-2+(d) / IN-13)。has_stripped_fields: true の場合は field edge を描画しない (K-2+(d))。TypeKindV2::TupleStruct の fields: 各 field type へ positional index label (`--o|.0|`, `--o|.1|` ...) で edge。Newtype (TupleStruct + 1 field) は通常 TupleStruct と同扱い — renderer は newtype-specific overlay を付与しない (CN-09)。unit test: Tuple variant の --o edge, Struct variant の --o|name| edge, Unit variant の edge なし を確認する (AC-05)。PlainStruct の --o|field_name| edge と has_stripped_fields: true の非描画を確認する (AC-07)。TupleStruct の positional edge を確認する (AC-07)。TypeAlias の `---|alias_of|` edge を確認する (AC-08)。
+
+### S8 — Infrastructure: trait impl edges + TraitEntry method nodes
+
+> Render TraitEntry method nodes (H'-1/IN-10) and generate trait impl edges from doc.trait_impls using the global trait index (J-2/O/IN-12/AC-06).
+> Workspace-external trait_ref targets are silent-skipped (CN-10).
+
+- [ ] **T008**: trait impl edge レンダリング + TraitEntry method node を実装する (adapter 内部): (1) TraitEntry.methods の各 MethodDeclaration を TraitEntry の entry subgraph 内に node 化する (H'-1 / IN-10)。TypeEntry と同じ表現 (method node + param/returns edge) を使用する。(2) doc.trait_impls の各 TraitImplDeclV2 から for_type → trait_ref 方向の `-.impl.->` edge を生成する (Decision J-2 / IN-12 / AC-06)。全 ContractRole で統一 edge style。(3) edge の target 解決: T004 で構築した global trait index (`BTreeMap<(CrateName, TraitName), subgraph_id>`) を参照して trait_ref の subgraph_id を解決する (Decision O)。trait_ref が workspace 外の型を指す場合は silent skip する (CN-10 / AC-06)。TraitImplDeclV2 は methods を持たない identity-only であるため、trait impl 由来の method node 化は行わない (CN-04)。unit test: for_type → trait_ref 方向の `-.impl.->` edge が生成されることを確認する (AC-06)。workspace 外 trait_ref が silent skip されることを確認する (CN-10)。
+
+### S9 — Infrastructure: mermaid output assembly + style application
+
+> Assemble the final mermaid string in the canonical order (classDef → layer subgraphs → edges → class attach) per IN-18 / ADR Render Output structure.
+> Apply style values from all config sections (C/L decisions) and verify no hardcoded layer names in output labels.
+
+- [ ] **T009**: mermaid 出力の最終組み立てとスタイル適用を実装する (adapter 内部): (1) Render Output 構造 (IN-18 / ADR Render Output 構造節) に従い出力を組み立てる: (a) `flowchart LR` (diagram type 宣言 — 先頭行)、(b) classDef 定義群 (設定ファイル [class.*] から alphabetical 順、edge arrow/label 定義は classDef に含めない)、(c) layer subgraph 群 (layer_order 順)、(d) edge 定義群 (構造 walk 順)、(e) class attach 群 (`class <id> <className>` を別行で記述 — subgraph への inline `:::className` は parse error のため使用しない)。(2) スタイル適用: [role.<RoleName>] から classDef への class 名マッピング、[node.<NodeCategory>] の shape/class でノード形状を決定 (FunctionEntry standalone callable node は [node.Function] から shape 取得)、[pattern.Typestate] の overlay_class を typestate PlainStruct subgraph に適用、[edge.<EdgeKind>] の arrow/label から各 edge 文字列を生成 (edge.method_param / edge.method_returns / edge.transition / edge.trait_impl / edge.variant_payload / edge.field / edge.alias)、[filter] の include_function_roles を将来の拡張として構造的に読み込む (現実装は全 FunctionEntry を render、I-1)。(3) layer subgraph label に層名をハードコードしない (CN-01 / GO-03)。unit test: 出力の先頭が `flowchart LR` であり、その後 classDef → layer subgraph → edge → class attach の順序を確認する (IN-18 / AC-01)。スタイル設定が反映されることを確認する (AC-11 は T003 で対応済み)。
+
+### S10 — Tests, CI green, and layer dependency verification
+
+> Layer-agnostic fixture tests (2-layer/3-layer/custom-name) confirming AC-12.
+> cargo make ci full gate (AC-13), cargo make check-layers (AC-14), style DTO encapsulation verification (AC-15).
+> Fail-closed test for absent style config (AC-11) was added in T003; this section verifies all gates pass together.
+
+- [ ] **T010**: テスト整備と CI green 確認を行う: (1) layer-agnostic fixture tests: 2 層構成 (例: core / api)、3 層構成 (domain / usecase / infrastructure)、独自層名構成 (alpha / beta) の最小 CatalogueDocument fixture を作成し、`ContractMapRendererAdapter::render` が正常終了することと subgraph label に層名がハードコードされていないことを unit test で確認する (AC-12)。(2) AC-15 確認: style DTO struct が infrastructure crate 以外のモジュールから見えないことを確認する (私有型の可視性は Rust コンパイラが保証するため、テストは ContractMapRendererAdapter の公開 API に style DTO が露出しないことを確認する)。(3) `cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全て pass することを確認する (AC-13)。(4) `cargo make check-layers` で infrastructure → domain の依存が許容され、domain → infrastructure の依存がエラーになることを確認する (AC-14 / CN-03)。(5) domain 層に serde / TOML crate 依存が存在しないことを `cargo make deny` + check-layers で確認する (AC-14)。

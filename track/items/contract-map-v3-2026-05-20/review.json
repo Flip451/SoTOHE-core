@@ -1,95 +1,35 @@
 {
   "schema_version": 2,
   "scopes": {
-    "plan-artifacts": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Decision D` and `Decision U` are not injective in the plan’s own `1 layer N crate` model. The ADR explicitly allows multiple crates per layer ([A](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L140)), but Type/Trait node IDs are built only from `sanitized_layer` + short name ([D](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L171)), and the top-module subgraph ID also omits `crate_name` ([U](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L281)). In a layer with two crates that reuse the same short type/trait name or top-level module segment, unrelated items will collapse into the same rendered node/subgraph.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 140,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ee97db96b214d8b0ca26f7450ad699e748dafdee0b2c47dccfddc1fd5676713e",
-          "at": "2026-05-20T23:34:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision O describes a \"global trait index\" being built from `doc.trait_impls`, but the cache it defines is keyed by `(CrateName, TraitName)` and stores `trait_subgraph_id`s. As written, the source data is the wrong layer of the model: impl records do not provide a complete trait index, so this conflates trait lookup with impl-edge traversal.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 265,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ee97db96b214d8b0ca26f7450ad699e748dafdee0b2c47dccfddc1fd5676713e",
-          "at": "2026-05-20T23:36:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The follow-up says D1–D6 were superseded by the new ADR, but the next sentence says D6's Reality View role split is still inherited. Those statements conflict on whether D6 was replaced or preserved.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
-              "line": 411,
-              "category": "contradiction"
-            },
-            {
-              "message": "The renderer is allowed to take multiple `CatalogueDocument`s per layer, but the Type/Trait node IDs only encode `layer` and `name`. That omits crate/module identity, so same-named entries in different crates or modules within one layer will collide and the stated injective scheme is false for the input model.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 171,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:55ea459f3e5beb1a994f9566f2b871d626184daec83c595ac9f0c0f81e8ffd5a",
-          "at": "2026-05-20T23:39:17Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:79382e64e797263f25b11148fcf3a647a197e6d632e92416702f609debf6fbb6",
-          "at": "2026-05-20T23:41:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision U drops `crate_name` from module subgraph identity even though Decision A explicitly supports `1 layer N crate`. With `subgraph id: <sanitized_layer>_module_<sanitized_module_path_first_segment>`, two crates in the same layer that both have a top-level module like `review` will generate the same Mermaid subgraph id, merging unrelated entries and making class attachment ambiguous. The module grouping needs to include the crate dimension, matching the node-id design in Decision D.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 282,
-              "category": "contradiction"
-            },
-            {
-              "message": "Decision D's function node-id specification is internally inconsistent: the Function template uses `sanitized_full_path`, but the `<len>` definition is only `sanitized_layer + '_' + sanitized_crate + '_' + sanitized_name` and the injectivity explanation only covers Type/Trait names. As written, implementers do not have a coherent length-prefix rule for FunctionPath ids, so the claimed injective id scheme is underspecified for one of the three node kinds.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
-              "line": 175,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:79382e64e797263f25b11148fcf3a647a197e6d632e92416702f609debf6fbb6",
-          "at": "2026-05-20T23:45:25Z"
+          "hash": "rvw1:sha256:a8ddcad1f5296e43f5932c7ed0ee07e2b27d39a37c2851346e38ac28ef78e865",
+          "at": "2026-05-21T02:04:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2e3169b94e388b3c97eca4d26e977097a415144da403c7502f978a479b5d867b",
-          "at": "2026-05-20T23:50:04Z"
+          "hash": "rvw1:sha256:a8ddcad1f5296e43f5932c7ed0ee07e2b27d39a37c2851346e38ac28ef78e865",
+          "at": "2026-05-21T02:07:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d2e872c20a65e66f62087bd43a8486b1b761d3bb811017e6ce7b4d5db5eec22",
+          "at": "2026-05-21T10:22:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d2e872c20a65e66f62087bd43a8486b1b761d3bb811017e6ce7b4d5db5eec22",
+          "at": "2026-05-21T10:24:45Z"
         }
       ]
     },
@@ -316,6 +256,759 @@
           "findings": [],
           "hash": "rvw1:sha256:5175ffba114f347be678269267bc19a024c340ec4795538723c49f5f4cf89a1c",
           "at": "2026-05-21T00:13:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc8f1bd6cb5169ca279098d5c5bf37ea438d38a7301cf337dad651cadefaecc",
+          "at": "2026-05-21T02:51:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc8f1bd6cb5169ca279098d5c5bf37ea438d38a7301cf337dad651cadefaecc",
+          "at": "2026-05-21T02:54:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:784b5a562acda1cedec39d6adbee50bc7faf05f72198983cdb7c568accfddaa2",
+          "at": "2026-05-21T10:22:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R10’s example re-allows the exact serde-boundary primitive escape hatch that R9 forbids: R9 says concept-bearing DTO fields / Vec elements / map keys must not be raw `String` and should deserialize into the domain VO/enum or an infra mirror enum, but this line says a validated identifier concept may be received in an infra DTO as `String` and converted with `TryFrom`. That leaves reviewers and type-designer with contradictory guidance for concept-bearing DTO fields.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 259,
+              "category": "internal-contradiction"
+            },
+            {
+              "message": "Step 12c now requires enumerating every concept-bearing slot and every impl/action check “in the final report”, but the Output section still defines the final message as only per-layer signal counts plus Open Questions and says catalogue/per-action details are not echoed. These instructions cannot both be followed as written, so the required 12c evidence may be omitted by an agent following the Output contract.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 204,
+              "category": "internal-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:784b5a562acda1cedec39d6adbee50bc7faf05f72198983cdb7c568accfddaa2",
+          "at": "2026-05-21T10:24:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new 12c action-correctness gate says a `reference` entry must be byte-identical to baseline and that a body-changed `reference` fails, but the required attestation scope is limited to `add`/`modify` types or traits. That lets `reference` entries avoid enumeration entirely, so the final report can satisfy the stated format while providing no evidence for the reference-vs-modify check the same section requires. Widen the enumeration/attestation scope to include `reference` entries that must be baseline-checked, or add a separate required reference-entry baseline check.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 208,
+              "category": "internal_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a5cf0cc08e75592499e4de11378f3b4d631ae8bad5bfc0a824cc95d947b32dae",
+          "at": "2026-05-21T10:26:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R10 says every domain concept, including examples like policies, must be modeled only as Entity/AggregateRoot/ValueObject/domain enum/typestate. That conflicts with the existing R1/R6 taxonomy where legitimate domain concepts with behavior belong in `DomainService` or `Specification`; the checklist repeats the same narrowed set, so an agent following R10 could reject or misclassify valid R6 domain-service designs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 234,
+              "category": "internal-contradiction"
+            },
+            {
+              "message": "The new 12c reference baseline attestation only covers `reference` types and traits. Catalogue `functions` also have `action: \"reference\"` and can diverge from baseline by signature/body changes, but this gate and final attestation let reference functions be omitted entirely, leaving the action-correctness check incomplete.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 215,
+              "category": "coverage-gap"
+            },
+            {
+              "message": "This cross-reference points to `libs/infrastructure/src/tddd/catalogue_document_codec.rs`, but that file does not exist; the codec lives under `libs/infrastructure/src/tddd/catalogue_document_codec/` (`mod.rs`, `decode.rs`, `dto.rs`, `encode.rs`). Reviewers/agents following the related-docs pointer will fail to resolve the stated codec source.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 323,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:9e7ad763386efca6a4c8d9033130635c73c83f063d5f7cb8b5c87f6d09e2d864",
+          "at": "2026-05-21T10:29:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12 now defines three required gates (12a, 12b, and the new 12c), but this preamble still says the agent “MUST run two checks.” That is an internal contradiction in the policy and can make 12c look optional despite the later hard requirement.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 153,
+              "category": "internal_contradiction"
+            },
+            {
+              "message": "This reference still points at `libs/infrastructure/src/tddd/catalogue_document_codec.rs`, but the repo now contains `libs/infrastructure/src/tddd/catalogue_document_codec/` and no `.rs` file. The Related Documents section was updated to the directory path, so this remaining old path is a broken reference.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 313,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:651d08121209655a779f2fc1e0c0d9975ab1383c27e5cf71c7650823d7ce3ba8",
+          "at": "2026-05-21T10:32:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36f481c4b44443af335ac576425011a5b8902477036005e13c584e722412a401",
+          "at": "2026-05-21T10:34:17Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Decision D` and `Decision U` are not injective in the plan’s own `1 layer N crate` model. The ADR explicitly allows multiple crates per layer ([A](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L140)), but Type/Trait node IDs are built only from `sanitized_layer` + short name ([D](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L171)), and the top-module subgraph ID also omits `crate_name` ([U](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L281)). In a layer with two crates that reuse the same short type/trait name or top-level module segment, unrelated items will collapse into the same rendered node/subgraph.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 140,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ee97db96b214d8b0ca26f7450ad699e748dafdee0b2c47dccfddc1fd5676713e",
+          "at": "2026-05-20T23:34:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision O describes a \"global trait index\" being built from `doc.trait_impls`, but the cache it defines is keyed by `(CrateName, TraitName)` and stores `trait_subgraph_id`s. As written, the source data is the wrong layer of the model: impl records do not provide a complete trait index, so this conflates trait lookup with impl-edge traversal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 265,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ee97db96b214d8b0ca26f7450ad699e748dafdee0b2c47dccfddc1fd5676713e",
+          "at": "2026-05-20T23:36:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The follow-up says D1–D6 were superseded by the new ADR, but the next sentence says D6's Reality View role split is still inherited. Those statements conflict on whether D6 was replaced or preserved.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-04-17-1528-tddd-contract-map.md",
+              "line": 411,
+              "category": "contradiction"
+            },
+            {
+              "message": "The renderer is allowed to take multiple `CatalogueDocument`s per layer, but the Type/Trait node IDs only encode `layer` and `name`. That omits crate/module identity, so same-named entries in different crates or modules within one layer will collide and the stated injective scheme is false for the input model.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 171,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:55ea459f3e5beb1a994f9566f2b871d626184daec83c595ac9f0c0f81e8ffd5a",
+          "at": "2026-05-20T23:39:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79382e64e797263f25b11148fcf3a647a197e6d632e92416702f609debf6fbb6",
+          "at": "2026-05-20T23:41:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision U drops `crate_name` from module subgraph identity even though Decision A explicitly supports `1 layer N crate`. With `subgraph id: <sanitized_layer>_module_<sanitized_module_path_first_segment>`, two crates in the same layer that both have a top-level module like `review` will generate the same Mermaid subgraph id, merging unrelated entries and making class attachment ambiguous. The module grouping needs to include the crate dimension, matching the node-id design in Decision D.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 282,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision D's function node-id specification is internally inconsistent: the Function template uses `sanitized_full_path`, but the `<len>` definition is only `sanitized_layer + '_' + sanitized_crate + '_' + sanitized_name` and the injectivity explanation only covers Type/Trait names. As written, implementers do not have a coherent length-prefix rule for FunctionPath ids, so the claimed injective id scheme is underspecified for one of the three node kinds.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 175,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:79382e64e797263f25b11148fcf3a647a197e6d632e92416702f609debf6fbb6",
+          "at": "2026-05-20T23:45:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e3169b94e388b3c97eca4d26e977097a415144da403c7502f978a479b5d867b",
+          "at": "2026-05-20T23:50:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ContractMapRenderer` and `render_contract_map` are described as the A-3' slice-based API in `spec.json`, but this catalog entry still encodes both as owned `Vec` inputs (`Vec<CatalogueDocument>`, `Vec<LayerId>`, owned `ContractMapRenderOptions`). That contradicts the ADR/spec contract and the same file's own docs note about accepting `&[CatalogueDocument]`/`&[LayerId]`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/domain-types.json",
+              "line": 221,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:087d05739aed0d537ee40636ec1c743f9d0b5601d870d0f22e687c1afadf2180",
+          "at": "2026-05-21T02:05:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is scheduled in phase 1 even though it depends on `ContractMapRenderAdapter`, which is only introduced in T005. That makes the CLI wiring step impossible to execute in the listed order unless the adapter task is moved earlier or split into a stub/constructor task.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1c91c4ede1233d3922068b890a7c58f307d164b084aec3961b569254c11f8b80",
+          "at": "2026-05-21T02:09:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public render API now has two competing layer inputs: `ContractMapRenderOptions.layers` here, and `layer_order` in the new `render_contract_map(...)` contract (`track/items/contract-map-v3-2026-05-20/spec.json:45`). The plan never defines precedence or a distinct meaning for `layers`, so callers can supply inconsistent layer sets/order and the renderer's behavior becomes ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/domain-types.json",
+              "line": 68,
+              "category": "contradiction"
+            },
+            {
+              "message": "This generated contract-map view still says detailed v3 rendering is deferred and labels the artifact as an IN-24 placeholder, but the current spec explicitly says IN-24 must be replaced by the v3 full renderer (`track/items/contract-map-v3-2026-05-20/spec.json:247`). That makes the artifact stale and contradicts the rest of the track.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/contract-map.md",
+              "line": 2,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:878b7245248c75d5bd7d76660ef3baf30f538e6682a7ff582d2c22ce0283011d",
+          "at": "2026-05-21T02:13:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee71c783002a26426b633d4a0e66f464667c0d52e57505dcf874c5854f7449ce",
+          "at": "2026-05-21T02:20:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001`/`S001` describes the `render_contract_map` API change as `BTreeMap -> Vec<CatalogueDocument>`, but the canonical contract in `spec.json` already fixes this as a borrowed slice `render_contract_map(catalogues: &[CatalogueDocument], ...)` and the generated domain type catalog matches that shape. The plan text is therefore inconsistent with the target API shape and could send implementation in the wrong direction.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/plan.md",
+              "line": 14,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8eeb906d68bbb84429e4f44e95cb7dc802f9ab8feb48b6afc32b55795a8a2496",
+          "at": "2026-05-21T02:52:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` still frames the renderer as an `IN-24` minimal placeholder with no node shapes or edges, which contradicts the rest of this plan set: `plan.md` and `spec.md` now define the full v3 renderer as the target and enumerate concrete node/edge behavior. The artifact set is internally inconsistent until this view is regenerated.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/contract-map.md",
+              "line": 2,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b811afbe6716fc71fdda95d4ab7409922b1d92c2d25492daf7c2f87507de2f52",
+          "at": "2026-05-21T02:55:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FilterConfig.include_function_roles` is typed as `Vec<String>`, but the ADR defines this field as `Vec<FunctionRole>` and uses it to restrict the rendered `FunctionRole` enum values. As written, the schema admits invalid role strings instead of keeping the filter type-safe.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/infrastructure-types.json",
+              "line": 203,
+              "category": "factual error"
+            },
+            {
+              "message": "`IN-17` claims a fixed nesting depth of `layer → top-module → entry → method`, but the same plan explicitly renders `FunctionEntry` as a standalone node under the top-module subgraph (`plan.md` T008). That makes the hierarchy non-uniform, so the “4-level fixed” invariant is false as written.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+              "line": 227,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b811afbe6716fc71fdda95d4ab7409922b1d92c2d25492daf7c2f87507de2f52",
+          "at": "2026-05-21T03:00:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4f9f18412d31c16d4c855311e2515d431c891e215fb91701440e2f85ff85f52",
+          "at": "2026-05-21T03:06:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T003` models `ContractMapRendererAdapter::new` as infallible and says the style config is loaded at `render`, but ADR P-3 says the adapter should load `.harness/config/contract-map-style.toml` during construction. Those lifecycles are incompatible: construction-time loading would need a fallible constructor (or equivalent error path), while render-time loading violates the ADR. The plan and the design decision are therefore inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/plan.md",
+              "line": 26,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0639c7a95fb15d03dd43203984fc7c468c170ae24e53db011a04d6e3d46d314b",
+          "at": "2026-05-21T10:24:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`contract-map.md` is still a pre-Decision-P placeholder: it says detailed v3 rendering is deferred and still lists `domain::tddd::contract_map_render::render_contract_map`, but the updated ADR/plan now treat the renderer as fully specified and delete that free function. That leaves this artifact contradicting the rest of the plan package.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/contract-map.md",
+              "line": 2,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fcf42e479615d7e53d8d5b96b8a1829e25f18cfec42299dedb7ba8fc1063b6c0",
+          "at": "2026-05-21T10:28:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ContractMapRenderOptions.layers` is documented as a layer filter, but the new render contract also takes a separate `layer_order`, and the usecase command still carries `layer_filter`. None of the ADR/spec/plan artifacts say whether filtering happens in the interactor, in `ContractMapRenderer::render`, or whether `layers` is ignored, so callers can supply inconsistent order/filter inputs and get undefined behavior.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/domain-types.json",
+              "line": 108,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fcf42e479615d7e53d8d5b96b8a1829e25f18cfec42299dedb7ba8fc1063b6c0",
+          "at": "2026-05-21T10:36:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:392607554d2568dda6d0d3eecb9cc04ce281e104c550c30935fe0d52ed08d6dc",
+          "at": "2026-05-21T10:41:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLoader` is still declared as an unchanged reference returning `BTreeMap<LayerId, CatalogueDocument>`, but the v3 plan requires `ContractMapRenderer::render` to receive `&[CatalogueDocument]` and explicitly support `1 layer に N crate`. A map keyed only by `LayerId` cannot carry multiple crate-level `CatalogueDocument`s for the same layer, so T002 has no sound source for the catalogue slice without collapsing data. The loader contract or an explicit collection/flattening task needs to be updated for the v3 input model.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/domain-types.json",
+              "line": 188,
+              "category": "contradiction"
+            },
+            {
+              "message": "OS-04 says the concrete error type and fallback behavior for invalid style configuration are out of scope, but the same plan makes them in scope: T001 defines `ContractMapRendererError::StyleConfigInvalid`, and T003 requires TOML parse failures to return that variant. This leaves the scope contract contradictory about whether invalid style config handling must be implemented in this track.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.md",
+              "line": 46,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:392607554d2568dda6d0d3eecb9cc04ce281e104c550c30935fe0d52ed08d6dc",
+          "at": "2026-05-21T10:48:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 keeps `CatalogueLoader.load_all` as `BTreeMap<LayerId, CatalogueDocument>` with an explicit `1 layer = 1 doc` contract, then claims collecting those map values preserves future N-crate-per-layer support. That cannot satisfy the ADR/spec v3 model where `CatalogueDocument` is crate-scoped and a single layer may contain multiple crate documents; the map key collapses those documents before the renderer ever receives its `&[CatalogueDocument]` input.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR still leaves “設定ファイル不正値の error type と fallback 挙動” in Open Question R, but Decision P-3 already fixes TOML parse failure as `ContractMapRendererError::StyleConfigInvalid`, and the plan tasks implement that variant. This makes the scope contradictory about whether invalid style-config error handling is deferred or required in this track.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 505,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision U says the nesting depth is fixed at `layer → top-module → entry → method = 4`, while the same ADR says `FunctionEntry` is a standalone callable node rather than an entry subgraph, and the spec/plan define FunctionEntry nesting as `layer → top-module → FunctionEntry = 3`. Leaving the ADR with a single fixed 4-level invariant contradicts the current renderer contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 297,
+              "category": "contradiction"
+            },
+            {
+              "message": "The human-readable catalogue views omit the `add` action for new declarations: `domain-types.json` marks both `ContractMapRendererError` and `ContractMapRenderer` as `\"action\": \"add\"`, but `domain-types.md` renders their Action cells as `—`; `infrastructure-types.json` likewise marks `ContractMapRendererAdapter` as `add`, while `infrastructure-types.md` shows `—`. This contradicts the required catalogue action contract in the plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/domain-types.md",
+              "line": 15,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:649154444be946337e16c71037a6a5d7397a5c3dca47d8832182b769ed1de554",
+          "at": "2026-05-21T10:54:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 preserves `CatalogueLoader.load_all` as `BTreeMap<LayerId, CatalogueDocument>` and claims collecting the values loses no information, but that shape can hold only one catalogue document per layer. This contradicts the ADR/spec requirement that catalogue v3 supports `1 crate = 1 catalogue document` and `1 layer N crate`; multiple crates in the same layer would be impossible to pass through the usecase workflow.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "OS-03 marks the exact `ContractMapRenderer` trait signature and `RenderContractMapInteractor` type-level signature as out of scope, while IN-01/T001 and the layer catalogues define and implement the exact render signature for this track. That leaves the plan internally inconsistent about whether the port/interactor type contract is enforced now or deferred.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+              "line": 337,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ad5e08a81de140447260f536eb81bc98f75c2374b1d040a4e256004ba786158f",
+          "at": "2026-05-21T11:02:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-22/Decision P-4 says the domain layer is limited to only ContractMapRenderer, ContractMapRendererError, ContractMapContent, and ContractMapRenderOptions, but the same catalogue still keeps CatalogueLoader/ContractMapWriter and their errors as domain reference contracts, and T002 depends on them. As written, the plan is contradictory: implementers cannot satisfy the “only four” rule without deleting ports the workflow still needs. Narrow this requirement to the renderer-specific domain surface, or explicitly exempt the existing catalogue loader/writer ports.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+              "line": 295,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan claims complete catalogue schema v3 support, including one catalogue document per crate and layers with N crates, but T002 preserves CatalogueLoader as BTreeMap<LayerId, CatalogueDocument> and explicitly states the usecase workflow is limited to one document per layer. That means the planned `sotp track contract-map` path cannot ingest/render multiple crates in the same layer, contradicting the stated v3 support goal unless multi-crate-per-layer is explicitly moved out of scope or the loader contract is changed in this track.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4ad4936047334586e0dd14b969b316d162eb2f2718c90f1bc21f68c3eda10f8a",
+          "at": "2026-05-21T11:06:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 assigns layer discovery to the renderer by requiring it to scan `architecture-rules.json`, but the accepted port contract and implementation plan pass `layer_order` into `ContractMapRenderer::render` and T005 explicitly renders layer labels from that argument. As written, the adapter would need an unplanned rules-file dependency to satisfy CN-01, contradicting Decision A/T005 and the adapter shape in T003. Reword CN-01 to require consuming the upstream topology-sorted `layer_order`, or update the port/adapter tasks consistently.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.md",
+              "line": 54,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-22 says all four renderer-related domain types are newly added, including `ContractMapContent` and `ContractMapRenderOptions`, but the domain catalogue marks those two as `reference` and T001 only adds `ContractMapRenderer` plus `ContractMapRendererError`. This leaves the plan with conflicting action semantics for whether those value objects are new or unchanged-from-baseline.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.md",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8abbf8fac49f84a7b654ce12534ddc984593297cd359d93fd9b11d402a89dcc0",
+          "at": "2026-05-21T11:10:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42ad873ed7c707860374fa62d316370a873bb5ac70b2ccc1bf34e65c92a9552d",
+          "at": "2026-05-21T11:17:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 states that `CatalogueLoader.load_all` returns only `BTreeMap<LayerId, CatalogueDocument>`, but the domain catalogue contract in `domain-types.json` declares `Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError>`, and CN-01 depends on that returned `Vec<LayerId>` for `layer_order`. This leaves the implementation plan internally inconsistent about the loader contract that the interactor must consume.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/plan.md",
+              "line": 18,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-05 covers both adding the domain `ContractMapRenderer` port and placing `ContractMapRendererAdapter` in infrastructure, but task coverage maps it only to T001/T002. The actual adapter placement is in T003, so the coverage map can mark IN-05 as covered without the infrastructure adapter task that satisfies half of the requirement.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/task-coverage.json",
+              "line": 8,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5adcbd9ab503b780c3e3ce5e9a78fd75497a9f1892a9fcf7cb0f9a33bbb46990",
+          "at": "2026-05-21T11:34:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-02 is the spec item that requires introducing the `CatalogueNode` enum, but its coverage maps only to T005-T008. The task that actually defines `CatalogueNode<'a>` is T004, so the coverage map can mark this requirement as covered without the task that implements the enum contract.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/task-coverage.json",
+              "line": 5,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-05 includes placing `ContractMapRendererAdapter` in infrastructure, but coverage maps it only to T001/T002. T001 covers the domain port/error and T002 covers usecase injection; T003 is the task that adds the infrastructure adapter, so the coverage declaration omits part of the requirement.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/task-coverage.json",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5adcbd9ab503b780c3e3ce5e9a78fd75497a9f1892a9fcf7cb0f9a33bbb46990",
+          "at": "2026-05-21T11:40:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 requires the end-to-end `sotp track contract-map` command to exit with an error when `.harness/config/contract-map-style.toml` is missing, but the coverage points only to T003, whose task text verifies the adapter-level missing/invalid TOML unit tests and never covers CLI composition or command-level failure propagation. An implementer can complete the mapped task while leaving the CLI path unverified against AC-11.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.md",
+              "line": 77,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:1982e38e7e0cdab528a72b25a600d4d100067a8e433926b2f26f48a849b4f917",
+          "at": "2026-05-21T11:43:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 only specifies and tests silent-skip when `trait_ref` is workspace-external, but ADR Decision O explicitly requires the same skip when `for_type` points outside the workspace, and AC-06/CN-10 require workspace-external trait-impl edges not to be drawn in general. As written, the sole task covering CN-10 can still implement `for_type -> trait_ref` edges for an external self type, leaving an invalid or unresolved source node path untested.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/plan.md",
+              "line": 59,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-21 requires the adapter to own full v3 rendering including syn-based TypeRef parsing, but the only mapped task, T003, just adds the adapter skeleton and style-config loading. The later rendering tasks cover edge/node assembly but never require syn-based TypeRef resolution, so the plan can satisfy its task list while missing a core Decision P-1 design requirement.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/plan.md",
+              "line": 26,
+              "category": "coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:52ccf625209cd4e9841a64c841a77a387b18abae8ef718eaf45545d63beb13be",
+          "at": "2026-05-21T11:49:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-11 requires the end-to-end `sotp track contract-map` path to fail closed when `.harness/config/contract-map-style.toml` is missing, but the coverage maps it only to T003/T010. T003 only adds adapter config loading and adapter unit tests, and T010 only verifies tests/CI; no task wires the command/track-render path to instantiate and use `ContractMapRendererAdapter` with the style path. As written, the adapter can satisfy its tests while the CLI path still bypasses the required fail-closed behavior.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/task-coverage.json",
+              "line": 63,
+              "category": "missing-task-coverage"
+            },
+            {
+              "message": "OS-09 declares multi-crate-per-layer rendering out of scope, but IN-01 defines the renderer contract as accepting `&[CatalogueDocument]` and grouping by `doc.layer`, while AC-09/T004 require behavior for two crates in the same layer. This leaves the adapter contract contradictory: implementers can read OS-09 as permission to skip the same-layer multi-crate case that the renderer input and node-id requirements explicitly support. Narrow OS-09 to the current `CatalogueLoader`/usecase workflow or remove the out-of-scope claim for the adapter renderer.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+              "line": 397,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:52ccf625209cd4e9841a64c841a77a387b18abae8ef718eaf45545d63beb13be",
+          "at": "2026-05-21T11:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-21 requires the infrastructure adapter to own the full v3 renderer, including syn-based TypeRef parsing, but task coverage maps IN-21 only to T003. T003 only scaffolds the adapter and style-config loading, while the later edge-building tasks never require syn-based TypeRef parsing. This leaves a required design element unplanned and could allow an implementation that resolves TypeRefs with ad hoc string handling contrary to the ADR/spec.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/task-coverage.json",
+              "line": 24,
+              "category": "coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9ef8e3670c9fe403304c9cb265ac649eb001430d46d268fbcbb620174a68f016",
+          "at": "2026-05-21T11:59:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Several ADR anchors in spec.json do not match any actual heading in the referenced ADR. For example, this entry points to `Context §2 catalogue schema v3 への移行`, but the ADR headings are `## Context` and `### §2 catalogue schema v3 への移行 (ADR 2026-05-08-0248 + make-catalogue-schema-permissive)`. The same mismatch appears for `Context §4...` at lines 32/414/680, `Context §1...` at line 259, and `Consequences 良い影響` at line 694. These spec-to-ADR references are part of the enforced plan contract and will not resolve to the intended headings as written.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+              "line": 12,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:46c6ba7d6b842f1f0a1315247067060bdad923177c04f14545ba38a3d9f61c5c",
+          "at": "2026-05-21T12:04:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 instructs the CLI composition to instantiate `ContractMapRendererAdapter::new(style_config_path)`, but the adapter is not added until T003. As ordered, completing T002 requires a type that does not exist yet, so the plan is not executable in task order. Move the CLI wiring to T003 or later, or split T003's adapter scaffold before T002.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:520a549001600426588771441d77f352a5fc52be97e65269f2c142044af1a969",
+          "at": "2026-05-21T12:11:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The node_id scheme claims injectivity while defining sanitization as replacing every non-alphanumeric character with `_`. That loses information, so valid distinct layer IDs such as `my-gateway` and `my_gateway` collapse to the same `sanitized_layer`; because `<len>` is computed from the sanitized string, it does not disambiguate them. This makes AC-09 unachievable for custom layer names and can produce duplicate Mermaid node IDs across layers.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/plan.md",
+              "line": 33,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:aea9143e8291b3736a17545de276d18286571c512b01befa31cd387390fcf5d3",
+          "at": "2026-05-21T12:17:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The deleted `render_contract_map` catalogue entry declares the old function as taking `&BTreeMap<LayerId, CatalogueDocument>`, but the spec/ADR describe the removed legacy API as the old-schema `&BTreeMap<LayerId, TypeCatalogueDocument>` input. Because delete entries are supposed to reflect the pre-existing contract being removed, this contradicts IN-19/CN-07 and can leave the plan pointing at the wrong function body/signature.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/domain-types.json",
+              "line": 272,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:faabcb3068945e08babe528d37e82fd59cc13138274e7997e178d81e9a36eede",
+          "at": "2026-05-21T12:22:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "OS-05 declares the 2-layer/3-layer/custom-name layer-agnostic fixture work out of scope, but AC-12 requires those same fixture tests and `impl-plan.json` T010 schedules them. This leaves the plan internally inconsistent: `task-coverage.json` correctly maps OS-05 to no tasks while also mapping AC-12 to T010, so implementers cannot tell whether those fixture tests are required or deferred.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+              "line": 356,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9c1a4d996b588ce16c81b11e2093b5b1b37159fdeb8e9d2c4e9d2cbec2746399",
+          "at": "2026-05-21T12:26:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc00c8b624c82b5d6237c4f7524d6d0b37d0d3fa7496dc4e8e49fcb46ef7cef3",
+          "at": "2026-05-21T12:30:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 requires `ContractMapRenderer::render` to generate a Mermaid `flowchart LR`, but the canonical output assembly in T009 starts with `classDef` and never adds the required diagram declaration. Implementing this literally would produce an invalid/incomplete Mermaid flowchart and would not satisfy AC-01; T009 should include `flowchart LR` as the first emitted line and AC-01 coverage should include that assembly task.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/plan.md",
+              "line": 66,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:acde896635e2a55cfa531b13643c842aa5f224d918085a361922c34cd014ee19",
+          "at": "2026-05-21T12:40:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-18 defines the mermaid output order as starting with `classDef`, but the ADR Render Output structure requires `flowchart LR` as the first line, and T009/AC-01 also expect a `flowchart LR` diagram. This leaves the canonical output contract contradictory: an implementer following IN-18 literally would omit or misplace the required diagram declaration.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/spec.md",
+              "line": 35,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision D still states that the prefix + length-prefix scheme preserves injectivity, but the same decision later acknowledges sanitized-name collisions such as `my-gateway` vs `my_gateway`. Because the documented ID only contains sanitized components and a total length, those inputs can still produce identical IDs, so the plan/spec claim of guaranteed non-collision across crates is not semantically true as written.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "line": 176,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4277a3afae29658bf446f2b76a19fb13986eaf958fce985fb0870f600dd059d3",
+          "at": "2026-05-21T12:44:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4de3518ab98ae3ec3fb237a6c8bc6b5079e857c800b1bf66e9de18b3901410f7",
+          "at": "2026-05-21T12:50:16Z"
         }
       ]
     }
