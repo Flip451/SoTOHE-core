@@ -113,7 +113,42 @@
     }
   },
   "functions": {},
-  "inherent_impls": [],
+  "inherent_impls": [
+    {
+      "type_name": "RenderContractMapInteractor",
+      "impl_generics": [
+        {
+          "name": "L",
+          "bounds": ["domain::tddd::catalogue_ports::CatalogueLoader"]
+        },
+        {
+          "name": "R",
+          "bounds": ["domain::tddd::ContractMapRenderer"]
+        },
+        {
+          "name": "W",
+          "bounds": ["domain::tddd::catalogue_ports::ContractMapWriter"]
+        }
+      ],
+      "impl_where_predicates": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "loader", "ty": "L" },
+            { "name": "renderer", "ty": "R" },
+            { "name": "writer", "ty": "W" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
   "trait_impls": [
     {
       "action": "modify",

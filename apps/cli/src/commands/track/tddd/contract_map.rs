@@ -3,14 +3,19 @@
 //!
 //! Composition root that wires the usecase interactor
 //! (`usecase::contract_map_workflow::RenderContractMapInteractor`) to its
-//! two secondary-port adapters (`FsCatalogueLoader` / `FsContractMapWriter`)
-//! and dispatches through the `RenderContractMap` primary port so the CLI
-//! stays substitutable for tests and future adapters.
+//! three secondary-port adapters:
+//! * `FsCatalogueLoader` — loads per-layer catalogue documents.
+//! * `ContractMapRendererAdapter` — renders the mermaid contract map (T003,
+//!   Decision P-1 / P-3). Style config at
+//!   `.harness/config/contract-map-style.toml` (fail-closed if absent or
+//!   invalid, CN-02 / AC-11).
+//! * `FsContractMapWriter` — writes `contract-map.md` to the track dir.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use infrastructure::tddd::contract_map_adapter::{FsCatalogueLoader, FsContractMapWriter};
+use infrastructure::tddd::contract_map_renderer_adapter::ContractMapRendererAdapter;
 use infrastructure::track::fs_store::read_track_status_str;
 use usecase::contract_map_workflow::{
     RenderContractMap, RenderContractMapCommand, RenderContractMapInteractor,
@@ -26,7 +31,7 @@ use super::signals::ensure_active_track;
 ///
 /// Returns `CliError` when the track id is invalid, the track is not
 /// active, `--layers` cannot be parsed, or the interactor fails
-/// (loader / writer / empty catalogue / unknown layer).
+/// (loader / renderer / writer / empty catalogue / unknown layer).
 pub fn execute_contract_map(
     items_dir: PathBuf,
     track_id: String,
@@ -43,15 +48,22 @@ pub fn execute_contract_map(
 
     let rules_path = workspace_root.join("architecture-rules.json");
     let loader = FsCatalogueLoader::new(items_dir.clone(), rules_path, workspace_root.clone());
-    let writer = FsContractMapWriter::new(items_dir.clone(), workspace_root);
-    let interactor = RenderContractMapInteractor::new(loader, writer);
+    let writer = FsContractMapWriter::new(items_dir.clone(), workspace_root.clone());
+
+    // Inject ContractMapRendererAdapter (T003, Decision P-1/P-3).
+    // Style config at .harness/config/contract-map-style.toml (fail-closed: absent/invalid
+    // config causes the interactor to return RenderContractMapError::RendererFailed, CN-02).
+    let style_config_path = workspace_root.join(".harness/config/contract-map-style.toml");
+    let renderer = ContractMapRendererAdapter::new(style_config_path);
+
+    let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
 
     // Dispatch through the primary port — CLI does not depend on the
     // concrete `RenderContractMapInteractor` type.
-    let renderer: &dyn RenderContractMap = &interactor;
+    let renderer_ref: &dyn RenderContractMap = &interactor;
     let cmd =
         RenderContractMapCommand { track_id: track_id.clone(), layer_filter: layer_filter_parsed };
-    let out = renderer
+    let out = renderer_ref
         .execute(&cmd)
         .map_err(|e| CliError::Message(format!("contract-map render failed: {e}")))?;
 

@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RenderContractMapError | error_type | modify | CatalogueLoaderFailed, ContractMapWriterFailed, EmptyCatalogue, LayerNotFound, InvalidTrackId, RendererFailed | 🟡 | 🔵 |
+| RenderContractMapError | error_type | modify | CatalogueLoaderFailed, ContractMapWriterFailed, EmptyCatalogue, LayerNotFound, InvalidTrackId, RendererFailed | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -16,7 +16,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RenderContractMapInteractor | interactor | modify | — | 🟡 | 🔵 |
+| RenderContractMapInteractor | interactor | modify | — | 🔵 | 🔵 |
 
 ## DTOs
 

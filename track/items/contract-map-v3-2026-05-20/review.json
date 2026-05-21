@@ -1,35 +1,183 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a8ddcad1f5296e43f5932c7ed0ee07e2b27d39a37c2851346e38ac28ef78e865",
-          "at": "2026-05-21T02:04:09Z"
+          "hash": "rvw1:sha256:8d56baf8db356c310622f204d3957bb47a3df997c3caa4b7d1a95e684e402b27",
+          "at": "2026-05-21T14:08:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a8ddcad1f5296e43f5932c7ed0ee07e2b27d39a37c2851346e38ac28ef78e865",
-          "at": "2026-05-21T02:07:25Z"
+          "hash": "rvw1:sha256:8d56baf8db356c310622f204d3957bb47a3df997c3caa4b7d1a95e684e402b27",
+          "at": "2026-05-21T14:11:06Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ContractMapRendererAdapter` does not actually fail closed on style-config input: the TOML DTOs are permissive `Deserialize` structs with no `deny_unknown_fields`, so typoed/extra keys are silently accepted, and `load_style_config()` maps every read error to `StyleConfigNotFound` instead of distinguishing unreadable or malformed files. That lets a broken `.harness/config/contract-map-style.toml` be treated as if it were merely absent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 44,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:a4ce080a82d287f68049cf295c829485e3f4531e222854d4fbbe0eba88fa8d60",
+          "at": "2026-05-21T14:10:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Swallowing `ContractMapRenderer::render` errors here turns `StyleConfigNotFound` / `StyleConfigInvalid` into a silent no-op, so `sync_rendered_views` can return success while leaving a stale or missing `contract-map.md` behind. That defeats the new fail-closed contract-map style loading behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 1236,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5304e6df29da693115d2637cf1476bfbe3de1a8b20f7c17e001b25833ebf0800",
+          "at": "2026-05-21T14:14:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Renderer failures are downgraded to a warning and treated as success, so a missing or invalid `.harness/config/contract-map-style.toml` leaves any existing `contract-map.md` untouched and the sync pass reports success. That violates the new fail-closed contract and can silently ship stale output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 1236,
+              "category": "error-handling"
+            },
+            {
+              "message": "The style-config DTOs deserialize permissively. Because `StyleConfig` and the nested structs do not use `deny_unknown_fields`, typos or stray keys/sections in `contract-map-style.toml` are ignored instead of producing `StyleConfigInvalid`. Malformed configs can therefore pass validation and render with defaults.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 41,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:5304e6df29da693115d2637cf1476bfbe3de1a8b20f7c17e001b25833ebf0800",
+          "at": "2026-05-21T14:20:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The style-config schema is only strict at the top level. Nested tables such as `[role.*]`, `[edge.*]`, and `[filter]` still use serde's default unknown-field behavior, so typos inside those sections are silently accepted and the adapter returns `Ok` instead of `StyleConfigInvalid`. That breaks the fail-closed CN-02 / AC-11 contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 47,
+              "category": "correctness"
+            },
+            {
+              "message": "The style config is read directly with `std::fs::read_to_string` and never passed through the shared symlink guard. A symlinked `.harness/config/contract-map-style.toml` will be followed and parsed instead of rejected, so the fail-closed 'symlinked' case described in `track/render.rs` is not actually enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 172,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:116efb8272409abc6bde8cfdb4016c6b1354fa202a7fc6603dec5d759c7ed3fd",
+          "at": "2026-05-21T14:26:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sync_rendered_views` now has a fail-closed path for missing/invalid contract-map style config, but the updated tests only cover the success case with a present config. There is no integration test that leaves `.harness/config/contract-map-style.toml` absent while still providing a catalogue, so the new `StyleConfigNotFound -> RenderError::Io` wiring in `render.rs` can regress without CI coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
+              "line": 2429,
+              "category": "test coverage"
+            },
+            {
+              "message": "The adapter’s public contract includes symlink rejection (`StyleConfigInvalid`), but the new unit tests only cover absent, invalid TOML, and valid config. A symlinked `contract-map-style.toml` is not exercised anywhere here, so a regression in the symlink guard would go undetected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 273,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:739871f4dbcf04741a50947cdabacc98c6252693fa7a965d65c53e706ee7496f",
+          "at": "2026-05-21T14:31:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_style_config` only checks `symlink_metadata` on the final config path and then re-opens the file with `read_to_string`. That leaves the fail-closed guard bypassable via a symlinked parent directory or a swap between the metadata check and the read, so the adapter can still follow an attacker-controlled path instead of rejecting it. Use the existing full-path symlink guard (`reject_symlinks_below` or equivalent no-follow open) before reading the style config.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "line": 183,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7280c6bc9be4cd7dde783687585195848e2354fddf2911de56c10f699f93ddeb",
+          "at": "2026-05-21T14:34:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7d2e872c20a65e66f62087bd43a8486b1b761d3bb811017e6ce7b4d5db5eec22",
-          "at": "2026-05-21T10:22:22Z"
+          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
+          "at": "2026-05-21T14:42:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This path is now hard-required and `StyleConfigNotFound` is propagated as an error, but the tracked diff does not add `.harness/config/contract-map-style.toml` (it is only untracked in the working tree). After merge/CI checkout, any `sync_rendered_views` call for a track with loadable catalogues will fail instead of rendering. The T003 contract calls for a committed default style config, so the default needs to be included with the change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 1236,
+              "category": "contract"
+            }
+          ],
+          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
+          "at": "2026-05-21T14:48:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7d2e872c20a65e66f62087bd43a8486b1b761d3bb811017e6ce7b4d5db5eec22",
-          "at": "2026-05-21T10:24:45Z"
+          "hash": "rvw1:sha256:4d05f8b326f02a79d67dadd74e9043ec7cd2acd58de8b819e40ff531f363ca72",
+          "at": "2026-05-21T14:58:04Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
+          "at": "2026-05-21T14:09:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
+          "at": "2026-05-21T14:10:41Z"
         }
       ]
     },
@@ -372,6 +520,67 @@
           "findings": [],
           "hash": "rvw1:sha256:36f481c4b44443af335ac576425011a5b8902477036005e13c584e722412a401",
           "at": "2026-05-21T10:34:17Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8ddcad1f5296e43f5932c7ed0ee07e2b27d39a37c2851346e38ac28ef78e865",
+          "at": "2026-05-21T02:04:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8ddcad1f5296e43f5932c7ed0ee07e2b27d39a37c2851346e38ac28ef78e865",
+          "at": "2026-05-21T02:07:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d2e872c20a65e66f62087bd43a8486b1b761d3bb811017e6ce7b4d5db5eec22",
+          "at": "2026-05-21T10:22:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d2e872c20a65e66f62087bd43a8486b1b761d3bb811017e6ce7b4d5db5eec22",
+          "at": "2026-05-21T10:24:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcf0995bb8cf09d649e318102ebeda12e6ee65e14e9f818bba3981f17eaa7f17",
+          "at": "2026-05-21T14:09:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The role map does not match the actual `DataRole`/`ContractRole`/`FunctionRole` enums: it omits `DataRole::UseCase` and `ContractRole::SpecificationPort`, while defining non-role entries such as `DomainEvent`, `Repository`, and `Primitive`. Once the renderer looks up styles by enum role name, valid catalogue entries with the omitted roles will have no configured class, and the extra sections are broken references.",
+              "severity": "P1",
+              "file": ".harness/config/contract-map-style.toml",
+              "line": 30,
+              "category": "broken references"
+            }
+          ],
+          "hash": "rvw1:sha256:bcf0995bb8cf09d649e318102ebeda12e6ee65e14e9f818bba3981f17eaa7f17",
+          "at": "2026-05-21T14:11:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ed54ce6514c07492462ce33fe8dc23acd8d88846122d1e6a6473fe5958665be",
+          "at": "2026-05-21T14:14:16Z"
         }
       ]
     },
@@ -1009,6 +1218,52 @@
           "findings": [],
           "hash": "rvw1:sha256:4de3518ab98ae3ec3fb237a6c8bc6b5079e857c800b1bf66e9de18b3901410f7",
           "at": "2026-05-21T12:50:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c544fd93c9b059f145f25ce3174c97e7c0982ee247b56baf2ab925bab43275b",
+          "at": "2026-05-21T14:08:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c544fd93c9b059f145f25ce3174c97e7c0982ee247b56baf2ab925bab43275b",
+          "at": "2026-05-21T14:09:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca3dfea3ec5875b61995127742469ec71f6c49fbbcc93f3a8e73c39cb8e27cee",
+          "at": "2026-05-21T15:14:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca3dfea3ec5875b61995127742469ec71f6c49fbbcc93f3a8e73c39cb8e27cee",
+          "at": "2026-05-21T15:17:05Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
+          "at": "2026-05-21T14:11:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
+          "at": "2026-05-21T14:13:15Z"
         }
       ]
     }

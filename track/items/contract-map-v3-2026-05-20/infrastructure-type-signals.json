@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-21T12:54:07Z",
+  "generated_at": "2026-05-21T15:18:28Z",
   "declaration_hash": "848484c5327fabfbce4b225a5545f82cf8d25e3a536459a417a17150d96e2915",
   "signals": [
     {
       "type_name": "ContractMapRendererAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ContractMapRenderer"
       ]
     },

@@ -202,7 +202,8 @@ pub fn contract_map_path(track_root: &Path, track_id: &TrackId) -> PathBuf {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod tests {
     use super::*;
-    use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, render_contract_map};
+    use crate::tddd::contract_map_renderer_adapter::ContractMapRendererAdapter;
+    use domain::tddd::{CatalogueLoader, ContractMapRenderOptions, ContractMapRenderer};
 
     const RULES_JSON: &str = r#"{
       "version": 2,
@@ -457,14 +458,14 @@ mod tests {
         );
     }
 
-    /// E2E: load a v3 catalogue with two types and verify the IN-24 placeholder
-    /// renderer emits entry names as comments in the subgraph.
+    /// E2E: load a v3 catalogue with two types and verify the T003 wiring-chain
+    /// placeholder renderer returns a valid `ContractMapContent`.
     ///
-    /// T025: The renderer is now v3-native (no v3→v2 stub conversion).
-    /// The output contains the flowchart scaffold and an IN-24 / OS-07 deferral
-    /// comment, with entry names listed as mermaid comments.
+    /// Full mermaid subgraph/node rendering is deferred to T004–T009.
+    /// This test exercises the load → render → content path using
+    /// `ContractMapRendererAdapter` with a minimal valid style config.
     #[test]
-    fn test_e2e_v3_catalogue_renders_in24_placeholder() {
+    fn test_e2e_v3_catalogue_renders_t003_placeholder() {
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path();
         let rules_path = root.join("architecture-rules.json");
@@ -483,24 +484,16 @@ mod tests {
         // v3-native: 2 types loaded directly from CatalogueDocument.
         assert_eq!(domain_doc.types.len(), 2, "expected 2 type entries from v3 doc");
 
-        // Render: IN-24 placeholder must emit deferral comment + domain subgraph.
+        // Write a minimal style config and render via the new adapter (T003).
+        let style_path = root.join("contract-map-style.toml");
+        write(&style_path, "[filter]\ninclude_function_roles = []\n");
+        let adapter = ContractMapRendererAdapter::new(style_path);
+        let catalogues_vec: Vec<_> = catalogues.values().cloned().collect();
         let opts = ContractMapRenderOptions::default();
-        let content = render_contract_map(&catalogues, &layer_order, &opts);
+        let content = adapter.render(&catalogues_vec, &layer_order, &opts).unwrap();
         let text = content.as_ref();
         assert!(text.contains("flowchart LR"), "render must contain flowchart LR; got:\n{text}");
-        assert!(text.contains("IN-24"), "render must contain IN-24 deferral comment; got:\n{text}");
-        assert!(
-            text.contains("OS-07"),
-            "render must contain OS-07 deferral reference; got:\n{text}"
-        );
-        assert!(
-            text.contains("subgraph domain [domain]"),
-            "render must contain domain subgraph; got:\n{text}"
-        );
-        // Placeholder: no mermaid edge arrows emitted.
-        assert!(!text.contains("-->|"), "placeholder must not emit edges");
-        // Old stale references must be gone.
-        assert!(!text.contains("OS-06"), "render must NOT reference OS-06; got:\n{text}");
-        assert!(!text.contains("T012"), "render must NOT reference T012; got:\n{text}");
+        // T003 placeholder: no subgraphs yet (T004–T009 will add them).
+        assert!(!text.contains("-->|"), "T003 placeholder must not emit edges");
     }
 }
