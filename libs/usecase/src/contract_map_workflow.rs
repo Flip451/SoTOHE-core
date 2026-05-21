@@ -1,4 +1,4 @@
-//! Contract Map render workflow (ADR 2026-04-17-1528 §D1).
+//! Contract Map render workflow (ADR 2026-04-17-1528 §D1 + ADR 2026-05-20-2221).
 //!
 //! Hexagonal composition:
 //!
@@ -6,8 +6,8 @@
 //!   CLI and future adapters depend on this trait, not on the concrete
 //!   interactor below, so composition roots stay substitutable.
 //! * [`RenderContractMapInteractor`] — the interactor that orchestrates
-//!   the secondary ports (`CatalogueLoader`, `ContractMapWriter`) and the
-//!   pure domain render function (`render_contract_map`). It implements
+//!   the secondary ports (`CatalogueLoader`, `ContractMapRenderer`,
+//!   `ContractMapWriter`) (Decision P-5 / IN-23). It implements
 //!   [`RenderContractMap`].
 //!
 //! The usecase layer stays pure-orchestrator per
@@ -19,7 +19,9 @@ use domain::TrackId;
 use domain::tddd::catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
 };
-use domain::tddd::{ContractMapRenderOptions, LayerId, render_contract_map};
+use domain::tddd::{
+    ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError, LayerId,
+};
 
 /// Command input for [`RenderContractMap::execute`].
 ///
@@ -54,34 +56,80 @@ pub struct RenderContractMapOutput {
 /// Error variants surfaced by [`RenderContractMap::execute`].
 ///
 /// Variant inventory matches the `usecase-types.json` declaration for the
-/// `tddd-contract-map-phase1-2026-04-17` track.
-#[derive(Debug, thiserror::Error)]
+/// `contract-map-v3-2026-05-20` track (Decision P-5 / IN-23).
+#[derive(Debug)]
 pub enum RenderContractMapError {
     /// Failure inside a [`CatalogueLoader`] implementation.
-    #[error(transparent)]
-    CatalogueLoaderFailed(#[from] CatalogueLoaderError),
+    CatalogueLoaderFailed(CatalogueLoaderError),
 
     /// Failure inside a [`ContractMapWriter`] implementation.
-    #[error(transparent)]
-    ContractMapWriterFailed(#[from] ContractMapWriterError),
+    ContractMapWriterFailed(ContractMapWriterError),
 
     /// The loader returned an empty layer set — no `tddd.enabled` layers
     /// exist for this track. Rendering an empty Contract Map is not a
     /// useful workflow, so we fail closed.
-    #[error(
-        "catalogue loader returned no enabled layers for track '{track_id}'; \
-         check `architecture-rules.json` tddd blocks"
-    )]
     EmptyCatalogue { track_id: String },
 
     /// The caller's `layer_filter` references a layer that the loader did
     /// not produce — typically a CLI typo or a disabled layer.
-    #[error("layer '{layer_id}' is not a tddd.enabled layer for track '{track_id}'")]
     LayerNotFound { track_id: String, layer_id: String },
 
     /// The `track_id` string is not a valid track identifier.
-    #[error("invalid track ID: {reason}")]
     InvalidTrackId { reason: String },
+
+    /// The [`ContractMapRenderer`] implementation returned an error.
+    /// Wraps [`ContractMapRendererError`] (Decision P-5 / IN-23).
+    RendererFailed(ContractMapRendererError),
+}
+
+impl std::fmt::Display for RenderContractMapError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::CatalogueLoaderFailed(e) => write!(f, "{e}"),
+            Self::ContractMapWriterFailed(e) => write!(f, "{e}"),
+            Self::EmptyCatalogue { track_id } => write!(
+                f,
+                "catalogue loader returned no enabled layers for track '{track_id}'; \
+                 check `architecture-rules.json` tddd blocks"
+            ),
+            Self::LayerNotFound { track_id, layer_id } => {
+                write!(f, "layer '{layer_id}' is not a tddd.enabled layer for track '{track_id}'")
+            }
+            Self::InvalidTrackId { reason } => write!(f, "invalid track ID: {reason}"),
+            Self::RendererFailed(e) => write!(f, "renderer failed: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for RenderContractMapError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::CatalogueLoaderFailed(e) => Some(e),
+            Self::ContractMapWriterFailed(e) => Some(e),
+            Self::RendererFailed(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
+impl From<CatalogueLoaderError> for RenderContractMapError {
+    fn from(e: CatalogueLoaderError) -> Self {
+        Self::CatalogueLoaderFailed(e)
+    }
+}
+
+impl From<ContractMapWriterError> for RenderContractMapError {
+    fn from(e: ContractMapWriterError) -> Self {
+        Self::ContractMapWriterFailed(e)
+    }
+}
+
+/// T002: `impl From<ContractMapRendererError> for RenderContractMapError`
+/// (Decision P-5 / IN-23).
+impl From<ContractMapRendererError> for RenderContractMapError {
+    fn from(e: ContractMapRendererError) -> Self {
+        Self::RendererFailed(e)
+    }
 }
 
 /// Primary port for the Contract Map render workflow.
@@ -93,11 +141,9 @@ pub trait RenderContractMap {
     ///
     /// # Errors
     ///
-    /// Returns [`RenderContractMapError`] if the loader fails, the
-    /// writer fails, the enabled-layer set is empty, or a
+    /// Returns [`RenderContractMapError`] if the loader fails, the renderer
+    /// fails, the writer fails, the enabled-layer set is empty, or a
     /// `layer_filter` entry does not appear in the loader output.
-    /// Both syntactically invalid and absent layer names surface as
-    /// [`RenderContractMapError::LayerNotFound`].
     fn execute(
         &self,
         cmd: &RenderContractMapCommand,
@@ -105,32 +151,36 @@ pub trait RenderContractMap {
 }
 
 /// Default [`RenderContractMap`] implementation that composes a
-/// [`CatalogueLoader`], the pure domain renderer, and a
-/// [`ContractMapWriter`].
-pub struct RenderContractMapInteractor<L, W>
+/// [`CatalogueLoader`], a [`ContractMapRenderer`], and a
+/// [`ContractMapWriter`] (Decision P-5 / IN-23).
+pub struct RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
+    R: ContractMapRenderer,
     W: ContractMapWriter,
 {
     loader: L,
+    renderer: R,
     writer: W,
 }
 
-impl<L, W> RenderContractMapInteractor<L, W>
+impl<L, R, W> RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
+    R: ContractMapRenderer,
     W: ContractMapWriter,
 {
     /// Creates a new interactor wrapping the supplied secondary ports.
     #[must_use]
-    pub fn new(loader: L, writer: W) -> Self {
-        Self { loader, writer }
+    pub fn new(loader: L, renderer: R, writer: W) -> Self {
+        Self { loader, renderer, writer }
     }
 }
 
-impl<L, W> RenderContractMap for RenderContractMapInteractor<L, W>
+impl<L, R, W> RenderContractMap for RenderContractMapInteractor<L, R, W>
 where
     L: CatalogueLoader,
+    R: ContractMapRenderer,
     W: ContractMapWriter,
 {
     fn execute(
@@ -172,6 +222,22 @@ where
             })
             .transpose()?;
 
+        // Apply layer_filter to derive the effective layer_order slice.
+        // The interactor owns the filtering responsibility (Decision P-5 / T002).
+        let filtered_layer_order: Vec<LayerId> = match layer_filter.as_deref() {
+            Some(f) if !f.is_empty() => {
+                layer_order.iter().filter(|l| f.contains(l)).cloned().collect()
+            }
+            _ => layer_order.clone(),
+        };
+
+        // Build a flat Vec<CatalogueDocument> from the BTreeMap values,
+        // preserving the 1-layer = 1-doc contract (Decision A-3' / T002).
+        let catalogues_vec: Vec<_> = catalogues.values().cloned().collect();
+
+        // Forward-compatibility stub: opts.layers is not read by the renderer
+        // in this track — layer filtering is already done by the interactor above.
+        // The opts struct is passed verbatim for forward-compatibility (Decision P-4).
         let opts = ContractMapRenderOptions {
             layers: layer_filter.clone().unwrap_or_default(),
             signal_overlay: false,
@@ -179,22 +245,21 @@ where
             include_spec_source_edges: false,
         };
 
-        let content = render_contract_map(&catalogues, &layer_order, &opts);
+        // Delegate rendering to the injected ContractMapRenderer port (T002).
+        let content = self.renderer.render(&catalogues_vec, &filtered_layer_order, &opts)?;
 
         self.writer.write(&track_id, &content)?;
 
         // `rendered_layer_count` reflects only the layers that were actually rendered
         // (respecting `layer_filter`), while `total_entry_count` reflects the full
-        // loader catalogue volume regardless of any filter — it is a coarse "how many
-        // types does the track catalogue contain?" metric, not a post-filter count.
-        let active: Vec<&LayerId> = match layer_filter.as_deref() {
-            Some(f) if !f.is_empty() => layer_order.iter().filter(|l| f.contains(l)).collect(),
-            _ => layer_order.iter().collect(),
-        };
+        // loader catalogue volume regardless of any filter.
         let total_entry_count: usize =
             catalogues.values().map(|d| d.types.len() + d.traits.len() + d.functions.len()).sum();
 
-        Ok(RenderContractMapOutput { rendered_layer_count: active.len(), total_entry_count })
+        Ok(RenderContractMapOutput {
+            rendered_layer_count: filtered_layer_order.len(),
+            total_entry_count,
+        })
     }
 }
 
@@ -225,6 +290,18 @@ mod tests {
                 (Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>),
                 CatalogueLoaderError,
             >;
+        }
+    }
+
+    mock! {
+        pub Renderer {}
+        impl ContractMapRenderer for Renderer {
+            fn render(
+                &self,
+                catalogues: &[CatalogueDocument],
+                layer_order: &[LayerId],
+                opts: &ContractMapRenderOptions,
+            ) -> Result<ContractMapContent, ContractMapRendererError>;
         }
     }
 
@@ -305,7 +382,7 @@ mod tests {
         }
         catalogues.insert(usecase_layer, usecase_doc);
 
-        // infra: 1 function entry — exercises the d.functions.len() branch of total_entry_count
+        // infra: 1 function entry
         let mut infra_doc = empty_v3_doc("infrastructure");
         let fn_crate = CrateName::new("infrastructure").unwrap();
         let fn_path =
@@ -334,7 +411,7 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_happy_path_calls_writer_and_returns_metrics() {
+    fn test_execute_happy_path_calls_renderer_writer_and_returns_metrics() {
         let (order, catalogues) = three_layer_catalogues();
         let mut loader = MockLoader::new();
         loader
@@ -343,17 +420,22 @@ mod tests {
             .times(1)
             .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
 
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().times(1).returning(|_catalogues, _layer_order, _opts| {
+            Ok(ContractMapContent::new("flowchart LR\n"))
+        });
+
         let mut writer = MockWriter::new();
         writer.expect_write().times(1).returning(|_: &TrackId, content: &ContractMapContent| {
             assert!(content.as_ref().contains("flowchart LR"));
             Ok(())
         });
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand { track_id: "t001".to_owned(), layer_filter: None };
         let out = interactor.execute(&cmd).unwrap();
         assert_eq!(out.rendered_layer_count, 3);
-        assert_eq!(out.total_entry_count, 4); // 1 type (domain) + 2 traits (usecase) + 1 function (infra)
+        assert_eq!(out.total_entry_count, 4); // 1 type (domain) + 2 traits (usecase) + 1 fn (infra)
     }
 
     #[test]
@@ -362,11 +444,12 @@ mod tests {
         loader.expect_load_all().returning(|_: &TrackId| {
             Err(CatalogueLoaderError::LayerDiscoveryFailed { reason: "boom".to_owned() })
         });
-        // Writer must NOT run when the loader fails — enforce via mockall.
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().times(0);
         let mut writer = MockWriter::new();
         writer.expect_write().times(0);
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand { track_id: "t002".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(matches!(err, RenderContractMapError::CatalogueLoaderFailed(_)));
@@ -380,6 +463,9 @@ mod tests {
             .expect_load_all()
             .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
 
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().returning(|_, _, _| Ok(ContractMapContent::new("flowchart LR\n")));
+
         let mut writer = MockWriter::new();
         writer.expect_write().returning(|_: &TrackId, _: &ContractMapContent| {
             Err(ContractMapWriterError::IoError {
@@ -388,7 +474,7 @@ mod tests {
             })
         });
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand { track_id: "t003".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(matches!(err, RenderContractMapError::ContractMapWriterFailed(_)));
@@ -398,11 +484,12 @@ mod tests {
     fn test_execute_empty_catalogue_returns_empty_catalogue_error() {
         let mut loader = MockLoader::new();
         loader.expect_load_all().returning(|_: &TrackId| Ok((Vec::new(), BTreeMap::new())));
-        // Writer must NOT run on the empty-catalogue path.
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().times(0);
         let mut writer = MockWriter::new();
         writer.expect_write().times(0);
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand { track_id: "t004".to_owned(), layer_filter: None };
         let err = interactor.execute(&cmd).unwrap_err();
         match err {
@@ -420,10 +507,12 @@ mod tests {
         loader
             .expect_load_all()
             .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().times(0);
         let mut writer = MockWriter::new();
         writer.expect_write().times(0);
 
-        let interactor = RenderContractMapInteractor::new(loader, writer);
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
         let cmd = RenderContractMapCommand {
             track_id: "t005".to_owned(),
             layer_filter: Some(vec!["typo-layer".to_owned()]),
@@ -436,5 +525,34 @@ mod tests {
             }
             other => panic!("expected LayerNotFound, got {other:?}"),
         }
+    }
+
+    /// T002 unit test: renderer returning ContractMapRendererError is converted
+    /// to RenderContractMapError::RendererFailed (Decision P-5 / IN-23).
+    #[test]
+    fn test_execute_renderer_error_converts_to_renderer_failed() {
+        let (order, catalogues) = three_layer_catalogues();
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
+
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render().returning(|_, _, _| {
+            Err(ContractMapRendererError::StyleConfigNotFound {
+                path: std::path::PathBuf::from("/missing/style.toml"),
+            })
+        });
+
+        let mut writer = MockWriter::new();
+        writer.expect_write().times(0);
+
+        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
+        let cmd = RenderContractMapCommand { track_id: "t006".to_owned(), layer_filter: None };
+        let err = interactor.execute(&cmd).unwrap_err();
+        assert!(
+            matches!(err, RenderContractMapError::RendererFailed(_)),
+            "expected RendererFailed, got {err:?}"
+        );
     }
 }

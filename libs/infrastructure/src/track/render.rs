@@ -2,8 +2,9 @@
 
 use std::path::{Path, PathBuf};
 
+use domain::tddd::ContractMapRenderOptions;
 use domain::tddd::{
-    CatalogueLoader, CatalogueLoaderError, ContractMapRenderOptions, render_contract_map,
+    CatalogueLoader, CatalogueLoaderError, ContractMapRenderer, ContractMapRendererError,
 };
 use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, derive_track_status};
 
@@ -12,6 +13,7 @@ use super::codec::{self, DocumentMeta};
 use crate::spec;
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::tddd::contract_map_adapter::FsCatalogueLoader;
+use crate::tddd::contract_map_renderer_adapter::ContractMapRendererAdapter;
 use crate::tddd::type_signals_codec;
 use crate::type_catalogue_render;
 use crate::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
@@ -1133,12 +1135,13 @@ pub fn sync_rendered_views(
 /// Renders `contract-map.md` for the active track and appends the path to
 /// `changed` when the content actually differs on disk.
 ///
-/// Fail-closed for `architecture-rules.json` discovery failures: a missing or
-/// malformed `architecture-rules.json` causes `CatalogueLoaderError::LayerDiscoveryFailed`
-/// or `CatalogueLoaderError::SymlinkRejected`, both of which are propagated as
-/// `RenderError::Io` so that callers detect the configuration error regardless of
-/// track status (including done/archived tracks that skip the per-layer catalogue
-/// iteration block).
+/// Fail-closed for configuration errors:
+/// - A missing or malformed `architecture-rules.json` causes
+///   `CatalogueLoaderError::LayerDiscoveryFailed` or `CatalogueLoaderError::SymlinkRejected`,
+///   both propagated as `RenderError::Io`.
+/// - A missing or unreadable/invalid `.harness/config/contract-map-style.toml`
+///   (`ContractMapRendererError::StyleConfigNotFound` / `StyleConfigInvalid`) is
+///   propagated as `RenderError::Io` (CN-02 / AC-11 fail-closed).
 ///
 /// Non-fatal for catalogue-level failures (`CatalogueNotFound`, `DecodeFailed`,
 /// `TopologicalSortFailed`): these indicate per-catalogue errors that should warn
@@ -1149,7 +1152,7 @@ pub fn sync_rendered_views(
 /// Returning `Ok(())` means the render either succeeded or was intentionally
 /// skipped (no track id, invalid track id, empty layer list, non-fatal catalogue
 /// error). Returning `Err(RenderError::Io(_))` means a hard configuration error
-/// (`architecture-rules.json` absent or malformed / symlinked).
+/// (`architecture-rules.json` or style config absent / malformed / symlinked).
 fn render_contract_map_view(
     root: &Path,
     track_dir: &Path,
@@ -1228,7 +1231,37 @@ fn render_contract_map_view(
     }
 
     let opts = ContractMapRenderOptions::default();
-    let content = render_contract_map(&catalogues, &layer_order, &opts);
+    // Use ContractMapRendererAdapter for rendering.
+    // Style config at `.harness/config/contract-map-style.toml` relative to workspace root.
+    let style_config_path = root.join(".harness/config/contract-map-style.toml");
+    let renderer = ContractMapRendererAdapter::new(style_config_path);
+    let catalogues_vec: Vec<_> = catalogues.values().cloned().collect();
+    let content = match renderer.render(&catalogues_vec, &layer_order, &opts) {
+        Ok(c) => c,
+        // Style-config errors are hard configuration errors (CN-02 / AC-11 fail-closed):
+        // an absent or unreadable/invalid style config means the contract-map cannot be
+        // rendered correctly and must surface as an error, not a silent skip.
+        Err(
+            e @ (ContractMapRendererError::StyleConfigNotFound { .. }
+            | ContractMapRendererError::StyleConfigInvalid { .. }),
+        ) => {
+            return Err(RenderError::Io(std::io::Error::other(format!(
+                "contract-map style config error for {} (CN-02): {e}",
+                track_dir.display()
+            ))));
+        }
+        // Render-logic failures (RenderFailed, e.g. a missing required [edge.*] key or a
+        // malformed TypeRef) are fatal in view-sync: leaving a stale contract-map.md in
+        // place while silently returning Ok would be fail-open and mislead callers.
+        // Surface the error so sync_rendered_views fails closed, consistent with the
+        // StyleConfig* arms above.
+        Err(e) => {
+            return Err(RenderError::Io(std::io::Error::other(format!(
+                "contract-map render failed for {} (RenderFailed): {e}",
+                track_dir.display()
+            ))));
+        }
+    };
     let contract_map_path = track_dir.join("contract-map.md");
     let old = match std::fs::read_to_string(&contract_map_path) {
         Ok(existing) => Some(existing),
