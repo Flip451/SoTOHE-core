@@ -1390,17 +1390,30 @@ const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
 
 const DOMAIN_ARCH_RULES: &str = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
 
-/// Write a minimal valid `.harness/config/contract-map-style.toml` under `root`.
+/// Write a complete `.harness/config/contract-map-style.toml` under `root`.
 ///
-/// `render_contract_map_view` requires the style config to be present (CN-02
-/// fail-closed). Tests that write a catalogue file and call `sync_rendered_views`
-/// with a track_id must call this helper so the contract-map render path does not
-/// abort with `StyleConfigNotFound`.
+/// `render_contract_map_view` requires the style config to be present *and* to
+/// contain all `[edge.*]` keys that the renderer needs (CN-02 fail-closed).
+/// An absent or incomplete style config now propagates as a hard error; tests that
+/// write a catalogue file and call `sync_rendered_views` with a track_id must call
+/// this helper so the contract-map render path does not abort.
 fn write_minimal_style_config_to_root(root: &std::path::Path) {
     let dir = root.join(".harness/config");
     std::fs::create_dir_all(&dir).unwrap();
-    std::fs::write(dir.join("contract-map-style.toml"), "[filter]\ninclude_function_roles = []\n")
-        .unwrap();
+    std::fs::write(
+        dir.join("contract-map-style.toml"),
+        concat!(
+            "[edge.method_param]\narrow = \"--o\"\n",
+            "[edge.method_returns]\narrow = \"-->\"\n",
+            "[edge.transition]\narrow = \"==>\"\nlabel = \"transitions_to\"\n",
+            "[edge.trait_impl]\narrow = \"-.impl.->\"\n",
+            "[edge.variant_payload]\narrow = \"--o\"\n",
+            "[edge.field]\narrow = \"--o\"\n",
+            "[edge.alias]\narrow = \"---\"\nlabel = \"alias_of\"\n",
+            "[filter]\ninclude_function_roles = []\n",
+        ),
+    )
+    .unwrap();
 }
 
 #[test]

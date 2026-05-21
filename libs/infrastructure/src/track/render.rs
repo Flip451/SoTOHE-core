@@ -1250,14 +1250,16 @@ fn render_contract_map_view(
                 track_dir.display()
             ))));
         }
-        // Future render-logic failures (T004–T009 RenderFailed) are non-fatal in view-sync:
-        // they indicate per-catalogue rendering errors (e.g. malformed TypeRef, missing
-        // cross-catalogue symbol). Log and leave the existing contract-map.md untouched.
-        // The authoritative fail-closed gate for rendering correctness lives in
-        // `spec_states::evaluate_layer_catalogue` and the merge-gate adapter.
+        // Render-logic failures (RenderFailed, e.g. a missing required [edge.*] key or a
+        // malformed TypeRef) are fatal in view-sync: leaving a stale contract-map.md in
+        // place while silently returning Ok would be fail-open and mislead callers.
+        // Surface the error so sync_rendered_views fails closed, consistent with the
+        // StyleConfig* arms above.
         Err(e) => {
-            eprintln!("warning: contract-map render failed for {}: {e}", track_dir.display());
-            return Ok(());
+            return Err(RenderError::Io(std::io::Error::other(format!(
+                "contract-map render failed for {} (RenderFailed): {e}",
+                track_dir.display()
+            ))));
         }
     };
     let contract_map_path = track_dir.join("contract-map.md");
