@@ -10,17 +10,19 @@
     {
       "id": "T002",
       "description": "usecase layer: RenderBaselineGraph primary port + RenderBaselineGraphInteractor<L,R,W> (L: BaselineGraphLoader, R: BaselineGraphRenderer, W: BaselineGraphWriter の 3 generic compose) + RenderBaselineGraphCommand / RenderBaselineGraphOutput / RenderBaselineGraphError を libs/usecase に新設する。interactor は load → render → write の 3 段パイプラインを compose する (IN-02, IN-19, AC-02, CN-12)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "246ef29b9107c9ca04bd50602905a273c6de66f9"
     },
     {
       "id": "T003",
       "description": "sibling modify (CN-12 波及): RenderContractMapCommand / RenderContractMapError の identity 系フィールドを raw String から TrackId / LayerId に変更し、呼び出し側 CLI および既存テストを更新する (CN-12, AC-18)",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "246ef29b9107c9ca04bd50602905a273c6de66f9"
     },
     {
       "id": "T004",
       "description": "infrastructure layer: BaselineGraphRendererAdapter を libs/infrastructure に新設し、BaselineGraphRenderer port を impl する。.harness/config/baseline-graph-style.toml を読み込む (fail-closed: ファイル不在は StyleConfigNotFound エラー)。style config section 構造: [node.*] + [pattern.*] + [class.*] + [edge.*] + [filter] ([role.*] なし) (IN-02, IN-04, AC-02, AC-15, CN-02, CN-06)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",

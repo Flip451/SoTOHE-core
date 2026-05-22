@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (1/14 resolved)
+## Tasks (3/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -18,7 +18,7 @@
 > load → render → write の 3 段パイプラインを hexagonal purity (CN-03) に従って usecase 内に実装する。
 > Command の identity 系フィールド (track_id / layer_filter) は validated domain value object (TrackId / LayerId) で型付けする (CN-12)。
 
-- [~] **T002**: usecase layer: RenderBaselineGraph primary port + RenderBaselineGraphInteractor<L,R,W> (L: BaselineGraphLoader, R: BaselineGraphRenderer, W: BaselineGraphWriter の 3 generic compose) + RenderBaselineGraphCommand / RenderBaselineGraphOutput / RenderBaselineGraphError を libs/usecase に新設する。interactor は load → render → write の 3 段パイプラインを compose する (IN-02, IN-19, AC-02, CN-12)
+- [x] **T002**: usecase layer: RenderBaselineGraph primary port + RenderBaselineGraphInteractor<L,R,W> (L: BaselineGraphLoader, R: BaselineGraphRenderer, W: BaselineGraphWriter の 3 generic compose) + RenderBaselineGraphCommand / RenderBaselineGraphOutput / RenderBaselineGraphError を libs/usecase に新設する。interactor は load → render → write の 3 段パイプラインを compose する (IN-02, IN-19, AC-02, CN-12) (`246ef29b9107c9ca04bd50602905a273c6de66f9`)
 
 ### S3 — Sibling modify: RenderContractMapCommand / Error の型厳格化
 
@@ -26,7 +26,7 @@
 > 変更は usecase 層 (struct 定義) + CLI (呼び出し側) + 既存テストに及ぶ。独立した task として影響範囲を明示する。
 > InvalidTrackId variant を削除し、Command 構築時の validation を CLI 境界に移動する。
 
-- [ ] **T003**: sibling modify (CN-12 波及): RenderContractMapCommand / RenderContractMapError の identity 系フィールドを raw String から TrackId / LayerId に変更し、呼び出し側 CLI および既存テストを更新する (CN-12, AC-18)
+- [x] **T003**: sibling modify (CN-12 波及): RenderContractMapCommand / RenderContractMapError の identity 系フィールドを raw String から TrackId / LayerId に変更し、呼び出し側 CLI および既存テストを更新する (CN-12, AC-18) (`246ef29b9107c9ca04bd50602905a273c6de66f9`)
 
 ### S4 — Infrastructure layer: 3 adapter 新設
 
@@ -35,7 +35,7 @@
 > T014: BaselineGraphWriterAdapter — atomic write で depth 1 / depth 2 ファイルを書き出す。symlink 拒否。Symmetric to FsContractMapWriter。
 > 3 adapter は責務が明確に独立しているため独立 task に分割する (各 200〜400 行の目安)。
 
-- [ ] **T004**: infrastructure layer: BaselineGraphRendererAdapter を libs/infrastructure に新設し、BaselineGraphRenderer port を impl する。.harness/config/baseline-graph-style.toml を読み込む (fail-closed: ファイル不在は StyleConfigNotFound エラー)。style config section 構造: [node.*] + [pattern.*] + [class.*] + [edge.*] + [filter] ([role.*] なし) (IN-02, IN-04, AC-02, AC-15, CN-02, CN-06)
+- [~] **T004**: infrastructure layer: BaselineGraphRendererAdapter を libs/infrastructure に新設し、BaselineGraphRenderer port を impl する。.harness/config/baseline-graph-style.toml を読み込む (fail-closed: ファイル不在は StyleConfigNotFound エラー)。style config section 構造: [node.*] + [pattern.*] + [class.*] + [edge.*] + [filter] ([role.*] なし) (IN-02, IN-04, AC-02, AC-15, CN-02, CN-06)
 - [ ] **T013**: infrastructure layer: BaselineGraphLoaderAdapter を libs/infrastructure に新設し、BaselineGraphLoader port を impl する。architecture-rules.json を rules_path から読み込んで tddd.enabled layers を列挙し、各 layer の rustdoc JSON baseline を track_root 下からロードして Vec<BaselineDocument> を返す。symlink は trusted_root 外で拒否 (SymlinkRejected)。ファイル不在は NotFound エラー (fail-closed)。Symmetric to FsCatalogueLoader (IN-02, IN-19, AC-02, CN-03)
 - [ ] **T014**: infrastructure layer: BaselineGraphWriterAdapter を libs/infrastructure に新設し、BaselineGraphWriter port を impl する。write_overview は track_root/<track_id>/<layer>-graph-d1/index.md に atomic write、write_cluster は track_root/<track_id>/<layer>-graph-d2/<cluster_key>.md に atomic write する。symlink は trusted_root 外で拒否 (SymlinkRejected)。Symmetric to FsContractMapWriter (IN-02, IN-19, AC-02, CN-03)
 

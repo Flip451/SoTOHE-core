@@ -1,0 +1,119 @@
+# Baseline Graph (Reality View) style configuration
+# (ADR 2026-05-22-1507 Decision C / config_location: Reality View dedicated file)
+#
+# This file is the repo-committed default for the baseline-graph renderer.
+# Edit this file to customize mermaid node shapes, colors, edge styles, etc.
+#
+# Absence of this file is a fail-closed error (CN-02 / AC-15):
+# BaselineGraphRendererAdapter::render_overview / render_clusters returns
+# BaselineGraphRendererError::StyleConfigNotFound.
+#
+# Section structure:
+#   [node.<NodeCategory>]  — shape + class for a node category (Method, Variant, Function)
+#   [pattern.<PatternName>]— overlay_class for a structural pattern (future extension)
+#   [class.<ClassName>]    — mermaid classDef parameters (fill / stroke / stroke_width / stroke_dasharray)
+#   [edge.<EdgeKind>]      — arrow syntax + optional label for an edge kind
+#   [filter]               — future rendering filters
+#
+# Note: [role.*] is NOT present — Reality View input is rustdoc_types::Crate which
+# carries no catalogue role data (ADR 2026-05-22-1507 Decision C / IN-04).
+
+# ---------------------------------------------------------------------------
+# Node category styles
+# ---------------------------------------------------------------------------
+
+[node.Method]
+shape = "([{label}])"
+class = "method_node"
+
+[node.Variant]
+shape = "[{label}]"
+class = "variant_node"
+
+[node.Function]
+shape = "[[{label}]]"
+class = "function_node"
+
+[node.Cluster]
+class = "cluster_node"
+
+# ---------------------------------------------------------------------------
+# Pattern overlays (future extension point)
+# ---------------------------------------------------------------------------
+
+# (none defined for Reality View — no typestate in rustdoc)
+
+# ---------------------------------------------------------------------------
+# classDef definitions (mermaid classDef <name> fill:<fill>,stroke:<stroke>,...)
+# ---------------------------------------------------------------------------
+
+[class.struct_entry]
+fill = "#dbeafe"
+stroke = "#1e40af"
+stroke_width = "2px"
+
+[class.enum_entry]
+fill = "#d1fae5"
+stroke = "#065f46"
+stroke_width = "2px"
+
+[class.trait_entry]
+fill = "#ede9fe"
+stroke = "#4c1d95"
+stroke_width = "2px"
+
+[class.type_alias_entry]
+fill = "#fdf4ff"
+stroke = "#6b21a8"
+stroke_width = "1px"
+stroke_dasharray = "4 2"
+
+[class.function_node]
+fill = "#f5f3ff"
+stroke = "#a78bfa"
+stroke_width = "1px"
+
+[class.method_node]
+fill = "#f8fafc"
+stroke = "#cbd5e1"
+stroke_width = "1px"
+
+[class.variant_node]
+fill = "#fafaf9"
+stroke = "#d6d3d1"
+stroke_width = "1px"
+
+[class.cluster_node]
+fill = "#f0f9ff"
+stroke = "#0369a1"
+stroke_width = "1px"
+
+# ---------------------------------------------------------------------------
+# Edge styles
+# ---------------------------------------------------------------------------
+
+[edge.method_param]
+arrow = "--o"
+
+[edge.method_returns]
+arrow = "-->"
+
+[edge.trait_impl]
+arrow = "-.impl.->"
+
+[edge.variant_payload]
+arrow = "--o"
+
+[edge.field]
+arrow = "--o"
+
+[edge.alias]
+arrow = "---"
+label = "alias_of"
+
+# ---------------------------------------------------------------------------
+# Filter (future extension point — I decision reserve)
+# ---------------------------------------------------------------------------
+
+[filter]
+include_functions = true
