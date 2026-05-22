@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (6/14 resolved)
+## Tasks (7/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -56,7 +56,7 @@
 > struct fields edge (K decision: PlainStruct の --o|field_name|、TupleStruct の positional index、Unit / stripped は skip)。
 > TypeAlias の無向 alias edge (N decision: ---|alias_of|)。
 
-- [~] **T007**: adapter 内: entry subgraph 化 (F-r1: Struct / Enum / Trait / TypeAlias) + Enum variant node 化 + payload edge (H decision) + Trait method 内包 (H' decision) + struct fields edge (K decision) + TypeAlias alias edge (N decision) を実装する (IN-06, IN-07, IN-08, IN-10, IN-11, AC-04, AC-06, AC-07, AC-09, AC-10)
+- [x] **T007**: adapter 内: entry subgraph 化 (F-r1: Struct / Enum / Trait / TypeAlias) + Enum variant node 化 + payload edge (H decision) + Trait method 内包 (H' decision) + struct fields edge (K decision) + TypeAlias alias edge (N decision) を実装する (IN-06, IN-07, IN-08, IN-10, IN-11, AC-04, AC-06, AC-07, AC-09, AC-10) (`8b29d5ee7178b9294f365ae6a9c0e2181a0b30e2`)
 
 ### S7 — Adapter: Impl 処理 + cross-baseline trait index (BB / O / J decisions)
 
@@ -65,7 +65,7 @@
 > trait impl edge `-.impl.->` (J decision)。workspace 外型は silent skip。
 > cross-baseline での rustdoc Id 比較禁止 (CN-05)。lookup 失敗は silent skip (CN-10)。
 
-- [ ] **T008**: adapter 内: cross-baseline global trait index 構築 (O-r1) + Impl Item 処理 (BB-4-fix1: inherent merge / trait impl edge / blanket 本体 / skip rules) + trait impl edge `-.impl.->` (J decision) を実装する (IN-09, IN-12, IN-13, AC-05, AC-08, AC-17, CN-04, CN-05, CN-10, CN-11)
+- [~] **T008**: adapter 内: cross-baseline global trait index 構築 (O-r1) + Impl Item 処理 (BB-4-fix1: inherent merge / trait impl edge / blanket 本体 / skip rules) + trait impl edge `-.impl.->` (J decision) を実装する (IN-09, IN-12, IN-13, AC-05, AC-08, AC-17, CN-04, CN-05, CN-10, CN-11)
 
 ### S8 — Adapter: depth 1 overview renderer (U-r3)
 

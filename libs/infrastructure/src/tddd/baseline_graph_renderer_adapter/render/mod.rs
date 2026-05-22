@@ -21,8 +21,15 @@
 //! [`entry_subgraph`] submodule implements F-r1 / H / H' / K / N decisions:
 //! Struct/Enum/Trait/TypeAlias as subgraphs, enum variant nodes + payload edges,
 //! Trait method inclusion, struct field edges, and TypeAlias alias edges.
+//!
+//! **Scope (T008)**: cross-baseline trait index + Impl Item processing —
+//! [`impl_processor`] submodule implements O-r1 (global trait index), BB-4-fix1
+//! (inherent merge / trait impl edge / blanket body / skip rules), and J decision
+//! (`-.impl.->` edge style). (IN-09 / IN-12 / IN-13 / AC-05 / AC-08 / AC-17 /
+//! CN-04 / CN-05 / CN-10 / CN-11)
 
 pub(super) mod entry_subgraph;
+pub(super) mod impl_processor;
 pub(super) mod node_extractor;
 pub(super) mod node_id_generator;
 

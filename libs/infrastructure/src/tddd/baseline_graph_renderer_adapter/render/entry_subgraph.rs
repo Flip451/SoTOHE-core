@@ -1,4 +1,4 @@
-//! Entry subgraph emission for the baseline-graph renderer (T007).
+//! Entry subgraph emission for the baseline-graph renderer (T007 / T008).
 //!
 //! Implements the following ADR decisions:
 //!
@@ -15,11 +15,15 @@
 //! - **N**: TypeAlias → undirected `---|alias_of|` edge to the target type subgraph.
 //!   The target is identified by its type_node_id; if the target is not a locally known
 //!   type it is emitted as an anonymous node (best-effort without cross-baseline lookup).
+//! - **BB-4-fix1 (T008)**: Inherent impl methods are merged into the target type's entry
+//!   subgraph. The `emit_*_subgraph` functions accept an optional `inherent_method_ids`
+//!   slice; when provided, those method nodes are emitted inside the subgraph before `end`.
 //!
 //! All functions are panic-free (no `unwrap` / `expect` / slice indexing on `[i]`
 //! in production code — only `.get()` / iterators).
 //!
-//! (IN-06 / IN-07 / IN-08 / IN-10 / IN-11 / AC-04 / AC-06 / AC-07 / AC-09 / AC-10)
+//! (IN-06 / IN-07 / IN-08 / IN-09 / IN-10 / IN-11 / IN-13 / AC-04 / AC-05 / AC-06 /
+//! AC-07 / AC-08 / AC-09 / AC-10)
 
 use std::collections::BTreeMap;
 
@@ -28,6 +32,10 @@ use rustdoc_types::{Id, ItemEnum, StructKind, Type, VariantKind, Visibility};
 use domain::tddd::baseline_document::BaselineDocument;
 use domain::tddd::baseline_graph_ports::BaselineGraphRendererError;
 
+use super::impl_processor::{
+    BlanketBodyEntry, build_blanket_body_map, build_inherent_method_map, build_trait_index,
+    emit_all_impl_edges_for_layer,
+};
 use super::node_id_generator::{
     function_node_id, module_path_from_summary, trait_node_id, trait_rep_node_id, type_node_id,
     type_rep_node_id,
@@ -38,10 +46,14 @@ use super::{StyleConfig, apply_shape, edge_arrow_label, sanitize};
 // Public entry points
 // ---------------------------------------------------------------------------
 
-/// Emit a Struct entry subgraph (F-r1 / K decision).
+/// Emit a Struct entry subgraph (F-r1 / K / BB-4-fix1 decision).
 ///
 /// Struct / Enum / Trait / TypeAlias become subgraphs; FunctionEntry is handled
 /// separately as a standalone node.
+///
+/// `inherent_method_ids` — when `Some`, the method Ids (collected by
+/// [`super::impl_processor::collect_inherent_methods`] for this type's rep node id)
+/// are emitted as method nodes inside the subgraph (BB-4-fix1, T008).
 ///
 /// # Errors
 ///
@@ -57,6 +69,7 @@ pub(super) fn emit_struct_subgraph(
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     indent: &str,
+    inherent_method_ids: Option<&[Id]>,
 ) -> Result<(), BaselineGraphRendererError> {
     let krate = &doc.krate;
 
@@ -150,6 +163,20 @@ pub(super) fn emit_struct_subgraph(
         }
     }
 
+    // BB-4-fix1 (T008): emit inherent method nodes inside the subgraph.
+    if let Some(method_ids) = inherent_method_ids {
+        let child_indent = format!("{indent}  ");
+        super::impl_processor::emit_inherent_methods(
+            method_ids,
+            krate,
+            &entry_sg_id,
+            subgraph_lines,
+            class_attach,
+            style,
+            &child_indent,
+        )?;
+    }
+
     // Close subgraph.
     subgraph_lines.push(format!("{indent}end"));
 
@@ -179,6 +206,7 @@ pub(super) fn emit_enum_subgraph(
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     indent: &str,
+    inherent_method_ids: Option<&[Id]>,
 ) -> Result<(), BaselineGraphRendererError> {
     let krate = &doc.krate;
 
@@ -300,6 +328,20 @@ pub(super) fn emit_enum_subgraph(
         }
     }
 
+    // BB-4-fix1 (T008): emit inherent method nodes inside the subgraph.
+    if let Some(method_ids) = inherent_method_ids {
+        let child_indent = format!("{indent}  ");
+        super::impl_processor::emit_inherent_methods(
+            method_ids,
+            krate,
+            &entry_sg_id,
+            subgraph_lines,
+            class_attach,
+            style,
+            &child_indent,
+        )?;
+    }
+
     // Close subgraph.
     subgraph_lines.push(format!("{indent}end"));
 
@@ -313,6 +355,11 @@ pub(super) fn emit_enum_subgraph(
 }
 
 /// Emit a Trait entry subgraph with method nodes (F-r1 / H' decision).
+///
+/// `blanket_entries` — when `Some`, blanket body indicator nodes collected by
+/// [`super::impl_processor::build_blanket_body_map`] are emitted inside the subgraph
+/// before its `end` line (a-plan, AC-17 / BB-4-fix1). Each entry contains a pre-built
+/// `node_id`, `node_def`, and an optional class attach statement.
 ///
 /// # Errors
 ///
@@ -328,6 +375,7 @@ pub(super) fn emit_trait_subgraph(
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     indent: &str,
+    blanket_entries: Option<&[BlanketBodyEntry]>,
 ) -> Result<(), BaselineGraphRendererError> {
     let krate = &doc.krate;
 
@@ -398,6 +446,19 @@ pub(super) fn emit_trait_subgraph(
         }
     }
 
+    // BB-4-fix1 / a-plan (AC-17): inject blanket body indicator nodes inside the trait
+    // subgraph before `end`. Nodes were pre-collected by `build_blanket_body_map` so
+    // they appear inside this subgraph block, not as disconnected top-level nodes.
+    if let Some(entries) = blanket_entries {
+        let child_indent = format!("{indent}  ");
+        for entry in entries {
+            subgraph_lines.push(format!("{child_indent}{}{}", entry.node_id, entry.node_def));
+            if let Some(ref ca) = entry.class_attach_line {
+                class_attach.push(ca.clone());
+            }
+        }
+    }
+
     // Close subgraph.
     subgraph_lines.push(format!("{indent}end"));
 
@@ -426,6 +487,7 @@ pub(super) fn emit_type_alias_subgraph(
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     indent: &str,
+    inherent_method_ids: Option<&[Id]>,
 ) -> Result<(), BaselineGraphRendererError> {
     let krate = &doc.krate;
 
@@ -461,6 +523,20 @@ pub(super) fn emit_type_alias_subgraph(
         if let Some(class_name) = ns.class.as_deref() {
             class_attach.push(format!("class {rep_node_id} {class_name}"));
         }
+    }
+
+    // BB-4-fix1 (T008): emit inherent method nodes inside the subgraph.
+    if let Some(method_ids) = inherent_method_ids {
+        let child_indent = format!("{indent}  ");
+        super::impl_processor::emit_inherent_methods(
+            method_ids,
+            krate,
+            &entry_sg_id,
+            subgraph_lines,
+            class_attach,
+            style,
+            &child_indent,
+        )?;
     }
 
     // Close subgraph.
@@ -572,6 +648,16 @@ pub(super) fn emit_all_entries_for_layer(
 
     let nodes = extract_nodes(baselines, &layer_id);
 
+    // T008 (O-r1, CN-04): build per-render-call indices once before the entry loop.
+    // These are local to this invocation — not cached/stored long-term.
+    let trait_index = build_trait_index(baselines, layer);
+    let inherent_map = build_inherent_method_map(baselines, layer);
+    // BB-4-fix1 / a-plan (AC-17): collect blanket body entries for each trait subgraph.
+    // Must be built before the traits emit loop so entries are available for injection
+    // inside each trait subgraph before its `end` line.
+    let blanket_body_map =
+        build_blanket_body_map(baselines, layer, crate_filter, &trait_index, style);
+
     // Sort entries alphabetically by module-qualified key (CN-08) — Functions separately.
     // Key = "<module_path>::<name>" (or just "<name>" for crate-root items) for stable
     // alphabetical ordering that avoids silent overwrites when the same name appears in
@@ -584,7 +670,7 @@ pub(super) fn emit_all_entries_for_layer(
 
     for node in &nodes {
         let doc = node.doc();
-        // Apply crate filter: skip nodes from crtes that don't match the requested crate.
+        // Apply crate filter: skip nodes from crates that don't match the requested crate.
         if let Some(filter) = crate_filter {
             if doc.crate_name.as_str() != filter {
                 continue;
@@ -631,6 +717,18 @@ pub(super) fn emit_all_entries_for_layer(
 
     // Emit entry subgraphs: Structs → Enums → Traits → TypeAliases (all alphabetical).
     for (id, doc) in structs.values() {
+        // T008 BB-4-fix1: look up inherent methods for this type's rep_node_id.
+        let crate_name_str = doc.crate_name.as_str();
+        let rep_id = {
+            let summary_path_opt = doc.krate.paths.get(id).map(|s| s.path.as_slice());
+            let mp = summary_path_opt
+                .map(super::node_id_generator::module_path_from_summary)
+                .unwrap_or_default();
+            let item_name = doc.krate.index.get(id).and_then(|i| i.name.as_deref()).unwrap_or("");
+            super::node_id_generator::type_rep_node_id(layer, crate_name_str, &mp, item_name)
+        };
+        let method_ids_for_type =
+            inherent_map.get(crate_name_str).and_then(|m| m.get(&rep_id)).map(|v| v.as_slice());
         emit_struct_subgraph(
             doc,
             *id,
@@ -640,9 +738,22 @@ pub(super) fn emit_all_entries_for_layer(
             class_attach,
             style,
             indent,
+            method_ids_for_type,
         )?;
     }
     for (id, doc) in enums.values() {
+        // T008 BB-4-fix1: look up inherent methods for this type's rep_node_id.
+        let crate_name_str = doc.crate_name.as_str();
+        let rep_id = {
+            let summary_path_opt = doc.krate.paths.get(id).map(|s| s.path.as_slice());
+            let mp = summary_path_opt
+                .map(super::node_id_generator::module_path_from_summary)
+                .unwrap_or_default();
+            let item_name = doc.krate.index.get(id).and_then(|i| i.name.as_deref()).unwrap_or("");
+            super::node_id_generator::type_rep_node_id(layer, crate_name_str, &mp, item_name)
+        };
+        let method_ids_for_type =
+            inherent_map.get(crate_name_str).and_then(|m| m.get(&rep_id)).map(|v| v.as_slice());
         emit_enum_subgraph(
             doc,
             *id,
@@ -652,9 +763,21 @@ pub(super) fn emit_all_entries_for_layer(
             class_attach,
             style,
             indent,
+            method_ids_for_type,
         )?;
     }
     for (id, doc) in traits.values() {
+        // BB-4-fix1 / a-plan: look up blanket body entries for this trait subgraph.
+        // The trait_sg_id is needed to match against the blanket_body_map key.
+        let trait_sg_id = {
+            let summary_path_opt = doc.krate.paths.get(id).map(|s| s.path.as_slice());
+            let mp = summary_path_opt
+                .map(super::node_id_generator::module_path_from_summary)
+                .unwrap_or_default();
+            let item_name = doc.krate.index.get(id).and_then(|i| i.name.as_deref()).unwrap_or("");
+            super::node_id_generator::trait_node_id(layer, doc.crate_name.as_str(), &mp, item_name)
+        };
+        let blanket_entries_for_trait = blanket_body_map.get(&trait_sg_id).map(|v| v.as_slice());
         emit_trait_subgraph(
             doc,
             *id,
@@ -664,9 +787,22 @@ pub(super) fn emit_all_entries_for_layer(
             class_attach,
             style,
             indent,
+            blanket_entries_for_trait,
         )?;
     }
     for (id, doc) in aliases.values() {
+        // T008 BB-4-fix1: look up inherent methods for this type alias's rep_node_id.
+        let crate_name_str = doc.crate_name.as_str();
+        let rep_id = {
+            let summary_path_opt = doc.krate.paths.get(id).map(|s| s.path.as_slice());
+            let mp = summary_path_opt
+                .map(super::node_id_generator::module_path_from_summary)
+                .unwrap_or_default();
+            let item_name = doc.krate.index.get(id).and_then(|i| i.name.as_deref()).unwrap_or("");
+            super::node_id_generator::type_rep_node_id(layer, crate_name_str, &mp, item_name)
+        };
+        let method_ids_for_type =
+            inherent_map.get(crate_name_str).and_then(|m| m.get(&rep_id)).map(|v| v.as_slice());
         emit_type_alias_subgraph(
             doc,
             *id,
@@ -676,6 +812,7 @@ pub(super) fn emit_all_entries_for_layer(
             class_attach,
             style,
             indent,
+            method_ids_for_type,
         )?;
     }
 
@@ -683,6 +820,12 @@ pub(super) fn emit_all_entries_for_layer(
     for (id, doc) in functions.values() {
         emit_function_node(doc, *id, layer, subgraph_lines, class_attach, style, indent)?;
     }
+
+    // T008 (BB-4-fix1 / J decision): emit trait impl edges for all baselines in this layer.
+    // Called after all entry subgraphs are emitted so all type/trait subgraph IDs are stable.
+    // Blanket body indicator nodes are already injected inside trait subgraphs above via
+    // build_blanket_body_map + emit_trait_subgraph (a-plan, AC-17).
+    emit_all_impl_edges_for_layer(baselines, layer, crate_filter, &trait_index, edge_lines, style)?;
 
     Ok(())
 }
@@ -930,6 +1073,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1000,6 +1144,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1063,6 +1208,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1128,6 +1274,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1196,6 +1343,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1253,6 +1401,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1326,6 +1475,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1402,6 +1552,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1488,6 +1639,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1560,6 +1712,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1626,6 +1779,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1690,6 +1844,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
@@ -1817,6 +1972,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         );
 
         assert!(
@@ -2005,6 +2161,7 @@ include_functions = true
             &mut class_attach,
             &style,
             "  ",
+            None,
         )
         .unwrap();
 
