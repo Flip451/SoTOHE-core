@@ -339,6 +339,57 @@
           "findings": [],
           "hash": "rvw1:sha256:504612017c51d6d16a76c4aa58ec4f261c846baf20966cfa89ba9bf28d04579b",
           "at": "2026-05-22T08:54:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e485884afd4fb51ab0116b27ee3729e85aa7d2673497f8a9d5a498480aecdbc",
+          "at": "2026-05-22T10:04:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RenderBaselineGraphInteractor::new` is specified with only `renderer: R`, but the plan requires the interactor to inject three secondary ports: baseline loader, `BaselineGraphRenderer`, and graph writer. With only the renderer in the type contract, the usecase cannot load rustdoc baselines or persist depth 1/2 output without bypassing the planned hexagonal dependency boundary, so T002/T011 are internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/usecase-types.json",
+              "line": 295,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e485884afd4fb51ab0116b27ee3729e85aa7d2673497f8a9d5a498480aecdbc",
+          "at": "2026-05-22T10:08:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR already defines `BaselineDocument` as a three-field wrapper struct earlier in the document, but this consequence bullet still calls it a `wrapper newtype`. In Rust, \"newtype\" implies a single-field tuple struct, so this wording contradicts the chosen data shape and can mislead the follow-up type-design/implementation work.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 562,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:43c92fb962beaaf30935e48235fa121c6c6397470b7ff95e360a681669bd611f",
+          "at": "2026-05-22T10:34:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdc3bec8579de3e679a4e78164259d46c0abf85daad669d360d0b775bc44eb36",
+          "at": "2026-05-22T10:40:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdc3bec8579de3e679a4e78164259d46c0abf85daad669d360d0b775bc44eb36",
+          "at": "2026-05-22T10:44:39Z"
         }
       ]
     }

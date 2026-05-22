@@ -49,6 +49,10 @@ decisions:
     user_decision_ref: "chat_segment:contract-map-sibling-promotion-followup:2026-05-22"
     candidate_selection: "inherits:[C,D,E,H,H_prime,I,J,K,L,M,N] from:knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md"
     status: proposed
+  - id: usecase_command_field_typing
+    user_decision_ref: "chat_segment:r9-strict-command-typing:2026-05-22"
+    candidate_selection: "from:[string-raw,typed-value-object] chose:typed-value-object"
+    status: accepted
 ---
 # Reality View Renderer: rustdoc_types::Crate 入力への対応設計 (v3 schema 移行)
 
@@ -548,13 +552,14 @@ Decision 群の集約として、生成する mermaid 出力の構造:
 - Contract Map との役割分担が明確化される (Contract Map = 設計意図の俯瞰、Reality View = 実装状態のドリルダウン)
 - syn 依存を追加しない (rustdoc が Type を既に parse 済みのため、Contract Map adapter との差分)
 - typestate transition edge を持たないことで、catalogue にない情報を rustdoc から推測しようとする誤りを構造的に避けられる
+- usecase Command / error の identity 系 field を validated domain value object で型付けすることで、構築時に不正な identity を排除できる (DD decision)。sibling Contract Map renderer の `RenderContractMapCommand` / `RenderContractMapError` も symmetric に同じ型付けへ揃える (modify)
 
 ### 悪い影響
 
 - 旧 ADR 2026-04-16-2200 の `--cluster-depth N` の自由度を捨てた (cluster = 最上位 module 固定)
 - 旧 ADR §D3 (Entry Point 検出) / §D8 (DRIFT detection) を YAGNI で不採用にしたため機能後退と見られる可能性がある
 - 設定ファイル `.harness/config/baseline-graph-style.toml` 不在は fail-closed エラーとなるため、セットアップ要件が生じる
-- `BaselineDocument` wrapper newtype の導入で baseline 関連 type が増える
+- `BaselineDocument` wrapper struct の導入で baseline 関連 type が増える
 - cluster 跨ぎ edge を depth 1 overview に集約する処理ロジックの実装コストが生じる
 - rustdoc の `Impl` Item の処理 (blanket / synthetic / negative の判別) で edge ケースが多く、実装時の注意が必要
 
@@ -567,6 +572,12 @@ Decision 群の集約として、生成する mermaid 出力の構造:
 - visibility = Public only 固定が運用上不便となり private 表示要求が出た場合 (CC decision 再評価)
 - baseline 入力が `rustdoc_types::Crate` 以外に変わった場合 (例: 別 schema 採用、ADR 2026-05-08-0258 改訂)
 - cluster 分割だけでは node 数が制御できないケースが頻発した場合 (X decision 再評価)
+
+## DD: usecase Command / error の identity 系 field の型付け (採択: typed-value-object)
+
+usecase 層の Command および error type が concept-bearing な identity 系 field (track_id / layer_id 等) を持つ場合、raw `String` ではなく validated domain value object (`TrackId` / `LayerId` 等) で型付けする。構築時に不正な identity が排除され、illegal state が表現不可能になる。
+
+`RenderBaselineGraphCommand` / `RenderBaselineGraphError` が対象 (具体的な struct 定義は Open Question P の port + adapter API 詳細で確定するが、identity field の型付け方針は本 decision で先行確定する)。
 
 ## Open Questions (本 ADR scope 外、別 phase / 別 ADR で扱う)
 

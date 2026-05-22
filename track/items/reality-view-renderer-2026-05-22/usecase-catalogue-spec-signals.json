@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e483dd0634017b739beaa3ce8791572934a44f6ec57231f9692e77059a4a9023",
+  "signals": [
+    {
+      "type_name": "RenderBaselineGraphCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderBaselineGraphError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderBaselineGraphInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderBaselineGraphOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderBaselineGraph",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RenderContractMap",
+      "signal": "blue"
+    }
+  ]
+}

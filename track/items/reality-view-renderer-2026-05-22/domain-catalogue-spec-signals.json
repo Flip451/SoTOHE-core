@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e9d19e268c18cb0d9ca76e9e67bf8007cad4c7530e47071eb6114eb3fa08b36b",
+  "signals": [
+    {
+      "type_name": "BaselineDocument",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineGraphLoaderError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineGraphRendererError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineGraphWriterError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineGraphLoader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineGraphRenderer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BaselineGraphWriter",
+      "signal": "blue"
+    }
+  ]
+}

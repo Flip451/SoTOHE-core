@@ -1,0 +1,161 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "BaselineGraphLoaderAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_root", "ty": "std::path::PathBuf" },
+          { "name": "rules_path", "ty": "std::path::PathBuf" },
+          { "name": "trusted_root", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "track_root", "ty": "std::path::PathBuf" },
+            { "name": "rules_path", "ty": "std::path::PathBuf" },
+            { "name": "trusted_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::baseline_graph_loader_adapter",
+      "docs": "Filesystem-backed BaselineGraphLoader implementation. Discovers tddd.enabled layers via architecture-rules.json at rules_path, then loads the rustdoc JSON baseline for each layer from track_root/<track_id>/<layer>-types-baseline.json (or co-located rustdoc output). Rejects symlinks below trusted_root. Symmetric to FsCatalogueLoader. (IN-02 / IN-19 / AC-02 / AC-15 / CN-03)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineGraphRendererAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "style_config_path", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "style_config_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::baseline_graph_renderer_adapter",
+      "docs": "Infrastructure adapter implementing BaselineGraphRenderer port. Reads .harness/config/baseline-graph-style.toml (Reality View dedicated style config, Decision L / IN-04). Produces depth-1 overview (render_overview) and depth-2 cluster-detail (render_cluster) mermaid output for rustdoc_types::Crate input. No syn dependency — rustdoc already parses types (Decision E note / CN-03). Style config DTO types are private. Symmetric to ContractMapRendererAdapter. (IN-02 / AC-02 / AC-15 / CN-02)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-04",
+          "hash": "6bd8a8d959d39f48d2a9fc8c56b9e6a2a01d50fde8b558cd2377773e148dc5a8"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "AC-15",
+          "hash": "ff9d9e402728099681328947d6ea400778fb6f9f7bc8d5e6522656712898aff7"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineGraphWriterAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_root", "ty": "std::path::PathBuf" },
+          { "name": "trusted_root", "ty": "std::path::PathBuf" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "track_root", "ty": "std::path::PathBuf" },
+            { "name": "trusted_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::baseline_graph_writer_adapter",
+      "docs": "Filesystem-backed BaselineGraphWriter implementation. write_overview writes track_root/<track_id>/<layer>-graph-d1/index.md atomically; write_cluster writes track_root/<track_id>/<layer>-graph-d2/<cluster_key>.md atomically. Rejects symlinks below trusted_root fail-closed. Symmetric to FsContractMapWriter. (IN-02 / IN-19 / AC-02 / AC-15 / CN-03)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "domain::tddd::BaselineGraphLoader",
+      "for_type": "BaselineGraphLoaderAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::tddd::BaselineGraphRenderer",
+      "for_type": "BaselineGraphRendererAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::tddd::BaselineGraphWriter",
+      "for_type": "BaselineGraphWriterAdapter"
+    }
+  ]
+}

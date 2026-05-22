@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-22T10:46:51Z",
+  "declaration_hash": "e483dd0634017b739beaa3ce8791572934a44f6ec57231f9692e77059a4a9023",
+  "signals": [
+    {
+      "type_name": "RenderBaselineGraph",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RenderBaselineGraphCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RenderBaselineGraphError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::convert::From<BaselineGraphLoaderError>",
+        "core::convert::From<BaselineGraphRendererError>",
+        "core::convert::From<BaselineGraphWriterError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RenderBaselineGraphInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "RenderBaselineGraph"
+      ]
+    },
+    {
+      "type_name": "RenderBaselineGraphOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RenderContractMapError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<CatalogueLoaderError>",
+        "core::convert::From<ContractMapRendererError>",
+        "core::convert::From<ContractMapWriterError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RenderContractMap",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
