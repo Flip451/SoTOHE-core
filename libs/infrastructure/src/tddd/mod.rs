@@ -14,6 +14,7 @@ pub mod baseline_capture;
 pub mod baseline_codec;
 pub mod baseline_graph_loader_adapter;
 pub mod baseline_graph_renderer_adapter;
+pub mod baseline_graph_writer_adapter;
 pub mod baseline_rustdoc_codec;
 pub mod catalogue_bulk_loader;
 pub mod catalogue_document_codec;

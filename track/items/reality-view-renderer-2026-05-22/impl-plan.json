@@ -74,12 +74,13 @@
     {
       "id": "T013",
       "description": "infrastructure layer: BaselineGraphLoaderAdapter を libs/infrastructure に新設し、BaselineGraphLoader port を impl する。architecture-rules.json を rules_path から読み込んで tddd.enabled layers を列挙し、各 layer の rustdoc JSON baseline を track_root 下からロードして Vec<BaselineDocument> を返す。symlink は trusted_root 外で拒否 (SymlinkRejected)。ファイル不在は NotFound エラー (fail-closed)。Symmetric to FsCatalogueLoader (IN-02, IN-19, AC-02, CN-03)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "31026b2f108a24dfd3e9981ae06f2a38f5d35d39"
     },
     {
       "id": "T014",
       "description": "infrastructure layer: BaselineGraphWriterAdapter を libs/infrastructure に新設し、BaselineGraphWriter port を impl する。write_overview は track_root/<track_id>/<layer>-graph-d1/index.md に atomic write、write_cluster は track_root/<track_id>/<layer>-graph-d2/<cluster_key>.md に atomic write する。symlink は trusted_root 外で拒否 (SymlinkRejected)。Symmetric to FsContractMapWriter (IN-02, IN-19, AC-02, CN-03)",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {

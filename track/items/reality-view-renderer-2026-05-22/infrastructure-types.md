@@ -6,5 +6,5 @@
 |------|------|--------|---------|--------|----------|
 | BaselineGraphLoaderAdapter | secondary_adapter | — | impl BaselineGraphLoader | 🔵 | 🔵 |
 | BaselineGraphRendererAdapter | secondary_adapter | — | impl BaselineGraphRenderer | 🔵 | 🔵 |
-| BaselineGraphWriterAdapter | secondary_adapter | — | impl BaselineGraphWriter | 🟡 | 🔵 |
+| BaselineGraphWriterAdapter | secondary_adapter | — | impl BaselineGraphWriter | 🔵 | 🔵 |
 
