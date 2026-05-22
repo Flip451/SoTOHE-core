@@ -64,7 +64,7 @@
     {
       "id": "T011",
       "description": "CLI 統合: sotp track baseline-graph サブコマンドを追加し RenderBaselineGraphInteractor を呼び出す。BaselineGraphLoaderAdapter (T013) / BaselineGraphRendererAdapter (T004) / BaselineGraphWriterAdapter (T014) を composition root で compose し RenderBaselineGraphInteractor<L,R,W> に inject する。depth 1 index.md + depth 2 cluster files を書き出す (IN-02, IN-19, AC-02, AC-18)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T012",
@@ -80,7 +80,8 @@
     {
       "id": "T014",
       "description": "infrastructure layer: BaselineGraphWriterAdapter を libs/infrastructure に新設し、BaselineGraphWriter port を impl する。write_overview は track_root/<track_id>/<layer>-graph-d1/index.md に atomic write、write_cluster は track_root/<track_id>/<layer>-graph-d2/<cluster_key>.md に atomic write する。symlink は trusted_root 外で拒否 (SymlinkRejected)。Symmetric to FsContractMapWriter (IN-02, IN-19, AC-02, CN-03)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "2a8cb94c0b358371c47ddd0f92fbae50ad275444"
     }
   ],
   "plan": {
