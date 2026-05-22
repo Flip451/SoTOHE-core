@@ -58,7 +58,8 @@
     {
       "id": "T010",
       "description": "adapter 内: depth 2 cluster detail renderer — top-module subgraph + entry subgraph + method/variant node + FunctionEntry callable node + cluster 内 edge + mermaid 出力構造 + ファイル名規則 (cluster_key をそのまま stem として使用: <crate_name>_<module_seg1>.md または <crate_name>_root.md) を実装し render_clusters を完成させる (IN-15, IN-16, AC-14, CN-07, CN-08)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "1c643301f15b5e14c2734cf33f00e641c3513750"
     },
     {
       "id": "T011",
@@ -73,7 +74,7 @@
     {
       "id": "T013",
       "description": "infrastructure layer: BaselineGraphLoaderAdapter を libs/infrastructure に新設し、BaselineGraphLoader port を impl する。architecture-rules.json を rules_path から読み込んで tddd.enabled layers を列挙し、各 layer の rustdoc JSON baseline を track_root 下からロードして Vec<BaselineDocument> を返す。symlink は trusted_root 外で拒否 (SymlinkRejected)。ファイル不在は NotFound エラー (fail-closed)。Symmetric to FsCatalogueLoader (IN-02, IN-19, AC-02, CN-03)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T014",

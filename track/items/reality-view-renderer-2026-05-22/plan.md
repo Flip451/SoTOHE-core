@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (9/14 resolved)
+## Tasks (10/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -36,7 +36,7 @@
 > 3 adapter は責務が明確に独立しているため独立 task に分割する (各 200〜400 行の目安)。
 
 - [x] **T004**: infrastructure layer: BaselineGraphRendererAdapter を libs/infrastructure に新設し、BaselineGraphRenderer port を impl する。.harness/config/baseline-graph-style.toml を読み込む (fail-closed: ファイル不在は StyleConfigNotFound エラー)。style config section 構造: [node.*] + [pattern.*] + [class.*] + [edge.*] + [filter] ([role.*] なし) (IN-02, IN-04, AC-02, AC-15, CN-02, CN-06) (`40fc5c1227b3a1343b8fed3e9e335b096b2a8e55`)
-- [ ] **T013**: infrastructure layer: BaselineGraphLoaderAdapter を libs/infrastructure に新設し、BaselineGraphLoader port を impl する。architecture-rules.json を rules_path から読み込んで tddd.enabled layers を列挙し、各 layer の rustdoc JSON baseline を track_root 下からロードして Vec<BaselineDocument> を返す。symlink は trusted_root 外で拒否 (SymlinkRejected)。ファイル不在は NotFound エラー (fail-closed)。Symmetric to FsCatalogueLoader (IN-02, IN-19, AC-02, CN-03)
+- [~] **T013**: infrastructure layer: BaselineGraphLoaderAdapter を libs/infrastructure に新設し、BaselineGraphLoader port を impl する。architecture-rules.json を rules_path から読み込んで tddd.enabled layers を列挙し、各 layer の rustdoc JSON baseline を track_root 下からロードして Vec<BaselineDocument> を返す。symlink は trusted_root 外で拒否 (SymlinkRejected)。ファイル不在は NotFound エラー (fail-closed)。Symmetric to FsCatalogueLoader (IN-02, IN-19, AC-02, CN-03)
 - [ ] **T014**: infrastructure layer: BaselineGraphWriterAdapter を libs/infrastructure に新設し、BaselineGraphWriter port を impl する。write_overview は track_root/<track_id>/<layer>-graph-d1/index.md に atomic write、write_cluster は track_root/<track_id>/<layer>-graph-d2/<cluster_key>.md に atomic write する。symlink は trusted_root 外で拒否 (SymlinkRejected)。Symmetric to FsContractMapWriter (IN-02, IN-19, AC-02, CN-03)
 
 ### S5 — Adapter: node 抽出 + node_id 生成
@@ -82,7 +82,7 @@
 > mermaid 出力構造: (1) classDef 定義群 (2) layer subgraph > top-module subgraph > entry subgraph 群 (alphabetical) > method/variant node (Vec 順) + FunctionEntry callable node 群 (alphabetical) (3) edge 定義群 (cluster 内 edge のみ) (4) class attach 群。
 > sub-module path を entry subgraph label に含める (例: team::manager::TeamManager)。cross-cluster edge は深さ 1 に集約済みのため描画しない。
 
-- [~] **T010**: adapter 内: depth 2 cluster detail renderer — top-module subgraph + entry subgraph + method/variant node + FunctionEntry callable node + cluster 内 edge + mermaid 出力構造 + ファイル名規則 (cluster_key をそのまま stem として使用: <crate_name>_<module_seg1>.md または <crate_name>_root.md) を実装し render_clusters を完成させる (IN-15, IN-16, AC-14, CN-07, CN-08)
+- [x] **T010**: adapter 内: depth 2 cluster detail renderer — top-module subgraph + entry subgraph + method/variant node + FunctionEntry callable node + cluster 内 edge + mermaid 出力構造 + ファイル名規則 (cluster_key をそのまま stem として使用: <crate_name>_<module_seg1>.md または <crate_name>_root.md) を実装し render_clusters を完成させる (IN-15, IN-16, AC-14, CN-07, CN-08) (`1c643301f15b5e14c2734cf33f00e641c3513750`)
 
 ### S10 — CLI 統合
 

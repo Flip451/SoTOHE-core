@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-22T20:12:35Z",
+  "generated_at": "2026-05-22T21:14:29Z",
   "declaration_hash": "e87efb494fde5d35ccdaa06553d8f0e0e32d188562b888d2831f15477065754a",
   "signals": [
     {
       "type_name": "BaselineGraphLoaderAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "BaselineGraphLoader"
       ]
     },
