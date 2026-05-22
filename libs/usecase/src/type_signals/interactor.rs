@@ -1,14 +1,13 @@
 //! `TypeSignalsInteractor` — implements [`TypeSignalsService`].
 //!
-//! Orchestrates track-status guard, layer-bindings resolution, and per-layer
-//! signal evaluation. All I/O is performed via injected ports (no direct
-//! infrastructure calls).
+//! Orchestrates the active-track guard (CN-07), layer-bindings resolution, and
+//! per-layer signal evaluation. All I/O is performed via injected ports (no
+//! direct infrastructure calls).
 
 use std::sync::Arc;
 
 use domain::tddd::catalogue_v2::{
-    MissingCataloguePolicy, TdddLayerBindingsError, TdddLayerBindingsPort, TrackStatusReaderPort,
-    TypeSignalsExecutorPort,
+    MissingCataloguePolicy, TdddLayerBindingsError, TdddLayerBindingsPort, TypeSignalsExecutorPort,
 };
 
 use super::service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};
@@ -71,16 +70,18 @@ fn validate_track_id(id: &str) -> Result<(), TypeSignalsError> {
 /// Interactor implementing [`TypeSignalsService`].
 ///
 /// All I/O is performed via injected ports:
-/// - [`TrackStatusReaderPort`]: reads derived track status from metadata.json +
-///   impl-plan.json (symlink-guarded).
 /// - [`TdddLayerBindingsPort`]: reads `architecture-rules.json`.
 /// - [`TypeSignalsExecutorPort`]: runs the three-way signal evaluation pipeline
 ///   for a single layer.
 ///
+/// The active-track guard (CN-07) runs before any I/O: the caller-supplied
+/// `branch` string is checked for the `track/` prefix and the suffix is
+/// matched against `track_id`. The interactor remains git-unaware — the CLI
+/// resolves the current branch and passes it in the request.
+///
 /// `apps/cli` constructs the concrete infrastructure adapters at the
 /// composition root and injects them.
 pub struct TypeSignalsInteractor {
-    status_reader: Arc<dyn TrackStatusReaderPort>,
     layer_bindings: Arc<dyn TdddLayerBindingsPort>,
     executor: Arc<dyn TypeSignalsExecutorPort>,
 }
@@ -89,11 +90,10 @@ impl TypeSignalsInteractor {
     /// Creates a new interactor with the given injected ports.
     #[must_use]
     pub fn new(
-        status_reader: Arc<dyn TrackStatusReaderPort>,
         layer_bindings: Arc<dyn TdddLayerBindingsPort>,
         executor: Arc<dyn TypeSignalsExecutorPort>,
     ) -> Self {
-        Self { status_reader, layer_bindings, executor }
+        Self { layer_bindings, executor }
     }
 }
 
@@ -106,8 +106,9 @@ impl TypeSignalsService for TypeSignalsInteractor {
     ///
     /// Steps:
     /// 1. Validate the track ID format (slug check).
-    /// 2. Derive `items_dir = workspace_root/track/items`.
-    /// 3. Read the track status; reject frozen tracks (Done/Archived).
+    /// 2. Active-track guard (CN-07): check that `branch` starts with `track/`
+    ///    and that the suffix matches `track_id`.
+    /// 3. Derive `items_dir = workspace_root/track/items`.
     /// 4. Resolve layer bindings; fail-closed when no layers found.
     /// 5. For each layer, call `TypeSignalsExecutorPort::evaluate_layer`.
     ///
@@ -115,11 +116,30 @@ impl TypeSignalsService for TypeSignalsInteractor {
     ///
     /// Returns [`TypeSignalsError`] on any failure.
     fn run(&self, request: TypeSignalsRequest) -> Result<(), TypeSignalsError> {
-        let TypeSignalsRequest { items_dir: _items_dir, track_id, workspace_root, layer, lenient } =
-            request;
+        let TypeSignalsRequest {
+            items_dir: _items_dir,
+            track_id,
+            branch,
+            workspace_root,
+            layer,
+            lenient,
+        } = request;
 
         // Step 1: validate track_id.
         validate_track_id(&track_id)?;
+
+        // Step 2: active-track guard (CN-07).
+        // Reject non-`track/` branches and branch/track-id mismatches.
+        // This mirrors `RefreshCatalogueSpecSignalsInteractor` exactly.
+        let suffix = branch
+            .strip_prefix("track/")
+            .ok_or_else(|| TypeSignalsError::NonActiveTrack { branch: branch.clone() })?;
+        if suffix != track_id.as_str() {
+            return Err(TypeSignalsError::BranchTrackMismatch {
+                branch: branch.clone(),
+                track_id: track_id.clone(),
+            });
+        }
 
         // Derive `items_dir` from `workspace_root` so that the interactor is
         // robust to CLI callers that pass relative (`"track/items"`) or absolute
@@ -128,19 +148,6 @@ impl TypeSignalsService for TypeSignalsInteractor {
         // invocations (e.g. `workspace_root = $PWD`, `items_dir = "track/items"`
         // resolve to the same directory but fail an `==` comparison).
         let items_dir = workspace_root.join("track").join("items");
-
-        // Step 2: read track status and guard against frozen tracks.
-        let status = self
-            .status_reader
-            .read_status(&items_dir, &track_id)
-            .map_err(|e| TypeSignalsError::StatusReadFailed { reason: e.to_string() })?;
-
-        if !status.is_active() {
-            return Err(TypeSignalsError::TrackFrozen {
-                track_id: track_id.clone(),
-                status: status.to_string(),
-            });
-        }
 
         // Step 3: resolve layer bindings.
         let bindings =

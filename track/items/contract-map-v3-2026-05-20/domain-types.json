@@ -1,0 +1,309 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ContractMapContent": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "tuple_struct",
+        "fields": ["String"],
+        "has_stripped_fields": false
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "content", "ty": "impl Into<String>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "into_string",
+          "receiver": "self",
+          "params": [],
+          "returns": "String",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::contract_map_content",
+      "docs": "Typed wrapper around rendered Contract Map markdown. Carried for edge exposure so the ContractMapRenderer port return type is resolvable.",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-22",
+          "hash": "3b734083bbe18f23cd4fc7827b2c2f342a04b57fb608f421d22ca9e4689d07de"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ContractMapRendererError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "StyleConfigNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "StyleConfigInvalid",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "RenderFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd",
+      "docs": "Error returned by ContractMapRenderer::render. Variants cover fail-closed style config loading (CN-02) and rendering failures (Open Question R placeholder). (Decision P-4 + IN-22)",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-01",
+          "hash": "8db33779f6918ed98fec0775f520dd52787719258f327316b754a2b4779a5d1e"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-22",
+          "hash": "3b734083bbe18f23cd4fc7827b2c2f342a04b57fb608f421d22ca9e4689d07de"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ContractMapRenderOptions": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "layers", "ty": "Vec<LayerId>" },
+          { "name": "signal_overlay", "ty": "bool" },
+          { "name": "action_overlay", "ty": "bool" },
+          { "name": "include_spec_source_edges", "ty": "bool" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "empty",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::contract_map_options",
+      "docs": "Options passed to ContractMapRenderer::render. Carried for edge exposure (Decision P-4, IN-22). Fields: layers (layer selection from the baseline API — unchanged from baseline; in the new port design the interactor translates RenderContractMapCommand.layer_filter into a filtered layer_order slice that is passed as the separate layer_order parameter to render(), so opts.layers is not read by ContractMapRendererAdapter and is effectively a forward-compatibility stub in this track), signal_overlay / action_overlay (Decision M stubs, YAGNI), include_spec_source_edges (Open Question Q stub).",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-22",
+          "hash": "3b734083bbe18f23cd4fc7827b2c2f342a04b57fb608f421d22ca9e4689d07de"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueLoaderError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "CatalogueNotFound", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "LayerDiscoveryFailed", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } },
+          { "name": "DecodeFailed", "payload": { "kind": "struct", "fields": [{ "name": "layer_id", "ty": "String" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "SymlinkRejected", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "IoError", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "TopologicalSortFailed", "payload": { "kind": "struct", "fields": [{ "name": "reason", "ty": "String" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_ports",
+      "docs": "Carried for R7 edge exposure (CatalogueLoader port reference).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ContractMapWriterError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "IoError", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }, { "name": "reason", "ty": "String" }] } },
+          { "name": "SymlinkRejected", "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "std::path::PathBuf" }] } },
+          { "name": "TrackNotFound", "payload": { "kind": "struct", "fields": [{ "name": "track_id", "ty": "String" }, { "name": "expected_dir", "ty": "std::path::PathBuf" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_ports",
+      "docs": "Carried for R7 edge exposure (ContractMapWriter port reference).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "CatalogueLoader": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "load_all",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "TrackId" }
+          ],
+          "returns": "Result<(Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>), CatalogueLoaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd::catalogue_ports",
+      "docs": "Carried for R7 edge exposure so FsCatalogueLoader impl edges are visible. load_all returns BTreeMap<LayerId, CatalogueDocument> (1 doc per layer, unchanged from baseline). RenderContractMapInteractor (T002) bridges to &[CatalogueDocument] by collecting BTreeMap values — each CatalogueDocument is self-describing (carries doc.layer and doc.crate_name), so the flat Vec retains all layer information needed by the renderer (Decision A-3').",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ContractMapRenderer": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "render",
+          "receiver": "&self",
+          "params": [
+            { "name": "catalogues", "ty": "&[CatalogueDocument]" },
+            { "name": "layer_order", "ty": "&[LayerId]" },
+            { "name": "opts", "ty": "&ContractMapRenderOptions" }
+          ],
+          "returns": "Result<ContractMapContent, ContractMapRendererError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd",
+      "docs": "Secondary port for v3 contract-map rendering. Infrastructure adapter (ContractMapRendererAdapter) implements this port. RenderContractMapInteractor injects it via generic R. (Decision E-3c + Decision P-1 + IN-01 + IN-05)",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-01",
+          "hash": "8db33779f6918ed98fec0775f520dd52787719258f327316b754a2b4779a5d1e"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-05",
+          "hash": "4be6fd212c3fbe539a3ef5973aa7811765705f82035904a412ccea413099b19f"
+        },
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-22",
+          "hash": "3b734083bbe18f23cd4fc7827b2c2f342a04b57fb608f421d22ca9e4689d07de"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ContractMapWriter": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "TrackId" },
+            { "name": "content", "ty": "&ContractMapContent" }
+          ],
+          "returns": "Result<(), ContractMapWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd::catalogue_ports",
+      "docs": "Carried for R7 edge exposure so FsContractMapWriter impl edges are visible.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "domain::tddd::contract_map_render::render_contract_map": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "catalogues", "ty": "&BTreeMap<LayerId, CatalogueDocument>" },
+        { "name": "layer_order", "ty": "&[LayerId]" },
+        { "name": "opts", "ty": "&ContractMapRenderOptions" }
+      ],
+      "returns": "ContractMapContent",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted in this track (IN-19 / Decision P-2). Replaced by ContractMapRenderer port + ContractMapRendererAdapter. The function was the IN-24 minimal placeholder; it is removed (not modified) and all callers are updated to use the port method.",
+      "spec_refs": [
+        {
+          "file": "track/items/contract-map-v3-2026-05-20/spec.json",
+          "anchor": "IN-19",
+          "hash": "04b2d441ef1a6c1ddcd0d2e35025ccc567616f4eeef6852ed864ec40c4633c65"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ContractMapRendererError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ContractMapRendererError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ContractMapRendererError"
+    }
+  ]
+}

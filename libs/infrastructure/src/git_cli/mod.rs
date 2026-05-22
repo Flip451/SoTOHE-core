@@ -140,9 +140,27 @@ impl SystemGitRepo {
     /// git cannot be spawned, the command fails, or the root path is empty.
     pub fn discover() -> Result<Self, GitError> {
         let cwd = std::env::current_dir().map_err(GitError::CurrentDir)?;
+        Self::discover_from(&cwd)
+    }
+
+    /// Discover the git repository root starting from `start_dir`, without
+    /// reading the process current working directory.
+    ///
+    /// Useful when the caller already holds a `workspace_root` path that may
+    /// differ from the process CWD (e.g. `--workspace-root` CLI argument).
+    /// Unlike [`Self::discover`], this method does not call
+    /// `std::env::current_dir`, so it is correct regardless of where the
+    /// process was started.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`GitError`] if git cannot be spawned, the command fails
+    /// (e.g. `start_dir` is not inside a git repository), or the root path
+    /// returned by git is empty.
+    pub fn discover_from(start_dir: &Path) -> Result<Self, GitError> {
         let output = Command::new("git")
             .args(["rev-parse", "--show-toplevel"])
-            .current_dir(&cwd)
+            .current_dir(start_dir)
             .output()
             .map_err(|source| GitError::Spawn {
                 command: "rev-parse --show-toplevel".to_owned(),
@@ -487,6 +505,22 @@ mod tests {
 
         let _guard = CurrentDirGuard::change_to(&nested);
         let repo = SystemGitRepo::discover().unwrap();
+
+        assert_eq!(repo.root(), dir.path());
+    }
+
+    /// `discover_from` must resolve the repo root from a path argument without
+    /// reading the process CWD. No `CurrentDirGuard` / `cwd_lock` is needed
+    /// because the test never changes the working directory.
+    #[test]
+    fn system_git_repo_discover_from_resolves_root_without_changing_cwd() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init"]);
+        let nested = dir.path().join("nested/deeper");
+        fs::create_dir_all(&nested).unwrap();
+
+        // Do NOT change the process CWD — discover_from must not depend on it.
+        let repo = SystemGitRepo::discover_from(&nested).unwrap();
 
         assert_eq!(repo.root(), dir.path());
     }

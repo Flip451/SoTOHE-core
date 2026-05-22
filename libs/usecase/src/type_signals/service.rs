@@ -15,6 +15,10 @@ pub struct TypeSignalsRequest {
     pub items_dir: PathBuf,
     /// Track identifier slug (e.g. `"my-track-2026-01-01"`).
     pub track_id: String,
+    /// Current git branch (e.g. `"track/my-feature-2026-04-24"`). Used by the
+    /// active-track guard (CN-07) to reject non-`track/` branches and
+    /// branch/track-id mismatches.
+    pub branch: String,
     /// Cargo workspace root used for rustdoc export.
     pub workspace_root: PathBuf,
     /// Optional layer filter (`--layer`). When `None`, all TDDD-enabled layers
@@ -34,22 +38,25 @@ pub enum TypeSignalsError {
         /// Human-readable reason.
         reason: String,
     },
-    /// Track status could not be read.
-    #[error("cannot load track status: {reason}")]
-    StatusReadFailed {
-        /// Human-readable reason.
-        reason: String,
+    /// The supplied branch does not start with `track/`, so the guard
+    /// (CN-07) rejects it to keep type-signals off archived / main / plan/
+    /// branches.
+    #[error("type-signals rejected: branch '{branch}' is not an active track branch (CN-07)")]
+    NonActiveTrack {
+        /// The branch name that triggered the guard.
+        branch: String,
     },
-    /// The track is frozen (Done / Archived) — type-signals must not run.
+    /// The branch `track/<suffix>` disagrees with the track_id argument.
+    /// Safeguards against CLI wrappers that mishandle branch/track_id mapping.
     #[error(
-        "cannot run type-signals on '{track_id}' (status={status}). \
-         Completed tracks are frozen — run on an active track instead."
+        "type-signals rejected: branch '{branch}' does not match track_id '{track_id}' \
+         (expected 'track/{track_id}')"
     )]
-    TrackFrozen {
-        /// Track identifier for which the guard fired.
+    BranchTrackMismatch {
+        /// The branch name that triggered the guard.
+        branch: String,
+        /// The track identifier from the request.
         track_id: String,
-        /// Derived status string (e.g. `"done"`, `"archived"`).
-        status: String,
     },
     /// `architecture-rules.json` could not be loaded or a specific layer was
     /// not found.

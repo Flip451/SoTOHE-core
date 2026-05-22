@@ -1,0 +1,246 @@
+# Contract Map style configuration (ADR 2026-05-20-2221 Decision L-1 + L-8 + L-10)
+#
+# This file is the repo-committed default for the contract-map renderer.
+# Edit this file to customize mermaid node shapes, colors, edge styles, etc.
+#
+# Absence of this file is a fail-closed error (CN-02 / AC-11):
+# ContractMapRendererAdapter::render returns ContractMapRendererError::StyleConfigNotFound.
+#
+# Section structure:
+#   [role.<RoleName>]    — maps a DataRole / ContractRole / FunctionRole to a classDef name
+#   [node.<NodeCategory>] — shape + class for a node category
+#   [pattern.<PatternName>] — overlay_class for a structural pattern (e.g. Typestate)
+#   [class.<ClassName>]  — mermaid classDef parameters (fill / stroke / stroke_width / stroke_dasharray)
+#   [edge.<EdgeKind>]    — arrow syntax + optional label for an edge kind
+#   [filter]             — future rendering filters
+
+# ---------------------------------------------------------------------------
+# Role → classDef mapping (DataRole 13 values + ContractRole 3 + FunctionRole 2)
+# ---------------------------------------------------------------------------
+
+[role.Entity]
+class = "entity"
+
+[role.ValueObject]
+class = "value_object"
+
+[role.AggregateRoot]
+class = "aggregate_root"
+
+[role.DomainService]
+class = "domain_service"
+
+[role.Specification]
+class = "specification"
+
+[role.Factory]
+class = "factory"
+
+[role.UseCase]
+class = "use_case"
+
+[role.ErrorType]
+class = "error_type"
+
+[role.Dto]
+class = "dto"
+
+[role.Command]
+class = "command"
+
+[role.Query]
+class = "query"
+
+[role.ApplicationService]
+class = "app_service"
+
+[role.SpecificationPort]
+class = "specification_port"
+
+[role.SecondaryPort]
+class = "secondary_port"
+
+[role.Interactor]
+class = "interactor"
+
+[role.FreeFunction]
+class = "free_function"
+
+[role.UseCaseFunction]
+class = "use_case_function"
+
+[role.SecondaryAdapter]
+class = "secondary_adapter"
+
+# ---------------------------------------------------------------------------
+# Node category styles
+# ---------------------------------------------------------------------------
+
+[node.Method]
+shape = "([{label}])"
+class = "method_node"
+
+[node.Variant]
+shape = "[{label}]"
+class = "variant_node"
+
+[node.Function]
+shape = "[[{label}]]"
+class = "function_node"
+
+# ---------------------------------------------------------------------------
+# Pattern overlays
+# ---------------------------------------------------------------------------
+
+[pattern.Typestate]
+overlay_class = "typestate_overlay"
+
+# ---------------------------------------------------------------------------
+# classDef definitions (mermaid classDef <name> fill:<fill>,stroke:<stroke>,...)
+# ---------------------------------------------------------------------------
+
+[class.entity]
+fill = "#dbeafe"
+stroke = "#1e40af"
+stroke_width = "2px"
+
+[class.value_object]
+fill = "#d1fae5"
+stroke = "#065f46"
+stroke_width = "1px"
+
+[class.aggregate_root]
+fill = "#ede9fe"
+stroke = "#4c1d95"
+stroke_width = "2px"
+
+[class.domain_service]
+fill = "#fee2e2"
+stroke = "#991b1b"
+stroke_width = "1px"
+
+[class.factory]
+fill = "#e0f2fe"
+stroke = "#0369a1"
+stroke_width = "1px"
+
+[class.use_case]
+fill = "#ecfeff"
+stroke = "#0e7490"
+stroke_width = "1px"
+
+[class.specification]
+fill = "#fdf4ff"
+stroke = "#6b21a8"
+stroke_width = "1px"
+
+[class.error_type]
+fill = "#fef2f2"
+stroke = "#b91c1c"
+stroke_width = "1px"
+stroke_dasharray = "4 2"
+
+[class.dto]
+fill = "#f8fafc"
+stroke = "#64748b"
+stroke_width = "1px"
+
+[class.command]
+fill = "#fff7ed"
+stroke = "#c2410c"
+stroke_width = "1px"
+
+[class.query]
+fill = "#f0f9ff"
+stroke = "#0369a1"
+stroke_width = "1px"
+
+[class.app_service]
+fill = "#ecfdf5"
+stroke = "#059669"
+stroke_width = "2px"
+
+[class.specification_port]
+fill = "#fdf4ff"
+stroke = "#9333ea"
+stroke_width = "1px"
+stroke_dasharray = "4 2"
+
+[class.secondary_port]
+fill = "#fafaf9"
+stroke = "#78716c"
+stroke_width = "1px"
+stroke_dasharray = "4 2"
+
+[class.interactor]
+fill = "#f0fdfa"
+stroke = "#0d9488"
+stroke_width = "1px"
+
+[class.free_function]
+fill = "#f5f3ff"
+stroke = "#7c3aed"
+stroke_width = "1px"
+
+[class.use_case_function]
+fill = "#eef2ff"
+stroke = "#4338ca"
+stroke_width = "1px"
+
+[class.secondary_adapter]
+fill = "#fafaf9"
+stroke = "#57534e"
+stroke_width = "1px"
+
+[class.method_node]
+fill = "#f8fafc"
+stroke = "#cbd5e1"
+stroke_width = "1px"
+
+[class.variant_node]
+fill = "#fafaf9"
+stroke = "#d6d3d1"
+stroke_width = "1px"
+
+[class.function_node]
+fill = "#f5f3ff"
+stroke = "#a78bfa"
+stroke_width = "1px"
+
+[class.typestate_overlay]
+stroke = "#dc2626"
+stroke_width = "3px"
+
+# ---------------------------------------------------------------------------
+# Edge styles
+# ---------------------------------------------------------------------------
+
+[edge.method_param]
+arrow = "--o"
+
+[edge.method_returns]
+arrow = "-->"
+
+[edge.transition]
+arrow = "==>"
+label = "transitions_to"
+
+[edge.trait_impl]
+arrow = "-.impl.->"
+
+[edge.variant_payload]
+arrow = "--o"
+
+[edge.field]
+arrow = "--o"
+
+[edge.alias]
+arrow = "---"
+label = "alias_of"
+
+# ---------------------------------------------------------------------------
+# Filter (future extension point — I-1 reserve)
+# ---------------------------------------------------------------------------
+
+[filter]
+include_function_roles = []

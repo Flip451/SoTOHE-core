@@ -103,6 +103,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Reality View renderer の edge カバレッジ拡張 — receiver-less method / trait-method incoming + 起源別視覚区別](2026-05-01-1226-reality-view-edge-coverage-expansion.md) | — | 2026-05-01 |
 | [旧 spec-code-consistency の廃止と catalogue-impl-signals 診断コマンドの導入: レイヤー配置・インターフェース・CI ゲート](2026-05-11-2330-catalogue-impl-signals-command-layering.md) | Proposed | 2026-05-11 |
 | [TDDD: struct の inherent method 比較を enum と同じ両側対称比較に統一する](2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md) | Proposed | 2026-05-20 |
+| [Contract Map Renderer: catalogue schema v3 対応設計](2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md) | Proposed | 2026-05-20 |
 
 ### トラック・ワークフロー
 

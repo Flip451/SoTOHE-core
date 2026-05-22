@@ -196,6 +196,70 @@ bare wrapper 名のみの宣言を catalogue の codec / verify CLI が schema v
 
 **関連 ADR**: `knowledge/adr/2026-04-29-0240-method-type-full-generic-declaration.md#D1`
 
+### R9. No Primitive Obsession (制約ある概念を生 primitive で宣言しない)
+
+catalogue の field / payload / param / returns / map キーで、検証可能な制約・有限値集合・ドメイン的意味を持つ概念を生 primitive (`String` / `i32` / `bool` 等) で宣言してはならない。値オブジェクト (`role: ValueObject` の newtype `tuple_struct`、または有限値集合の `enum`) を定義して使う。
+
+対象フィールド:
+
+- `kind.fields[].ty` (plain_struct / tuple_struct)
+- `kind.variants[].payload` の field 型 (enum payload)
+- `methods[].params[].ty` / `methods[].returns` / FunctionEntry の `params[].ty` / `returns`
+- `BTreeMap` / `HashMap` のキー型 (有限集合 → enum、識別子 → 検証付き newtype)
+
+判断手順:
+
+1. その概念に「不正値」が存在するか判定する (空文字禁止 / 特定書式 / 有限集合 / 単位など)
+2. 制約があるなら値オブジェクトを定義する: 有限集合 → `role: ValueObject` の `enum`; 検証付き識別子・値 → `role: ValueObject` の `tuple_struct` (newtype) + constructor 検証
+3. 生 primitive が正当なのは「真に制約のない不透明値」(検証も有限性もないフリーテキスト等) のみ。その場合は `docs` に生 primitive を選んだ根拠を記録する
+4. **serde 境界 (`role: Dto`) も R9 の例外ではない**。`role: Dto` は wire format だが、概念に対応するフィールド・map キー・Vec 要素を生 String にしてよい免罪符ではない:
+   - フィールド / Vec 要素が domain VO/enum を表す → infra 側 `deserialize_with` で domain VO/enum へパースする (例: `include_function_roles: Vec<FunctionRole>` を文字列要素からパースする deserializer で受ける。`Vec<String>` 禁止)
+   - **serde map キー** が serde-free な domain enum を表す → infra 側に deserializable な **mirror enum** を定義し (`#[derive(Deserialize)]` + domain enum への `From` / `TryFrom`)、`BTreeMap<MirrorEnum, _>` で受ける。生 String キー + runtime 検証へ退避してはならない
+   - **config キー / filter 値が domain 概念を名指すなら、それは概念への参照である**。`[role.<RoleName>]` の RoleName、`[edge.<EdgeKind>]` の EdgeKind、`include_function_roles` の各 FunctionRole 等、有限の domain 概念集合を名指すキー/値は「ただの設定文字列」ではなく、当該 domain enum (serde は infra mirror 経由) で型付ける。「open-ended だから String」「runtime で検証するから String」は R9 違反
+   - 対応する domain enum が未だ無ければ R10 に従い domain enum を新設する (迷う場合は概念扱いで domain へ)。生 String 可は color / mermaid 構文のような domain 的意味を持たない提示専用値のみ
+
+draft が本ルールに違反する (制約ある概念を生 primitive で宣言している) 場合、orchestrator レビュー前に self-reject して値オブジェクト化する。
+
+判定例:
+
+- mermaid class 名 (空文字禁止の識別子) → `MermaidClassName(String)` newtype (生 `String` 禁止)
+- 有限の edge 種別 → domain の `EdgeKind` enum (R10: domain 概念。生 `String` キー禁止)。infra の TOML map キーは deserializable な mirror enum (`EdgeKindKey` 等) で受け、domain `EdgeKind` へ変換する
+- `include_function_roles = ["UseCaseFunction"]` (TOML) → `Vec<FunctionRole>` を `deserialize_with` で受ける (`Vec<String>` 禁止)
+- 検証も有限性もない任意ラベル / color / mermaid 構文 → 生 `String` 許容 (`docs` に根拠記録)
+
+**根拠**: `.claude/rules/04-coding-principles.md` § Make Illegal States Unrepresentable / Newtype。本ルールは当プロジェクト固有 convention であり、生 primitive を許容する方針のプロジェクトでは異なりうる (type-designer.md の横断性を保つため、本制約は agent 定義でなく本 convention に置く)。
+
+### R10. Concept → Domain Object in Domain Layer (概念は domain 層にドメインオブジェクトとして定義する)
+
+ドメイン上の概念 (ユビキタス言語に現れる名詞: 識別子・数量・分類・ポリシー・状態 等) は、必ず **ドメインオブジェクト** として R1 マトリクスで domain 層に合法な role (`ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `Specification` / `Factory` / `ErrorType` — R1 マトリクスの domain 列を参照) のいずれかでモデル化し、**domain 層の `domain-types.json` に定義する**。どの層がそれを消費するかは問わない。R9 が「概念を生 primitive にしない」を、本 R10 が「ドメインオブジェクト化 + domain 層配置 + カタログ宣言」を担う。role 選定は R1–R6 の判断木 (R3: ValueObject 制限 / R6: DomainService 選定基準 等) に従う。
+
+論理連鎖 (なぜ概念が省略不能か):
+
+1. 概念は **ドメインオブジェクト化** する (生 primitive 化は R9 で禁止、kind 選定は R1 / R3)
+2. ドメインオブジェクトは **domain 層に配置** する (R1 マトリクス: `Entity` / `AggregateRoot` / `Specification` は domain ONLY、`ValueObject` は domain default)
+3. domain 層の型は他層から参照されるため **`pub` 宣言が必須** (層 = 別クレート境界。`pub` + 公開パスがなければ usecase / infrastructure から名前で参照できずコンパイル不能)
+4. `pub` 型は **カタログ宣言が必須** (カタログは public rustdoc API surface を写す。source に在る pub 型がカタログ未宣言なら signal evaluator の `CMinusSUnionD` = 🔴)
+5. ∴ **各概念は省略不能でカタログに宣言される**
+
+ただし手順 4 の signal 裏打ち (`CMinusSUnionD` 🔴) は **実装後** にしか効かない (計画段階では概念が source に未在のため、カタログから省いても赤にならない)。よって R10 は **計画段階** で概念のモデル化・配置・宣言を保証する上流ルールであり、R9 / 12c と同じく **信号機評価とは別軸** (全緑でも R10 充足を意味しない)。
+
+**serde / domain 純粋性を概念モデリング省略の口実にしてはならない**:
+
+- domain serde-free (R1 の CN-05 / ADR `2026-04-14-1531-domain-serde-ripout.md`) は、概念を domain にモデル化しない理由には **ならない**。外部形式 (TOML / JSON 等) から読む必要がある概念は、(a) domain 層に serde-free なドメインオブジェクトを定義し、(b) infrastructure 層に `role: Dto` の serde DTO を定義して相互変換する (R1: `Dto` は infrastructure)。purity は「domain モデル + infra DTO」の対で解決する。
+- 「serde が要るから infra の生 struct に留める」「domain に置けないと判断してカタログから省略する」は **いずれも R10 違反**。
+
+判別 (概念か否か):
+
+- 判別は「ドメイン的意味を持つか (ドメインエキスパートとの会話に現れるか)」のみで行う。serde / 外部形式 / 表示の都合は判別に **関与しない** (それは配置ではなく DTO 変換の問題)。
+- 概念でない (= domain に置かない) と判断してよいのは、ドメイン的意味を一切持たない純粋な技術ノブ (adapter 内部のバッファサイズ・リトライ回数等) のみ。**迷う場合は概念として扱い domain にモデル化する** (省略 / infra 寄せより誤りが少ない)。
+
+判定例:
+
+- 「許可された種別の有限集合」という概念 → domain に `role: ValueObject` の `enum` を定義。外部設定から読むなら infrastructure に `role: Dto` を置いて変換。`Vec<String>` を infra に持つのは R9 + R10 違反
+- 検証付き識別子の概念 → domain に `role: ValueObject` newtype。infra DTO フィールドも生 `String` にはしない — `deserialize_with` カスタムデシリアライザで受けてフィールド型を domain VO にするか、serde-free な domain enum を持つ場合はinfra 側に deserializable な mirror newtype を定義して変換する
+
+**根拠**: hexagonal — ドメインモデル (概念) は最内核の domain 層に属する (`architecture-rules.json` で domain は `may_depend_on: []`、`knowledge/conventions/hexagonal-architecture.md`)。本ルールは当プロジェクト固有 convention (hexagonal 前提) であり、agent 定義でなく本 convention に置く (横断性のため)。
+
 ## Examples
 
 ### Good
@@ -236,15 +300,17 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 - [ ] catch-all として `role: ValueObject` / `role: UseCase` を選んでいないか (R5)
 - [ ] top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照するすべての trait (port) が当該 track の catalogue に `role: SecondaryPort` の `traits` エントリとして declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
 - [ ] `methods[].returns` / `methods[].params[].ty` (TypeEntry / TraitEntry) および FunctionEntry の `returns` / `params[].ty` に bare wrapper 名のみの宣言 (`Result` / `Option` / `Vec` / `Box` / `Arc` / `Rc` / `Cow` / `BTreeMap` / `HashMap` / `HashSet` / `BTreeSet`) がないか (R8)
-- [ ] R1〜R8 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
+- [ ] field / payload / param / returns / map キーで、制約ある概念を生 primitive (`String` 等) で宣言していないか (R9)。制約があれば値オブジェクト (newtype / enum) を定義しているか。**`role: Dto` / serde 境界も例外ではない** — 概念を名指す map キー・filter 値は domain enum (serde は infra mirror enum 経由) で型付けているか。生 primitive は color / 自由ラベル等の真に不透明な提示専用値のみで、その場合 `docs` に根拠が記録されているか
+- [ ] ドメイン上の概念がすべて R1 マトリクスで domain 層に合法な role (ValueObject / Entity / AggregateRoot / DomainService / Specification / Factory / ErrorType) のいずれかで domain 層に定義され、カタログに宣言されているか (R10)。role 選定は R1–R6 の判断木に従う。serde / 外部形式の都合を口実に domain モデリングをスキップして infra 生 struct に留めたり、層配置を避けて概念をカタログから省略したりしていないか。外部形式が要る概念は「domain オブジェクト + infra `role: Dto`」の対で表現しているか
+- [ ] R1〜R10 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
 
 ## Enforcement
 
 - 第一線: catalogue を起草する agent の定義で本 convention の reading + compliance を義務付ける
-- 第二線: reviewer briefing template (将来 `track/review-prompts/<scope>.md` 配下に追加可能) に R1〜R8 の checklist を埋め込む
+- 第二線: reviewer briefing template (将来 `track/review-prompts/<scope>.md` 配下に追加可能) に R1〜R10 の checklist を埋め込む
 - 第三線: `bin/sotp track type-signals` の signal 評価 (catalogue → spec の trace integrity)。role 違反は signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
 
-将来の自動化候補: catalogue codec (`libs/infrastructure/src/tddd/catalogue_document_codec.rs`) で R1 layer-role マトリクスを machine-readable に表現し、`bin/sotp` の codec validation で reject する (`forbidden` 組合せ → codec error)。
+将来の自動化候補: catalogue codec (`libs/infrastructure/src/tddd/catalogue_document_codec/`) で R1 layer-role マトリクスを machine-readable に表現し、`bin/sotp` の codec validation で reject する (`forbidden` 組合せ → codec error)。
 
 ## Related Documents
 
@@ -254,7 +320,7 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 - `architecture-rules.json` — TDDD 対応層の SSoT (R1 layer 列挙の根拠)
 - `libs/domain/src/tddd/catalogue_v2/roles.rs` — `DataRole` / `ContractRole` / `FunctionRole` enum 定義 (v3 schema の role 正本; v2 の `TypeDefinitionKind` に相当)
 - `libs/domain/src/tddd/catalogue_v2/entries.rs` — `TypeEntry` / `TraitEntry` / `FunctionEntry` + `TypeKindV2` / `CompositePattern` 定義 (v3 schema の型正本)
-- `libs/infrastructure/src/tddd/catalogue_document_codec.rs` — v3 catalogue serde codec (将来の R1 自動化候補; TypeKindDto / PatternDto 等の wire format 定義)
+- `libs/infrastructure/src/tddd/catalogue_document_codec/` — v3 catalogue serde codec (将来の R1 自動化候補; TypeKindDto / PatternDto 等の wire format 定義)
 - `knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md` — v3 schema 設計 ADR (DataRole / ContractRole / FunctionRole 導入の決定記録)
 - `knowledge/adr/2026-04-29-0243-cross-track-port-reference.md` — R7 の決定記録 (cross-track port reference の意味論・declare 義務)
 - `knowledge/adr/2026-04-29-0240-method-type-full-generic-declaration.md` — R8 の決定記録 (method / param 型フィールドの完全型宣言規範)

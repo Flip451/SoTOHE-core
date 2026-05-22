@@ -1390,6 +1390,32 @@ const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
 
 const DOMAIN_ARCH_RULES: &str = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
 
+/// Write a complete `.harness/config/contract-map-style.toml` under `root`.
+///
+/// `render_contract_map_view` requires the style config to be present *and* to
+/// contain all `[edge.*]` keys that the renderer needs (CN-02 fail-closed).
+/// An absent or incomplete style config now propagates as a hard error; tests that
+/// write a catalogue file and call `sync_rendered_views` with a track_id must call
+/// this helper so the contract-map render path does not abort.
+fn write_minimal_style_config_to_root(root: &std::path::Path) {
+    let dir = root.join(".harness/config");
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(
+        dir.join("contract-map-style.toml"),
+        concat!(
+            "[edge.method_param]\narrow = \"--o\"\n",
+            "[edge.method_returns]\narrow = \"-->\"\n",
+            "[edge.transition]\narrow = \"==>\"\nlabel = \"transitions_to\"\n",
+            "[edge.trait_impl]\narrow = \"-.impl.->\"\n",
+            "[edge.variant_payload]\narrow = \"--o\"\n",
+            "[edge.field]\narrow = \"--o\"\n",
+            "[edge.alias]\narrow = \"---\"\nlabel = \"alias_of\"\n",
+            "[filter]\ninclude_function_roles = []\n",
+        ),
+    )
+    .unwrap();
+}
+
 #[test]
 fn sync_rendered_views_generates_domain_types_md_from_domain_types_json() {
     let dir = tempfile::tempdir().unwrap();
@@ -1408,6 +1434,7 @@ fn sync_rendered_views_generates_domain_types_md_from_domain_types_json() {
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -1444,6 +1471,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     // Companion signal file with a Blue signal for the declared TrackId.
     let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
@@ -1501,6 +1529,7 @@ fn sync_rendered_views_ignores_stale_signal_file_when_hash_mismatches() {
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     // Stale signal file — `declaration_hash` does NOT match the on-disk
     // declaration bytes.
@@ -1584,6 +1613,7 @@ fn sync_rendered_views_does_not_overwrite_domain_types_md_when_already_up_to_dat
     // architecture-rules.json is required since T045: render.rs skips per-layer
     // rendering when arch rules are absent (fail-graceful precondition check).
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     // First sync — generates domain-types.md.
     sync_rendered_views(dir.path(), Some("track-a")).unwrap();
@@ -1812,6 +1842,8 @@ fn sync_rendered_views_single_track_skips_domain_types_md_for_done_track() {
         .unwrap();
     // architecture-rules.json is required by render_contract_map_view (fail-closed).
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    // Style config required by ContractMapRendererAdapter (CN-02 fail-closed).
+    write_minimal_style_config_to_root(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-done-domain")).unwrap();
 
@@ -1966,6 +1998,7 @@ fn sync_rendered_views_generates_multiple_layer_types_md_independently() {
     std::fs::write(track_dir.join("usecase-types.json"), USECASE_TYPES_JSON_MINIMAL).unwrap();
     std::fs::write(track_dir.join("infrastructure-types.json"), INFRASTRUCTURE_TYPES_JSON_MINIMAL)
         .unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     let changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -2138,6 +2171,7 @@ fn sync_rendered_views_renders_cat_spec_column_when_signals_fresh_and_opt_in_ena
         serde_json::to_string_pretty(&spec_signals_json).unwrap(),
     )
     .unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -2196,6 +2230,7 @@ fn sync_rendered_views_skips_cat_spec_column_when_opt_in_disabled() {
         serde_json::to_string_pretty(&spec_signals_json).unwrap(),
     )
     .unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -2401,9 +2436,14 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
     // This test proves that:
     // 1. `sync_rendered_views` produces a `contract-map.md` even when the
     //    track status is `done` (all tasks in impl-plan.json are done).
-    // 2. The rendered contract-map contains the IN-24 / OS-07 placeholder
-    //    scaffold (deferment comment + domain subgraph). Full v3 rendering
-    //    is deferred per IN-24 / OS-07.
+    // 2. The rendered contract-map contains `flowchart LR` and catalogue entries
+    //    (full T004–T009 mermaid rendering pipeline).
+    //
+    // NOTE: T003 adapter requires `.harness/config/contract-map-style.toml`.
+    // A minimal style config is written to the temp workspace root here.
+    // An absent or invalid style config causes render_contract_map_view to return
+    // a hard error (CN-02 fail-closed), so any test that exercises the contract-map
+    // render path must provide the config.
     let dir = tempfile::tempdir().unwrap();
     let track_dir = dir.path().join("track/items/track-done-cmap");
     std::fs::create_dir_all(&track_dir).unwrap();
@@ -2411,6 +2451,28 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
     // architecture-rules.json — required by FsCatalogueLoader inside
     // `render_contract_map_view`.
     std::fs::write(dir.path().join("architecture-rules.json"), ARCH_RULES_DOMAIN_ONLY).unwrap();
+
+    // .harness/config/contract-map-style.toml — required by ContractMapRendererAdapter.
+    // Absent config causes fail-closed error (CN-02), which render_contract_map_view
+    // handles as a non-fatal warning (skips rendering). Provide a full style config
+    // (all [edge.*] sections) so the render actually runs and produces contract-map.md.
+    // The catalogue below includes enum tuple variants that require [edge.variant_payload].
+    let harness_config_dir = dir.path().join(".harness/config");
+    std::fs::create_dir_all(&harness_config_dir).unwrap();
+    std::fs::write(
+        harness_config_dir.join("contract-map-style.toml"),
+        concat!(
+            "[edge.method_param]\narrow = \"--o\"\n",
+            "[edge.method_returns]\narrow = \"-->\"\n",
+            "[edge.transition]\narrow = \"==>\"\nlabel = \"transitions_to\"\n",
+            "[edge.trait_impl]\narrow = \"-.impl.->\"\n",
+            "[edge.variant_payload]\narrow = \"--o\"\n",
+            "[edge.field]\narrow = \"--o\"\n",
+            "[edge.alias]\narrow = \"---\"\nlabel = \"alias_of\"\n",
+            "[filter]\ninclude_function_roles = []\n",
+        ),
+    )
+    .unwrap();
 
     // v5 metadata (no status field — status derived from impl-plan.json).
     std::fs::write(
@@ -2437,17 +2499,69 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
         "contract-map.md must be rendered for done tracks; changed: {changed:?}"
     );
 
-    // IN-24 placeholder: the rendered contract-map must contain the deferment
-    // comment and the domain subgraph. Full v3 rendering is deferred per IN-24.
+    // T004–T009: the rendered contract-map must contain flowchart LR and catalogue entries.
     let cmap = std::fs::read_to_string(track_dir.join("contract-map.md")).unwrap();
     assert!(
-        cmap.contains("IN-24"),
-        "IN-24 deferment comment must appear in contract-map.md; got:\n{cmap}"
+        cmap.contains("flowchart LR"),
+        "flowchart LR must appear in contract-map.md; got:\n{cmap}"
     );
+    // Enum entries from the catalogue must appear in the output.
     assert!(
-        cmap.contains("subgraph domain [domain]"),
-        "domain subgraph must appear in contract-map.md; got:\n{cmap}"
+        cmap.contains("MemberDeclaration"),
+        "MemberDeclaration must appear in contract-map.md; got:\n{cmap}"
     );
-    // Placeholder must not emit mermaid edge arrows.
-    assert!(!cmap.contains("-->|"), "placeholder must not emit mermaid edges; got:\n{cmap}");
+}
+
+/// CN-02 / AC-11 fail-closed: `sync_rendered_views` must propagate a hard error when
+/// `.harness/config/contract-map-style.toml` is absent but a catalogue is present.
+/// This guards the `StyleConfigNotFound -> RenderError::Io` wiring in
+/// `render_contract_map_view`.
+#[test]
+fn sync_rendered_views_errors_on_missing_style_config_when_catalogue_present() {
+    let dir = tempfile::tempdir().unwrap();
+    let track_dir = dir.path().join("track/items/track-cmap-no-style");
+    std::fs::create_dir_all(&track_dir).unwrap();
+
+    std::fs::write(dir.path().join("architecture-rules.json"), ARCH_RULES_DOMAIN_ONLY).unwrap();
+    // NOTE: `.harness/config/contract-map-style.toml` is intentionally NOT written.
+
+    std::fs::write(
+        track_dir.join("metadata.json"),
+        sample_metadata_json("track-cmap-no-style", "in_progress", "2026-03-10T00:00:00Z", "[]"),
+    )
+    .unwrap();
+    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_WITH_ENUM_VARIANTS).unwrap();
+
+    // With the catalogue present but style config absent, render_contract_map_view
+    // must return a hard error (CN-02 fail-closed), propagated as RenderError::Io.
+    let err = sync_rendered_views(dir.path(), Some("track-cmap-no-style")).unwrap_err();
+    let msg = err.to_string();
+    assert!(
+        msg.contains("CN-02") || msg.contains("style config"),
+        "error message must mention the style config failure; got: {msg}"
+    );
+}
+
+/// Symlink guard for the adapter: `ContractMapRendererAdapter::render` must return
+/// `StyleConfigInvalid` (not `Ok`) when the style config path points to a symlink.
+#[cfg(unix)]
+#[test]
+fn adapter_render_rejects_symlinked_style_config() {
+    use domain::tddd::{ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError};
+
+    let tmp = tempfile::tempdir().unwrap();
+    let real_target = tmp.path().join("real-style.toml");
+    std::fs::write(&real_target, "[filter]\ninclude_function_roles = []\n").unwrap();
+
+    // Create a symlink at the expected config path pointing to the real file.
+    let symlink_path = tmp.path().join("contract-map-style.toml");
+    std::os::unix::fs::symlink(&real_target, &symlink_path).unwrap();
+
+    let adapter = super::ContractMapRendererAdapter::new(symlink_path.clone());
+    let opts = ContractMapRenderOptions::default();
+    let err = adapter.render(&[], &[], &opts).unwrap_err();
+    assert!(
+        matches!(err, ContractMapRendererError::StyleConfigInvalid { ref path, .. } if path == &symlink_path),
+        "expected StyleConfigInvalid for symlinked config, got {err:?}"
+    );
 }

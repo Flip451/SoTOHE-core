@@ -7,10 +7,6 @@ decisions:
 ---
 # TDDD Contract Map — 全層カタログを入力とする統合 mermaid view
 
-## Status
-
-Accepted (2026-04-17)
-
 ## Related ADRs
 
 - 2026-04-16-2200-tddd-type-graph-view — rustdoc ベース可視化 (Reality View)
@@ -409,3 +405,11 @@ ADR 2026-04-16-2200 側に §D10 補記を追加することで、両 ADR の整
 3. `architecture-rules.json` から layer discovery + topological sort を行う既存経路 (ADR 2026-04-15-1012 関連 / `resolve_layers`) の再利用。**新規の層ハードコード経路を作らない**
 4. mermaid 13 kind shape mapping の意匠決定 — 別途 proposal 文書化を推奨
 5. layer-agnostic テスト — 2 層 / 3 層 / 独自層名の 3 構成で render が通ることを `libs/infrastructure` の unit test で担保する (現 SoTOHE-core 以外の構成を fixture で用意)
+
+## Follow-up
+
+本 ADR の D1〜D6 はいずれも catalogue v1 (旧 13-variant `TypeDefinitionKind`) を前提とした renderer 設計だった。catalogue v3 schema (ADR `knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md`) への移行に伴い、renderer 設計は `knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md` で全面再設計された。
+
+このうち **D1 (renderer signature) / D3 (13 kind shape mapping) / D4 (Method call edge / Trait impl edge) / D5 (action / signal overlay)** は当該 ADR の Decision A / C / F / H / J / M で書き換え (supersede) された。D4 の spec_source edge については、当該 ADR では Open Question Q として採否未確定のまま持ち越された (supersede ではなく deferred)。
+
+一方、**§4.5 の layer-agnostic 不変条件** (層名ハードコード禁止 / `architecture-rules.json` 由来 / topological sort) と **D6 の Reality View との役割分担**は当該 ADR でも継承される (supersede ではなく継続)。本 ADR の Known Limitations (L1〜L4 のうち renderer 由来の課題) は当該 ADR で別 Decision として置き換えられたか、Open Questions に移送された。

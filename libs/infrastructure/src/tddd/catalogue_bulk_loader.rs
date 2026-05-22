@@ -74,6 +74,19 @@ pub enum LoadAllCataloguesNativeError {
         #[source]
         source: ValidationError,
     },
+
+    /// The decoded catalogue's `layer` field disagrees with the binding key
+    /// derived from `architecture-rules.json`.  Fail-closed — silently accepting
+    /// a mismatch would let entries render under the wrong layer subgraph or be
+    /// omitted entirely when the interactor flattens `.values()`.
+    #[error(
+        "catalogue at '{}' declares layer '{}' but is bound to layer '{}' \
+         in architecture-rules.json",
+        .path.display(),
+        .doc_layer,
+        .binding_layer
+    )]
+    LayerMismatch { binding_layer: String, doc_layer: String, path: PathBuf },
 }
 
 /// Load every `tddd.enabled` layer's catalogue from `track_dir` using the
@@ -158,6 +171,18 @@ pub fn load_all_catalogues_native(
                         source,
                     }
                 })?;
+                // Fail-closed: the document's `layer` field must match the
+                // binding key (`layer_id`) derived from `architecture-rules.json`.
+                // A mismatch would cause entries to render under the wrong layer
+                // subgraph (or be omitted) when the interactor flattens
+                // `.values()` and the renderer groups by `doc.layer`.
+                if doc.layer.as_ref() != layer_id.as_ref() {
+                    return Err(LoadAllCataloguesNativeError::LayerMismatch {
+                        binding_layer: layer_id.as_ref().to_owned(),
+                        doc_layer: doc.layer.as_ref().to_owned(),
+                        path: catalogue_path,
+                    });
+                }
                 catalogues.insert(layer_id.clone(), doc);
                 ordered_ids.push(layer_id);
             }
@@ -594,5 +619,49 @@ mod tests {
         let deps: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let ordered = topological_sort(&["b", "a"], &deps).unwrap();
         assert_eq!(ordered, vec!["b".to_owned(), "a".to_owned()]);
+    }
+
+    /// Fail-closed regression: a catalogue whose `layer` field disagrees with
+    /// the `architecture-rules.json` binding key must be rejected with
+    /// `LayerMismatch`, not silently inserted under the binding key.
+    ///
+    /// Without the validation, the interactor would flatten `.values()` and the
+    /// renderer would group by `doc.layer`, potentially rendering entries under
+    /// the wrong layer subgraph or omitting them entirely.
+    #[test]
+    fn test_load_all_catalogues_native_rejects_layer_field_mismatch() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let rules = root.join("architecture-rules.json");
+        write(&rules, RULES_REVERSED_ORDER);
+
+        let track_dir = root.join("track-item");
+        write(&track_dir.join("domain-types.json"), V3_DOMAIN_JSON);
+        write(&track_dir.join("usecase-types.json"), V3_USECASE_JSON);
+
+        // infrastructure-types.json declares `"layer": "domain"` instead of
+        // `"layer": "infrastructure"` — binding key mismatch.
+        let mismatch_json = r#"{
+          "schema_version": 3,
+          "crate_name": "infrastructure",
+          "layer": "domain",
+          "types": {},
+          "traits": {},
+          "functions": {}
+        }"#;
+        write(&track_dir.join("infrastructure-types.json"), mismatch_json);
+
+        let err = load_all_catalogues_native(&track_dir, &rules, root).unwrap_err();
+        match err {
+            LoadAllCataloguesNativeError::LayerMismatch { binding_layer, doc_layer, path } => {
+                assert_eq!(binding_layer, "infrastructure", "binding_layer must be the key");
+                assert_eq!(doc_layer, "domain", "doc_layer must reflect the JSON field");
+                assert!(
+                    path.ends_with("infrastructure-types.json"),
+                    "path must point to the mismatched file"
+                );
+            }
+            other => panic!("expected LoadAllCataloguesNativeError::LayerMismatch, got {other:?}"),
+        }
     }
 }
