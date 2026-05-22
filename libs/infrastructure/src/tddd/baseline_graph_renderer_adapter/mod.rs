@@ -131,9 +131,10 @@ impl BaselineGraphRenderer for BaselineGraphRendererAdapter {
     /// Enumerate all depth-2 clusters for the given baselines and layer,
     /// render each cluster, and return them as `Vec<ClusterRender>`.
     ///
-    /// The adapter is responsible for cluster enumeration (krate.paths scanning + cluster key
-    /// generation per IN-14/IN-15). In T004, one root-cluster placeholder per crate is returned;
-    /// full enumeration will be added in T010.
+    /// Cluster enumeration is fully implemented (T010): scans `krate.paths` for all public
+    /// B-r1 entries, derives cluster keys per IN-14/IN-15, and renders one mermaid file per
+    /// unique `(crate_name, top-level module)` cluster. Returns `Vec<ClusterRender>` where
+    /// each element's `cluster_key` is the file name stem (without `.md` extension).
     ///
     /// # Errors
     ///
@@ -360,8 +361,83 @@ include_functions = true
         assert!(content.contains("subgraph domain"), "must contain layer subgraph label");
     }
 
+    // Helper: create a BaselineDocument with a crate that has one public struct at the crate root.
+    // Required for T010 tests (render_clusters reads krate.paths, not just baselines list).
+    fn make_baseline_with_root_struct(layer_str: &str, crate_str: &str) -> BaselineDocument {
+        use rustdoc_types::{
+            Crate, Generics, Id, Item, ItemEnum, ItemKind, ItemSummary, Struct, StructKind, Target,
+            Visibility,
+        };
+        use std::collections::HashMap;
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            Item {
+                id: root_id,
+                crate_id: 0,
+                name: Some(crate_str.to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Module(rustdoc_types::Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            },
+        );
+        index.insert(
+            struct_id,
+            Item {
+                id: struct_id,
+                crate_id: 0,
+                name: Some("RootStruct".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![],
+                }),
+            },
+        );
+        let mut paths = HashMap::new();
+        paths.insert(
+            struct_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_str.to_string(), "RootStruct".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        let krate = Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+        BaselineDocument::new(
+            LayerId::try_new(layer_str).unwrap(),
+            CrateName::new(crate_str).unwrap(),
+            krate,
+        )
+    }
+
     // -----------------------------------------------------------------------
-    // T004: render_clusters output structure
+    // T010: render_clusters output structure
     // -----------------------------------------------------------------------
 
     #[test]
@@ -370,9 +446,10 @@ include_functions = true
         let path = write_style_config(tmp.path(), MINIMAL_VALID_CONFIG);
         let adapter = BaselineGraphRendererAdapter::new(path);
         let layer = LayerId::try_new("domain").unwrap();
-        let baseline = make_baseline("domain", "domain");
+        // T010: baseline must have actual B-r1 entries (krate.paths) to enumerate clusters.
+        let baseline = make_baseline_with_root_struct("domain", "domain");
         let clusters = adapter.render_clusters(&[baseline], &layer).unwrap();
-        assert_eq!(clusters.len(), 1, "one cluster per crate in T004");
+        assert_eq!(clusters.len(), 1, "one entry at crate root → one cluster");
         assert_eq!(clusters[0].cluster_key, "domain_root");
     }
 
@@ -382,8 +459,10 @@ include_functions = true
         let path = write_style_config(tmp.path(), MINIMAL_VALID_CONFIG);
         let adapter = BaselineGraphRendererAdapter::new(path);
         let layer = LayerId::try_new("domain").unwrap();
-        let baseline = make_baseline("domain", "domain");
+        // T010: baseline must have actual B-r1 entries (krate.paths) to enumerate clusters.
+        let baseline = make_baseline_with_root_struct("domain", "domain");
         let clusters = adapter.render_clusters(&[baseline], &layer).unwrap();
+        assert!(!clusters.is_empty(), "baseline with root struct → at least one cluster");
         let content = &clusters[0].content;
         assert!(content.contains("```mermaid\n"), "cluster content must have mermaid fence");
         assert!(content.contains("\n```\n"), "cluster content must have closing fence");

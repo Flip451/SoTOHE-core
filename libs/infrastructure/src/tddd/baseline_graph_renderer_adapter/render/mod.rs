@@ -909,15 +909,27 @@ pub(super) fn render_overview_mermaid(
     Ok(lines.join("\n"))
 }
 
-/// Enumerate clusters in `baselines` for `layer` and render each as a depth-2
-/// cluster mermaid diagram.
+/// Enumerate all clusters in `baselines` for `layer` and render each as a depth-2
+/// cluster mermaid diagram (T010).
 ///
-/// T004 scope: per-cluster file contains classDef block + layer subgraph frame.
-/// T007 scope: entry subgraphs (Struct/Enum/Trait/TypeAlias) + variant nodes +
-///   payload edges + Trait method nodes + struct field edges + TypeAlias alias
-///   edges are emitted inside the cluster subgraph (F-r1 / H / H' / K / N decisions).
-/// Full cluster enumeration (beyond the single root cluster per crate) will be
-/// added in T010.
+/// Cluster enumeration (IN-14/IN-15 / U-r3):
+/// - Scans `krate.paths` for all public B-r1 entries in the layer.
+/// - Derives a `ClusterKey` per entry: `(crate_name, path[1])` for module entries,
+///   or `(crate_name, "root")` for crate-root entries (path length <= 2).
+/// - One mermaid file per unique cluster key.
+///
+/// Each cluster detail file (depth-2 / IN-15 / AC-14):
+/// 1. `classDef` definitions (alphabetical, CN-08).
+/// 2. layer subgraph → top-module subgraph → entry subgraph group (alphabetical by name) →
+///    method/variant nodes (rustdoc Vec order) + FunctionEntry callable node group (alphabetical).
+/// 3. edge group (cluster-internal edges only; cross-cluster edges are suppressed).
+/// 4. class attach group.
+///
+/// Sub-module path is included in the entry subgraph label (e.g. `team::manager::TeamManager`)
+/// via the `build_entry_label` function in `entry_subgraph`.
+///
+/// Cluster key → file name stem: `<crate_name>_<module_seg1>` or `<crate_name>_root`
+/// (the cluster_key field of the returned `ClusterRender` is the stem; IN-15 / AC-14).
 ///
 /// # Errors
 ///
@@ -928,26 +940,56 @@ pub(super) fn render_clusters_mermaid(
     layer: &LayerId,
     style: &StyleConfig,
 ) -> Result<Vec<(String, String)>, BaselineGraphRendererError> {
+    use node_extractor::extract_nodes;
+
     let layer_str = layer.as_ref();
 
-    // Enumerate clusters: (cluster_key, crate_name_str) pairs.
-    // cluster_key per IN-14/IN-15: "<crate_name>_root" or "<crate_name>_<module_seg1>".
-    // T004/T007: emit one "root" cluster per crate (full cluster enumeration in T010).
-    let mut cluster_keys: Vec<(String, String)> = Vec::new();
-    for baseline in baselines {
-        if baseline.layer != *layer {
-            continue;
+    // ---------------------------------------------------------------------------
+    // Step 1: Enumerate ALL unique clusters for this layer (alphabetical, CN-08).
+    //
+    // Scan all B-r1 entries in krate.paths for the layer; derive a ClusterKey per
+    // entry and collect into a BTreeMap (for alphabetical ordering).
+    // ---------------------------------------------------------------------------
+    let nodes = extract_nodes(baselines, layer);
+
+    // BTreeMap: ClusterKey → (crate_name string) — use BTreeMap for alphabetical order.
+    let mut clusters: BTreeMap<ClusterKey, String> = BTreeMap::new();
+    for node in &nodes {
+        let doc = node.doc();
+        let id = node.id();
+        let krate = &doc.krate;
+        if let Some(summary) = krate.paths.get(&id) {
+            if let Some(ck) = cluster_key_from_path(&summary.path) {
+                clusters.insert(ck, doc.crate_name.as_str().to_string());
+            }
         }
-        let crate_str = baseline.crate_name.as_str();
-        let cluster_key = format!("{crate_str}_root");
-        cluster_keys.push((cluster_key, crate_str.to_string()));
     }
 
+    // ---------------------------------------------------------------------------
+    // Step 2: Build the node-cluster map for edge cross-cluster filtering.
+    // ---------------------------------------------------------------------------
+    let node_cluster_map = build_node_cluster_map(baselines, layer_str);
+
+    // ---------------------------------------------------------------------------
+    // Step 3: Render each cluster.
+    // ---------------------------------------------------------------------------
     let mut results: Vec<(String, String)> = Vec::new();
 
-    for (cluster_key, crate_str) in &cluster_keys {
+    for (cluster_key, crate_str) in &clusters {
+        let cluster_key_str = cluster_key.node_id(); // e.g. "domain_review" or "domain_root"
         let layer_sg_id = layer_subgraph_id(layer_str);
-        let crate_sg = sanitize(crate_str);
+
+        // Top-module subgraph id and label (U-r3 depth-2 structure).
+        // For root clusters: label = "<crate_name> root"; id = sanitize("<crate_name>") + "_root_sg"
+        // For module clusters: label = "<crate_name>::<module_seg1>"; id = cluster_key_str + "_sg"
+        let (top_mod_sg_id, top_mod_label) = if cluster_key.module_seg1 == "root" {
+            (format!("{}_root_sg", sanitize(crate_str)), format!("{} root", crate_str))
+        } else {
+            (
+                format!("{}_sg", sanitize(&cluster_key_str)),
+                format!("{}::{}", crate_str, cluster_key.module_seg1),
+            )
+        };
 
         // Section 1: classDef definitions (alphabetical, CN-08).
         let mut class_defs: Vec<String> = Vec::new();
@@ -955,27 +997,27 @@ pub(super) fn render_clusters_mermaid(
             class_defs.push(class_def_line(class_name, class_style));
         }
 
-        // Section 2: layer subgraph > cluster subgraph > entry subgraphs (T007).
+        // Section 2: layer subgraph > top-module subgraph > entry subgraphs (T010).
         let mut subgraph_lines: Vec<String> = Vec::new();
-        // Section 3: edge definitions (cluster-internal, cross-cluster suppressed).
-        let mut edge_lines: Vec<String> = Vec::new();
+        // Section 3: edge definitions (cluster-internal only — cross-cluster suppressed).
+        let mut raw_edge_lines: Vec<String> = Vec::new();
         // Section 4: class attach statements.
         let mut class_attach: Vec<String> = Vec::new();
 
         subgraph_lines.push(format!("subgraph {layer_sg_id}[\"{layer_str}\"]"));
         subgraph_lines.push("  direction TB".to_string());
-        subgraph_lines.push(format!("  subgraph {crate_sg}_root_sg[\"{crate_str} root\"]"));
+        subgraph_lines.push(format!("  subgraph {top_mod_sg_id}[\"{top_mod_label}\"]"));
         subgraph_lines.push("    direction TB".to_string());
 
-        // T007: emit entry subgraphs (F-r1 / H / H' / K / N decisions).
-        // Pass the crate name filter so each cluster file contains only the entries
-        // for its own crate (not all crates in the layer).
-        entry_subgraph::emit_all_entries_for_layer(
+        // T010: emit entry subgraphs + callable nodes for this cluster only.
+        // cluster_key.module_seg1 is "root" for crate-root entries, or the top-level module name.
+        entry_subgraph::emit_entries_for_cluster(
             baselines,
             layer_str,
-            Some(crate_str),
+            crate_str,
+            &cluster_key.module_seg1,
             &mut subgraph_lines,
-            &mut edge_lines,
+            &mut raw_edge_lines,
             &mut class_attach,
             style,
             "    ",
@@ -984,11 +1026,95 @@ pub(super) fn render_clusters_mermaid(
         subgraph_lines.push("  end".to_string());
         subgraph_lines.push("end".to_string());
 
+        // ---------------------------------------------------------------------------
+        // Cross-cluster edge suppression (IN-15 / AC-14 / CN-07):
+        // Only intra-cluster edges are included in the depth-2 cluster detail.
+        // An edge is intra-cluster if both its source and destination node ids
+        // belong to `cluster_key` in the node_cluster_map (or if either endpoint
+        // is an anonymous/primitive node — those are always kept since they have
+        // no cluster membership).
+        // ---------------------------------------------------------------------------
+        let mut edge_lines: Vec<String> = Vec::new();
+        for edge_line in &raw_edge_lines {
+            // Parse the edge source and destination node ids from the mermaid edge line.
+            // Mermaid edge lines have the form: `<src_id> <arrow> <dst_id>` or
+            // `<src_id> <arrow>|"label"| <dst_id>`.
+            // We extract the first and last whitespace-separated tokens.
+            let parts: Vec<&str> = edge_line.split_whitespace().collect();
+            let (src_id, dst_id) = match (parts.first(), parts.last()) {
+                (Some(&s), Some(&d)) if s != d => (s, d),
+                _ => {
+                    // Cannot parse — keep the edge (safe default).
+                    edge_lines.push(edge_line.clone());
+                    continue;
+                }
+            };
+
+            // Determine cluster membership of both endpoints.
+            let src_cluster = lookup_cluster(src_id, &node_cluster_map);
+            let dst_cluster = lookup_cluster(dst_id, &node_cluster_map);
+
+            match (src_cluster, dst_cluster) {
+                (Some(sc), Some(dc)) => {
+                    // Both endpoints have known cluster membership.
+                    // Keep only intra-cluster edges (same cluster on both sides).
+                    if sc == cluster_key || dc == cluster_key {
+                        // At least one endpoint belongs to the current cluster.
+                        // Suppress if the other endpoint belongs to a DIFFERENT cluster.
+                        let is_intra = sc == dc;
+                        if is_intra {
+                            edge_lines.push(edge_line.clone());
+                        }
+                        // Cross-cluster edge: suppress (collected in depth-1 overview).
+                    }
+                    // Both endpoints belong to another cluster entirely: skip.
+                }
+                (Some(sc), None) => {
+                    // Source belongs to a known cluster; destination has no cluster entry.
+                    //
+                    // Two sub-cases:
+                    //
+                    // (a) Destination is a true anonymous node (`anon_*` / `prim_*` /
+                    //     `generic_*` / `anon_type_*`) — produced when `field_type_node_id`
+                    //     could not find the target in `krate.paths`.  These nodes have no
+                    //     cluster membership by construction and are kept as local references
+                    //     (e.g. external library types not recorded in rustdoc, primitives,
+                    //     generics).
+                    //
+                    // (b) Destination has a structured node-id (D-decision prefix `T` / `R` /
+                    //     `F` followed by digits) — produced when `field_type_node_id` resolved
+                    //     a cross-crate `ResolvedPath` to a concrete rep-node id, but that type
+                    //     is not rendered (e.g. an external-library type that is in `krate.paths`
+                    //     but not in the layer's B-r1 node set).  Such an edge points to an
+                    //     undefined node and must be suppressed regardless of the cluster owner.
+                    //
+                    // In both sub-cases we additionally require that the source belongs to the
+                    // current cluster to avoid edges from a foreign cluster leaking into this
+                    // cluster file.
+                    let dst_is_anonymous = dst_id.starts_with("anon_")
+                        || dst_id.starts_with("prim_")
+                        || dst_id.starts_with("generic_");
+                    if sc == cluster_key && dst_is_anonymous {
+                        edge_lines.push(edge_line.clone());
+                    }
+                    // Otherwise: either the source is from a different cluster, or the
+                    // destination is a structured id that maps to a non-rendered type.
+                    // Suppress in both cases.
+                }
+                _ => {
+                    // Source is anonymous/primitive (no cluster entry in the map).
+                    // Keep the edge — a source with no cluster membership cannot be
+                    // attributed to a foreign cluster, so it is treated as local.
+                    edge_lines.push(edge_line.clone());
+                }
+            }
+        }
+
         // Assemble mermaid content in section order (IN-16):
         // 1) classDef  2) layer subgraph  3) edge definitions  4) class attach
         let mut lines: Vec<String> = Vec::new();
         lines.push(format!(
-            "<!-- Generated baseline-graph-renderer (cluster: {cluster_key}) — DO NOT EDIT DIRECTLY -->"
+            "<!-- Generated baseline-graph-renderer (cluster: {cluster_key_str}) — DO NOT EDIT DIRECTLY -->"
         ));
         lines.push("```mermaid".to_string());
         lines.push("flowchart LR".to_string());
@@ -1007,7 +1133,7 @@ pub(super) fn render_clusters_mermaid(
         lines.push("```".to_string());
         lines.push(String::new()); // trailing newline
 
-        results.push((cluster_key.clone(), lines.join("\n")));
+        results.push((cluster_key_str, lines.join("\n")));
     }
 
     Ok(results)
@@ -1200,22 +1326,78 @@ mod tests {
     // render_clusters_mermaid: minimal valid output checks
     // -----------------------------------------------------------------------
 
+    // T010: test helpers that produce a crate with real B-r1 entries in krate.paths
+    // (required for render_clusters_mermaid — the T010 implementation reads paths, not just baselines)
+
+    fn make_baseline_with_module_struct(
+        layer_str: &str,
+        crate_str: &str,
+        module_seg1: Option<&str>,
+        struct_name: &str,
+    ) -> BaselineDocument {
+        use domain::tddd::baseline_document::BaselineDocument;
+        use domain::tddd::catalogue_v2::identifiers::CrateName;
+        use domain::tddd::layer_id::LayerId;
+        let krate = make_crate_with_struct(crate_str, module_seg1, struct_name);
+        BaselineDocument::new(
+            LayerId::try_new(layer_str).unwrap(),
+            CrateName::new(crate_str).unwrap(),
+            krate,
+        )
+    }
+
+    // -----------------------------------------------------------------------
+    // T010: render_clusters_mermaid — full cluster enumeration
+    // -----------------------------------------------------------------------
+
     #[test]
-    fn test_render_clusters_mermaid_returns_one_root_per_crate() {
+    fn test_render_clusters_mermaid_crate_root_entry_produces_root_cluster() {
+        // T010: a baseline with a struct at crate root → one cluster with key "domain_root"
         let layer = LayerId::try_new("domain").unwrap();
-        let baseline = make_baseline("domain", "domain");
+        let baseline = make_baseline_with_module_struct("domain", "domain", None, "MyStruct");
         let style = minimal_style();
         let clusters = render_clusters_mermaid(&[baseline], &layer, &style).unwrap();
-        assert_eq!(clusters.len(), 1, "T004 emits one root cluster per crate");
-        assert_eq!(clusters[0].0, "domain_root");
+        assert_eq!(clusters.len(), 1, "one entry at crate root → one cluster");
+        assert_eq!(clusters[0].0, "domain_root", "cluster key must be 'domain_root'");
+    }
+
+    #[test]
+    fn test_render_clusters_mermaid_module_entry_produces_module_cluster() {
+        // T010: a struct in "review" module → cluster key "domain_review"
+        let layer = LayerId::try_new("domain").unwrap();
+        let baseline =
+            make_baseline_with_module_struct("domain", "domain", Some("review"), "Review");
+        let style = minimal_style();
+        let clusters = render_clusters_mermaid(&[baseline], &layer, &style).unwrap();
+        assert_eq!(clusters.len(), 1, "one entry in 'review' module → one cluster");
+        assert_eq!(clusters[0].0, "domain_review", "cluster key must be 'domain_review'");
+    }
+
+    #[test]
+    fn test_render_clusters_mermaid_two_modules_produce_two_clusters() {
+        // T010: entries in two different modules → two separate clusters
+        let layer = LayerId::try_new("domain").unwrap();
+        let baseline_review =
+            make_baseline_with_module_struct("domain", "domain", Some("review"), "Review");
+        let baseline_user =
+            make_baseline_with_module_struct("domain", "domain", Some("user"), "User");
+        let style = minimal_style();
+        let clusters =
+            render_clusters_mermaid(&[baseline_review, baseline_user], &layer, &style).unwrap();
+        assert_eq!(clusters.len(), 2, "two modules → two clusters");
+        // Alphabetical order: "review" < "user"
+        assert_eq!(clusters[0].0, "domain_review", "first cluster alphabetically");
+        assert_eq!(clusters[1].0, "domain_user", "second cluster alphabetically");
     }
 
     #[test]
     fn test_render_clusters_mermaid_cluster_content_contains_mermaid_fence() {
+        // T010: cluster content must be a valid mermaid fenced block
         let layer = LayerId::try_new("domain").unwrap();
-        let baseline = make_baseline("domain", "domain");
+        let baseline = make_baseline_with_module_struct("domain", "domain", None, "MyStruct");
         let style = minimal_style();
         let clusters = render_clusters_mermaid(&[baseline], &layer, &style).unwrap();
+        assert!(!clusters.is_empty(), "one crate root entry → one cluster");
         let content = &clusters[0].1;
         assert!(content.contains("```mermaid\n"), "cluster content must have mermaid fence");
         assert!(content.contains("\n```\n"), "cluster content must have closing fence");
@@ -1230,19 +1412,107 @@ mod tests {
     }
 
     #[test]
-    fn test_render_clusters_mermaid_filters_to_given_layer() {
+    fn test_render_clusters_mermaid_empty_crate_returns_empty() {
+        // T010: a baseline with no entries in krate.paths → no clusters emitted
         let layer = LayerId::try_new("domain").unwrap();
-        let baseline_domain = make_baseline("domain", "domain");
-        let baseline_usecase = make_baseline("usecase", "usecase");
+        let baseline = make_baseline("domain", "domain"); // empty crate — no index entries
+        let style = minimal_style();
+        let clusters = render_clusters_mermaid(&[baseline], &layer, &style).unwrap();
+        assert!(clusters.is_empty(), "empty crate (no entries in paths) → no clusters");
+    }
+
+    #[test]
+    fn test_render_clusters_mermaid_filters_to_given_layer() {
+        // T010: baselines from a different layer must not produce clusters for the target layer
+        let layer = LayerId::try_new("domain").unwrap();
+        let baseline_domain =
+            make_baseline_with_module_struct("domain", "domain", Some("review"), "Review");
+        let baseline_usecase =
+            make_baseline_with_module_struct("usecase", "usecase", Some("commands"), "CreateUser");
         let style = minimal_style();
         let clusters =
             render_clusters_mermaid(&[baseline_domain, baseline_usecase], &layer, &style).unwrap();
-        // Only domain crate's cluster is returned.
+        // Only domain layer clusters should be returned (layer filter).
         assert_eq!(clusters.len(), 1, "only domain layer baseline should produce clusters");
         assert!(
             clusters[0].0.starts_with("domain"),
-            "cluster key must be prefixed with crate name"
+            "cluster key must be prefixed with crate name; got: {}",
+            clusters[0].0
         );
+    }
+
+    #[test]
+    fn test_render_clusters_mermaid_cluster_contains_top_module_subgraph() {
+        // T010: depth-2 cluster detail must contain a top-module subgraph with the module name
+        let layer = LayerId::try_new("domain").unwrap();
+        let baseline =
+            make_baseline_with_module_struct("domain", "domain", Some("review"), "Review");
+        let style = minimal_style();
+        let clusters = render_clusters_mermaid(&[baseline], &layer, &style).unwrap();
+        assert_eq!(clusters.len(), 1);
+        let content = &clusters[0].1;
+        // The top-module subgraph label includes the crate::module path
+        assert!(
+            content.contains("domain::review"),
+            "cluster detail must show top-module subgraph label 'domain::review'; content:\n{content}"
+        );
+    }
+
+    #[test]
+    fn test_render_clusters_mermaid_root_cluster_has_root_subgraph_label() {
+        // T010: crate-root cluster must have a top-module subgraph labelled "<crate_name> root"
+        let layer = LayerId::try_new("domain").unwrap();
+        let baseline = make_baseline_with_module_struct("domain", "domain", None, "MyStruct");
+        let style = minimal_style();
+        let clusters = render_clusters_mermaid(&[baseline], &layer, &style).unwrap();
+        assert_eq!(clusters.len(), 1);
+        let content = &clusters[0].1;
+        assert!(
+            content.contains("domain root"),
+            "root cluster label must be 'domain root'; content:\n{content}"
+        );
+    }
+
+    #[test]
+    fn test_render_clusters_mermaid_cluster_key_is_file_stem() {
+        // T010 / AC-14: cluster_key field is the file name stem (no extension)
+        // e.g. "domain_review" → file stem, caller adds ".md"
+        let layer = LayerId::try_new("domain").unwrap();
+        let baseline =
+            make_baseline_with_module_struct("domain", "domain", Some("review"), "Review");
+        let style = minimal_style();
+        let clusters = render_clusters_mermaid(&[baseline], &layer, &style).unwrap();
+        assert_eq!(clusters.len(), 1);
+        // The cluster key returned is the stem (no ".md" suffix)
+        let stem = &clusters[0].0;
+        assert!(!stem.contains('.'), "cluster key must not include extension; got: {stem}");
+        assert_eq!(stem, "domain_review", "stem must equal cluster_key_str");
+    }
+
+    #[test]
+    fn test_render_clusters_mermaid_clusters_alphabetical() {
+        // T010 / CN-08: clusters must be returned in alphabetical order by ClusterKey
+        let layer = LayerId::try_new("domain").unwrap();
+        // Add in reverse alphabetical order; output must still be alphabetical.
+        let baseline_user =
+            make_baseline_with_module_struct("domain", "domain", Some("user"), "User");
+        let baseline_review =
+            make_baseline_with_module_struct("domain", "domain", Some("review"), "Review");
+        let baseline_root = make_baseline_with_module_struct("domain", "domain", None, "Root");
+        let style = minimal_style();
+        let clusters = render_clusters_mermaid(
+            &[baseline_user, baseline_review, baseline_root],
+            &layer,
+            &style,
+        )
+        .unwrap();
+        assert_eq!(clusters.len(), 3);
+        // ClusterKey orders: (domain, review) < (domain, root) < (domain, user)
+        // because 'r' < 'r' at second char 'e' vs 'o' → "review" < "root",
+        // and "root" < "user" (alphabetical).
+        assert_eq!(clusters[0].0, "domain_review");
+        assert_eq!(clusters[1].0, "domain_root");
+        assert_eq!(clusters[2].0, "domain_user");
     }
 
     // -----------------------------------------------------------------------

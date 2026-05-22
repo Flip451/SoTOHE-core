@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (8/14 resolved)
+## Tasks (9/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -74,7 +74,7 @@
 > mermaid 出力構造: (1) classDef 定義群 (2) layer subgraph > cluster node 群 (alphabetical) (3) cross-cluster edge group (4) class attach 群。
 > subgraph への inline :::className は parse error のため class <id> <className> を別行で記述。
 
-- [~] **T009**: adapter 内: depth 1 overview renderer — cluster (crate_name × top-level module) 縮約 + cross-cluster edge 集約 + alphabetical ordering (U-r3) + mermaid 出力構造 (classDef / layer subgraph / cluster node / edge group / class attach) を実装し render_overview を完成させる (IN-14, IN-16, AC-13, CN-07, CN-08)
+- [x] **T009**: adapter 内: depth 1 overview renderer — cluster (crate_name × top-level module) 縮約 + cross-cluster edge 集約 + alphabetical ordering (U-r3) + mermaid 出力構造 (classDef / layer subgraph / cluster node / edge group / class attach) を実装し render_overview を完成させる (IN-14, IN-16, AC-13, CN-07, CN-08) (`d4336a52f7a48b25ae4e3476a6f5052e6eb1f7f8`)
 
 ### S9 — Adapter: depth 2 cluster detail renderer (U-r3)
 
@@ -82,7 +82,7 @@
 > mermaid 出力構造: (1) classDef 定義群 (2) layer subgraph > top-module subgraph > entry subgraph 群 (alphabetical) > method/variant node (Vec 順) + FunctionEntry callable node 群 (alphabetical) (3) edge 定義群 (cluster 内 edge のみ) (4) class attach 群。
 > sub-module path を entry subgraph label に含める (例: team::manager::TeamManager)。cross-cluster edge は深さ 1 に集約済みのため描画しない。
 
-- [ ] **T010**: adapter 内: depth 2 cluster detail renderer — top-module subgraph + entry subgraph + method/variant node + FunctionEntry callable node + cluster 内 edge + mermaid 出力構造 + ファイル名規則 (cluster_key をそのまま stem として使用: <crate_name>_<module_seg1>.md または <crate_name>_root.md) を実装し render_clusters を完成させる (IN-15, IN-16, AC-14, CN-07, CN-08)
+- [~] **T010**: adapter 内: depth 2 cluster detail renderer — top-module subgraph + entry subgraph + method/variant node + FunctionEntry callable node + cluster 内 edge + mermaid 出力構造 + ファイル名規則 (cluster_key をそのまま stem として使用: <crate_name>_<module_seg1>.md または <crate_name>_root.md) を実装し render_clusters を完成させる (IN-15, IN-16, AC-14, CN-07, CN-08)
 
 ### S10 — CLI 統合
 

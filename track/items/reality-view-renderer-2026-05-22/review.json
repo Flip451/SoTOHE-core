@@ -1,38 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:43:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:45:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:18:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:20:06Z"
-        }
-      ]
-    },
     "domain": {
       "rounds": [
         {
@@ -62,6 +30,54 @@
           "findings": [],
           "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
           "at": "2026-05-22T13:30:19Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 161,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
+          "at": "2026-05-22T12:27:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 44,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
+          "at": "2026-05-22T12:31:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:34:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:35:36Z"
         }
       ]
     },
@@ -713,6 +729,134 @@
           "findings": [],
           "hash": "rvw1:sha256:e1b2e4df975238fe373bcfad3d282a1474ecc6e77e8e0a394398fa5a921f1551",
           "at": "2026-05-22T19:20:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new depth-2 edge filter still lets cross-cluster edges through when the target is rendered as `anon_*`/`generic_*`. `field_type_node_id` in `entry_subgraph.rs` falls back to anonymous ids whenever `krate.paths` cannot resolve a `ResolvedPath`, which is exactly what happens for same-layer types that live in another crate. Those edges land in the `_ => keep` branch here, so a cluster file can still contain cross-cluster connections despite the new \"cluster-internal edges only\" contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 1072,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:09747ed47a1e96997b4985f559523166922e792ec822da5047dcd3b1449fa761",
+          "at": "2026-05-22T19:43:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cluster-local entry filtering does not cover blanket-body nodes. `build_blanket_body_map(...)` is still populated with only `crate_filter`, so a depth-2 cluster can render blanket impl bodies declared in a different top-level module. That breaks the \"cluster-internal only\" guarantee for trait subgraphs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 734,
+              "category": "correctness"
+            },
+            {
+              "message": "Cross-crate same-layer type references still fall back to anonymous node IDs here, so the new cluster post-filter cannot map them to a cluster. Field/alias/variant edges to another cluster will be kept as local edges instead of being suppressed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 980,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f599083138e410928ac33b4b07fb5927fdd93c06c1f83f0aff1e97de163677ec",
+          "at": "2026-05-22T19:51:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: Depth-2 cluster rendering still leaks same-layer cross-cluster references as anonymous edges. `field_type_node_id()` only resolves `ResolvedPath` targets when `summary.crate_id == 0`, so a field/alias pointing at another crate in the same layer falls back to `anon_*` ([entry_subgraph.rs:968-982]). The new post-filter in `render_clusters_mermaid()` only suppresses edges when both endpoints map to known clusters; it keeps every `(Some(sc), None)` edge as long as `sc == cluster_key` ([render/mod.rs:1030-1088]). As a result, a struct in `domain_review` that references `domain_user::Thing` will still show an anonymous edge in the `domain_review` file instead of being suppressed, violating the \"cluster-internal edges only\" requirement.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 1072,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f599083138e410928ac33b4b07fb5927fdd93c06c1f83f0aff1e97de163677ec",
+          "at": "2026-05-22T19:53:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Type::ResolvedPath` now resolves every `krate.paths` hit to a concrete rep-node id, even when that target is not rendered in the current layer. `extract_nodes` still excludes external items, so a dependency on a non-rendered external/public type will now emit an edge to an undefined `T...__self` node instead of the previous anonymous fallback, producing broken cluster diagrams. This needs an additional guard (for example, only resolving targets that are actually in the layer/render set).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 971,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:57d481f1e7cca253d835a496374b7b6438fd1c7414e04a2c843ae596e7d0ecc7",
+          "at": "2026-05-22T19:59:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Same-layer cross-crate dependencies are still rendered in depth-2 cluster files. `field_type_node_id()` now turns every `ResolvedPath` with `crate_id > 0` into `anon_*`, and `render_clusters_mermaid()` keeps any `Some(sc), None` edge when the source belongs to the current cluster. In a multi-crate layer, a field/alias/variant that points at another crate therefore survives the post-filter instead of being suppressed, so the cluster output can still contain cross-cluster edges and violate the \"cluster-internal edges only\" contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 1072,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bd1b798aa6473df61a6c85076225bcad3578bd59dbeaa30d8484b22e3041a9e5",
+          "at": "2026-05-22T20:03:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c20a3e41cd2b721f10c8d3a6599623c526d6fc6012a2623ae3353180f9b8a51",
+          "at": "2026-05-22T20:09:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c20a3e41cd2b721f10c8d3a6599623c526d6fc6012a2623ae3353180f9b8a51",
+          "at": "2026-05-22T20:11:25Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:45:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:20:06Z"
         }
       ]
     },
@@ -812,54 +956,6 @@
           "findings": [],
           "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
           "at": "2026-05-22T13:58:55Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 161,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
-          "at": "2026-05-22T12:27:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 44,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
-          "at": "2026-05-22T12:31:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:34:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:35:36Z"
         }
       ]
     },
@@ -1481,6 +1577,20 @@
           "findings": [],
           "hash": "rvw1:sha256:0490dcedba0443a5a214a69f870b9093287ad7269b837f65fb8a5933793570bc",
           "at": "2026-05-22T17:43:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a7e73346698f148d4c8ac0cdf7ae416e3e7fcae5a2831ae43b63a93615a660c",
+          "at": "2026-05-22T19:38:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a7e73346698f148d4c8ac0cdf7ae416e3e7fcae5a2831ae43b63a93615a660c",
+          "at": "2026-05-22T19:39:22Z"
         }
       ]
     }

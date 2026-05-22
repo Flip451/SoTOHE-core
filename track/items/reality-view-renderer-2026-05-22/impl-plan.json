@@ -52,12 +52,13 @@
     {
       "id": "T009",
       "description": "adapter 内: depth 1 overview renderer — cluster (crate_name × top-level module) 縮約 + cross-cluster edge 集約 + alphabetical ordering (U-r3) + mermaid 出力構造 (classDef / layer subgraph / cluster node / edge group / class attach) を実装し render_overview を完成させる (IN-14, IN-16, AC-13, CN-07, CN-08)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d4336a52f7a48b25ae4e3476a6f5052e6eb1f7f8"
     },
     {
       "id": "T010",
       "description": "adapter 内: depth 2 cluster detail renderer — top-module subgraph + entry subgraph + method/variant node + FunctionEntry callable node + cluster 内 edge + mermaid 出力構造 + ファイル名規則 (cluster_key をそのまま stem として使用: <crate_name>_<module_seg1>.md または <crate_name>_root.md) を実装し render_clusters を完成させる (IN-15, IN-16, AC-14, CN-07, CN-08)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T011",

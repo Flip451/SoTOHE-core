@@ -620,6 +620,11 @@ pub(super) fn emit_function_node(
 /// are processed. This ensures that each cluster file contains only the entries for its
 /// own crate and not all crates in the layer.
 ///
+/// When `cluster_key_filter` is `Some(ck)`, only entries whose `ItemSummary.path`
+/// maps to the given cluster key are rendered. This is used for T010 depth-2 cluster
+/// rendering where each cluster file contains only the entries for its own cluster
+/// (crate_name × top-level module). Pass `None` to include all entries for the crate.
+///
 /// Entries are sorted alphabetically by their fully-qualified key (module_path + name)
 /// within each crate (CN-08). Functions are emitted after the subgraph entries
 /// (alphabetical by full path, CN-08).
@@ -628,11 +633,82 @@ pub(super) fn emit_function_node(
 ///
 /// Returns `BaselineGraphRendererError::RenderFailed` when a required `[edge.*]`
 /// key is absent from the style config (CN-02 — fail-closed).
+#[cfg(test)]
 #[allow(clippy::too_many_arguments)]
 pub(super) fn emit_all_entries_for_layer(
     baselines: &[BaselineDocument],
     layer: &str,
     crate_filter: Option<&str>,
+    subgraph_lines: &mut Vec<String>,
+    edge_lines: &mut Vec<String>,
+    class_attach: &mut Vec<String>,
+    style: &StyleConfig,
+    indent: &str,
+) -> Result<(), BaselineGraphRendererError> {
+    emit_entries_for_layer_and_cluster(
+        baselines,
+        layer,
+        crate_filter,
+        None,
+        subgraph_lines,
+        edge_lines,
+        class_attach,
+        style,
+        indent,
+    )
+}
+
+/// Render B-r1 entry nodes for a specific cluster (crate_name × top-level module).
+///
+/// Equivalent to [`emit_all_entries_for_layer`] but additionally filters entries to
+/// only those whose `ItemSummary.path` maps to `cluster_key` (via the cluster
+/// enumeration logic: `path[1]` = top-level module, or `"root"` for crate-root entries).
+///
+/// Used by T010 (depth-2 cluster renderer): each cluster detail file renders only
+/// the entries belonging to that specific cluster. Cross-cluster edges emitted by
+/// [`emit_all_entries_for_layer`] are suppressed via the caller's edge post-filter.
+///
+/// # Errors
+///
+/// Returns `BaselineGraphRendererError::RenderFailed` when a required `[edge.*]`
+/// key is absent from the style config (CN-02 — fail-closed).
+#[allow(clippy::too_many_arguments)]
+pub(super) fn emit_entries_for_cluster(
+    baselines: &[BaselineDocument],
+    layer: &str,
+    crate_name: &str,
+    cluster_module_seg1: &str,
+    subgraph_lines: &mut Vec<String>,
+    edge_lines: &mut Vec<String>,
+    class_attach: &mut Vec<String>,
+    style: &StyleConfig,
+    indent: &str,
+) -> Result<(), BaselineGraphRendererError> {
+    emit_entries_for_layer_and_cluster(
+        baselines,
+        layer,
+        Some(crate_name),
+        Some(cluster_module_seg1),
+        subgraph_lines,
+        edge_lines,
+        class_attach,
+        style,
+        indent,
+    )
+}
+
+/// Internal implementation shared by [`emit_all_entries_for_layer`] and
+/// [`emit_entries_for_cluster`].
+///
+/// When `cluster_module_seg1_filter` is `Some(seg1)`, only entries whose
+/// `ItemSummary.path[1]` equals `seg1` (or `"root"` for crate-root entries when
+/// `seg1 == "root"`) are rendered.
+#[allow(clippy::too_many_arguments)]
+fn emit_entries_for_layer_and_cluster(
+    baselines: &[BaselineDocument],
+    layer: &str,
+    crate_filter: Option<&str>,
+    cluster_module_seg1_filter: Option<&str>,
     subgraph_lines: &mut Vec<String>,
     edge_lines: &mut Vec<String>,
     class_attach: &mut Vec<String>,
@@ -678,6 +754,18 @@ pub(super) fn emit_all_entries_for_layer(
         }
         let item = node.item();
         let id = node.id();
+        // Apply cluster filter (T010): restrict to entries whose top-level module segment
+        // matches the requested cluster. Use krate.paths to derive the cluster membership.
+        if let Some(seg1_filter) = cluster_module_seg1_filter {
+            let path_opt = doc.krate.paths.get(&id).map(|s| s.path.as_slice());
+            let entry_seg1 = match path_opt {
+                Some(p) if p.len() >= 3 => p.get(1).map(|s| s.as_str()).unwrap_or("root"),
+                _ => "root", // crate-root entry (path length <= 2)
+            };
+            if entry_seg1 != seg1_filter {
+                continue;
+            }
+        }
         let name = item.name.as_deref().unwrap_or("").to_string();
         // Build a module-qualified sort key to avoid overwriting same-named items from
         // different modules. Uses krate.paths for the module path when available.
@@ -861,35 +949,41 @@ fn build_entry_label(summary_path: &[String], name: &str) -> String {
 
 /// Resolve a `rustdoc_types::Type` to a mermaid node_id for use as an edge endpoint.
 ///
-/// For same-crate `ResolvedPath` types, returns the **representative node id** (`__self`
-/// suffix) so that edges terminate on the concrete node inside the target subgraph rather
-/// than on the subgraph container itself (Finding 3 / spec N decision: edges point to
-/// the rep-node of the target type, not the subgraph container).
+/// For `ResolvedPath` types present in `krate.paths`, returns the **representative node id**
+/// (`__self` suffix) so that edges terminate on the concrete node inside the target subgraph
+/// rather than on the subgraph container itself.  The crate name is derived from
+/// `summary.path[0]` (the first path segment), which correctly handles cross-crate references
+/// within the same layer: the returned node_id is then looked up by the depth-2 cluster filter
+/// (`render_clusters_mermaid` / `lookup_cluster`) to determine whether the edge is intra-cluster
+/// or cross-cluster.  Cross-cluster edges are suppressed per spec IN-15 / AC-14 / CN-07.
 ///
-/// Handles `Type::ResolvedPath` (lookup via krate.paths), `Type::Primitive`, and
-/// generic/other types.  For non-resolved types an anonymous descriptive node_id
-/// is generated (best-effort — cross-crate lookups not yet implemented per O-r1
-/// scope of T007).
+/// Types not found in `krate.paths` (e.g. external library types not recorded by rustdoc)
+/// fall back to `anon_*` and are treated as anonymous nodes by the cluster filter.
+///
+/// For primitive (`prim_*`), generic (`generic_*`), or other types, an anonymous descriptive
+/// node_id is generated (best-effort).
 fn field_type_node_id(
     ty: &Type,
     krate: &rustdoc_types::Crate,
     layer: &str,
-    crate_name: &str,
+    _crate_name: &str,
 ) -> String {
     match ty {
         Type::ResolvedPath(path) => {
-            // Try to look up the target in krate.paths.
+            // Look up the target in krate.paths.  Use path[0] as the crate name (same logic as
+            // `resolve_type_node_id` in the depth-1 overview extractor) so that cross-crate
+            // types within the same layer produce the same rep-node id as recorded in
+            // `node_cluster_map`, enabling the depth-2 cluster filter to suppress them.
             if let Some(summary) = krate.paths.get(&path.id) {
-                // Only handle same-crate items (crate_id == 0).
-                if summary.crate_id == 0 {
+                if let Some(target_crate) = summary.path.first().map(|s| s.as_str()) {
                     let module_path = module_path_from_summary(&summary.path);
                     let type_name = summary.path.last().map(|s| s.as_str()).unwrap_or("?");
                     // Return the rep-node id (__self) so edges target the concrete node
                     // inside the target subgraph, not the subgraph container.
-                    return type_rep_node_id(layer, crate_name, &module_path, type_name);
+                    return type_rep_node_id(layer, target_crate, &module_path, type_name);
                 }
             }
-            // External type or not found — emit an anonymous node using the path string.
+            // Not found in krate.paths — emit an anonymous node using the path string.
             let anon_name = sanitize(&path.path);
             format!("anon_{anon_name}")
         }
