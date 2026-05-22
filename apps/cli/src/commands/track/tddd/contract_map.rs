@@ -20,6 +20,7 @@ use infrastructure::tddd::contract_map_renderer_adapter::ContractMapRendererAdap
 use usecase::contract_map_workflow::{
     RenderContractMap, RenderContractMapCommand, RenderContractMapInteractor,
 };
+use usecase::{LayerId, TrackId};
 
 use crate::CliError;
 
@@ -37,6 +38,17 @@ pub fn execute_contract_map(
     workspace_root: PathBuf,
     layers: Option<String>,
 ) -> Result<ExitCode, CliError> {
+    // Validate track_id into domain type at the CLI boundary (CN-12).
+    // Runs before git discovery so a malformed track_id is always caught
+    // here and never masked by "cannot discover git repo" or branch-mismatch
+    // errors.
+    let typed_track_id = TrackId::try_new(track_id.clone())
+        .map_err(|e| CliError::Message(format!("invalid track ID '{track_id}': {e}")))?;
+
+    // Parse and validate layer filter strings into LayerId at the CLI boundary (CN-12).
+    let layer_filter_parsed: Option<Vec<LayerId>> =
+        layers.as_deref().map(parse_layer_filter_ids).transpose()?;
+
     // CN-07 active-track guard: resolve the current git branch and verify it
     // matches `track/<track_id>`, rooted at workspace_root so
     // `--workspace-root` is always honoured.
@@ -57,8 +69,6 @@ pub fn execute_contract_map(
         )));
     }
 
-    let layer_filter_parsed = layers.as_deref().map(parse_layer_filter_strings).transpose()?;
-
     let rules_path = workspace_root.join("architecture-rules.json");
     let loader = FsCatalogueLoader::new(items_dir.clone(), rules_path, workspace_root.clone());
     let writer = FsContractMapWriter::new(items_dir.clone(), workspace_root.clone());
@@ -75,7 +85,7 @@ pub fn execute_contract_map(
     // concrete `RenderContractMapInteractor` type.
     let renderer_ref: &dyn RenderContractMap = &interactor;
     let cmd =
-        RenderContractMapCommand { track_id: track_id.clone(), layer_filter: layer_filter_parsed };
+        RenderContractMapCommand { track_id: typed_track_id, layer_filter: layer_filter_parsed };
     let out = renderer_ref
         .execute(&cmd)
         .map_err(|e| CliError::Message(format!("contract-map render failed: {e}")))?;
@@ -88,16 +98,22 @@ pub fn execute_contract_map(
     Ok(ExitCode::SUCCESS)
 }
 
-/// Parses a `--layers` CSV value into a list of layer identifier strings.
+/// Parses a `--layers` CSV value into validated [`LayerId`] values (CN-12).
 /// Validation that the layer is enabled happens in the interactor.
-fn parse_layer_filter_strings(raw: &str) -> Result<Vec<String>, CliError> {
+///
+/// # Errors
+///
+/// Returns `CliError` if any token is not a valid `LayerId`.
+fn parse_layer_filter_ids(raw: &str) -> Result<Vec<LayerId>, CliError> {
     let mut layers = Vec::new();
     for token in raw.split(',') {
         let trimmed = token.trim();
         if trimmed.is_empty() {
             continue;
         }
-        layers.push(trimmed.to_owned());
+        let id = LayerId::try_new(trimmed)
+            .map_err(|e| CliError::Message(format!("invalid layer id '{trimmed}': {e}")))?;
+        layers.push(id);
     }
     Ok(layers)
 }
@@ -121,23 +137,36 @@ mod tests {
     }
 
     #[test]
-    fn test_parse_layer_filter_strings_single_value_succeeds() {
-        let layers = parse_layer_filter_strings("domain").unwrap();
-        assert_eq!(layers, ["domain"]);
+    fn test_parse_layer_filter_ids_single_value_succeeds() {
+        let layers = parse_layer_filter_ids("domain").unwrap();
+        assert_eq!(layers.len(), 1);
+        assert_eq!(layers[0].as_ref(), "domain");
     }
 
     #[test]
-    fn test_parse_layer_filter_strings_multiple_values_preserves_order() {
-        let layers = parse_layer_filter_strings("infrastructure,usecase,domain").unwrap();
-        assert_eq!(layers, ["infrastructure", "usecase", "domain"]);
+    fn test_parse_layer_filter_ids_multiple_values_preserves_order() {
+        let layers = parse_layer_filter_ids("infrastructure,usecase,domain").unwrap();
+        assert_eq!(layers.len(), 3);
+        assert_eq!(layers[0].as_ref(), "infrastructure");
+        assert_eq!(layers[1].as_ref(), "usecase");
+        assert_eq!(layers[2].as_ref(), "domain");
     }
 
     #[test]
-    fn test_parse_layer_filter_strings_trims_whitespace_and_skips_empty() {
-        let layers = parse_layer_filter_strings(" domain ,, usecase , ").unwrap();
-        assert_eq!(layers, ["domain", "usecase"]);
+    fn test_parse_layer_filter_ids_trims_whitespace_and_skips_empty() {
+        let layers = parse_layer_filter_ids(" domain ,, usecase , ").unwrap();
+        assert_eq!(layers.len(), 2);
+        assert_eq!(layers[0].as_ref(), "domain");
+        assert_eq!(layers[1].as_ref(), "usecase");
     }
 
+    /// Verifies that `TrackId::try_new` validation runs at the CLI boundary
+    /// (CN-12) before git discovery, so a malformed `track_id` is always
+    /// caught here and never masked by `cannot discover git repo` or
+    /// branch-mismatch errors.
+    ///
+    /// `../evil` is rejected by `TrackId::try_new` (contains `/`) regardless
+    /// of whether `workspace_root` is a valid git repository.
     #[test]
     fn test_execute_contract_map_with_invalid_track_id_returns_error() {
         let dir = tempfile::tempdir().unwrap();
@@ -145,7 +174,26 @@ mod tests {
         std::fs::create_dir_all(&items_dir).unwrap();
 
         let result = execute_contract_map(items_dir, "../evil".to_owned(), dir.path().into(), None);
-        assert!(result.is_err(), "path traversal track id must be rejected");
+        let err = result.expect_err("path traversal track id must be rejected by CN-12");
+        let msg = format!("{err}");
+        assert!(
+            msg.contains("invalid track ID"),
+            "error must be a CN-12 track ID validation rejection, got: {msg}"
+        );
+    }
+
+    /// Verifies that `parse_layer_filter_ids` returns an error for an invalid
+    /// layer ID token, covering the CN-12 `LayerId::try_new` validation path
+    /// directly without going through the CN-07 branch guard.
+    #[test]
+    fn test_parse_layer_filter_ids_invalid_value_returns_error() {
+        // A value with an internal space is rejected by LayerId::try_new (CN-12).
+        let result = parse_layer_filter_ids("domain core");
+        assert!(result.is_err(), "layer id with space must be rejected");
+
+        // A value starting with a digit is rejected by LayerId::try_new (CN-12).
+        let result = parse_layer_filter_ids("1layer");
+        assert!(result.is_err(), "layer id starting with digit must be rejected");
     }
 
     #[test]

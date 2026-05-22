@@ -43,7 +43,7 @@
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
           "anchor": "IN-19",
-          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
         }
       ],
       "informal_grounds": []
@@ -74,7 +74,7 @@
         }
       ],
       "module_path": "tddd::baseline_graph_renderer_adapter",
-      "docs": "Infrastructure adapter implementing BaselineGraphRenderer port. Reads .harness/config/baseline-graph-style.toml (Reality View dedicated style config, Decision L / IN-04). Produces depth-1 overview (render_overview) and depth-2 cluster-detail (render_cluster) mermaid output for rustdoc_types::Crate input. No syn dependency — rustdoc already parses types (Decision E note / CN-03). Style config DTO types are private. Symmetric to ContractMapRendererAdapter. (IN-02 / AC-02 / AC-15 / CN-02)",
+      "docs": "Infrastructure adapter implementing BaselineGraphRenderer port. Reads .harness/config/baseline-graph-style.toml (Reality View dedicated style config, Decision L / IN-04). Produces depth-1 overview (render_overview) and all depth-2 cluster files (render_clusters) for rustdoc_types::Crate input. render_clusters owns the full cluster-enumeration pipeline: it filters krate.paths to local-crate items only (crate_id == 0), derives cluster keys per IN-14/IN-15, and returns Vec<ClusterRender>. No syn dependency — rustdoc already parses types (Decision E note / CN-03). Style config DTO types are private. Symmetric to ContractMapRendererAdapter. (IN-02 / IN-14 / IN-15 / AC-02 / AC-15 / CN-02)",
       "spec_refs": [
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
@@ -132,7 +132,7 @@
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
           "anchor": "IN-19",
-          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
         }
       ],
       "informal_grounds": []

@@ -63,7 +63,7 @@ pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
 pub use tddd::baseline_document::BaselineDocument;
 pub use tddd::baseline_graph_ports::{
     BaselineGraphLoader, BaselineGraphLoaderError, BaselineGraphRenderer,
-    BaselineGraphRendererError, BaselineGraphWriter, BaselineGraphWriterError,
+    BaselineGraphRendererError, BaselineGraphWriter, BaselineGraphWriterError, ClusterRender,
 };
 pub use tddd::catalogue::{
     EnumVariantDeclaration, MemberDeclaration, MethodDeclaration, ParamDeclaration, TypeSignal,

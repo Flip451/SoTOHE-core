@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e483dd0634017b739beaa3ce8791572934a44f6ec57231f9692e77059a4a9023",
+  "catalogue_declaration_hash": "2c597a25170e0e72452880eccbf8efb46777544782c29a51432d02b953b9b310",
   "signals": [
     {
       "type_name": "RenderBaselineGraphCommand",

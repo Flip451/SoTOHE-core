@@ -34,7 +34,7 @@ pub mod type_signals_doc;
 pub use baseline_document::BaselineDocument;
 pub use baseline_graph_ports::{
     BaselineGraphLoader, BaselineGraphLoaderError, BaselineGraphRenderer,
-    BaselineGraphRendererError, BaselineGraphWriter, BaselineGraphWriterError,
+    BaselineGraphRendererError, BaselineGraphWriter, BaselineGraphWriterError, ClusterRender,
 };
 pub use catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,

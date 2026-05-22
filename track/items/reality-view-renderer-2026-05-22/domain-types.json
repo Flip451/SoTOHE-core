@@ -43,6 +43,30 @@
       ],
       "informal_grounds": []
     },
+    "ClusterRender": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "cluster_key", "ty": "String" },
+          { "name": "content", "ty": "String" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "tddd",
+      "docs": "Data transfer object returned by BaselineGraphRenderer::render_clusters. cluster_key follows spec IN-14/IN-15 convention: '<crate_name>_root' for crate-root clusters or '<crate_name>_<module_seg1>' for top-level module clusters. content is the rendered Mermaid markdown string. Placed in domain alongside the port it serves (R1 delta: port return-value containers live in the same layer as their port). Both fields are raw String: cluster_key is a renderer-generated composite synthetic key with no independent domain-level constraint that warrants a newtype; content is opaque Mermaid markup text. (IN-14 / IN-15)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-15",
+          "hash": "4e08e8aa440fb1f32cb6ded4cf177e60ad392a49d023ab0f150f55fd1cfe9ca7"
+        }
+      ],
+      "informal_grounds": []
+    },
     "BaselineGraphLoaderError": {
       "action": "add",
       "role": "ErrorType",
@@ -112,7 +136,7 @@
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
           "anchor": "IN-19",
-          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
         }
       ],
       "informal_grounds": []
@@ -214,7 +238,7 @@
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
           "anchor": "IN-19",
-          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
         }
       ],
       "informal_grounds": []
@@ -250,7 +274,7 @@
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
           "anchor": "IN-19",
-          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
         }
       ],
       "informal_grounds": []
@@ -273,15 +297,13 @@
           "where_predicates": []
         },
         {
-          "name": "render_cluster",
+          "name": "render_clusters",
           "receiver": "&self",
           "params": [
             { "name": "baselines", "ty": "&[BaselineDocument]" },
-            { "name": "layer", "ty": "&LayerId" },
-            { "name": "cluster_crate", "ty": "&CrateName" },
-            { "name": "cluster_module", "ty": "&str" }
+            { "name": "layer", "ty": "&LayerId" }
           ],
-          "returns": "Result<String, BaselineGraphRendererError>",
+          "returns": "Result<Vec<ClusterRender>, BaselineGraphRendererError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -290,12 +312,22 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "tddd",
-      "docs": "Secondary port for Reality View (baseline graph) rendering. Infrastructure adapter implements this port. RenderBaselineGraphInteractor injects it via generic R. render_overview produces depth-1 overview content for a layer; render_cluster produces depth-2 cluster-detail content for a specific (crate, module) cluster. Symmetric to ContractMapRenderer (Decision E / IN-02 / AC-02). No syn dependency (rustdoc already parses types — Decision E note).",
+      "docs": "Secondary port for Reality View (baseline graph) rendering. Infrastructure adapter implements this port. RenderBaselineGraphInteractor injects it via generic R. render_overview produces depth-1 overview content for a layer; render_clusters enumerates all clusters internally (krate.paths parsing, filtering to local-crate items only where crate_id == 0, then cluster_key generation per IN-14/IN-15) and returns Vec<ClusterRender>. This keeps cluster-enumeration logic inside the adapter, making the design symmetric to ContractMapRenderer::render (single method, no cluster enumeration in the interactor). Replaces the prior render_cluster (single-cluster) that required the interactor to enumerate clusters from krate.paths. No syn dependency (rustdoc already parses types — Decision E note). (Decision E / IN-02 / IN-14 / IN-15 / AC-02)",
       "spec_refs": [
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
           "anchor": "IN-02",
           "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-15",
+          "hash": "4e08e8aa440fb1f32cb6ded4cf177e60ad392a49d023ab0f150f55fd1cfe9ca7"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
         }
       ],
       "informal_grounds": []
@@ -346,7 +378,7 @@
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
           "anchor": "IN-19",
-          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
         }
       ],
       "informal_grounds": []
@@ -364,6 +396,26 @@
       "action": "add",
       "trait_ref": "core::clone::Clone",
       "for_type": "BaselineDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ClusterRender"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ClusterRender"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ClusterRender"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ClusterRender"
     },
     {
       "action": "add",

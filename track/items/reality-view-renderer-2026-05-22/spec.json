@@ -186,7 +186,7 @@
       },
       {
         "id": "IN-14",
-        "text": "depth 1 (overview): `<layer>-graph-d1/index.md` 1 ファイルを layer ごとに生成する (Decision U-r3)。cluster (= crate_name × top-level module) を 1 node に縮約し (subgraph 化しない)、cross-cluster edge group のみ表示する。cluster node は `:::cluster` 等の classDef で表現。cluster key は (crate_name, module_seg1) の組。crate root entry (module_seg1 なし) は cluster key `(crate_name, <root>)` として `<crate_name> root` cluster に集約",
+        "text": "depth 1 (overview): `<layer>-graph-d1/index.md` 1 ファイルを layer ごとに生成する (Decision U-r3)。cluster (= crate_name × top-level module) を 1 node に縮約し (subgraph 化しない)、cross-cluster edge group のみ表示する。cluster node は `:::cluster` 等の classDef で表現。cluster key は (crate_name, module_seg1) の組。crate root entry (module_seg1 なし) は cluster key `(crate_name, <root>)` として `<crate_name> root` cluster に集約。renderer は該当層に属する全 cluster を内部で自律的に列挙し、overview コンテンツを一括して生成する",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
@@ -196,7 +196,7 @@
       },
       {
         "id": "IN-15",
-        "text": "depth 2 (cluster detail): `<layer>-graph-d2/<cluster>.md` per cluster を生成する (Decision U-r3)。該当 cluster 内の entry を Contract Map U-6d-iii と同じ subgraph 構造で表現する。最上位 module 1 段 subgraph + sub-module path を entry subgraph label に含める (例: team::manager::TeamManager)。cluster 内 edge のみ描画し cross-cluster edge は depth 1 overview に集約する。ファイル名は `<crate_name>_<module_seg1>.md` 形式",
+        "text": "depth 2 (cluster detail): `<layer>-graph-d2/<cluster>.md` per cluster を生成する (Decision U-r3)。該当 cluster 内の entry を Contract Map U-6d-iii と同じ subgraph 構造で表現する。最上位 module 1 段 subgraph + sub-module path を entry subgraph label に含める (例: team::manager::TeamManager)。cluster 内 edge のみ描画し cross-cluster edge は depth 1 overview に集約する。ファイル名は cluster key をそのまま stem として使い `<cluster_key>.md` 形式とする: top-level module cluster は `<crate_name>_<module_seg1>.md`、crate root cluster は `<crate_name>_root.md`。renderer は該当層に属する全 cluster を内部で列挙し、各 cluster の識別キー (cluster key: `<crate_name>_<module_seg1>` または `<crate_name>_root` 形式) と描画済みコンテンツのペアを一括して返す。この per-cluster 出力コンテナ (識別キー + 描画内容の組) は writer が各ファイルへの書き込みに用いる",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
@@ -236,11 +236,15 @@
       },
       {
         "id": "IN-19",
-        "text": "3 つの secondary port (`BaselineGraphLoader` / `BaselineGraphRenderer` / `BaselineGraphWriter`) をすべて domain 層に定義し、各 adapter を infrastructure 層に配置する。`RenderBaselineGraphInteractor` (usecase 層) がこれら 3 port をジェネリクス L / R / W で inject され、load → render → write の 3 段パイプラインを compose する。各 port は対応する error type (`BaselineGraphLoaderError` / `BaselineGraphRendererError` / `BaselineGraphWriterError`) を domain 層に持つ。syn 依存を追加しない点は renderer adapter のみの制約 (Decision E 継承)。loader / writer も hexagonal 分離の同一原則に従う",
+        "text": "3 つの secondary port (`BaselineGraphLoader` / `BaselineGraphRenderer` / `BaselineGraphWriter`) をすべて domain 層に定義し、各 adapter を infrastructure 層に配置する。`RenderBaselineGraphInteractor` (usecase 層) がこれら 3 port をジェネリクス L / R / W で inject され、load → render → write の 3 段パイプラインを compose する。各 port は対応する error type (`BaselineGraphLoaderError` / `BaselineGraphRendererError` / `BaselineGraphWriterError`) を domain 層に持つ。syn 依存を追加しない点は renderer adapter のみの制約 (Decision E 継承)。loader / writer も hexagonal 分離の同一原則に従う。`BaselineGraphRenderer` port の behavioral contract (IN-14 / IN-15 と整合): overview rendering (depth 1) は層単位で 1 つのコンテンツを返す。cluster rendering (depth 2) は該当層の全 cluster を内部で列挙し、各 cluster の識別キーと描画コンテンツのペアを一括して返す。cluster 列挙ロジックは renderer adapter に閉じ、interactor は個別の cluster key を引数として渡す必要がない。正確な method 署名は Open Question P (type-designer 領分) で確定する",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
             "anchor": "E: renderer の配置層 (Contract Map E を継承、ただし syn は不要)"
+          },
+          {
+            "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+            "anchor": "U: cluster 構造 + depth 分割 (採択: U-r3)"
           },
           {
             "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
@@ -651,7 +655,7 @@
     },
     {
       "id": "AC-14",
-      "text": "depth 2 (cluster detail) として `<layer>-graph-d2/<cluster>.md` が cluster ごとに生成される。ファイル名は `<crate_name>_<module_seg1>.md` 形式。cluster 内 edge のみ描画される (cross-cluster edge は depth 1 に集約)。sub-module path が entry subgraph label に含まれる (例: team::manager::TeamManager)",
+      "text": "depth 2 (cluster detail) として `<layer>-graph-d2/<cluster>.md` が cluster ごとに生成される。ファイル名は cluster key をそのまま stem として使い `<cluster_key>.md` 形式: top-level module cluster は `<crate_name>_<module_seg1>.md`、crate root cluster は `<crate_name>_root.md`。cluster 内 edge のみ描画される (cross-cluster edge は depth 1 に集約)。sub-module path が entry subgraph label に含まれる (例: team::manager::TeamManager)",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",

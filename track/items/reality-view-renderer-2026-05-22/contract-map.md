@@ -55,6 +55,10 @@ subgraph domain["domain"]
     T38_domain_domain_BaselineGraphWriterError_SymlinkRejected[SymlinkRejected]
     T38_domain_domain_BaselineGraphWriterError_TrackNotFound[TrackNotFound]
   end
+  subgraph T27_domain_domain_ClusterRender["tddd::ClusterRender"]
+    direction TB
+    T27_domain_domain_ClusterRender__self[ClusterRender]
+  end
   subgraph R33_domain_domain_BaselineGraphLoader["tddd::BaselineGraphLoader"]
     direction TB
     R33_domain_domain_BaselineGraphLoader__self[BaselineGraphLoader]
@@ -64,7 +68,7 @@ subgraph domain["domain"]
     direction TB
     R35_domain_domain_BaselineGraphRenderer__self[BaselineGraphRenderer]
     R35_domain_domain_BaselineGraphRenderer_render_overview([render_overview])
-    R35_domain_domain_BaselineGraphRenderer_render_cluster([render_cluster])
+    R35_domain_domain_BaselineGraphRenderer_render_clusters([render_clusters])
   end
   subgraph R33_domain_domain_BaselineGraphWriter["tddd::BaselineGraphWriter"]
     direction TB
@@ -154,8 +158,9 @@ R33_domain_domain_BaselineGraphLoader_load_all --> T30_domain_domain_BaselineDoc
 R33_domain_domain_BaselineGraphLoader_load_all --> T38_domain_domain_BaselineGraphLoaderError__self
 R35_domain_domain_BaselineGraphRenderer_render_overview --o T30_domain_domain_BaselineDocument__self
 R35_domain_domain_BaselineGraphRenderer_render_overview --> T40_domain_domain_BaselineGraphRendererError__self
-R35_domain_domain_BaselineGraphRenderer_render_cluster --o T30_domain_domain_BaselineDocument__self
-R35_domain_domain_BaselineGraphRenderer_render_cluster --> T40_domain_domain_BaselineGraphRendererError__self
+R35_domain_domain_BaselineGraphRenderer_render_clusters --o T30_domain_domain_BaselineDocument__self
+R35_domain_domain_BaselineGraphRenderer_render_clusters --> T40_domain_domain_BaselineGraphRendererError__self
+R35_domain_domain_BaselineGraphRenderer_render_clusters --> T27_domain_domain_ClusterRender__self
 R33_domain_domain_BaselineGraphWriter_write_overview --> T38_domain_domain_BaselineGraphWriterError__self
 R33_domain_domain_BaselineGraphWriter_write_cluster --> T38_domain_domain_BaselineGraphWriterError__self
 T40_usecase_usecase_RenderBaselineGraphError_LoaderFailed --o T38_domain_domain_BaselineGraphLoaderError__self
@@ -190,10 +195,11 @@ class T38_domain_domain_BaselineGraphWriterError_IoError variant_node
 class T38_domain_domain_BaselineGraphWriterError_SymlinkRejected variant_node
 class T38_domain_domain_BaselineGraphWriterError_TrackNotFound variant_node
 class T38_domain_domain_BaselineGraphWriterError__self error_type
+class T27_domain_domain_ClusterRender__self dto
 class R33_domain_domain_BaselineGraphLoader_load_all method_node
 class R33_domain_domain_BaselineGraphLoader__self secondary_port
 class R35_domain_domain_BaselineGraphRenderer_render_overview method_node
-class R35_domain_domain_BaselineGraphRenderer_render_cluster method_node
+class R35_domain_domain_BaselineGraphRenderer_render_clusters method_node
 class R35_domain_domain_BaselineGraphRenderer__self secondary_port
 class R33_domain_domain_BaselineGraphWriter_write_overview method_node
 class R33_domain_domain_BaselineGraphWriter_write_cluster method_node

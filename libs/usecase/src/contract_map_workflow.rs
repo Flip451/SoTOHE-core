@@ -25,22 +25,22 @@ use domain::tddd::{
 
 /// Command input for [`RenderContractMap::execute`].
 ///
-/// All fields accept raw strings so callers (e.g. the CLI) never need to
-/// import domain types (`TrackId`, `LayerId`).
-/// The interactor validates and converts them internally.
+/// `track_id` is a validated [`TrackId`] (CN-12: concept-bearing identity
+/// field typed as domain value object). Callers (CLI) construct `TrackId`
+/// and `LayerId` at the boundary and pass typed values. This eliminates
+/// the need for `RenderContractMapError::InvalidTrackId`.
 ///
 /// Fields mirror the CLI arguments (`sotp track contract-map <track-id>
 /// [--layers l1,l2]`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RenderContractMapCommand {
-    /// Raw track identifier string (validated by the interactor).
-    pub track_id: String,
-    /// If `Some`, restricts rendering to the listed layer identifier
-    /// strings. The interactor fails with
-    /// [`RenderContractMapError::LayerNotFound`] when any supplied string
-    /// is absent from the loader's output set, guarding against silent
-    /// typos in CLI input.
-    pub layer_filter: Option<Vec<String>>,
+    /// Validated track identifier (CN-12).
+    pub track_id: TrackId,
+    /// If `Some`, restricts rendering to the listed layer identifiers.
+    /// The interactor fails with [`RenderContractMapError::LayerNotFound`]
+    /// when any supplied `LayerId` is absent from the loader's output set,
+    /// guarding against silent typos in CLI input.
+    pub layer_filter: Option<Vec<LayerId>>,
 }
 
 /// Output DTO returned by [`RenderContractMap::execute`] on success.
@@ -55,8 +55,10 @@ pub struct RenderContractMapOutput {
 
 /// Error variants surfaced by [`RenderContractMap::execute`].
 ///
-/// Variant inventory matches the `usecase-types.json` declaration for the
-/// `contract-map-v3-2026-05-20` track (Decision P-5 / IN-23).
+/// `InvalidTrackId` variant is absent: the `Command` now receives a validated
+/// `TrackId` (CN-12), eliminating the validation step from the interactor.
+///
+/// (Decision P-5 / IN-23 / CN-12)
 #[derive(Debug)]
 pub enum RenderContractMapError {
     /// Failure inside a [`CatalogueLoader`] implementation.
@@ -68,14 +70,15 @@ pub enum RenderContractMapError {
     /// The loader returned an empty layer set — no `tddd.enabled` layers
     /// exist for this track. Rendering an empty Contract Map is not a
     /// useful workflow, so we fail closed.
-    EmptyCatalogue { track_id: String },
+    ///
+    /// `track_id: TrackId` per CN-12.
+    EmptyCatalogue { track_id: TrackId },
 
     /// The caller's `layer_filter` references a layer that the loader did
     /// not produce — typically a CLI typo or a disabled layer.
-    LayerNotFound { track_id: String, layer_id: String },
-
-    /// The `track_id` string is not a valid track identifier.
-    InvalidTrackId { reason: String },
+    ///
+    /// `track_id: TrackId` and `layer_id: LayerId` per CN-12.
+    LayerNotFound { track_id: TrackId, layer_id: LayerId },
 
     /// The [`ContractMapRenderer`] implementation returned an error.
     /// Wraps [`ContractMapRendererError`] (Decision P-5 / IN-23).
@@ -95,7 +98,6 @@ impl std::fmt::Display for RenderContractMapError {
             Self::LayerNotFound { track_id, layer_id } => {
                 write!(f, "layer '{layer_id}' is not a tddd.enabled layer for track '{track_id}'")
             }
-            Self::InvalidTrackId { reason } => write!(f, "invalid track ID: {reason}"),
             Self::RendererFailed(e) => write!(f, "renderer failed: {e}"),
         }
     }
@@ -107,7 +109,7 @@ impl std::error::Error for RenderContractMapError {
             Self::CatalogueLoaderFailed(e) => Some(e),
             Self::ContractMapWriterFailed(e) => Some(e),
             Self::RendererFailed(e) => Some(e),
-            _ => None,
+            Self::EmptyCatalogue { .. } | Self::LayerNotFound { .. } => None,
         }
     }
 }
@@ -187,36 +189,28 @@ where
         &self,
         cmd: &RenderContractMapCommand,
     ) -> Result<RenderContractMapOutput, RenderContractMapError> {
-        // Validate and convert the track_id string to the domain type.
-        let track_id = TrackId::try_new(cmd.track_id.clone())
-            .map_err(|e| RenderContractMapError::InvalidTrackId { reason: e.to_string() })?;
-
-        let (layer_order, catalogues) = self.loader.load_all(&track_id)?;
+        // track_id is already validated (CN-12): no TrackId::try_new needed.
+        let (layer_order, catalogues) = self.loader.load_all(&cmd.track_id)?;
 
         if layer_order.is_empty() {
             return Err(RenderContractMapError::EmptyCatalogue { track_id: cmd.track_id.clone() });
         }
 
-        // Resolve layer_filter strings against the loaded layer set.
-        // An absent or syntactically invalid layer name both produce
-        // LayerNotFound — if a string cannot be found in layer_order it is
-        // not a TDDD-enabled layer regardless of whether it would parse as a
-        // valid LayerId, so the distinction is not meaningful to the caller.
+        // Resolve layer_filter LayerId values against the loaded layer set.
+        // An absent LayerId produces LayerNotFound — the layer is not a
+        // TDDD-enabled layer for this track.
         let layer_filter: Option<Vec<LayerId>> = cmd
             .layer_filter
             .as_ref()
-            .map(|names| {
-                names
-                    .iter()
-                    .map(|name| {
-                        layer_order
-                            .iter()
-                            .find(|l| l.as_ref() == name.as_str())
-                            .cloned()
-                            .ok_or_else(|| RenderContractMapError::LayerNotFound {
+            .map(|ids| {
+                ids.iter()
+                    .map(|id| {
+                        layer_order.iter().find(|l| *l == id).cloned().ok_or_else(|| {
+                            RenderContractMapError::LayerNotFound {
                                 track_id: cmd.track_id.clone(),
-                                layer_id: name.clone(),
-                            })
+                                layer_id: id.clone(),
+                            }
+                        })
                     })
                     .collect::<Result<Vec<_>, _>>()
             })
@@ -252,7 +246,7 @@ where
         // Delegate rendering to the injected ContractMapRenderer port (T002).
         let content = self.renderer.render(&catalogues_vec, &filtered_layer_order, &opts)?;
 
-        self.writer.write(&track_id, &content)?;
+        self.writer.write(&cmd.track_id, &content)?;
 
         // `rendered_layer_count` reflects only the layers that were actually rendered
         // (respecting `layer_filter`), while `total_entry_count` reflects the full
@@ -436,7 +430,10 @@ mod tests {
         });
 
         let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
-        let cmd = RenderContractMapCommand { track_id: "t001".to_owned(), layer_filter: None };
+        let cmd = RenderContractMapCommand {
+            track_id: TrackId::try_new("t001").unwrap(),
+            layer_filter: None,
+        };
         let out = interactor.execute(&cmd).unwrap();
         assert_eq!(out.rendered_layer_count, 3);
         assert_eq!(out.total_entry_count, 4); // 1 type (domain) + 2 traits (usecase) + 1 fn (infra)
@@ -454,7 +451,10 @@ mod tests {
         writer.expect_write().times(0);
 
         let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
-        let cmd = RenderContractMapCommand { track_id: "t002".to_owned(), layer_filter: None };
+        let cmd = RenderContractMapCommand {
+            track_id: TrackId::try_new("t002").unwrap(),
+            layer_filter: None,
+        };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(matches!(err, RenderContractMapError::CatalogueLoaderFailed(_)));
     }
@@ -479,7 +479,10 @@ mod tests {
         });
 
         let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
-        let cmd = RenderContractMapCommand { track_id: "t003".to_owned(), layer_filter: None };
+        let cmd = RenderContractMapCommand {
+            track_id: TrackId::try_new("t003").unwrap(),
+            layer_filter: None,
+        };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(matches!(err, RenderContractMapError::ContractMapWriterFailed(_)));
     }
@@ -494,11 +497,14 @@ mod tests {
         writer.expect_write().times(0);
 
         let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
-        let cmd = RenderContractMapCommand { track_id: "t004".to_owned(), layer_filter: None };
+        let cmd = RenderContractMapCommand {
+            track_id: TrackId::try_new("t004").unwrap(),
+            layer_filter: None,
+        };
         let err = interactor.execute(&cmd).unwrap_err();
         match err {
             RenderContractMapError::EmptyCatalogue { track_id } => {
-                assert_eq!(track_id, "t004");
+                assert_eq!(track_id.as_ref(), "t004");
             }
             other => panic!("expected EmptyCatalogue, got {other:?}"),
         }
@@ -517,15 +523,17 @@ mod tests {
         writer.expect_write().times(0);
 
         let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
+        // Note: "typo-layer" is not in the layer set, so LayerNotFound fires.
+        // LayerId::try_new("typo-layer") is valid syntactically; it is absent from the loader output.
         let cmd = RenderContractMapCommand {
-            track_id: "t005".to_owned(),
-            layer_filter: Some(vec!["typo-layer".to_owned()]),
+            track_id: TrackId::try_new("t005").unwrap(),
+            layer_filter: Some(vec![LayerId::try_new("typo-layer").unwrap()]),
         };
         let err = interactor.execute(&cmd).unwrap_err();
         match err {
             RenderContractMapError::LayerNotFound { track_id, layer_id } => {
-                assert_eq!(track_id, "t005");
-                assert_eq!(layer_id, "typo-layer");
+                assert_eq!(track_id.as_ref(), "t005");
+                assert_eq!(layer_id.as_ref(), "typo-layer");
             }
             other => panic!("expected LayerNotFound, got {other:?}"),
         }
@@ -552,7 +560,10 @@ mod tests {
         writer.expect_write().times(0);
 
         let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
-        let cmd = RenderContractMapCommand { track_id: "t006".to_owned(), layer_filter: None };
+        let cmd = RenderContractMapCommand {
+            track_id: TrackId::try_new("t006").unwrap(),
+            layer_filter: None,
+        };
         let err = interactor.execute(&cmd).unwrap_err();
         assert!(
             matches!(err, RenderContractMapError::RendererFailed(_)),

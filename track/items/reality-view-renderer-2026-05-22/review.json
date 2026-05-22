@@ -1,6 +1,153 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
+          "at": "2026-05-22T12:26:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` writes the overview immediately after rendering it, before rendering the layer's cluster files. If a later `render_cluster` call fails, the method returns `RendererFailed` after `index.md` has already been persisted, so the required load -> render -> write pipeline can leave partial baseline graph output behind.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 283,
+              "category": "correctness"
+            },
+            {
+              "message": "Depth-2 cluster generation is hard-coded to one root cluster per crate: `render_cluster` is always called with an empty module and the writer key is only the crate name. The spec/port contract is per `(crate, top-level module)` cluster with `<crate_name>_<module_seg1>.md`, so crates with top-level modules will miss cluster files and `written_file_count` will be too low.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 292,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
+          "at": "2026-05-22T12:28:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` writes each layer inside the same loop that renders later layers. If rendering succeeds for an earlier layer and then `render_overview` or `render_cluster` fails for a later layer, the method returns `RendererFailed` after already persisting the earlier files. That violates the intended load -> render -> write pipeline and the local guarantee that renderer errors cannot leave partial output; render all filtered layers into memory first, then perform writes only after every render succeeds.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 351,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:98a8be6778601335ec95f7373d6aafa5c23fdcfd02c8ebdf287c4fe9ef27c7c3",
+          "at": "2026-05-22T12:38:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The root-cluster key is emitted as just the crate name, so a writer following the port contract (`<cluster_key>.md`) will create `domain.md` for crate-root items. The track spec/ADR requires crate-root detail files to use `<crate_name>_root.md`; this will put root cluster output at the wrong path once the writer adapter is connected.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 345,
+              "category": "spec_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:e1d49ccfab8024fd3db380515e25489887df02d175ccc5549a345419d5bc20db",
+          "at": "2026-05-22T12:42:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22107f7b0faacadd13b3ec0d1f1f6a4e9ea8cde0db4a9a7570a9eb892b3305bb",
+          "at": "2026-05-22T12:44:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_filter` entries are copied verbatim into `resolved`, so duplicate `LayerId`s are rendered and written multiple times and `rendered_layer_count` is inflated. That makes the baseline-graph workflow behave differently from the contract-map workflow, where duplicates collapse via membership filtering. If repeated layers are meant to be harmless input, this needs deduping before the render/write loop.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 257,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:0ec821a856cbf624e91d3ee6291329023d3f80d1f5e6726bb8a278c74455a730",
+          "at": "2026-05-22T13:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
+          "at": "2026-05-22T13:56:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
+          "at": "2026-05-22T13:58:55Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 161,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
+          "at": "2026-05-22T12:27:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 44,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
+          "at": "2026-05-22T12:31:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:34:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:35:36Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -418,6 +565,109 @@
           "findings": [],
           "hash": "rvw1:sha256:924cb795a1da6d942bebc39c2df217db418bd24591f0f4cdf1f7d978a0f44baa",
           "at": "2026-05-22T12:02:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a646574d53ece5aaeee6443b8fab62563a518181ab7ed6a7b9cc23d5b8f2dde9",
+          "at": "2026-05-22T12:24:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a646574d53ece5aaeee6443b8fab62563a518181ab7ed6a7b9cc23d5b8f2dde9",
+          "at": "2026-05-22T12:25:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` and `impl-plan.json` still describe the renderer work as `render_cluster`/single-cluster even though the updated spec, domain, usecase, and contract-map artifacts now require `render_clusters` returning `Vec<ClusterRender>`. That leaves the implementation plan internally contradictory and points T004/T010 at the obsolete API instead of the new symmetric contract.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/plan.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ffea44e828dbfc9119e7891f366e693962267cfe6f6feed24274e927d2c47f19",
+          "at": "2026-05-22T13:30:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineGraphRenderer` now describes `render_clusters` as enumerating clusters with an `external item filter crate_id!=0`, but the infrastructure artifact says the adapter filters to local-crate items only (`crate_id == 0`) before deriving cluster keys. Those two descriptions disagree on which `krate.paths` entries drive depth-2 cluster generation, so the plan is internally inconsistent about the renderer's source set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reality-view-renderer-2026-05-22/domain-types.json",
+              "line": 315,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3feb9e54a7911a746837c9238b7d293b1349d06cbb3fd80e5291905d893560a6",
+          "at": "2026-05-22T13:37:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `RenderBaselineGraphInteractor` description says it renders the overview and then forwards only `ClusterRender` entries to `writer.write_cluster`, but it never mentions `writer.write_overview`. That makes the depth-1 `index.md` output disappear from the described pipeline, which contradicts the rest of the plan where the writer port explicitly owns both overview and cluster files.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/usecase-types.json",
+              "line": 135,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8835ee2ea4f404d82647f1ed42ab6007d891cb3b7ba0850b90574722e345950e",
+          "at": "2026-05-22T13:41:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5ce10c926bb95a725d99b3f8337b18c0bde0eb5937aa8cf2f6b23e34c406ff5",
+          "at": "2026-05-22T13:43:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-15 now says renderer returns cluster keys in either `<crate_name>_<module_seg1>` or `<crate_name>_root` form, but the same requirement still constrains depth-2 filenames to only `<crate_name>_<module_seg1>.md`. The generated plan/AC repeat that narrower rule, so root-cluster output has no coherent filename contract even though `ClusterRender.cluster_key` and the writer flow use the key as the file stem. Please update the filename rule to explicitly include the root-cluster key form.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/spec.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f5ce10c926bb95a725d99b3f8337b18c0bde0eb5937aa8cf2f6b23e34c406ff5",
+          "at": "2026-05-22T13:45:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 still defines the depth-2 filename rule only as `<crate_name>_<module_seg1>.md`, but IN-15/AC-14 now require root clusters to use `<crate_name>_root.md` as well. Since `render_clusters` returns `cluster_key` for the writer to use as the file stem, the implementation plan leaves crate-root cluster output without the same filename contract as the spec.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/impl-plan.json",
+              "line": 52,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c4d95533c9a84fa1ce0ff108156eeccd13e2238b431e3798d235f92c3a9717c9",
+          "at": "2026-05-22T13:48:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84925e78ce8914b8f5fd0a39f53b6f2618f59f3aeb6b0ce4fad3f129274218a7",
+          "at": "2026-05-22T13:51:09Z"
         }
       ]
     },
@@ -436,6 +686,20 @@
           "findings": [],
           "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
           "at": "2026-05-22T11:51:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
+          "at": "2026-05-22T13:29:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
+          "at": "2026-05-22T13:30:19Z"
         }
       ]
     },

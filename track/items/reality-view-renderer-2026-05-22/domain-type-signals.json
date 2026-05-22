@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-22T12:03:31Z",
-  "declaration_hash": "e9d19e268c18cb0d9ca76e9e67bf8007cad4c7530e47071eb6114eb3fa08b36b",
+  "generated_at": "2026-05-22T14:00:54Z",
+  "declaration_hash": "d4a6b87d4c9712ad9b27d7333cb984d8cb02cc848b76972e6f7d2f5da1821995",
   "signals": [
     {
       "type_name": "BaselineDocument",
@@ -62,6 +62,18 @@
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ClusterRender",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
       ]
     }
   ]

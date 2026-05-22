@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-22T12:03:33Z",
-  "declaration_hash": "f77468095bbb38654b7c16536c56faf4ed724418b2b420e901ecdda37ff3da12",
+  "generated_at": "2026-05-22T14:00:55Z",
+  "declaration_hash": "e87efb494fde5d35ccdaa06553d8f0e0e32d188562b888d2831f15477065754a",
   "signals": [
     {
       "type_name": "BaselineGraphLoaderAdapter",

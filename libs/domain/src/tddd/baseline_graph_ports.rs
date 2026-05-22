@@ -28,7 +28,6 @@ use std::path::PathBuf;
 
 use crate::TrackId;
 use crate::tddd::baseline_document::BaselineDocument;
-use crate::tddd::catalogue_v2::identifiers::CrateName;
 use crate::tddd::layer_id::LayerId;
 
 // ---------------------------------------------------------------------------
@@ -232,6 +231,34 @@ impl std::fmt::Display for BaselineGraphWriterError {
 impl std::error::Error for BaselineGraphWriterError {}
 
 // ---------------------------------------------------------------------------
+// ClusterRender — DTO returned by BaselineGraphRenderer::render_clusters
+// ---------------------------------------------------------------------------
+
+/// Data transfer object returned by [`BaselineGraphRenderer::render_clusters`].
+///
+/// `cluster_key` follows the spec IN-14/IN-15 convention:
+/// `'<crate_name>_root'` for crate-root clusters or
+/// `'<crate_name>_<module_seg1>'` for top-level module clusters.
+/// It is a renderer-generated composite synthetic key with no independent
+/// domain-level constraint that warrants a newtype.
+///
+/// `content` is the rendered Mermaid markdown string — opaque Mermaid markup
+/// text with no domain-level structure.
+///
+/// Placed in domain alongside the port it serves (R1 delta: port
+/// return-value containers live in the same layer as their port).
+///
+/// (IN-14 / IN-15)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ClusterRender {
+    /// Renderer-generated composite synthetic cluster key
+    /// (`<crate_name>_root` or `<crate_name>_<module_seg1>`).
+    pub cluster_key: String,
+    /// Rendered Mermaid markdown — opaque text produced by the adapter.
+    pub content: String,
+}
+
+// ---------------------------------------------------------------------------
 // BaselineGraphLoader — secondary port
 // ---------------------------------------------------------------------------
 
@@ -268,8 +295,14 @@ pub trait BaselineGraphLoader: Send + Sync {
 /// injects it via generic `R`.
 ///
 /// - `render_overview` produces depth-1 overview content for a layer.
-/// - `render_cluster` produces depth-2 cluster-detail content for a specific
-///   `(crate, module)` cluster.
+/// - `render_clusters` enumerates all clusters internally (krate.paths parsing +
+///   external item filter + cluster key generation per IN-14/IN-15) and returns
+///   `Vec<`[`ClusterRender`]`>`. This keeps cluster-enumeration logic inside the
+///   adapter, making the design symmetric to `ContractMapRenderer::render`
+///   (single method, no cluster enumeration in the interactor).
+///
+/// Replaces the prior `render_cluster` (single-cluster) that required the
+/// interactor to enumerate clusters from `krate.paths`.
 ///
 /// Symmetric to `ContractMapRenderer` (Decision E / IN-02 / AC-02). No syn
 /// dependency (rustdoc already parses types — Decision E note).
@@ -286,20 +319,22 @@ pub trait BaselineGraphRenderer: Send + Sync {
         layer: &LayerId,
     ) -> Result<String, BaselineGraphRendererError>;
 
-    /// Render a depth-2 cluster-detail Mermaid diagram for a specific
-    /// `(crate, module)` cluster within a layer.
+    /// Enumerate all depth-2 clusters for the given baselines and layer,
+    /// render each cluster, and return them as a `Vec<`[`ClusterRender`]`>`.
+    ///
+    /// The adapter is responsible for `krate.paths` parsing, external-item
+    /// filtering (`crate_id != 0`), and cluster key generation per the
+    /// IN-14/IN-15 convention (`<crate_name>_root` / `<crate_name>_<module_seg1>`).
     ///
     /// # Errors
     ///
     /// Returns [`BaselineGraphRendererError`] when style configuration is absent
     /// or invalid (fail-closed, CN-02 / AC-15), or when rendering fails.
-    fn render_cluster(
+    fn render_clusters(
         &self,
         baselines: &[BaselineDocument],
         layer: &LayerId,
-        cluster_crate: &CrateName,
-        cluster_module: &str,
-    ) -> Result<String, BaselineGraphRendererError>;
+    ) -> Result<Vec<ClusterRender>, BaselineGraphRendererError>;
 }
 
 // ---------------------------------------------------------------------------

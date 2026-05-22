@@ -9,7 +9,7 @@
 > Contract Map の CatalogueDocument / CatalogueLoader / ContractMapRenderer / ContractMapWriter と symmetric な設計。domain → infrastructure 依存なし (hexagonal 分離)。
 > syn 依存は追加しない (rustdoc が Type を構造化済み)。
 
-- [x] **T001**: domain layer: BaselineDocument wrapper struct + 3 secondary port (BaselineGraphLoader / BaselineGraphRenderer / BaselineGraphWriter) + 3 error type (BaselineGraphLoaderError / BaselineGraphRendererError / BaselineGraphWriterError) を libs/domain に新設する。各 port は Send + Sync bound を持つ。error type は Display / Error / Debug を impl する (IN-01, IN-02, IN-19, AC-01, AC-02)
+- [x] **T001**: domain layer: BaselineDocument wrapper struct + 3 secondary port (BaselineGraphLoader / BaselineGraphRenderer / BaselineGraphWriter) + 3 error type (BaselineGraphLoaderError / BaselineGraphRendererError / BaselineGraphWriterError) を libs/domain に新設する。各 port は Send + Sync bound を持つ。error type は Display / Error / Debug を impl する (IN-01, IN-02, IN-19, AC-01, AC-02) (`cf2caa3c2175bcc835b53f1e4f6e9696c642ee89`)
 
 ### S2 — Usecase layer: interactor + Command / Error (3-port compose)
 
@@ -18,7 +18,7 @@
 > load → render → write の 3 段パイプラインを hexagonal purity (CN-03) に従って usecase 内に実装する。
 > Command の identity 系フィールド (track_id / layer_filter) は validated domain value object (TrackId / LayerId) で型付けする (CN-12)。
 
-- [ ] **T002**: usecase layer: RenderBaselineGraph primary port + RenderBaselineGraphInteractor<L,R,W> (L: BaselineGraphLoader, R: BaselineGraphRenderer, W: BaselineGraphWriter の 3 generic compose) + RenderBaselineGraphCommand / RenderBaselineGraphOutput / RenderBaselineGraphError を libs/usecase に新設する。interactor は load → render → write の 3 段パイプラインを compose する (IN-02, IN-19, AC-02, CN-12)
+- [~] **T002**: usecase layer: RenderBaselineGraph primary port + RenderBaselineGraphInteractor<L,R,W> (L: BaselineGraphLoader, R: BaselineGraphRenderer, W: BaselineGraphWriter の 3 generic compose) + RenderBaselineGraphCommand / RenderBaselineGraphOutput / RenderBaselineGraphError を libs/usecase に新設する。interactor は load → render → write の 3 段パイプラインを compose する (IN-02, IN-19, AC-02, CN-12)
 
 ### S3 — Sibling modify: RenderContractMapCommand / Error の型厳格化
 
@@ -30,7 +30,7 @@
 
 ### S4 — Infrastructure layer: 3 adapter 新設
 
-> T004: BaselineGraphRendererAdapter — .harness/config/baseline-graph-style.toml 読み込み (fail-closed) + BaselineGraphRenderer port impl。render_overview / render_cluster の骨格を実装する。
+> T004: BaselineGraphRendererAdapter — .harness/config/baseline-graph-style.toml 読み込み (fail-closed) + BaselineGraphRenderer port impl。render_overview / render_clusters の骨格を実装する。
 > T013: BaselineGraphLoaderAdapter — architecture-rules.json で tddd.enabled layers を列挙、各 layer の rustdoc JSON をロード。symlink 拒否 (trusted_root 外)。Symmetric to FsCatalogueLoader。
 > T014: BaselineGraphWriterAdapter — atomic write で depth 1 / depth 2 ファイルを書き出す。symlink 拒否。Symmetric to FsContractMapWriter。
 > 3 adapter は責務が明確に独立しているため独立 task に分割する (各 200〜400 行の目安)。
@@ -78,11 +78,11 @@
 
 ### S9 — Adapter: depth 2 cluster detail renderer (U-r3)
 
-> render_cluster を完成させる。ファイル名は <crate_name>_<module_seg1>.md 形式。
+> render_clusters を完成させる。各 cluster の識別キー (cluster_key) と描画コンテンツのペアを Vec<ClusterRender> で返す。ファイル名規則: cluster_key をそのまま stem として使用: top-level module cluster は <crate_name>_<module_seg1>.md、crate root cluster は <crate_name>_root.md (cluster_key がそのままファイル名 stem になる)。
 > mermaid 出力構造: (1) classDef 定義群 (2) layer subgraph > top-module subgraph > entry subgraph 群 (alphabetical) > method/variant node (Vec 順) + FunctionEntry callable node 群 (alphabetical) (3) edge 定義群 (cluster 内 edge のみ) (4) class attach 群。
 > sub-module path を entry subgraph label に含める (例: team::manager::TeamManager)。cross-cluster edge は深さ 1 に集約済みのため描画しない。
 
-- [ ] **T010**: adapter 内: depth 2 cluster detail renderer — top-module subgraph + entry subgraph + method/variant node + FunctionEntry callable node + cluster 内 edge + mermaid 出力構造 + ファイル名規則 (<crate_name>_<module_seg1>.md) を実装し render_cluster を完成させる (IN-15, IN-16, AC-14, CN-07, CN-08)
+- [ ] **T010**: adapter 内: depth 2 cluster detail renderer — top-module subgraph + entry subgraph + method/variant node + FunctionEntry callable node + cluster 内 edge + mermaid 出力構造 + ファイル名規則 (cluster_key をそのまま stem として使用: <crate_name>_<module_seg1>.md または <crate_name>_root.md) を実装し render_clusters を完成させる (IN-15, IN-16, AC-14, CN-07, CN-08)
 
 ### S10 — CLI 統合
 

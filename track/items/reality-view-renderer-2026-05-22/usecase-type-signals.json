@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-22T12:03:31Z",
-  "declaration_hash": "e483dd0634017b739beaa3ce8791572934a44f6ec57231f9692e77059a4a9023",
+  "generated_at": "2026-05-22T14:00:54Z",
+  "declaration_hash": "2c597a25170e0e72452880eccbf8efb46777544782c29a51432d02b953b9b310",
   "signals": [
     {
       "type_name": "RenderBaselineGraph",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RenderBaselineGraphCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -24,9 +24,9 @@
     {
       "type_name": "RenderBaselineGraphError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<BaselineGraphLoaderError>",
         "core::convert::From<BaselineGraphRendererError>",
         "core::convert::From<BaselineGraphWriterError>",
@@ -38,18 +38,18 @@
     {
       "type_name": "RenderBaselineGraphInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "RenderBaselineGraph"
       ]
     },
     {
       "type_name": "RenderBaselineGraphOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -59,7 +59,7 @@
     {
       "type_name": "RenderContractMapCommand",
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -71,7 +71,7 @@
     {
       "type_name": "RenderContractMapError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::convert::From<CatalogueLoaderError>",

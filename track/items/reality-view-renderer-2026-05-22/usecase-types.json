@@ -132,7 +132,7 @@
       },
       "methods": [],
       "module_path": "baseline_graph_workflow",
-      "docs": "Default RenderBaselineGraph implementation. Composes three secondary ports: L (BaselineGraphLoader — loads rustdoc JSON per layer), R (BaselineGraphRenderer — renders depth-1 overview and depth-2 cluster files), W (BaselineGraphWriter — persists generated markdown). Symmetric to RenderContractMapInteractor (Decision E / IN-02 / IN-19 / AC-02). No direct infrastructure calls per hexagonal purity (CN-03).",
+      "docs": "Default RenderBaselineGraph implementation. Composes three secondary ports: L (BaselineGraphLoader — loads rustdoc JSON per layer), R (BaselineGraphRenderer — renders depth-1 overview via render_overview and all depth-2 cluster files via render_clusters; cluster enumeration is the renderer's responsibility), W (BaselineGraphWriter — persists generated markdown). The interactor calls render_overview then writer.write_overview for depth-1, then calls render_clusters and passes each ClusterRender.cluster_key + ClusterRender.content to writer.write_cluster for depth-2 — no krate.paths parsing in the interactor. Symmetric to RenderContractMapInteractor (Decision E / IN-02 / IN-19 / AC-02). No direct infrastructure calls per hexagonal purity (CN-03).",
       "spec_refs": [
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
@@ -142,7 +142,7 @@
         {
           "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
           "anchor": "IN-19",
-          "hash": "123274db7320b5a5e7aff87f83a7af3d9cb10c6de478c90c7a5c90e13b100c74"
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
         }
       ],
       "informal_grounds": []
