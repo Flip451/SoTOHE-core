@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (0/14 resolved)
+## Tasks (1/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -9,7 +9,7 @@
 > Contract Map の CatalogueDocument / CatalogueLoader / ContractMapRenderer / ContractMapWriter と symmetric な設計。domain → infrastructure 依存なし (hexagonal 分離)。
 > syn 依存は追加しない (rustdoc が Type を構造化済み)。
 
-- [ ] **T001**: domain layer: BaselineDocument wrapper struct + 3 secondary port (BaselineGraphLoader / BaselineGraphRenderer / BaselineGraphWriter) + 3 error type (BaselineGraphLoaderError / BaselineGraphRendererError / BaselineGraphWriterError) を libs/domain に新設する。各 port は Send + Sync bound を持つ。error type は Display / Error / Debug を impl する (IN-01, IN-02, IN-19, AC-01, AC-02)
+- [x] **T001**: domain layer: BaselineDocument wrapper struct + 3 secondary port (BaselineGraphLoader / BaselineGraphRenderer / BaselineGraphWriter) + 3 error type (BaselineGraphLoaderError / BaselineGraphRendererError / BaselineGraphWriterError) を libs/domain に新設する。各 port は Send + Sync bound を持つ。error type は Display / Error / Debug を impl する (IN-01, IN-02, IN-19, AC-01, AC-02)
 
 ### S2 — Usecase layer: interactor + Command / Error (3-port compose)
 
