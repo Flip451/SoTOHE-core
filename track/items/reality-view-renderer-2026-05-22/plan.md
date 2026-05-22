@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (4/14 resolved)
+## Tasks (5/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -45,8 +45,8 @@
 > T006: node_id 生成スキーム (D decision: T/R/F prefix + length-prefix + sanitized_module_path) を実装する。同一 crate 内の同名 Type / Trait 衝突を防ぐ。
 > これら 2 タスクは密結合のため同じセクションに配置するが、各実装範囲が 500 行以内に収まるよう分割する。
 
-- [~] **T005**: adapter 内: node 抽出ロジック (B-r1: 5 種固定 Struct / Enum / TypeAlias / Trait / Function) + visibility filter (CC-1: Public only / Default 例外) + Function 列挙範囲 (I decision) を実装する (IN-03, IN-17, IN-18, AC-03, AC-12)
-- [ ] **T006**: adapter 内: node_id 生成スキーム (D decision: T/R/F prefix + length-prefix + sanitized_module_path) を実装し、同一 crate 内の同名 Type / Trait の衝突を防ぐ (IN-05, AC-11)
+- [x] **T005**: adapter 内: node 抽出ロジック (B-r1: 5 種固定 Struct / Enum / TypeAlias / Trait / Function) + visibility filter (CC-1: Public only / Default 例外) + Function 列挙範囲 (I decision) を実装する (IN-03, IN-17, IN-18, AC-03, AC-12) (`6ab06b3f218d4c479813383835e8c4ecef30ea5d`)
+- [~] **T006**: adapter 内: node_id 生成スキーム (D decision: T/R/F prefix + length-prefix + sanitized_module_path) を実装し、同一 crate 内の同名 Type / Trait の衝突を防ぐ (IN-05, AC-11)
 
 ### S6 — Adapter: entry subgraph + edge (F / H / H' / K / N decisions)
 

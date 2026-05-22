@@ -28,12 +28,13 @@
     {
       "id": "T005",
       "description": "adapter 内: node 抽出ロジック (B-r1: 5 種固定 Struct / Enum / TypeAlias / Trait / Function) + visibility filter (CC-1: Public only / Default 例外) + Function 列挙範囲 (I decision) を実装する (IN-03, IN-17, IN-18, AC-03, AC-12)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "6ab06b3f218d4c479813383835e8c4ecef30ea5d"
     },
     {
       "id": "T006",
       "description": "adapter 内: node_id 生成スキーム (D decision: T/R/F prefix + length-prefix + sanitized_module_path) を実装し、同一 crate 内の同名 Type / Trait の衝突を防ぐ (IN-05, AC-11)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T007",

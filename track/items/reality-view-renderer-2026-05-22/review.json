@@ -60,70 +60,157 @@
           "findings": [],
           "hash": "rvw1:sha256:9adb63dc9589dc2be337a8f69b05dfe9ea936fda56bbd94199bcb0b78e97410c",
           "at": "2026-05-22T14:57:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`module_path_from_summary` collapses every middle path segment into a single `_`-joined string, so distinct Rust module paths can still map to the same node id. For example, `foo_bar::Thing` and `foo::bar::Thing` both become `foo_bar`, which means same-named types/traits in different modules can still collide and violate AC-11. This is a correctness bug, not just a rare edge case, because underscores are valid in Rust identifiers.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "line": 179,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ddb4052e8e086a36b89b8ecf4b9037db5c9c450253c58c2d32fc232c37a9347b",
+          "at": "2026-05-22T15:10:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`module_path_from_summary` is still not injective: joining middle path segments with `__` only blocks the simple `foo_bar` vs `foo::bar` case. Valid paths such as `crate::foo_::bar::Thing` and `crate::foo::_bar::Thing` both collapse to `foo___bar`, so same-named types/traits in different modules can still share a node id and violate AC-11.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "line": 192,
+              "category": "correctness"
+            },
+            {
+              "message": "`type_rep_node_id` / `trait_rep_node_id` append `__self` without reserving that suffix. A real item named `Foo__self` produces the same id as the representative node for `Foo`, so an actual type/trait can collide with its edge-endpoint helper node.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "line": 108,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:eae72375cf56dc7fbac97859ba435a08668148d70e2cde8037f0dfa9ae64380c",
+          "at": "2026-05-22T15:16:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_node_id` sanitizes the entire `full_path` as one string, which drops path-boundary information and can produce identical ids for different functions when module or item names contain underscores. For example, `crate::a::b__c::f` and `crate::a__b::c::f` both sanitize to `crate__a__b__c__f`, so the final `F<len>_...` ids collide even though the paths are distinct. This breaks the intended injective node-id scheme and can merge unrelated function nodes/edges.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "line": 149,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f559398fa7c5382042b429c5554a483417d4e3f7bb4383c9f6beaa01f2653575",
+          "at": "2026-05-22T15:23:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`module_path_from_summary` does not return the `sanitized_module_path` format required by the ADR/spec. It length-encodes each middle segment (`6__review__7__manager`), but the contract says the module path should just be the middle segments joined with `_` after sanitization (`review_manager`). As written, every type/trait id built from this helper will diverge from the documented `T<len>_...` / `R<len>_...` format.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "line": 193,
+              "category": "correctness"
+            },
+            {
+              "message": "`function_node_id` is also using a per-segment length encoding (`encode_path_segments`) instead of the spec's `sanitized_full_path` string. The ADR defines `F<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_full_path>`, so this implementation will generate ids that do not match the documented format for any function path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "line": 153,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c7c729cc62a7cc15736b52a284fc70e87f11d26649e1fb3915f38aee15f1f4e6",
+          "at": "2026-05-22T15:28:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`function_node_id` (and the shared `type_trait_body` path used by `type_node_id` / `trait_node_id`) joins sanitized segments with raw `_` separators. Because `LayerId` and `CrateName` both allow `_`, distinct inputs can still collapse to the same node ID before the length prefix. Example: `type_node_id(\"a_b\", \"c\", \"\", \"d\") == type_node_id(\"a\", \"b_c\", \"\", \"d\")`. That breaks the collision-free guarantee and can merge unrelated nodes/edges.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "line": 150,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:58a523bdf98435ee3b8a950438508177b2fe116c74e06e51de7ae5f922835e14",
+          "at": "2026-05-22T15:34:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58a523bdf98435ee3b8a950438508177b2fe116c74e06e51de7ae5f922835e14",
+          "at": "2026-05-22T15:37:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58a523bdf98435ee3b8a950438508177b2fe116c74e06e51de7ae5f922835e14",
+          "at": "2026-05-22T15:39:09Z"
         }
       ]
     },
-    "domain": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
-          "at": "2026-05-22T11:46:33Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 161,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
+          "at": "2026-05-22T12:27:37Z"
         },
         {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
-          "at": "2026-05-22T11:51:55Z"
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 44,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
+          "at": "2026-05-22T12:31:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
-          "at": "2026-05-22T13:29:14Z"
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:34:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
-          "at": "2026-05-22T13:30:19Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:43:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:45:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:18:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:20:06Z"
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:35:36Z"
         }
       ]
     },
@@ -689,6 +776,52 @@
           "findings": [],
           "hash": "rvw1:sha256:853c8c2a336b0258deca9711d331b0a1c59e5e9c2837819596f1e2cbfe7362ac",
           "at": "2026-05-22T14:45:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94876f7b6076a36c7c162eabd6999905e9cf6babc234c5a906f2436a25e6a740",
+          "at": "2026-05-22T15:08:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94876f7b6076a36c7c162eabd6999905e9cf6babc234c5a906f2436a25e6a740",
+          "at": "2026-05-22T15:09:12Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:45:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:20:06Z"
         }
       ]
     },
@@ -791,51 +924,35 @@
         }
       ]
     },
-    "cli": {
+    "domain": {
       "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 161,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
-          "at": "2026-05-22T12:27:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 44,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
-          "at": "2026-05-22T12:31:48Z"
-        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:34:28Z"
+          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
+          "at": "2026-05-22T11:46:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:35:36Z"
+          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
+          "at": "2026-05-22T11:51:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
+          "at": "2026-05-22T13:29:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
+          "at": "2026-05-22T13:30:19Z"
         }
       ]
     }

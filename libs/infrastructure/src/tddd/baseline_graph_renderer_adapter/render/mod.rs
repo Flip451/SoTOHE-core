@@ -12,8 +12,13 @@
 //! [`node_extractor::extract_nodes`] which extracts the 5 B-r1 node kinds (Decision B-r1)
 //! from `rustdoc_types::Crate` index entries, applying the visibility filter (Decision CC-1)
 //! and the standalone-Function listing range (Decision I).
+//!
+//! **Scope (T006)**: node_id generation — [`node_id_generator`] submodule implements
+//! Decision D (T/R/F prefix + length-prefix + sanitized_module_path) to avoid collisions
+//! between same-named types in different modules (IN-05 / AC-11).
 
 pub(super) mod node_extractor;
+pub(super) mod node_id_generator;
 
 use std::collections::BTreeMap;
 
