@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (12/14 resolved)
+## Tasks (13/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -90,7 +90,7 @@
 > BaselineGraphLoaderAdapter (T013) / BaselineGraphRendererAdapter (T004) / BaselineGraphWriterAdapter (T014) を composition root で compose し、RenderBaselineGraphInteractor<L,R,W> に inject する。
 > depth 1 <layer>-graph-d1/index.md と depth 2 <layer>-graph-d2/<cluster>.md を書き出す。
 
-- [~] **T011**: CLI 統合: sotp track baseline-graph サブコマンドを追加し RenderBaselineGraphInteractor を呼び出す。BaselineGraphLoaderAdapter (T013) / BaselineGraphRendererAdapter (T004) / BaselineGraphWriterAdapter (T014) を composition root で compose し RenderBaselineGraphInteractor<L,R,W> に inject する。depth 1 index.md + depth 2 cluster files を書き出す (IN-02, IN-19, AC-02, AC-18)
+- [x] **T011**: CLI 統合: sotp track baseline-graph サブコマンドを追加し RenderBaselineGraphInteractor を呼び出す。BaselineGraphLoaderAdapter (T013) / BaselineGraphRendererAdapter (T004) / BaselineGraphWriterAdapter (T014) を composition root で compose し RenderBaselineGraphInteractor<L,R,W> に inject する。depth 1 index.md + depth 2 cluster files を書き出す (IN-02, IN-19, AC-02, AC-18) (`3936c45df2e12c4c0037a15e645f16c864b42936`)
 
 ### S11 — layer-agnostic unit tests + CI gate
 
@@ -98,4 +98,4 @@
 > subgraph label に層名がハードコードされていないことを unit test で検証する (AC-16)。
 > cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-18)。
 
-- [ ] **T012**: layer-agnostic unit tests: 2 層構成 / 3 層構成 / 独自層名構成の rustdoc JSON fixture で renderer が正常動作することを確認し、subgraph label に層名がハードコードされていないことを検証する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-16, AC-18, CN-01, CN-03, CN-09)
+- [~] **T012**: layer-agnostic unit tests: 2 層構成 / 3 層構成 / 独自層名構成の rustdoc JSON fixture で renderer が正常動作することを確認し、subgraph label に層名がハードコードされていないことを検証する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-16, AC-18, CN-01, CN-03, CN-09)

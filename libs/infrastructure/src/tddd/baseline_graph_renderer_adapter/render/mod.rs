@@ -1934,4 +1934,279 @@ include_functions = true
             "no cross-cluster edges expected with single cluster; mermaid body:\n{mermaid_body}"
         );
     }
+
+    // -----------------------------------------------------------------------
+    // T012: layer-agnostic unit tests (AC-16 / CN-01 / CN-03 / CN-09)
+    //
+    // These tests verify that the renderer (BaselineGraphRendererAdapter) works
+    // correctly with 2-layer, 3-layer, and custom-layer-name configurations,
+    // and that subgraph labels / node ids do NOT hard-code layer names.
+    // -----------------------------------------------------------------------
+
+    // T012 helper: create a baseline with one public struct in a module.
+    // `layer_str` and `crate_str` are kept independent to support multi-layer setups
+    // where the layer name differs from the crate name.
+    fn make_baseline_with_struct(
+        layer_str: &str,
+        crate_str: &str,
+        module_seg1: Option<&str>,
+        struct_name: &str,
+    ) -> BaselineDocument {
+        let krate = make_crate_with_struct(crate_str, module_seg1, struct_name);
+        BaselineDocument::new(
+            LayerId::try_new(layer_str).unwrap(),
+            CrateName::new(crate_str).unwrap(),
+            krate,
+        )
+    }
+
+    // T012: 2-layer configuration — renderer produces separate, correct output for each layer.
+    //
+    // AC-16: renderer operates correctly with 2-layer fixture (domain + usecase).
+    // CN-01: layer name must not be hardcoded — both layers must produce valid output
+    //        with their own layer name in the subgraph, not each other's name.
+    #[test]
+    fn test_render_overview_two_layer_configuration_each_layer_produces_correct_output() {
+        let style = minimal_style();
+        let baselines = [
+            make_baseline_with_struct("domain", "domain", Some("review"), "Review"),
+            make_baseline_with_struct("usecase", "usecase", Some("commands"), "CreateReview"),
+        ];
+
+        for layer_str in ["domain", "usecase"] {
+            let layer = LayerId::try_new(layer_str).unwrap();
+            let output = render_overview_mermaid(&baselines, &layer, &style).unwrap();
+            assert!(
+                output.contains(layer_str),
+                "2-layer: output for layer '{layer_str}' must contain its own name; got:\n{output}"
+            );
+            // The other layer's name must not appear as a subgraph label.
+            let other = if layer_str == "domain" { "usecase" } else { "domain" };
+            assert!(
+                !output.contains(&format!("subgraph {other}")),
+                "2-layer: output for '{layer_str}' must not contain other layer's subgraph '{other}'; got:\n{output}"
+            );
+        }
+    }
+
+    // T012: 3-layer configuration — renderer operates correctly for all three layers.
+    //
+    // AC-16: renderer operates correctly with 3-layer fixture.
+    // CN-01: each layer produces its own output without hardcoded foreign layer names.
+    #[test]
+    fn test_render_overview_three_layer_configuration_each_layer_independent() {
+        let style = minimal_style();
+        let layers = ["domain", "usecase", "infrastructure"];
+        let baselines: Vec<BaselineDocument> = layers
+            .iter()
+            .map(|&l| make_baseline_with_struct(l, l, Some("types"), "MyType"))
+            .collect();
+
+        for &layer_str in &layers {
+            let layer = LayerId::try_new(layer_str).unwrap();
+            let output = render_overview_mermaid(&baselines, &layer, &style).unwrap();
+            // Own layer name must appear.
+            assert!(
+                output.contains(layer_str),
+                "3-layer: output for '{layer_str}' must contain its own name"
+            );
+            // Other layer names must NOT appear as subgraph labels.
+            for &other in &layers {
+                if other != layer_str {
+                    assert!(
+                        !output.contains(&format!("subgraph {other}")),
+                        "3-layer: layer '{layer_str}' output must not contain subgraph '{other}'"
+                    );
+                }
+            }
+        }
+    }
+
+    // T012: custom (non-standard) layer names — renderer is layer-agnostic (CN-01).
+    //
+    // AC-16: confirms that non-domain/usecase/infrastructure layer names work correctly.
+    // CN-01: renderer must not hardcode standard layer names; it must handle arbitrary LayerId values.
+    #[test]
+    fn test_render_overview_custom_layer_names_not_hardcoded() {
+        let style = minimal_style();
+        let custom_layers = ["alpha", "beta", "gamma"];
+        let baselines: Vec<BaselineDocument> = custom_layers
+            .iter()
+            .map(|&l| make_baseline_with_struct(l, l, Some("module_a"), "TypeA"))
+            .collect();
+
+        for &layer_str in &custom_layers {
+            let layer = LayerId::try_new(layer_str).unwrap();
+            let output = render_overview_mermaid(&baselines, &layer, &style).unwrap();
+            // Custom layer name must appear in subgraph label.
+            assert!(
+                output.contains(&format!("subgraph {layer_str}")),
+                "custom layer '{layer_str}' must appear as subgraph; output:\n{output}"
+            );
+            // Standard layer names must NOT appear (layer-agnostic guarantee).
+            for standard_name in ["domain", "usecase", "infrastructure"] {
+                assert!(
+                    !output.contains(&format!("subgraph {standard_name}")),
+                    "custom layer '{layer_str}' output must not hardcode standard name '{standard_name}'"
+                );
+            }
+        }
+    }
+
+    // T012: subgraph label does not hardcode layer names — render_clusters_mermaid (CN-01).
+    //
+    // The depth-2 cluster detail must use the actual layer name passed in, not a hardcoded string.
+    // This is the counterpart of the depth-1 overview assertion above, for render_clusters_mermaid.
+    #[test]
+    fn test_render_clusters_custom_layer_name_appears_in_subgraph_not_hardcoded() {
+        let style = minimal_style();
+        let layer = LayerId::try_new("my_layer").unwrap();
+        let baseline = make_baseline_with_struct("my_layer", "my_crate", None, "MyStruct");
+        let clusters = render_clusters_mermaid(&[baseline], &layer, &style).unwrap();
+        assert!(!clusters.is_empty(), "baseline with struct must produce at least one cluster");
+        let content = &clusters[0].1;
+        // The custom layer name must appear as the actual subgraph header label.
+        // Use the exact header form `subgraph my_layer["my_layer"]` to distinguish the
+        // subgraph label from entry node ids that also contain the layer name (CN-01).
+        assert!(
+            content.contains(r#"subgraph my_layer["my_layer"]"#),
+            "depth-2 cluster must contain layer subgraph header 'subgraph my_layer[\"my_layer\"]'; content:\n{content}"
+        );
+        // Standard layer names must not appear as subgraph labels (layer-agnostic guarantee).
+        for standard_name in ["domain", "usecase", "infrastructure"] {
+            assert!(
+                !content.contains(&format!("subgraph {standard_name}")),
+                "depth-2 content must not hardcode standard name '{standard_name}'; content:\n{content}"
+            );
+        }
+    }
+
+    // T012: 2-layer render_clusters — each layer produces its own cluster files (CN-01 / AC-16).
+    //
+    // When baselines from two layers are provided, render_clusters for layer A must only produce
+    // clusters from layer A's baselines (layer filter guarantee, symmetric to depth-1 overview).
+    #[test]
+    fn test_render_clusters_two_layer_configuration_layer_filter_correct() {
+        let style = minimal_style();
+        let baselines = [
+            make_baseline_with_struct("domain", "domain", Some("review"), "Review"),
+            make_baseline_with_struct("usecase", "usecase", Some("commands"), "CreateReview"),
+        ];
+
+        // Domain layer clusters must only contain domain-layer entries.
+        let domain_layer = LayerId::try_new("domain").unwrap();
+        let domain_clusters = render_clusters_mermaid(&baselines, &domain_layer, &style).unwrap();
+        assert_eq!(
+            domain_clusters.len(),
+            1,
+            "domain layer must produce exactly 1 cluster for the 2-layer fixture; got {}",
+            domain_clusters.len()
+        );
+        for (key, content) in &domain_clusters {
+            assert!(
+                key.starts_with("domain"),
+                "domain layer cluster key must start with 'domain'; got: {key}"
+            );
+            assert!(
+                !content.contains("subgraph usecase"),
+                "domain cluster content must not include usecase subgraph; key={key}"
+            );
+        }
+
+        // Usecase layer clusters must only contain usecase-layer entries.
+        let usecase_layer = LayerId::try_new("usecase").unwrap();
+        let usecase_clusters = render_clusters_mermaid(&baselines, &usecase_layer, &style).unwrap();
+        assert_eq!(
+            usecase_clusters.len(),
+            1,
+            "usecase layer must produce exactly 1 cluster for the 2-layer fixture; got {}",
+            usecase_clusters.len()
+        );
+        for (key, content) in &usecase_clusters {
+            assert!(
+                key.starts_with("usecase"),
+                "usecase layer cluster key must start with 'usecase'; got: {key}"
+            );
+            assert!(
+                !content.contains("subgraph domain"),
+                "usecase cluster content must not include domain subgraph; key={key}"
+            );
+        }
+    }
+
+    // T012: 3-layer render_clusters — each layer has independent, non-overlapping cluster output.
+    //
+    // Verifies the isolation guarantee across 3 layers (AC-16 / CN-01).
+    #[test]
+    fn test_render_clusters_three_layer_configuration_all_layers_independent() {
+        let style = minimal_style();
+        let layer_strs = ["domain", "usecase", "infrastructure"];
+        let baselines: Vec<BaselineDocument> = layer_strs
+            .iter()
+            .map(|&l| make_baseline_with_struct(l, l, Some("module_x"), "TypeX"))
+            .collect();
+
+        for &layer_str in &layer_strs {
+            let layer = LayerId::try_new(layer_str).unwrap();
+            let clusters = render_clusters_mermaid(&baselines, &layer, &style).unwrap();
+            // Each layer must produce exactly 1 cluster (one baseline, one module).
+            assert_eq!(
+                clusters.len(),
+                1,
+                "3-layer: layer '{layer_str}' must produce exactly 1 cluster; got {}",
+                clusters.len()
+            );
+            let (key, content) = &clusters[0];
+            // Cluster key must belong to the current layer's crate.
+            assert!(
+                key.starts_with(layer_str),
+                "3-layer: cluster key for '{layer_str}' must start with layer name; got: {key}"
+            );
+            // Content must contain the current layer name in the subgraph.
+            assert!(
+                content.contains(layer_str),
+                "3-layer: cluster content for '{layer_str}' must contain its own name"
+            );
+            // Content must NOT contain other layer names as subgraph labels.
+            for &other in &layer_strs {
+                if other != layer_str {
+                    assert!(
+                        !content.contains(&format!("subgraph {other}")),
+                        "3-layer: cluster for '{layer_str}' must not contain subgraph '{other}'"
+                    );
+                }
+            }
+        }
+    }
+
+    // T012: subgraph label non-hardcode property — layer name is dynamic, not compiled-in.
+    //
+    // Runs the same renderer with many different layer names (all arbitrary) and asserts
+    // that (a) each layer name appears in its own output, and (b) none of the other layer
+    // names appear in the output. This is the exhaustive form of the CN-01 guarantee.
+    #[test]
+    fn test_render_overview_layer_name_is_fully_dynamic_not_hardcoded() {
+        let style = minimal_style();
+        // Arbitrary layer names that are not the conventional architecture names.
+        let layer_names = ["apple", "banana", "cherry", "date"];
+        let baselines: Vec<BaselineDocument> =
+            layer_names.iter().map(|&l| make_baseline_with_struct(l, l, None, "Fruit")).collect();
+
+        for &layer_str in &layer_names {
+            let layer = LayerId::try_new(layer_str).unwrap();
+            let output = render_overview_mermaid(&baselines, &layer, &style).unwrap();
+
+            // Must contain its own layer name.
+            assert!(output.contains(layer_str), "layer name '{layer_str}' must appear in output");
+            // Must NOT contain any other layer name's subgraph label.
+            for &other in &layer_names {
+                if other != layer_str {
+                    assert!(
+                        !output.contains(&format!("subgraph {other}")),
+                        "output for '{layer_str}' must not contain subgraph '{other}'"
+                    );
+                }
+            }
+        }
+    }
 }

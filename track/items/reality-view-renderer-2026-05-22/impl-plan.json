@@ -64,12 +64,13 @@
     {
       "id": "T011",
       "description": "CLI 統合: sotp track baseline-graph サブコマンドを追加し RenderBaselineGraphInteractor を呼び出す。BaselineGraphLoaderAdapter (T013) / BaselineGraphRendererAdapter (T004) / BaselineGraphWriterAdapter (T014) を composition root で compose し RenderBaselineGraphInteractor<L,R,W> に inject する。depth 1 index.md + depth 2 cluster files を書き出す (IN-02, IN-19, AC-02, AC-18)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3936c45df2e12c4c0037a15e645f16c864b42936"
     },
     {
       "id": "T012",
       "description": "layer-agnostic unit tests: 2 層構成 / 3 層構成 / 独自層名構成の rustdoc JSON fixture で renderer が正常動作することを確認し、subgraph label に層名がハードコードされていないことを検証する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-16, AC-18, CN-01, CN-03, CN-09)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T013",
