@@ -1,6 +1,38 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:45:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:20:06Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -414,38 +446,420 @@
           "findings": [],
           "hash": "rvw1:sha256:5c057c2d500d22e042a876f70672fd71fc6346cdf6aefe19e4a3574d30f72f74",
           "at": "2026-05-22T17:27:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_overview_mermaid` now calls the full depth-2 `emit_all_entries_for_layer` just to harvest edge lines. That makes the overview fail on any baseline that needs a depth-2-only style key (for example `[edge.field]`, `[edge.alias]`, or method/blanket node styles) even though those lines are discarded and never appear in the overview. The overview should only depend on styles for the cross-cluster output it actually renders.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 477,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b4947f6caa3ecf4cac980d611eb8e9cd5101ebf6be726978fbd52141a671c291",
+          "at": "2026-05-22T17:45:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The overview renderer hardcodes `:::cluster` on every cluster node even though it reads the configured cluster class from `style.node[\"Cluster\"].class`. That means cluster styling is not fully config-driven: a user-defined `classDef cluster` will be applied unintentionally, and a non-`cluster` class name is only partially honored.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 556,
+              "category": "spec_divergence"
+            }
+          ],
+          "hash": "rvw1:sha256:f03a620fa80fc602ebea836fdda4bf906db51ee645bef0075e70ff56068be64c",
+          "at": "2026-05-22T17:51:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClusterKey::node_id()` is not injective: it concatenates two already-valid identifiers with `_`, so distinct clusters can collapse to the same Mermaid node id when the crate name or top-level module contains underscores. The `\"root\"` sentinel in `cluster_key_from_path()` makes the ambiguity worse by merging a real top-level `root` module with crate-root items. That can silently merge separate clusters and misroute cross-cluster edges.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 257,
+              "category": "correctness"
+            },
+            {
+              "message": "The `emit_all_entries_for_layer()` result is discarded and the scratch edge buffer is still consumed afterward. If edge-style resolution fails partway through rendering, the overview can emit a partial, misleading cross-cluster edge set instead of propagating the error or suppressing the harvest entirely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 486,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:e87891c498785d189db2ff718e94e9335ceb2eec08160241cb9b04eae04a9c83",
+          "at": "2026-05-22T17:56:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClusterKey::node_id()` is not injective: it just sanitizes and concatenates `crate_name` and `module_seg1`, so distinct raw cluster keys can alias after sanitization (for example `a-b` + `c` vs `a` + `b_c`). `cluster_key_from_path()` also uses the literal `root` sentinel, so a real top-level module named `root` collapses into the crate-root cluster. That can merge unrelated clusters and misclassify edges.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 256,
+              "category": "correctness"
+            },
+            {
+              "message": "`render_overview_mermaid()` suppresses any error from `emit_all_entries_for_layer()` and clears `all_edge_lines`. If a required edge style is missing or another render failure occurs, the function still returns `Ok(...)` with cross-cluster edges silently omitted instead of failing closed, which hides configuration problems and contradicts the stated error contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 489,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:14de8d810f020e0ef5246563e1da2356032a3b6960897fac7c02672f2a7f06a7",
+          "at": "2026-05-22T18:01:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The overview renderer still emits inline `:::<class>` annotations for cluster nodes (`{cluster_node_id}[\"{label}\"]:::{cluster_class}`) even though the T009 brief requires class application to be emitted only as separate `class <id> <className>` lines. That violates the mandated output structure and reintroduces the Mermaid parsing risk this step was meant to eliminate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 578,
+              "category": "spec deviation"
+            }
+          ],
+          "hash": "rvw1:sha256:5f026d0443d212c3ecfb2116e84c4a95f82b0cdb97c318ff7bf6674a8ebffc84",
+          "at": "2026-05-22T18:08:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The overview reducer discards the original edge syntax and label when it collapses cross-cluster relations: every surviving relation is re-emitted as `-->` after deduping by `(src_cluster, dst_cluster)`. That turns explicit non-directional/typed edges such as `---|alias_of|` into plain directed arrows and can collapse different relation kinds between the same cluster pair into one arbitrary edge, so the depth-1 diagram no longer faithfully reflects the underlying graph.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 503,
+              "category": "spec"
+            }
+          ],
+          "hash": "rvw1:sha256:5ba37f771e80d6a4487b742822ae76c580a2c10613745e0fc57bae31bd34a5ff",
+          "at": "2026-05-22T18:16:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`lookup_cluster` uses a raw string prefix match (`starts_with(\"{key}_\")`) to classify edge endpoints. That can misattribute non-entry node ids such as `anon_*`, `prim_*`, or `generic_*` when their text happens to share a cluster prefix, which then produces incorrect cluster-pair aggregation or drops real cross-cluster edges.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 405,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fd6fe26d92ebaaea362939bda922afd12ce88cba572ef814509ed280347c42da",
+          "at": "2026-05-22T18:22:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cluster nodes are emitted with a hard-coded rectangular shape (`[{label}]`) here, so any configured `[node.Cluster].shape` is silently ignored. That breaks the documented node-style API and makes the overview renderer inconsistent with the other node kinds, which do honor `shape`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 575,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:668d959bae26e9ab6d0ec866c71ee5c922091c4d8f25a1cdd58a78a4a341419c",
+          "at": "2026-05-22T18:28:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClusterKey::node_id()` builds Mermaid ids by simply concatenating sanitized `crate_name` and `module_seg1`, so distinct valid clusters can collide after sanitization (for example `foo` + `bar_baz` and `foo_bar` + `baz` both become `foo_bar_baz`). That would merge unrelated clusters and misattach edges/classes in the overview; the `",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 262,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d871f3dae33d9c5b120e39c4c62fb20b6bccccaf9270293919fd6c75ba135f2d",
+          "at": "2026-05-22T18:33:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClusterKey::node_id()` is not injective for legal Rust names. Sanitizing each segment and joining them with `__` still collides when one side has leading/trailing underscores, so two distinct `(crate_name, module_seg1)` pairs can render to the same Mermaid node id and be merged into one cluster.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 263,
+              "category": "correctness"
+            },
+            {
+              "message": "`cluster_key_from_path()` uses the literal string `\"root\"` as a sentinel for crate-root items. That makes a real top-level module named `root` indistinguishable from crate-root entries, so different clusters collapse together and their cross-cluster edges are attributed to the wrong cluster.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 292,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7e9a4714baad5480b7c0b9bbe74bfabff3313e2368a56b67d0465f660c3056fa",
+          "at": "2026-05-22T18:41:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42cad531890815c402a86c54f14596911a7cd0f13bf7995f1103f20967f42631",
+          "at": "2026-05-22T18:49:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_overview_mermaid` calls the full depth-2 entry renderer before it knows which edges survive the overview reduction. That makes depth-1 overview rendering fail on depth-2-only style requirements, e.g. a same-cluster struct field with a style config missing `[edge.field]` returns `RenderFailed` even though the overview would discard that intra-cluster edge and emit no field styling. The overview path should classify cross-cluster relations without requiring styles for edges it will not output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 505,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:42cad531890815c402a86c54f14596911a7cd0f13bf7995f1103f20967f42631",
+          "at": "2026-05-22T18:51:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_entry_edge_pairs` does not preserve the full rendered dependency graph for the overview: it only harvests struct-field and type-alias targets, then explicitly skips enum variant payload edges and trait impl edges. Those edges are emitted by the depth-2 renderer, so any payload or impl dependency whose source and target are in different clusters disappears from the depth-1 cross-cluster aggregation, violating the T009 requirement to emit deduplicated cross-cluster connectivity.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 533,
+              "category": "spec"
+            },
+            {
+              "message": "Cross-crate field/alias dependencies are dropped before clustering. `resolve_type_node_id` only maps `ResolvedPath` targets when `summary.crate_id == 0`; external crate targets become `anon_*`, and `render_overview_mermaid` then skips them because they cannot be found in `node_cluster_map`. If another `BaselineDocument` in the layer contains that target crate, both cluster nodes are present but their cross-cluster edge is missing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 562,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e8c62f995d5060b1ede870fe2a1af32d68482adf0646d511b4f371f751bed8b8",
+          "at": "2026-05-22T18:59:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Trait impl edges to traits below nested modules are silently dropped. `build_trait_index` keys traits with a `::`-joined module path, but this overview lookup builds the `TraitKey` with `module_path_from_summary`, which joins middle path segments with `_`. For a trait at `crate::api::traits::MyTrait`, the index contains `api::traits` while the overview lookup asks for `api_traits`, so `trait_index.get(&key)` fails and the depth-1 cross-cluster edge is omitted. That violates the T009 requirement to aggregate cross-cluster trait-impl edges.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 667,
+              "category": "spec deviation"
+            }
+          ],
+          "hash": "rvw1:sha256:f4f3a9f008ee577feaae0b4cbd6503a612fe4cf3c2157db27da82a3d6b4fb902",
+          "at": "2026-05-22T19:07:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_entry_edge_pairs` drops trait impl edges when the `for_` type is from another baseline in the same layer. The resolver requires `krate.index.get(&p.id)` to succeed, but rustdoc external items are normally present in `paths`/`external_crates`, not the current crate's `index`. A valid cross-cluster impl such as a local trait implemented for a type from another workspace crate will be omitted from the depth-1 overview, violating the U-r3 requirement to aggregate cross-cluster edge groups. Resolve the type identity from `paths`/`external_crates` and let `node_cluster_map` decide whether it is in scope instead of requiring a current-crate index item.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 632,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8dfe4af47fa50eb7cc24ad9a260b699c7e9ea6fded8054739662d5a6749c8b9f",
+          "at": "2026-05-22T19:10:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The overview cluster node IDs are length-prefixed (`6udomain_review`) instead of the U-r3/briefing shape (`domain_review`, `domain_root`). The depth-1 Mermaid structure explicitly uses `<crate_name>_<module_seg1>` examples for cluster nodes, and the task briefing calls out crate-root clusters as `<crate_name>_root`; with this implementation every emitted cluster node, edge endpoint, and class attach line uses a different identifier, so consumers or tests expecting the documented overview IDs will not match the rendered graph.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 268,
+              "category": "spec"
+            }
+          ],
+          "hash": "rvw1:sha256:cece737f255c9d1e0b70875137e8b5b7928847f12a9f4e036272b021bdea6244",
+          "at": "2026-05-22T19:13:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1b2e4df975238fe373bcfad3d282a1474ecc6e77e8e0a394398fa5a921f1551",
+          "at": "2026-05-22T19:20:59Z"
         }
       ]
     },
-    "other": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:43:11Z"
+          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
+          "at": "2026-05-22T12:26:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` writes the overview immediately after rendering it, before rendering the layer's cluster files. If a later `render_cluster` call fails, the method returns `RendererFailed` after `index.md` has already been persisted, so the required load -> render -> write pipeline can leave partial baseline graph output behind.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 283,
+              "category": "correctness"
+            },
+            {
+              "message": "Depth-2 cluster generation is hard-coded to one root cluster per crate: `render_cluster` is always called with an empty module and the writer key is only the crate name. The spec/port contract is per `(crate, top-level module)` cluster with `<crate_name>_<module_seg1>.md`, so crates with top-level modules will miss cluster files and `written_file_count` will be too low.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 292,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
+          "at": "2026-05-22T12:28:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` writes each layer inside the same loop that renders later layers. If rendering succeeds for an earlier layer and then `render_overview` or `render_cluster` fails for a later layer, the method returns `RendererFailed` after already persisting the earlier files. That violates the intended load -> render -> write pipeline and the local guarantee that renderer errors cannot leave partial output; render all filtered layers into memory first, then perform writes only after every render succeeds.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 351,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:98a8be6778601335ec95f7373d6aafa5c23fdcfd02c8ebdf287c4fe9ef27c7c3",
+          "at": "2026-05-22T12:38:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The root-cluster key is emitted as just the crate name, so a writer following the port contract (`<cluster_key>.md`) will create `domain.md` for crate-root items. The track spec/ADR requires crate-root detail files to use `<crate_name>_root.md`; this will put root cluster output at the wrong path once the writer adapter is connected.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 345,
+              "category": "spec_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:e1d49ccfab8024fd3db380515e25489887df02d175ccc5549a345419d5bc20db",
+          "at": "2026-05-22T12:42:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:45:01Z"
+          "hash": "rvw1:sha256:22107f7b0faacadd13b3ec0d1f1f6a4e9ea8cde0db4a9a7570a9eb892b3305bb",
+          "at": "2026-05-22T12:44:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_filter` entries are copied verbatim into `resolved`, so duplicate `LayerId`s are rendered and written multiple times and `rendered_layer_count` is inflated. That makes the baseline-graph workflow behave differently from the contract-map workflow, where duplicates collapse via membership filtering. If repeated layers are meant to be harmless input, this needs deduping before the render/write loop.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 257,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:0ec821a856cbf624e91d3ee6291329023d3f80d1f5e6726bb8a278c74455a730",
+          "at": "2026-05-22T13:31:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:18:45Z"
+          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
+          "at": "2026-05-22T13:56:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:20:06Z"
+          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
+          "at": "2026-05-22T13:58:55Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 161,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
+          "at": "2026-05-22T12:27:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 44,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
+          "at": "2026-05-22T12:31:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:34:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:35:36Z"
         }
       ]
     },
@@ -1053,153 +1467,20 @@
           "findings": [],
           "hash": "rvw1:sha256:55d3d79b7bf1fa1af00d9798fb346afa81bf9a686344faceb86e058329ac1df2",
           "at": "2026-05-22T16:53:19Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 161,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
-          "at": "2026-05-22T12:27:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 44,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
-          "at": "2026-05-22T12:31:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:34:28Z"
+          "hash": "rvw1:sha256:0490dcedba0443a5a214a69f870b9093287ad7269b837f65fb8a5933793570bc",
+          "at": "2026-05-22T17:42:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:35:36Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
-          "at": "2026-05-22T12:26:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` writes the overview immediately after rendering it, before rendering the layer's cluster files. If a later `render_cluster` call fails, the method returns `RendererFailed` after `index.md` has already been persisted, so the required load -> render -> write pipeline can leave partial baseline graph output behind.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 283,
-              "category": "correctness"
-            },
-            {
-              "message": "Depth-2 cluster generation is hard-coded to one root cluster per crate: `render_cluster` is always called with an empty module and the writer key is only the crate name. The spec/port contract is per `(crate, top-level module)` cluster with `<crate_name>_<module_seg1>.md`, so crates with top-level modules will miss cluster files and `written_file_count` will be too low.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 292,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
-          "at": "2026-05-22T12:28:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` writes each layer inside the same loop that renders later layers. If rendering succeeds for an earlier layer and then `render_overview` or `render_cluster` fails for a later layer, the method returns `RendererFailed` after already persisting the earlier files. That violates the intended load -> render -> write pipeline and the local guarantee that renderer errors cannot leave partial output; render all filtered layers into memory first, then perform writes only after every render succeeds.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 351,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:98a8be6778601335ec95f7373d6aafa5c23fdcfd02c8ebdf287c4fe9ef27c7c3",
-          "at": "2026-05-22T12:38:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The root-cluster key is emitted as just the crate name, so a writer following the port contract (`<cluster_key>.md`) will create `domain.md` for crate-root items. The track spec/ADR requires crate-root detail files to use `<crate_name>_root.md`; this will put root cluster output at the wrong path once the writer adapter is connected.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 345,
-              "category": "spec_mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:e1d49ccfab8024fd3db380515e25489887df02d175ccc5549a345419d5bc20db",
-          "at": "2026-05-22T12:42:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22107f7b0faacadd13b3ec0d1f1f6a4e9ea8cde0db4a9a7570a9eb892b3305bb",
-          "at": "2026-05-22T12:44:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`layer_filter` entries are copied verbatim into `resolved`, so duplicate `LayerId`s are rendered and written multiple times and `rendered_layer_count` is inflated. That makes the baseline-graph workflow behave differently from the contract-map workflow, where duplicates collapse via membership filtering. If repeated layers are meant to be harmless input, this needs deduping before the render/write loop.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 257,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:0ec821a856cbf624e91d3ee6291329023d3f80d1f5e6726bb8a278c74455a730",
-          "at": "2026-05-22T13:31:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
-          "at": "2026-05-22T13:56:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
-          "at": "2026-05-22T13:58:55Z"
+          "hash": "rvw1:sha256:0490dcedba0443a5a214a69f870b9093287ad7269b837f65fb8a5933793570bc",
+          "at": "2026-05-22T17:43:03Z"
         }
       ]
     }

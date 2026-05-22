@@ -46,12 +46,13 @@
     {
       "id": "T008",
       "description": "adapter 内: cross-baseline global trait index 構築 (O-r1) + Impl Item 処理 (BB-4-fix1: inherent merge / trait impl edge / blanket 本体 / skip rules) + trait impl edge `-.impl.->` (J decision) を実装する (IN-09, IN-12, IN-13, AC-05, AC-08, AC-17, CN-04, CN-05, CN-10, CN-11)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "ebe68a25b054281ea3d6b1a124f8ad20c08bf2e7"
     },
     {
       "id": "T009",
       "description": "adapter 内: depth 1 overview renderer — cluster (crate_name × top-level module) 縮約 + cross-cluster edge 集約 + alphabetical ordering (U-r3) + mermaid 出力構造 (classDef / layer subgraph / cluster node / edge group / class attach) を実装し render_overview を完成させる (IN-14, IN-16, AC-13, CN-07, CN-08)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T010",

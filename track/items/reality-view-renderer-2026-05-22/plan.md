@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (7/14 resolved)
+## Tasks (8/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -65,7 +65,7 @@
 > trait impl edge `-.impl.->` (J decision)。workspace 外型は silent skip。
 > cross-baseline での rustdoc Id 比較禁止 (CN-05)。lookup 失敗は silent skip (CN-10)。
 
-- [~] **T008**: adapter 内: cross-baseline global trait index 構築 (O-r1) + Impl Item 処理 (BB-4-fix1: inherent merge / trait impl edge / blanket 本体 / skip rules) + trait impl edge `-.impl.->` (J decision) を実装する (IN-09, IN-12, IN-13, AC-05, AC-08, AC-17, CN-04, CN-05, CN-10, CN-11)
+- [x] **T008**: adapter 内: cross-baseline global trait index 構築 (O-r1) + Impl Item 処理 (BB-4-fix1: inherent merge / trait impl edge / blanket 本体 / skip rules) + trait impl edge `-.impl.->` (J decision) を実装する (IN-09, IN-12, IN-13, AC-05, AC-08, AC-17, CN-04, CN-05, CN-10, CN-11) (`ebe68a25b054281ea3d6b1a124f8ad20c08bf2e7`)
 
 ### S8 — Adapter: depth 1 overview renderer (U-r3)
 
@@ -74,7 +74,7 @@
 > mermaid 出力構造: (1) classDef 定義群 (2) layer subgraph > cluster node 群 (alphabetical) (3) cross-cluster edge group (4) class attach 群。
 > subgraph への inline :::className は parse error のため class <id> <className> を別行で記述。
 
-- [ ] **T009**: adapter 内: depth 1 overview renderer — cluster (crate_name × top-level module) 縮約 + cross-cluster edge 集約 + alphabetical ordering (U-r3) + mermaid 出力構造 (classDef / layer subgraph / cluster node / edge group / class attach) を実装し render_overview を完成させる (IN-14, IN-16, AC-13, CN-07, CN-08)
+- [~] **T009**: adapter 内: depth 1 overview renderer — cluster (crate_name × top-level module) 縮約 + cross-cluster edge 集約 + alphabetical ordering (U-r3) + mermaid 出力構造 (classDef / layer subgraph / cluster node / edge group / class attach) を実装し render_overview を完成させる (IN-14, IN-16, AC-13, CN-07, CN-08)
 
 ### S9 — Adapter: depth 2 cluster detail renderer (U-r3)
 
