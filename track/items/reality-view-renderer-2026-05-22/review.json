@@ -1,6 +1,86 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:45:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:20:06Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 161,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
+          "at": "2026-05-22T12:27:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 44,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
+          "at": "2026-05-22T12:31:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:34:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:35:36Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -163,54 +243,122 @@
           "findings": [],
           "hash": "rvw1:sha256:58a523bdf98435ee3b8a950438508177b2fe116c74e06e51de7ae5f922835e14",
           "at": "2026-05-22T15:39:09Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 161,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
-          "at": "2026-05-22T12:27:37Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
+              "message": "Grouping Struct/Enum/Trait/TypeAlias entries by the short `name` key overwrites same-named items from different modules, so one of the colliding entries and its edges disappear from the rendered graph.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 44,
-              "category": "error handling"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 553,
+              "category": "correctness"
+            },
+            {
+              "message": "This call renders every crate cluster with the full `baselines` slice, and `emit_all_entries_for_layer` also extracts nodes from the full layer, so a layer with multiple crates duplicates all entries under every `*_root` cluster instead of scoping the content to that crate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 342,
+              "category": "correctness"
+            },
+            {
+              "message": "`field_type_node_id` resolves same-crate `Type::ResolvedPath` values to `type_node_id` (the subgraph id) instead of the representative `type_rep_node_id`, so struct-field, enum-payload, and alias edges target the container rather than the concrete node the renderer creates for edge endpoints.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 677,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
-          "at": "2026-05-22T12:31:48Z"
+          "hash": "rvw1:sha256:1bed1f27ce5fc1bd0b51d23cce736e6d7244603b2b7165295329b3430bab5861",
+          "at": "2026-05-22T16:03:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_clusters_mermaid` builds one output per crate (`cluster_key`), but `emit_all_entries_for_layer` is called with the full `baselines` slice and no crate filter. Every cluster file will therefore contain all layer entries from every crate, not just the crate named in the surrounding root subgraph.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "line": 342,
+              "category": "correctness"
+            },
+            {
+              "message": "`emit_all_entries_for_layer` deduplicates structs/enums/traits/type aliases by bare `name` in a `BTreeMap`. If two same-named items exist in different modules, the later insert overwrites the earlier one, so one node and its edges disappear silently even though the node-id scheme was designed to disambiguate module-qualified names.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 559,
+              "category": "correctness"
+            },
+            {
+              "message": "`field_type_node_id` returns `type_node_id(...)` for same-crate `ResolvedPath` targets, but these edges are supposed to point at the representative `__self` node inside the target subgraph. Local struct/enum/alias edges will therefore terminate on the subgraph container ID instead of a concrete node.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 677,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1bed1f27ce5fc1bd0b51d23cce736e6d7244603b2b7165295329b3430bab5861",
+          "at": "2026-05-22T16:05:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_entry_label` reconstructs the display path by replacing every `_` with `::`, but `module_path_from_summary()` already collapses real path segments with `_`. Any module segment that legitimately contains an underscore will be rendered as a different path (for example `foo_bar` becomes `foo::bar`), so the emitted subgraph labels can be wrong.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 686,
+              "category": "correctness"
+            },
+            {
+              "message": "`VariantKind::Struct` payload handling ignores `has_stripped_fields`. When rustdoc omits hidden/private variant fields, this code still emits edges for the remaining field IDs, which produces a partial and potentially misleading enum-variant shape instead of skipping or marking the incomplete payload.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 265,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:930e7f745a9807f84afb8ed394e0db19f3fa0bd1d51ccf6d2f305bf76393cb79",
+          "at": "2026-05-22T16:12:55Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:34:28Z"
+          "hash": "rvw1:sha256:bb1c913a9513431b13c6ad0995db73b7ecf2baac6b0aff9e9512af889dc6ff05",
+          "at": "2026-05-22T16:22:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`emit_struct_subgraph` looks up `[edge.field]` as soon as it sees a non-stripped plain struct, before knowing whether any field edge will actually be emitted. An empty public plain struct, or one whose listed fields are absent/non-`StructField`, will return `RenderFailed` if `[edge.field]` is omitted even though K requires no field edges for that case. The tuple branch has the same eager lookup at line 124 for an empty/all-`None` tuple struct. Defer the `edge_arrow_label(..., \"field\")` lookup until just before pushing the first field edge.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 107,
+              "category": "spec_deviation"
+            },
+            {
+              "message": "`emit_enum_subgraph` requires `[edge.variant_payload]` before it knows whether any payload edge exists. For an enum with only plain variants, no variants, or all payload fields skipped, rendering fails on a missing `variant_payload` style even though decision H says plain variants emit no edge. Move the lookup into the tuple/struct payload branches only when an edge is about to be pushed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "line": 216,
+              "category": "spec_deviation"
+            }
+          ],
+          "hash": "rvw1:sha256:bb1c913a9513431b13c6ad0995db73b7ecf2baac6b0aff9e9512af889dc6ff05",
+          "at": "2026-05-22T16:24:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:35:36Z"
+          "hash": "rvw1:sha256:e7bddf968f53468b2499ac26ba4a1d0e953f1225f0569dad5d20d243f8729e65",
+          "at": "2026-05-22T16:29:45Z"
         }
       ]
     },
@@ -790,38 +938,52 @@
           "findings": [],
           "hash": "rvw1:sha256:94876f7b6076a36c7c162eabd6999905e9cf6babc234c5a906f2436a25e6a740",
           "at": "2026-05-22T15:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a567ecbe9dd577331e167eb55e2f871d1198f151d0fd25051634f084a63c61dc",
+          "at": "2026-05-22T16:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a567ecbe9dd577331e167eb55e2f871d1198f151d0fd25051634f084a63c61dc",
+          "at": "2026-05-22T16:03:34Z"
         }
       ]
     },
-    "other": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:43:11Z"
+          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
+          "at": "2026-05-22T11:46:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:45:01Z"
+          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
+          "at": "2026-05-22T11:51:55Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:18:45Z"
+          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
+          "at": "2026-05-22T13:29:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:20:06Z"
+          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
+          "at": "2026-05-22T13:30:19Z"
         }
       ]
     },
@@ -921,38 +1083,6 @@
           "findings": [],
           "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
           "at": "2026-05-22T13:58:55Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
-          "at": "2026-05-22T11:46:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
-          "at": "2026-05-22T11:51:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
-          "at": "2026-05-22T13:29:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
-          "at": "2026-05-22T13:30:19Z"
         }
       ]
     }

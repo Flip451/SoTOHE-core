@@ -34,12 +34,13 @@
     {
       "id": "T006",
       "description": "adapter 内: node_id 生成スキーム (D decision: T/R/F prefix + length-prefix + sanitized_module_path) を実装し、同一 crate 内の同名 Type / Trait の衝突を防ぐ (IN-05, AC-11)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "4f6f00955804259461863f812e11275dc69cd9e1"
     },
     {
       "id": "T007",
       "description": "adapter 内: entry subgraph 化 (F-r1: Struct / Enum / Trait / TypeAlias) + Enum variant node 化 + payload edge (H decision) + Trait method 内包 (H' decision) + struct fields edge (K decision) + TypeAlias alias edge (N decision) を実装する (IN-06, IN-07, IN-08, IN-10, IN-11, AC-04, AC-06, AC-07, AC-09, AC-10)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T008",

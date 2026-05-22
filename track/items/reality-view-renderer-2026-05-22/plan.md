@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (5/14 resolved)
+## Tasks (6/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -46,7 +46,7 @@
 > これら 2 タスクは密結合のため同じセクションに配置するが、各実装範囲が 500 行以内に収まるよう分割する。
 
 - [x] **T005**: adapter 内: node 抽出ロジック (B-r1: 5 種固定 Struct / Enum / TypeAlias / Trait / Function) + visibility filter (CC-1: Public only / Default 例外) + Function 列挙範囲 (I decision) を実装する (IN-03, IN-17, IN-18, AC-03, AC-12) (`6ab06b3f218d4c479813383835e8c4ecef30ea5d`)
-- [~] **T006**: adapter 内: node_id 生成スキーム (D decision: T/R/F prefix + length-prefix + sanitized_module_path) を実装し、同一 crate 内の同名 Type / Trait の衝突を防ぐ (IN-05, AC-11)
+- [x] **T006**: adapter 内: node_id 生成スキーム (D decision: T/R/F prefix + length-prefix + sanitized_module_path) を実装し、同一 crate 内の同名 Type / Trait の衝突を防ぐ (IN-05, AC-11) (`4f6f00955804259461863f812e11275dc69cd9e1`)
 
 ### S6 — Adapter: entry subgraph + edge (F / H / H' / K / N decisions)
 
@@ -56,7 +56,7 @@
 > struct fields edge (K decision: PlainStruct の --o|field_name|、TupleStruct の positional index、Unit / stripped は skip)。
 > TypeAlias の無向 alias edge (N decision: ---|alias_of|)。
 
-- [ ] **T007**: adapter 内: entry subgraph 化 (F-r1: Struct / Enum / Trait / TypeAlias) + Enum variant node 化 + payload edge (H decision) + Trait method 内包 (H' decision) + struct fields edge (K decision) + TypeAlias alias edge (N decision) を実装する (IN-06, IN-07, IN-08, IN-10, IN-11, AC-04, AC-06, AC-07, AC-09, AC-10)
+- [~] **T007**: adapter 内: entry subgraph 化 (F-r1: Struct / Enum / Trait / TypeAlias) + Enum variant node 化 + payload edge (H decision) + Trait method 内包 (H' decision) + struct fields edge (K decision) + TypeAlias alias edge (N decision) を実装する (IN-06, IN-07, IN-08, IN-10, IN-11, AC-04, AC-06, AC-07, AC-09, AC-10)
 
 ### S7 — Adapter: Impl 処理 + cross-baseline trait index (BB / O / J decisions)
 

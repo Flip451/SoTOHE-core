@@ -16,7 +16,13 @@
 //! **Scope (T006)**: node_id generation — [`node_id_generator`] submodule implements
 //! Decision D (T/R/F prefix + length-prefix + sanitized_module_path) to avoid collisions
 //! between same-named types in different modules (IN-05 / AC-11).
+//!
+//! **Scope (T007)**: entry subgraph + variant/method/field/alias edge emission —
+//! [`entry_subgraph`] submodule implements F-r1 / H / H' / K / N decisions:
+//! Struct/Enum/Trait/TypeAlias as subgraphs, enum variant nodes + payload edges,
+//! Trait method inclusion, struct field edges, and TypeAlias alias edges.
 
+pub(super) mod entry_subgraph;
 pub(super) mod node_extractor;
 pub(super) mod node_id_generator;
 
@@ -273,16 +279,20 @@ pub(super) fn render_overview_mermaid(
     Ok(lines.join("\n"))
 }
 
-/// Enumerate clusters in `baselines` for `layer` and render each as a skeleton
-/// depth-2 cluster mermaid diagram (T004).
+/// Enumerate clusters in `baselines` for `layer` and render each as a depth-2
+/// cluster mermaid diagram.
 ///
 /// T004 scope: per-cluster file contains classDef block + layer subgraph frame.
-/// Full entry subgraph / edge content will be added in T010.
+/// T007 scope: entry subgraphs (Struct/Enum/Trait/TypeAlias) + variant nodes +
+///   payload edges + Trait method nodes + struct field edges + TypeAlias alias
+///   edges are emitted inside the cluster subgraph (F-r1 / H / H' / K / N decisions).
+/// Full cluster enumeration (beyond the single root cluster per crate) will be
+/// added in T010.
 ///
 /// # Errors
 ///
-/// Returns `BaselineGraphRendererError::RenderFailed` if rendering fails.
-/// For T004 this always succeeds as long as the style config was loaded.
+/// Returns `BaselineGraphRendererError::RenderFailed` if rendering fails (e.g.
+/// required `[edge.*]` key absent from style config — CN-02 fail-closed).
 pub(super) fn render_clusters_mermaid(
     baselines: &[BaselineDocument],
     layer: &LayerId,
@@ -292,15 +302,13 @@ pub(super) fn render_clusters_mermaid(
 
     // Enumerate clusters: (cluster_key, crate_name_str) pairs.
     // cluster_key per IN-14/IN-15: "<crate_name>_root" or "<crate_name>_<module_seg1>".
-    // T004 emits one "root" cluster per crate (full cluster enumeration in T010).
+    // T004/T007: emit one "root" cluster per crate (full cluster enumeration in T010).
     let mut cluster_keys: Vec<(String, String)> = Vec::new();
     for baseline in baselines {
         if baseline.layer != *layer {
             continue;
         }
         let crate_str = baseline.crate_name.as_str();
-        // T004: emit one placeholder root cluster per crate.
-        // T010 will replace this with the full krate.paths enumeration.
         let cluster_key = format!("{crate_str}_root");
         cluster_keys.push((cluster_key, crate_str.to_string()));
     }
@@ -317,18 +325,37 @@ pub(super) fn render_clusters_mermaid(
             class_defs.push(class_def_line(class_name, class_style));
         }
 
-        // Section 2: layer subgraph > cluster subgraph frame.
+        // Section 2: layer subgraph > cluster subgraph > entry subgraphs (T007).
         let mut subgraph_lines: Vec<String> = Vec::new();
+        // Section 3: edge definitions (cluster-internal, cross-cluster suppressed).
+        let mut edge_lines: Vec<String> = Vec::new();
+        // Section 4: class attach statements.
+        let mut class_attach: Vec<String> = Vec::new();
+
         subgraph_lines.push(format!("subgraph {layer_sg_id}[\"{layer_str}\"]"));
         subgraph_lines.push("  direction TB".to_string());
         subgraph_lines.push(format!("  subgraph {crate_sg}_root_sg[\"{crate_str} root\"]"));
         subgraph_lines.push("    direction TB".to_string());
-        // Placeholder — entry subgraphs will be filled in by T010.
-        subgraph_lines.push(format!("    %% entry placeholder: {crate_sg}"));
+
+        // T007: emit entry subgraphs (F-r1 / H / H' / K / N decisions).
+        // Pass the crate name filter so each cluster file contains only the entries
+        // for its own crate (not all crates in the layer).
+        entry_subgraph::emit_all_entries_for_layer(
+            baselines,
+            layer_str,
+            Some(crate_str),
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            style,
+            "    ",
+        )?;
+
         subgraph_lines.push("  end".to_string());
         subgraph_lines.push("end".to_string());
 
-        // Assemble output.
+        // Assemble mermaid content in section order (IN-16):
+        // 1) classDef  2) layer subgraph  3) edge definitions  4) class attach
         let mut lines: Vec<String> = Vec::new();
         lines.push(format!(
             "<!-- Generated baseline-graph-renderer (cluster: {cluster_key}) — DO NOT EDIT DIRECTLY -->"
@@ -340,6 +367,12 @@ pub(super) fn render_clusters_mermaid(
         }
         for sl in &subgraph_lines {
             lines.push(sl.clone());
+        }
+        for el in &edge_lines {
+            lines.push(el.clone());
+        }
+        for ca in &class_attach {
+            lines.push(ca.clone());
         }
         lines.push("```".to_string());
         lines.push(String::new()); // trailing newline
