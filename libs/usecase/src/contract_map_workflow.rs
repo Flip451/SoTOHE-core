@@ -233,6 +233,10 @@ where
 
         // Build a flat Vec<CatalogueDocument> from the BTreeMap values,
         // preserving the 1-layer = 1-doc contract (Decision A-3' / T002).
+        // The loader (`FsCatalogueLoader` / `load_all_catalogues_native`) guarantees
+        // that each document's `layer` field matches its BTreeMap key, so flattening
+        // to `.values()` here is safe — no entry will render under the wrong layer
+        // or be omitted by the renderer's `doc.layer`-based grouping.
         let catalogues_vec: Vec<_> = catalogues.values().cloned().collect();
 
         // Forward-compatibility stub: opts.layers is not read by the renderer

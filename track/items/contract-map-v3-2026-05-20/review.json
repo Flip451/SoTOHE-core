@@ -1,6 +1,348 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Steps 3 and 6 call `/track:commit` without a commit-message argument. Per `.claude/commands/track/commit.md`, empty arguments take the interactive candidate-message path, so this orchestrator will pause for user input and violate its own 'Fully autonomous' constraint.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 17,
+              "category": "logic"
+            },
+            {
+              "message": "Step 4 delegates to `/track:plan`, but `.claude/commands/track/plan.md` can stop at termination and ask the user to accept/revert/manual-edit/abort when the ADR working tree differs from HEAD. This file never defines an automatic policy for that decision, so the chain is not actually autonomous end-to-end.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 18,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:89f83ca61549aa2e47aa5a8903ab03ebf0852da0080cc6445d385ed87255a417",
+          "at": "2026-05-20T23:33:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 is not executable as written: `/track:plan` always runs Phase 0 first (`.claude/commands/track/plan.md:61-70`), and `/track:init` stops unless the current branch is `main` (`.claude/commands/track/init.md:10-15`). After step 1 the orchestrator is already on `track/<id>`, so this step will fail instead of running only Phase 1-3.",
+              "severity": "P0",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 18,
+              "category": "workflow"
+            },
+            {
+              "message": "The documented autonomy guarantee is not actually satisfied. `/track:plan` still pauses for a user decision whenever the ADR working tree differs from `HEAD` (`.claude/commands/track/plan.md:112-117`), but this orchestrator never defines a no-prompt path for that termination branch. That leaves the chain stuck waiting for confirmation at step 4 despite the \"Fully autonomous\" constraint.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 38,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:89f83ca61549aa2e47aa5a8903ab03ebf0852da0080cc6445d385ed87255a417",
+          "at": "2026-05-20T23:35:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 bypasses `/track:plan`, but it does not re-specify the red/yellow/ERROR re-invocation rules that `/track:plan` owns. The referenced phase commands are single-shot wrappers, so the instruction to handle escalation via the phase commands' own rules is inaccurate and can leave unresolved signals stuck before step 8.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 32,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f33be141ca17ae9def2505ea3bf82e0e73678ca7ee85b3555dbdcbaa1c76dd82",
+          "at": "2026-05-20T23:39:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `/track:commit` steps are invoked with no staging step in between. The canonical commit flow requires staging the post-review worktree first (`cargo make add-all` or `track-add-paths`), and `track-commit-message` only commits already staged files. As written, the first and second commits can fail on an empty index or leave generated files / ADR edits uncommitted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 17,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:f221a792b92d6172462315ef6a4cd585a6072aa6261f55a7866871e1406d2458",
+          "at": "2026-05-20T23:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 5 says the plan artifacts are committed at step 7, but the actual commit step is 8 and step 7 is staging. That internal mismatch makes the execution order ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 19,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ef48a91cedb8428f45c5671d6eb87b8dff7a5ea20eadcd5b353a46ae11ae9e23",
+          "at": "2026-05-20T23:47:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This command re-encodes `/track:plan`'s phase-loop semantics instead of delegating to the canonical subcommands, which makes `adr2pr` a second source of truth for retry and escalation behavior. If the canonical commands change, this doc can drift into a different state machine than the one it claims to orchestrate.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 19,
+              "category": "architecture"
+            },
+            {
+              "message": "The copied Phase 1/2 loop summary is not faithful to the canonical behavior: it only mentions direct re-invocation of `spec-design` / `type-design`, but `/track:plan`'s Phase 1 red path can escalate to `adr-editor` or a user pause, and Phase 2 red must re-evaluate Phase 1 before retrying Phase 2. Following this text literally can skip required upstream escalation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 34,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:767f8c9b1e060adf6884f742330db39fdc56cd5860859d2f5e64192b3e83bf5f",
+          "at": "2026-05-20T23:48:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Yellow handling is internally inconsistent. This step says to follow `/track:plan`'s Phase 1-3 loops exactly, but the referenced Phase 1 loop allows 🟡 to advance, while this file separately requires every 🟡 to be resolved at the phase where it appears. A phase that returns yellow has no single valid action under the current wording.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 42,
+              "category": "contradiction"
+            },
+            {
+              "message": "The rationale for not invoking `/track:plan` overstates its termination behavior. `/track:plan` only pauses in Termination when the ADR working tree differs from HEAD; it does not unconditionally pause for a user decision. The justification at this line is therefore factually incorrect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 34,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ae6d4fbac2914b3404d184f3ce870c9218186df1cf936c14708476c2afc87d8d",
+          "at": "2026-05-20T23:51:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Steps 4 and 8 invoke `/track:commit` with no arguments, but `.claude/commands/track/commit.md` explicitly stops and asks the user to choose or edit a commit message when `$ARGUMENTS` is empty. That makes the workflow non-autonomous and violates the command's own Constraint 2.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 18,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:a7abcc9595d0621e02ce7f5fd0f9144874decd5daca5bc6583019eb16f03d809",
+          "at": "2026-05-20T23:53:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:review` is scheduled here before `spec.md` exists. `track/review.md` Step 0 expects the current track's `spec.md`, and `track/init.md` says `spec.md` is created later in Phase 1 and is not required for the first commit, so this step order is internally inconsistent and can make the initial baseline-review stage fail.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 16,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:85b963c8cbf7ad0503afbae44827a7a215050752f3ebd60db6a606cc1c089056",
+          "at": "2026-05-20T23:56:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:pr-review` is the terminal step in this chain, but this rule says a \"PR merge gate\" at step 10 enforces yellow-resolution. That enforcement point does not exist here because the chain explicitly forbids merge, so the rationale conflicts with the no-merge constraint and misstates how the requirement is enforced.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 42,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2d75281ed68c632667cd61f7758a7644f64edafc6c258fe76f8dd6052ea13f98",
+          "at": "2026-05-20T23:59:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The first `/track:review` is scheduled before `spec.md` exists, but `track/review.md` Step 0 requires the current track's `spec.md`, `plan.md`, and `metadata.json` and does not document a fallback path. On a fresh track this makes the baseline-review stage potentially fail before the first commit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "line": 16,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:359e47240497a7fded50b5e83c2d8162afa0c17a88a4588de12662540c26ed00",
+          "at": "2026-05-21T00:01:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7038cb301b92a6c719ad9bac388971420ad81436a1a4a328160f56d70072e7",
+          "at": "2026-05-21T00:03:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 instructs running `/track:review` before Phase 1 and explicitly says `spec.md` does not exist yet, but the canonical `/track:review` Step 0 requires reading the current track's `spec.md` along with `plan.md` and `metadata.json`. As written, the orchestrator can drive into a sub-command whose documented preconditions/context reads are unavailable, so the ADR-baseline review path may fail instead of reaching the first guarded commit.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 16,
+              "category": "harness-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:eb7038cb301b92a6c719ad9bac388971420ad81436a1a4a328160f56d70072e7",
+          "at": "2026-05-21T00:10:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5175ffba114f347be678269267bc19a024c340ec4795538723c49f5f4cf89a1c",
+          "at": "2026-05-21T00:13:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc8f1bd6cb5169ca279098d5c5bf37ea438d38a7301cf337dad651cadefaecc",
+          "at": "2026-05-21T02:51:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcc8f1bd6cb5169ca279098d5c5bf37ea438d38a7301cf337dad651cadefaecc",
+          "at": "2026-05-21T02:54:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:784b5a562acda1cedec39d6adbee50bc7faf05f72198983cdb7c568accfddaa2",
+          "at": "2026-05-21T10:22:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R10’s example re-allows the exact serde-boundary primitive escape hatch that R9 forbids: R9 says concept-bearing DTO fields / Vec elements / map keys must not be raw `String` and should deserialize into the domain VO/enum or an infra mirror enum, but this line says a validated identifier concept may be received in an infra DTO as `String` and converted with `TryFrom`. That leaves reviewers and type-designer with contradictory guidance for concept-bearing DTO fields.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 259,
+              "category": "internal-contradiction"
+            },
+            {
+              "message": "Step 12c now requires enumerating every concept-bearing slot and every impl/action check “in the final report”, but the Output section still defines the final message as only per-layer signal counts plus Open Questions and says catalogue/per-action details are not echoed. These instructions cannot both be followed as written, so the required 12c evidence may be omitted by an agent following the Output contract.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 204,
+              "category": "internal-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:784b5a562acda1cedec39d6adbee50bc7faf05f72198983cdb7c568accfddaa2",
+          "at": "2026-05-21T10:24:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new 12c action-correctness gate says a `reference` entry must be byte-identical to baseline and that a body-changed `reference` fails, but the required attestation scope is limited to `add`/`modify` types or traits. That lets `reference` entries avoid enumeration entirely, so the final report can satisfy the stated format while providing no evidence for the reference-vs-modify check the same section requires. Widen the enumeration/attestation scope to include `reference` entries that must be baseline-checked, or add a separate required reference-entry baseline check.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 208,
+              "category": "internal_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a5cf0cc08e75592499e4de11378f3b4d631ae8bad5bfc0a824cc95d947b32dae",
+          "at": "2026-05-21T10:26:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R10 says every domain concept, including examples like policies, must be modeled only as Entity/AggregateRoot/ValueObject/domain enum/typestate. That conflicts with the existing R1/R6 taxonomy where legitimate domain concepts with behavior belong in `DomainService` or `Specification`; the checklist repeats the same narrowed set, so an agent following R10 could reject or misclassify valid R6 domain-service designs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 234,
+              "category": "internal-contradiction"
+            },
+            {
+              "message": "The new 12c reference baseline attestation only covers `reference` types and traits. Catalogue `functions` also have `action: \"reference\"` and can diverge from baseline by signature/body changes, but this gate and final attestation let reference functions be omitted entirely, leaving the action-correctness check incomplete.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 215,
+              "category": "coverage-gap"
+            },
+            {
+              "message": "This cross-reference points to `libs/infrastructure/src/tddd/catalogue_document_codec.rs`, but that file does not exist; the codec lives under `libs/infrastructure/src/tddd/catalogue_document_codec/` (`mod.rs`, `decode.rs`, `dto.rs`, `encode.rs`). Reviewers/agents following the related-docs pointer will fail to resolve the stated codec source.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 323,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:9e7ad763386efca6a4c8d9033130635c73c83f063d5f7cb8b5c87f6d09e2d864",
+          "at": "2026-05-21T10:29:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 12 now defines three required gates (12a, 12b, and the new 12c), but this preamble still says the agent “MUST run two checks.” That is an internal contradiction in the policy and can make 12c look optional despite the later hard requirement.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 153,
+              "category": "internal_contradiction"
+            },
+            {
+              "message": "This reference still points at `libs/infrastructure/src/tddd/catalogue_document_codec.rs`, but the repo now contains `libs/infrastructure/src/tddd/catalogue_document_codec/` and no `.rs` file. The Related Documents section was updated to the directory path, so this remaining old path is a broken reference.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 313,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:651d08121209655a779f2fc1e0c0d9975ab1383c27e5cf71c7650823d7ce3ba8",
+          "at": "2026-05-21T10:32:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36f481c4b44443af335ac576425011a5b8902477036005e13c584e722412a401",
+          "at": "2026-05-21T10:34:17Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -59,6 +401,34 @@
           "findings": [],
           "hash": "rvw1:sha256:7ed54ce6514c07492462ce33fe8dc23acd8d88846122d1e6a6473fe5958665be",
           "at": "2026-05-21T14:14:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ffdee976f12a7a18daaad04bfda6ce2e159d095e0d24597114b53d7b5b3fc0a",
+          "at": "2026-05-22T00:43:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ffdee976f12a7a18daaad04bfda6ce2e159d095e0d24597114b53d7b5b3fc0a",
+          "at": "2026-05-22T00:44:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccd7b1d099b8e778f103a673c45a5675468fc99fdc285e67c1b8641d33a3db65",
+          "at": "2026-05-22T03:15:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccd7b1d099b8e778f103a673c45a5675468fc99fdc285e67c1b8641d33a3db65",
+          "at": "2026-05-22T03:17:15Z"
         }
       ]
     },
@@ -752,24 +1122,56 @@
           "findings": [],
           "hash": "rvw1:sha256:8614f512c78bf72eee2a7a2c1285d370487e5dd7bd4619217bfdb499061c66f0",
           "at": "2026-05-21T17:22:09Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
-          "at": "2026-05-21T14:11:11Z"
+          "hash": "rvw1:sha256:60b98b0b9dd62a86a6a0ef28eea751c2974f9847e87a3bc7c35c01e25c9c0b08",
+          "at": "2026-05-22T00:43:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rendered TraitEntry method nodes omit declared method edges from the catalogue. For example, `ContractMapRenderer::render` is shown as a method node, but the edge block never connects it to the declared `ContractMapRenderOptions` parameter or to the declared `ContractMapContent` / `ContractMapRendererError` return contract; the same omission affects `ContractMapWriter::write` and `RenderContractMap::execute`. This makes the contract map semantically incomplete for v3 method dependencies.",
+              "severity": "P1",
+              "file": "track/items/contract-map-v3-2026-05-20/contract-map.md",
+              "line": 57,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:60b98b0b9dd62a86a6a0ef28eea751c2974f9847e87a3bc7c35c01e25c9c0b08",
+          "at": "2026-05-22T00:46:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13df314f027a0ee1dce587003eeb7137d01531e3b6488b3f827ce808302ae0ca",
+          "at": "2026-05-22T01:15:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
-          "at": "2026-05-21T14:13:15Z"
+          "hash": "rvw1:sha256:13df314f027a0ee1dce587003eeb7137d01531e3b6488b3f827ce808302ae0ca",
+          "at": "2026-05-22T01:19:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c1323850691aa72b156fde6ab96ba0d986a25b5a7d595b63be3223b175958e3",
+          "at": "2026-05-22T03:05:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c1323850691aa72b156fde6ab96ba0d986a25b5a7d595b63be3223b175958e3",
+          "at": "2026-05-22T03:08:40Z"
         }
       ]
     },
@@ -788,366 +1190,6 @@
           "findings": [],
           "hash": "rvw1:sha256:8d56baf8db356c310622f204d3957bb47a3df997c3caa4b7d1a95e684e402b27",
           "at": "2026-05-21T14:11:06Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
-          "at": "2026-05-21T14:09:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
-          "at": "2026-05-21T14:10:41Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Steps 3 and 6 call `/track:commit` without a commit-message argument. Per `.claude/commands/track/commit.md`, empty arguments take the interactive candidate-message path, so this orchestrator will pause for user input and violate its own 'Fully autonomous' constraint.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 17,
-              "category": "logic"
-            },
-            {
-              "message": "Step 4 delegates to `/track:plan`, but `.claude/commands/track/plan.md` can stop at termination and ask the user to accept/revert/manual-edit/abort when the ADR working tree differs from HEAD. This file never defines an automatic policy for that decision, so the chain is not actually autonomous end-to-end.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 18,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:89f83ca61549aa2e47aa5a8903ab03ebf0852da0080cc6445d385ed87255a417",
-          "at": "2026-05-20T23:33:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 is not executable as written: `/track:plan` always runs Phase 0 first (`.claude/commands/track/plan.md:61-70`), and `/track:init` stops unless the current branch is `main` (`.claude/commands/track/init.md:10-15`). After step 1 the orchestrator is already on `track/<id>`, so this step will fail instead of running only Phase 1-3.",
-              "severity": "P0",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 18,
-              "category": "workflow"
-            },
-            {
-              "message": "The documented autonomy guarantee is not actually satisfied. `/track:plan` still pauses for a user decision whenever the ADR working tree differs from `HEAD` (`.claude/commands/track/plan.md:112-117`), but this orchestrator never defines a no-prompt path for that termination branch. That leaves the chain stuck waiting for confirmation at step 4 despite the \"Fully autonomous\" constraint.",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 38,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:89f83ca61549aa2e47aa5a8903ab03ebf0852da0080cc6445d385ed87255a417",
-          "at": "2026-05-20T23:35:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 bypasses `/track:plan`, but it does not re-specify the red/yellow/ERROR re-invocation rules that `/track:plan` owns. The referenced phase commands are single-shot wrappers, so the instruction to handle escalation via the phase commands' own rules is inaccurate and can leave unresolved signals stuck before step 8.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 32,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:f33be141ca17ae9def2505ea3bf82e0e73678ca7ee85b3555dbdcbaa1c76dd82",
-          "at": "2026-05-20T23:39:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Both `/track:commit` steps are invoked with no staging step in between. The canonical commit flow requires staging the post-review worktree first (`cargo make add-all` or `track-add-paths`), and `track-commit-message` only commits already staged files. As written, the first and second commits can fail on an empty index or leave generated files / ADR edits uncommitted.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 17,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:f221a792b92d6172462315ef6a4cd585a6072aa6261f55a7866871e1406d2458",
-          "at": "2026-05-20T23:44:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 5 says the plan artifacts are committed at step 7, but the actual commit step is 8 and step 7 is staging. That internal mismatch makes the execution order ambiguous.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 19,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ef48a91cedb8428f45c5671d6eb87b8dff7a5ea20eadcd5b353a46ae11ae9e23",
-          "at": "2026-05-20T23:47:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This command re-encodes `/track:plan`'s phase-loop semantics instead of delegating to the canonical subcommands, which makes `adr2pr` a second source of truth for retry and escalation behavior. If the canonical commands change, this doc can drift into a different state machine than the one it claims to orchestrate.",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 19,
-              "category": "architecture"
-            },
-            {
-              "message": "The copied Phase 1/2 loop summary is not faithful to the canonical behavior: it only mentions direct re-invocation of `spec-design` / `type-design`, but `/track:plan`'s Phase 1 red path can escalate to `adr-editor` or a user pause, and Phase 2 red must re-evaluate Phase 1 before retrying Phase 2. Following this text literally can skip required upstream escalation.",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 34,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:767f8c9b1e060adf6884f742330db39fdc56cd5860859d2f5e64192b3e83bf5f",
-          "at": "2026-05-20T23:48:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Yellow handling is internally inconsistent. This step says to follow `/track:plan`'s Phase 1-3 loops exactly, but the referenced Phase 1 loop allows 🟡 to advance, while this file separately requires every 🟡 to be resolved at the phase where it appears. A phase that returns yellow has no single valid action under the current wording.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 42,
-              "category": "contradiction"
-            },
-            {
-              "message": "The rationale for not invoking `/track:plan` overstates its termination behavior. `/track:plan` only pauses in Termination when the ADR working tree differs from HEAD; it does not unconditionally pause for a user decision. The justification at this line is therefore factually incorrect.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 34,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ae6d4fbac2914b3404d184f3ce870c9218186df1cf936c14708476c2afc87d8d",
-          "at": "2026-05-20T23:51:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Steps 4 and 8 invoke `/track:commit` with no arguments, but `.claude/commands/track/commit.md` explicitly stops and asks the user to choose or edit a commit message when `$ARGUMENTS` is empty. That makes the workflow non-autonomous and violates the command's own Constraint 2.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 18,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:a7abcc9595d0621e02ce7f5fd0f9144874decd5daca5bc6583019eb16f03d809",
-          "at": "2026-05-20T23:53:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`/track:review` is scheduled here before `spec.md` exists. `track/review.md` Step 0 expects the current track's `spec.md`, and `track/init.md` says `spec.md` is created later in Phase 1 and is not required for the first commit, so this step order is internally inconsistent and can make the initial baseline-review stage fail.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 16,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:85b963c8cbf7ad0503afbae44827a7a215050752f3ebd60db6a606cc1c089056",
-          "at": "2026-05-20T23:56:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`/track:pr-review` is the terminal step in this chain, but this rule says a \"PR merge gate\" at step 10 enforces yellow-resolution. That enforcement point does not exist here because the chain explicitly forbids merge, so the rationale conflicts with the no-merge constraint and misstates how the requirement is enforced.",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 42,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2d75281ed68c632667cd61f7758a7644f64edafc6c258fe76f8dd6052ea13f98",
-          "at": "2026-05-20T23:59:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The first `/track:review` is scheduled before `spec.md` exists, but `track/review.md` Step 0 requires the current track's `spec.md`, `plan.md`, and `metadata.json` and does not document a fallback path. On a fresh track this makes the baseline-review stage potentially fail before the first commit.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
-              "line": 16,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:359e47240497a7fded50b5e83c2d8162afa0c17a88a4588de12662540c26ed00",
-          "at": "2026-05-21T00:01:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb7038cb301b92a6c719ad9bac388971420ad81436a1a4a328160f56d70072e7",
-          "at": "2026-05-21T00:03:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 2 instructs running `/track:review` before Phase 1 and explicitly says `spec.md` does not exist yet, but the canonical `/track:review` Step 0 requires reading the current track's `spec.md` along with `plan.md` and `metadata.json`. As written, the orchestrator can drive into a sub-command whose documented preconditions/context reads are unavailable, so the ADR-baseline review path may fail instead of reaching the first guarded commit.",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 16,
-              "category": "harness-policy"
-            }
-          ],
-          "hash": "rvw1:sha256:eb7038cb301b92a6c719ad9bac388971420ad81436a1a4a328160f56d70072e7",
-          "at": "2026-05-21T00:10:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5175ffba114f347be678269267bc19a024c340ec4795538723c49f5f4cf89a1c",
-          "at": "2026-05-21T00:13:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcc8f1bd6cb5169ca279098d5c5bf37ea438d38a7301cf337dad651cadefaecc",
-          "at": "2026-05-21T02:51:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcc8f1bd6cb5169ca279098d5c5bf37ea438d38a7301cf337dad651cadefaecc",
-          "at": "2026-05-21T02:54:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:784b5a562acda1cedec39d6adbee50bc7faf05f72198983cdb7c568accfddaa2",
-          "at": "2026-05-21T10:22:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "R10’s example re-allows the exact serde-boundary primitive escape hatch that R9 forbids: R9 says concept-bearing DTO fields / Vec elements / map keys must not be raw `String` and should deserialize into the domain VO/enum or an infra mirror enum, but this line says a validated identifier concept may be received in an infra DTO as `String` and converted with `TryFrom`. That leaves reviewers and type-designer with contradictory guidance for concept-bearing DTO fields.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 259,
-              "category": "internal-contradiction"
-            },
-            {
-              "message": "Step 12c now requires enumerating every concept-bearing slot and every impl/action check “in the final report”, but the Output section still defines the final message as only per-layer signal counts plus Open Questions and says catalogue/per-action details are not echoed. These instructions cannot both be followed as written, so the required 12c evidence may be omitted by an agent following the Output contract.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 204,
-              "category": "internal-contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:784b5a562acda1cedec39d6adbee50bc7faf05f72198983cdb7c568accfddaa2",
-          "at": "2026-05-21T10:24:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new 12c action-correctness gate says a `reference` entry must be byte-identical to baseline and that a body-changed `reference` fails, but the required attestation scope is limited to `add`/`modify` types or traits. That lets `reference` entries avoid enumeration entirely, so the final report can satisfy the stated format while providing no evidence for the reference-vs-modify check the same section requires. Widen the enumeration/attestation scope to include `reference` entries that must be baseline-checked, or add a separate required reference-entry baseline check.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 208,
-              "category": "internal_contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a5cf0cc08e75592499e4de11378f3b4d631ae8bad5bfc0a824cc95d947b32dae",
-          "at": "2026-05-21T10:26:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "R10 says every domain concept, including examples like policies, must be modeled only as Entity/AggregateRoot/ValueObject/domain enum/typestate. That conflicts with the existing R1/R6 taxonomy where legitimate domain concepts with behavior belong in `DomainService` or `Specification`; the checklist repeats the same narrowed set, so an agent following R10 could reject or misclassify valid R6 domain-service designs.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 234,
-              "category": "internal-contradiction"
-            },
-            {
-              "message": "The new 12c reference baseline attestation only covers `reference` types and traits. Catalogue `functions` also have `action: \"reference\"` and can diverge from baseline by signature/body changes, but this gate and final attestation let reference functions be omitted entirely, leaving the action-correctness check incomplete.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 215,
-              "category": "coverage-gap"
-            },
-            {
-              "message": "This cross-reference points to `libs/infrastructure/src/tddd/catalogue_document_codec.rs`, but that file does not exist; the codec lives under `libs/infrastructure/src/tddd/catalogue_document_codec/` (`mod.rs`, `decode.rs`, `dto.rs`, `encode.rs`). Reviewers/agents following the related-docs pointer will fail to resolve the stated codec source.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 323,
-              "category": "broken-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:9e7ad763386efca6a4c8d9033130635c73c83f063d5f7cb8b5c87f6d09e2d864",
-          "at": "2026-05-21T10:29:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 12 now defines three required gates (12a, 12b, and the new 12c), but this preamble still says the agent “MUST run two checks.” That is an internal contradiction in the policy and can make 12c look optional despite the later hard requirement.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 153,
-              "category": "internal_contradiction"
-            },
-            {
-              "message": "This reference still points at `libs/infrastructure/src/tddd/catalogue_document_codec.rs`, but the repo now contains `libs/infrastructure/src/tddd/catalogue_document_codec/` and no `.rs` file. The Related Documents section was updated to the directory path, so this remaining old path is a broken reference.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 313,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:651d08121209655a779f2fc1e0c0d9975ab1383c27e5cf71c7650823d7ce3ba8",
-          "at": "2026-05-21T10:32:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:36f481c4b44443af335ac576425011a5b8902477036005e13c584e722412a401",
-          "at": "2026-05-21T10:34:17Z"
         }
       ]
     },
@@ -1556,6 +1598,370 @@
           "findings": [],
           "hash": "rvw1:sha256:847443dd851e1c9b7446fb88f6bdb91dc76fd46c76da8c01f10443167a545fd8",
           "at": "2026-05-21T22:12:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e995642a27c80498cedea8b7c5085a2073ecdfd7c85db2b20ad4ea99bd355671",
+          "at": "2026-05-21T23:15:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`edge_arrow_label` is still evaluated before the code knows whether any edge survives the new declared-only filtering. For catalogs whose fields/params/returns/variant payloads are all primitives, external types, or deleted targets, a minimal style config that omits the corresponding `[edge.*]` section will now fail with `RenderFailed` even though no edge would be emitted. That makes edge-free renders unexpectedly depend on unused edge config; the same pattern appears in the variant-payload and field branches as well.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
+              "line": 288,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:57fecef6fdef8f0770ca2558e7207e27dde779b941462c5a5e4bc09051862a74",
+          "at": "2026-05-22T00:47:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `PlainStruct` and `TupleStruct` still look up `edge.field` before checking whether any field target resolved. In `[emit.rs:193](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs#L193)` and `[emit.rs:215](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs#L215)`, a struct whose fields are all primitives/undeclared/external will still fail with `RenderFailed` if `[edge.field]` is absent, even though no field edge would be emitted. That breaks the new silent-skip contract and can make otherwise valid renders fail.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
+              "line": 193,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9b74ca1d794421333fb538e4afed8fe4ff07fe0db1627c0e733c94c8da4b3de6",
+          "at": "2026-05-22T00:54:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2c021f867aa468708950db9d10cf38c44985f59a630aa3d20f5e2e8bd787d16",
+          "at": "2026-05-22T00:59:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LayerMismatch` is downgraded to `CatalogueLoaderError::DecodeFailed` here, but the render pipeline treats `DecodeFailed` as non-fatal and returns `Ok(())` without rewriting `contract-map.md`. A catalogue whose `doc.layer` disagrees with `architecture-rules.json` can therefore leave the previous diagram on disk and only emit a warning, which is the fail-open/stale-output path this validation was meant to prevent.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_adapter.rs",
+              "line": 127,
+              "category": "fail-open"
+            },
+            {
+              "message": "`Self` is only substituted when the entire `TypeRef` string is exactly `Self`. After the syn walk, nested occurrences like `Option<Self>` or `Result<Self, E>` are handed to `NodeIndex::resolve`, which cannot resolve `Self`, so valid edges back to the enclosing type are silently dropped.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
+              "line": 365,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4d2b729a98abd2943caebbcb8dd888eed0757cc0a902d40905a8ab18e8d7204c",
+          "at": "2026-05-22T01:17:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_type_names_from_syn` only recurses into `GenericArgument::Type`, so valid type refs that use associated-type bindings are dropped. A signature like `Iterator<Item = Foo>` will only yield `Iterator`; the declared inner type `Foo` never reaches `node_index`, which means the renderer silently omits a real edge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 417,
+              "category": "broken-reference"
+            },
+            {
+              "message": "The `Type::Path` branch discards `qself` and treats every path as an ordinary type candidate. Projections such as `<T as Trait>::Assoc` or `Self::Output` are therefore reduced to `Assoc`/`Output`, which can resolve to an unrelated declared catalogue node and create a bogus edge instead of skipping the projection.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "line": 404,
+              "category": "broken-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:a7713baffa7bfcd2bda39c78eeca96efc694ec2bf96b21b8cadb57c6f76524f2",
+          "at": "2026-05-22T01:29:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5859efea9a204a85be0ad34a065796e22d1bf168e25bad873d97a7b356a0261",
+          "at": "2026-05-22T01:53:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e34669f95f2612fc790728d1b9a22610cdb13deec3f6248c67024fce304b2312",
+          "at": "2026-05-22T03:11:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e34669f95f2612fc790728d1b9a22610cdb13deec3f6248c67024fce304b2312",
+          "at": "2026-05-22T03:15:37Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
+          "at": "2026-05-21T14:11:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:086277ae9b1113fcba6d352671dd6e87ebef0e23a8277e6def5fd5a15de197a8",
+          "at": "2026-05-21T14:13:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8945dd3e2352eb6a69980837eb326dc3b4e66c15091a9effb0f839d9a0939e29",
+          "at": "2026-05-21T23:11:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8945dd3e2352eb6a69980837eb326dc3b4e66c15091a9effb0f839d9a0939e29",
+          "at": "2026-05-21T23:12:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0074b0b129013942da850b2013e46958e48fafe534151578887c46e9002aa427",
+          "at": "2026-05-22T00:45:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0074b0b129013942da850b2013e46958e48fafe534151578887c46e9002aa427",
+          "at": "2026-05-22T00:47:38Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
+          "at": "2026-05-21T14:09:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14e185506750d8a9967733b48e41250b1c4e61105c68bfcecb574d9065dd01f7",
+          "at": "2026-05-21T14:10:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new regression test never asserts the CN-07 branch/track-id mismatch outcome; it drops `result` on the floor, so the test passes even if `execute_contract_map` succeeds or fails for the wrong reason. The branch-guard wiring is no longer actually covered here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 192,
+              "category": "testing"
+            },
+            {
+              "message": "This test treats any `Err` as success, including git-discovery failure. As written it does not verify that `execute_type_signals` forwards the current branch or that the interactor returns `BranchTrackMismatch` for a mismatched track id, so the CN-07 CLI regression is no longer guarded.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 517,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:96c2c5c807400ae7f279c386936a3e6f814d576fbfeef4c99e7c3352f36844cd",
+          "at": "2026-05-22T00:44:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new branch-guard tests do not actually pin the CN-07 behavior. `test_execute_contract_map_rejects_non_track_branch` duplicates the invalid-track-id case, and `test_execute_contract_map_rejects_branch_track_id_mismatch` only checks `is_err()` without setting up a fixture that distinguishes branch mismatch from later loader/interactor failures. If the CLI stops forwarding or checking the current branch, these tests can still pass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 140,
+              "category": "test coverage"
+            },
+            {
+              "message": "This CN-07 regression test is too permissive: it accepts `cannot discover git repo`, `cannot read current branch`, or any message containing either `does not match` / `not an active track branch`. That means a broken branch-resolution path can still keep the test green, so it does not reliably verify that the CLI forwards the real current branch into the usecase.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 492,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:bac1aa42ab76b1593a860d34c78aaeb75d68d84aa4a4e4b6c34b6c86b6fcc39b",
+          "at": "2026-05-22T00:50:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new branch guard is tied to `SystemGitRepo::discover()` from the process cwd, not to `workspace_root`. That means `sotp track type-signals` / `track contract-map` can validate the branch for a different checkout than the files being read and written when the user runs the command from another repo or passes `--workspace-root` explicitly. The git root needs to stay aligned with the workspace root used for the track data.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 133,
+              "category": "correctness"
+            },
+            {
+              "message": "These regression tests no longer pin the behavior they claim to cover: `test_execute_type_signals_with_unknown_layer_returns_error` and `test_execute_contract_map_rejects_branch_track_id_mismatch` now assert only `is_err()`, so they still pass if CN-07 branch forwarding is removed and the command fails later for unrelated reasons (for example missing `architecture-rules.json`). That drops CLI-level coverage for the branch/layer wiring change.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 397,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:7ada8ca84b38c278774c4ddc0f1b4b0da3c8ec761cb87abf8fd081b7c9b2d563",
+          "at": "2026-05-22T00:58:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Canonicalizing only `workspace_root` before `starts_with(repo.root())` makes the repo-membership check sensitive to path aliases. A checkout/workspace reached through a symlink can resolve to a different lexical path than the one returned by `git rev-parse --show-toplevel`, so valid invocations can be rejected before rendering. The same asymmetry is used in `signals.rs` and has the same failure mode.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 50,
+              "category": "correctness"
+            },
+            {
+              "message": "These updated tests no longer reach the behavior their names describe. Because `execute_type_signals` now fails the new git/workspace preflight for the tempdir fixtures, the cases here only assert `is_err()` and never exercise layer binding resolution or the evaluator paths. That drops coverage for the main public API and can hide regressions in the code this file is meant to protect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 393,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:10c841396f69a186cc01005fec3b814baee7545c805d17be0df0f2edd1452319",
+          "at": "2026-05-22T01:10:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The updated `execute_type_signals` tests no longer exercise the success path they are meant to protect. Both CLI integration tests now use track IDs that intentionally trip the new CN-07 branch guard, so they only prove early rejection and never reach layer resolution or evaluator dispatch. That leaves the new branch-forwarding wiring unverified at the CLI layer, so a regression that breaks the matching-branch path would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 417,
+              "category": "test coverage"
+            },
+            {
+              "message": "P1: The new contract-map tests cover only mismatched-branch rejection. There is no CLI-level test for the matching `track/<id>` case, so the new branch gate and the call into `RenderContractMapInteractor` are unverified from this layer. If branch discovery or the guard logic regresses, the current test set will still pass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 147,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:c9af47d4c5281a5ad4f3ec9f02f1dba96b922d49d50e0c52a57fbf0d351129e3",
+          "at": "2026-05-22T01:17:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These test replacements no longer exercise the CLI's `--layer` forwarding path or the branch-forwarding success path deterministically. `test_execute_type_signals_with_unknown_layer_returns_error` now only checks branch mismatch, so a regression in unknown-layer handling would be uncaught, and `test_execute_type_signals_branch_guard_passes_for_current_track` can still pass on any later non-branch failure because it never sets up fixtures that prove the interactor was reached. The new CN-07 wiring therefore has no effective CLI-level coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 387,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:138cdf16181b8ba4e85d5961e77c3ae47605f8b3b9c1640bcd5c942d3489a046",
+          "at": "2026-05-22T01:24:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ccfe6caaf31b9af7af7c894d8f39e1418f032f9d580e2269bac202396572453",
+          "at": "2026-05-22T01:34:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These assertions hard-code the review branch slug and rely on `SystemGitRepo::discover()` reading the real checkout branch. On any detached-head CI checkout or when the branch name is not exactly `track/contract-map-v3-2026-05-20`, the CN-07 guard rejects before the intended path and the test either fails or stops testing the layer/evaluator behavior. The branch should be controlled in the test instead of depending on the ambient repository branch.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 598,
+              "category": "testing"
+            },
+            {
+              "message": "This success-path guard test also hard-codes the current track id to `contract-map-v3-2026-05-20` while the code under test reads the ambient git branch. Running the test suite from a different branch or detached HEAD makes the guard reject and turns the test into an environment-dependent failure. Use a controllable git fixture or injectable branch source so the test is independent of the checkout branch.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 223,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7ccfe6caaf31b9af7af7c894d8f39e1418f032f9d580e2269bac202396572453",
+          "at": "2026-05-22T03:17:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_type_signals_lenient_with_bindings` still uses the old status-based frozen guard (`read_track_status_str` + `ensure_active_track`) instead of the new CN-07 branch guard. This leaves the shared/pre-commit type-signals path rejecting Done/Archived tracks even when the current branch is `track/<track_id>`, and it also never rejects calls made from the wrong branch. The briefing says the old frozen-reject path is removed for type-signals; this path still has it.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 215,
+              "category": "contract violation"
+            }
+          ],
+          "hash": "rvw1:sha256:bc8857fc0595b2730bf219c7cc7cb101db78fe04edec439167a662a1910ee830",
+          "at": "2026-05-22T03:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track contract-map` resolves the current branch, but the branch is consumed by a CLI-local check instead of being forwarded in the contract-map request/usecase. The briefing requires the CN-07 branch/track guard to live in the usecase with the CLI passing the branch in; with this wiring, `RenderContractMapInteractor` remains callable without the CN-07 guard and the CLI duplicates a business rule instead of exercising the intended guard path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 57,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:97439cb26dea46c5ac62202225de99d2db6437fc84fc93d72d3ad93f04875790",
+          "at": "2026-05-22T03:28:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97439cb26dea46c5ac62202225de99d2db6437fc84fc93d72d3ad93f04875790",
+          "at": "2026-05-22T03:37:57Z"
         }
       ]
     }

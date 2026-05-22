@@ -124,6 +124,23 @@ fn map_loader_error(err: LoadAllCataloguesNativeError) -> CatalogueLoaderError {
                 reason: format!("invalid layer id '{value}': {source}"),
             }
         }
+        LoadAllCataloguesNativeError::LayerMismatch { binding_layer, doc_layer, path } => {
+            // Map to `LayerDiscoveryFailed` (hard error) rather than `DecodeFailed`
+            // (non-fatal, warn-and-skip) because a layer-field mismatch is an
+            // architecture-rules.json integrity failure: the catalogue claims to belong
+            // to a different layer than the binding key derived from the authoritative
+            // rules file.  Treating it as non-fatal would leave the previous
+            // contract-map.md on disk and only emit a warning — the fail-open path the
+            // validation was meant to prevent (render pipeline §fail-closed).
+            CatalogueLoaderError::LayerDiscoveryFailed {
+                reason: format!(
+                    "catalogue at '{}' declares layer '{}' but architecture-rules.json binds it to layer '{}'",
+                    path.display(),
+                    doc_layer,
+                    binding_layer,
+                ),
+            }
+        }
     }
 }
 

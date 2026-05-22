@@ -633,6 +633,11 @@
     - **L4** (Free function の返すエラー型): catalogue schema に `free_function` kind 追加 (or `helper` kind)、`expected_params` / `expected_returns` を declare 可能にする。または adapter wrapper が free function を呼ぶ関係を `SecondaryAdapter` の expected_methods で近似する代替案を検討
   Phase 2 signal / action overlay (ADR §D5) と並行可。全 L# が Phase 2 完了時点で "Resolved in <track-id>" 注記で埋まるよう ADR Known Limitations 節を継続更新する。関連: ADR 2026-04-17-1528 §D4, §Known Limitations, §Implementation Phases Phase 2
 
+- [ ] **contract-map-v3-mermaid-layout** (MEDIUM) — mermaid 描画時に深くネストした subgraph (layer → module → entry の3階層) が親レイヤー枠からはみ出す矩形包含崩れ。`contract-map-v3-2026-05-20` の PR レビュー中にユーザーが実レンダリング画像で段階診断し、原因を切り分けた:
+  - **本トラックで解消済み**: ① delete エントリ除外 + プリミティブ/std/ジェネリクス/impl-trait/外部型のノード化抑制 (syn ベース TypeRef 解決 `resolve_type_ref_node_ids` + Self/AssocType/qself ハンドリング)。② **subgraph ID をエッジ終点に兼用していた問題** — 各型/トレイト subgraph 内に代表ノード `__self` を置き、`NodeIndex`/trait index を代表ノード ID に解決させ、全エッジを実ノード終点に変更 (`new --> 親subgraph` の自己包含クラスタエッジを解消、test `test_no_edge_endpoint_is_a_subgraph_id` で保証)。各 subgraph に `direction TB` も付与。これらで包含崩れは大幅改善。
+  - **残存 (本 follow-up の対象)**: **cross-layer edge が深くネストした subgraph をまたぐ**こと (特に infra→domain の3 impl edge `Adapter__self -.impl.-> Port__self` + usecase→domain の error ラップ edge)。Dagre/ELK が親 box よりエッジルーティングを優先し子境界が一部はみ出す。**修正方向**: 層をまたぐ依存を、詳細 subgraph 内の `__self` ではなく layer/module の外側に置いた **proxy ノード**経由で接続する (「詳細ノード」と「層間依存ノード」を分離; detail `__self` とは直接つながない)。対象 cross-layer edge の範囲 (impl のみか error ラップ variant edge も)・proxy 配置 (top-level か layer 直下)・detail/proxy の重複表示は **ADR §D1 (contract-map 描画表現) の設計判断**を要するため、focused な follow-up トラック + ADR で実施する。
+  - **由来**: ユーザーが `contract-map-v3-2026-05-20` (`/track:adr2pr`) PR レビュー中に実レンダリング画像で根本原因を段階診断 (direction 不足説 → subgraph-ID 兼用 → cross-layer edge)。subgraph-ID 兼用は本トラックで修正、proxy 再設計は描画モデルそのものの変更のため follow-up と決定 (2026-05-22)。
+
 ---
 
 ## CLI エラーハンドリング改善（未完了分）

@@ -5,55 +5,13 @@
 use std::path::Path;
 use std::sync::Arc;
 
-use domain::TrackStatus;
 use domain::tddd::catalogue_v2::{
     MissingCataloguePolicy, TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
-    TrackStatusReadError, TrackStatusReaderPort, TypeSignalsExecutionError,
-    TypeSignalsExecutorPort,
+    TypeSignalsExecutionError, TypeSignalsExecutorPort,
 };
 
 use super::super::service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};
 use super::TypeSignalsInteractor;
-
-// ---------------------------------------------------------------------------
-// Test stubs
-// ---------------------------------------------------------------------------
-
-struct ActiveStatusReader;
-
-impl TrackStatusReaderPort for ActiveStatusReader {
-    fn read_status(
-        &self,
-        _items_dir: &Path,
-        _track_id: &str,
-    ) -> Result<TrackStatus, TrackStatusReadError> {
-        Ok(TrackStatus::InProgress)
-    }
-}
-
-struct FrozenStatusReader;
-
-impl TrackStatusReaderPort for FrozenStatusReader {
-    fn read_status(
-        &self,
-        _items_dir: &Path,
-        _track_id: &str,
-    ) -> Result<TrackStatus, TrackStatusReadError> {
-        Ok(TrackStatus::Done)
-    }
-}
-
-struct FailingStatusReader;
-
-impl TrackStatusReaderPort for FailingStatusReader {
-    fn read_status(
-        &self,
-        _items_dir: &Path,
-        _track_id: &str,
-    ) -> Result<TrackStatus, TrackStatusReadError> {
-        Err(TrackStatusReadError("metadata read failed".to_owned()))
-    }
-}
 
 struct StubLayerBindings {
     bindings: Vec<TdddLayerBinding>,
@@ -121,17 +79,17 @@ fn stub_binding(layer_id: &str) -> TdddLayerBinding {
 }
 
 fn build_interactor(
-    status_reader: Arc<dyn TrackStatusReaderPort>,
     layer_bindings: Arc<dyn TdddLayerBindingsPort>,
     executor: Arc<dyn TypeSignalsExecutorPort>,
 ) -> TypeSignalsInteractor {
-    TypeSignalsInteractor::new(status_reader, layer_bindings, executor)
+    TypeSignalsInteractor::new(layer_bindings, executor)
 }
 
 fn valid_request(tmp: &std::path::Path) -> TypeSignalsRequest {
     TypeSignalsRequest {
         items_dir: tmp.join("track/items"),
         track_id: "test-track-2026-01-01".to_owned(),
+        branch: "track/test-track-2026-01-01".to_owned(),
         workspace_root: tmp.to_path_buf(),
         layer: None,
         lenient: false,
@@ -150,7 +108,6 @@ fn valid_request(tmp: &std::path::Path) -> TypeSignalsRequest {
 #[test]
 fn test_run_with_dot_workspace_root_and_relative_items_dir_succeeds() {
     let interactor = build_interactor(
-        Arc::new(ActiveStatusReader),
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(SuccessExecutor),
     );
@@ -159,6 +116,7 @@ fn test_run_with_dot_workspace_root_and_relative_items_dir_succeeds() {
     let req = TypeSignalsRequest {
         items_dir: std::path::PathBuf::from("track/items"),
         track_id: "test-track-2026-01-01".to_owned(),
+        branch: "track/test-track-2026-01-01".to_owned(),
         workspace_root: std::path::PathBuf::from("."),
         layer: None,
         lenient: false,
@@ -174,7 +132,6 @@ fn test_run_with_dot_workspace_root_and_relative_items_dir_succeeds() {
 #[test]
 fn test_run_with_invalid_track_id_returns_error() {
     let interactor = build_interactor(
-        Arc::new(ActiveStatusReader),
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(SuccessExecutor),
     );
@@ -189,49 +146,80 @@ fn test_run_with_invalid_track_id_returns_error() {
     );
 }
 
+/// CN-07 guard: a branch that does not start with `track/` is rejected.
 #[test]
-fn test_run_with_failing_status_reader_returns_error() {
+fn test_run_rejects_non_track_branch() {
     let interactor = build_interactor(
-        Arc::new(FailingStatusReader),
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(SuccessExecutor),
     );
     let tmp = tempfile::tempdir().unwrap();
-    let req = valid_request(tmp.path());
+    let req = TypeSignalsRequest {
+        items_dir: tmp.path().join("track/items"),
+        track_id: "test-track-2026-01-01".to_owned(),
+        branch: "main".to_owned(),
+        workspace_root: tmp.path().to_path_buf(),
+        layer: None,
+        lenient: false,
+    };
 
     let err = interactor.run(req).unwrap_err();
     assert!(
-        matches!(err, TypeSignalsError::StatusReadFailed { .. }),
-        "status read failure must return StatusReadFailed, got: {err:?}"
+        matches!(err, TypeSignalsError::NonActiveTrack { ref branch } if branch == "main"),
+        "non-track branch must return NonActiveTrack, got: {err:?}"
     );
 }
 
+/// CN-07 guard: a branch `track/<x>` where `<x>` != `track_id` is rejected.
 #[test]
-fn test_run_with_frozen_track_returns_error() {
+fn test_run_rejects_branch_track_id_mismatch() {
     let interactor = build_interactor(
-        Arc::new(FrozenStatusReader),
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(SuccessExecutor),
     );
     let tmp = tempfile::tempdir().unwrap();
-    let req = valid_request(tmp.path());
+    let req = TypeSignalsRequest {
+        items_dir: tmp.path().join("track/items"),
+        track_id: "test-track-2026-01-01".to_owned(),
+        branch: "track/other-track".to_owned(),
+        workspace_root: tmp.path().to_path_buf(),
+        layer: None,
+        lenient: false,
+    };
 
     let err = interactor.run(req).unwrap_err();
     assert!(
-        matches!(err, TypeSignalsError::TrackFrozen { .. }),
-        "frozen track must return TrackFrozen, got: {err:?}"
+        matches!(
+            err,
+            TypeSignalsError::BranchTrackMismatch { ref branch, ref track_id }
+                if branch == "track/other-track" && track_id == "test-track-2026-01-01"
+        ),
+        "branch/track-id mismatch must return BranchTrackMismatch, got: {err:?}"
     );
-    let msg = err.to_string();
-    assert!(msg.contains("status=done"), "message must mention the status, got: {msg}");
+}
+
+/// CN-07 guard: a Done track is allowed when the current branch matches `track/<id>`.
+#[test]
+fn test_run_allows_done_track_on_matching_branch() {
+    // The CN-07 guard checks branch, not track status. A Done track on its own
+    // branch must be allowed through the guard so type-signals can render.
+    let interactor = build_interactor(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(SuccessExecutor),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+    let req = valid_request(tmp.path()); // branch = "track/test-track-2026-01-01"
+
+    let result = interactor.run(req);
+    assert!(
+        result.is_ok(),
+        "a matching branch must pass CN-07 regardless of track status, got: {result:?}"
+    );
 }
 
 #[test]
 fn test_run_with_no_layers_returns_error() {
-    let interactor = build_interactor(
-        Arc::new(ActiveStatusReader),
-        Arc::new(NoLayersBindings),
-        Arc::new(SuccessExecutor),
-    );
+    let interactor = build_interactor(Arc::new(NoLayersBindings), Arc::new(SuccessExecutor));
     let tmp = tempfile::tempdir().unwrap();
     let req = valid_request(tmp.path());
 
@@ -245,7 +233,6 @@ fn test_run_with_no_layers_returns_error() {
 #[test]
 fn test_run_with_failing_executor_returns_error() {
     let interactor = build_interactor(
-        Arc::new(ActiveStatusReader),
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(FailingExecutor),
     );
@@ -262,7 +249,6 @@ fn test_run_with_failing_executor_returns_error() {
 #[test]
 fn test_run_with_success_returns_ok() {
     let interactor = build_interactor(
-        Arc::new(ActiveStatusReader),
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(SuccessExecutor),
     );
@@ -295,7 +281,6 @@ fn test_run_with_multiple_layers_processes_all() {
 
     let count = Arc::new(AtomicUsize::new(0));
     let interactor = build_interactor(
-        Arc::new(ActiveStatusReader),
         Arc::new(StubLayerBindings {
             bindings: vec![stub_binding("domain"), stub_binding("usecase")],
         }),
@@ -330,7 +315,6 @@ fn test_run_lenient_mode_passes_skip_silently_policy() {
 
     let policies: Arc<Mutex<Vec<MissingCataloguePolicy>>> = Arc::new(Mutex::new(Vec::new()));
     let interactor = build_interactor(
-        Arc::new(ActiveStatusReader),
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(PolicyCapture(Arc::clone(&policies))),
     );
@@ -371,7 +355,6 @@ fn test_run_strict_mode_passes_fail_closed_policy() {
 
     let policies: Arc<Mutex<Vec<MissingCataloguePolicy>>> = Arc::new(Mutex::new(Vec::new()));
     let interactor = build_interactor(
-        Arc::new(ActiveStatusReader),
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(PolicyCapture(Arc::clone(&policies))),
     );

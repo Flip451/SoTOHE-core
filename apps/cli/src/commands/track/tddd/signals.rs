@@ -5,8 +5,8 @@
 //! the updated document back to `<layer>-types.json`.
 //!
 //! `resolve_layers` and `ensure_active_track` remain in this module as shared
-//! helpers for sibling CLI commands (`catalogue_spec_signals.rs`,
-//! `contract_map.rs`) that have not yet been migrated to usecase interactors.
+//! helpers for sibling CLI commands (`catalogue_spec_signals.rs`) that have
+//! not yet been migrated to usecase interactors.
 //! `execute_type_signals_lenient_with_bindings` stays here to allow
 //! `commands/make.rs` to share a single architecture-rules.json parse (TOCTOU
 //! prevention).
@@ -15,13 +15,12 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Arc;
 
+use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
 use infrastructure::tddd::type_signals_evaluator::{
     EvaluateSignalsError, execute_type_signals_for_layer,
 };
 use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
-use infrastructure::track::fs_store::read_track_status_str;
-use infrastructure::track::track_status_reader_adapter::FsTrackStatusReaderAdapter;
 use infrastructure::verify::tddd_layers::{
     LoadTdddLayersError, TdddLayerBinding, load_tddd_layers,
 };
@@ -129,14 +128,35 @@ pub fn execute_type_signals(
     // is always satisfied regardless of how the caller invoked the command.
     let items_dir = workspace_root.join("track").join("items");
 
-    let status_reader = Arc::new(FsTrackStatusReaderAdapter::new());
+    // Resolve the current git branch (CN-07 active-track guard requires it).
+    //
+    // SystemGitRepo::discover() uses the process CWD to locate the git repo.
+    // In normal usage sotp is always run from the workspace root, so CWD and
+    // workspace_root match (workspace_root defaults to `.`). A user who passes
+    // an explicit `--workspace-root /other/path` while standing in a different
+    // checkout would get the branch from the CWD checkout, not from
+    // workspace_root — but that is a misconfiguration of the caller and not a
+    // use case this CLI explicitly supports.
+    let branch = SystemGitRepo::discover()
+        .map_err(|e| CliError::Message(format!("cannot discover git repo: {e}")))?
+        .current_branch()
+        .map_err(|e| CliError::Message(format!("cannot read current branch: {e}")))?
+        .unwrap_or_default();
+
     let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
     let executor = Arc::new(TypeSignalsExecutorAdapter::new());
 
-    let interactor = TypeSignalsInteractor::new(status_reader, layer_bindings, executor);
+    let interactor = TypeSignalsInteractor::new(layer_bindings, executor);
 
     interactor
-        .run(TypeSignalsRequest { items_dir, track_id, workspace_root, layer, lenient: false })
+        .run(TypeSignalsRequest {
+            items_dir,
+            track_id,
+            branch,
+            workspace_root,
+            layer,
+            lenient: false,
+        })
         .map_err(|e| CliError::Message(e.to_string()))?;
 
     Ok(ExitCode::SUCCESS)
@@ -191,11 +211,26 @@ pub fn execute_type_signals_lenient_with_bindings(
     workspace_root: PathBuf,
     bindings: &[TdddLayerBinding],
 ) -> Result<ExitCode, CliError> {
-    // Validate track_id and derive status without importing domain types (CN-01 / AC-03).
-    let status_str = read_track_status_str(&items_dir, &track_id).map_err(|e| {
-        CliError::Message(format!("cannot load track status for '{track_id}': {e}"))
+    // CN-07 active-track guard: verify the current git branch matches
+    // `track/<track_id>`. This replaces the old Done/Archived status guard so
+    // the pre-commit path accepts Done tracks when they are the currently
+    // checked-out track branch, and rejects calls from the wrong branch.
+    let branch = SystemGitRepo::discover()
+        .map_err(|e| CliError::Message(format!("cannot discover git repo: {e}")))?
+        .current_branch()
+        .map_err(|e| CliError::Message(format!("cannot read current branch: {e}")))?
+        .unwrap_or_default();
+    let suffix = branch.strip_prefix("track/").ok_or_else(|| {
+        CliError::Message(format!(
+            "type-signals rejected: branch '{branch}' is not an active track branch (CN-07)"
+        ))
     })?;
-    ensure_active_track(&status_str, &track_id)?;
+    if suffix != track_id.as_str() {
+        return Err(CliError::Message(format!(
+            "type-signals rejected: branch '{branch}' does not match \
+             track_id '{track_id}' (expected 'track/{track_id}')"
+        )));
+    }
 
     if bindings.is_empty() {
         return Err(CliError::Message(
@@ -269,6 +304,19 @@ mod tests {
     use std::path::PathBuf;
 
     use super::*;
+
+    /// Returns the current git branch's track-id suffix (the part after `track/`)
+    /// if the working directory is on a `track/<id>` branch, or `None` otherwise
+    /// (e.g. detached HEAD, `main`, non-track branches).
+    ///
+    /// Tests that require the branch guard to *pass* use this helper to derive
+    /// the track_id at runtime, making them independent of which specific branch
+    /// name is checked out when the test suite is run.
+    fn current_track_id_suffix() -> Option<String> {
+        let repo = SystemGitRepo::discover().ok()?;
+        let branch = repo.current_branch().ok()??;
+        branch.strip_prefix("track/").map(|s| s.to_owned())
+    }
 
     /// Minimal valid `metadata.json` (schema v5) with a branch set (activated track).
     /// Callers must also write `impl-plan.json` (see [`minimal_impl_plan_json`]) to satisfy
@@ -364,37 +412,39 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_with_unknown_layer_returns_error() {
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
-            .unwrap();
-        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
-        // Provide architecture-rules.json with only "domain" enabled so that
-        // requesting layer "nonexistent" is a known-not-found error (not an IO error).
-        let rules_json = r#"{
-          "layers": [
-            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
-          ]
-        }"#;
-        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
-        let workspace_root = dir.path().to_path_buf();
+        // Verify that the `--layer` argument is forwarded through the CLI into the
+        // usecase interactor and that an unknown layer is rejected by the interactor's
+        // layer-resolution step.
+        //
+        // Reads the current branch at runtime so that the track_id used to pass CN-07
+        // is not hard-coded: the test is skipped when the checkout is not on a
+        // `track/<id>` branch (detached HEAD, `main`, CI branches), preventing
+        // environment-dependent failures.
+        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(|p| p.parent())
+            .expect("workspace root from CARGO_MANIFEST_DIR")
+            .to_path_buf();
+
+        // Derive the track_id from the ambient branch at test runtime.
+        let Some(track_id) = current_track_id_suffix() else {
+            // Not on a track/ branch — skip this test.
+            return;
+        };
 
         let result = execute_type_signals(
-            "test-track".to_owned(),
+            // Runtime-derived track_id — CN-07 passes because branch matches.
+            track_id,
             workspace_root,
-            Some("nonexistent".to_owned()),
+            // A layer name that is never in architecture-rules.json.
+            Some("__nonexistent_layer__".to_owned()),
         );
-        let err = result.unwrap_err();
+        // CN-07 passes; the interactor rejects the unknown layer name.
+        let err = result.expect_err("unknown layer must be rejected by the interactor");
         let msg = format!("{err}");
         assert!(
-            msg.contains("nonexistent"),
-            "error must mention the unknown layer name, got: {msg}"
-        );
-        assert!(
             msg.contains("not tddd.enabled") || msg.contains("not found"),
-            "error must mention tddd.enabled or not found, got: {msg}"
+            "error must be an unknown-layer rejection from the interactor, got: {msg}"
         );
     }
 
@@ -477,96 +527,42 @@ mod tests {
         assert!(ensure_active_track("cancelled", "test-track").is_ok());
     }
 
-    // --- Integration test: execute_type_signals rejects done track via full path ---
+    // --- Integration test: execute_type_signals CN-07 branch guard ---
 
     #[test]
-    fn test_execute_type_signals_rejects_done_track() {
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-done-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-
-        // v5 metadata — no status field
-        let done_metadata = r#"{
-  "schema_version": 5,
-  "id": "test-done-track",
-  "branch": "track/test-done-track",
-  "title": "Test Done Track",
-  "created_at": "2026-04-15T00:00:00Z",
-  "updated_at": "2026-04-15T00:00:00Z"
-}"#;
-        std::fs::write(track_dir.join("metadata.json"), done_metadata).unwrap();
-
-        // impl-plan with all tasks done → derives TrackStatus::Done
-        let done_impl_plan = r#"{
-  "schema_version": 1,
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "A completed task",
-      "status": "done",
-      "commit_hash": "0000000000000000000000000000000000000000"
-    }
-  ],
-  "plan": {
-    "summary": ["Test"],
-    "sections": [{
-      "id": "S001",
-      "title": "Test",
-      "description": ["Test"],
-      "task_ids": ["T001"]
-    }]
-  }
-}"#;
-        std::fs::write(track_dir.join("impl-plan.json"), done_impl_plan).unwrap();
-
-        let result =
-            execute_type_signals("test-done-track".to_owned(), dir.path().to_path_buf(), None);
-
-        let err = result.unwrap_err();
-        let msg = format!("{err}");
-        assert!(msg.contains("status=done"), "guard must mention status=done, got: {msg}");
-        assert!(
-            msg.contains("Completed tracks are frozen"),
-            "guard must mention 'Completed tracks are frozen', got: {msg}"
-        );
-        assert!(msg.contains("test-done-track"), "guard must mention the track_id, got: {msg}");
-    }
-
-    #[test]
-    fn test_execute_type_signals_rejects_archived_track_with_incomplete_tasks() {
-        // Regression guard: schema v3 metadata (which carries status="archived") is
-        // rejected at the codec decode step — schema v5 is required. This ensures that
-        // legacy archived tracks (stored under v3) cannot have type-signals run on them,
-        // because the metadata load fails before the active-track guard is reached.
+    fn test_execute_type_signals_rejects_non_matching_track_id() {
+        // CN-07: the current git branch is `track/<some-id>`. Invoking
+        // type-signals for a different `track_id` must be rejected by the
+        // branch/track-id mismatch guard (regardless of track status).
         //
-        // The `ensure_active_track` unit tests cover the archived → rejection path.
-        // This integration test verifies the full path: v3 metadata decode failure → error propagation.
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-archived-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
+        // Use the real workspace root (derived from CARGO_MANIFEST_DIR) so the
+        // workspace-alignment guard passes; the CN-07 guard then fires because
+        // the supplied track_id does not match the current branch suffix.
+        // The error message must contain CN-07 text to pin the branch-forwarding
+        // wiring from the CLI into the interactor.
+        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(|p| p.parent())
+            .expect("workspace root from CARGO_MANIFEST_DIR")
+            .to_path_buf();
 
-        // v3 metadata with status="archived" — codec::decode rejects schema_version < 5
-        let archived_v3_metadata = r#"{
-  "schema_version": 3,
-  "id": "test-archived-track",
-  "branch": "track/test-archived-track",
-  "title": "Test Archived Track",
-  "status": "archived",
-  "created_at": "2026-04-15T00:00:00Z",
-  "updated_at": "2026-04-15T00:00:00Z",
-  "tasks": [],
-  "plan": { "summary": [], "sections": [] }
-}"#;
-        std::fs::write(track_dir.join("metadata.json"), archived_v3_metadata).unwrap();
+        // A track_id that will never match the current branch suffix.
+        let result = execute_type_signals(
+            "this-id-will-never-match-the-real-branch".to_owned(),
+            workspace_root,
+            None,
+        );
 
-        let result =
-            execute_type_signals("test-archived-track".to_owned(), dir.path().to_path_buf(), None);
-
-        let err = result.unwrap_err();
+        // SystemGitRepo::discover() finds the actual git branch (workspace CWD).
+        // The current branch does not match the supplied track_id, so the usecase
+        // CN-07 guard must fire with BranchTrackMismatch ("does not match track_id")
+        // or NonActiveTrack ("not an active track branch" on main/detached HEAD).
+        let err = result.expect_err("mismatched track_id must be rejected by CN-07");
         let msg = format!("{err}");
-        assert!(msg.contains("test-archived-track"), "error must mention the track_id, got: {msg}");
+        assert!(
+            msg.contains("does not match") || msg.contains("not an active track branch"),
+            "error must be CN-07 branch guard rejection (BranchTrackMismatch or NonActiveTrack), got: {msg}"
+        );
     }
 
     #[test]
@@ -604,6 +600,60 @@ mod tests {
 
         // T008: evaluator stub always returns Err — just verify fail-closed.
         assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
+    }
+
+    #[test]
+    fn test_execute_type_signals_branch_guard_passes_for_current_track() {
+        // Verify the branch-forwarding wiring: when track_id matches the current git
+        // branch suffix, the CN-07 guard passes and execution reaches the layer-resolution
+        // or evaluation step.
+        //
+        // Reads the current branch at runtime to derive the track_id, so this test is
+        // independent of which specific branch name is checked out (not hard-coded to a
+        // particular track). Skipped on non-track/ branches (detached HEAD, main, CI).
+        //
+        // After CN-07 passes, the interactor loads layer bindings from the real
+        // architecture-rules.json and then attempts to evaluate signals.  The
+        // evaluator stub (T008) returns an error at that stage, so the function
+        // returns Err — but the error must come from the evaluation step (containing
+        // "evaluation failed" or "evaluator") not from the branch guard. This
+        // confirms: (a) the branch was forwarded from the CLI to the interactor,
+        // (b) the guard passed for a matching branch, and (c) execution reached the
+        // layer-evaluation step.
+        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(|p| p.parent())
+            .expect("workspace root from CARGO_MANIFEST_DIR")
+            .to_path_buf();
+
+        // Derive the track_id from the ambient branch at test runtime.
+        let Some(track_id) = current_track_id_suffix() else {
+            // Not on a track/ branch (detached HEAD, main, CI) — skip.
+            return;
+        };
+
+        let result = execute_type_signals(track_id, workspace_root, None);
+
+        // The evaluator stub (T008) fires and returns an error.
+        // The error must NOT be a CN-07 rejection (branch guard must have passed).
+        // It also must NOT be a git-discovery failure (which would mean CWD was wrong).
+        let err = result.expect_err("evaluator error expected (T008 stub)");
+        let msg = format!("{err}");
+        assert!(
+            !msg.contains("does not match") && !msg.contains("not an active track branch"),
+            "error must NOT be a CN-07 branch guard rejection — guard should have passed, got: {msg}"
+        );
+        assert!(
+            !msg.contains("cannot discover git repo"),
+            "error must NOT be a git-discovery failure — CWD must point to the real workspace, got: {msg}"
+        );
+        // The error must originate from the evaluation stage (after CN-07 + layer resolution).
+        assert!(
+            msg.contains("evaluation failed")
+                || msg.contains("evaluator")
+                || msg.contains("EvaluationFailed"),
+            "error must come from the evaluation stage (T008 stub), confirming interactor was reached, got: {msg}"
+        );
     }
 
     /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.

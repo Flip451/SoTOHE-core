@@ -200,10 +200,15 @@ pub(super) fn sanitize(s: &str) -> String {
     s.chars().map(|c| if c.is_ascii_alphanumeric() || c == '_' { c } else { '_' }).collect()
 }
 
-/// Generate a node_id for a Type entry (Decision D-2).
+/// Generate a subgraph id for a Type entry (Decision D-2).
 ///
 /// Format: `T<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>`
 /// where `<len>` is the length of `<sanitized_layer>_<sanitized_crate>_<sanitized_name>`.
+///
+/// This id is the **container** subgraph id only.  Edge endpoints must use
+/// [`type_rep_node_id`] (the representative node inside the subgraph) so that
+/// no edge points at a subgraph id, which breaks Dagre/ELK cluster-boundary
+/// layout.
 pub(super) fn type_node_id(layer: &str, crate_name: &str, type_name: &str) -> String {
     let sl = sanitize(layer);
     let sc = sanitize(crate_name);
@@ -212,15 +217,35 @@ pub(super) fn type_node_id(layer: &str, crate_name: &str, type_name: &str) -> St
     format!("T{}_{}", body.len(), body)
 }
 
-/// Generate a node_id for a Trait entry (Decision D-2).
+/// Generate the representative node id for a Type entry.
+///
+/// The representative node is emitted **inside** the entry subgraph and acts
+/// as the sole valid edge target for the type.  Its id is the subgraph id
+/// (from [`type_node_id`]) with an `__self` suffix appended, ensuring the
+/// two ids are always distinct and collision-free.
+pub(super) fn type_rep_node_id(layer: &str, crate_name: &str, type_name: &str) -> String {
+    format!("{}__self", type_node_id(layer, crate_name, type_name))
+}
+
+/// Generate a subgraph id for a Trait entry (Decision D-2).
 ///
 /// Format: `R<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_name>`
+///
+/// This id is the **container** subgraph id only.  Edge endpoints must use
+/// [`trait_rep_node_id`] (the representative node inside the subgraph).
 pub(super) fn trait_node_id(layer: &str, crate_name: &str, trait_name: &str) -> String {
     let sl = sanitize(layer);
     let sc = sanitize(crate_name);
     let sn = sanitize(trait_name);
     let body = format!("{sl}_{sc}_{sn}");
     format!("R{}_{}", body.len(), body)
+}
+
+/// Generate the representative node id for a Trait entry.
+///
+/// Appends `__self` to the subgraph id from [`trait_node_id`].
+pub(super) fn trait_rep_node_id(layer: &str, crate_name: &str, trait_name: &str) -> String {
+    format!("{}__self", trait_node_id(layer, crate_name, trait_name))
 }
 
 /// Generate a node_id for a Function entry (Decision D-2).
@@ -316,17 +341,32 @@ pub(super) fn edge_line(source: &str, arrow: &str, label: Option<&str>, target: 
 
 /// Build a global trait index from all catalogues (Decision O-2/O-3).
 ///
-/// Returns `BTreeMap<(crate_name_str, trait_name_str), subgraph_id_str>`.
+/// Returns `BTreeMap<(crate_name_str, trait_name_str), rep_node_id_str>` where
+/// `rep_node_id_str` is the **representative node** id inside the trait subgraph
+/// (i.e. the `__self` node, not the subgraph container id).  Edges must target
+/// representative nodes, never subgraph ids, to avoid Dagre/ELK cluster-boundary
+/// layout breakage.
+///
+/// Entries with `action: Delete` are excluded — deleted items must not appear
+/// as edge targets or in the rendered contract-map output.
 pub(super) fn build_trait_index(
     catalogues: &[CatalogueDocument],
 ) -> BTreeMap<(String, String), String> {
+    use domain::tddd::catalogue_v2::roles::ItemAction;
+
     let mut index: BTreeMap<(String, String), String> = BTreeMap::new();
     for doc in catalogues {
         let layer = doc.layer.as_ref();
         let crate_name = doc.crate_name.as_str();
-        for trait_name in doc.traits.keys() {
-            let subgraph_id = trait_node_id(layer, crate_name, trait_name.as_str());
-            index.insert((crate_name.to_string(), trait_name.as_str().to_string()), subgraph_id);
+        for (trait_name, trait_entry) in &doc.traits {
+            // Skip Delete-action entries — they must not appear in the rendered map.
+            if trait_entry.action == ItemAction::Delete {
+                continue;
+            }
+            // Store the representative node id (not the subgraph container id) so that
+            // trait_impl edges target a real node rather than a subgraph.
+            let rep_node_id = trait_rep_node_id(layer, crate_name, trait_name.as_str());
+            index.insert((crate_name.to_string(), trait_name.as_str().to_string()), rep_node_id);
         }
     }
     index
@@ -337,21 +377,37 @@ pub(super) fn build_trait_index(
 /// Populates `NodeIndex` covering **`TypeEntry` only** (not `TraitEntry`), keyed
 /// both by qualified `"crate_name::Name"` and by bare `"Name"`. This index is
 /// used to resolve field/param/return/variant TypeRef targets to their actual
-/// rendered type subgraph node IDs (Decision D-2).
+/// rendered mermaid node IDs (Decision D-2).
+///
+/// The stored node id is the **representative node** id (the `__self` node inside
+/// the entry subgraph), not the subgraph container id.  Edges must target
+/// representative nodes, never subgraph ids, to avoid Dagre/ELK cluster-boundary
+/// layout breakage.
 ///
 /// `TraitEntry` names are deliberately excluded: trait_impl target resolution uses
 /// a separate `build_trait_index` + `resolve_trait_subgraph` path. Mixing type and
 /// trait names in the same index would cause a TypeRef that matches only a trait to
 /// incorrectly link to a trait subgraph, and a name shared by a type and a trait to
 /// become ambiguous and fall back to a ghost node.
+///
+/// Entries with `action: Delete` are excluded — deleted types must not appear as
+/// edge target nodes in the rendered contract-map output.
 pub(super) fn build_node_index(catalogues: &[CatalogueDocument]) -> NodeIndex {
+    use domain::tddd::catalogue_v2::roles::ItemAction;
+
     let mut index = NodeIndex::new();
     for doc in catalogues {
         let layer = doc.layer.as_ref();
         let crate_name = doc.crate_name.as_str();
-        for type_name in doc.types.keys() {
-            let node_id = type_node_id(layer, crate_name, type_name.as_str());
-            index.insert(crate_name, type_name.as_str(), node_id);
+        for (type_name, type_entry) in &doc.types {
+            // Skip Delete-action entries — they must not appear in the rendered map.
+            if type_entry.action == ItemAction::Delete {
+                continue;
+            }
+            // Store the representative node id (not the subgraph container id) so that
+            // all resolved edges target a real node rather than a subgraph.
+            let rep_node_id = type_rep_node_id(layer, crate_name, type_name.as_str());
+            index.insert(crate_name, type_name.as_str(), rep_node_id);
         }
     }
     index
@@ -365,23 +421,168 @@ fn strip_generics(name: &str) -> &str {
     name.split_once('<').map_or(name, |(head, _)| head)
 }
 
-/// Resolve a `TypeRef` string to a rendered mermaid node ID.
+// ---------------------------------------------------------------------------
+// syn-based type-expression extraction
+// ---------------------------------------------------------------------------
+
+/// Collect all leaf type-path names from a `syn::Type` AST.
 ///
-/// Delegates to `NodeIndex::resolve`; falls back to `sanitize(type_ref_str)` when
-/// no unambiguous match exists (external type, unknown type, or bare-name collision
-/// across multiple catalogues).
+/// Recurses into `Type::Reference` (`&T`/`&mut T`), `Type::Slice` (`[T]`),
+/// `Type::Array` (`[T; N]`), `Type::Tuple` (`(A, B, …)`), `Type::Group`/`Type::Paren`,
+/// and every generic argument of `Type::Path` (covers `Result<T, E>`, `Vec<T>`,
+/// `Option<T>`, `Box<T>`, `Arc<T>`, nested generics).  For each `Type::Path` the last
+/// segment name (the type's short name) is pushed as a lookup candidate alongside the
+/// full dot-joined path — both forms are tried so that `NodeIndex::resolve` can match
+/// either a qualified (`"domain::MyType"`) or bare (`"MyType"`) catalogue key.
 ///
+/// `ImplTrait`, `TraitObject`, and `Infer`/`Never`/`Verbatim` produce no output
+/// (they cannot be catalogue types).
+fn collect_type_names_from_syn(ty: &syn::Type, out: &mut Vec<String>) {
+    match ty {
+        syn::Type::Path(tp) => {
+            // Skip UFCS projections such as `<T as Trait>::Assoc` or `Self::Output`.
+            // When `qself` is present the leading path segment is not a type name at
+            // the catalogue level; reducing it to just the last segment (e.g. `Assoc`)
+            // would create bogus edges to any unrelated declared type of the same name.
+            // Catalogue TypeRefs should never use UFCS form, so safe to skip entirely.
+            if tp.qself.is_some() {
+                return;
+            }
+
+            // Push the full path as a `"::"` joined string so that qualified lookups
+            // (`"domain::MyType"`) have a chance to match.
+            let full_path: String = tp
+                .path
+                .segments
+                .iter()
+                .map(|seg| seg.ident.to_string())
+                .collect::<Vec<_>>()
+                .join("::");
+            out.push(full_path);
+
+            // Recurse into every generic argument (covers `Result<T, E>`, `Vec<T>`, …).
+            for seg in &tp.path.segments {
+                if let syn::PathArguments::AngleBracketed(ref args) = seg.arguments {
+                    for arg in &args.args {
+                        match arg {
+                            syn::GenericArgument::Type(inner_ty) => {
+                                collect_type_names_from_syn(inner_ty, out);
+                            }
+                            // Associated-type bindings: `Iterator<Item = Foo>`.
+                            // The bound type `Foo` must be extracted so edges to
+                            // declared catalogue types inside these bindings are emitted.
+                            syn::GenericArgument::AssocType(assoc) => {
+                                collect_type_names_from_syn(&assoc.ty, out);
+                            }
+                            // Lifetimes, const generics, assoc const — not type paths.
+                            _ => {}
+                        }
+                    }
+                } else if let syn::PathArguments::Parenthesized(ref args) = seg.arguments {
+                    // Fn trait `Fn(A, B) -> C`
+                    for input in &args.inputs {
+                        collect_type_names_from_syn(input, out);
+                    }
+                    if let syn::ReturnType::Type(_, ref ret) = args.output {
+                        collect_type_names_from_syn(ret, out);
+                    }
+                }
+            }
+        }
+        syn::Type::Reference(tr) => {
+            collect_type_names_from_syn(&tr.elem, out);
+        }
+        syn::Type::Slice(ts) => {
+            collect_type_names_from_syn(&ts.elem, out);
+        }
+        syn::Type::Array(ta) => {
+            collect_type_names_from_syn(&ta.elem, out);
+        }
+        syn::Type::Tuple(tt) => {
+            for elem in &tt.elems {
+                collect_type_names_from_syn(elem, out);
+            }
+        }
+        syn::Type::Paren(tp) => {
+            collect_type_names_from_syn(&tp.elem, out);
+        }
+        syn::Type::Group(tg) => {
+            collect_type_names_from_syn(&tg.elem, out);
+        }
+        syn::Type::Ptr(ptr) => {
+            collect_type_names_from_syn(&ptr.elem, out);
+        }
+        // ImplTrait, TraitObject, BareFn, Infer, Never, Verbatim, Macro — not catalogue types.
+        _ => {}
+    }
+}
+
+/// Resolve a `TypeRef` string to **all** rendered mermaid node IDs that it references.
+///
+/// Uses `syn::parse_str::<syn::Type>` to parse the full type expression (handling
+/// `&T`, `&mut T`, `Result<T, E>`, `Vec<T>`, `Option<T>`, `Box<T>`, `Arc<T>`,
+/// `[T]`, `(A, B)`, nested generics, etc.), then walks the resulting AST to collect
+/// every referenced type-path name.  Each candidate is resolved against `node_index`;
+/// only names that map to a **declared** catalogue node produce an entry in the
+/// returned `Vec`.  Undeclared/primitive/generic/external types are silently skipped.
+///
+/// `self_node_id` — when `Some`, the literal name `"Self"` extracted by the syn walk
+/// is substituted with the provided node_id directly, without going through
+/// `NodeIndex::resolve`.  This handles nested `Self` occurrences such as
+/// `Option<Self>` or `Result<Self, E>` in method signatures; `NodeIndex` never holds a
+/// `"Self"` key (it indexes declared types by their bare names), so without
+/// substitution the edge would be silently dropped.  Pass `None` for field / alias /
+/// function-level TypeRefs where `Self` has no meaningful resolution.
+///
+/// Returns an empty `Vec` (never panics) when:
+/// - `syn::parse_str` fails on a malformed TypeRef string (graceful fallback).
+/// - No inner type resolves to a declared catalogue node.
+///
+/// This upholds ADR 2026-04-17-1528 §D1: edges only between **declared** types.
 /// `current_crate` is forwarded to `NodeIndex::resolve` as a tie-breaker for bare
 /// TypeRef names that appear in multiple crates.
-pub(super) fn resolve_type_ref_node_id(
+pub(super) fn resolve_type_ref_node_ids(
     type_ref_str: &str,
     node_index: &NodeIndex,
     current_crate: &str,
-) -> String {
-    match node_index.resolve(type_ref_str, current_crate) {
-        Some(node_id) => node_id.to_string(),
-        None => sanitize(type_ref_str),
+    self_node_id: Option<&str>,
+) -> Vec<String> {
+    // Parse with syn; fall back silently on malformed input.
+    let syn_type = match syn::parse_str::<syn::Type>(type_ref_str) {
+        Ok(t) => t,
+        Err(_) => return Vec::new(),
+    };
+
+    let mut candidates: Vec<String> = Vec::new();
+    collect_type_names_from_syn(&syn_type, &mut candidates);
+
+    // Deduplicate: the same path may appear multiple times (e.g. nested).
+    candidates.sort_unstable();
+    candidates.dedup();
+
+    // Resolve each candidate against the node index; keep only declared types.
+    // The literal name "Self" is substituted directly with `self_node_id` when
+    // provided — `NodeIndex` does not hold a "Self" key (OS-04 / correctness).
+    let mut resolved: Vec<String> = Vec::new();
+    for candidate in &candidates {
+        if candidate == "Self" {
+            if let Some(id) = self_node_id {
+                let id_str = id.to_string();
+                if !resolved.contains(&id_str) {
+                    resolved.push(id_str);
+                }
+            }
+            // If self_node_id is None, "Self" has no resolution — silent skip.
+            continue;
+        }
+        if let Some(node_id) = node_index.resolve(candidate, current_crate) {
+            let node_id_str = node_id.to_string();
+            if !resolved.contains(&node_id_str) {
+                resolved.push(node_id_str);
+            }
+        }
     }
+    resolved
 }
 
 /// Resolve a `trait_ref` string to the rendered mermaid subgraph ID for that trait.
@@ -479,6 +680,7 @@ pub(super) fn render_mermaid(
         let layer_sg_id = layer_subgraph_id(layer_str);
 
         subgraph_lines.push(format!("subgraph {layer_sg_id}[\"{layer_str}\"]"));
+        subgraph_lines.push("  direction TB".to_string());
 
         // Sort docs within layer alphabetically by crate_name (CN-08).
         let docs_in_layer = docs_by_layer.get(layer_str).cloned().unwrap_or_default();
@@ -502,11 +704,18 @@ pub(super) fn render_mermaid(
             }
 
             // Separate entries into root (module_path=[]) and module-grouped.
+            // Delete-action entries are skipped — the contract-map shows the resulting
+            // contract, not removed items.
             let mut module_first_segs: BTreeMap<String, Vec<EntryKind<'_>>> = BTreeMap::new();
             let mut root_entries: Vec<EntryKind<'_>> = Vec::new();
 
+            use domain::tddd::catalogue_v2::roles::ItemAction;
+
             // Types
             for (type_name, type_entry) in &doc.types {
+                if type_entry.action == ItemAction::Delete {
+                    continue; // deleted types must not appear in the rendered map
+                }
                 if type_entry.module_path.is_root() {
                     root_entries.push(EntryKind::Type(type_name.as_str(), type_entry));
                 } else {
@@ -526,6 +735,9 @@ pub(super) fn render_mermaid(
 
             // Traits
             for (trait_name, trait_entry) in &doc.traits {
+                if trait_entry.action == ItemAction::Delete {
+                    continue; // deleted traits must not appear in the rendered map
+                }
                 if trait_entry.module_path.is_root() {
                     root_entries.push(EntryKind::Trait(trait_name.as_str(), trait_entry));
                 } else {
@@ -545,6 +757,9 @@ pub(super) fn render_mermaid(
 
             // Functions
             for (fn_path, fn_entry) in &doc.functions {
+                if fn_entry.action == ItemAction::Delete {
+                    continue; // deleted functions must not appear in the rendered map
+                }
                 if fn_path.module_path.is_root() {
                     root_entries.push(EntryKind::Function(fn_path, fn_entry));
                 } else {
@@ -582,6 +797,7 @@ pub(super) fn render_mermaid(
                 let mod_sg_id = module_subgraph_id(layer_str_doc, crate_str, first_seg);
                 let mod_label = format!("{crate_str}::{first_seg}");
                 subgraph_lines.push(format!("  subgraph {mod_sg_id}[\"{mod_label}\"]"));
+                subgraph_lines.push("    direction TB".to_string());
 
                 for entry in entries {
                     emit_entry(
@@ -633,7 +849,13 @@ pub(super) fn render_mermaid(
     }
 
     // Assemble output per IN-18 / ADR Render Output structure.
+    // The mermaid body (flowchart LR + content sections) is wrapped in a
+    // fenced markdown block so GitHub renders it as a diagram rather than
+    // plain text.  Order within the fence: classDef → layer-subgraph →
+    // edge → class-attach (IN-18 unchanged).
     let mut out = String::new();
+    out.push_str("<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->\n");
+    out.push_str("```mermaid\n");
     out.push_str("flowchart LR\n");
 
     for line in &class_defs {
@@ -655,6 +877,8 @@ pub(super) fn render_mermaid(
         out.push_str(line);
         out.push('\n');
     }
+
+    out.push_str("```\n");
 
     Ok(out)
 }
