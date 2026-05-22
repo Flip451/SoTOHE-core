@@ -1,0 +1,346 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section F says every `Struct / Enum / Trait / TypeAlias / Function` entry is subgraph化, but the surrounding text treats `FunctionEntry` as a standalone callable node that is not subgraphized. This needs one consistent rule for Function entries.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 202,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d33ba8c11f6febb34104e71f2f0bc25f530aead01d04fbda1a630f67905c595d",
+          "at": "2026-05-22T06:40:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision O indexes traits by `(CrateName, TraitName)` after reducing `Impl.trait_` to the last `::` segment. That drops module-path information, so a crate with two public traits that share the same short name will collide and impl edges can be misresolved or silently skipped.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 287,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
+          "at": "2026-05-22T06:50:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
+          "at": "2026-05-22T06:50:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
+          "at": "2026-05-22T06:51:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CC makes `Item.visibility == Visibility::Public` the sole node filter, but rustdoc uses `Visibility::Default` for associated items of public traits and variants of public enums. Applied as written, this contradicts H/H' because public enum variants and public trait methods would be filtered out before they can be rendered.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 400,
+              "category": "contradiction"
+            },
+            {
+              "message": "The enum payload model is wrong for rustdoc_types: `VariantKind::Tuple` contains `Vec<Option<Id>>`, not `Vec<Option<Type>>`, and struct variant fields are also IDs to `ItemEnum::StructField(Type)`. The plan therefore describes direct Type edges where the renderer actually needs an index lookup for each field ID, which would mis-specify variant payload rendering.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 220,
+              "category": "factual error"
+            },
+            {
+              "message": "The trait-impl resolution algorithm treats the first segment of `Path.path` as the crate name, but rustdoc `Path.path` is the path as used and may be short or re-exported (for example just `Vec`/`Trait`). This makes cross-baseline trait impl lookup semantically unreliable and can silently skip or misroute workspace trait edges.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 292,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
+          "at": "2026-05-22T06:55:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The render-output summary says classDef definitions are derived from both `[class.*]` and `[edge.*]`, but this ADR's schema defines `[edge.<EdgeKind>]` as only `arrow` plus optional `label`, while `[class.<ClassName>]` is the classDef source. Since this ADR inherits Contract Map L and the sibling ADR explicitly excludes `[edge.*]` from classDef generation, this contradicts the declared style schema and would mislead implementation of the renderer output.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 502,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e1b941411c6b6c34a89fcb5554e60d17c63f279f1dd778008fb3bce7dccc1699",
+          "at": "2026-05-22T06:58:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision D claims the node_id scheme is injective, but Type and Trait ids include only layer, crate, and the short item name. Rustdoc paths are module-qualified and Rust permits public items with the same short name in different modules; those entries can collide in a depth-2 cluster file, and Decision O repeats the same short-name collision for trait-impl lookup via `(CrateName, TraitName)`. The renderer needs full module/path identity for Type/Trait nodes and trait indexes, not just the last segment.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 181,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:6d688a825aca26c6eaa23d79bafc4e6d647bbe9c2a3f975028aa32f10eb5d743",
+          "at": "2026-05-22T07:02:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sanitized_module_path` is defined as the prefix of `ItemSummary.path` before the item name, but rustdoc paths are fully qualified and include the crate segment. That makes crate-root items look like they have module path `<crate>` instead of `[]`, which conflicts with the later root-cluster rule and with the trait lookup algorithm that explicitly strips the crate segment. The node-id and cluster scheme would duplicate the crate name and fail to bucket root items consistently.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 189,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan says to render public `ItemEnum::Function`s as standalone Function nodes, but rustdoc uses `ItemEnum::Function` for methods and associated functions too. Since trait methods and inherent impl methods are also embedded under their owning Trait/Type subgraphs, public inherent methods can be emitted twice unless the design defines a module/top-level membership filter for standalone functions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 236,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:70024956632c10948ab8822aa78546d3d383d695855fe34fab63deafa74e6ae4",
+          "at": "2026-05-22T07:07:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision D claims the length-prefixed node_id scheme preserves injectivity, but the ADR later acknowledges that sanitizing non-alphanumeric characters can collapse distinct names to the same value. Length-prefixing only disambiguates segment boundaries; it does not prevent sanitized-name collisions, so the design currently promises a uniqueness property it explicitly does not guarantee. Tighten the claim or make the collision-avoidance suffix part of the decision rather than leaving it optional for implementation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 181,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision U defines clusters as the top-level module segment (`module_path[0]`), but the filename and mermaid examples use multi-segment cluster names like `domain::review` and `domain::user`. Those are different cluster identities, which leaves the implementation unable to know whether to group by only the first module segment or by a crate/layer-prefixed path. The ADR should settle one cluster key and use the same key for grouping, labels, and filenames.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 329,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7c66efc05e1a31c9fca85ff21842e9dffcc44c312dcaa06188392df31d499d97",
+          "at": "2026-05-22T07:10:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision K describes `ItemEnum::Struct` as carrying fields in a single `fields: Vec<Id>` field, but `rustdoc_types::Struct` stores them under `Struct.kind`: named structs use `Plain { fields, has_stripped_fields }` and tuple structs use `Tuple(Vec<Option<Id>>)` with hidden fields represented as `None`. As written, the traversal is not implementable for the declared tuple/plain struct coverage and would mishandle stripped tuple fields.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 254,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:2ab38c3602c0931f6a14855b1eb3422f9098876477973f9a3c6b2f4583dc3a96",
+          "at": "2026-05-22T07:14:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision U defines the depth-2 cluster key and filename using only the crate-relative top-level module segment, but Decision A explicitly claims the renderer supports `1 layer N crate` inputs. In a layer with two crates that both have `review` (or root) entries, both map to the same `review.md` / root detail file and the same overview cluster, unlike the sibling Contract Map U-6d-iii design that keys module groups by `(crate_name, module_path[0])`. The plan needs either crate-qualified cluster keys/files or an explicit cross-crate aggregation rule to make the `1 layer N crate` claim coherent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 332,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision O already fixes cross-baseline trait lookup failures as `silent skip` (`edge を引かない`), but Open Question R later says cross-baseline lookup failure fallback behavior is still out of scope for a future phase. That leaves implementers with conflicting guidance on whether lookup failure handling is decided or still open.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 575,
+              "category": "contradiction"
+            },
+            {
+              "message": "This section says it inherits `旧 ADR §4.5`, but the immediately preceding `旧 ADR` reference is the Reality View ADR `2026-04-16-2200`, whose layer-agnostic material is not §4.5. The invariant being cited is later named as Contract Map ADR `2026-04-17-1528 §4.5`, so this cross-reference should be made explicit here to avoid pointing readers at the wrong ADR section.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 100,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:be5f99c5aafbb489787d77d98e3393fc0468ac08ca52aa1942a1b9788238e0df",
+          "at": "2026-05-22T07:18:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineDocument` is described as a \"wrapper newtype\", but the same decision defines and depends on it as a three-field document struct (`layer`, `crate_name`, `krate`). In Rust, a newtype is a single-field tuple struct; this wording conflicts with the intended self-describing wrapper design and can mislead the follow-up type-design phase. Rename this to a wrapper/document struct, or make the type an actual newtype and carry layer/crate metadata elsewhere.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 134,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ab70f9b2e67f3693712aa300e391508849c6f715b7c3901361aafac2eb5db2e0",
+          "at": "2026-05-22T07:21:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "BB treats `blanket_impl: Some(_)` as only an expanded duplicate to skip, while later claiming the user-declared blanket body is `blanket_impl: None + for_: Type::Generic`. In rustdoc, `blanket_impl` is the marker for blanket impls themselves, so this plan would skip the blanket impls it explicitly says should be preserved/rendered, making the blanket-impl rendering semantics wrong.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 402,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "The Reality View style schema inherits Contract Map filters such as `include_function_roles`, but this ADR’s input is pure `rustdoc_types::Crate` and it explicitly avoids catalogue-only role/pattern data. A fail-closed config containing function-role filters cannot be evaluated from rustdoc-only input without reintroducing catalogue semantics, contradicting the stated Reality View design boundary.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 269,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7337e7e2d6815cddb42b95b78feb4c9e0a2ba17def4a7b574f1317400c00e51f",
+          "at": "2026-05-22T07:25:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision BB says `blanket_impl: Some(_)` is the blanket impl body and should be skipped for now, but the rejected-alternatives section says skipping blanket impls is the corrected-away error and that the user-declared blanket body is `blanket_impl: None + for_: Type::Generic`; the same decision also refers to non-existent Open Question AA. The plan therefore leaves blanket impl handling undecidable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 401,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision C says the Reality View style schema has the same structure as Contract Map L, including `[role.*]`, but Decision L later says `[role.*]` and `include_function_roles` are intentionally removed because rustdoc input has no catalogue role data. These are conflicting schema requirements for the same config file.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 175,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:755ad7aa4eb4cf13705e322fa9eed249e62dc76abe4007c7cafc50e42e3ee8a0",
+          "at": "2026-05-22T07:35:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bde57b680f4fc64313799145693c471e6633380871c7bdb21bb6967d1dded48e",
+          "at": "2026-05-22T07:40:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Reality View config schema is internally inconsistent: line 175 says the section schema is `[node.*] + [pattern.*] + [class.*] + [edge.*] + [filter]` and explicitly omits `[role.*]`, but the later L decision reintroduces `[role.<RoleName>]` at lines 263-267. Implementers cannot tell whether role entries are part of the baseline-graph style file or not.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 175,
+              "category": "contradiction"
+            },
+            {
+              "message": "The proposed `render_baseline_graph_cluster(..., cluster_module: &ModulePath, ...)` API is not sufficient for the cluster identity defined later in U, which keys clusters by `(crate_name, top-level module)` and names files `<crate_name>_<module_seg1>.md`. In a layer with multiple crates that share the same top-level module, this signature cannot select the intended cluster unambiguously.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 126,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:8f8aa68ed922456d5736aec7928154ef44a4d87665bab7bad942a8a27cf04152",
+          "at": "2026-05-22T08:30:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9caf97240b5482eaed4ec9ca37623217d5ae98db9c4d9dc2ea6f0e97ebab308c",
+          "at": "2026-05-22T08:34:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a6fc2a29271b5dff9928f20073b0c29d7eed62e053c7c07a48b9776a176b454",
+          "at": "2026-05-22T08:42:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The U-r1 rejection cites old ADR `§Phase 2 Scope Update §S1` as the source for the depth=1 vs depth=2 evidence, but §S1 is the typestate/entry-point measurement section. The depth comparison and `Default=2` rationale are in `§S5.1`, so this cross-reference sends readers to the wrong design evidence for the cluster-depth decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 470,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6fc2a29271b5dff9928f20073b0c29d7eed62e053c7c07a48b9776a176b454",
+          "at": "2026-05-22T08:47:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision B includes standalone/top-level `ItemEnum::Function` as a rendered node, but the depth-2 output structure only allocates space for entry subgraphs and method/variant nodes. Since Function nodes are explicitly not subgraphs, the plan leaves them without a placement in cluster detail output, contradicting the selected node set and making the renderer behavior underspecified.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 531,
+              "category": "contradiction"
+            },
+            {
+              "message": "Open Question R says cross-baseline lookup failure fallback is out of scope, but Decision O already specifies that missing ids/crates/paths and lookup failures are handled by silent skip. The same failure mode is both decided and declared open, so implementers cannot tell whether lookup failure should be silently skipped or deferred to a later error/fallback design.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 575,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c809a2c2d3994e7e18de9885dceb8fa24811ac65a2970e9f9b108116ea7b29b5",
+          "at": "2026-05-22T08:50:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:504612017c51d6d16a76c4aa58ec4f261c846baf20966cfa89ba9bf28d04579b",
+          "at": "2026-05-22T08:54:03Z"
+        }
+      ]
+    }
+  }
+}
