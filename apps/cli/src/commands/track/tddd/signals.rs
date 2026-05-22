@@ -128,16 +128,9 @@ pub fn execute_type_signals(
     // is always satisfied regardless of how the caller invoked the command.
     let items_dir = workspace_root.join("track").join("items");
 
-    // Resolve the current git branch (CN-07 active-track guard requires it).
-    //
-    // SystemGitRepo::discover() uses the process CWD to locate the git repo.
-    // In normal usage sotp is always run from the workspace root, so CWD and
-    // workspace_root match (workspace_root defaults to `.`). A user who passes
-    // an explicit `--workspace-root /other/path` while standing in a different
-    // checkout would get the branch from the CWD checkout, not from
-    // workspace_root — but that is a misconfiguration of the caller and not a
-    // use case this CLI explicitly supports.
-    let branch = SystemGitRepo::discover()
+    // Resolve the current git branch (CN-07 active-track guard requires it),
+    // rooted at workspace_root so `--workspace-root` is always honoured.
+    let branch = SystemGitRepo::discover_from(&workspace_root)
         .map_err(|e| CliError::Message(format!("cannot discover git repo: {e}")))?
         .current_branch()
         .map_err(|e| CliError::Message(format!("cannot read current branch: {e}")))?
@@ -212,10 +205,9 @@ pub fn execute_type_signals_lenient_with_bindings(
     bindings: &[TdddLayerBinding],
 ) -> Result<ExitCode, CliError> {
     // CN-07 active-track guard: verify the current git branch matches
-    // `track/<track_id>`. This replaces the old Done/Archived status guard so
-    // the pre-commit path accepts Done tracks when they are the currently
-    // checked-out track branch, and rejects calls from the wrong branch.
-    let branch = SystemGitRepo::discover()
+    // `track/<track_id>`, rooted at workspace_root so `--workspace-root` is
+    // always honoured.
+    let branch = SystemGitRepo::discover_from(&workspace_root)
         .map_err(|e| CliError::Message(format!("cannot discover git repo: {e}")))?
         .current_branch()
         .map_err(|e| CliError::Message(format!("cannot read current branch: {e}")))?

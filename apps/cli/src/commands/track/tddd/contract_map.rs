@@ -38,18 +38,9 @@ pub fn execute_contract_map(
     layers: Option<String>,
 ) -> Result<ExitCode, CliError> {
     // CN-07 active-track guard: resolve the current git branch and verify it
-    // matches `track/<track_id>`. This replaces the old Done/Archived status
-    // guard so a track can render its contract-map when it is the track tied
-    // to the current branch — regardless of Done/Archived status.
-    //
-    // SystemGitRepo::discover() uses the process CWD to locate the git repo.
-    // In normal usage sotp is always run from the workspace root, so CWD and
-    // workspace_root match (workspace_root defaults to `.`). A user who passes
-    // an explicit `--workspace-root /other/path` while standing in a different
-    // checkout would get the branch from the CWD checkout, not from
-    // workspace_root — but that is a misconfiguration of the caller and not a
-    // use case this CLI explicitly supports.
-    let branch = SystemGitRepo::discover()
+    // matches `track/<track_id>`, rooted at workspace_root so
+    // `--workspace-root` is always honoured.
+    let branch = SystemGitRepo::discover_from(&workspace_root)
         .map_err(|e| CliError::Message(format!("cannot discover git repo: {e}")))?
         .current_branch()
         .map_err(|e| CliError::Message(format!("cannot read current branch: {e}")))?
