@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (13/14 resolved)
+## Tasks (14/14 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -98,4 +98,4 @@
 > subgraph label に層名がハードコードされていないことを unit test で検証する (AC-16)。
 > cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-18)。
 
-- [~] **T012**: layer-agnostic unit tests: 2 層構成 / 3 層構成 / 独自層名構成の rustdoc JSON fixture で renderer が正常動作することを確認し、subgraph label に層名がハードコードされていないことを検証する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-16, AC-18, CN-01, CN-03, CN-09)
+- [x] **T012**: layer-agnostic unit tests: 2 層構成 / 3 層構成 / 独自層名構成の rustdoc JSON fixture で renderer が正常動作することを確認し、subgraph label に層名がハードコードされていないことを検証する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-16, AC-18, CN-01, CN-03, CN-09) (`8d253bbd3adb398ff50ca2b9418edc6132124bd3`)
