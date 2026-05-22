@@ -7,6 +7,13 @@
 //! **Scope (T004)**: private TOML schema DTOs + style config loading + skeleton
 //! mermaid output (classDef block + layer subgraph frame). Full node/edge rendering
 //! will be added in T005–T010.
+//!
+//! **Scope (T005)**: node extraction logic — [`node_extractor`] submodule provides
+//! [`node_extractor::extract_nodes`] which extracts the 5 B-r1 node kinds (Decision B-r1)
+//! from `rustdoc_types::Crate` index entries, applying the visibility filter (Decision CC-1)
+//! and the standalone-Function listing range (Decision I).
+
+pub(super) mod node_extractor;
 
 use std::collections::BTreeMap;
 

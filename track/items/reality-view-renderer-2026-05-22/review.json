@@ -1,6 +1,68 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8007aa1d750e7740a315e7cefc7391f2c91589f02873b51ac92c6b7fbf0232d8",
+          "at": "2026-05-22T14:20:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8007aa1d750e7740a315e7cefc7391f2c91589f02873b51ac92c6b7fbf0232d8",
+          "at": "2026-05-22T14:22:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This filter still admits public inherent methods as standalone `Function` nodes. The only gates here are `crate_id == 0`, `krate.paths.contains_key(id)`, and `Visibility::Public`, but method items are also registered in `Crate::paths` as `ItemKind::Function` with paths like `[crate, ..., ParentName, method_name]`, so they pass this check and get misclassified as top-level functions. That violates the documented 'standalone / top-level only' scope for `ItemEnum::Function` and will render methods in the wrong place.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_extractor.rs",
+              "line": 123,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fa31a5b8a1c7de4cacafb359515c8e71120ac973f28080b8962249db0df0d98c",
+          "at": "2026-05-22T14:46:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ItemEnum::Function` is emitted whenever the item is public and present in `krate.paths`, but that does not prove it is a free function. Rustdoc can also place associated methods in `paths`, so this loop will misclassify public impl/trait methods as top-level Function nodes and violate the standalone-function requirement. Exclude method IDs (or otherwise check the parent `Trait`/`Impl` item lists) before constructing `ExtractedNode::Function`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_extractor.rs",
+              "line": 128,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fa31a5b8a1c7de4cacafb359515c8e71120ac973f28080b8962249db0df0d98c",
+          "at": "2026-05-22T14:49:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9adb63dc9589dc2be337a8f69b05dfe9ea936fda56bbd94199bcb0b78e97410c",
+          "at": "2026-05-22T14:55:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9adb63dc9589dc2be337a8f69b05dfe9ea936fda56bbd94199bcb0b78e97410c",
+          "at": "2026-05-22T14:57:12Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -33,24 +95,6 @@
         }
       ]
     },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8007aa1d750e7740a315e7cefc7391f2c91589f02873b51ac92c6b7fbf0232d8",
-          "at": "2026-05-22T14:20:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8007aa1d750e7740a315e7cefc7391f2c91589f02873b51ac92c6b7fbf0232d8",
-          "at": "2026-05-22T14:22:43Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -80,153 +124,6 @@
           "findings": [],
           "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
           "at": "2026-05-22T14:20:06Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
-          "at": "2026-05-22T12:26:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` writes the overview immediately after rendering it, before rendering the layer's cluster files. If a later `render_cluster` call fails, the method returns `RendererFailed` after `index.md` has already been persisted, so the required load -> render -> write pipeline can leave partial baseline graph output behind.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 283,
-              "category": "correctness"
-            },
-            {
-              "message": "Depth-2 cluster generation is hard-coded to one root cluster per crate: `render_cluster` is always called with an empty module and the writer key is only the crate name. The spec/port contract is per `(crate, top-level module)` cluster with `<crate_name>_<module_seg1>.md`, so crates with top-level modules will miss cluster files and `written_file_count` will be too low.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 292,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
-          "at": "2026-05-22T12:28:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` writes each layer inside the same loop that renders later layers. If rendering succeeds for an earlier layer and then `render_overview` or `render_cluster` fails for a later layer, the method returns `RendererFailed` after already persisting the earlier files. That violates the intended load -> render -> write pipeline and the local guarantee that renderer errors cannot leave partial output; render all filtered layers into memory first, then perform writes only after every render succeeds.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 351,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:98a8be6778601335ec95f7373d6aafa5c23fdcfd02c8ebdf287c4fe9ef27c7c3",
-          "at": "2026-05-22T12:38:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The root-cluster key is emitted as just the crate name, so a writer following the port contract (`<cluster_key>.md`) will create `domain.md` for crate-root items. The track spec/ADR requires crate-root detail files to use `<crate_name>_root.md`; this will put root cluster output at the wrong path once the writer adapter is connected.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 345,
-              "category": "spec_mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:e1d49ccfab8024fd3db380515e25489887df02d175ccc5549a345419d5bc20db",
-          "at": "2026-05-22T12:42:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22107f7b0faacadd13b3ec0d1f1f6a4e9ea8cde0db4a9a7570a9eb892b3305bb",
-          "at": "2026-05-22T12:44:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`layer_filter` entries are copied verbatim into `resolved`, so duplicate `LayerId`s are rendered and written multiple times and `rendered_layer_count` is inflated. That makes the baseline-graph workflow behave differently from the contract-map workflow, where duplicates collapse via membership filtering. If repeated layers are meant to be harmless input, this needs deduping before the render/write loop.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 257,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:0ec821a856cbf624e91d3ee6291329023d3f80d1f5e6726bb8a278c74455a730",
-          "at": "2026-05-22T13:31:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
-          "at": "2026-05-22T13:56:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
-          "at": "2026-05-22T13:58:55Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 161,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
-          "at": "2026-05-22T12:27:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 44,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
-          "at": "2026-05-22T12:31:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:34:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:35:36Z"
         }
       ]
     },
@@ -778,6 +675,167 @@
           "findings": [],
           "hash": "rvw1:sha256:2cb5d9796390e4ccaafea57874a6fb03c33ae238ed7981cfc7d3afaaea6764e8",
           "at": "2026-05-22T14:27:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:853c8c2a336b0258deca9711d331b0a1c59e5e9c2837819596f1e2cbfe7362ac",
+          "at": "2026-05-22T14:44:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:853c8c2a336b0258deca9711d331b0a1c59e5e9c2837819596f1e2cbfe7362ac",
+          "at": "2026-05-22T14:45:33Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
+          "at": "2026-05-22T12:26:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` writes the overview immediately after rendering it, before rendering the layer's cluster files. If a later `render_cluster` call fails, the method returns `RendererFailed` after `index.md` has already been persisted, so the required load -> render -> write pipeline can leave partial baseline graph output behind.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 283,
+              "category": "correctness"
+            },
+            {
+              "message": "Depth-2 cluster generation is hard-coded to one root cluster per crate: `render_cluster` is always called with an empty module and the writer key is only the crate name. The spec/port contract is per `(crate, top-level module)` cluster with `<crate_name>_<module_seg1>.md`, so crates with top-level modules will miss cluster files and `written_file_count` will be too low.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 292,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
+          "at": "2026-05-22T12:28:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` writes each layer inside the same loop that renders later layers. If rendering succeeds for an earlier layer and then `render_overview` or `render_cluster` fails for a later layer, the method returns `RendererFailed` after already persisting the earlier files. That violates the intended load -> render -> write pipeline and the local guarantee that renderer errors cannot leave partial output; render all filtered layers into memory first, then perform writes only after every render succeeds.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 351,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:98a8be6778601335ec95f7373d6aafa5c23fdcfd02c8ebdf287c4fe9ef27c7c3",
+          "at": "2026-05-22T12:38:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The root-cluster key is emitted as just the crate name, so a writer following the port contract (`<cluster_key>.md`) will create `domain.md` for crate-root items. The track spec/ADR requires crate-root detail files to use `<crate_name>_root.md`; this will put root cluster output at the wrong path once the writer adapter is connected.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 345,
+              "category": "spec_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:e1d49ccfab8024fd3db380515e25489887df02d175ccc5549a345419d5bc20db",
+          "at": "2026-05-22T12:42:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22107f7b0faacadd13b3ec0d1f1f6a4e9ea8cde0db4a9a7570a9eb892b3305bb",
+          "at": "2026-05-22T12:44:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_filter` entries are copied verbatim into `resolved`, so duplicate `LayerId`s are rendered and written multiple times and `rendered_layer_count` is inflated. That makes the baseline-graph workflow behave differently from the contract-map workflow, where duplicates collapse via membership filtering. If repeated layers are meant to be harmless input, this needs deduping before the render/write loop.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 257,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:0ec821a856cbf624e91d3ee6291329023d3f80d1f5e6726bb8a278c74455a730",
+          "at": "2026-05-22T13:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
+          "at": "2026-05-22T13:56:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
+          "at": "2026-05-22T13:58:55Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 161,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
+          "at": "2026-05-22T12:27:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 44,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
+          "at": "2026-05-22T12:31:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:34:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:35:36Z"
         }
       ]
     }

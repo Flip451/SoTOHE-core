@@ -22,12 +22,13 @@
     {
       "id": "T004",
       "description": "infrastructure layer: BaselineGraphRendererAdapter を libs/infrastructure に新設し、BaselineGraphRenderer port を impl する。.harness/config/baseline-graph-style.toml を読み込む (fail-closed: ファイル不在は StyleConfigNotFound エラー)。style config section 構造: [node.*] + [pattern.*] + [class.*] + [edge.*] + [filter] ([role.*] なし) (IN-02, IN-04, AC-02, AC-15, CN-02, CN-06)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "40fc5c1227b3a1343b8fed3e9e335b096b2a8e55"
     },
     {
       "id": "T005",
       "description": "adapter 内: node 抽出ロジック (B-r1: 5 種固定 Struct / Enum / TypeAlias / Trait / Function) + visibility filter (CC-1: Public only / Default 例外) + Function 列挙範囲 (I decision) を実装する (IN-03, IN-17, IN-18, AC-03, AC-12)",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",
