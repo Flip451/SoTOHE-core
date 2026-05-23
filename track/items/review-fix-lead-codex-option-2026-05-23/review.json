@@ -1,134 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:344fb695dcd95e55879a6195e424763a22f65494cef5d2e8abc4ea99ca5f9ef0",
-          "at": "2026-05-23T10:11:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 treats Codex's `.git` read-only sandbox as enough to drop post-run scope-violation validation, but that protection only prevents staging/commit/branch writes. The same plan gives Codex shell-level file editing over the workspace and only prompt-injects the scope list, then has the trusted orchestrator commit afterward; out-of-scope working-tree edits could therefore still be produced and later recorded. The ADR should not remove scope-diff validation on the basis of `.git` protection alone.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
-              "line": 65,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:344fb695dcd95e55879a6195e424763a22f65494cef5d2e8abc4ea99ca5f9ef0",
-          "at": "2026-05-23T10:13:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 relies on a launch-time smoke-test as the replacement for post-run validation, but the specified checks only assert that `workspace-write` is requested and that the CLI version is in an allowed range. They do not actually verify the runtime invariant that `.git` is read-only, while later passages both admit the guarantee can break if the smoke-test misses a behavior change and say the D3 smoke-test will detect that condition. This leaves the safety gate internally inconsistent: either the smoke-test must include an actual `.git` write-failure probe, or the ADR should stop claiming D3 detects loss of the sandbox guarantee.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
-              "line": 72,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:72d8860cb1b5bf1883a234cce4ef41c4d792d70c012e33383fe1268a3fd0bc70",
-          "at": "2026-05-23T10:16:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 claims scope-boundary compliance is guaranteed by the briefing contract while making post-run scope-diff validation optional, but the same section acknowledges that Codex can edit any file in the workspace. A prompt-only contract plus a possible pre-commit review does not enforce that out-of-scope working-tree edits cannot be recorded by the orchestrator, so the plan either needs a mandatory scope check before commit or must stop treating scope containment as guaranteed.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
-              "line": 68,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:ecbab7db06beda8094390dd7fdeb8284af58da345385d5605264c02a775c48d2",
-          "at": "2026-05-23T10:18:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 claims Codex workspace-write `.git` read-only protection structurally prevents `push` along with stage/commit, but push is a remote write and is not covered by the cited empirical result, which only demonstrates local `.git` mutations such as `git add` failing. Credential isolation is therefore not merely defense-in-depth for push; it is part of the required guarantee. The plan should separate local git mutation prevention from publish prevention so implementers do not rely on `.git` read-only as a push guard.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
-              "line": 67,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:b65094aacab9eb278a0d0fcd57a71eb4d829b92d80bce8bbe3888abe59a989d3",
-          "at": "2026-05-23T10:20:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c494ef9b2f3cabd7eeda383989d45d1bdfb3aa66d4fa88b5fd6695775367b15",
-          "at": "2026-05-23T10:22:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d0ca693f5c8c163b5244ea93dcce90eed6be00b2f1116f08161a25df3b06edf",
-          "at": "2026-05-23T10:44:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The plan gives conflicting switch semantics for Codex: GO-01/IN-01 advertises a one-line/provider-only switch to `provider=codex`, but T001 says selecting Codex also requires `model=gpt-5.5`. If the implementation follows the provider-only contract, Codex can inherit the Claude model; if it follows T001, the advertised switch contract is false. Specify whether the model is provider-derived/defaulted or must be edited by the user.",
-              "severity": "P1",
-              "file": "track/items/review-fix-lead-codex-option-2026-05-23/spec.md",
-              "line": 11,
-              "category": "contradiction"
-            },
-            {
-              "message": "AC-05 only checks that `GITHUB_TOKEN / SSH 鍵` are not passed as environment variables, but SSH credentials commonly flow through `SSH_AUTH_SOCK`, `HOME`/`~/.ssh`, or key files rather than an `SSH key` env var. This criterion can pass while the fixer still has push credentials, contradicting CN-02/D3's credential isolation guarantee.",
-              "severity": "P1",
-              "file": "track/items/review-fix-lead-codex-option-2026-05-23/spec.md",
-              "line": 43,
-              "category": "factual error (semantic)"
-            }
-          ],
-          "hash": "rvw1:sha256:4d0ca693f5c8c163b5244ea93dcce90eed6be00b2f1116f08161a25df3b06edf",
-          "at": "2026-05-23T10:47:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65b29e90400bcee9962bee1660d28ff223d70952b871e5c202f94c0991780405",
-          "at": "2026-05-23T10:50:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:44c42b3237f5cfe0bac397336c5cf56d837f5b107e110bf3cfb9f0c2c28532ba",
-          "at": "2026-05-23T11:17:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:44c42b3237f5cfe0bac397336c5cf56d837f5b107e110bf3cfb9f0c2c28532ba",
-          "at": "2026-05-23T11:18:40Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -361,6 +233,148 @@
           "findings": [],
           "hash": "rvw1:sha256:aeec96107c7157dca83d0071f630f9b3fae8bf6203e5a59b4299f6727e766782",
           "at": "2026-05-23T12:23:45Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:344fb695dcd95e55879a6195e424763a22f65494cef5d2e8abc4ea99ca5f9ef0",
+          "at": "2026-05-23T10:11:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 treats Codex's `.git` read-only sandbox as enough to drop post-run scope-violation validation, but that protection only prevents staging/commit/branch writes. The same plan gives Codex shell-level file editing over the workspace and only prompt-injects the scope list, then has the trusted orchestrator commit afterward; out-of-scope working-tree edits could therefore still be produced and later recorded. The ADR should not remove scope-diff validation on the basis of `.git` protection alone.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
+              "line": 65,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:344fb695dcd95e55879a6195e424763a22f65494cef5d2e8abc4ea99ca5f9ef0",
+          "at": "2026-05-23T10:13:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 relies on a launch-time smoke-test as the replacement for post-run validation, but the specified checks only assert that `workspace-write` is requested and that the CLI version is in an allowed range. They do not actually verify the runtime invariant that `.git` is read-only, while later passages both admit the guarantee can break if the smoke-test misses a behavior change and say the D3 smoke-test will detect that condition. This leaves the safety gate internally inconsistent: either the smoke-test must include an actual `.git` write-failure probe, or the ADR should stop claiming D3 detects loss of the sandbox guarantee.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:72d8860cb1b5bf1883a234cce4ef41c4d792d70c012e33383fe1268a3fd0bc70",
+          "at": "2026-05-23T10:16:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 claims scope-boundary compliance is guaranteed by the briefing contract while making post-run scope-diff validation optional, but the same section acknowledges that Codex can edit any file in the workspace. A prompt-only contract plus a possible pre-commit review does not enforce that out-of-scope working-tree edits cannot be recorded by the orchestrator, so the plan either needs a mandatory scope check before commit or must stop treating scope containment as guaranteed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
+              "line": 68,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:ecbab7db06beda8094390dd7fdeb8284af58da345385d5605264c02a775c48d2",
+          "at": "2026-05-23T10:18:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 claims Codex workspace-write `.git` read-only protection structurally prevents `push` along with stage/commit, but push is a remote write and is not covered by the cited empirical result, which only demonstrates local `.git` mutations such as `git add` failing. Credential isolation is therefore not merely defense-in-depth for push; it is part of the required guarantee. The plan should separate local git mutation prevention from publish prevention so implementers do not rely on `.git` read-only as a push guard.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
+              "line": 67,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:b65094aacab9eb278a0d0fcd57a71eb4d829b92d80bce8bbe3888abe59a989d3",
+          "at": "2026-05-23T10:20:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c494ef9b2f3cabd7eeda383989d45d1bdfb3aa66d4fa88b5fd6695775367b15",
+          "at": "2026-05-23T10:22:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d0ca693f5c8c163b5244ea93dcce90eed6be00b2f1116f08161a25df3b06edf",
+          "at": "2026-05-23T10:44:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan gives conflicting switch semantics for Codex: GO-01/IN-01 advertises a one-line/provider-only switch to `provider=codex`, but T001 says selecting Codex also requires `model=gpt-5.5`. If the implementation follows the provider-only contract, Codex can inherit the Claude model; if it follows T001, the advertised switch contract is false. Specify whether the model is provider-derived/defaulted or must be edited by the user.",
+              "severity": "P1",
+              "file": "track/items/review-fix-lead-codex-option-2026-05-23/spec.md",
+              "line": 11,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-05 only checks that `GITHUB_TOKEN / SSH 鍵` are not passed as environment variables, but SSH credentials commonly flow through `SSH_AUTH_SOCK`, `HOME`/`~/.ssh`, or key files rather than an `SSH key` env var. This criterion can pass while the fixer still has push credentials, contradicting CN-02/D3's credential isolation guarantee.",
+              "severity": "P1",
+              "file": "track/items/review-fix-lead-codex-option-2026-05-23/spec.md",
+              "line": 43,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:4d0ca693f5c8c163b5244ea93dcce90eed6be00b2f1116f08161a25df3b06edf",
+          "at": "2026-05-23T10:47:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65b29e90400bcee9962bee1660d28ff223d70952b871e5c202f94c0991780405",
+          "at": "2026-05-23T10:50:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44c42b3237f5cfe0bac397336c5cf56d837f5b107e110bf3cfb9f0c2c28532ba",
+          "at": "2026-05-23T11:17:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44c42b3237f5cfe0bac397336c5cf56d837f5b107e110bf3cfb9f0c2c28532ba",
+          "at": "2026-05-23T11:18:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cbbda628a2489feb770587df05f73dfbc4016c35d83fbb58f4da5e5125f9a9c",
+          "at": "2026-05-23T12:32:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cbbda628a2489feb770587df05f73dfbc4016c35d83fbb58f4da5e5125f9a9c",
+          "at": "2026-05-23T12:34:01Z"
         }
       ]
     }
