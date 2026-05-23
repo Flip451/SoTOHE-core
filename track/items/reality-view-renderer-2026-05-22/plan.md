@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (17/17 resolved)
+## Tasks (17/18 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -110,3 +110,12 @@
 - [x] **T015**: adapter 内: method edge 実装 — inherent method (BB: entry subgraph 内包) および Trait method (H': Trait subgraph 内包) の各 method node から、引数の型へ method_param edge、返り値の型へ method_returns edge を引く。FunctionSignature.inputs / output を走査し、own crate 型 (krate.paths lookup で crate_id == 0) のみ entry subgraph へ edge を引く。型解決は Type::ResolvedPath.args (GenericArgs) の再帰走査で行う (syn 不使用)。method node が引数・返り値を持たない場合は edge なし。edge スタイルは設定ファイル [edge.method_param] / [edge.method_returns] を参照する。修正対象: render/entry_subgraph.rs / render/impl_processor.rs (AC-19, AC-20 の method 経路) (`6fde3a59a49786e5779cb1b69bd2edc268d112fa`)
 - [x] **T016**: adapter 内: 既存 edge の型解決を ResolvedPath.args 再帰に変更 — struct field (K decision) / enum variant payload (H decision) / TypeAlias target (N decision) の型解決ロジックを Type::ResolvedPath.args (GenericArgs) 再帰走査に統一し、own crate 型 (krate.paths lookup で crate_id == 0) のみ edge を引くように修正する。primitive (Type::Primitive) / generic 型パラメータ (Type::Generic) / 外部型への edge は生成しない。anonymous node (prim_* / generic_* / anon_*) 生成コードおよびそれらへの edge 生成コードを削除する (syn 不使用)。修正対象: render/entry_subgraph.rs (AC-20 の既存 edge 修正) (`1adc93a29cbcdfbec9c1ebff2cdd254de740f14c`)
 - [x] **T017**: adapter 内: depth-1 overview の edge collector `collect_entry_edge_pairs` (render/mod.rs) に method-signature edge walk (Pass 3) を追加する — inherent method (Impl items: trait_:None / blanket:None / non-negative / non-synthetic) および Trait method (Trait items の Function variant) の FunctionSignature.inputs / output を既存の `collect_resolved_node_ids_from_type` で own crate 型解決し、(src_rep_id, dst_type_rep_id) の cross-cluster pair を生成して既存の cross-cluster フィルタに流す。depth-2 側 (impl_processor の emit_method_signature_edges) のロジックを参照して再利用する。catalogue 宣言型 (BaselineGraphRenderer) は不変。修正対象: render/mod.rs のみ (AC-19 depth-1 経路) (`572013d366f7a1bc6be5558ba6028e4a9fd855a5`)
+
+### S13 — Render サブモジュール module 分割 (700 行上限 refactor)
+
+> T018: render/mod.rs / render/impl_processor.rs / render/entry_subgraph.rs の 3 ファイルが production 行数 700 行上限 (04-coding-principles.md) を超過している (mod.rs: 1391 行、impl_processor.rs: 975 行、entry_subgraph.rs: 708 行)。
+> 責務単位でサブモジュールに分割し、各 production ファイルを 700 行以下にする。分割は機能不変の pure refactor — 出力・API・catalogue 宣言型は不変。
+> 分割境界の具体的な判断 (overview render / cluster render / edge collector / cluster key 等) は implementer が実コードを読んで決定する。
+> テストは移動先モジュールに追従させる。cargo make ci 全 pass を確認して完了とする。
+
+- [ ] **T018**: render サブモジュール module 分割 (機能不変 refactor) — render/mod.rs (production 1391 行) / render/impl_processor.rs (production 975 行) / render/entry_subgraph.rs (production 708 行) を責務単位で分割し、各 production ファイルの行数を 700 行以下にする。分割境界の例: overview render / cluster render / edge collector / cluster key / inherent method / trait index / impl edge / struct subgraph / enum subgraph 等 (実際の境界は implementer が判断)。BaselineGraphRendererAdapter の pub(super) API および catalogue 宣言型 (BaselineGraphRendererAdapter) は不変。テストは移動先モジュールに追従する。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (04-coding-principles.md 700 行上限、PR #136 finding 1-3 対応)

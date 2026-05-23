@@ -1,83 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 161,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
-          "at": "2026-05-22T12:27:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 44,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
-          "at": "2026-05-22T12:31:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:34:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:35:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new CLI composition root still lacks a real success-path test. `test_execute_baseline_graph_branch_guard_passes_for_current_track` only proves the branch guard does not reject; it accepts any loader/renderer/writer failure and skips entirely on non-`track/` branches. That leaves regressions in the new wiring (wrong adapter construction, wrong style-config path, broken writer output path) uncovered in CI.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/baseline_graph.rs",
-              "line": 262,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
-          "at": "2026-05-22T21:40:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
-          "at": "2026-05-22T21:42:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
-          "at": "2026-05-22T21:44:40Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -209,838 +132,80 @@
         }
       ]
     },
-    "plan-artifacts": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Section F says every `Struct / Enum / Trait / TypeAlias / Function` entry is subgraph化, but the surrounding text treats `FunctionEntry` as a standalone callable node that is not subgraphized. This needs one consistent rule for Function entries.",
+              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 202,
-              "category": "contradiction"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 161,
+              "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:d33ba8c11f6febb34104e71f2f0bc25f530aead01d04fbda1a630f67905c595d",
-          "at": "2026-05-22T06:40:47Z"
+          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
+          "at": "2026-05-22T12:27:37Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Decision O indexes traits by `(CrateName, TraitName)` after reducing `Impl.trait_` to the last `::` segment. That drops module-path information, so a crate with two public traits that share the same short name will collide and impl edges can be misresolved or silently skipped.",
+              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 287,
-              "category": "factual error"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 44,
+              "category": "error handling"
             }
           ],
-          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
-          "at": "2026-05-22T06:50:03Z"
+          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
+          "at": "2026-05-22T12:31:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
-          "at": "2026-05-22T06:50:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
-          "at": "2026-05-22T06:51:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CC makes `Item.visibility == Visibility::Public` the sole node filter, but rustdoc uses `Visibility::Default` for associated items of public traits and variants of public enums. Applied as written, this contradicts H/H' because public enum variants and public trait methods would be filtered out before they can be rendered.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 400,
-              "category": "contradiction"
-            },
-            {
-              "message": "The enum payload model is wrong for rustdoc_types: `VariantKind::Tuple` contains `Vec<Option<Id>>`, not `Vec<Option<Type>>`, and struct variant fields are also IDs to `ItemEnum::StructField(Type)`. The plan therefore describes direct Type edges where the renderer actually needs an index lookup for each field ID, which would mis-specify variant payload rendering.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 220,
-              "category": "factual error"
-            },
-            {
-              "message": "The trait-impl resolution algorithm treats the first segment of `Path.path` as the crate name, but rustdoc `Path.path` is the path as used and may be short or re-exported (for example just `Vec`/`Trait`). This makes cross-baseline trait impl lookup semantically unreliable and can silently skip or misroute workspace trait edges.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 292,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
-          "at": "2026-05-22T06:55:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The render-output summary says classDef definitions are derived from both `[class.*]` and `[edge.*]`, but this ADR's schema defines `[edge.<EdgeKind>]` as only `arrow` plus optional `label`, while `[class.<ClassName>]` is the classDef source. Since this ADR inherits Contract Map L and the sibling ADR explicitly excludes `[edge.*]` from classDef generation, this contradicts the declared style schema and would mislead implementation of the renderer output.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 502,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e1b941411c6b6c34a89fcb5554e60d17c63f279f1dd778008fb3bce7dccc1699",
-          "at": "2026-05-22T06:58:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision D claims the node_id scheme is injective, but Type and Trait ids include only layer, crate, and the short item name. Rustdoc paths are module-qualified and Rust permits public items with the same short name in different modules; those entries can collide in a depth-2 cluster file, and Decision O repeats the same short-name collision for trait-impl lookup via `(CrateName, TraitName)`. The renderer needs full module/path identity for Type/Trait nodes and trait indexes, not just the last segment.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 181,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:6d688a825aca26c6eaa23d79bafc4e6d647bbe9c2a3f975028aa32f10eb5d743",
-          "at": "2026-05-22T07:02:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sanitized_module_path` is defined as the prefix of `ItemSummary.path` before the item name, but rustdoc paths are fully qualified and include the crate segment. That makes crate-root items look like they have module path `<crate>` instead of `[]`, which conflicts with the later root-cluster rule and with the trait lookup algorithm that explicitly strips the crate segment. The node-id and cluster scheme would duplicate the crate name and fail to bucket root items consistently.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 189,
-              "category": "contradiction"
-            },
-            {
-              "message": "The plan says to render public `ItemEnum::Function`s as standalone Function nodes, but rustdoc uses `ItemEnum::Function` for methods and associated functions too. Since trait methods and inherent impl methods are also embedded under their owning Trait/Type subgraphs, public inherent methods can be emitted twice unless the design defines a module/top-level membership filter for standalone functions.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 236,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:70024956632c10948ab8822aa78546d3d383d695855fe34fab63deafa74e6ae4",
-          "at": "2026-05-22T07:07:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision D claims the length-prefixed node_id scheme preserves injectivity, but the ADR later acknowledges that sanitizing non-alphanumeric characters can collapse distinct names to the same value. Length-prefixing only disambiguates segment boundaries; it does not prevent sanitized-name collisions, so the design currently promises a uniqueness property it explicitly does not guarantee. Tighten the claim or make the collision-avoidance suffix part of the decision rather than leaving it optional for implementation.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 181,
-              "category": "contradiction"
-            },
-            {
-              "message": "Decision U defines clusters as the top-level module segment (`module_path[0]`), but the filename and mermaid examples use multi-segment cluster names like `domain::review` and `domain::user`. Those are different cluster identities, which leaves the implementation unable to know whether to group by only the first module segment or by a crate/layer-prefixed path. The ADR should settle one cluster key and use the same key for grouping, labels, and filenames.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 329,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:7c66efc05e1a31c9fca85ff21842e9dffcc44c312dcaa06188392df31d499d97",
-          "at": "2026-05-22T07:10:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision K describes `ItemEnum::Struct` as carrying fields in a single `fields: Vec<Id>` field, but `rustdoc_types::Struct` stores them under `Struct.kind`: named structs use `Plain { fields, has_stripped_fields }` and tuple structs use `Tuple(Vec<Option<Id>>)` with hidden fields represented as `None`. As written, the traversal is not implementable for the declared tuple/plain struct coverage and would mishandle stripped tuple fields.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 254,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:2ab38c3602c0931f6a14855b1eb3422f9098876477973f9a3c6b2f4583dc3a96",
-          "at": "2026-05-22T07:14:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision U defines the depth-2 cluster key and filename using only the crate-relative top-level module segment, but Decision A explicitly claims the renderer supports `1 layer N crate` inputs. In a layer with two crates that both have `review` (or root) entries, both map to the same `review.md` / root detail file and the same overview cluster, unlike the sibling Contract Map U-6d-iii design that keys module groups by `(crate_name, module_path[0])`. The plan needs either crate-qualified cluster keys/files or an explicit cross-crate aggregation rule to make the `1 layer N crate` claim coherent.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 332,
-              "category": "contradiction"
-            },
-            {
-              "message": "Decision O already fixes cross-baseline trait lookup failures as `silent skip` (`edge を引かない`), but Open Question R later says cross-baseline lookup failure fallback behavior is still out of scope for a future phase. That leaves implementers with conflicting guidance on whether lookup failure handling is decided or still open.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 575,
-              "category": "contradiction"
-            },
-            {
-              "message": "This section says it inherits `旧 ADR §4.5`, but the immediately preceding `旧 ADR` reference is the Reality View ADR `2026-04-16-2200`, whose layer-agnostic material is not §4.5. The invariant being cited is later named as Contract Map ADR `2026-04-17-1528 §4.5`, so this cross-reference should be made explicit here to avoid pointing readers at the wrong ADR section.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 100,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:be5f99c5aafbb489787d77d98e3393fc0468ac08ca52aa1942a1b9788238e0df",
-          "at": "2026-05-22T07:18:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineDocument` is described as a \"wrapper newtype\", but the same decision defines and depends on it as a three-field document struct (`layer`, `crate_name`, `krate`). In Rust, a newtype is a single-field tuple struct; this wording conflicts with the intended self-describing wrapper design and can mislead the follow-up type-design phase. Rename this to a wrapper/document struct, or make the type an actual newtype and carry layer/crate metadata elsewhere.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 134,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ab70f9b2e67f3693712aa300e391508849c6f715b7c3901361aafac2eb5db2e0",
-          "at": "2026-05-22T07:21:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "BB treats `blanket_impl: Some(_)` as only an expanded duplicate to skip, while later claiming the user-declared blanket body is `blanket_impl: None + for_: Type::Generic`. In rustdoc, `blanket_impl` is the marker for blanket impls themselves, so this plan would skip the blanket impls it explicitly says should be preserved/rendered, making the blanket-impl rendering semantics wrong.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 402,
-              "category": "factual error (semantic)"
-            },
-            {
-              "message": "The Reality View style schema inherits Contract Map filters such as `include_function_roles`, but this ADR’s input is pure `rustdoc_types::Crate` and it explicitly avoids catalogue-only role/pattern data. A fail-closed config containing function-role filters cannot be evaluated from rustdoc-only input without reintroducing catalogue semantics, contradicting the stated Reality View design boundary.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 269,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:7337e7e2d6815cddb42b95b78feb4c9e0a2ba17def4a7b574f1317400c00e51f",
-          "at": "2026-05-22T07:25:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision BB says `blanket_impl: Some(_)` is the blanket impl body and should be skipped for now, but the rejected-alternatives section says skipping blanket impls is the corrected-away error and that the user-declared blanket body is `blanket_impl: None + for_: Type::Generic`; the same decision also refers to non-existent Open Question AA. The plan therefore leaves blanket impl handling undecidable.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 401,
-              "category": "contradiction"
-            },
-            {
-              "message": "Decision C says the Reality View style schema has the same structure as Contract Map L, including `[role.*]`, but Decision L later says `[role.*]` and `include_function_roles` are intentionally removed because rustdoc input has no catalogue role data. These are conflicting schema requirements for the same config file.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 175,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:755ad7aa4eb4cf13705e322fa9eed249e62dc76abe4007c7cafc50e42e3ee8a0",
-          "at": "2026-05-22T07:35:10Z"
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:34:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bde57b680f4fc64313799145693c471e6633380871c7bdb21bb6967d1dded48e",
-          "at": "2026-05-22T07:40:09Z"
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:35:36Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The Reality View config schema is internally inconsistent: line 175 says the section schema is `[node.*] + [pattern.*] + [class.*] + [edge.*] + [filter]` and explicitly omits `[role.*]`, but the later L decision reintroduces `[role.<RoleName>]` at lines 263-267. Implementers cannot tell whether role entries are part of the baseline-graph style file or not.",
+              "message": "The new CLI composition root still lacks a real success-path test. `test_execute_baseline_graph_branch_guard_passes_for_current_track` only proves the branch guard does not reject; it accepts any loader/renderer/writer failure and skips entirely on non-`track/` branches. That leaves regressions in the new wiring (wrong adapter construction, wrong style-config path, broken writer output path) uncovered in CI.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 175,
-              "category": "contradiction"
-            },
-            {
-              "message": "The proposed `render_baseline_graph_cluster(..., cluster_module: &ModulePath, ...)` API is not sufficient for the cluster identity defined later in U, which keys clusters by `(crate_name, top-level module)` and names files `<crate_name>_<module_seg1>.md`. In a layer with multiple crates that share the same top-level module, this signature cannot select the intended cluster unambiguously.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 126,
-              "category": "infeasibility"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 262,
+              "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:8f8aa68ed922456d5736aec7928154ef44a4d87665bab7bad942a8a27cf04152",
-          "at": "2026-05-22T08:30:06Z"
+          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
+          "at": "2026-05-22T21:40:14Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9caf97240b5482eaed4ec9ca37623217d5ae98db9c4d9dc2ea6f0e97ebab308c",
-          "at": "2026-05-22T08:34:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a6fc2a29271b5dff9928f20073b0c29d7eed62e053c7c07a48b9776a176b454",
-          "at": "2026-05-22T08:42:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The U-r1 rejection cites old ADR `§Phase 2 Scope Update §S1` as the source for the depth=1 vs depth=2 evidence, but §S1 is the typestate/entry-point measurement section. The depth comparison and `Default=2` rationale are in `§S5.1`, so this cross-reference sends readers to the wrong design evidence for the cluster-depth decision.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 470,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:0a6fc2a29271b5dff9928f20073b0c29d7eed62e053c7c07a48b9776a176b454",
-          "at": "2026-05-22T08:47:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Decision B includes standalone/top-level `ItemEnum::Function` as a rendered node, but the depth-2 output structure only allocates space for entry subgraphs and method/variant nodes. Since Function nodes are explicitly not subgraphs, the plan leaves them without a placement in cluster detail output, contradicting the selected node set and making the renderer behavior underspecified.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 531,
-              "category": "contradiction"
-            },
-            {
-              "message": "Open Question R says cross-baseline lookup failure fallback is out of scope, but Decision O already specifies that missing ids/crates/paths and lookup failures are handled by silent skip. The same failure mode is both decided and declared open, so implementers cannot tell whether lookup failure should be silently skipped or deferred to a later error/fallback design.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 575,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c809a2c2d3994e7e18de9885dceb8fa24811ac65a2970e9f9b108116ea7b29b5",
-          "at": "2026-05-22T08:50:32Z"
+          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
+          "at": "2026-05-22T21:42:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:504612017c51d6d16a76c4aa58ec4f261c846baf20966cfa89ba9bf28d04579b",
-          "at": "2026-05-22T08:54:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e485884afd4fb51ab0116b27ee3729e85aa7d2673497f8a9d5a498480aecdbc",
-          "at": "2026-05-22T10:04:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RenderBaselineGraphInteractor::new` is specified with only `renderer: R`, but the plan requires the interactor to inject three secondary ports: baseline loader, `BaselineGraphRenderer`, and graph writer. With only the renderer in the type contract, the usecase cannot load rustdoc baselines or persist depth 1/2 output without bypassing the planned hexagonal dependency boundary, so T002/T011 are internally inconsistent.",
-              "severity": "P1",
-              "file": "track/items/reality-view-renderer-2026-05-22/usecase-types.json",
-              "line": 295,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5e485884afd4fb51ab0116b27ee3729e85aa7d2673497f8a9d5a498480aecdbc",
-          "at": "2026-05-22T10:08:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The ADR already defines `BaselineDocument` as a three-field wrapper struct earlier in the document, but this consequence bullet still calls it a `wrapper newtype`. In Rust, \"newtype\" implies a single-field tuple struct, so this wording contradicts the chosen data shape and can mislead the follow-up type-design/implementation work.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
-              "line": 562,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:43c92fb962beaaf30935e48235fa121c6c6397470b7ff95e360a681669bd611f",
-          "at": "2026-05-22T10:34:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdc3bec8579de3e679a4e78164259d46c0abf85daad669d360d0b775bc44eb36",
-          "at": "2026-05-22T10:40:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdc3bec8579de3e679a4e78164259d46c0abf85daad669d360d0b775bc44eb36",
-          "at": "2026-05-22T10:44:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42a5840bd92827c191638d61c035ac400b33b34c224e97dde7361bf5c535faa0",
-          "at": "2026-05-22T11:42:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42a5840bd92827c191638d61c035ac400b33b34c224e97dde7361bf5c535faa0",
-          "at": "2026-05-22T11:44:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:924cb795a1da6d942bebc39c2df217db418bd24591f0f4cdf1f7d978a0f44baa",
-          "at": "2026-05-22T11:59:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:924cb795a1da6d942bebc39c2df217db418bd24591f0f4cdf1f7d978a0f44baa",
-          "at": "2026-05-22T12:02:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a646574d53ece5aaeee6443b8fab62563a518181ab7ed6a7b9cc23d5b8f2dde9",
-          "at": "2026-05-22T12:24:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a646574d53ece5aaeee6443b8fab62563a518181ab7ed6a7b9cc23d5b8f2dde9",
-          "at": "2026-05-22T12:25:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.md` and `impl-plan.json` still describe the renderer work as `render_cluster`/single-cluster even though the updated spec, domain, usecase, and contract-map artifacts now require `render_clusters` returning `Vec<ClusterRender>`. That leaves the implementation plan internally contradictory and points T004/T010 at the obsolete API instead of the new symmetric contract.",
-              "severity": "P1",
-              "file": "track/items/reality-view-renderer-2026-05-22/plan.md",
-              "line": 33,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:ffea44e828dbfc9119e7891f366e693962267cfe6f6feed24274e927d2c47f19",
-          "at": "2026-05-22T13:30:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`BaselineGraphRenderer` now describes `render_clusters` as enumerating clusters with an `external item filter crate_id!=0`, but the infrastructure artifact says the adapter filters to local-crate items only (`crate_id == 0`) before deriving cluster keys. Those two descriptions disagree on which `krate.paths` entries drive depth-2 cluster generation, so the plan is internally inconsistent about the renderer's source set.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reality-view-renderer-2026-05-22/domain-types.json",
-              "line": 315,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:3feb9e54a7911a746837c9238b7d293b1349d06cbb3fd80e5291905d893560a6",
-          "at": "2026-05-22T13:37:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `RenderBaselineGraphInteractor` description says it renders the overview and then forwards only `ClusterRender` entries to `writer.write_cluster`, but it never mentions `writer.write_overview`. That makes the depth-1 `index.md` output disappear from the described pipeline, which contradicts the rest of the plan where the writer port explicitly owns both overview and cluster files.",
-              "severity": "P1",
-              "file": "track/items/reality-view-renderer-2026-05-22/usecase-types.json",
-              "line": 135,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:8835ee2ea4f404d82647f1ed42ab6007d891cb3b7ba0850b90574722e345950e",
-          "at": "2026-05-22T13:41:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f5ce10c926bb95a725d99b3f8337b18c0bde0eb5937aa8cf2f6b23e34c406ff5",
-          "at": "2026-05-22T13:43:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-15 now says renderer returns cluster keys in either `<crate_name>_<module_seg1>` or `<crate_name>_root` form, but the same requirement still constrains depth-2 filenames to only `<crate_name>_<module_seg1>.md`. The generated plan/AC repeat that narrower rule, so root-cluster output has no coherent filename contract even though `ClusterRender.cluster_key` and the writer flow use the key as the file stem. Please update the filename rule to explicitly include the root-cluster key form.",
-              "severity": "P1",
-              "file": "track/items/reality-view-renderer-2026-05-22/spec.md",
-              "line": 32,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f5ce10c926bb95a725d99b3f8337b18c0bde0eb5937aa8cf2f6b23e34c406ff5",
-          "at": "2026-05-22T13:45:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T010 still defines the depth-2 filename rule only as `<crate_name>_<module_seg1>.md`, but IN-15/AC-14 now require root clusters to use `<crate_name>_root.md` as well. Since `render_clusters` returns `cluster_key` for the writer to use as the file stem, the implementation plan leaves crate-root cluster output without the same filename contract as the spec.",
-              "severity": "P1",
-              "file": "track/items/reality-view-renderer-2026-05-22/impl-plan.json",
-              "line": 52,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:c4d95533c9a84fa1ce0ff108156eeccd13e2238b431e3798d235f92c3a9717c9",
-          "at": "2026-05-22T13:48:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84925e78ce8914b8f5fd0a39f53b6f2618f59f3aeb6b0ce4fad3f129274218a7",
-          "at": "2026-05-22T13:51:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5aeabc0047efc3ae8174b68eb1d5a4b5fbd9437703cc3bcdcbcff0e01b6e7d49",
-          "at": "2026-05-22T14:18:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5aeabc0047efc3ae8174b68eb1d5a4b5fbd9437703cc3bcdcbcff0e01b6e7d49",
-          "at": "2026-05-22T14:18:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cb5d9796390e4ccaafea57874a6fb03c33ae238ed7981cfc7d3afaaea6764e8",
-          "at": "2026-05-22T14:26:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cb5d9796390e4ccaafea57874a6fb03c33ae238ed7981cfc7d3afaaea6764e8",
-          "at": "2026-05-22T14:27:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:853c8c2a336b0258deca9711d331b0a1c59e5e9c2837819596f1e2cbfe7362ac",
-          "at": "2026-05-22T14:44:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:853c8c2a336b0258deca9711d331b0a1c59e5e9c2837819596f1e2cbfe7362ac",
-          "at": "2026-05-22T14:45:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94876f7b6076a36c7c162eabd6999905e9cf6babc234c5a906f2436a25e6a740",
-          "at": "2026-05-22T15:08:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94876f7b6076a36c7c162eabd6999905e9cf6babc234c5a906f2436a25e6a740",
-          "at": "2026-05-22T15:09:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a567ecbe9dd577331e167eb55e2f871d1198f151d0fd25051634f084a63c61dc",
-          "at": "2026-05-22T16:02:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a567ecbe9dd577331e167eb55e2f871d1198f151d0fd25051634f084a63c61dc",
-          "at": "2026-05-22T16:03:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55d3d79b7bf1fa1af00d9798fb346afa81bf9a686344faceb86e058329ac1df2",
-          "at": "2026-05-22T16:52:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55d3d79b7bf1fa1af00d9798fb346afa81bf9a686344faceb86e058329ac1df2",
-          "at": "2026-05-22T16:53:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0490dcedba0443a5a214a69f870b9093287ad7269b837f65fb8a5933793570bc",
-          "at": "2026-05-22T17:42:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0490dcedba0443a5a214a69f870b9093287ad7269b837f65fb8a5933793570bc",
-          "at": "2026-05-22T17:43:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a7e73346698f148d4c8ac0cdf7ae416e3e7fcae5a2831ae43b63a93615a660c",
-          "at": "2026-05-22T19:38:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a7e73346698f148d4c8ac0cdf7ae416e3e7fcae5a2831ae43b63a93615a660c",
-          "at": "2026-05-22T19:39:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b56cd0f44cd3da07a291276e2c229960082d6c173a9151508c8a847d2f2e8531",
-          "at": "2026-05-22T20:45:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b56cd0f44cd3da07a291276e2c229960082d6c173a9151508c8a847d2f2e8531",
-          "at": "2026-05-22T20:46:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69cae1dafaa99ba13bc44fe282c984ebdb0603a06c0fcbf869053b04bb327063",
-          "at": "2026-05-22T21:20:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69cae1dafaa99ba13bc44fe282c984ebdb0603a06c0fcbf869053b04bb327063",
-          "at": "2026-05-22T21:21:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:324d4bcb8f4522fa93c309a3fbca2d4b6bb1a78fc4507f587baebbb69b7b485b",
-          "at": "2026-05-22T21:39:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:324d4bcb8f4522fa93c309a3fbca2d4b6bb1a78fc4507f587baebbb69b7b485b",
-          "at": "2026-05-22T21:39:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7da6f07edb0067502e88d40e8fe66019cc1fcb27d9e75cb622568da572534e52",
-          "at": "2026-05-22T21:52:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7da6f07edb0067502e88d40e8fe66019cc1fcb27d9e75cb622568da572534e52",
-          "at": "2026-05-22T21:53:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff794668d8b57f7007bbafd9539a6296f738b089be51f080e4160afec0a0af52",
-          "at": "2026-05-22T22:03:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff794668d8b57f7007bbafd9539a6296f738b089be51f080e4160afec0a0af52",
-          "at": "2026-05-22T22:04:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1249eefa015494347a58dcdccef4371dd71292307fc0a166699ca43094f02a3c",
-          "at": "2026-05-23T00:11:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1249eefa015494347a58dcdccef4371dd71292307fc0a166699ca43094f02a3c",
-          "at": "2026-05-23T00:13:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1de03fc86c406ff77aa61da1e90a2be0695456e1b699ff0d5c083d39419effe1",
-          "at": "2026-05-23T00:30:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1de03fc86c406ff77aa61da1e90a2be0695456e1b699ff0d5c083d39419effe1",
-          "at": "2026-05-23T00:31:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9794ed06903e14cefe62db409ed5f12f16ff7c05ff4ae29335564feb8701ba3",
-          "at": "2026-05-23T01:17:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9794ed06903e14cefe62db409ed5f12f16ff7c05ff4ae29335564feb8701ba3",
-          "at": "2026-05-23T01:18:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98e6f45ff2cf180eea32f4229848f400e1886370cda36ab2371db28150262711",
-          "at": "2026-05-23T01:27:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98e6f45ff2cf180eea32f4229848f400e1886370cda36ab2371db28150262711",
-          "at": "2026-05-23T01:28:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbf2a21179ece24f6521809c209e4b68558c3ca44baa103030d577c60f1bc2a5",
-          "at": "2026-05-23T01:48:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbf2a21179ece24f6521809c209e4b68558c3ca44baa103030d577c60f1bc2a5",
-          "at": "2026-05-23T01:50:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7782e99fa681ac7cdbe2696c877ba79a2597a8c651f0915d1eb2427a4a718e76",
-          "at": "2026-05-23T02:03:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7782e99fa681ac7cdbe2696c877ba79a2597a8c651f0915d1eb2427a4a718e76",
-          "at": "2026-05-23T02:04:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:76ad1346ca69ccf6ca28b3c557213de4cf7648e26911dbdb47b94c1ca2b27b4a",
-          "at": "2026-05-23T02:22:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:76ad1346ca69ccf6ca28b3c557213de4cf7648e26911dbdb47b94c1ca2b27b4a",
-          "at": "2026-05-23T02:24:09Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:43:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:45:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:18:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:20:06Z"
+          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
+          "at": "2026-05-22T21:44:40Z"
         }
       ]
     },
@@ -2089,6 +1254,855 @@
           "findings": [],
           "hash": "rvw1:sha256:9f4808d42b451922b93184c4ec605de77e2681e5c518388e6e7d7d12cd55e0c5",
           "at": "2026-05-23T02:18:04Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:45:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:20:06Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section F says every `Struct / Enum / Trait / TypeAlias / Function` entry is subgraph化, but the surrounding text treats `FunctionEntry` as a standalone callable node that is not subgraphized. This needs one consistent rule for Function entries.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 202,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d33ba8c11f6febb34104e71f2f0bc25f530aead01d04fbda1a630f67905c595d",
+          "at": "2026-05-22T06:40:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision O indexes traits by `(CrateName, TraitName)` after reducing `Impl.trait_` to the last `::` segment. That drops module-path information, so a crate with two public traits that share the same short name will collide and impl edges can be misresolved or silently skipped.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 287,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
+          "at": "2026-05-22T06:50:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
+          "at": "2026-05-22T06:50:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
+          "at": "2026-05-22T06:51:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CC makes `Item.visibility == Visibility::Public` the sole node filter, but rustdoc uses `Visibility::Default` for associated items of public traits and variants of public enums. Applied as written, this contradicts H/H' because public enum variants and public trait methods would be filtered out before they can be rendered.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 400,
+              "category": "contradiction"
+            },
+            {
+              "message": "The enum payload model is wrong for rustdoc_types: `VariantKind::Tuple` contains `Vec<Option<Id>>`, not `Vec<Option<Type>>`, and struct variant fields are also IDs to `ItemEnum::StructField(Type)`. The plan therefore describes direct Type edges where the renderer actually needs an index lookup for each field ID, which would mis-specify variant payload rendering.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 220,
+              "category": "factual error"
+            },
+            {
+              "message": "The trait-impl resolution algorithm treats the first segment of `Path.path` as the crate name, but rustdoc `Path.path` is the path as used and may be short or re-exported (for example just `Vec`/`Trait`). This makes cross-baseline trait impl lookup semantically unreliable and can silently skip or misroute workspace trait edges.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 292,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:28771047edacfb894f03a9634eeb0f75567f10b918fd2d62d58af85d3c016e44",
+          "at": "2026-05-22T06:55:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The render-output summary says classDef definitions are derived from both `[class.*]` and `[edge.*]`, but this ADR's schema defines `[edge.<EdgeKind>]` as only `arrow` plus optional `label`, while `[class.<ClassName>]` is the classDef source. Since this ADR inherits Contract Map L and the sibling ADR explicitly excludes `[edge.*]` from classDef generation, this contradicts the declared style schema and would mislead implementation of the renderer output.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 502,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e1b941411c6b6c34a89fcb5554e60d17c63f279f1dd778008fb3bce7dccc1699",
+          "at": "2026-05-22T06:58:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision D claims the node_id scheme is injective, but Type and Trait ids include only layer, crate, and the short item name. Rustdoc paths are module-qualified and Rust permits public items with the same short name in different modules; those entries can collide in a depth-2 cluster file, and Decision O repeats the same short-name collision for trait-impl lookup via `(CrateName, TraitName)`. The renderer needs full module/path identity for Type/Trait nodes and trait indexes, not just the last segment.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 181,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:6d688a825aca26c6eaa23d79bafc4e6d647bbe9c2a3f975028aa32f10eb5d743",
+          "at": "2026-05-22T07:02:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sanitized_module_path` is defined as the prefix of `ItemSummary.path` before the item name, but rustdoc paths are fully qualified and include the crate segment. That makes crate-root items look like they have module path `<crate>` instead of `[]`, which conflicts with the later root-cluster rule and with the trait lookup algorithm that explicitly strips the crate segment. The node-id and cluster scheme would duplicate the crate name and fail to bucket root items consistently.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 189,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan says to render public `ItemEnum::Function`s as standalone Function nodes, but rustdoc uses `ItemEnum::Function` for methods and associated functions too. Since trait methods and inherent impl methods are also embedded under their owning Trait/Type subgraphs, public inherent methods can be emitted twice unless the design defines a module/top-level membership filter for standalone functions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 236,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:70024956632c10948ab8822aa78546d3d383d695855fe34fab63deafa74e6ae4",
+          "at": "2026-05-22T07:07:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision D claims the length-prefixed node_id scheme preserves injectivity, but the ADR later acknowledges that sanitizing non-alphanumeric characters can collapse distinct names to the same value. Length-prefixing only disambiguates segment boundaries; it does not prevent sanitized-name collisions, so the design currently promises a uniqueness property it explicitly does not guarantee. Tighten the claim or make the collision-avoidance suffix part of the decision rather than leaving it optional for implementation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 181,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision U defines clusters as the top-level module segment (`module_path[0]`), but the filename and mermaid examples use multi-segment cluster names like `domain::review` and `domain::user`. Those are different cluster identities, which leaves the implementation unable to know whether to group by only the first module segment or by a crate/layer-prefixed path. The ADR should settle one cluster key and use the same key for grouping, labels, and filenames.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 329,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7c66efc05e1a31c9fca85ff21842e9dffcc44c312dcaa06188392df31d499d97",
+          "at": "2026-05-22T07:10:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision K describes `ItemEnum::Struct` as carrying fields in a single `fields: Vec<Id>` field, but `rustdoc_types::Struct` stores them under `Struct.kind`: named structs use `Plain { fields, has_stripped_fields }` and tuple structs use `Tuple(Vec<Option<Id>>)` with hidden fields represented as `None`. As written, the traversal is not implementable for the declared tuple/plain struct coverage and would mishandle stripped tuple fields.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 254,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:2ab38c3602c0931f6a14855b1eb3422f9098876477973f9a3c6b2f4583dc3a96",
+          "at": "2026-05-22T07:14:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision U defines the depth-2 cluster key and filename using only the crate-relative top-level module segment, but Decision A explicitly claims the renderer supports `1 layer N crate` inputs. In a layer with two crates that both have `review` (or root) entries, both map to the same `review.md` / root detail file and the same overview cluster, unlike the sibling Contract Map U-6d-iii design that keys module groups by `(crate_name, module_path[0])`. The plan needs either crate-qualified cluster keys/files or an explicit cross-crate aggregation rule to make the `1 layer N crate` claim coherent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 332,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision O already fixes cross-baseline trait lookup failures as `silent skip` (`edge を引かない`), but Open Question R later says cross-baseline lookup failure fallback behavior is still out of scope for a future phase. That leaves implementers with conflicting guidance on whether lookup failure handling is decided or still open.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 575,
+              "category": "contradiction"
+            },
+            {
+              "message": "This section says it inherits `旧 ADR §4.5`, but the immediately preceding `旧 ADR` reference is the Reality View ADR `2026-04-16-2200`, whose layer-agnostic material is not §4.5. The invariant being cited is later named as Contract Map ADR `2026-04-17-1528 §4.5`, so this cross-reference should be made explicit here to avoid pointing readers at the wrong ADR section.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 100,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:be5f99c5aafbb489787d77d98e3393fc0468ac08ca52aa1942a1b9788238e0df",
+          "at": "2026-05-22T07:18:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineDocument` is described as a \"wrapper newtype\", but the same decision defines and depends on it as a three-field document struct (`layer`, `crate_name`, `krate`). In Rust, a newtype is a single-field tuple struct; this wording conflicts with the intended self-describing wrapper design and can mislead the follow-up type-design phase. Rename this to a wrapper/document struct, or make the type an actual newtype and carry layer/crate metadata elsewhere.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 134,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ab70f9b2e67f3693712aa300e391508849c6f715b7c3901361aafac2eb5db2e0",
+          "at": "2026-05-22T07:21:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "BB treats `blanket_impl: Some(_)` as only an expanded duplicate to skip, while later claiming the user-declared blanket body is `blanket_impl: None + for_: Type::Generic`. In rustdoc, `blanket_impl` is the marker for blanket impls themselves, so this plan would skip the blanket impls it explicitly says should be preserved/rendered, making the blanket-impl rendering semantics wrong.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 402,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "The Reality View style schema inherits Contract Map filters such as `include_function_roles`, but this ADR’s input is pure `rustdoc_types::Crate` and it explicitly avoids catalogue-only role/pattern data. A fail-closed config containing function-role filters cannot be evaluated from rustdoc-only input without reintroducing catalogue semantics, contradicting the stated Reality View design boundary.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 269,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7337e7e2d6815cddb42b95b78feb4c9e0a2ba17def4a7b574f1317400c00e51f",
+          "at": "2026-05-22T07:25:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision BB says `blanket_impl: Some(_)` is the blanket impl body and should be skipped for now, but the rejected-alternatives section says skipping blanket impls is the corrected-away error and that the user-declared blanket body is `blanket_impl: None + for_: Type::Generic`; the same decision also refers to non-existent Open Question AA. The plan therefore leaves blanket impl handling undecidable.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 401,
+              "category": "contradiction"
+            },
+            {
+              "message": "Decision C says the Reality View style schema has the same structure as Contract Map L, including `[role.*]`, but Decision L later says `[role.*]` and `include_function_roles` are intentionally removed because rustdoc input has no catalogue role data. These are conflicting schema requirements for the same config file.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 175,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:755ad7aa4eb4cf13705e322fa9eed249e62dc76abe4007c7cafc50e42e3ee8a0",
+          "at": "2026-05-22T07:35:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bde57b680f4fc64313799145693c471e6633380871c7bdb21bb6967d1dded48e",
+          "at": "2026-05-22T07:40:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Reality View config schema is internally inconsistent: line 175 says the section schema is `[node.*] + [pattern.*] + [class.*] + [edge.*] + [filter]` and explicitly omits `[role.*]`, but the later L decision reintroduces `[role.<RoleName>]` at lines 263-267. Implementers cannot tell whether role entries are part of the baseline-graph style file or not.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 175,
+              "category": "contradiction"
+            },
+            {
+              "message": "The proposed `render_baseline_graph_cluster(..., cluster_module: &ModulePath, ...)` API is not sufficient for the cluster identity defined later in U, which keys clusters by `(crate_name, top-level module)` and names files `<crate_name>_<module_seg1>.md`. In a layer with multiple crates that share the same top-level module, this signature cannot select the intended cluster unambiguously.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 126,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:8f8aa68ed922456d5736aec7928154ef44a4d87665bab7bad942a8a27cf04152",
+          "at": "2026-05-22T08:30:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9caf97240b5482eaed4ec9ca37623217d5ae98db9c4d9dc2ea6f0e97ebab308c",
+          "at": "2026-05-22T08:34:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a6fc2a29271b5dff9928f20073b0c29d7eed62e053c7c07a48b9776a176b454",
+          "at": "2026-05-22T08:42:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The U-r1 rejection cites old ADR `§Phase 2 Scope Update §S1` as the source for the depth=1 vs depth=2 evidence, but §S1 is the typestate/entry-point measurement section. The depth comparison and `Default=2` rationale are in `§S5.1`, so this cross-reference sends readers to the wrong design evidence for the cluster-depth decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 470,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:0a6fc2a29271b5dff9928f20073b0c29d7eed62e053c7c07a48b9776a176b454",
+          "at": "2026-05-22T08:47:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Decision B includes standalone/top-level `ItemEnum::Function` as a rendered node, but the depth-2 output structure only allocates space for entry subgraphs and method/variant nodes. Since Function nodes are explicitly not subgraphs, the plan leaves them without a placement in cluster detail output, contradicting the selected node set and making the renderer behavior underspecified.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 531,
+              "category": "contradiction"
+            },
+            {
+              "message": "Open Question R says cross-baseline lookup failure fallback is out of scope, but Decision O already specifies that missing ids/crates/paths and lookup failures are handled by silent skip. The same failure mode is both decided and declared open, so implementers cannot tell whether lookup failure should be silently skipped or deferred to a later error/fallback design.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 575,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c809a2c2d3994e7e18de9885dceb8fa24811ac65a2970e9f9b108116ea7b29b5",
+          "at": "2026-05-22T08:50:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:504612017c51d6d16a76c4aa58ec4f261c846baf20966cfa89ba9bf28d04579b",
+          "at": "2026-05-22T08:54:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e485884afd4fb51ab0116b27ee3729e85aa7d2673497f8a9d5a498480aecdbc",
+          "at": "2026-05-22T10:04:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RenderBaselineGraphInteractor::new` is specified with only `renderer: R`, but the plan requires the interactor to inject three secondary ports: baseline loader, `BaselineGraphRenderer`, and graph writer. With only the renderer in the type contract, the usecase cannot load rustdoc baselines or persist depth 1/2 output without bypassing the planned hexagonal dependency boundary, so T002/T011 are internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/usecase-types.json",
+              "line": 295,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e485884afd4fb51ab0116b27ee3729e85aa7d2673497f8a9d5a498480aecdbc",
+          "at": "2026-05-22T10:08:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR already defines `BaselineDocument` as a three-field wrapper struct earlier in the document, but this consequence bullet still calls it a `wrapper newtype`. In Rust, \"newtype\" implies a single-field tuple struct, so this wording contradicts the chosen data shape and can mislead the follow-up type-design/implementation work.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "line": 562,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:43c92fb962beaaf30935e48235fa121c6c6397470b7ff95e360a681669bd611f",
+          "at": "2026-05-22T10:34:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdc3bec8579de3e679a4e78164259d46c0abf85daad669d360d0b775bc44eb36",
+          "at": "2026-05-22T10:40:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdc3bec8579de3e679a4e78164259d46c0abf85daad669d360d0b775bc44eb36",
+          "at": "2026-05-22T10:44:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42a5840bd92827c191638d61c035ac400b33b34c224e97dde7361bf5c535faa0",
+          "at": "2026-05-22T11:42:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42a5840bd92827c191638d61c035ac400b33b34c224e97dde7361bf5c535faa0",
+          "at": "2026-05-22T11:44:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:924cb795a1da6d942bebc39c2df217db418bd24591f0f4cdf1f7d978a0f44baa",
+          "at": "2026-05-22T11:59:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:924cb795a1da6d942bebc39c2df217db418bd24591f0f4cdf1f7d978a0f44baa",
+          "at": "2026-05-22T12:02:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a646574d53ece5aaeee6443b8fab62563a518181ab7ed6a7b9cc23d5b8f2dde9",
+          "at": "2026-05-22T12:24:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a646574d53ece5aaeee6443b8fab62563a518181ab7ed6a7b9cc23d5b8f2dde9",
+          "at": "2026-05-22T12:25:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` and `impl-plan.json` still describe the renderer work as `render_cluster`/single-cluster even though the updated spec, domain, usecase, and contract-map artifacts now require `render_clusters` returning `Vec<ClusterRender>`. That leaves the implementation plan internally contradictory and points T004/T010 at the obsolete API instead of the new symmetric contract.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/plan.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ffea44e828dbfc9119e7891f366e693962267cfe6f6feed24274e927d2c47f19",
+          "at": "2026-05-22T13:30:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineGraphRenderer` now describes `render_clusters` as enumerating clusters with an `external item filter crate_id!=0`, but the infrastructure artifact says the adapter filters to local-crate items only (`crate_id == 0`) before deriving cluster keys. Those two descriptions disagree on which `krate.paths` entries drive depth-2 cluster generation, so the plan is internally inconsistent about the renderer's source set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reality-view-renderer-2026-05-22/domain-types.json",
+              "line": 315,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3feb9e54a7911a746837c9238b7d293b1349d06cbb3fd80e5291905d893560a6",
+          "at": "2026-05-22T13:37:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `RenderBaselineGraphInteractor` description says it renders the overview and then forwards only `ClusterRender` entries to `writer.write_cluster`, but it never mentions `writer.write_overview`. That makes the depth-1 `index.md` output disappear from the described pipeline, which contradicts the rest of the plan where the writer port explicitly owns both overview and cluster files.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/usecase-types.json",
+              "line": 135,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:8835ee2ea4f404d82647f1ed42ab6007d891cb3b7ba0850b90574722e345950e",
+          "at": "2026-05-22T13:41:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5ce10c926bb95a725d99b3f8337b18c0bde0eb5937aa8cf2f6b23e34c406ff5",
+          "at": "2026-05-22T13:43:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-15 now says renderer returns cluster keys in either `<crate_name>_<module_seg1>` or `<crate_name>_root` form, but the same requirement still constrains depth-2 filenames to only `<crate_name>_<module_seg1>.md`. The generated plan/AC repeat that narrower rule, so root-cluster output has no coherent filename contract even though `ClusterRender.cluster_key` and the writer flow use the key as the file stem. Please update the filename rule to explicitly include the root-cluster key form.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/spec.md",
+              "line": 32,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f5ce10c926bb95a725d99b3f8337b18c0bde0eb5937aa8cf2f6b23e34c406ff5",
+          "at": "2026-05-22T13:45:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 still defines the depth-2 filename rule only as `<crate_name>_<module_seg1>.md`, but IN-15/AC-14 now require root clusters to use `<crate_name>_root.md` as well. Since `render_clusters` returns `cluster_key` for the writer to use as the file stem, the implementation plan leaves crate-root cluster output without the same filename contract as the spec.",
+              "severity": "P1",
+              "file": "track/items/reality-view-renderer-2026-05-22/impl-plan.json",
+              "line": 52,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c4d95533c9a84fa1ce0ff108156eeccd13e2238b431e3798d235f92c3a9717c9",
+          "at": "2026-05-22T13:48:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84925e78ce8914b8f5fd0a39f53b6f2618f59f3aeb6b0ce4fad3f129274218a7",
+          "at": "2026-05-22T13:51:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aeabc0047efc3ae8174b68eb1d5a4b5fbd9437703cc3bcdcbcff0e01b6e7d49",
+          "at": "2026-05-22T14:18:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aeabc0047efc3ae8174b68eb1d5a4b5fbd9437703cc3bcdcbcff0e01b6e7d49",
+          "at": "2026-05-22T14:18:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cb5d9796390e4ccaafea57874a6fb03c33ae238ed7981cfc7d3afaaea6764e8",
+          "at": "2026-05-22T14:26:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cb5d9796390e4ccaafea57874a6fb03c33ae238ed7981cfc7d3afaaea6764e8",
+          "at": "2026-05-22T14:27:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:853c8c2a336b0258deca9711d331b0a1c59e5e9c2837819596f1e2cbfe7362ac",
+          "at": "2026-05-22T14:44:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:853c8c2a336b0258deca9711d331b0a1c59e5e9c2837819596f1e2cbfe7362ac",
+          "at": "2026-05-22T14:45:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94876f7b6076a36c7c162eabd6999905e9cf6babc234c5a906f2436a25e6a740",
+          "at": "2026-05-22T15:08:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94876f7b6076a36c7c162eabd6999905e9cf6babc234c5a906f2436a25e6a740",
+          "at": "2026-05-22T15:09:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a567ecbe9dd577331e167eb55e2f871d1198f151d0fd25051634f084a63c61dc",
+          "at": "2026-05-22T16:02:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a567ecbe9dd577331e167eb55e2f871d1198f151d0fd25051634f084a63c61dc",
+          "at": "2026-05-22T16:03:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55d3d79b7bf1fa1af00d9798fb346afa81bf9a686344faceb86e058329ac1df2",
+          "at": "2026-05-22T16:52:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55d3d79b7bf1fa1af00d9798fb346afa81bf9a686344faceb86e058329ac1df2",
+          "at": "2026-05-22T16:53:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0490dcedba0443a5a214a69f870b9093287ad7269b837f65fb8a5933793570bc",
+          "at": "2026-05-22T17:42:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0490dcedba0443a5a214a69f870b9093287ad7269b837f65fb8a5933793570bc",
+          "at": "2026-05-22T17:43:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a7e73346698f148d4c8ac0cdf7ae416e3e7fcae5a2831ae43b63a93615a660c",
+          "at": "2026-05-22T19:38:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a7e73346698f148d4c8ac0cdf7ae416e3e7fcae5a2831ae43b63a93615a660c",
+          "at": "2026-05-22T19:39:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b56cd0f44cd3da07a291276e2c229960082d6c173a9151508c8a847d2f2e8531",
+          "at": "2026-05-22T20:45:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b56cd0f44cd3da07a291276e2c229960082d6c173a9151508c8a847d2f2e8531",
+          "at": "2026-05-22T20:46:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69cae1dafaa99ba13bc44fe282c984ebdb0603a06c0fcbf869053b04bb327063",
+          "at": "2026-05-22T21:20:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69cae1dafaa99ba13bc44fe282c984ebdb0603a06c0fcbf869053b04bb327063",
+          "at": "2026-05-22T21:21:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:324d4bcb8f4522fa93c309a3fbca2d4b6bb1a78fc4507f587baebbb69b7b485b",
+          "at": "2026-05-22T21:39:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:324d4bcb8f4522fa93c309a3fbca2d4b6bb1a78fc4507f587baebbb69b7b485b",
+          "at": "2026-05-22T21:39:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7da6f07edb0067502e88d40e8fe66019cc1fcb27d9e75cb622568da572534e52",
+          "at": "2026-05-22T21:52:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7da6f07edb0067502e88d40e8fe66019cc1fcb27d9e75cb622568da572534e52",
+          "at": "2026-05-22T21:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff794668d8b57f7007bbafd9539a6296f738b089be51f080e4160afec0a0af52",
+          "at": "2026-05-22T22:03:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff794668d8b57f7007bbafd9539a6296f738b089be51f080e4160afec0a0af52",
+          "at": "2026-05-22T22:04:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1249eefa015494347a58dcdccef4371dd71292307fc0a166699ca43094f02a3c",
+          "at": "2026-05-23T00:11:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1249eefa015494347a58dcdccef4371dd71292307fc0a166699ca43094f02a3c",
+          "at": "2026-05-23T00:13:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1de03fc86c406ff77aa61da1e90a2be0695456e1b699ff0d5c083d39419effe1",
+          "at": "2026-05-23T00:30:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1de03fc86c406ff77aa61da1e90a2be0695456e1b699ff0d5c083d39419effe1",
+          "at": "2026-05-23T00:31:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9794ed06903e14cefe62db409ed5f12f16ff7c05ff4ae29335564feb8701ba3",
+          "at": "2026-05-23T01:17:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9794ed06903e14cefe62db409ed5f12f16ff7c05ff4ae29335564feb8701ba3",
+          "at": "2026-05-23T01:18:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98e6f45ff2cf180eea32f4229848f400e1886370cda36ab2371db28150262711",
+          "at": "2026-05-23T01:27:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98e6f45ff2cf180eea32f4229848f400e1886370cda36ab2371db28150262711",
+          "at": "2026-05-23T01:28:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbf2a21179ece24f6521809c209e4b68558c3ca44baa103030d577c60f1bc2a5",
+          "at": "2026-05-23T01:48:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbf2a21179ece24f6521809c209e4b68558c3ca44baa103030d577c60f1bc2a5",
+          "at": "2026-05-23T01:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7782e99fa681ac7cdbe2696c877ba79a2597a8c651f0915d1eb2427a4a718e76",
+          "at": "2026-05-23T02:03:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7782e99fa681ac7cdbe2696c877ba79a2597a8c651f0915d1eb2427a4a718e76",
+          "at": "2026-05-23T02:04:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76ad1346ca69ccf6ca28b3c557213de4cf7648e26911dbdb47b94c1ca2b27b4a",
+          "at": "2026-05-23T02:22:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76ad1346ca69ccf6ca28b3c557213de4cf7648e26911dbdb47b94c1ca2b27b4a",
+          "at": "2026-05-23T02:24:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e038eb555d6dc3706404dd7cfdc3732dedc6eb0957c5dc47040fd0785dc06913",
+          "at": "2026-05-23T02:36:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e038eb555d6dc3706404dd7cfdc3732dedc6eb0957c5dc47040fd0785dc06913",
+          "at": "2026-05-23T02:37:53Z"
         }
       ]
     }
