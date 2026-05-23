@@ -1,7 +1,15 @@
 #![forbid(unsafe_code)]
 //! Use case layer for the SoTOHE-core track state machine.
 
+// Re-export domain identity types so the CLI composition root can construct
+// typed `TrackId` and `LayerId` values at the boundary (CN-12) without
+// depending on `domain` directly (architecture-rules.json: cli may_depend_on
+// [infrastructure, usecase]).
+pub use domain::tddd::LayerId;
+pub use domain::{TrackId, ValidationError};
+
 pub mod baseline_capture;
+pub mod baseline_graph_workflow;
 pub mod catalogue_impl_signals;
 pub mod catalogue_lint_workflow;
 pub mod catalogue_spec_refs;
@@ -33,8 +41,7 @@ use std::sync::Arc;
 
 use domain::{
     CommitHash, ImplPlanReader, ImplPlanWriter, RepositoryError, StatusOverride, TaskId,
-    TaskTransition, TrackId, TrackMetadata, TrackReadError, TrackReader, TrackWriteError,
-    TrackWriter, ValidationError,
+    TaskTransition, TrackMetadata, TrackReadError, TrackReader, TrackWriteError, TrackWriter,
 };
 
 /// Persists a track aggregate.

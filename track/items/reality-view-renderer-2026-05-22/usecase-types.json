@@ -1,0 +1,450 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "RenderBaselineGraphCommand": {
+      "action": "add",
+      "role": "Command",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_id", "ty": "domain::TrackId" },
+          { "name": "layer_filter", "ty": "Option<Vec<domain::tddd::LayerId>>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "baseline_graph_workflow",
+      "docs": "Command input for RenderBaselineGraph::execute. track_id is a validated TrackId (CN-12: concept-bearing identity field typed as domain value object). layer_filter restricts rendering to the listed LayerId values when Some; the interactor fails with RenderBaselineGraphError::LayerNotFound when any entry is absent from the loader output set. Symmetric to RenderContractMapCommand (IN-02 / AC-01 / AC-02).",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "CN-12",
+          "hash": "e66764ae824c3554b3d2a5d5d5b11b2b979721481a1c4cf0e5389f612f1be07d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RenderBaselineGraphOutput": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "rendered_layer_count", "ty": "usize" },
+          { "name": "written_file_count", "ty": "usize" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "baseline_graph_workflow",
+      "docs": "Output DTO returned by RenderBaselineGraph::execute on success. Lightweight metrics for CLI callers to report a post-write summary. rendered_layer_count is the number of layers processed; written_file_count includes depth-1 index.md plus all depth-2 cluster files written. (IN-02 / AC-02)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RenderBaselineGraphError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "LoaderFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["domain::tddd::BaselineGraphLoaderError"]
+            }
+          },
+          {
+            "name": "WriterFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["domain::tddd::BaselineGraphWriterError"]
+            }
+          },
+          {
+            "name": "EmptyBaseline",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "domain::TrackId" }
+              ]
+            }
+          },
+          {
+            "name": "LayerNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "domain::TrackId" },
+                { "name": "layer_id", "ty": "domain::tddd::LayerId" }
+              ]
+            }
+          },
+          {
+            "name": "RendererFailed",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["domain::tddd::BaselineGraphRendererError"]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "baseline_graph_workflow",
+      "docs": "Error variants for RenderBaselineGraph::execute. LoaderFailed: baseline loader returned BaselineGraphLoaderError. WriterFailed: writer returned BaselineGraphWriterError. EmptyBaseline: no tddd.enabled layers for track (track_id: TrackId per CN-12). LayerNotFound: layer_filter entry not in loader output (track_id: TrackId, layer_id: LayerId per CN-12). RendererFailed: renderer returned BaselineGraphRendererError. InvalidTrackId variant absent: Command receives validated TrackId so interactor never sees an invalid ID. (IN-02 / AC-02 / AC-15 / CN-12)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "CN-12",
+          "hash": "e66764ae824c3554b3d2a5d5d5b11b2b979721481a1c4cf0e5389f612f1be07d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RenderBaselineGraphInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "baseline_graph_workflow",
+      "docs": "Default RenderBaselineGraph implementation. Composes three secondary ports: L (BaselineGraphLoader — loads rustdoc JSON per layer), R (BaselineGraphRenderer — renders depth-1 overview via render_overview and all depth-2 cluster files via render_clusters; cluster enumeration is the renderer's responsibility), W (BaselineGraphWriter — persists generated markdown). The interactor calls render_overview then writer.write_overview for depth-1, then calls render_clusters and passes each ClusterRender.cluster_key + ClusterRender.content to writer.write_cluster for depth-2 — no krate.paths parsing in the interactor. Symmetric to RenderContractMapInteractor (Decision E / IN-02 / IN-19 / AC-02). No direct infrastructure calls per hexagonal purity (CN-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RenderContractMapCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "track_id", "ty": "domain::TrackId" },
+          { "name": "layer_filter", "ty": "Option<Vec<domain::tddd::LayerId>>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "contract_map_workflow",
+      "docs": "Command input for RenderContractMap::execute. CN-12: track_id changed from raw String to validated TrackId; layer_filter changed from Option<Vec<String>> to Option<Vec<LayerId>>. Callers (CLI) now construct TrackId/LayerId at the boundary and pass typed values. This eliminates the need for RenderContractMapError::InvalidTrackId. Symmetric with RenderBaselineGraphCommand.",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "CN-12",
+          "hash": "e66764ae824c3554b3d2a5d5d5b11b2b979721481a1c4cf0e5389f612f1be07d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RenderContractMapError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CatalogueLoaderFailed",
+            "payload": { "kind": "tuple", "fields": ["domain::tddd::catalogue_ports::CatalogueLoaderError"] }
+          },
+          {
+            "name": "ContractMapWriterFailed",
+            "payload": { "kind": "tuple", "fields": ["domain::tddd::catalogue_ports::ContractMapWriterError"] }
+          },
+          {
+            "name": "EmptyCatalogue",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "domain::TrackId" }
+              ]
+            }
+          },
+          {
+            "name": "LayerNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "domain::TrackId" },
+                { "name": "layer_id", "ty": "domain::tddd::LayerId" }
+              ]
+            }
+          },
+          {
+            "name": "RendererFailed",
+            "payload": { "kind": "tuple", "fields": ["domain::tddd::ContractMapRendererError"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "contract_map_workflow",
+      "docs": "Error variants for RenderContractMap::execute. CN-12: EmptyCatalogue.track_id and LayerNotFound.track_id/layer_id changed from raw String to TrackId/LayerId. InvalidTrackId variant removed: Command now receives validated TrackId, eliminating the validation step from the interactor. CatalogueLoaderFailed / ContractMapWriterFailed / RendererFailed unchanged.",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "CN-12",
+          "hash": "e66764ae824c3554b3d2a5d5d5b11b2b979721481a1c4cf0e5389f612f1be07d"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "RenderBaselineGraph": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RenderBaselineGraphCommand" }
+          ],
+          "returns": "Result<RenderBaselineGraphOutput, RenderBaselineGraphError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "baseline_graph_workflow",
+      "docs": "Primary port (ApplicationService) for the Reality View (baseline graph) render workflow. CLI invokes the workflow through this trait so composition roots remain substitutable. Symmetric to RenderContractMap (Decision E / IN-02 / AC-02).",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RenderContractMap": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RenderContractMapCommand" }
+          ],
+          "returns": "Result<RenderContractMapOutput, RenderContractMapError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "contract_map_workflow",
+      "docs": "Carried as reference for edge exposure (RenderContractMapInteractor impl edge). The trait signature itself is unchanged in this track — only RenderContractMapCommand (cmd type) and RenderContractMapError (return type) are modified.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RenderBaselineGraphInteractor",
+      "impl_generics": [
+        {
+          "name": "L",
+          "bounds": ["domain::tddd::BaselineGraphLoader"]
+        },
+        {
+          "name": "R",
+          "bounds": ["domain::tddd::BaselineGraphRenderer"]
+        },
+        {
+          "name": "W",
+          "bounds": ["domain::tddd::BaselineGraphWriter"]
+        }
+      ],
+      "impl_where_predicates": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "loader", "ty": "L" },
+            { "name": "renderer", "ty": "R" },
+            { "name": "writer", "ty": "W" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RenderBaselineGraphCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RenderBaselineGraphCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RenderBaselineGraphCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RenderBaselineGraphCommand"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RenderBaselineGraphOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RenderBaselineGraphOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RenderBaselineGraphOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RenderBaselineGraphOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "RenderBaselineGraph",
+      "for_type": "RenderBaselineGraphInteractor",
+      "impl_generics": [
+        { "name": "L", "bounds": ["domain::tddd::BaselineGraphLoader"] },
+        { "name": "R", "bounds": ["domain::tddd::BaselineGraphRenderer"] },
+        { "name": "W", "bounds": ["domain::tddd::BaselineGraphWriter"] }
+      ],
+      "impl_where_predicates": []
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RenderBaselineGraphError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RenderBaselineGraphError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "RenderBaselineGraphError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<domain::tddd::BaselineGraphLoaderError>",
+      "for_type": "RenderBaselineGraphError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<domain::tddd::BaselineGraphWriterError>",
+      "for_type": "RenderBaselineGraphError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<domain::tddd::BaselineGraphRendererError>",
+      "for_type": "RenderBaselineGraphError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RenderContractMapCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RenderContractMapCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RenderContractMapCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RenderContractMapCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::convert::From<domain::tddd::catalogue_ports::CatalogueLoaderError>",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::convert::From<domain::tddd::catalogue_ports::ContractMapWriterError>",
+      "for_type": "RenderContractMapError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::convert::From<domain::tddd::ContractMapRendererError>",
+      "for_type": "RenderContractMapError"
+    }
+  ]
+}

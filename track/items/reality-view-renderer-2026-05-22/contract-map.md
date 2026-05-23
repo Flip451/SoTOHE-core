@@ -1,0 +1,234 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T30_domain_domain_BaselineDocument["tddd::BaselineDocument"]
+    direction TB
+    T30_domain_domain_BaselineDocument__self[BaselineDocument]
+    T30_domain_domain_BaselineDocument_new([new])
+  end
+  subgraph T38_domain_domain_BaselineGraphLoaderError["tddd::BaselineGraphLoaderError"]
+    direction TB
+    T38_domain_domain_BaselineGraphLoaderError__self[BaselineGraphLoaderError]
+    T38_domain_domain_BaselineGraphLoaderError_NotFound[NotFound]
+    T38_domain_domain_BaselineGraphLoaderError_ParseFailed[ParseFailed]
+    T38_domain_domain_BaselineGraphLoaderError_IoError[IoError]
+    T38_domain_domain_BaselineGraphLoaderError_SymlinkRejected[SymlinkRejected]
+    T38_domain_domain_BaselineGraphLoaderError_LayerDiscoveryFailed[LayerDiscoveryFailed]
+  end
+  subgraph T40_domain_domain_BaselineGraphRendererError["tddd::BaselineGraphRendererError"]
+    direction TB
+    T40_domain_domain_BaselineGraphRendererError__self[BaselineGraphRendererError]
+    T40_domain_domain_BaselineGraphRendererError_StyleConfigNotFound[StyleConfigNotFound]
+    T40_domain_domain_BaselineGraphRendererError_StyleConfigInvalid[StyleConfigInvalid]
+    T40_domain_domain_BaselineGraphRendererError_RenderFailed[RenderFailed]
+  end
+  subgraph T38_domain_domain_BaselineGraphWriterError["tddd::BaselineGraphWriterError"]
+    direction TB
+    T38_domain_domain_BaselineGraphWriterError__self[BaselineGraphWriterError]
+    T38_domain_domain_BaselineGraphWriterError_IoError[IoError]
+    T38_domain_domain_BaselineGraphWriterError_SymlinkRejected[SymlinkRejected]
+    T38_domain_domain_BaselineGraphWriterError_TrackNotFound[TrackNotFound]
+  end
+  subgraph T27_domain_domain_ClusterRender["tddd::ClusterRender"]
+    direction TB
+    T27_domain_domain_ClusterRender__self[ClusterRender]
+  end
+  subgraph R33_domain_domain_BaselineGraphLoader["tddd::BaselineGraphLoader"]
+    direction TB
+    R33_domain_domain_BaselineGraphLoader__self[BaselineGraphLoader]
+    R33_domain_domain_BaselineGraphLoader_load_all([load_all])
+  end
+  subgraph R35_domain_domain_BaselineGraphRenderer["tddd::BaselineGraphRenderer"]
+    direction TB
+    R35_domain_domain_BaselineGraphRenderer__self[BaselineGraphRenderer]
+    R35_domain_domain_BaselineGraphRenderer_render_overview([render_overview])
+    R35_domain_domain_BaselineGraphRenderer_render_clusters([render_clusters])
+  end
+  subgraph R33_domain_domain_BaselineGraphWriter["tddd::BaselineGraphWriter"]
+    direction TB
+    R33_domain_domain_BaselineGraphWriter__self[BaselineGraphWriter]
+    R33_domain_domain_BaselineGraphWriter_write_overview([write_overview])
+    R33_domain_domain_BaselineGraphWriter_write_cluster([write_cluster])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_baseline_graph_workflow["usecase::baseline_graph_workflow"]
+    direction TB
+  subgraph T42_usecase_usecase_RenderBaselineGraphCommand["baseline_graph_workflow::RenderBaselineGraphCommand"]
+    direction TB
+    T42_usecase_usecase_RenderBaselineGraphCommand__self[RenderBaselineGraphCommand]
+  end
+  subgraph T40_usecase_usecase_RenderBaselineGraphError["baseline_graph_workflow::RenderBaselineGraphError"]
+    direction TB
+    T40_usecase_usecase_RenderBaselineGraphError__self[RenderBaselineGraphError]
+    T40_usecase_usecase_RenderBaselineGraphError_LoaderFailed[LoaderFailed]
+    T40_usecase_usecase_RenderBaselineGraphError_WriterFailed[WriterFailed]
+    T40_usecase_usecase_RenderBaselineGraphError_EmptyBaseline[EmptyBaseline]
+    T40_usecase_usecase_RenderBaselineGraphError_LayerNotFound[LayerNotFound]
+    T40_usecase_usecase_RenderBaselineGraphError_RendererFailed[RendererFailed]
+  end
+  subgraph T45_usecase_usecase_RenderBaselineGraphInteractor["baseline_graph_workflow::RenderBaselineGraphInteractor"]
+    direction TB
+    T45_usecase_usecase_RenderBaselineGraphInteractor__self[RenderBaselineGraphInteractor]
+    T45_usecase_usecase_RenderBaselineGraphInteractor_new([new])
+  end
+  subgraph T41_usecase_usecase_RenderBaselineGraphOutput["baseline_graph_workflow::RenderBaselineGraphOutput"]
+    direction TB
+    T41_usecase_usecase_RenderBaselineGraphOutput__self[RenderBaselineGraphOutput]
+  end
+  subgraph R35_usecase_usecase_RenderBaselineGraph["baseline_graph_workflow::RenderBaselineGraph"]
+    direction TB
+    R35_usecase_usecase_RenderBaselineGraph__self[RenderBaselineGraph]
+    R35_usecase_usecase_RenderBaselineGraph_execute([execute])
+  end
+  end
+  subgraph usecase_usecase_module_contract_map_workflow["usecase::contract_map_workflow"]
+    direction TB
+  subgraph T40_usecase_usecase_RenderContractMapCommand["contract_map_workflow::RenderContractMapCommand"]
+    direction TB
+    T40_usecase_usecase_RenderContractMapCommand__self[RenderContractMapCommand]
+  end
+  subgraph T38_usecase_usecase_RenderContractMapError["contract_map_workflow::RenderContractMapError"]
+    direction TB
+    T38_usecase_usecase_RenderContractMapError__self[RenderContractMapError]
+    T38_usecase_usecase_RenderContractMapError_CatalogueLoaderFailed[CatalogueLoaderFailed]
+    T38_usecase_usecase_RenderContractMapError_ContractMapWriterFailed[ContractMapWriterFailed]
+    T38_usecase_usecase_RenderContractMapError_EmptyCatalogue[EmptyCatalogue]
+    T38_usecase_usecase_RenderContractMapError_LayerNotFound[LayerNotFound]
+    T38_usecase_usecase_RenderContractMapError_RendererFailed[RendererFailed]
+  end
+  subgraph R33_usecase_usecase_RenderContractMap["contract_map_workflow::RenderContractMap"]
+    direction TB
+    R33_usecase_usecase_RenderContractMap__self[RenderContractMap]
+    R33_usecase_usecase_RenderContractMap_execute([execute])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T56_infrastructure_infrastructure_BaselineGraphLoaderAdapter["tddd::baseline_graph_loader_adapter::BaselineGraphLoaderAdapter"]
+    direction TB
+    T56_infrastructure_infrastructure_BaselineGraphLoaderAdapter__self[BaselineGraphLoaderAdapter]
+    T56_infrastructure_infrastructure_BaselineGraphLoaderAdapter_new([new])
+  end
+  subgraph T58_infrastructure_infrastructure_BaselineGraphRendererAdapter["tddd::baseline_graph_renderer_adapter::BaselineGraphRendererAdapter"]
+    direction TB
+    T58_infrastructure_infrastructure_BaselineGraphRendererAdapter__self[BaselineGraphRendererAdapter]
+    T58_infrastructure_infrastructure_BaselineGraphRendererAdapter_new([new])
+  end
+  subgraph T56_infrastructure_infrastructure_BaselineGraphWriterAdapter["tddd::baseline_graph_writer_adapter::BaselineGraphWriterAdapter"]
+    direction TB
+    T56_infrastructure_infrastructure_BaselineGraphWriterAdapter__self[BaselineGraphWriterAdapter]
+    T56_infrastructure_infrastructure_BaselineGraphWriterAdapter_new([new])
+  end
+  end
+end
+T30_domain_domain_BaselineDocument_new --> T30_domain_domain_BaselineDocument__self
+R33_domain_domain_BaselineGraphLoader_load_all --> T30_domain_domain_BaselineDocument__self
+R33_domain_domain_BaselineGraphLoader_load_all --> T38_domain_domain_BaselineGraphLoaderError__self
+R35_domain_domain_BaselineGraphRenderer_render_overview --o T30_domain_domain_BaselineDocument__self
+R35_domain_domain_BaselineGraphRenderer_render_overview --> T40_domain_domain_BaselineGraphRendererError__self
+R35_domain_domain_BaselineGraphRenderer_render_clusters --o T30_domain_domain_BaselineDocument__self
+R35_domain_domain_BaselineGraphRenderer_render_clusters --> T40_domain_domain_BaselineGraphRendererError__self
+R35_domain_domain_BaselineGraphRenderer_render_clusters --> T27_domain_domain_ClusterRender__self
+R33_domain_domain_BaselineGraphWriter_write_overview --> T38_domain_domain_BaselineGraphWriterError__self
+R33_domain_domain_BaselineGraphWriter_write_cluster --> T38_domain_domain_BaselineGraphWriterError__self
+T40_usecase_usecase_RenderBaselineGraphError_LoaderFailed --o T38_domain_domain_BaselineGraphLoaderError__self
+T40_usecase_usecase_RenderBaselineGraphError_WriterFailed --o T38_domain_domain_BaselineGraphWriterError__self
+T40_usecase_usecase_RenderBaselineGraphError_RendererFailed --o T40_domain_domain_BaselineGraphRendererError__self
+T45_usecase_usecase_RenderBaselineGraphInteractor_new --> T45_usecase_usecase_RenderBaselineGraphInteractor__self
+R35_usecase_usecase_RenderBaselineGraph_execute --o T42_usecase_usecase_RenderBaselineGraphCommand__self
+R35_usecase_usecase_RenderBaselineGraph_execute --> T40_usecase_usecase_RenderBaselineGraphError__self
+R35_usecase_usecase_RenderBaselineGraph_execute --> T41_usecase_usecase_RenderBaselineGraphOutput__self
+R33_usecase_usecase_RenderContractMap_execute --o T40_usecase_usecase_RenderContractMapCommand__self
+R33_usecase_usecase_RenderContractMap_execute --> T38_usecase_usecase_RenderContractMapError__self
+T45_usecase_usecase_RenderBaselineGraphInteractor__self -.impl.-> R35_usecase_usecase_RenderBaselineGraph__self
+T56_infrastructure_infrastructure_BaselineGraphLoaderAdapter_new --> T56_infrastructure_infrastructure_BaselineGraphLoaderAdapter__self
+T58_infrastructure_infrastructure_BaselineGraphRendererAdapter_new --> T58_infrastructure_infrastructure_BaselineGraphRendererAdapter__self
+T56_infrastructure_infrastructure_BaselineGraphWriterAdapter_new --> T56_infrastructure_infrastructure_BaselineGraphWriterAdapter__self
+T56_infrastructure_infrastructure_BaselineGraphLoaderAdapter__self -.impl.-> R33_domain_domain_BaselineGraphLoader__self
+T58_infrastructure_infrastructure_BaselineGraphRendererAdapter__self -.impl.-> R35_domain_domain_BaselineGraphRenderer__self
+T56_infrastructure_infrastructure_BaselineGraphWriterAdapter__self -.impl.-> R33_domain_domain_BaselineGraphWriter__self
+class T30_domain_domain_BaselineDocument_new method_node
+class T30_domain_domain_BaselineDocument__self value_object
+class T38_domain_domain_BaselineGraphLoaderError_NotFound variant_node
+class T38_domain_domain_BaselineGraphLoaderError_ParseFailed variant_node
+class T38_domain_domain_BaselineGraphLoaderError_IoError variant_node
+class T38_domain_domain_BaselineGraphLoaderError_SymlinkRejected variant_node
+class T38_domain_domain_BaselineGraphLoaderError_LayerDiscoveryFailed variant_node
+class T38_domain_domain_BaselineGraphLoaderError__self error_type
+class T40_domain_domain_BaselineGraphRendererError_StyleConfigNotFound variant_node
+class T40_domain_domain_BaselineGraphRendererError_StyleConfigInvalid variant_node
+class T40_domain_domain_BaselineGraphRendererError_RenderFailed variant_node
+class T40_domain_domain_BaselineGraphRendererError__self error_type
+class T38_domain_domain_BaselineGraphWriterError_IoError variant_node
+class T38_domain_domain_BaselineGraphWriterError_SymlinkRejected variant_node
+class T38_domain_domain_BaselineGraphWriterError_TrackNotFound variant_node
+class T38_domain_domain_BaselineGraphWriterError__self error_type
+class T27_domain_domain_ClusterRender__self dto
+class R33_domain_domain_BaselineGraphLoader_load_all method_node
+class R33_domain_domain_BaselineGraphLoader__self secondary_port
+class R35_domain_domain_BaselineGraphRenderer_render_overview method_node
+class R35_domain_domain_BaselineGraphRenderer_render_clusters method_node
+class R35_domain_domain_BaselineGraphRenderer__self secondary_port
+class R33_domain_domain_BaselineGraphWriter_write_overview method_node
+class R33_domain_domain_BaselineGraphWriter_write_cluster method_node
+class R33_domain_domain_BaselineGraphWriter__self secondary_port
+class T42_usecase_usecase_RenderBaselineGraphCommand__self command
+class T40_usecase_usecase_RenderBaselineGraphError_LoaderFailed variant_node
+class T40_usecase_usecase_RenderBaselineGraphError_WriterFailed variant_node
+class T40_usecase_usecase_RenderBaselineGraphError_EmptyBaseline variant_node
+class T40_usecase_usecase_RenderBaselineGraphError_LayerNotFound variant_node
+class T40_usecase_usecase_RenderBaselineGraphError_RendererFailed variant_node
+class T40_usecase_usecase_RenderBaselineGraphError__self error_type
+class T45_usecase_usecase_RenderBaselineGraphInteractor_new method_node
+class T45_usecase_usecase_RenderBaselineGraphInteractor__self interactor
+class T41_usecase_usecase_RenderBaselineGraphOutput__self dto
+class R35_usecase_usecase_RenderBaselineGraph_execute method_node
+class R35_usecase_usecase_RenderBaselineGraph__self app_service
+class T40_usecase_usecase_RenderContractMapCommand__self command
+class T38_usecase_usecase_RenderContractMapError_CatalogueLoaderFailed variant_node
+class T38_usecase_usecase_RenderContractMapError_ContractMapWriterFailed variant_node
+class T38_usecase_usecase_RenderContractMapError_EmptyCatalogue variant_node
+class T38_usecase_usecase_RenderContractMapError_LayerNotFound variant_node
+class T38_usecase_usecase_RenderContractMapError_RendererFailed variant_node
+class T38_usecase_usecase_RenderContractMapError__self error_type
+class R33_usecase_usecase_RenderContractMap_execute method_node
+class R33_usecase_usecase_RenderContractMap__self app_service
+class T56_infrastructure_infrastructure_BaselineGraphLoaderAdapter_new method_node
+class T56_infrastructure_infrastructure_BaselineGraphLoaderAdapter__self secondary_adapter
+class T58_infrastructure_infrastructure_BaselineGraphRendererAdapter_new method_node
+class T58_infrastructure_infrastructure_BaselineGraphRendererAdapter__self secondary_adapter
+class T56_infrastructure_infrastructure_BaselineGraphWriterAdapter_new method_node
+class T56_infrastructure_infrastructure_BaselineGraphWriterAdapter__self secondary_adapter
+```

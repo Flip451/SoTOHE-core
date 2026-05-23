@@ -257,6 +257,7 @@ dependencies = [
  "globset",
  "rstest",
  "rustdoc-types",
+ "serde_json",
  "strum",
  "thiserror",
 ]

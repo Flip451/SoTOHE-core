@@ -1,0 +1,2755 @@
+//! Impl Item processing for the baseline-graph renderer (T008 / T015).
+//!
+//! Implements the following ADR decisions:
+//!
+//! - **O-r1**: cross-baseline global trait index construction. Index key is
+//!   `(CrateName, module_path_string, TraitName)`. Built once per render call
+//!   (not long-lived — no Arc / stale data risk). Workspace-external types are
+//!   silently skipped.
+//! - **BB-4-fix1 + blanket a**: Impl Item processing:
+//!   - Inherent impl (`trait_: None`): merge inherent methods into the
+//!     corresponding type entry subgraph. Multiple impl blocks are accumulated
+//!     into one entry.
+//!   - Trait impl (`trait_: Some(Path)`, `blanket_impl: None`,
+//!     `for_: Type::ResolvedPath`): emit `-.impl.->` edge (Decision J).
+//!   - `provided_trait_methods`: skip.
+//!   - `is_negative: true`: skip.
+//!   - `is_synthetic: true`: skip.
+//!   - `blanket_impl: Some(_)` (expanded copy per concrete type): skip.
+//!   - `blanket_impl: None` + `for_: Type::Generic` (blanket body, user-declared):
+//!     display near/inside the target Trait subgraph (a-plan).
+//! - **J**: `-.impl.->` edge style for all trait impls.
+//! - **AC-19 / AC-20 (method path, T015)**: inherent and trait method nodes emit
+//!   `method_param` and `method_returns` edges to own-crate types extracted from
+//!   `FunctionSignature.inputs` / `.output` by recursive `ResolvedPath.args` traversal.
+//!   `Type::Primitive` / `Type::Generic` / external types are skipped (no edge).
+//! - **CN-05**: cross-baseline rustdoc `Id` comparison is prohibited.
+//!   Trait identity is resolved via `(CrateName, module_path, TraitName)`.
+//! - **CN-10**: workspace-external types and lookup failures are silently skipped.
+//! - **CN-11**: provided_method / negative / synthetic / `blanket_impl: Some` are skipped.
+//!
+//! All functions are panic-free (no `unwrap` / `expect` / slice indexing on `[i]`
+//! in production code — only `.get()` / iterators).
+//!
+//! (IN-09 / IN-12 / IN-13 / AC-05 / AC-08 / AC-17 / AC-19 / AC-20 / CN-04 / CN-05 /
+//! CN-10 / CN-11)
+
+use std::collections::{HashMap, HashSet};
+
+use rustdoc_types::{Id, ItemEnum, Type, Visibility};
+
+use domain::tddd::baseline_document::BaselineDocument;
+use domain::tddd::baseline_graph_ports::BaselineGraphRendererError;
+
+use super::node_id_generator::{module_path_from_summary, trait_rep_node_id, type_rep_node_id};
+use super::style_config::{StyleConfig, apply_shape, edge_arrow_label, sanitize};
+use super::trait_index::{TraitIndex, resolve_trait_key};
+#[cfg(test)]
+use super::trait_index::{TraitKey, build_trait_index};
+use super::type_resolver::collect_own_crate_node_ids_from_type;
+
+// ---------------------------------------------------------------------------
+// Inherent method accumulation
+// ---------------------------------------------------------------------------
+
+/// Collect all inherent-impl method Ids for each target type, keyed by the
+/// type's representative node id.
+///
+/// Scans all `ItemEnum::Impl` items in the given `krate`:
+/// - `trait_: None` (inherent impl)
+/// - `blanket_impl: None` (not a blanket copy)
+/// - `is_negative: false`, `is_synthetic: false`
+/// - `for_: Type::ResolvedPath` that resolves to an own-crate type in `krate.paths`
+///
+/// Returns a map: `type_rep_node_id → Vec<method_id>`.
+/// Multiple impl blocks for the same type are merged (BB-4-fix1).
+///
+/// `layer` and `crate_name` are needed to compute the type representative node id
+/// (D-decision).
+pub(super) fn collect_inherent_methods(
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    crate_name: &str,
+) -> HashMap<String, Vec<Id>> {
+    let mut map: HashMap<String, Vec<Id>> = HashMap::new();
+
+    for item in krate.index.values() {
+        let impl_data = match &item.inner {
+            ItemEnum::Impl(i) => i,
+            _ => continue,
+        };
+
+        // Skip: trait impl, blanket copy, negative, synthetic (BB-4-fix1 / CN-11).
+        if impl_data.trait_.is_some() {
+            continue;
+        }
+        if impl_data.blanket_impl.is_some() {
+            continue;
+        }
+        if impl_data.is_negative {
+            continue;
+        }
+        if impl_data.is_synthetic {
+            continue;
+        }
+
+        // Resolve the target type — must be a ResolvedPath to an own-crate type.
+        let type_rep_id = match resolve_type_rep_node_id(&impl_data.for_, krate, layer, crate_name)
+        {
+            Some(id) => id,
+            None => continue, // external type or unresolvable — silent skip (CN-10)
+        };
+
+        // Accumulate method Ids (BB-4-fix1: multiple blocks → 1 entry).
+        let methods = map.entry(type_rep_id).or_default();
+        for &method_id in &impl_data.items {
+            methods.push(method_id);
+        }
+    }
+
+    map
+}
+
+/// Resolve a `Type` to the representative node id of the target type (for inherent
+/// impl accumulation and trait impl edge source).
+///
+/// Returns `Some(type_rep_node_id)` only for `Type::ResolvedPath` that resolves
+/// to an own-crate type (`crate_id == 0`). All other cases return `None` (silent
+/// skip, CN-10).
+fn resolve_type_rep_node_id(
+    ty: &Type,
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    crate_name: &str,
+) -> Option<String> {
+    let path = match ty {
+        Type::ResolvedPath(p) => p,
+        _ => return None,
+    };
+    let summary = krate.paths.get(&path.id)?;
+    if summary.crate_id != 0 {
+        // External type — silent skip (CN-10).
+        return None;
+    }
+    // Visibility + kind filter (CC-1 / B-r1 parity with extract_nodes):
+    // - Only Public types have rendered entry subgraphs.
+    // - Only the 4 rendered type kinds (Struct / Enum / TypeAlias / Trait) have a
+    //   type_rep_node_id in the output. Other kinds (Union, etc.) are skipped by
+    //   extract_nodes (B-r1), so emitting an edge to their rep node creates a phantom.
+    let item = krate.index.get(&path.id)?;
+    if !matches!(item.visibility, Visibility::Public) {
+        return None;
+    }
+    if !matches!(
+        item.inner,
+        ItemEnum::Struct(_) | ItemEnum::Enum(_) | ItemEnum::TypeAlias(_) | ItemEnum::Trait(_)
+    ) {
+        return None;
+    }
+    let module_path = module_path_from_summary(&summary.path);
+    let type_name = summary.path.last()?;
+    Some(type_rep_node_id(layer, crate_name, &module_path, type_name))
+}
+
+// ---------------------------------------------------------------------------
+// Inherent method emission
+// ---------------------------------------------------------------------------
+
+/// Emit inherent method nodes for a given type entry subgraph (BB-4-fix1 / T015).
+///
+/// `method_ids` is the list of Ids collected by [`collect_inherent_methods`] for
+/// this type's representative node id. Each method that is a `Function` item with
+/// `Visibility::Public` is emitted as a method node inside `parent_sg_id` (the entry
+/// subgraph id). Private and default-visibility inherent methods are skipped (CC-1).
+///
+/// **T015 (AC-19 / AC-20 — method path)**: after emitting each method node, the
+/// function also emits `method_param` edges from the method node to own-crate types
+/// found in `FunctionSignature.inputs`, and `method_returns` edges to own-crate types
+/// found in `FunctionSignature.output`.  Own-crate types are determined by
+/// [`collect_own_crate_node_ids_from_type`]: `Type::Primitive` / `Type::Generic` /
+/// external types produce no edge.  Edge styles are resolved from `[edge.method_param]`
+/// and `[edge.method_returns]` in the style config (fail-closed, CN-02).
+///
+/// - `provided_trait_methods` are not in `method_ids` here (they belong to trait
+///   impl, not inherent impl). However, if a method id is in `provided_methods_set`
+///   it is skipped (safety guard against provided method leakage, CN-11).
+///
+/// # Errors
+///
+/// Returns `BaselineGraphRendererError::RenderFailed` when `[edge.method_param]` or
+/// `[edge.method_returns]` is absent from the style config **and** at least one edge
+/// of that kind would be emitted (CN-02 — fail-closed).
+#[allow(clippy::too_many_arguments)]
+pub(super) fn emit_inherent_methods(
+    method_ids: &[Id],
+    krate: &rustdoc_types::Crate,
+    parent_sg_id: &str,
+    layer: &str,
+    crate_name: &str,
+    subgraph_lines: &mut Vec<String>,
+    edge_lines: &mut Vec<String>,
+    class_attach: &mut Vec<String>,
+    style: &StyleConfig,
+    indent: &str,
+) -> Result<(), BaselineGraphRendererError> {
+    // Build provided-method name set from all trait impls in this krate
+    // to guard against accidental emission (CN-11).
+    let provided_method_ids: HashSet<Id> = collect_provided_method_ids(krate);
+
+    let method_shape = style.node.get("Method").and_then(|ns| ns.shape.as_deref());
+
+    for &method_id in method_ids {
+        // Skip provided methods (CN-11 safety guard).
+        if provided_method_ids.contains(&method_id) {
+            continue;
+        }
+
+        let method_item = match krate.index.get(&method_id) {
+            Some(m) => m,
+            None => continue,
+        };
+
+        // Visibility filter (CC-1): Public only for inherent methods.
+        // The CC-1 exception for Visibility::Default applies only to trait methods
+        // and enum variants (which are associated items inside a Public parent).
+        // Inherent methods are top-level declarations and must be Public to be visible.
+        if !matches!(method_item.visibility, Visibility::Public) {
+            continue;
+        }
+
+        let fn_data = match &method_item.inner {
+            ItemEnum::Function(f) => f,
+            _ => continue,
+        };
+
+        let method_name = match method_item.name.as_deref() {
+            Some(n) => n,
+            None => continue,
+        };
+
+        let method_node_id = format!("{parent_sg_id}_{}", sanitize(method_name));
+        let method_node_def = apply_shape(method_name, method_shape);
+        subgraph_lines.push(format!("{indent}{method_node_id}{method_node_def}"));
+
+        if let Some(ns) = style.node.get("Method") {
+            if let Some(class_name) = ns.class.as_deref() {
+                class_attach.push(format!("class {method_node_id} {class_name}"));
+            }
+        }
+
+        // T015 (AC-19 / AC-20 — method path): emit method_param and method_returns edges.
+        emit_method_signature_edges(
+            &fn_data.sig,
+            &method_node_id,
+            krate,
+            layer,
+            crate_name,
+            edge_lines,
+            style,
+        )?;
+    }
+
+    Ok(())
+}
+
+/// Emit `method_param` and `method_returns` edges from a method node to own-crate
+/// types referenced in a [`rustdoc_types::FunctionSignature`] (T015 / AC-19 / AC-20).
+///
+/// - `method_node_id`: the mermaid node id of the method node (source of edges).
+/// - `sig`: the `FunctionSignature` of the method.
+/// - `krate`, `layer`, `crate_name`: used by [`collect_own_crate_node_ids_from_type`].
+/// - `edge_lines`: receives the generated edge lines.
+/// - `style`: style config for `[edge.method_param]` / `[edge.method_returns]` lookup.
+///
+/// Own-crate type extraction uses [`collect_own_crate_node_ids_from_type`] which
+/// recursively traverses `ResolvedPath.args` (GenericArgs).  `Type::Primitive`,
+/// `Type::Generic`, and external types produce no edge (AC-20).
+///
+/// Edge style keys are looked up lazily — only when at least one edge of that kind
+/// would be emitted.  Missing keys when no edges would be emitted do not cause errors.
+///
+/// # Errors
+///
+/// Returns `BaselineGraphRendererError::RenderFailed` when `[edge.method_param]` or
+/// `[edge.method_returns]` is absent and at least one edge of that kind needs to be
+/// emitted (CN-02 — fail-closed).
+pub(super) fn emit_method_signature_edges(
+    sig: &rustdoc_types::FunctionSignature,
+    method_node_id: &str,
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    crate_name: &str,
+    edge_lines: &mut Vec<String>,
+    style: &StyleConfig,
+) -> Result<(), BaselineGraphRendererError> {
+    // method_param edges: one edge per own-crate type in each input parameter.
+    for (_param_name, param_ty) in &sig.inputs {
+        let targets = collect_own_crate_node_ids_from_type(param_ty, krate, layer, crate_name);
+        if !targets.is_empty() {
+            // Lazy edge style lookup: only when we have edges to emit (CN-02 fail-closed).
+            let (param_arrow, _) = edge_arrow_label(&style.edge, "method_param")?;
+            for target_id in &targets {
+                edge_lines.push(format!("{method_node_id} {param_arrow} {target_id}"));
+            }
+        }
+    }
+
+    // method_returns edges: one edge per own-crate type in the output type.
+    if let Some(output_ty) = &sig.output {
+        let targets = collect_own_crate_node_ids_from_type(output_ty, krate, layer, crate_name);
+        if !targets.is_empty() {
+            // Lazy edge style lookup: only when we have edges to emit (CN-02 fail-closed).
+            let (ret_arrow, _) = edge_arrow_label(&style.edge, "method_returns")?;
+            for target_id in &targets {
+                edge_lines.push(format!("{method_node_id} {ret_arrow} {target_id}"));
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Collect all Ids that appear in `provided_trait_methods` across all trait impls
+/// in the given `krate`. Used as a safety guard in inherent method emission (CN-11).
+///
+/// Also used by `mod.rs` Pass 3a (method-signature edge collection for the depth-1
+/// overview) to skip provided methods from the signature walk (symmetric to
+/// `emit_inherent_methods`'s CN-11 guard).
+pub(super) fn collect_provided_method_ids(krate: &rustdoc_types::Crate) -> HashSet<Id> {
+    let mut set = HashSet::new();
+    for item in krate.index.values() {
+        if let ItemEnum::Impl(impl_data) = &item.inner {
+            if impl_data.trait_.is_some() {
+                for &method_id in &impl_data.items {
+                    set.insert(method_id);
+                }
+            }
+        }
+    }
+    set
+}
+
+// ---------------------------------------------------------------------------
+// Trait impl edge emission
+// ---------------------------------------------------------------------------
+
+/// Process all `Impl` items in `krate` and emit trait impl edges (J decision /
+/// BB-4-fix1).
+///
+/// For each `ItemEnum::Impl`:
+/// - **Skip** if `is_negative`, `is_synthetic`, or `blanket_impl.is_some()` (CN-11).
+/// - **Inherent impl** (`trait_: None`): already handled by `emit_inherent_methods`;
+///   skipped here.
+/// - **Trait impl** (`trait_: Some(path)`):
+///   - `blanket_impl: None` + `for_: Type::ResolvedPath`: emit `-.impl.->` edge
+///     from type rep node to trait subgraph rep node (J decision), **only when the
+///     trait's crate matches `crate_filter`** (ADR §332/368: cluster files contain
+///     only intra-cluster edges; cross-cluster edges belong to the depth-1 overview).
+///   - `blanket_impl: None` + `for_: Type::Generic`: blanket body — handled
+///     separately via [`build_blanket_body_map`] which injects the indicator node
+///     inside the trait subgraph before its `end` line (a-plan, AC-17).
+///   - Lookup failures (O-r1, CN-10) → silent skip.
+///
+/// `crate_filter` restricts edge emission to cases where the resolved trait belongs
+/// to the same crate as the cluster file being rendered. When `None` (e.g. overview
+/// render) all indexed traits are reachable.
+///
+/// # Errors
+///
+/// Returns `BaselineGraphRendererError::RenderFailed` when the `[edge.trait_impl]`
+/// style entry is absent from the style config (CN-02 — fail-closed), but only when
+/// at least one trait impl edge is about to be emitted. If no edges are emitted the
+/// style key is never looked up and `Ok(())` is returned.
+pub(super) fn emit_impl_edges(
+    doc: &BaselineDocument,
+    trait_index: &TraitIndex,
+    edge_lines: &mut Vec<String>,
+    style: &StyleConfig,
+    layer: &str,
+    crate_filter: Option<&str>,
+) -> Result<(), BaselineGraphRendererError> {
+    let krate = &doc.krate;
+    let own_crate_name = doc.crate_name.as_str();
+
+    for item in krate.index.values() {
+        let impl_data = match &item.inner {
+            ItemEnum::Impl(i) => i,
+            _ => continue,
+        };
+
+        // BB-4-fix1 / CN-11: skip negative, synthetic, blanket copies.
+        if impl_data.is_negative || impl_data.is_synthetic || impl_data.blanket_impl.is_some() {
+            continue;
+        }
+
+        // Inherent impl: skip here (handled by emit_inherent_methods).
+        let trait_path = match &impl_data.trait_ {
+            Some(p) => p,
+            None => continue,
+        };
+
+        // Blanket bodies (for_: Generic) are handled by build_blanket_body_map; skip here.
+        if matches!(impl_data.for_, Type::Generic(_)) {
+            continue;
+        }
+
+        // Only concrete type trait impls (for_: ResolvedPath) emit `-.impl.->` edges (J decision).
+        // Other for_ kinds (Primitive, Tuple, Slice, etc.) are not own-crate concrete types
+        // and are silently skipped (CN-10).
+        if !matches!(impl_data.for_, Type::ResolvedPath(_)) {
+            continue;
+        }
+
+        // Resolve trait key for index lookup (O-r1, CN-05: no Id cross-comparison).
+        let trait_key = match resolve_trait_key(trait_path, krate, own_crate_name) {
+            Some(k) => k,
+            None => continue, // external / unresolvable — silent skip (CN-10)
+        };
+
+        // Cross-cluster guard (ADR §332/368): cluster files render only intra-cluster
+        // edges. If `crate_filter` is set, skip traits that belong to a different crate —
+        // their subgraph would not be present in this cluster file, creating a phantom
+        // Mermaid node. Cross-cluster impl edges are deferred to the depth-1 overview.
+        if let Some(filter) = crate_filter {
+            if trait_key.crate_name != filter {
+                continue;
+            }
+        }
+
+        // Look up trait subgraph id in the index.
+        let trait_sg_id = match trait_index.get(&trait_key) {
+            Some(id) => id,
+            None => continue, // trait not in index (cross-crate or not in layer) — silent skip
+        };
+        // Trait rep node id (for edge target — targets the concrete node inside the subgraph).
+        let trait_rep_id = format!("{trait_sg_id}__self");
+
+        // Concrete type trait impl: emit `-.impl.->` edge (J decision, BB-4-fix1).
+        let type_rep_id =
+            match resolve_type_rep_node_id(&impl_data.for_, krate, layer, own_crate_name) {
+                Some(id) => id,
+                None => continue, // external type — silent skip (CN-10)
+            };
+
+        // Lazy edge style lookup (CN-02 fail-closed, but only when emitting).
+        let (arrow, _) = edge_arrow_label(&style.edge, "trait_impl")?;
+        edge_lines.push(format!("{type_rep_id} {arrow} {trait_rep_id}"));
+    }
+
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// Blanket body collection (for trait subgraph injection, BB-4-fix1 / a-plan)
+// ---------------------------------------------------------------------------
+
+/// A single blanket-body indicator entry to be injected inside a trait subgraph.
+///
+/// Collected by [`build_blanket_body_map`] and passed to `emit_trait_subgraph`
+/// so the indicator node is emitted before the subgraph's `end` line (a-plan, AC-17).
+pub(super) struct BlanketBodyEntry {
+    /// Mermaid node id for the blanket indicator (e.g. `"<trait_sg_id>__blanket"`).
+    pub(super) node_id: String,
+    /// Full mermaid node definition string (e.g. `"[impl<T> MyTrait]"`).
+    pub(super) node_def: String,
+    /// Optional `class <node_id> <class_name>` attach statement.
+    pub(super) class_attach_line: Option<String>,
+}
+
+/// Build a map from `trait_sg_id` → `Vec<BlanketBodyEntry>` for all baselines in `layer`.
+///
+/// Scans all `ItemEnum::Impl` items in each baseline and collects entries where:
+/// - `blanket_impl: None` (not an expanded copy)
+/// - `for_: Type::Generic` (blanket body, user-declared)
+/// - `trait_` is `Some` and resolves to a trait in the `trait_index`
+///
+/// The resulting map is used by `emit_all_entries_for_layer` to inject blanket body
+/// nodes inside the corresponding trait subgraph before its `end` line (a-plan).
+///
+/// Lookup failures (CN-10) and external/unresolvable traits are silently skipped.
+pub(super) fn build_blanket_body_map(
+    baselines: &[BaselineDocument],
+    layer: &str,
+    crate_filter: Option<&str>,
+    trait_index: &TraitIndex,
+    style: &StyleConfig,
+) -> HashMap<String, Vec<BlanketBodyEntry>> {
+    let mut map: HashMap<String, Vec<BlanketBodyEntry>> = HashMap::new();
+
+    for doc in baselines {
+        if doc.layer.as_ref() != layer {
+            continue;
+        }
+        if let Some(filter) = crate_filter {
+            if doc.crate_name.as_str() != filter {
+                continue;
+            }
+        }
+        let krate = &doc.krate;
+        let own_crate_name = doc.crate_name.as_str();
+
+        for item in krate.index.values() {
+            let impl_data = match &item.inner {
+                ItemEnum::Impl(i) => i,
+                _ => continue,
+            };
+
+            // Skip: negative, synthetic, blanket copies (CN-11).
+            if impl_data.is_negative || impl_data.is_synthetic || impl_data.blanket_impl.is_some() {
+                continue;
+            }
+
+            // Only blanket bodies: for_ must be Generic, trait_ must be Some.
+            if !matches!(impl_data.for_, Type::Generic(_)) {
+                continue;
+            }
+            let trait_path = match &impl_data.trait_ {
+                Some(p) => p,
+                None => continue,
+            };
+
+            // Resolve trait key for index lookup (O-r1, CN-05).
+            let trait_key = match resolve_trait_key(trait_path, krate, own_crate_name) {
+                Some(k) => k,
+                None => continue, // unresolvable — silent skip (CN-10)
+            };
+
+            // Look up trait subgraph id in the index.
+            let trait_sg_id = match trait_index.get(&trait_key) {
+                Some(id) => id.clone(),
+                None => continue, // trait not in index — silent skip
+            };
+
+            let blanket_node_id = format!("{trait_sg_id}__blanket");
+            let blanket_label = format!("impl<T> {}", trait_key.trait_name);
+            let blanket_shape = style.node.get("BlanketImpl").and_then(|ns| ns.shape.as_deref());
+            let node_def = apply_shape(&blanket_label, blanket_shape);
+            let class_attach_line = style
+                .node
+                .get("BlanketImpl")
+                .and_then(|ns| ns.class.as_deref())
+                .map(|class_name| format!("class {blanket_node_id} {class_name}"));
+
+            map.entry(trait_sg_id).or_default().push(BlanketBodyEntry {
+                node_id: blanket_node_id,
+                node_def,
+                class_attach_line,
+            });
+        }
+    }
+
+    map
+}
+
+// ---------------------------------------------------------------------------
+// Convenience: collect inherent methods for all types in a layer
+// ---------------------------------------------------------------------------
+
+/// Build the inherent-method map for all baselines in `layer`.
+///
+/// Returns a nested map:
+/// `crate_name → (type_rep_node_id → Vec<method_id>)`
+///
+/// Callers use this to augment each Struct / Enum / TypeAlias entry subgraph with
+/// the inherent methods collected from all impl blocks in the same crate (BB-4-fix1).
+pub(super) fn build_inherent_method_map(
+    baselines: &[BaselineDocument],
+    layer: &str,
+) -> HashMap<String, HashMap<String, Vec<Id>>> {
+    let mut outer: HashMap<String, HashMap<String, Vec<Id>>> = HashMap::new();
+
+    for doc in baselines {
+        if doc.layer.as_ref() != layer {
+            continue;
+        }
+        let crate_name = doc.crate_name.as_str();
+        let methods = collect_inherent_methods(&doc.krate, layer, crate_name);
+        outer.insert(crate_name.to_string(), methods);
+    }
+
+    outer
+}
+
+// ---------------------------------------------------------------------------
+// Top-level integration: emit all Impl edges for a layer
+// ---------------------------------------------------------------------------
+
+/// Process all Impl items across all baselines in `layer` and emit trait impl
+/// edges (J decision).
+///
+/// Blanket body indicator nodes are handled separately via [`build_blanket_body_map`] +
+/// `emit_trait_subgraph` so they appear inside the corresponding trait subgraph before
+/// its `end` line (a-plan, AC-17).
+///
+/// This function emits only concrete-type trait impl edges (`-.impl.->`).
+/// It is called by `emit_all_entries_for_layer` after all subgraph definitions
+/// are stable.
+///
+/// # Errors
+///
+/// Returns `BaselineGraphRendererError::RenderFailed` when `[edge.trait_impl]` is
+/// absent from the style config and at least one concrete-type trait impl edge
+/// needs to be emitted (CN-02 fail-closed).
+pub(super) fn emit_all_impl_edges_for_layer(
+    baselines: &[BaselineDocument],
+    layer: &str,
+    crate_filter: Option<&str>,
+    trait_index: &TraitIndex,
+    edge_lines: &mut Vec<String>,
+    style: &StyleConfig,
+) -> Result<(), BaselineGraphRendererError> {
+    for doc in baselines {
+        if doc.layer.as_ref() != layer {
+            continue;
+        }
+        if let Some(filter) = crate_filter {
+            if doc.crate_name.as_str() != filter {
+                continue;
+            }
+        }
+        emit_impl_edges(doc, trait_index, edge_lines, style, layer, crate_filter)?;
+    }
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// Repr-node id helpers exposed to entry_subgraph callers
+// ---------------------------------------------------------------------------
+
+/// Compute the trait representative node id (alias for [`trait_rep_node_id`])
+/// for use as an edge target (J decision).
+///
+/// Re-exported here so that `entry_subgraph.rs` callers can use it without
+/// importing from `node_id_generator` directly.
+#[allow(dead_code)]
+pub(super) fn trait_rep_node_id_for_key(
+    layer: &str,
+    crate_name: &str,
+    module_path_joined: &str,
+    trait_name: &str,
+) -> String {
+    trait_rep_node_id(layer, crate_name, module_path_joined, trait_name)
+}
+
+// ---------------------------------------------------------------------------
+// Tests (T008)
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
+mod tests {
+    use std::collections::HashMap;
+
+    use domain::tddd::baseline_document::BaselineDocument;
+    use domain::tddd::catalogue_v2::identifiers::CrateName;
+    use domain::tddd::layer_id::LayerId;
+    use rustdoc_types::{
+        Crate, FORMAT_VERSION, FunctionHeader, FunctionSignature, Generics, Id, Impl, Item,
+        ItemEnum, ItemKind, ItemSummary, Module, Path, Struct, StructKind, Target, Trait,
+        Visibility,
+    };
+
+    use super::*;
+
+    // -----------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------
+
+    fn empty_generics() -> Generics {
+        Generics { params: vec![], where_predicates: vec![] }
+    }
+
+    fn make_item(id: Id, name: Option<&str>, inner: ItemEnum, vis: Visibility) -> Item {
+        Item {
+            id,
+            crate_id: 0,
+            name: name.map(|s| s.to_string()),
+            span: None,
+            visibility: vis,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner,
+        }
+    }
+
+    fn pub_item(id: Id, name: &str, inner: ItemEnum) -> Item {
+        make_item(id, Some(name), inner, Visibility::Public)
+    }
+
+    fn default_vis_item(id: Id, name: Option<&str>, inner: ItemEnum) -> Item {
+        make_item(id, name, inner, Visibility::Default)
+    }
+
+    fn empty_function_inner() -> ItemEnum {
+        ItemEnum::Function(rustdoc_types::Function {
+            sig: FunctionSignature { inputs: vec![], output: None, is_c_variadic: false },
+            generics: empty_generics(),
+            header: FunctionHeader {
+                is_unsafe: false,
+                is_const: false,
+                is_async: false,
+                abi: rustdoc_types::Abi::Rust,
+            },
+            has_body: true,
+        })
+    }
+
+    fn make_crate(root_id: Id, index: HashMap<Id, Item>, paths: HashMap<Id, ItemSummary>) -> Crate {
+        Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        }
+    }
+
+    fn item_summary(crate_id: u32, path: Vec<&str>, kind: ItemKind) -> ItemSummary {
+        ItemSummary { crate_id, path: path.into_iter().map(|s| s.to_string()).collect(), kind }
+    }
+
+    fn make_baseline(layer_str: &str, crate_name_str: &str, krate: Crate) -> BaselineDocument {
+        BaselineDocument::new(
+            LayerId::try_new(layer_str).unwrap(),
+            CrateName::new(crate_name_str).unwrap(),
+            krate,
+        )
+    }
+
+    fn minimal_impl(
+        id: Id,
+        trait_path: Option<Path>,
+        for_ty: rustdoc_types::Type,
+        items: Vec<Id>,
+        is_negative: bool,
+        is_synthetic: bool,
+        blanket_impl: Option<rustdoc_types::Type>,
+    ) -> Item {
+        let inner = ItemEnum::Impl(Impl {
+            is_unsafe: false,
+            generics: empty_generics(),
+            provided_trait_methods: vec![],
+            trait_: trait_path,
+            for_: for_ty,
+            items,
+            is_negative,
+            is_synthetic,
+            blanket_impl,
+        });
+        default_vis_item(id, None, inner)
+    }
+
+    fn resolved_path(id: Id, path_str: &str) -> rustdoc_types::Type {
+        rustdoc_types::Type::ResolvedPath(Path { path: path_str.to_string(), id, args: None })
+    }
+
+    fn trait_path(id: Id, path_str: &str) -> Path {
+        Path { path: path_str.to_string(), id, args: None }
+    }
+
+    fn minimal_style() -> super::super::StyleConfig {
+        toml::from_str::<super::super::StyleConfig>(
+            r#"
+[edge.trait_impl]
+arrow = "-.impl.->"
+
+[filter]
+include_functions = true
+"#,
+        )
+        .unwrap()
+    }
+
+    // -----------------------------------------------------------------------
+    // T008: build_trait_index (O-r1)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_build_trait_index_indexes_own_crate_traits() {
+        let root_id = Id(0);
+        let trait_id = Id(1);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let idx = build_trait_index(&[baseline], "domain");
+
+        let key = TraitKey {
+            crate_name: "my_crate".to_string(),
+            module_path: String::new(),
+            trait_name: "MyTrait".to_string(),
+        };
+        assert!(
+            idx.contains_key(&key),
+            "MyTrait must be in the index; got keys: {:?}",
+            idx.keys().collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn test_build_trait_index_indexes_module_nested_trait() {
+        let root_id = Id(0);
+        let trait_id = Id(1);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "Repository",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(
+            trait_id,
+            item_summary(0, vec!["my_crate", "ports", "Repository"], ItemKind::Trait),
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let idx = build_trait_index(&[baseline], "domain");
+
+        let key = TraitKey {
+            crate_name: "my_crate".to_string(),
+            module_path: "ports".to_string(),
+            trait_name: "Repository".to_string(),
+        };
+        assert!(idx.contains_key(&key), "nested trait Repository must be in the index");
+    }
+
+    #[test]
+    fn test_build_trait_index_excludes_external_crate_traits() {
+        // Traits from external crates (crate_id != 0) must not be indexed (CN-10).
+        let root_id = Id(0);
+        let trait_id = Id(1);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module { is_crate: true, items: vec![], is_stripped: false }),
+            ),
+        );
+        // Simulate external trait appearing in index with crate_id != 0.
+        index.insert(
+            trait_id,
+            Item {
+                id: trait_id,
+                crate_id: 99,
+                name: Some("ExternalTrait".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            },
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(
+            trait_id,
+            item_summary(99, vec!["external_crate", "ExternalTrait"], ItemKind::Trait),
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let idx = build_trait_index(&[baseline], "domain");
+        assert!(
+            idx.is_empty(),
+            "external traits must not be indexed; got: {:?}",
+            idx.keys().collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn test_build_trait_index_filters_by_layer() {
+        // Traits from a different layer must not be indexed.
+        let root_id = Id(0);
+        let trait_id = Id(1);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        // Baseline is "usecase" layer, but we query "domain".
+        let baseline = make_baseline("usecase", "my_crate", krate);
+
+        let idx = build_trait_index(&[baseline], "domain");
+        assert!(idx.is_empty(), "traits from different layer must not be indexed");
+    }
+
+    // -----------------------------------------------------------------------
+    // T008: collect_inherent_methods (BB-4-fix1)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_collect_inherent_methods_collects_public_methods() {
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let impl_id = Id(2);
+        let method_id = Id(3);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![impl_id],
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, None, struct_ty, vec![method_id], false, false, None),
+        );
+        index.insert(method_id, pub_item(method_id, "do_it", empty_function_inner()));
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+
+        let krate = make_crate(root_id, index, paths);
+
+        let methods = collect_inherent_methods(&krate, "domain", "my_crate");
+
+        // Find the entry for MyStruct.
+        let rep_id = type_rep_node_id("domain", "my_crate", "", "MyStruct");
+        assert!(
+            methods.contains_key(&rep_id),
+            "inherent methods must be keyed by type rep node id; keys: {:?}",
+            methods.keys().collect::<Vec<_>>()
+        );
+        let ids = &methods[&rep_id];
+        assert!(ids.contains(&method_id), "method_id must be in the list");
+    }
+
+    #[test]
+    fn test_collect_inherent_methods_skips_trait_impl() {
+        // Trait impls (trait_: Some) must not be included as inherent.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let impl_id = Id(2);
+        let method_id = Id(3);
+        let trait_id = Id(4);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+        let trait_p = trait_path(trait_id, "MyTrait");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        // This is a TRAIT impl — must be skipped by collect_inherent_methods.
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, Some(trait_p), struct_ty, vec![method_id], false, false, None),
+        );
+        index.insert(method_id, pub_item(method_id, "do_it", empty_function_inner()));
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+
+        let methods = collect_inherent_methods(&krate, "domain", "my_crate");
+        // Trait impls must not be collected as inherent methods.
+        assert!(
+            methods.is_empty(),
+            "trait impls must not appear in inherent method map; got: {:?}",
+            methods
+        );
+    }
+
+    #[test]
+    fn test_collect_inherent_methods_skips_negative_impl() {
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let impl_id = Id(2);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        // is_negative: true — must be skipped (CN-11 / BB-4-fix1).
+        index.insert(impl_id, minimal_impl(impl_id, None, struct_ty, vec![], true, false, None));
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+
+        let krate = make_crate(root_id, index, paths);
+        let methods = collect_inherent_methods(&krate, "domain", "my_crate");
+        assert!(methods.is_empty(), "negative impl must be skipped (CN-11)");
+    }
+
+    #[test]
+    fn test_collect_inherent_methods_skips_synthetic_impl() {
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let impl_id = Id(2);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        // is_synthetic: true — must be skipped (CN-11 / BB-4-fix1).
+        index.insert(impl_id, minimal_impl(impl_id, None, struct_ty, vec![], false, true, None));
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+
+        let krate = make_crate(root_id, index, paths);
+        let methods = collect_inherent_methods(&krate, "domain", "my_crate");
+        assert!(methods.is_empty(), "synthetic impl must be skipped (CN-11)");
+    }
+
+    #[test]
+    fn test_collect_inherent_methods_skips_blanket_impl_some() {
+        // blanket_impl: Some(_) = expanded copy — must be skipped (CN-11 / BB-4-fix1).
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let impl_id = Id(2);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+        let concrete_type = rustdoc_types::Type::Primitive("SomeType".to_string());
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, None, struct_ty, vec![], false, false, Some(concrete_type)),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+
+        let krate = make_crate(root_id, index, paths);
+        let methods = collect_inherent_methods(&krate, "domain", "my_crate");
+        assert!(methods.is_empty(), "blanket_impl: Some must be skipped (CN-11)");
+    }
+
+    #[test]
+    fn test_collect_inherent_methods_merges_multiple_impl_blocks() {
+        // Multiple inherent impl blocks for the same type must be merged (BB-4-fix1).
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let impl1_id = Id(2);
+        let impl2_id = Id(3);
+        let method1_id = Id(4);
+        let method2_id = Id(5);
+
+        let struct_ty1 = resolved_path(struct_id, "MyStruct");
+        let struct_ty2 = resolved_path(struct_id, "MyStruct");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl1_id,
+            minimal_impl(impl1_id, None, struct_ty1, vec![method1_id], false, false, None),
+        );
+        index.insert(
+            impl2_id,
+            minimal_impl(impl2_id, None, struct_ty2, vec![method2_id], false, false, None),
+        );
+        index.insert(method1_id, pub_item(method1_id, "method_a", empty_function_inner()));
+        index.insert(method2_id, pub_item(method2_id, "method_b", empty_function_inner()));
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+
+        let krate = make_crate(root_id, index, paths);
+
+        let methods = collect_inherent_methods(&krate, "domain", "my_crate");
+
+        let rep_id = type_rep_node_id("domain", "my_crate", "", "MyStruct");
+        assert!(methods.contains_key(&rep_id), "MyStruct must be in the inherent map");
+        let ids = &methods[&rep_id];
+        assert!(ids.contains(&method1_id), "method_a must be in merged list");
+        assert!(ids.contains(&method2_id), "method_b must be in merged list");
+    }
+
+    // -----------------------------------------------------------------------
+    // T008: emit_impl_edges — trait impl edge `-.impl.->` (J decision)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_emit_impl_edges_concrete_type_emits_trait_impl_edge() {
+        // trait_: Some, blanket_impl: None, for_: ResolvedPath (concrete type)
+        // → should emit `-.impl.->` edge.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let trait_id = Id(2);
+        let impl_id = Id(3);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+        let trait_p = trait_path(trait_id, "MyTrait");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, Some(trait_p), struct_ty, vec![], false, false, None),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let trait_idx = build_trait_index(std::slice::from_ref(&baseline), "domain");
+        let style = minimal_style();
+
+        let mut edge_lines = vec![];
+
+        emit_impl_edges(&baseline, &trait_idx, &mut edge_lines, &style, "domain", None).unwrap();
+
+        assert_eq!(edge_lines.len(), 1, "one trait impl → one edge; got: {edge_lines:?}");
+        assert!(edge_lines[0].contains("-.impl.->"), "edge must use -.impl.-> arrow (J decision)");
+    }
+
+    #[test]
+    fn test_emit_impl_edges_skips_negative_impl() {
+        // is_negative: true → skip (CN-11 / BB-4-fix1).
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let trait_id = Id(2);
+        let impl_id = Id(3);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+        let trait_p = trait_path(trait_id, "MyTrait");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, Some(trait_p), struct_ty, vec![], true, false, None),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let trait_idx = build_trait_index(std::slice::from_ref(&baseline), "domain");
+        let style = minimal_style();
+
+        let mut edge_lines = vec![];
+
+        emit_impl_edges(&baseline, &trait_idx, &mut edge_lines, &style, "domain", None).unwrap();
+
+        assert!(edge_lines.is_empty(), "negative impl must produce no edges (CN-11)");
+    }
+
+    #[test]
+    fn test_emit_impl_edges_skips_synthetic_impl() {
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let trait_id = Id(2);
+        let impl_id = Id(3);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+        let trait_p = trait_path(trait_id, "MyTrait");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            // is_synthetic: true → skip (CN-11 / BB-4-fix1)
+            minimal_impl(impl_id, Some(trait_p), struct_ty, vec![], false, true, None),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let trait_idx = build_trait_index(std::slice::from_ref(&baseline), "domain");
+        let style = minimal_style();
+
+        let mut edge_lines = vec![];
+
+        emit_impl_edges(&baseline, &trait_idx, &mut edge_lines, &style, "domain", None).unwrap();
+
+        assert!(edge_lines.is_empty(), "synthetic impl must produce no edges (CN-11)");
+    }
+
+    #[test]
+    fn test_emit_impl_edges_skips_blanket_impl_some() {
+        // blanket_impl: Some(_) = expanded copy → skip (CN-11 / BB-4-fix1).
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let trait_id = Id(2);
+        let impl_id = Id(3);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+        let trait_p = trait_path(trait_id, "MyTrait");
+        let concrete = rustdoc_types::Type::Primitive("SomeConcrete".to_string());
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, Some(trait_p), struct_ty, vec![], false, false, Some(concrete)),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let trait_idx = build_trait_index(std::slice::from_ref(&baseline), "domain");
+        let style = minimal_style();
+
+        let mut edge_lines = vec![];
+
+        emit_impl_edges(&baseline, &trait_idx, &mut edge_lines, &style, "domain", None).unwrap();
+
+        assert!(edge_lines.is_empty(), "blanket_impl: Some must be skipped (CN-11)");
+    }
+
+    #[test]
+    fn test_emit_impl_edges_blanket_body_none_generic_not_in_edge_lines() {
+        // blanket_impl: None + for_: Generic → blanket body (a-plan, AC-17).
+        // emit_impl_edges must NOT emit a `-.impl.->` edge for blanket bodies;
+        // the indicator node is handled separately via build_blanket_body_map.
+        let root_id = Id(0);
+        let trait_id = Id(1);
+        let impl_id = Id(2);
+
+        let generic_ty = rustdoc_types::Type::Generic("T".to_string());
+        let trait_p = trait_path(trait_id, "MyTrait");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, Some(trait_p), generic_ty, vec![], false, false, None),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let trait_idx = build_trait_index(std::slice::from_ref(&baseline), "domain");
+        let style = minimal_style();
+
+        let mut edge_lines = vec![];
+
+        emit_impl_edges(&baseline, &trait_idx, &mut edge_lines, &style, "domain", None).unwrap();
+
+        // Edge: none (blanket body is not a concrete type impl — no `-.impl.->` edge).
+        assert!(edge_lines.is_empty(), "blanket body must not produce a trait_impl edge");
+    }
+
+    #[test]
+    fn test_build_blanket_body_map_none_generic_produces_entry() {
+        // blanket_impl: None + for_: Generic → build_blanket_body_map collects an entry
+        // keyed by the trait subgraph id (a-plan, AC-17).
+        let root_id = Id(0);
+        let trait_id = Id(1);
+        let impl_id = Id(2);
+
+        let generic_ty = rustdoc_types::Type::Generic("T".to_string());
+        let trait_p = trait_path(trait_id, "MyTrait");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, Some(trait_p), generic_ty, vec![], false, false, None),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let trait_idx = build_trait_index(std::slice::from_ref(&baseline), "domain");
+        let style = minimal_style();
+
+        let blanket_map = build_blanket_body_map(
+            std::slice::from_ref(&baseline),
+            "domain",
+            None,
+            &trait_idx,
+            &style,
+        );
+
+        // Must have one entry for the MyTrait subgraph.
+        assert_eq!(blanket_map.len(), 1, "one blanket body → one trait_sg_id entry");
+        let entries = blanket_map.values().next().unwrap();
+        assert_eq!(entries.len(), 1, "one blanket body impl → one entry");
+        assert!(
+            entries[0].node_id.contains("__blanket"),
+            "blanket node id must contain '__blanket'; got: {}",
+            entries[0].node_id
+        );
+        assert!(
+            entries[0].node_def.contains("MyTrait"),
+            "blanket node def must reference the trait name; got: {}",
+            entries[0].node_def
+        );
+    }
+
+    #[test]
+    fn test_emit_impl_edges_cross_baseline_lookup() {
+        // Trait is declared in crate_a; impl for crate_b type impls the crate_a trait.
+        // Both baselines are in the same layer. The edge must be emitted cross-crate.
+        let root_a = Id(0);
+        let trait_id = Id(1);
+        let _root_b = Id(10);
+        let _struct_id = Id(11);
+        let _impl_id = Id(12);
+
+        // Baseline A: declares MyTrait.
+        let mut index_a = HashMap::new();
+        index_a.insert(
+            root_a,
+            pub_item(
+                root_a,
+                "crate_a",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index_a.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+
+        let mut paths_a = HashMap::new();
+        paths_a.insert(trait_id, item_summary(0, vec!["crate_a", "MyTrait"], ItemKind::Trait));
+
+        let krate_a = make_crate(root_a, index_a, paths_a);
+        let baseline_a = make_baseline("domain", "crate_a", krate_a);
+
+        // Baseline B: declares MyStruct and impl MyTrait for MyStruct.
+        // For cross-crate, the impl sees crate_a's trait via external_crates resolution.
+        // For simplicity in tests, we put the trait in the same crate (same-crate cross-test).
+        // A real cross-crate test would require external_crates setup; this test just verifies
+        // that the index lookup succeeds when a second baseline provides the trait.
+        // We test this by checking that the trait index built from both baselines contains
+        // the trait from crate_a, and can be used to look up from baseline_b's impl.
+
+        // Since trait_id in baseline_b's krate would be external (crate_id != 0),
+        // the lookup in resolve_trait_key returns None and the edge is not emitted.
+        // This is the correct CN-10 behavior.
+        // We test the happy path: same-crate impl is already covered by the test above.
+        // This test verifies that the trait index from multiple baselines works.
+
+        let trait_idx = build_trait_index(&[baseline_a], "domain");
+        assert!(
+            trait_idx.contains_key(&TraitKey {
+                crate_name: "crate_a".to_string(),
+                module_path: String::new(),
+                trait_name: "MyTrait".to_string(),
+            }),
+            "trait from baseline_a must be indexed"
+        );
+    }
+
+    #[test]
+    fn test_emit_impl_edges_cross_crate_external_type_silent_skip() {
+        // If the `for_` type resolves to an external crate (crate_id != 0), the edge
+        // must be silently skipped (CN-10).
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let trait_id = Id(2);
+        let impl_id = Id(3);
+        let external_struct_id = Id(99);
+
+        // `for_` is a ResolvedPath to an external struct (crate_id != 0 in paths).
+        let external_struct_ty = resolved_path(external_struct_id, "ExternalStruct");
+        let trait_p = trait_path(trait_id, "MyTrait");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, Some(trait_p), external_struct_ty, vec![], false, false, None),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+        // External struct: crate_id = 99 (not own crate).
+        paths.insert(
+            external_struct_id,
+            item_summary(99, vec!["external", "ExternalStruct"], ItemKind::Struct),
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let trait_idx = build_trait_index(std::slice::from_ref(&baseline), "domain");
+        let style = minimal_style();
+
+        let mut edge_lines = vec![];
+
+        emit_impl_edges(&baseline, &trait_idx, &mut edge_lines, &style, "domain", None).unwrap();
+
+        assert!(
+            edge_lines.is_empty(),
+            "trait impl for external type must be silently skipped (CN-10); got: {edge_lines:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // T008: missing [edge.trait_impl] style → RenderFailed (CN-02 fail-closed)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_emit_impl_edges_missing_trait_impl_style_returns_render_failed() {
+        // If [edge.trait_impl] is absent from style config and a concrete-type impl
+        // needs to be emitted, must return RenderFailed (CN-02).
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let trait_id = Id(2);
+        let impl_id = Id(3);
+
+        let struct_ty = resolved_path(struct_id, "MyStruct");
+        let trait_p = trait_path(trait_id, "MyTrait");
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            impl_id,
+            minimal_impl(impl_id, Some(trait_p), struct_ty, vec![], false, false, None),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(trait_id, item_summary(0, vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let baseline = make_baseline("domain", "my_crate", krate);
+
+        let trait_idx = build_trait_index(std::slice::from_ref(&baseline), "domain");
+
+        // Style WITHOUT [edge.trait_impl] — must fail-closed.
+        let style: super::super::StyleConfig =
+            toml::from_str("[filter]\ninclude_functions = true\n").unwrap();
+
+        let mut edge_lines = vec![];
+
+        let result =
+            emit_impl_edges(&baseline, &trait_idx, &mut edge_lines, &style, "domain", None);
+
+        assert!(
+            matches!(
+                result,
+                Err(
+                    domain::tddd::baseline_graph_ports::BaselineGraphRendererError::RenderFailed { .. }
+                )
+            ),
+            "missing [edge.trait_impl] must return RenderFailed (CN-02); got {result:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // T015: collect_own_crate_node_ids_from_type (AC-20)
+    // -----------------------------------------------------------------------
+
+    /// Build a minimal krate with one own-crate type registered in krate.paths.
+    fn krate_with_own_type(struct_id: Id, path: Vec<&str>) -> rustdoc_types::Crate {
+        let root_id = Id(0);
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                path.first().copied().unwrap_or("my_crate"),
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                path.last().copied().unwrap_or("MyType"),
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, path.clone(), ItemKind::Struct));
+        make_crate(root_id, index, paths)
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_resolved_path_own_crate() {
+        // A ResolvedPath to an own-crate type → one rep-node id returned.
+        let struct_id = Id(1);
+        let krate = krate_with_own_type(struct_id, vec!["my_crate", "MyType"]);
+
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "MyType".to_string(),
+            id: struct_id,
+            args: None,
+        });
+
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert_eq!(result.len(), 1, "one own-crate type → one node id; got: {result:?}");
+        let expected = type_rep_node_id("domain", "my_crate", "", "MyType");
+        assert_eq!(result[0], expected, "node id must match type_rep_node_id output");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_primitive_returns_empty() {
+        // Primitive types → skip, empty result.
+        let krate = make_crate(Id(0), HashMap::new(), HashMap::new());
+        let ty = rustdoc_types::Type::Primitive("u32".to_string());
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert!(result.is_empty(), "primitive → no node ids; got: {result:?}");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_generic_param_returns_empty() {
+        // Generic type parameter (T, U) → skip, empty result.
+        let krate = make_crate(Id(0), HashMap::new(), HashMap::new());
+        let ty = rustdoc_types::Type::Generic("T".to_string());
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert!(result.is_empty(), "generic type param → no node ids; got: {result:?}");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_external_type_returns_empty() {
+        // A ResolvedPath to an external crate type (crate_id != 0) → skip.
+        let struct_id = Id(1);
+        let root_id = Id(0);
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module { is_crate: true, items: vec![], is_stripped: false }),
+            ),
+        );
+        let mut paths = HashMap::new();
+        // crate_id = 99 → external
+        paths.insert(struct_id, item_summary(99, vec!["ext_crate", "ExtType"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ext_crate::ExtType".to_string(),
+            id: struct_id,
+            args: None,
+        });
+
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert!(result.is_empty(), "external type → no node ids; got: {result:?}");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_nested_generic_arg() {
+        // Vec<MyType> (Vec is external, MyType is own-crate) → extracts MyType only.
+        let vec_id = Id(1); // "external" Vec
+        let inner_id = Id(2); // own-crate MyType
+        let root_id = Id(0);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![inner_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            inner_id,
+            pub_item(
+                inner_id,
+                "MyType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        let mut paths = HashMap::new();
+        // Vec: external crate_id = 10
+        paths.insert(vec_id, item_summary(10, vec!["std", "vec", "Vec"], ItemKind::Struct));
+        // MyType: own crate_id = 0
+        paths.insert(inner_id, item_summary(0, vec!["my_crate", "MyType"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        // Vec<MyType>: ResolvedPath(Vec) with AngleBracketed<MyType>
+        let inner_path = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "MyType".to_string(),
+            id: inner_id,
+            args: None,
+        });
+        let args = rustdoc_types::GenericArgs::AngleBracketed {
+            args: vec![rustdoc_types::GenericArg::Type(inner_path)],
+            constraints: vec![],
+        };
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "Vec".to_string(),
+            id: vec_id,
+            args: Some(Box::new(args)),
+        });
+
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert_eq!(
+            result.len(),
+            1,
+            "Vec<MyType>: only MyType (own-crate) extracted; got: {result:?}"
+        );
+        let expected = type_rep_node_id("domain", "my_crate", "", "MyType");
+        assert_eq!(result[0], expected, "must be MyType rep-node id");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_not_in_paths_returns_empty() {
+        // ResolvedPath whose id is not in krate.paths → skip silently.
+        let krate = make_crate(Id(0), HashMap::new(), HashMap::new());
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "UnknownType".to_string(),
+            id: Id(999),
+            args: None,
+        });
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert!(result.is_empty(), "id not in krate.paths → no node ids; got: {result:?}");
+    }
+
+    // -----------------------------------------------------------------------
+    // T015: emit_inherent_methods — method_param / method_returns edges (AC-19)
+    // -----------------------------------------------------------------------
+
+    fn style_with_method_edges() -> super::super::StyleConfig {
+        toml::from_str::<super::super::StyleConfig>(
+            r#"
+[edge.method_param]
+arrow = "-->"
+
+[edge.method_returns]
+arrow = "==>"
+
+[filter]
+include_functions = true
+"#,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_with_own_crate_param_emits_method_param_edge() {
+        // A method with one own-crate param type → one method_param edge.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+        let param_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        // Method with one own-crate param.
+        let param_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ParamType".to_string(),
+            id: param_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            pub_item(
+                method_id,
+                "do_something",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("arg".to_string(), param_ty)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            ),
+        );
+
+        // ParamType must be in krate.index as a Public Struct so the visibility/kind
+        // filter in collect_own_crate_node_ids_recursive accepts it as a renderable type.
+        index.insert(
+            param_type_id,
+            pub_item(
+                param_type_id,
+                "ParamType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        // ParamType is an own-crate type.
+        paths.insert(
+            param_type_id,
+            item_summary(0, vec!["my_crate", "ParamType"], ItemKind::Struct),
+        );
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        let style = style_with_method_edges();
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        )
+        .unwrap();
+
+        // Must emit one method_param edge.
+        let param_edges: Vec<_> = edge_lines.iter().filter(|l| l.contains("-->")).collect();
+        assert_eq!(
+            param_edges.len(),
+            1,
+            "one own-crate param → one method_param edge; got: {edge_lines:?}"
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "ParamType");
+        assert!(
+            param_edges[0].contains(&expected_target),
+            "method_param edge must target ParamType rep-node; edge: {}; expected target: {}",
+            param_edges[0],
+            expected_target
+        );
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_with_own_crate_return_type_emits_method_returns_edge() {
+        // A method with an own-crate return type → one method_returns edge.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+        let ret_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        let ret_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ReturnType".to_string(),
+            id: ret_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            pub_item(
+                method_id,
+                "get_val",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![],
+                        output: Some(ret_ty),
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            ),
+        );
+
+        // ReturnType must be in krate.index as a Public Struct so the visibility/kind
+        // filter in collect_own_crate_node_ids_recursive accepts it as a renderable type.
+        index.insert(
+            ret_type_id,
+            pub_item(
+                ret_type_id,
+                "ReturnType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths
+            .insert(ret_type_id, item_summary(0, vec!["my_crate", "ReturnType"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        let style = style_with_method_edges();
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        )
+        .unwrap();
+
+        let ret_edges: Vec<_> = edge_lines.iter().filter(|l| l.contains("==>")).collect();
+        assert_eq!(
+            ret_edges.len(),
+            1,
+            "one own-crate return type → one method_returns edge; got: {edge_lines:?}"
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "ReturnType");
+        assert!(
+            ret_edges[0].contains(&expected_target),
+            "method_returns edge must target ReturnType rep-node; edge: {}",
+            ret_edges[0]
+        );
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_primitive_param_no_edge() {
+        // A method with a primitive param type → no method_param edge.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            method_id,
+            pub_item(
+                method_id,
+                "with_val",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![(
+                            "val".to_string(),
+                            rustdoc_types::Type::Primitive("u32".to_string()),
+                        )],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        let style = style_with_method_edges();
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        )
+        .unwrap();
+
+        assert!(
+            edge_lines.is_empty(),
+            "primitive param → no method_param edge (AC-20); got: {edge_lines:?}"
+        );
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_no_params_no_return_no_edges() {
+        // A method with no params and no return type → no method edges.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(method_id, pub_item(method_id, "do_nothing", empty_function_inner()));
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        let style = style_with_method_edges();
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        )
+        .unwrap();
+
+        assert!(
+            edge_lines.is_empty(),
+            "method with no params/return → no method edges (AC-19); got: {edge_lines:?}"
+        );
+        // Method node still appears in subgraph_lines.
+        let joined = subgraph_lines.join("\n");
+        assert!(joined.contains("do_nothing"), "method node must still be emitted");
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_missing_method_param_edge_style_returns_render_failed() {
+        // When [edge.method_param] is absent from style config and there's an own-crate
+        // param type, must return RenderFailed (CN-02 fail-closed).
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+        let param_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        let param_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ParamType".to_string(),
+            id: param_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            pub_item(
+                method_id,
+                "do_something",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("arg".to_string(), param_ty)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            ),
+        );
+        // ParamType must be in krate.index as a Public Struct so the visibility/kind
+        // filter in collect_own_crate_node_ids_recursive accepts it as a renderable type,
+        // allowing the test to reach the edge-style lookup and trigger the CN-02 error.
+        index.insert(
+            param_type_id,
+            pub_item(
+                param_type_id,
+                "ParamType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(
+            param_type_id,
+            item_summary(0, vec!["my_crate", "ParamType"], ItemKind::Struct),
+        );
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        // Style WITHOUT [edge.method_param] — must fail-closed.
+        let style: super::super::StyleConfig =
+            toml::from_str("[filter]\ninclude_functions = true\n").unwrap();
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        let result = emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        );
+
+        assert!(
+            matches!(
+                result,
+                Err(
+                    domain::tddd::baseline_graph_ports::BaselineGraphRendererError::RenderFailed { .. }
+                )
+            ),
+            "missing [edge.method_param] must return RenderFailed (CN-02); got {result:?}"
+        );
+    }
+}

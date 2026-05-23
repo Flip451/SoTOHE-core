@@ -13,6 +13,8 @@
 // T008: baseline kept mod-scope (no pub re-export); signals removed.
 // baseline.rs types are private to this crate — public re-exports removed from lib.rs.
 mod baseline;
+pub mod baseline_document;
+pub mod baseline_graph_ports;
 pub mod catalogue;
 pub mod catalogue_linter;
 pub mod catalogue_ports;
@@ -29,6 +31,11 @@ pub mod new_typegraph_codec_error;
 pub mod signal_evaluator;
 pub mod type_signals_doc;
 
+pub use baseline_document::BaselineDocument;
+pub use baseline_graph_ports::{
+    BaselineGraphLoader, BaselineGraphLoaderError, BaselineGraphRenderer,
+    BaselineGraphRendererError, BaselineGraphWriter, BaselineGraphWriterError, ClusterRender,
+};
 pub use catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
 };

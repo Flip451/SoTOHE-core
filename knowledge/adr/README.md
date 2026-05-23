@@ -104,6 +104,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [旧 spec-code-consistency の廃止と catalogue-impl-signals 診断コマンドの導入: レイヤー配置・インターフェース・CI ゲート](2026-05-11-2330-catalogue-impl-signals-command-layering.md) | Proposed | 2026-05-11 |
 | [TDDD: struct の inherent method 比較を enum と同じ両側対称比較に統一する](2026-05-20-0413-tddd-struct-inherent-method-symmetric-comparison.md) | Proposed | 2026-05-20 |
 | [Contract Map Renderer: catalogue schema v3 対応設計](2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md) | Proposed | 2026-05-20 |
+| [Reality View Renderer: rustdoc_types::Crate 入力への対応設計 (v3 schema 移行)](2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md) | Proposed | 2026-05-22 |
 
 ### トラック・ワークフロー
 

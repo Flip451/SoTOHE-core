@@ -1,38 +1,42 @@
-//! `sotp track contract-map` — render the catalogue-input contract map
-//! for a track.
+//! `sotp track baseline-graph` — render the rustdoc-input baseline graph
+//! (Reality View) for a track.
 //!
 //! Composition root that wires the usecase interactor
-//! (`usecase::contract_map_workflow::RenderContractMapInteractor`) to its
+//! (`usecase::baseline_graph_workflow::RenderBaselineGraphInteractor`) to its
 //! three secondary-port adapters:
-//! * `FsCatalogueLoader` — loads per-layer catalogue documents.
-//! * `ContractMapRendererAdapter` — renders the mermaid contract map (T003,
-//!   Decision P-1 / P-3). Style config at
-//!   `.harness/config/contract-map-style.toml` (fail-closed if absent or
-//!   invalid, CN-02 / AC-11).
-//! * `FsContractMapWriter` — writes `contract-map.md` to the track dir.
+//! * `BaselineGraphLoaderAdapter` — loads per-layer rustdoc JSON baselines (T013).
+//! * `BaselineGraphRendererAdapter` — renders mermaid depth-1 overview +
+//!   depth-2 cluster files. Style config at
+//!   `.harness/config/baseline-graph-style.toml` (fail-closed if absent or
+//!   invalid, CN-02 / AC-15).
+//! * `BaselineGraphWriterAdapter` — writes depth-1 `<layer>-graph-d1/index.md`
+//!   and depth-2 `<layer>-graph-d2/<cluster>.md` files to the track dir (T014).
+//!
+//! Symmetric to `contract_map.rs`. (IN-02 / IN-19 / AC-02 / AC-18)
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-use infrastructure::tddd::contract_map_adapter::{FsCatalogueLoader, FsContractMapWriter};
-use infrastructure::tddd::contract_map_renderer_adapter::ContractMapRendererAdapter;
-use usecase::contract_map_workflow::{
-    RenderContractMap, RenderContractMapCommand, RenderContractMapInteractor,
+use infrastructure::tddd::baseline_graph_loader_adapter::BaselineGraphLoaderAdapter;
+use infrastructure::tddd::baseline_graph_renderer_adapter::BaselineGraphRendererAdapter;
+use infrastructure::tddd::baseline_graph_writer_adapter::BaselineGraphWriterAdapter;
+use usecase::baseline_graph_workflow::{
+    RenderBaselineGraph, RenderBaselineGraphCommand, RenderBaselineGraphInteractor,
 };
 use usecase::{LayerId, TrackId};
 
 use crate::CliError;
 
-/// Render the Contract Map for a single track.
+/// Render the baseline graph (Reality View) for a single track.
 ///
 /// # Errors
 ///
 /// Returns `CliError` when the track id is invalid, the current branch does
 /// not match `track/<track_id>` (CN-07 guard), `--layers` cannot be parsed,
-/// or the interactor fails (loader / renderer / writer / empty catalogue /
+/// or the interactor fails (loader / renderer / writer / empty baseline /
 /// unknown layer).
-pub fn execute_contract_map(
+pub fn execute_baseline_graph(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
@@ -59,41 +63,42 @@ pub fn execute_contract_map(
         .unwrap_or_default();
     let suffix = branch.strip_prefix("track/").ok_or_else(|| {
         CliError::Message(format!(
-            "contract-map rejected: branch '{branch}' is not an active track branch (CN-07)"
+            "baseline-graph rejected: branch '{branch}' is not an active track branch (CN-07)"
         ))
     })?;
     if suffix != track_id.as_str() {
         return Err(CliError::Message(format!(
-            "contract-map rejected: branch '{branch}' does not match \
+            "baseline-graph rejected: branch '{branch}' does not match \
              track_id '{track_id}' (expected 'track/{track_id}')"
         )));
     }
 
     let rules_path = workspace_root.join("architecture-rules.json");
-    let loader = FsCatalogueLoader::new(items_dir.clone(), rules_path, workspace_root.clone());
-    let writer = FsContractMapWriter::new(items_dir.clone(), workspace_root.clone());
+    let loader =
+        BaselineGraphLoaderAdapter::new(items_dir.clone(), rules_path, workspace_root.clone());
+    let writer = BaselineGraphWriterAdapter::new(items_dir.clone(), workspace_root.clone());
 
-    // Inject ContractMapRendererAdapter (T003, Decision P-1/P-3).
-    // Style config at .harness/config/contract-map-style.toml (fail-closed: absent/invalid
-    // config causes the interactor to return RenderContractMapError::RendererFailed, CN-02).
-    let style_config_path = workspace_root.join(".harness/config/contract-map-style.toml");
-    let renderer = ContractMapRendererAdapter::new(style_config_path);
+    // Inject BaselineGraphRendererAdapter (T004).
+    // Style config at .harness/config/baseline-graph-style.toml (fail-closed: absent/invalid
+    // config causes the interactor to return RenderBaselineGraphError::RendererFailed, CN-02).
+    let style_config_path = workspace_root.join(".harness/config/baseline-graph-style.toml");
+    let renderer = BaselineGraphRendererAdapter::new(style_config_path);
 
-    let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
+    let interactor = RenderBaselineGraphInteractor::new(loader, renderer, writer);
 
     // Dispatch through the primary port — CLI does not depend on the
-    // concrete `RenderContractMapInteractor` type.
-    let renderer_ref: &dyn RenderContractMap = &interactor;
+    // concrete `RenderBaselineGraphInteractor` type.
+    let renderer_ref: &dyn RenderBaselineGraph = &interactor;
     let cmd =
-        RenderContractMapCommand { track_id: typed_track_id, layer_filter: layer_filter_parsed };
+        RenderBaselineGraphCommand { track_id: typed_track_id, layer_filter: layer_filter_parsed };
     let out = renderer_ref
         .execute(&cmd)
-        .map_err(|e| CliError::Message(format!("contract-map render failed: {e}")))?;
+        .map_err(|e| CliError::Message(format!("baseline-graph render failed: {e}")))?;
 
     println!(
-        "[OK] contract-map: wrote track/items/{track_id}/contract-map.md \
-         (layers={}, entries={})",
-        out.rendered_layer_count, out.total_entry_count,
+        "[OK] baseline-graph: wrote depth-1 overview + depth-2 cluster files for track '{track_id}' \
+         (layers={}, files={})",
+        out.rendered_layer_count, out.written_file_count,
     );
     Ok(ExitCode::SUCCESS)
 }
@@ -168,12 +173,13 @@ mod tests {
     /// `../evil` is rejected by `TrackId::try_new` (contains `/`) regardless
     /// of whether `workspace_root` is a valid git repository.
     #[test]
-    fn test_execute_contract_map_with_invalid_track_id_returns_error() {
+    fn test_execute_baseline_graph_with_invalid_track_id_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         std::fs::create_dir_all(&items_dir).unwrap();
 
-        let result = execute_contract_map(items_dir, "../evil".to_owned(), dir.path().into(), None);
+        let result =
+            execute_baseline_graph(items_dir, "../evil".to_owned(), dir.path().into(), None);
         let err = result.expect_err("path traversal track id must be rejected by CN-12");
         let msg = format!("{err}");
         assert!(
@@ -197,11 +203,11 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_contract_map_rejects_branch_mismatch_error_message() {
+    fn test_execute_baseline_graph_rejects_branch_mismatch_error_message() {
         // CN-07 branch guard: a well-formed track_id that does not match the
         // current git branch suffix must be rejected with a message that mentions
-        // "contract-map rejected" (the BranchTrackMismatch or NonActiveTrack path
-        // in `execute_contract_map`).
+        // "baseline-graph rejected" (the BranchTrackMismatch or NonActiveTrack path
+        // in `execute_baseline_graph`).
         //
         // Uses the real workspace root (from CARGO_MANIFEST_DIR) so that
         // SystemGitRepo::discover() finds the actual branch. Since the supplied
@@ -215,29 +221,26 @@ mod tests {
         let items_dir = workspace_root.join("track/items");
 
         // A track_id that will never match the real current branch suffix.
-        let result = execute_contract_map(
+        let result = execute_baseline_graph(
             items_dir,
             "this-id-will-never-match-the-real-branch".to_owned(),
             workspace_root,
             None,
         );
         let err = result.expect_err(
-            "contract-map with mismatched track_id must be rejected by CN-07 branch guard",
+            "baseline-graph with mismatched track_id must be rejected by CN-07 branch guard",
         );
         let msg = format!("{err}");
         assert!(
-            msg.contains("contract-map rejected"),
+            msg.contains("baseline-graph rejected"),
             "error must be a CN-07 branch guard rejection, got: {msg}"
         );
     }
 
     #[test]
-    fn test_execute_contract_map_rejects_branch_track_id_mismatch() {
+    fn test_execute_baseline_graph_rejects_branch_track_id_mismatch() {
         // CN-07: verify that a well-formed track_id tied to a different branch is
-        // rejected. The real workspace root is used so SystemGitRepo::discover()
-        // finds the actual branch; since "test-done" does not match the current
-        // branch suffix (e.g. "contract-map-v3-2026-05-20"), the CN-07 guard fires
-        // with "contract-map rejected: branch ... does not match track_id 'test-done'".
+        // rejected.
         let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .and_then(|p| p.parent())
@@ -245,17 +248,18 @@ mod tests {
             .to_path_buf();
         let items_dir = workspace_root.join("track/items");
 
-        let result = execute_contract_map(items_dir, "test-done".to_owned(), workspace_root, None);
-        let err = result.expect_err("contract-map must reject when branch doesn't match");
+        let result =
+            execute_baseline_graph(items_dir, "test-done".to_owned(), workspace_root, None);
+        let err = result.expect_err("baseline-graph must reject when branch doesn't match");
         let msg = format!("{err}");
         assert!(
-            msg.contains("contract-map rejected"),
+            msg.contains("baseline-graph rejected"),
             "error must be a CN-07 branch guard rejection, got: {msg}"
         );
     }
 
     #[test]
-    fn test_execute_contract_map_branch_guard_passes_for_current_track() {
+    fn test_execute_baseline_graph_branch_guard_passes_for_current_track() {
         // Verify the branch-forwarding wiring: when track_id matches the current git
         // branch suffix, the CN-07 guard passes and execution reaches the interactor.
         //
@@ -275,15 +279,15 @@ mod tests {
             return;
         };
 
-        let result = execute_contract_map(items_dir, track_id, workspace_root, None);
+        let result = execute_baseline_graph(items_dir, track_id, workspace_root, None);
 
         // The CN-07 guard should pass (branch matches track_id).
-        // The result is Ok (contract-map rendered) or Err (loader/renderer issue).
+        // The result is Ok (baseline-graph rendered) or Err (loader/renderer issue).
         // Either way, the error must NOT be a CN-07 branch guard rejection.
         if let Err(ref err) = result {
             let msg = format!("{err}");
             assert!(
-                !msg.contains("contract-map rejected: branch"),
+                !msg.contains("baseline-graph rejected: branch"),
                 "error must NOT be a CN-07 branch guard rejection — guard should pass for the current track, got: {msg}"
             );
         }

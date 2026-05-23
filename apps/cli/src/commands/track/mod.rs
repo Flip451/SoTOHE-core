@@ -392,6 +392,36 @@ pub enum TrackCommand {
         edges: String,
     },
 
+    /// Render the rustdoc-input baseline graph (Reality View) for a track
+    /// (ADR 2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation).
+    ///
+    /// Writes per-layer depth-1 `<layer>-graph-d1/index.md` (overview) and
+    /// depth-2 `<layer>-graph-d2/<cluster>.md` (cluster detail) files under
+    /// `track/items/<track-id>/`.
+    ///
+    /// Requires rustdoc JSON baselines captured by `sotp track baseline-capture`.
+    /// Style config at `.harness/config/baseline-graph-style.toml` (fail-closed
+    /// if absent or invalid, CN-02 / AC-15).
+    BaselineGraph {
+        /// Path to the track items root directory (e.g., `track/items`).
+        #[arg(long, default_value = "track/items")]
+        items_dir: PathBuf,
+
+        /// Track ID (directory name under items_dir).
+        track_id: String,
+
+        /// Workspace root directory (must contain `architecture-rules.json`).
+        /// Defaults to current directory.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
+
+        /// Optional comma-separated layer id filter (e.g.
+        /// `domain,usecase`). When omitted every `tddd.enabled` layer is
+        /// rendered. Unknown layer ids fail closed.
+        #[arg(long)]
+        layers: Option<String>,
+    },
+
     /// Render the catalogue-input contract map for a track
     /// (ADR 2026-04-17-1528 §D1).
     ///
@@ -706,6 +736,14 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             cluster_depth,
             edges,
         ),
+        TrackCommand::BaselineGraph { items_dir, track_id, workspace_root, layers } => {
+            tddd::baseline_graph::execute_baseline_graph(
+                items_dir,
+                track_id,
+                workspace_root,
+                layers,
+            )
+        }
         TrackCommand::ContractMap { items_dir, track_id, workspace_root, layers } => {
             tddd::contract_map::execute_contract_map(items_dir, track_id, workspace_root, layers)
         }

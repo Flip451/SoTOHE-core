@@ -1,0 +1,466 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BaselineDocument": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "layer", "ty": "LayerId" },
+          { "name": "crate_name", "ty": "CrateName" },
+          { "name": "krate", "ty": "rustdoc_types::Crate" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "layer", "ty": "LayerId" },
+            { "name": "crate_name", "ty": "CrateName" },
+            { "name": "krate", "ty": "rustdoc_types::Crate" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd",
+      "docs": "Wrapper struct grouping a rustdoc_types::Crate with its layer identity (LayerId) and crate name (CrateName). Contract Map CatalogueDocument-symmetric: the renderer can group documents by layer autonomously without caller-provided context. Internal krate field holds rustdoc_types::Crate pure — no extension (ADR 2026-05-08-0258 D2). (Decision A-r3 / IN-01 / AC-01)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-01",
+          "hash": "35f07127d3de7f6d73dad46ed284706734bdd1adb40e574f2bfbb3df01fb74de"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ClusterRender": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "cluster_key", "ty": "String" },
+          { "name": "content", "ty": "String" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "tddd",
+      "docs": "Data transfer object returned by BaselineGraphRenderer::render_clusters. cluster_key follows spec IN-14/IN-15 convention: '<crate_name>_root' for crate-root clusters or '<crate_name>_<module_seg1>' for top-level module clusters. content is the rendered Mermaid markdown string. Placed in domain alongside the port it serves (R1 delta: port return-value containers live in the same layer as their port). Both fields are raw String: cluster_key is a renderer-generated composite synthetic key with no independent domain-level constraint that warrants a newtype; content is opaque Mermaid markup text. (IN-14 / IN-15)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-15",
+          "hash": "4e08e8aa440fb1f32cb6ded4cf177e60ad392a49d023ab0f150f55fd1cfe9ca7"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineGraphLoaderError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "LayerId" },
+                { "name": "path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "ParseFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "LayerId" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "IoError",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "LayerId" },
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "SymlinkRejected",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "LayerDiscoveryFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd",
+      "docs": "Error returned by BaselineGraphLoader::load_all. NotFound: a layer's rustdoc baseline JSON is absent on disk (fail-closed — no skip). ParseFailed: the rustdoc JSON deserialization failed. IoError: non-symlink I/O failure during load. SymlinkRejected: path reaches through a symlink and must be refused. LayerDiscoveryFailed: architecture-rules.json could not be read or parsed. Symmetric to CatalogueLoaderError. (IN-02 / IN-19 / AC-15)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineGraphRendererError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "StyleConfigNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "StyleConfigInvalid",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "RenderFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd",
+      "docs": "Error returned by BaselineGraphRenderer. StyleConfigNotFound / StyleConfigInvalid cover fail-closed style config loading (CN-02 / AC-15). RenderFailed is an open placeholder for future rendering errors. Symmetric to ContractMapRendererError. (IN-02 / AC-15)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineGraphWriterError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "IoError",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "SymlinkRejected",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" }
+              ]
+            }
+          },
+          {
+            "name": "TrackNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "TrackId" },
+                { "name": "expected_dir", "ty": "std::path::PathBuf" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd",
+      "docs": "Error returned by BaselineGraphWriter implementations. IoError: non-symlink I/O failure during the atomic write. SymlinkRejected: write target or an intermediate component is a symlink; write refused fail-closed. TrackNotFound: the track directory does not exist. Symmetric to ContractMapWriterError. (IN-02 / IN-19 / AC-15)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "BaselineGraphLoader": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "load_all",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&TrackId" }
+          ],
+          "returns": "Result<Vec<BaselineDocument>, BaselineGraphLoaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd",
+      "docs": "Secondary port that loads all per-layer rustdoc baselines for a given track as a Vec<BaselineDocument>. Each BaselineDocument carries its own LayerId so callers can group by layer without additional context. Symmetric to CatalogueLoader (which loads CatalogueDocument per layer). Implementations discover tddd.enabled layers via architecture-rules.json and load the associated rustdoc JSON for each layer. (IN-02 / IN-19 / AC-02 / CN-03)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineGraphRenderer": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "render_overview",
+          "receiver": "&self",
+          "params": [
+            { "name": "baselines", "ty": "&[BaselineDocument]" },
+            { "name": "layer", "ty": "&LayerId" }
+          ],
+          "returns": "Result<String, BaselineGraphRendererError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "render_clusters",
+          "receiver": "&self",
+          "params": [
+            { "name": "baselines", "ty": "&[BaselineDocument]" },
+            { "name": "layer", "ty": "&LayerId" }
+          ],
+          "returns": "Result<Vec<ClusterRender>, BaselineGraphRendererError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd",
+      "docs": "Secondary port for Reality View (baseline graph) rendering. Infrastructure adapter implements this port. RenderBaselineGraphInteractor injects it via generic R. render_overview produces depth-1 overview content for a layer; render_clusters enumerates all clusters internally (krate.paths parsing, filtering to local-crate items only where crate_id == 0, then cluster_key generation per IN-14/IN-15) and returns Vec<ClusterRender>. This keeps cluster-enumeration logic inside the adapter, making the design symmetric to ContractMapRenderer::render (single method, no cluster enumeration in the interactor). Replaces the prior render_cluster (single-cluster) that required the interactor to enumerate clusters from krate.paths. No syn dependency (rustdoc already parses types — Decision E note). (Decision E / IN-02 / IN-14 / IN-15 / AC-02)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-15",
+          "hash": "4e08e8aa440fb1f32cb6ded4cf177e60ad392a49d023ab0f150f55fd1cfe9ca7"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BaselineGraphWriter": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "write_overview",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&TrackId" },
+            { "name": "layer", "ty": "&LayerId" },
+            { "name": "content", "ty": "&str" }
+          ],
+          "returns": "Result<(), BaselineGraphWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "write_cluster",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&TrackId" },
+            { "name": "layer", "ty": "&LayerId" },
+            { "name": "cluster_key", "ty": "&str" },
+            { "name": "content", "ty": "&str" }
+          ],
+          "returns": "Result<(), BaselineGraphWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd",
+      "docs": "Secondary port that persists Reality View (baseline graph) mermaid markdown files. write_overview writes <layer>-graph-d1/index.md; write_cluster writes <layer>-graph-d2/<cluster_key>.md. Symmetric to ContractMapWriter. Implementations must write atomically and refuse to follow symlinks below the caller-supplied trust root. (IN-02 / IN-19 / AC-02 / CN-03)",
+      "spec_refs": [
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-02",
+          "hash": "de914cad90bc54c873e9b9379faa11af4d3efc108a35f57a0923f516cf05b784"
+        },
+        {
+          "file": "track/items/reality-view-renderer-2026-05-22/spec.json",
+          "anchor": "IN-19",
+          "hash": "ef0fd869be5472cc2c21a0871e3b9d4dd28e0d6a6e0620af0d8d404da4d830c0"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BaselineDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "BaselineDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ClusterRender"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ClusterRender"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ClusterRender"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ClusterRender"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "BaselineGraphLoaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "BaselineGraphLoaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BaselineGraphLoaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "BaselineGraphRendererError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "BaselineGraphRendererError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BaselineGraphRendererError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "BaselineGraphWriterError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "BaselineGraphWriterError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BaselineGraphWriterError"
+    }
+  ]
+}
