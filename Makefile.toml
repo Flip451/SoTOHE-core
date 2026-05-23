@@ -883,6 +883,267 @@ description = "[wrapper] Run the local Codex reviewer through the repo-owned Rus
 script_runner = "@shell"
 script = ['bin/sotp make track-sync-views && bin/sotp make track-local-review "$@"']
 
+[tasks.track-local-review-fix-codex]
+description = "[wrapper] Launch a Codex review-fix-lead fixer via `codex exec --sandbox workspace-write`. Performs pre-launch smoke-tests (sandbox assertion + version check) and credential isolation (strips GITHUB_TOKEN, SSH credentials). Parses Codex output for `completed`/`blocked_cross_scope`/`failed` and prints the result. Usage: cargo make track-local-review-fix-codex -- --scope <scope> --briefing-file <path> --track-id <id> --round-type <fast|final> --reviewer-model <model> [--model <model>] --scope-files <file1,file2,...>"
+script_runner = "bash"
+script = ['''
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# Parse arguments
+# ---------------------------------------------------------------------------
+SCOPE=""
+BRIEFING_FILE=""
+TRACK_ID=""
+ROUND_TYPE=""
+REVIEWER_MODEL=""
+MODEL="gpt-5.5"
+SCOPE_FILES=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --) shift; break ;;
+    --scope) SCOPE="$2"; shift 2 ;;
+    --briefing-file) BRIEFING_FILE="$2"; shift 2 ;;
+    --track-id) TRACK_ID="$2"; shift 2 ;;
+    --round-type) ROUND_TYPE="$2"; shift 2 ;;
+    --reviewer-model) REVIEWER_MODEL="$2"; shift 2 ;;
+    --model) MODEL="$2"; shift 2 ;;
+    --scope-files) SCOPE_FILES="$2"; shift 2 ;;
+    *) echo "[review-fix-codex] Unknown argument: $1" >&2; exit 1 ;;
+  esac
+done
+
+# ---------------------------------------------------------------------------
+# Validate required arguments
+# ---------------------------------------------------------------------------
+if [ -z "$SCOPE" ] || [ -z "$BRIEFING_FILE" ] || [ -z "$TRACK_ID" ] || \
+   [ -z "$ROUND_TYPE" ] || [ -z "$REVIEWER_MODEL" ] || [ -z "$SCOPE_FILES" ]; then
+  echo "[review-fix-codex] ERROR: Missing required argument." >&2
+  echo "Required: --scope --briefing-file --track-id --round-type --reviewer-model --scope-files" >&2
+  echo "  --scope-files must be a non-empty comma-separated list of files the fixer may modify." >&2
+  echo "  Omitting it is fail-open (fixer operates without a modification boundary)." >&2
+  exit 1
+fi
+
+if [ ! -f "$BRIEFING_FILE" ]; then
+  echo "[review-fix-codex] ERROR: Briefing file not found: $BRIEFING_FILE" >&2
+  exit 1
+fi
+
+# ---------------------------------------------------------------------------
+# SMOKE-TEST 1: Reject forbidden sandbox flags
+# The sandbox MUST be workspace-write. danger-full-access and
+# --dangerously-bypass-approvals-and-sandbox are unconditionally forbidden
+# because they disable the .git read-only protection (ADR D3/CN-01).
+# This wrapper hardcodes --sandbox workspace-write; the check here guards
+# against future callers accidentally passing overrides via env vars or
+# config files that codex may pick up.
+# ---------------------------------------------------------------------------
+if [ "${CODEX_SANDBOX:-}" = "danger-full-access" ] || \
+   [ "${CODEX_SANDBOX:-}" = "dangerously-bypass-approvals-and-sandbox" ]; then
+  echo "[review-fix-codex] SMOKE-TEST FAILED: Forbidden sandbox override detected in environment." >&2
+  echo "  CODEX_SANDBOX=${CODEX_SANDBOX:-}" >&2
+  echo "  --sandbox danger-full-access and --dangerously-bypass-approvals-and-sandbox are prohibited (ADR D3/CN-01)." >&2
+  exit 2
+fi
+
+# ---------------------------------------------------------------------------
+# SMOKE-TEST 2: Codex CLI version range check
+# The .git read-only protection was verified on v0.125.0 (see
+# knowledge/research/2026-05-23-1848-agent-agnostic-vcs-guardrail.md §5).
+# Require >= 0.115.0 and < 1.0.0 (a major version bump warrants re-validation).
+# ---------------------------------------------------------------------------
+if ! command -v codex >/dev/null 2>&1; then
+  echo "[review-fix-codex] SMOKE-TEST FAILED: codex CLI not found in PATH." >&2
+  exit 2
+fi
+
+# The || true suppresses set -e pipeline exit when grep finds no x.y.z pattern
+# (e.g. if codex prints a non-version string); the [ -z ] guard below then
+# catches the empty string and exits with the structured smoke-test error.
+CODEX_VERSION=$(codex --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+if [ -z "$CODEX_VERSION" ]; then
+  echo "[review-fix-codex] SMOKE-TEST FAILED: Cannot determine codex version." >&2
+  exit 2
+fi
+
+# Split version into components
+CODEX_MAJOR=$(echo "$CODEX_VERSION" | cut -d. -f1)
+CODEX_MINOR=$(echo "$CODEX_VERSION" | cut -d. -f2)
+
+if [ "$CODEX_MAJOR" -gt 0 ]; then
+  echo "[review-fix-codex] SMOKE-TEST FAILED: codex version $CODEX_VERSION is outside validated range (>= 0.115.0, < 1.0.0)." >&2
+  echo "  The .git read-only protection guarantee requires re-validation for major version upgrades." >&2
+  exit 2
+fi
+if [ "$CODEX_MINOR" -lt 115 ]; then
+  echo "[review-fix-codex] SMOKE-TEST FAILED: codex version $CODEX_VERSION is below minimum validated version 0.115.0." >&2
+  echo "  The .git read-only sandbox protection is only guaranteed from v0.115.0+ (see knowledge/research/2026-05-23-1848-agent-agnostic-vcs-guardrail.md §5)." >&2
+  exit 2
+fi
+
+echo "[review-fix-codex] Smoke-tests passed (codex $CODEX_VERSION, sandbox=workspace-write)."
+
+# ---------------------------------------------------------------------------
+# CREDENTIAL ISOLATION
+# Build a minimal safe environment for codex exec, stripping all credentials
+# that could enable git push or network authentication (ADR D3/CN-02).
+# - GITHUB_TOKEN: removed (GitHub API / HTTPS push token)
+# - SSH_AUTH_SOCK: removed (SSH agent socket — without this, SSH agent auth fails)
+# - GIT_SSH / GIT_SSH_COMMAND: removed (SSH key overrides); GIT_SSH_COMMAND set
+#   to /bin/false to block git from using filesystem keys even when HOME is set.
+# - SSH_CONNECTION / SSH_CLIENT: removed (SSH session context)
+# - HOME: replaced with a temp directory that contains no .ssh/ dir, so that
+#   filesystem SSH keys (~/.ssh/*) are structurally unavailable to the fixer.
+#   CARGO_HOME is preserved via explicit env var so cargo still resolves caches.
+# - CODEX_HOME: explicitly passed through (pointing to the caller's real ~/.codex)
+#   so Codex can authenticate for model inference. CODEX_HOME contains Codex auth
+#   tokens and config — these are model-inference credentials, NOT git credentials,
+#   so passing them does not weaken push-prevention. Without CODEX_HOME the fixer
+#   launches unauthenticated and fails immediately.
+# - OPENAI_API_KEY / CODEX_API_KEY / OPENAI_ORG_ID / OPENAI_BASE_URL: passed through
+#   for the same reason (model inference auth only; no git-write capability).
+# We preserve PATH, USER, TERM, LANG, TMPDIR, and Cargo/Rust build env
+# so that `cargo make` commands inside codex work correctly.
+# HTTPS push is blocked by GITHUB_TOKEN removal.
+# ---------------------------------------------------------------------------
+
+# Create a clean HOME with no .ssh/ to block filesystem SSH-key access.
+SAFE_HOME=$(mktemp -d /tmp/review-fix-codex-home.XXXXXX)
+
+# Preserve Codex's own config/auth directory (needed for model inference auth).
+# CODEX_HOME defaults to ~/.codex when unset; since we replace HOME with SAFE_HOME
+# we must explicitly pin it to the caller's real ~/.codex so Codex can authenticate.
+# OpenAI / Codex model inference credentials (OPENAI_API_KEY, CODEX_API_KEY) are
+# model-inference keys, not git credentials — safe to pass through.
+# GITHUB_TOKEN and SSH credentials are still excluded (push-prevention).
+REAL_CODEX_HOME="${CODEX_HOME:-${HOME}/.codex}"
+
+SAFE_ENV_VARS="PATH USER LOGNAME TERM LANG LC_ALL TMPDIR TEMP TMP \
+  CARGO_HOME RUSTUP_HOME RUSTUP_TOOLCHAIN CARGO_TARGET_DIR \
+  DOCKER_HOST COMPOSE_PROJECT_NAME \
+  CLAUDE_PROJECT_DIR CARGO_MAKE_CURRENT_TASK_NAME \
+  OPENAI_API_KEY OPENAI_ORG_ID OPENAI_BASE_URL CODEX_API_KEY"
+
+# Build env invocation as a bash array to safely handle values with spaces or
+# shell metacharacters. Using eval+string concatenation would be vulnerable to
+# word-splitting if any variable value (e.g. PATH, TMPDIR) contains spaces.
+# HOME is set to the clean temp dir; CODEX_HOME is explicitly pointed to the
+# real ~/.codex so Codex can find its auth config (login token, stored API key).
+# GIT_SSH_COMMAND blocks SSH key auth as an additional layer (defense-in-depth
+# even if HOME somehow retained .ssh).
+env_args=(env -i "GIT_SSH_COMMAND=/bin/false" "HOME=$SAFE_HOME" "CODEX_HOME=$REAL_CODEX_HOME")
+for VAR in $SAFE_ENV_VARS; do
+  if [ -n "${!VAR+set}" ]; then
+    env_args+=("$VAR=${!VAR}")
+  fi
+done
+
+# ---------------------------------------------------------------------------
+# Build the Codex prompt
+# ---------------------------------------------------------------------------
+SCOPE_FILES_SECTION="
+
+## Scope File List (modification boundary)
+
+You may ONLY modify files within this list:
+$(echo "$SCOPE_FILES" | tr ',' '\n' | sed 's/^/- /')"
+
+PROMPT="$(cat "$BRIEFING_FILE")
+
+---
+
+## Orchestrator Assignment
+
+- Track ID: $TRACK_ID
+- Scope: $SCOPE
+- Round type: $ROUND_TYPE
+- Reviewer model: $REVIEWER_MODEL
+- Reviewer invocation: cargo make track-local-review -- --model $REVIEWER_MODEL --round-type $ROUND_TYPE --group $SCOPE --track-id $TRACK_ID --briefing-file $BRIEFING_FILE
+$SCOPE_FILES_SECTION
+
+When you finish (zero_findings confirmed or unrecoverable error), print EXACTLY one of these
+status lines as your final output line, with no trailing text:
+
+  REVIEW_FIX_STATUS: completed
+  REVIEW_FIX_STATUS: blocked_cross_scope
+  REVIEW_FIX_STATUS: failed"
+
+# Write prompt to a temp file to avoid shell quoting issues
+PROMPT_FILE=$(mktemp /tmp/review-fix-codex-prompt.XXXXXX.md)
+printf '%s' "$PROMPT" > "$PROMPT_FILE"
+
+# ---------------------------------------------------------------------------
+# Launch codex exec with workspace-write sandbox and credential isolation
+# ---------------------------------------------------------------------------
+echo "[review-fix-codex] Launching Codex fixer (scope=$SCOPE, round=$ROUND_TYPE, model=$MODEL)..."
+
+OUTPUT_FILE=$(mktemp /tmp/review-fix-codex-output.XXXXXX.txt)
+# Single consolidated cleanup trap for all temp resources.
+trap 'rm -f "$PROMPT_FILE" "$OUTPUT_FILE"; rm -rf "$SAFE_HOME"' EXIT
+
+# Launch via the env_args array (no eval, no word-splitting on env values).
+# GIT_SSH_COMMAND=/bin/false (already in env_args) blocks filesystem SSH-key auth.
+# The pipeline exit code is captured via || to prevent set -euo pipefail from aborting
+# the script before the STATUS parsing below can emit a structured result.
+# The prompt is fed via stdin ('-') because codex exec does not support --prompt-file.
+EXIT_CODE=0
+"${env_args[@]}" \
+  codex exec \
+    --model "$MODEL" \
+    --sandbox workspace-write \
+    - \
+  < "$PROMPT_FILE" 2>&1 | tee "$OUTPUT_FILE" || EXIT_CODE=$?
+
+# ---------------------------------------------------------------------------
+# Parse return value from Codex output
+# ---------------------------------------------------------------------------
+# The sentinel MUST be the last non-empty line of Codex output (as instructed
+# in the prompt). We match it anchored (full-line match) to reject cases where
+# Codex quotes or embeds the sentinel string inside explanatory prose.
+# Algorithm:
+#   1. Find the last non-empty line (grep -v '^$' | tail -1) so that a
+#      trailing blank line does not mask the sentinel.
+#   2. Accept the line ONLY if the entire trimmed line matches exactly
+#      ^REVIEW_FIX_STATUS: (completed|blocked_cross_scope|failed)$
+#      using grep -E with ^ and $ anchors. grep -oE is NOT used here because
+#      it would match a substring; -q with a full-line pattern is used instead.
+#   3. Extract the status value with sed only after the anchor check passes.
+# || LAST_LINE="" / || STATUS="" guard against unexpected non-zero exits with
+# set -e active (tail, grep, and sed all return 0 on normal empty output but
+# we keep the guards as belt-and-suspenders).
+LAST_NON_EMPTY_LINE=$(grep -v '^[[:space:]]*$' "$OUTPUT_FILE" | tail -1) || LAST_NON_EMPTY_LINE=""
+STATUS=""
+if printf '%s' "$LAST_NON_EMPTY_LINE" | grep -qE '^REVIEW_FIX_STATUS: (completed|blocked_cross_scope|failed)$'; then
+  STATUS=$(printf '%s' "$LAST_NON_EMPTY_LINE" | sed 's/^REVIEW_FIX_STATUS: //') || STATUS=""
+fi
+
+if [ -z "$STATUS" ]; then
+  if [ "$EXIT_CODE" -ne 0 ]; then
+    STATUS="failed"
+  else
+    STATUS="failed"
+    echo "[review-fix-codex] WARNING: No REVIEW_FIX_STATUS line found in Codex output. Treating as failed." >&2
+  fi
+fi
+
+echo "[review-fix-codex] Result: $STATUS (codex exit=$EXIT_CODE)"
+echo "$STATUS"
+
+# Exit with a non-zero status code for non-completed outcomes so that shell
+# callers and cargo make can detect failure from the process exit code without
+# having to parse stdout. Exit codes:
+#   0 — completed (zero_findings confirmed)
+#   2 — blocked_cross_scope (fixer needs cross-scope assistance)
+#   1 — failed (unrecoverable error or missing sentinel)
+case "$STATUS" in
+  completed)            exit 0 ;;
+  blocked_cross_scope)  exit 2 ;;
+  *)                    exit 1 ;;
+esac
+''']
+
 [tasks.track-set-commit-hash]
 description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"
 script_runner = "@shell"

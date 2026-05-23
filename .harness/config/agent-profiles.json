@@ -43,6 +43,10 @@
     },
     "researcher": {
       "provider": "gemini"
+    },
+    "review-fix-lead": {
+      "provider": "claude",
+      "model": "claude-opus-4-7"
     }
   }
 }

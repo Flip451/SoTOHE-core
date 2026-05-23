@@ -112,6 +112,255 @@
           "findings": [],
           "hash": "rvw1:sha256:65b29e90400bcee9962bee1660d28ff223d70952b871e5c202f94c0991780405",
           "at": "2026-05-23T10:50:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44c42b3237f5cfe0bac397336c5cf56d837f5b107e110bf3cfb9f0c2c28532ba",
+          "at": "2026-05-23T11:17:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44c42b3237f5cfe0bac397336c5cf56d837f5b107e110bf3cfb9f0c2c28532ba",
+          "at": "2026-05-23T11:18:40Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The version smoke-test still accepts Codex v0.100.x through v0.114.x, but this repo's safety model says the `.git` read-only protection is only guaranteed from v0.115.0 upward. Letting older versions through means the fixer can run without the protection this wrapper is supposed to enforce.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 953,
+              "category": "security"
+            },
+            {
+              "message": "The credential-isolation allowlist keeps `HOME`, and the comments explicitly note that `~/.ssh` remains readable. That leaves host SSH keys and other home-directory auth material available to the fixer, so the wrapper does not actually remove filesystem-based push capability as required.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 996,
+              "category": "security"
+            },
+            {
+              "message": "`codex exec` runs inside a `set -euo pipefail` pipeline, so any non-zero Codex exit or missing `REVIEW_FIX_STATUS` sentinel aborts the script before `EXIT_CODE` is captured and before the fallback `failed` status can be emitted. That breaks the required safe mapping of launch failures to a structured wrapper result.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 1056,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:436beb52e8cf938626f01eb030fc042d183b41dde951f061dcfae3b16009b034",
+          "at": "2026-05-23T11:18:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Credential isolation is still incomplete: the allowlist keeps `HOME`, and the wrapper only sets `GIT_SSH_COMMAND=/bin/false`. That leaves `~/.ssh` and direct SSH-based auth available to the fixer, so the promised removal of filesystem SSH-key push capability is not actually enforced.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 991,
+              "category": "security"
+            },
+            {
+              "message": "`STATUS=$(grep ...)` runs under `set -euo pipefail`; if Codex output does not contain the sentinel, `grep` returns 1 and the shell exits before the fallback `failed` branch can run. Missing or malformed status output therefore does not fail closed as intended.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 1075,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:49f981cdf72aa28979c3e6ab5b4529b805174639dd96192a00b9cf8217bb8ac8",
+          "at": "2026-05-23T11:27:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The status parser matches `REVIEW_FIX_STATUS:` anywhere in Codex output (`grep -oE ... | tail -1`) instead of requiring the final line to be the sentinel. If Codex quotes one of the status strings in its explanation or prints any extra text after it, the wrapper can misclassify the run as `completed` or `blocked_cross_scope` even though the contract was violated.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 1084,
+              "category": "correctness"
+            },
+            {
+              "message": "`--scope-files` is treated as optional, and the modification-boundary section is omitted entirely when the value is empty. That lets the fixer launch without an explicit file list if the caller forgets the argument or passes an empty list, which is a fail-open path for cross-scope edits.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 912,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d54666192db352a6c4323bdc1e7cde24f9fe7355387e5791a4ca7eb62ad5b589",
+          "at": "2026-05-23T11:34:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `env -i` isolation here also strips Codex's own auth/config home (`CODEX_HOME` / `~/.codex`). The current `codex exec --help` contract says auth still uses `CODEX_HOME`, so the spawned fixer can lose its login state and fail to start even though the goal is only to remove GitHub/SSH credentials. Preserve the Codex auth home while excluding the push credentials.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 1015,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:85554f11f35d40d95c61fdcd9699fb2811a213a486d0c2f860b4cec87edfce4a",
+          "at": "2026-05-23T11:46:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `track-local-review-fix-codex` wrapper has no automated coverage, so regressions in its security-critical guards (the `0.115.0` version floor, forbidden-sandbox rejection, credential isolation, and sentinel parsing) would slip through unnoticed. This is a P1 test gap because this task now gates the Codex review-fix path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 886,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:85554f11f35d40d95c61fdcd9699fb2811a213a486d0c2f860b4cec87edfce4a",
+          "at": "2026-05-23T11:48:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Inference: this launch path likely never delivers the briefing text to Codex. Existing in-repo Codex launchers pass the prompt as the final argv item and keep stdin null, but this wrapper redirects the briefing file on stdin and passes `-` as the positional argument. Unless `codex exec` has undocumented stdin support, the fixer will receive `-` instead of the orchestrator briefing and scope list, so the task will not run as intended.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 1071,
+              "category": "correctness"
+            },
+            {
+              "message": "The wrapper always exits `0` after printing `completed`, `blocked_cross_scope`, or `failed`. That masks non-completed outcomes from Cargo Make and any shell automation that relies on process status, so a failed fixer run can be reported as a successful task at the exit-code level.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 1112,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:85554f11f35d40d95c61fdcd9699fb2811a213a486d0c2f860b4cec87edfce4a",
+          "at": "2026-05-23T11:48:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`env -i` combined with `HOME=$SAFE_HOME` strips the Codex CLI's own persisted login state and any env-based API credential before `codex exec` starts. In the normal CLI-login or `CODEX_API_KEY` setup, the fixer will launch unauthenticated and fail before it can do any work.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 1015,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:80b9587ce11ec37d2d2f2972c33fb00105abfb03afc6e634a7e1882cdbb681c6",
+          "at": "2026-05-23T11:55:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e2500dddfcb52617273542ee12c6a8b023c574db7b56a8a3a370ada868875414",
+          "at": "2026-05-23T12:03:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review-fix-codex` is declared with `script_runner = \"@shell\"`, which cargo-make runs through the platform shell; on this repo's Linux environment `/bin/sh` is `dash`. The new script uses bash-only syntax (`set -o pipefail`, arrays, `${!VAR}`), so the wrapper can fail before any smoke test or Codex launch runs. This makes the new fixer task unusable unless the task explicitly uses bash or is rewritten as POSIX shell.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 890,
+              "category": "shell robustness"
+            }
+          ],
+          "hash": "rvw1:sha256:e2500dddfcb52617273542ee12c6a8b023c574db7b56a8a3a370ada868875414",
+          "at": "2026-05-23T12:07:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The intended unparsable-version smoke-test branch is unreachable for a no-match version string. With `set -euo pipefail`, `CODEX_VERSION=$(codex --version 2>&1 | grep -oE ... | head -1)` exits the script immediately when `grep` finds no `x.y.z`, before the `[ -z \"$CODEX_VERSION\" ]` check can print the smoke-test error and return exit 2. That makes this security preflight fail with an unstructured exit instead of the documented smoke-test failure path.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 962,
+              "category": "shell_robustness"
+            }
+          ],
+          "hash": "rvw1:sha256:2384760a8f1eee0472e63643ffe81a7a56742dfcdfb0122f0017af1b0dff36fb",
+          "at": "2026-05-23T12:12:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c39ec836ce4cf25a46f2d75c97cddad3ae0777943e5ac73179b7e4288b272e2",
+          "at": "2026-05-23T12:15:11Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `review-fix-lead` config leaves `model` set to `claude-opus-4-7`, but the new Codex dispatch path forwards that same field into `codex exec --model`. As a result, opting into `provider: codex` still inherits the Claude model unless the user also changes a second setting, so the documented provider-only switch is not actually usable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/config/agent-profiles.json",
+              "line": 47,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6fc34cb9ecfc4912b670b15d47512cf1010a8a2047afea70c774ac2fbc967fce",
+          "at": "2026-05-23T11:19:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b69127cd1d9600c128166ec28b09c81deae2c540ef8423e3b2d20a325d7aed69",
+          "at": "2026-05-23T11:21:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b69127cd1d9600c128166ec28b09c81deae2c540ef8423e3b2d20a325d7aed69",
+          "at": "2026-05-23T11:23:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeec96107c7157dca83d0071f630f9b3fae8bf6203e5a59b4299f6727e766782",
+          "at": "2026-05-23T12:20:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aeec96107c7157dca83d0071f630f9b3fae8bf6203e5a59b4299f6727e766782",
+          "at": "2026-05-23T12:23:45Z"
         }
       ]
     }
