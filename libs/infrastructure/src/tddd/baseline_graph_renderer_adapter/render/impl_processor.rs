@@ -1,4 +1,4 @@
-//! Impl Item processing for the baseline-graph renderer (T008).
+//! Impl Item processing for the baseline-graph renderer (T008 / T015).
 //!
 //! Implements the following ADR decisions:
 //!
@@ -19,6 +19,10 @@
 //!   - `blanket_impl: None` + `for_: Type::Generic` (blanket body, user-declared):
 //!     display near/inside the target Trait subgraph (a-plan).
 //! - **J**: `-.impl.->` edge style for all trait impls.
+//! - **AC-19 / AC-20 (method path, T015)**: inherent and trait method nodes emit
+//!   `method_param` and `method_returns` edges to own-crate types extracted from
+//!   `FunctionSignature.inputs` / `.output` by recursive `ResolvedPath.args` traversal.
+//!   `Type::Primitive` / `Type::Generic` / external types are skipped (no edge).
 //! - **CN-05**: cross-baseline rustdoc `Id` comparison is prohibited.
 //!   Trait identity is resolved via `(CrateName, module_path, TraitName)`.
 //! - **CN-10**: workspace-external types and lookup failures are silently skipped.
@@ -27,7 +31,8 @@
 //! All functions are panic-free (no `unwrap` / `expect` / slice indexing on `[i]`
 //! in production code — only `.get()` / iterators).
 //!
-//! (IN-09 / IN-12 / IN-13 / AC-05 / AC-08 / AC-17 / CN-04 / CN-05 / CN-10 / CN-11)
+//! (IN-09 / IN-12 / IN-13 / AC-05 / AC-08 / AC-17 / AC-19 / AC-20 / CN-04 / CN-05 /
+//! CN-10 / CN-11)
 
 use std::collections::{HashMap, HashSet};
 
@@ -304,31 +309,222 @@ fn resolve_type_rep_node_id(
 }
 
 // ---------------------------------------------------------------------------
+// Type-reference extraction utility (AC-20 / T015)
+// ---------------------------------------------------------------------------
+
+/// Collect representative node ids for all **own-crate** types referenced
+/// (directly or nested inside generic arguments) in `ty`.
+///
+/// The function performs a depth-first traversal of the rustdoc [`Type`] tree:
+///
+/// - **`Type::ResolvedPath`**: look up the path's `Id` in `krate.paths`.  If the
+///   entry exists and its `crate_id == 0` (own crate), add the type's
+///   `type_rep_node_id` to the result.  Then **recursively** descend into
+///   `path.args` (the generic arguments, e.g. `Vec<TrackId>` → descend into
+///   `TrackId`) so that nested own-crate types are captured too (AC-20).
+/// - **`Type::Primitive`** / **`Type::Generic`**: skip — no edge drawn.
+/// - **External types** (`crate_id != 0`): skip — descend into generic args to
+///   find any own-crate types nested inside (e.g. `Arc<MyType>` → `MyType`).
+/// - All other `Type` variants: no own-crate node ids are produced; the caller
+///   can ignore them.
+///
+/// This shared utility is also used by T016 for struct fields, enum variant
+/// payloads, and TypeAlias targets.
+///
+/// # Arguments
+///
+/// - `ty`: the `rustdoc_types::Type` to inspect.
+/// - `krate`: the rustdoc crate metadata (for `krate.paths` lookup).
+/// - `layer`: the rendering layer string (needed for `type_rep_node_id`).
+/// - `crate_name`: the own-crate name (used as fallback when `path[0]` is absent).
+///
+/// # Returns
+///
+/// A `Vec<String>` of `type_rep_node_id` values, one per distinct own-crate
+/// `ResolvedPath` type found in `ty` (including nested generic arguments).
+/// The vec may contain duplicates when the same type appears multiple times.
+/// The caller decides whether to deduplicate.
+///
+/// # Panics
+///
+/// This function never panics; all indexing uses `.get()` / iterators.
+pub(super) fn collect_own_crate_node_ids_from_type(
+    ty: &rustdoc_types::Type,
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    crate_name: &str,
+) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    collect_own_crate_node_ids_recursive(ty, krate, layer, crate_name, &mut out);
+    out
+}
+
+/// Internal recursive helper for [`collect_own_crate_node_ids_from_type`].
+fn collect_own_crate_node_ids_recursive(
+    ty: &rustdoc_types::Type,
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    crate_name: &str,
+    out: &mut Vec<String>,
+) {
+    match ty {
+        rustdoc_types::Type::ResolvedPath(path) => {
+            // Look up the type in krate.paths.
+            if let Some(summary) = krate.paths.get(&path.id) {
+                if summary.crate_id == 0 {
+                    // Own-crate type: apply the same visibility + kind filter as the
+                    // renderer (parity with resolve_type_rep_node_id / extract_nodes).
+                    // Private types and non-rendered kinds (Union, etc.) have no entry
+                    // subgraph, so emitting an edge to their rep node would create a
+                    // phantom Mermaid node (CN-10 / CC-1 / B-r1).
+                    if let Some(item) = krate.index.get(&path.id) {
+                        if matches!(item.visibility, Visibility::Public)
+                            && matches!(
+                                item.inner,
+                                ItemEnum::Struct(_)
+                                    | ItemEnum::Enum(_)
+                                    | ItemEnum::TypeAlias(_)
+                                    | ItemEnum::Trait(_)
+                            )
+                        {
+                            let module_path = module_path_from_summary(&summary.path);
+                            if let Some(type_name) = summary.path.last() {
+                                out.push(type_rep_node_id(
+                                    layer,
+                                    crate_name,
+                                    &module_path,
+                                    type_name,
+                                ));
+                            }
+                        }
+                    }
+                    // Private or non-rendered kind: skip edge (but still recurse into
+                    // generic args — they may contain other renderable own-crate types).
+                }
+                // Whether own-crate or external, recurse into generic args to
+                // find nested own-crate types (e.g. Arc<MyType> → MyType).
+            }
+            // Recurse into generic arguments (e.g. Vec<TrackId> → TrackId).
+            if let Some(args) = path.args.as_deref() {
+                collect_own_crate_node_ids_from_generic_args(args, krate, layer, crate_name, out);
+            }
+        }
+        rustdoc_types::Type::Primitive(_) | rustdoc_types::Type::Generic(_) => {
+            // Primitive (u32, bool, etc.) and generic type params (T, U) → skip.
+        }
+        rustdoc_types::Type::BorrowedRef { type_: inner, .. }
+        | rustdoc_types::Type::RawPointer { type_: inner, .. }
+        | rustdoc_types::Type::Slice(inner)
+        | rustdoc_types::Type::Array { type_: inner, .. }
+        | rustdoc_types::Type::Pat { type_: inner, .. } => {
+            // Transparent wrappers — recurse into the inner type.
+            collect_own_crate_node_ids_recursive(inner, krate, layer, crate_name, out);
+        }
+        rustdoc_types::Type::Tuple(tys) => {
+            for t in tys {
+                collect_own_crate_node_ids_recursive(t, krate, layer, crate_name, out);
+            }
+        }
+        _ => {
+            // DynTrait, ImplTrait, QualifiedPath, FunctionPointer, etc.:
+            // too complex for our edge-drawing purpose; no own-crate node ids emitted.
+        }
+    }
+}
+
+/// Internal recursive helper: descend into [`rustdoc_types::GenericArgs`].
+fn collect_own_crate_node_ids_from_generic_args(
+    args: &rustdoc_types::GenericArgs,
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    crate_name: &str,
+    out: &mut Vec<String>,
+) {
+    use rustdoc_types::{AssocItemConstraintKind, GenericArg, GenericArgs, Term};
+    match args {
+        GenericArgs::AngleBracketed { args: ga, constraints } => {
+            // Process positional/type generic arguments (e.g. `Vec<MyType>`).
+            for arg in ga {
+                if let GenericArg::Type(t) = arg {
+                    collect_own_crate_node_ids_recursive(t, krate, layer, crate_name, out);
+                }
+            }
+            // Process associated-type constraints (e.g. `Iterator<Item = MyType>`).
+            // Rustdoc stores these in `constraints` as `AssocItemConstraint` entries
+            // (AC-20: must capture nested own-crate types in assoc-type bindings).
+            for constraint in constraints {
+                // Recurse into args of the constraint itself (e.g.
+                // `Item<Foo = Bar>` — the args on the constraint).
+                if let Some(c_args) = constraint.args.as_deref() {
+                    collect_own_crate_node_ids_from_generic_args(
+                        c_args, krate, layer, crate_name, out,
+                    );
+                }
+                // Recurse into the constraint binding (Equality or Bound).
+                match &constraint.binding {
+                    AssocItemConstraintKind::Equality(term) => {
+                        if let Term::Type(t) = term {
+                            collect_own_crate_node_ids_recursive(t, krate, layer, crate_name, out);
+                        }
+                        // Term::Constant: no type reference to follow.
+                    }
+                    AssocItemConstraintKind::Constraint(_) => {
+                        // Generic bounds (e.g. `Item: Trait`) do not contribute
+                        // a direct type reference for an edge; skip.
+                    }
+                }
+            }
+        }
+        GenericArgs::Parenthesized { inputs, output } => {
+            // Fn traits: Fn(A, B) -> C — recurse into inputs and optional output.
+            for t in inputs {
+                collect_own_crate_node_ids_recursive(t, krate, layer, crate_name, out);
+            }
+            if let Some(ret) = output {
+                collect_own_crate_node_ids_recursive(ret, krate, layer, crate_name, out);
+            }
+        }
+        _ => {}
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Inherent method emission
 // ---------------------------------------------------------------------------
 
-/// Emit inherent method nodes for a given type entry subgraph (BB-4-fix1).
+/// Emit inherent method nodes for a given type entry subgraph (BB-4-fix1 / T015).
 ///
 /// `method_ids` is the list of Ids collected by [`collect_inherent_methods`] for
 /// this type's representative node id. Each method that is a `Function` item with
 /// `Visibility::Public` is emitted as a method node inside `parent_sg_id` (the entry
 /// subgraph id). Private and default-visibility inherent methods are skipped (CC-1).
 ///
+/// **T015 (AC-19 / AC-20 — method path)**: after emitting each method node, the
+/// function also emits `method_param` edges from the method node to own-crate types
+/// found in `FunctionSignature.inputs`, and `method_returns` edges to own-crate types
+/// found in `FunctionSignature.output`.  Own-crate types are determined by
+/// [`collect_own_crate_node_ids_from_type`]: `Type::Primitive` / `Type::Generic` /
+/// external types produce no edge.  Edge styles are resolved from `[edge.method_param]`
+/// and `[edge.method_returns]` in the style config (fail-closed, CN-02).
+///
 /// - `provided_trait_methods` are not in `method_ids` here (they belong to trait
 ///   impl, not inherent impl). However, if a method id is in `provided_methods_set`
 ///   it is skipped (safety guard against provided method leakage, CN-11).
-/// - No edge style lookup is required for inherent method nodes — they are nodes
-///   only, not edges.
 ///
 /// # Errors
 ///
-/// This function is infallible for the emit step (no edge style lookup needed for
-/// inherent method nodes). Returns `Ok(())`.
+/// Returns `BaselineGraphRendererError::RenderFailed` when `[edge.method_param]` or
+/// `[edge.method_returns]` is absent from the style config **and** at least one edge
+/// of that kind would be emitted (CN-02 — fail-closed).
+#[allow(clippy::too_many_arguments)]
 pub(super) fn emit_inherent_methods(
     method_ids: &[Id],
     krate: &rustdoc_types::Crate,
     parent_sg_id: &str,
+    layer: &str,
+    crate_name: &str,
     subgraph_lines: &mut Vec<String>,
+    edge_lines: &mut Vec<String>,
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     indent: &str,
@@ -358,9 +554,10 @@ pub(super) fn emit_inherent_methods(
             continue;
         }
 
-        if !matches!(method_item.inner, ItemEnum::Function(_)) {
-            continue;
-        }
+        let fn_data = match &method_item.inner {
+            ItemEnum::Function(f) => f,
+            _ => continue,
+        };
 
         let method_name = match method_item.name.as_deref() {
             Some(n) => n,
@@ -374,6 +571,74 @@ pub(super) fn emit_inherent_methods(
         if let Some(ns) = style.node.get("Method") {
             if let Some(class_name) = ns.class.as_deref() {
                 class_attach.push(format!("class {method_node_id} {class_name}"));
+            }
+        }
+
+        // T015 (AC-19 / AC-20 — method path): emit method_param and method_returns edges.
+        emit_method_signature_edges(
+            &fn_data.sig,
+            &method_node_id,
+            krate,
+            layer,
+            crate_name,
+            edge_lines,
+            style,
+        )?;
+    }
+
+    Ok(())
+}
+
+/// Emit `method_param` and `method_returns` edges from a method node to own-crate
+/// types referenced in a [`rustdoc_types::FunctionSignature`] (T015 / AC-19 / AC-20).
+///
+/// - `method_node_id`: the mermaid node id of the method node (source of edges).
+/// - `sig`: the `FunctionSignature` of the method.
+/// - `krate`, `layer`, `crate_name`: used by [`collect_own_crate_node_ids_from_type`].
+/// - `edge_lines`: receives the generated edge lines.
+/// - `style`: style config for `[edge.method_param]` / `[edge.method_returns]` lookup.
+///
+/// Own-crate type extraction uses [`collect_own_crate_node_ids_from_type`] which
+/// recursively traverses `ResolvedPath.args` (GenericArgs).  `Type::Primitive`,
+/// `Type::Generic`, and external types produce no edge (AC-20).
+///
+/// Edge style keys are looked up lazily — only when at least one edge of that kind
+/// would be emitted.  Missing keys when no edges would be emitted do not cause errors.
+///
+/// # Errors
+///
+/// Returns `BaselineGraphRendererError::RenderFailed` when `[edge.method_param]` or
+/// `[edge.method_returns]` is absent and at least one edge of that kind needs to be
+/// emitted (CN-02 — fail-closed).
+pub(super) fn emit_method_signature_edges(
+    sig: &rustdoc_types::FunctionSignature,
+    method_node_id: &str,
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    crate_name: &str,
+    edge_lines: &mut Vec<String>,
+    style: &StyleConfig,
+) -> Result<(), BaselineGraphRendererError> {
+    // method_param edges: one edge per own-crate type in each input parameter.
+    for (_param_name, param_ty) in &sig.inputs {
+        let targets = collect_own_crate_node_ids_from_type(param_ty, krate, layer, crate_name);
+        if !targets.is_empty() {
+            // Lazy edge style lookup: only when we have edges to emit (CN-02 fail-closed).
+            let (param_arrow, _) = edge_arrow_label(&style.edge, "method_param")?;
+            for target_id in &targets {
+                edge_lines.push(format!("{method_node_id} {param_arrow} {target_id}"));
+            }
+        }
+    }
+
+    // method_returns edges: one edge per own-crate type in the output type.
+    if let Some(output_ty) = &sig.output {
+        let targets = collect_own_crate_node_ids_from_type(output_ty, krate, layer, crate_name);
+        if !targets.is_empty() {
+            // Lazy edge style lookup: only when we have edges to emit (CN-02 fail-closed).
+            let (ret_arrow, _) = edge_arrow_label(&style.edge, "method_returns")?;
+            for target_id in &targets {
+                edge_lines.push(format!("{method_node_id} {ret_arrow} {target_id}"));
             }
         }
     }
@@ -2087,6 +2352,737 @@ include_functions = true
                 )
             ),
             "missing [edge.trait_impl] must return RenderFailed (CN-02); got {result:?}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // T015: collect_own_crate_node_ids_from_type (AC-20)
+    // -----------------------------------------------------------------------
+
+    /// Build a minimal krate with one own-crate type registered in krate.paths.
+    fn krate_with_own_type(struct_id: Id, path: Vec<&str>) -> rustdoc_types::Crate {
+        let root_id = Id(0);
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                path.first().copied().unwrap_or("my_crate"),
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                path.last().copied().unwrap_or("MyType"),
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, path.clone(), ItemKind::Struct));
+        make_crate(root_id, index, paths)
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_resolved_path_own_crate() {
+        // A ResolvedPath to an own-crate type → one rep-node id returned.
+        let struct_id = Id(1);
+        let krate = krate_with_own_type(struct_id, vec!["my_crate", "MyType"]);
+
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "MyType".to_string(),
+            id: struct_id,
+            args: None,
+        });
+
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert_eq!(result.len(), 1, "one own-crate type → one node id; got: {result:?}");
+        let expected = type_rep_node_id("domain", "my_crate", "", "MyType");
+        assert_eq!(result[0], expected, "node id must match type_rep_node_id output");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_primitive_returns_empty() {
+        // Primitive types → skip, empty result.
+        let krate = make_crate(Id(0), HashMap::new(), HashMap::new());
+        let ty = rustdoc_types::Type::Primitive("u32".to_string());
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert!(result.is_empty(), "primitive → no node ids; got: {result:?}");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_generic_param_returns_empty() {
+        // Generic type parameter (T, U) → skip, empty result.
+        let krate = make_crate(Id(0), HashMap::new(), HashMap::new());
+        let ty = rustdoc_types::Type::Generic("T".to_string());
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert!(result.is_empty(), "generic type param → no node ids; got: {result:?}");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_external_type_returns_empty() {
+        // A ResolvedPath to an external crate type (crate_id != 0) → skip.
+        let struct_id = Id(1);
+        let root_id = Id(0);
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module { is_crate: true, items: vec![], is_stripped: false }),
+            ),
+        );
+        let mut paths = HashMap::new();
+        // crate_id = 99 → external
+        paths.insert(struct_id, item_summary(99, vec!["ext_crate", "ExtType"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ext_crate::ExtType".to_string(),
+            id: struct_id,
+            args: None,
+        });
+
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert!(result.is_empty(), "external type → no node ids; got: {result:?}");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_nested_generic_arg() {
+        // Vec<MyType> (Vec is external, MyType is own-crate) → extracts MyType only.
+        let vec_id = Id(1); // "external" Vec
+        let inner_id = Id(2); // own-crate MyType
+        let root_id = Id(0);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![inner_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            inner_id,
+            pub_item(
+                inner_id,
+                "MyType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        let mut paths = HashMap::new();
+        // Vec: external crate_id = 10
+        paths.insert(vec_id, item_summary(10, vec!["std", "vec", "Vec"], ItemKind::Struct));
+        // MyType: own crate_id = 0
+        paths.insert(inner_id, item_summary(0, vec!["my_crate", "MyType"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        // Vec<MyType>: ResolvedPath(Vec) with AngleBracketed<MyType>
+        let inner_path = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "MyType".to_string(),
+            id: inner_id,
+            args: None,
+        });
+        let args = rustdoc_types::GenericArgs::AngleBracketed {
+            args: vec![rustdoc_types::GenericArg::Type(inner_path)],
+            constraints: vec![],
+        };
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "Vec".to_string(),
+            id: vec_id,
+            args: Some(Box::new(args)),
+        });
+
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert_eq!(
+            result.len(),
+            1,
+            "Vec<MyType>: only MyType (own-crate) extracted; got: {result:?}"
+        );
+        let expected = type_rep_node_id("domain", "my_crate", "", "MyType");
+        assert_eq!(result[0], expected, "must be MyType rep-node id");
+    }
+
+    #[test]
+    fn test_collect_own_crate_node_ids_from_type_not_in_paths_returns_empty() {
+        // ResolvedPath whose id is not in krate.paths → skip silently.
+        let krate = make_crate(Id(0), HashMap::new(), HashMap::new());
+        let ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "UnknownType".to_string(),
+            id: Id(999),
+            args: None,
+        });
+        let result = collect_own_crate_node_ids_from_type(&ty, &krate, "domain", "my_crate");
+        assert!(result.is_empty(), "id not in krate.paths → no node ids; got: {result:?}");
+    }
+
+    // -----------------------------------------------------------------------
+    // T015: emit_inherent_methods — method_param / method_returns edges (AC-19)
+    // -----------------------------------------------------------------------
+
+    fn style_with_method_edges() -> super::super::StyleConfig {
+        toml::from_str::<super::super::StyleConfig>(
+            r#"
+[edge.method_param]
+arrow = "-->"
+
+[edge.method_returns]
+arrow = "==>"
+
+[filter]
+include_functions = true
+"#,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_with_own_crate_param_emits_method_param_edge() {
+        // A method with one own-crate param type → one method_param edge.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+        let param_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        // Method with one own-crate param.
+        let param_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ParamType".to_string(),
+            id: param_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            pub_item(
+                method_id,
+                "do_something",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("arg".to_string(), param_ty)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            ),
+        );
+
+        // ParamType must be in krate.index as a Public Struct so the visibility/kind
+        // filter in collect_own_crate_node_ids_recursive accepts it as a renderable type.
+        index.insert(
+            param_type_id,
+            pub_item(
+                param_type_id,
+                "ParamType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        // ParamType is an own-crate type.
+        paths.insert(
+            param_type_id,
+            item_summary(0, vec!["my_crate", "ParamType"], ItemKind::Struct),
+        );
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        let style = style_with_method_edges();
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        )
+        .unwrap();
+
+        // Must emit one method_param edge.
+        let param_edges: Vec<_> = edge_lines.iter().filter(|l| l.contains("-->")).collect();
+        assert_eq!(
+            param_edges.len(),
+            1,
+            "one own-crate param → one method_param edge; got: {edge_lines:?}"
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "ParamType");
+        assert!(
+            param_edges[0].contains(&expected_target),
+            "method_param edge must target ParamType rep-node; edge: {}; expected target: {}",
+            param_edges[0],
+            expected_target
+        );
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_with_own_crate_return_type_emits_method_returns_edge() {
+        // A method with an own-crate return type → one method_returns edge.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+        let ret_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        let ret_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ReturnType".to_string(),
+            id: ret_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            pub_item(
+                method_id,
+                "get_val",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![],
+                        output: Some(ret_ty),
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            ),
+        );
+
+        // ReturnType must be in krate.index as a Public Struct so the visibility/kind
+        // filter in collect_own_crate_node_ids_recursive accepts it as a renderable type.
+        index.insert(
+            ret_type_id,
+            pub_item(
+                ret_type_id,
+                "ReturnType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths
+            .insert(ret_type_id, item_summary(0, vec!["my_crate", "ReturnType"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        let style = style_with_method_edges();
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        )
+        .unwrap();
+
+        let ret_edges: Vec<_> = edge_lines.iter().filter(|l| l.contains("==>")).collect();
+        assert_eq!(
+            ret_edges.len(),
+            1,
+            "one own-crate return type → one method_returns edge; got: {edge_lines:?}"
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "ReturnType");
+        assert!(
+            ret_edges[0].contains(&expected_target),
+            "method_returns edge must target ReturnType rep-node; edge: {}",
+            ret_edges[0]
+        );
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_primitive_param_no_edge() {
+        // A method with a primitive param type → no method_param edge.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            method_id,
+            pub_item(
+                method_id,
+                "with_val",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![(
+                            "val".to_string(),
+                            rustdoc_types::Type::Primitive("u32".to_string()),
+                        )],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        let style = style_with_method_edges();
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        )
+        .unwrap();
+
+        assert!(
+            edge_lines.is_empty(),
+            "primitive param → no method_param edge (AC-20); got: {edge_lines:?}"
+        );
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_no_params_no_return_no_edges() {
+        // A method with no params and no return type → no method edges.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(method_id, pub_item(method_id, "do_nothing", empty_function_inner()));
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        let style = style_with_method_edges();
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        )
+        .unwrap();
+
+        assert!(
+            edge_lines.is_empty(),
+            "method with no params/return → no method edges (AC-19); got: {edge_lines:?}"
+        );
+        // Method node still appears in subgraph_lines.
+        let joined = subgraph_lines.join("\n");
+        assert!(joined.contains("do_nothing"), "method node must still be emitted");
+    }
+
+    #[test]
+    fn test_emit_inherent_methods_missing_method_param_edge_style_returns_render_failed() {
+        // When [edge.method_param] is absent from style config and there's an own-crate
+        // param type, must return RenderFailed (CN-02 fail-closed).
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let method_id = Id(2);
+        let param_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        let param_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ParamType".to_string(),
+            id: param_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            pub_item(
+                method_id,
+                "do_something",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("arg".to_string(), param_ty)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            ),
+        );
+        // ParamType must be in krate.index as a Public Struct so the visibility/kind
+        // filter in collect_own_crate_node_ids_recursive accepts it as a renderable type,
+        // allowing the test to reach the edge-style lookup and trigger the CN-02 error.
+        index.insert(
+            param_type_id,
+            pub_item(
+                param_type_id,
+                "ParamType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(0, vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(
+            param_type_id,
+            item_summary(0, vec!["my_crate", "ParamType"], ItemKind::Struct),
+        );
+        let krate = make_crate(root_id, index, paths);
+
+        let parent_sg_id = type_rep_node_id("domain", "my_crate", "", "MyStruct")
+            .strip_suffix("__self")
+            .unwrap_or("T10_domain_my_crate__MyStruct")
+            .to_string();
+
+        // Style WITHOUT [edge.method_param] — must fail-closed.
+        let style: super::super::StyleConfig =
+            toml::from_str("[filter]\ninclude_functions = true\n").unwrap();
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+
+        let result = emit_inherent_methods(
+            &[method_id],
+            &krate,
+            &parent_sg_id,
+            "domain",
+            "my_crate",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+        );
+
+        assert!(
+            matches!(
+                result,
+                Err(
+                    domain::tddd::baseline_graph_ports::BaselineGraphRendererError::RenderFailed { .. }
+                )
+            ),
+            "missing [edge.method_param] must return RenderFailed (CN-02); got {result:?}"
         );
     }
 }

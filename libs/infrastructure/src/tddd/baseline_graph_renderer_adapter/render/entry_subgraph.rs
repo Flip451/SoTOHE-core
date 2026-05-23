@@ -1,4 +1,4 @@
-//! Entry subgraph emission for the baseline-graph renderer (T007 / T008).
+//! Entry subgraph emission for the baseline-graph renderer (T007 / T008 / T015).
 //!
 //! Implements the following ADR decisions:
 //!
@@ -18,12 +18,18 @@
 //! - **BB-4-fix1 (T008)**: Inherent impl methods are merged into the target type's entry
 //!   subgraph. The `emit_*_subgraph` functions accept an optional `inherent_method_ids`
 //!   slice; when provided, those method nodes are emitted inside the subgraph before `end`.
+//! - **AC-19 / AC-20 (T015 — method path)**: inherent method nodes (BB, via
+//!   `impl_processor::emit_inherent_methods`) and Trait method nodes (H', via
+//!   `emit_trait_subgraph`) emit `method_param` / `method_returns` edges to own-crate
+//!   types extracted from `FunctionSignature.inputs` / `.output` by recursive
+//!   `ResolvedPath.args` traversal (`collect_own_crate_node_ids_from_type`).
+//!   `Type::Primitive` / `Type::Generic` / external types produce no edge.
 //!
 //! All functions are panic-free (no `unwrap` / `expect` / slice indexing on `[i]`
 //! in production code — only `.get()` / iterators).
 //!
 //! (IN-06 / IN-07 / IN-08 / IN-09 / IN-10 / IN-11 / IN-13 / AC-04 / AC-05 / AC-06 /
-//! AC-07 / AC-08 / AC-09 / AC-10)
+//! AC-07 / AC-08 / AC-09 / AC-10 / AC-19 / AC-20)
 
 use std::collections::BTreeMap;
 
@@ -163,14 +169,18 @@ pub(super) fn emit_struct_subgraph(
         }
     }
 
-    // BB-4-fix1 (T008): emit inherent method nodes inside the subgraph.
+    // BB-4-fix1 (T008) + T015: emit inherent method nodes inside the subgraph,
+    // and method_param / method_returns edges from each method node.
     if let Some(method_ids) = inherent_method_ids {
         let child_indent = format!("{indent}  ");
         super::impl_processor::emit_inherent_methods(
             method_ids,
             krate,
             &entry_sg_id,
+            layer,
+            crate_name,
             subgraph_lines,
+            edge_lines,
             class_attach,
             style,
             &child_indent,
@@ -328,14 +338,18 @@ pub(super) fn emit_enum_subgraph(
         }
     }
 
-    // BB-4-fix1 (T008): emit inherent method nodes inside the subgraph.
+    // BB-4-fix1 (T008) + T015: emit inherent method nodes inside the subgraph,
+    // and method_param / method_returns edges from each method node.
     if let Some(method_ids) = inherent_method_ids {
         let child_indent = format!("{indent}  ");
         super::impl_processor::emit_inherent_methods(
             method_ids,
             krate,
             &entry_sg_id,
+            layer,
+            crate_name,
             subgraph_lines,
+            edge_lines,
             class_attach,
             style,
             &child_indent,
@@ -354,12 +368,18 @@ pub(super) fn emit_enum_subgraph(
     Ok(())
 }
 
-/// Emit a Trait entry subgraph with method nodes (F-r1 / H' decision).
+/// Emit a Trait entry subgraph with method nodes (F-r1 / H' decision / T015).
 ///
 /// `blanket_entries` — when `Some`, blanket body indicator nodes collected by
 /// [`super::impl_processor::build_blanket_body_map`] are emitted inside the subgraph
 /// before its `end` line (a-plan, AC-17 / BB-4-fix1). Each entry contains a pre-built
 /// `node_id`, `node_def`, and an optional class attach statement.
+///
+/// **T015 (AC-19 / AC-20 — method path)**: for each Trait method node emitted (H'),
+/// the function also emits `method_param` edges from the method node to own-crate types
+/// in `FunctionSignature.inputs`, and `method_returns` edges to own-crate types in
+/// `FunctionSignature.output`.  Edge styles are resolved from `[edge.method_param]` and
+/// `[edge.method_returns]` (fail-closed, CN-02).
 ///
 /// # Errors
 ///
@@ -371,7 +391,7 @@ pub(super) fn emit_trait_subgraph(
     id: Id,
     layer: &str,
     subgraph_lines: &mut Vec<String>,
-    _edge_lines: &mut Vec<String>,
+    edge_lines: &mut Vec<String>,
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     indent: &str,
@@ -414,6 +434,8 @@ pub(super) fn emit_trait_subgraph(
     }
 
     // H' decision: Trait.items — extract Function variants as method nodes.
+    // T015 (AC-19 / AC-20): also emit method_param / method_returns edges.
+    let crate_name = doc.crate_name.as_str();
     if let ItemEnum::Trait(trait_data) = &item.inner {
         let method_shape = style.node.get("Method").and_then(|ns| ns.shape.as_deref());
 
@@ -426,9 +448,10 @@ pub(super) fn emit_trait_subgraph(
             if !matches!(method_item.visibility, Visibility::Public | Visibility::Default) {
                 continue;
             }
-            if !matches!(method_item.inner, ItemEnum::Function(_)) {
-                continue;
-            }
+            let fn_data = match &method_item.inner {
+                ItemEnum::Function(f) => f,
+                _ => continue,
+            };
             let method_name = match method_item.name.as_deref() {
                 Some(n) => n,
                 None => continue,
@@ -443,6 +466,17 @@ pub(super) fn emit_trait_subgraph(
                     class_attach.push(format!("class {method_node_id} {class_name}"));
                 }
             }
+
+            // T015 (AC-19 / AC-20): emit method_param / method_returns edges.
+            super::impl_processor::emit_method_signature_edges(
+                &fn_data.sig,
+                &method_node_id,
+                krate,
+                layer,
+                crate_name,
+                edge_lines,
+                style,
+            )?;
         }
     }
 
@@ -525,14 +559,18 @@ pub(super) fn emit_type_alias_subgraph(
         }
     }
 
-    // BB-4-fix1 (T008): emit inherent method nodes inside the subgraph.
+    // BB-4-fix1 (T008) + T015: emit inherent method nodes inside the subgraph,
+    // and method_param / method_returns edges from each method node.
     if let Some(method_ids) = inherent_method_ids {
         let child_indent = format!("{indent}  ");
         super::impl_processor::emit_inherent_methods(
             method_ids,
             krate,
             &entry_sg_id,
+            layer,
+            crate_name,
             subgraph_lines,
+            edge_lines,
             class_attach,
             style,
             &child_indent,
@@ -813,7 +851,7 @@ fn emit_entries_for_layer_and_cluster(
                 .map(super::node_id_generator::module_path_from_summary)
                 .unwrap_or_default();
             let item_name = doc.krate.index.get(id).and_then(|i| i.name.as_deref()).unwrap_or("");
-            super::node_id_generator::type_rep_node_id(layer, crate_name_str, &mp, item_name)
+            type_rep_node_id(layer, crate_name_str, &mp, item_name)
         };
         let method_ids_for_type =
             inherent_map.get(crate_name_str).and_then(|m| m.get(&rep_id)).map(|v| v.as_slice());
@@ -838,7 +876,7 @@ fn emit_entries_for_layer_and_cluster(
                 .map(super::node_id_generator::module_path_from_summary)
                 .unwrap_or_default();
             let item_name = doc.krate.index.get(id).and_then(|i| i.name.as_deref()).unwrap_or("");
-            super::node_id_generator::type_rep_node_id(layer, crate_name_str, &mp, item_name)
+            type_rep_node_id(layer, crate_name_str, &mp, item_name)
         };
         let method_ids_for_type =
             inherent_map.get(crate_name_str).and_then(|m| m.get(&rep_id)).map(|v| v.as_slice());
@@ -887,7 +925,7 @@ fn emit_entries_for_layer_and_cluster(
                 .map(super::node_id_generator::module_path_from_summary)
                 .unwrap_or_default();
             let item_name = doc.krate.index.get(id).and_then(|i| i.name.as_deref()).unwrap_or("");
-            super::node_id_generator::type_rep_node_id(layer, crate_name_str, &mp, item_name)
+            type_rep_node_id(layer, crate_name_str, &mp, item_name)
         };
         let method_ids_for_type =
             inherent_map.get(crate_name_str).and_then(|m| m.get(&rep_id)).map(|v| v.as_slice());
@@ -1883,6 +1921,478 @@ include_functions = true
             "even a trait with no methods must produce a subgraph"
         );
         assert!(joined.contains("Marker"), "subgraph must contain trait name");
+    }
+
+    // -----------------------------------------------------------------------
+    // T015: H' — Trait method method_param / method_returns edges (AC-19)
+    // -----------------------------------------------------------------------
+
+    fn style_with_method_edges() -> StyleConfig {
+        toml::from_str::<StyleConfig>(
+            r#"
+[edge.field]
+arrow = "--o"
+
+[edge.variant_payload]
+arrow = "--o"
+
+[edge.alias]
+arrow = "---"
+
+[edge.method_param]
+arrow = "-->"
+
+[edge.method_returns]
+arrow = "==>"
+
+[filter]
+include_functions = true
+"#,
+        )
+        .unwrap()
+    }
+
+    fn item_summary_ext(crate_id: u32, path: Vec<&str>, kind: ItemKind) -> ItemSummary {
+        ItemSummary { crate_id, path: path.into_iter().map(|s| s.to_string()).collect(), kind }
+    }
+
+    #[test]
+    fn test_emit_trait_subgraph_method_with_own_crate_param_emits_method_param_edge() {
+        // H' decision: a Trait method with an own-crate param → method_param edge is emitted.
+        let root_id = Id(0);
+        let trait_id = Id(1);
+        let method_id = Id(2);
+        let param_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![method_id],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+
+        let param_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ParamType".to_string(),
+            id: param_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            default_vis_item(
+                method_id,
+                "process",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("arg".to_string(), param_ty)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: false,
+                }),
+            ),
+        );
+        // ParamType must be in krate.index as a Public Struct so the visibility/kind
+        // filter in collect_own_crate_node_ids_recursive accepts it as a renderable type.
+        index.insert(
+            param_type_id,
+            pub_item(
+                param_type_id,
+                "ParamType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(trait_id, item_summary(vec!["my_crate", "MyTrait"], ItemKind::Trait));
+        paths.insert(
+            param_type_id,
+            item_summary_ext(0, vec!["my_crate", "ParamType"], ItemKind::Struct),
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = style_with_method_edges();
+
+        emit_trait_subgraph(
+            &doc,
+            trait_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        let param_edges: Vec<_> = edge_lines.iter().filter(|l| l.contains("-->")).collect();
+        assert_eq!(
+            param_edges.len(),
+            1,
+            "trait method with one own-crate param → one method_param edge; got: {edge_lines:?}"
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "ParamType");
+        assert!(
+            param_edges[0].contains(&expected_target),
+            "method_param edge must target ParamType rep-node; edge: {}; expected: {}",
+            param_edges[0],
+            expected_target
+        );
+    }
+
+    #[test]
+    fn test_emit_trait_subgraph_method_with_own_crate_return_type_emits_method_returns_edge() {
+        // H' decision: a Trait method with an own-crate return type → method_returns edge.
+        let root_id = Id(0);
+        let trait_id = Id(1);
+        let method_id = Id(2);
+        let ret_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![method_id],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+
+        let ret_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ReturnType".to_string(),
+            id: ret_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            default_vis_item(
+                method_id,
+                "build",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![],
+                        output: Some(ret_ty),
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: false,
+                }),
+            ),
+        );
+        // ReturnType must be in krate.index as a Public Struct so the visibility/kind
+        // filter in collect_own_crate_node_ids_recursive accepts it as a renderable type.
+        index.insert(
+            ret_type_id,
+            pub_item(
+                ret_type_id,
+                "ReturnType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(trait_id, item_summary(vec!["my_crate", "MyTrait"], ItemKind::Trait));
+        paths.insert(
+            ret_type_id,
+            item_summary_ext(0, vec!["my_crate", "ReturnType"], ItemKind::Struct),
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = style_with_method_edges();
+
+        emit_trait_subgraph(
+            &doc,
+            trait_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        let ret_edges: Vec<_> = edge_lines.iter().filter(|l| l.contains("==>")).collect();
+        assert_eq!(
+            ret_edges.len(),
+            1,
+            "trait method with own-crate return type → one method_returns edge; got: {edge_lines:?}"
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "ReturnType");
+        assert!(
+            ret_edges[0].contains(&expected_target),
+            "method_returns edge must target ReturnType rep-node; edge: {}; expected: {}",
+            ret_edges[0],
+            expected_target
+        );
+    }
+
+    #[test]
+    fn test_emit_trait_subgraph_method_with_primitive_param_no_method_param_edge() {
+        // H' decision: primitive param → no method_param edge (AC-20 exclusion).
+        let root_id = Id(0);
+        let trait_id = Id(1);
+        let method_id = Id(2);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![method_id],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+        index.insert(
+            method_id,
+            default_vis_item(
+                method_id,
+                "with_val",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("n".to_string(), Type::Primitive("usize".to_string()))],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: false,
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(trait_id, item_summary(vec!["my_crate", "MyTrait"], ItemKind::Trait));
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = style_with_method_edges();
+
+        emit_trait_subgraph(
+            &doc,
+            trait_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        assert!(
+            edge_lines.is_empty(),
+            "primitive param type → no method_param edge; got: {edge_lines:?}"
+        );
+        // Method node still appears in subgraph.
+        let joined = subgraph_lines.join("\n");
+        assert!(joined.contains("with_val"), "method node must still appear in subgraph");
+    }
+
+    #[test]
+    fn test_emit_trait_subgraph_method_with_external_type_param_no_edge() {
+        // H' decision: external-crate type param (crate_id != 0) → no method_param edge.
+        let root_id = Id(0);
+        let trait_id = Id(1);
+        let method_id = Id(2);
+        let ext_type_id = Id(3);
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            trait_id,
+            pub_item(
+                trait_id,
+                "MyTrait",
+                ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![method_id],
+                    generics: empty_generics(),
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            ),
+        );
+
+        let ext_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "ext_crate::ExtType".to_string(),
+            id: ext_type_id,
+            args: None,
+        });
+        index.insert(
+            method_id,
+            default_vis_item(
+                method_id,
+                "process_ext",
+                ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("arg".to_string(), ext_ty)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: empty_generics(),
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: false,
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(trait_id, item_summary(vec!["my_crate", "MyTrait"], ItemKind::Trait));
+        // ext_type_id has crate_id = 99 (external)
+        paths.insert(
+            ext_type_id,
+            item_summary_ext(99, vec!["ext_crate", "ExtType"], ItemKind::Struct),
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = style_with_method_edges();
+
+        emit_trait_subgraph(
+            &doc,
+            trait_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        assert!(
+            edge_lines.is_empty(),
+            "external-crate type param → no method_param edge; got: {edge_lines:?}"
+        );
     }
 
     // -----------------------------------------------------------------------
