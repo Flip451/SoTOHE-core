@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (15/16 resolved)
+## Tasks (16/16 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -107,4 +107,4 @@
 > 両 task とも syn は使わない (rustdoc Type が構造化済みのため ADR E の制約通り)。catalogue 宣言型 (BaselineGraphRenderer) は不変のため type-design 不要。各 task が 500 行以内に収まるよう分割する。
 
 - [x] **T015**: adapter 内: method edge 実装 — inherent method (BB: entry subgraph 内包) および Trait method (H': Trait subgraph 内包) の各 method node から、引数の型へ method_param edge、返り値の型へ method_returns edge を引く。FunctionSignature.inputs / output を走査し、own crate 型 (krate.paths lookup で crate_id == 0) のみ entry subgraph へ edge を引く。型解決は Type::ResolvedPath.args (GenericArgs) の再帰走査で行う (syn 不使用)。method node が引数・返り値を持たない場合は edge なし。edge スタイルは設定ファイル [edge.method_param] / [edge.method_returns] を参照する。修正対象: render/entry_subgraph.rs / render/impl_processor.rs (AC-19, AC-20 の method 経路) (`6fde3a59a49786e5779cb1b69bd2edc268d112fa`)
-- [~] **T016**: adapter 内: 既存 edge の型解決を ResolvedPath.args 再帰に変更 — struct field (K decision) / enum variant payload (H decision) / TypeAlias target (N decision) の型解決ロジックを Type::ResolvedPath.args (GenericArgs) 再帰走査に統一し、own crate 型 (krate.paths lookup で crate_id == 0) のみ edge を引くように修正する。primitive (Type::Primitive) / generic 型パラメータ (Type::Generic) / 外部型への edge は生成しない。anonymous node (prim_* / generic_* / anon_*) 生成コードおよびそれらへの edge 生成コードを削除する (syn 不使用)。修正対象: render/entry_subgraph.rs (AC-20 の既存 edge 修正)
+- [x] **T016**: adapter 内: 既存 edge の型解決を ResolvedPath.args 再帰に変更 — struct field (K decision) / enum variant payload (H decision) / TypeAlias target (N decision) の型解決ロジックを Type::ResolvedPath.args (GenericArgs) 再帰走査に統一し、own crate 型 (krate.paths lookup で crate_id == 0) のみ edge を引くように修正する。primitive (Type::Primitive) / generic 型パラメータ (Type::Generic) / 外部型への edge は生成しない。anonymous node (prim_* / generic_* / anon_*) 生成コードおよびそれらへの edge 生成コードを削除する (syn 不使用)。修正対象: render/entry_subgraph.rs (AC-20 の既存 edge 修正) (`1adc93a29cbcdfbec9c1ebff2cdd254de740f14c`)

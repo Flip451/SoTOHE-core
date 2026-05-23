@@ -94,7 +94,8 @@
     {
       "id": "T016",
       "description": "adapter 内: 既存 edge の型解決を ResolvedPath.args 再帰に変更 — struct field (K decision) / enum variant payload (H decision) / TypeAlias target (N decision) の型解決ロジックを Type::ResolvedPath.args (GenericArgs) 再帰走査に統一し、own crate 型 (krate.paths lookup で crate_id == 0) のみ edge を引くように修正する。primitive (Type::Primitive) / generic 型パラメータ (Type::Generic) / 外部型への edge は生成しない。anonymous node (prim_* / generic_* / anon_*) 生成コードおよびそれらへの edge 生成コードを削除する (syn 不使用)。修正対象: render/entry_subgraph.rs (AC-20 の既存 edge 修正)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "1adc93a29cbcdfbec9c1ebff2cdd254de740f14c"
     }
   ],
   "plan": {
