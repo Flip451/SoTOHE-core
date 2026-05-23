@@ -26,6 +26,11 @@ Read `.harness/config/agent-profiles.json` `capabilities.reviewer`:
 - `capabilities.reviewer.fast_model` — used for `--round-type fast` (falls back to `capabilities.reviewer.model` if absent)
 - `capabilities.reviewer.model` — used for `--round-type final`
 
+Also read `capabilities.review-fix-lead` to resolve the fixer-loop provider (used by the Step 4 / Step 5 dispatch):
+- `capabilities.review-fix-lead.provider` — `claude` (default) launches the `review-fix-lead` subagent; `codex` launches the Codex fixer wrapper instead.
+- `capabilities.review-fix-lead.model` — the fixer model passed to the chosen provider. **When `provider: codex`, this field must also be set to a Codex-compatible model (consistent with the Codex models configured under `capabilities.reviewer`); leaving a Claude model name here will cause `codex exec --model` to receive an invalid (Claude) model name.**
+- If the `review-fix-lead` capability is absent, default to `provider: claude` (legacy behavior unchanged).
+
 ## Step 2: Determine required scopes
 
 ```
@@ -65,12 +70,23 @@ Constraints:
   `track/review-scope.json` (e.g., `plan-artifacts` → `track/review-prompts/plan-artifacts.md`)
   receive the policy reference automatically via `sotp review codex-local`.
 
-## Step 4: Launch review-fix-lead agents (parallel, fast round)
+## Step 4: Launch review-fix-lead fixers (parallel, fast round)
 
-For each `required` scope, launch one `review-fix-lead` subagent in parallel
-(`run_in_background: true`, `subagent_type: "review-fix-lead"`).
+For each `required` scope, launch one fixer in parallel (`run_in_background: true`),
+dispatching on `capabilities.review-fix-lead.provider` (resolved in Step 1):
 
-Agent prompt minimum content:
+- **`provider: claude`** (default) — launch a `review-fix-lead` subagent
+  (`subagent_type: "review-fix-lead"`). Use the prompt content below.
+- **`provider: codex`** — instead of the subagent, launch the Codex fixer wrapper via Bash:
+  `cargo make track-local-review-fix-codex -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --track-id {track-id} --round-type fast --reviewer-model {fast_model} --model {review-fix-lead.model} --scope-files "{scope-files}"`
+  The wrapper runs the same review → fix → re-review loop inside a `workspace-write` sandbox
+  (`.git` is read-only there, so the fixer edits files but cannot stage/commit), performs
+  launch-time smoke-tests, isolates credentials, and prints `completed` /
+  `blocked_cross_scope` / `failed` — the same status contract as the subagent. The Claude
+  subagent definition (`.claude/agents/review-fix-lead.md`) is unchanged and remains the
+  `provider: claude` path.
+
+Agent prompt minimum content (`provider: claude` path):
 
 - Track id, scope name, briefing path
 - `round_type: fast`, `model: {fast_model}`
@@ -99,9 +115,11 @@ Agent statuses:
 
 ## Step 5: Escalate to final round (per-scope, immediate)
 
-When a scope's fast agent reports `completed`, **immediately** launch a `review-fix-lead`
-subagent for the same scope with `round_type: final`, `model: {model}`. Do not wait for
-other scopes.
+When a scope's fast fixer reports `completed`, **immediately** launch the final round for the
+same scope (do not wait for other scopes), dispatching on `capabilities.review-fix-lead.provider`:
+
+- **`provider: claude`** — launch a `review-fix-lead` subagent with `round_type: final`, `model: {model}`.
+- **`provider: codex`** — run `cargo make track-local-review-fix-codex -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --track-id {track-id} --round-type final --reviewer-model {model} --model {review-fix-lead.model} --scope-files "{scope-files}"`.
 
 Agent status handling for the `final` agent:
 
