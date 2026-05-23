@@ -648,7 +648,11 @@ pub(super) fn emit_method_signature_edges(
 
 /// Collect all Ids that appear in `provided_trait_methods` across all trait impls
 /// in the given `krate`. Used as a safety guard in inherent method emission (CN-11).
-fn collect_provided_method_ids(krate: &rustdoc_types::Crate) -> HashSet<Id> {
+///
+/// Also used by `mod.rs` Pass 3a (method-signature edge collection for the depth-1
+/// overview) to skip provided methods from the signature walk (symmetric to
+/// `emit_inherent_methods`'s CN-11 guard).
+pub(super) fn collect_provided_method_ids(krate: &rustdoc_types::Crate) -> HashSet<Id> {
     let mut set = HashSet::new();
     for item in krate.index.values() {
         if let ItemEnum::Impl(impl_data) = &item.inner {

@@ -701,6 +701,187 @@ fn collect_entry_edge_pairs(baselines: &[BaselineDocument], layer: &str) -> Vec<
         }
     }
 
+    // -----------------------------------------------------------------------
+    // Pass 3: method-signature edges (T017 / AC-19 depth-1 path).
+    //
+    // Collect (src_rep_id, dst_type_rep_id) pairs from:
+    //   3a) Inherent method params/returns: from Impl items where
+    //       `trait_: None / blanket_impl: None / is_negative: false /
+    //       is_synthetic: false / for_: Type::ResolvedPath`.
+    //       src = the `for_` type's rep node id.
+    //   3b) Trait method params/returns: from Trait items' Function variants.
+    //       src = the Trait entry's rep node id.
+    //
+    // Type resolution uses `collect_resolved_node_ids_from_type` (same as Pass 1),
+    // which includes cross-crate within the same layer (unlike the depth-2 renderer
+    // which uses `collect_own_crate_node_ids_from_type` with crate_id == 0 only).
+    // This is correct for the depth-1 overview where any cross-cluster edge must be
+    // reported regardless of whether src and dst are in the same or different crates.
+    //
+    // No panics: all indexing via `.get()` / iterators.
+    // -----------------------------------------------------------------------
+    for doc in baselines {
+        if doc.layer.as_ref() != layer {
+            continue;
+        }
+        let krate = &doc.krate;
+        let own_crate_name = doc.crate_name.as_str();
+        let layer_str = doc.layer.as_ref();
+
+        // Pass 3a: inherent method param/return edges.
+        //
+        // Scan all Impl items. For each inherent impl (trait_: None, blanket_impl: None,
+        // is_negative: false, is_synthetic: false, for_: ResolvedPath), compute the
+        // src rep node id from `for_`, then for each Public, non-provided method item
+        // that is a Function, resolve param/return types to cross-cluster pairs.
+        //
+        // Guards applied (symmetric to `emit_inherent_methods` in impl_processor):
+        // - Visibility::Public only (CC-1): private helpers do not contribute to
+        //   the rendered API surface and must not inflate the depth-1 overview.
+        // - Provided-method skip (CN-11): method ids that appear as items in any
+        //   trait impl block of the same krate are provided methods; they must not
+        //   be double-counted as inherent method edges.
+        //
+        // Note on phantom source nodes: pairs whose src is absent from
+        // `node_cluster_map` (private types, non-rendered entries, etc.) are
+        // silently dropped by `render_overview_mermaid`'s `lookup_cluster` call
+        // (`None => continue`).  No phantom source node can enter the mermaid output.
+        let provided_method_ids = impl_processor::collect_provided_method_ids(krate);
+
+        for item in krate.index.values() {
+            let impl_data = match &item.inner {
+                ItemEnum::Impl(i) => i,
+                _ => continue,
+            };
+            // Only inherent impls (BB-4-fix1 / CN-11).
+            if impl_data.trait_.is_some()
+                || impl_data.blanket_impl.is_some()
+                || impl_data.is_negative
+                || impl_data.is_synthetic
+            {
+                continue;
+            }
+            // Only concrete for_ types (ResolvedPath).
+            let for_path = match &impl_data.for_ {
+                Type::ResolvedPath(p) => p,
+                _ => continue,
+            };
+            // Resolve the src rep node id from `for_` via krate.paths.
+            let src_rep_id: Option<String> = krate.paths.get(&for_path.id).and_then(|summary| {
+                // Use path[0] as crate name to handle cross-crate within same layer.
+                let src_crate = summary.path.first().map(|s| s.as_str()).unwrap_or(own_crate_name);
+                let module_path = module_path_from_summary(&summary.path);
+                let type_name = summary.path.last()?;
+                Some(type_rep_node_id(layer_str, src_crate, &module_path, type_name))
+            });
+            let src_rep_id = match src_rep_id {
+                Some(id) => id,
+                None => continue,
+            };
+
+            // Walk each method item in this inherent impl block.
+            for &method_id in &impl_data.items {
+                // Skip provided methods (CN-11 safety guard, symmetric to emit_inherent_methods).
+                if provided_method_ids.contains(&method_id) {
+                    continue;
+                }
+                let method_item = match krate.index.get(&method_id) {
+                    Some(m) => m,
+                    None => continue,
+                };
+                // Visibility filter (CC-1): Public only for inherent methods.
+                // Private helpers do not contribute to the rendered API surface.
+                if !matches!(method_item.visibility, rustdoc_types::Visibility::Public) {
+                    continue;
+                }
+                let fn_data = match &method_item.inner {
+                    ItemEnum::Function(f) => f,
+                    _ => continue,
+                };
+
+                // Collect param types.
+                for (_param_name, param_ty) in &fn_data.sig.inputs {
+                    for dst in collect_resolved_node_ids_from_type(param_ty, krate, layer_str) {
+                        pairs.push((src_rep_id.clone(), dst));
+                    }
+                }
+                // Collect return type.
+                if let Some(output_ty) = &fn_data.sig.output {
+                    for dst in collect_resolved_node_ids_from_type(output_ty, krate, layer_str) {
+                        pairs.push((src_rep_id.clone(), dst));
+                    }
+                }
+            }
+        }
+
+        // Pass 3b: trait method param/return edges.
+        //
+        // Scan all Trait items (own-crate, crate_id == 0, Public) in krate.index.
+        // For each Trait's Function items (H' decision), resolve param/return types.
+        // src = trait's rep node id.
+        for (id, item) in &krate.index {
+            // Own-crate items only (crate_id == 0, mirroring build_trait_index / CC-1).
+            if item.crate_id != 0 {
+                continue;
+            }
+            if !matches!(item.visibility, rustdoc_types::Visibility::Public) {
+                continue;
+            }
+            let trait_data = match &item.inner {
+                ItemEnum::Trait(t) => t,
+                _ => continue,
+            };
+            // Must be in krate.paths to compute the rep node id.
+            let summary = match krate.paths.get(id) {
+                Some(s) => s,
+                None => continue,
+            };
+            let module_path = module_path_from_summary(&summary.path);
+            let trait_name = match summary.path.last() {
+                Some(n) => n,
+                None => continue,
+            };
+            let src_rep_id = node_id_generator::trait_rep_node_id(
+                layer_str,
+                own_crate_name,
+                &module_path,
+                trait_name,
+            );
+
+            // Walk each method item in the trait definition (H' decision).
+            for &method_item_id in &trait_data.items {
+                let method_item = match krate.index.get(&method_item_id) {
+                    Some(m) => m,
+                    None => continue,
+                };
+                // CC-1 exception: trait methods use Visibility::Default — accepted.
+                if !matches!(
+                    method_item.visibility,
+                    rustdoc_types::Visibility::Public | rustdoc_types::Visibility::Default
+                ) {
+                    continue;
+                }
+                let fn_data = match &method_item.inner {
+                    ItemEnum::Function(f) => f,
+                    _ => continue,
+                };
+
+                // Collect param types.
+                for (_param_name, param_ty) in &fn_data.sig.inputs {
+                    for dst in collect_resolved_node_ids_from_type(param_ty, krate, layer_str) {
+                        pairs.push((src_rep_id.clone(), dst));
+                    }
+                }
+                // Collect return type.
+                if let Some(output_ty) = &fn_data.sig.output {
+                    for dst in collect_resolved_node_ids_from_type(output_ty, krate, layer_str) {
+                        pairs.push((src_rep_id.clone(), dst));
+                    }
+                }
+            }
+        }
+    }
+
     pairs
 }
 
@@ -2272,5 +2453,1018 @@ include_functions = true
                 }
             }
         }
+    }
+
+    // -----------------------------------------------------------------------
+    // T017: Pass 3 — method-signature edge walk (AC-19 depth-1 path)
+    //
+    // Tests for collect_entry_edge_pairs Pass 3a (inherent methods) and
+    // Pass 3b (trait methods). Verifies that method param/return types in
+    // own-crate (or cross-crate within same layer) produce cross-cluster pairs,
+    // and primitive/external types do not.
+    // -----------------------------------------------------------------------
+
+    // Helper: build a minimal rustdoc::Crate with a struct (in module_a) that has
+    // an inherent method whose parameter is a type from another module (module_b).
+    //
+    // Layout:
+    //   crate_name::module_a::Sender          (Struct)
+    //   crate_name::module_a::Sender::send()  (inherent method, param: &module_b::Receiver)
+    //   crate_name::module_b::Receiver        (Struct)
+    //
+    // This creates a cross-cluster dependency: module_a → module_b via method param.
+    fn make_crate_with_inherent_method_param(crate_name: &str) -> rustdoc_types::Crate {
+        use rustdoc_types::{
+            Crate, FunctionHeader, FunctionSignature, Generics, Id, Impl, Item, ItemEnum, ItemKind,
+            ItemSummary, Module, Path, Struct, StructKind, Target, Visibility,
+        };
+
+        let root_id = Id(0);
+        let sender_id = Id(1);
+        let receiver_id = Id(2);
+        let impl_id = Id(3);
+        let method_id = Id(4);
+
+        // Receiver type as a ResolvedPath (the method param type).
+        let receiver_path = rustdoc_types::Type::ResolvedPath(Path {
+            path: format!("{crate_name}::module_b::Receiver"),
+            id: receiver_id,
+            args: None,
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            Item {
+                id: root_id,
+                crate_id: 0,
+                name: Some(crate_name.to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![sender_id, receiver_id],
+                    is_stripped: false,
+                }),
+            },
+        );
+        // Sender struct in module_a.
+        index.insert(
+            sender_id,
+            Item {
+                id: sender_id,
+                crate_id: 0,
+                name: Some("Sender".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![impl_id],
+                }),
+            },
+        );
+        // Receiver struct in module_b.
+        index.insert(
+            receiver_id,
+            Item {
+                id: receiver_id,
+                crate_id: 0,
+                name: Some("Receiver".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![],
+                }),
+            },
+        );
+        // Inherent impl for Sender.
+        let sender_type = rustdoc_types::Type::ResolvedPath(Path {
+            path: format!("{crate_name}::module_a::Sender"),
+            id: sender_id,
+            args: None,
+        });
+        index.insert(
+            impl_id,
+            Item {
+                id: impl_id,
+                crate_id: 0,
+                name: None,
+                span: None,
+                visibility: Visibility::Default,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Impl(Impl {
+                    is_unsafe: false,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    provided_trait_methods: vec![],
+                    trait_: None,
+                    for_: sender_type,
+                    items: vec![method_id],
+                    is_negative: false,
+                    is_synthetic: false,
+                    blanket_impl: None,
+                }),
+            },
+        );
+        // Method `send` with param: Receiver.
+        index.insert(
+            method_id,
+            Item {
+                id: method_id,
+                crate_id: 0,
+                name: Some("send".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("receiver".to_string(), receiver_path)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            },
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(
+            sender_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "module_a".to_string(), "Sender".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        paths.insert(
+            receiver_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "module_b".to_string(), "Receiver".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        }
+    }
+
+    // Helper: build a crate where Sender has an inherent method whose RETURN type is Receiver.
+    fn make_crate_with_inherent_method_return(crate_name: &str) -> rustdoc_types::Crate {
+        use rustdoc_types::{
+            Crate, FunctionHeader, FunctionSignature, Generics, Id, Item, ItemEnum, ItemKind,
+            ItemSummary, Module, Path, Struct, StructKind, Target, Visibility,
+        };
+
+        let root_id = Id(0);
+        let sender_id = Id(1);
+        let receiver_id = Id(2);
+        let impl_id = Id(3);
+        let method_id = Id(4);
+
+        let receiver_path = rustdoc_types::Type::ResolvedPath(Path {
+            path: format!("{crate_name}::module_b::Receiver"),
+            id: receiver_id,
+            args: None,
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            Item {
+                id: root_id,
+                crate_id: 0,
+                name: Some(crate_name.to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![sender_id, receiver_id],
+                    is_stripped: false,
+                }),
+            },
+        );
+        index.insert(
+            sender_id,
+            Item {
+                id: sender_id,
+                crate_id: 0,
+                name: Some("Sender".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![impl_id],
+                }),
+            },
+        );
+        index.insert(
+            receiver_id,
+            Item {
+                id: receiver_id,
+                crate_id: 0,
+                name: Some("Receiver".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![],
+                }),
+            },
+        );
+        let sender_type = rustdoc_types::Type::ResolvedPath(Path {
+            path: format!("{crate_name}::module_a::Sender"),
+            id: sender_id,
+            args: None,
+        });
+        // Inherent impl for Sender with method returning Receiver.
+        index.insert(
+            impl_id,
+            Item {
+                id: impl_id,
+                crate_id: 0,
+                name: None,
+                span: None,
+                visibility: Visibility::Default,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Impl(rustdoc_types::Impl {
+                    is_unsafe: false,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    provided_trait_methods: vec![],
+                    trait_: None,
+                    for_: sender_type,
+                    items: vec![method_id],
+                    is_negative: false,
+                    is_synthetic: false,
+                    blanket_impl: None,
+                }),
+            },
+        );
+        // Method `build` returns Receiver.
+        index.insert(
+            method_id,
+            Item {
+                id: method_id,
+                crate_id: 0,
+                name: Some("build".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![],
+                        output: Some(receiver_path),
+                        is_c_variadic: false,
+                    },
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            },
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(
+            sender_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "module_a".to_string(), "Sender".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        paths.insert(
+            receiver_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "module_b".to_string(), "Receiver".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        }
+    }
+
+    // Helper: build a crate with a Trait (in module_a) that has a method
+    // whose param is a type from another module (module_b).
+    //
+    // Layout:
+    //   crate_name::module_a::MyTrait          (Trait)
+    //   crate_name::module_a::MyTrait::handle() (method, param: module_b::Event)
+    //   crate_name::module_b::Event             (Struct)
+    fn make_crate_with_trait_method_param(crate_name: &str) -> rustdoc_types::Crate {
+        use rustdoc_types::{
+            Crate, FunctionHeader, FunctionSignature, Generics, Id, Item, ItemEnum, ItemKind,
+            ItemSummary, Module, Path, Struct, StructKind, Target, Trait, Visibility,
+        };
+
+        let root_id = Id(0);
+        let trait_id = Id(1);
+        let event_id = Id(2);
+        let method_id = Id(3);
+
+        let event_path = rustdoc_types::Type::ResolvedPath(Path {
+            path: format!("{crate_name}::module_b::Event"),
+            id: event_id,
+            args: None,
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            Item {
+                id: root_id,
+                crate_id: 0,
+                name: Some(crate_name.to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![trait_id, event_id],
+                    is_stripped: false,
+                }),
+            },
+        );
+        // Trait in module_a.
+        index.insert(
+            trait_id,
+            Item {
+                id: trait_id,
+                crate_id: 0,
+                name: Some("MyTrait".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Trait(Trait {
+                    is_auto: false,
+                    is_unsafe: false,
+                    is_dyn_compatible: true,
+                    items: vec![method_id],
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    bounds: vec![],
+                    implementations: vec![],
+                }),
+            },
+        );
+        // Event struct in module_b.
+        index.insert(
+            event_id,
+            Item {
+                id: event_id,
+                crate_id: 0,
+                name: Some("Event".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![],
+                }),
+            },
+        );
+        // Method `handle` with param: Event.
+        index.insert(
+            method_id,
+            Item {
+                id: method_id,
+                crate_id: 0,
+                name: Some("handle".to_string()),
+                span: None,
+                visibility: Visibility::Default, // trait method: Default visibility
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("event".to_string(), event_path)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: false,
+                }),
+            },
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(
+            trait_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "module_a".to_string(), "MyTrait".to_string()],
+                kind: ItemKind::Trait,
+            },
+        );
+        paths.insert(
+            event_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec![crate_name.to_string(), "module_b".to_string(), "Event".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        }
+    }
+
+    // T017 / AC-19 depth-1: inherent method with own-crate param produces cross-cluster pair.
+    //
+    // Sender (module_a) has an inherent method `send(receiver: Receiver)` where Receiver is
+    // in module_b. Both are in the same layer. The pair (Sender rep, Receiver rep) must appear
+    // in the pairs returned by collect_entry_edge_pairs.
+    #[test]
+    fn test_collect_entry_edge_pairs_inherent_method_param_produces_pair() {
+        let krate = make_crate_with_inherent_method_param("domain");
+        let baseline = BaselineDocument::new(
+            domain::tddd::layer_id::LayerId::try_new("domain").unwrap(),
+            CrateName::new("domain").unwrap(),
+            krate,
+        );
+
+        let pairs = collect_entry_edge_pairs(&[baseline], "domain");
+
+        // Sender rep node id (module_a).
+        let sender_rep =
+            node_id_generator::type_rep_node_id("domain", "domain", "module_a", "Sender");
+        // Receiver rep node id (module_b).
+        let receiver_rep =
+            node_id_generator::type_rep_node_id("domain", "domain", "module_b", "Receiver");
+
+        assert!(
+            pairs.iter().any(|(src, dst)| src == &sender_rep && dst == &receiver_rep),
+            "inherent method param must produce (Sender, Receiver) pair; pairs: {pairs:?}\nsender_rep={sender_rep}\nreceiver_rep={receiver_rep}"
+        );
+    }
+
+    // T017 / AC-19 depth-1: inherent method with own-crate return produces cross-cluster pair.
+    #[test]
+    fn test_collect_entry_edge_pairs_inherent_method_return_produces_pair() {
+        let krate = make_crate_with_inherent_method_return("domain");
+        let baseline = BaselineDocument::new(
+            domain::tddd::layer_id::LayerId::try_new("domain").unwrap(),
+            CrateName::new("domain").unwrap(),
+            krate,
+        );
+
+        let pairs = collect_entry_edge_pairs(&[baseline], "domain");
+
+        let sender_rep =
+            node_id_generator::type_rep_node_id("domain", "domain", "module_a", "Sender");
+        let receiver_rep =
+            node_id_generator::type_rep_node_id("domain", "domain", "module_b", "Receiver");
+
+        assert!(
+            pairs.iter().any(|(src, dst)| src == &sender_rep && dst == &receiver_rep),
+            "inherent method return must produce (Sender, Receiver) pair; pairs: {pairs:?}"
+        );
+    }
+
+    // T017 / AC-19 depth-1: trait method with own-crate param produces cross-cluster pair.
+    //
+    // MyTrait (module_a) has a method `handle(event: Event)` where Event is in module_b.
+    // The pair (MyTrait rep, Event rep) must appear in the pairs.
+    #[test]
+    fn test_collect_entry_edge_pairs_trait_method_param_produces_pair() {
+        let krate = make_crate_with_trait_method_param("domain");
+        let baseline = BaselineDocument::new(
+            domain::tddd::layer_id::LayerId::try_new("domain").unwrap(),
+            CrateName::new("domain").unwrap(),
+            krate,
+        );
+
+        let pairs = collect_entry_edge_pairs(&[baseline], "domain");
+
+        let trait_rep =
+            node_id_generator::trait_rep_node_id("domain", "domain", "module_a", "MyTrait");
+        let event_rep =
+            node_id_generator::type_rep_node_id("domain", "domain", "module_b", "Event");
+
+        assert!(
+            pairs.iter().any(|(src, dst)| src == &trait_rep && dst == &event_rep),
+            "trait method param must produce (MyTrait, Event) pair; pairs: {pairs:?}\ntrait_rep={trait_rep}\nevent_rep={event_rep}"
+        );
+    }
+
+    // T017 / AC-19 depth-1: inherent method with primitive param produces no pair.
+    //
+    // If the method param is a primitive type (u32, bool, etc.), no pair should be produced
+    // by Pass 3 (AC-20: primitive / generic / external types produce no edge).
+    #[test]
+    fn test_collect_entry_edge_pairs_inherent_method_primitive_param_no_pair() {
+        use rustdoc_types::{
+            Crate, FunctionHeader, FunctionSignature, Generics, Id, Impl, Item, ItemEnum, ItemKind,
+            ItemSummary, Module, Struct, StructKind, Target, Visibility,
+        };
+
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let impl_id = Id(2);
+        let method_id = Id(3);
+
+        // Method param is a primitive type (u32) — no pair should be produced.
+        let prim_ty = rustdoc_types::Type::Primitive("u32".to_string());
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            Item {
+                id: root_id,
+                crate_id: 0,
+                name: Some("domain".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id],
+                    is_stripped: false,
+                }),
+            },
+        );
+        index.insert(
+            struct_id,
+            Item {
+                id: struct_id,
+                crate_id: 0,
+                name: Some("Counter".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![impl_id],
+                }),
+            },
+        );
+        let struct_ty = rustdoc_types::Type::ResolvedPath(rustdoc_types::Path {
+            path: "domain::stats::Counter".to_string(),
+            id: struct_id,
+            args: None,
+        });
+        index.insert(
+            impl_id,
+            Item {
+                id: impl_id,
+                crate_id: 0,
+                name: None,
+                span: None,
+                visibility: Visibility::Default,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Impl(Impl {
+                    is_unsafe: false,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    provided_trait_methods: vec![],
+                    trait_: None,
+                    for_: struct_ty,
+                    items: vec![method_id],
+                    is_negative: false,
+                    is_synthetic: false,
+                    blanket_impl: None,
+                }),
+            },
+        );
+        index.insert(
+            method_id,
+            Item {
+                id: method_id,
+                crate_id: 0,
+                name: Some("increment".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("amount".to_string(), prim_ty)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            },
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(
+            struct_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["domain".to_string(), "stats".to_string(), "Counter".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let krate = Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+
+        let baseline = BaselineDocument::new(
+            domain::tddd::layer_id::LayerId::try_new("domain").unwrap(),
+            CrateName::new("domain").unwrap(),
+            krate,
+        );
+
+        let pairs = collect_entry_edge_pairs(&[baseline], "domain");
+
+        // Primitive param must not produce any pair from Pass 3.
+        // (Pass 1 and Pass 2 also produce nothing for this fixture.)
+        let counter_rep =
+            node_id_generator::type_rep_node_id("domain", "domain", "stats", "Counter");
+        // No pair where src = counter_rep AND dst is any prim_* node.
+        let has_prim_pair = pairs.iter().any(|(src, dst)| {
+            src == &counter_rep && (dst.starts_with("prim_") || dst.contains("u32"))
+        });
+        assert!(
+            !has_prim_pair,
+            "primitive param must not produce a pair; pairs from counter: {:?}",
+            pairs.iter().filter(|(src, _)| src == &counter_rep).collect::<Vec<_>>()
+        );
+    }
+
+    // T017 / AC-19 depth-1: inherent method with negative impl is skipped.
+    //
+    // is_negative: true → the Impl must be completely skipped in Pass 3a.
+    #[test]
+    fn test_collect_entry_edge_pairs_inherent_method_negative_impl_skipped() {
+        use rustdoc_types::{
+            Crate, FunctionHeader, FunctionSignature, Generics, Id, Impl, Item, ItemEnum, ItemKind,
+            ItemSummary, Module, Path, Struct, StructKind, Target, Visibility,
+        };
+
+        let root_id = Id(0);
+        let sender_id = Id(1);
+        let receiver_id = Id(2);
+        let impl_id = Id(3);
+        let method_id = Id(4);
+
+        let receiver_path = rustdoc_types::Type::ResolvedPath(Path {
+            path: "domain::module_b::Receiver".to_string(),
+            id: receiver_id,
+            args: None,
+        });
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            Item {
+                id: root_id,
+                crate_id: 0,
+                name: Some("domain".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![sender_id, receiver_id],
+                    is_stripped: false,
+                }),
+            },
+        );
+        index.insert(
+            sender_id,
+            Item {
+                id: sender_id,
+                crate_id: 0,
+                name: Some("Sender".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![impl_id],
+                }),
+            },
+        );
+        index.insert(
+            receiver_id,
+            Item {
+                id: receiver_id,
+                crate_id: 0,
+                name: Some("Receiver".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    impls: vec![],
+                }),
+            },
+        );
+        let sender_type = rustdoc_types::Type::ResolvedPath(Path {
+            path: "domain::module_a::Sender".to_string(),
+            id: sender_id,
+            args: None,
+        });
+        // is_negative: true → must be skipped.
+        index.insert(
+            impl_id,
+            Item {
+                id: impl_id,
+                crate_id: 0,
+                name: None,
+                span: None,
+                visibility: Visibility::Default,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Impl(Impl {
+                    is_unsafe: false,
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    provided_trait_methods: vec![],
+                    trait_: None,
+                    for_: sender_type,
+                    items: vec![method_id],
+                    is_negative: true, // NEGATIVE — must skip
+                    is_synthetic: false,
+                    blanket_impl: None,
+                }),
+            },
+        );
+        index.insert(
+            method_id,
+            Item {
+                id: method_id,
+                crate_id: 0,
+                name: Some("send".to_string()),
+                span: None,
+                visibility: Visibility::Public,
+                docs: None,
+                links: HashMap::new(),
+                attrs: vec![],
+                deprecation: None,
+                inner: ItemEnum::Function(rustdoc_types::Function {
+                    sig: FunctionSignature {
+                        inputs: vec![("receiver".to_string(), receiver_path)],
+                        output: None,
+                        is_c_variadic: false,
+                    },
+                    generics: Generics { params: vec![], where_predicates: vec![] },
+                    header: FunctionHeader {
+                        is_unsafe: false,
+                        is_const: false,
+                        is_async: false,
+                        abi: rustdoc_types::Abi::Rust,
+                    },
+                    has_body: true,
+                }),
+            },
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(
+            sender_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["domain".to_string(), "module_a".to_string(), "Sender".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        paths.insert(
+            receiver_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["domain".to_string(), "module_b".to_string(), "Receiver".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let krate = Crate {
+            root: root_id,
+            crate_version: None,
+            includes_private: false,
+            index,
+            paths,
+            external_crates: HashMap::new(),
+            format_version: rustdoc_types::FORMAT_VERSION,
+            target: Target { triple: String::new(), target_features: vec![] },
+        };
+
+        let baseline = BaselineDocument::new(
+            domain::tddd::layer_id::LayerId::try_new("domain").unwrap(),
+            CrateName::new("domain").unwrap(),
+            krate,
+        );
+
+        let pairs = collect_entry_edge_pairs(&[baseline], "domain");
+
+        // Negative impl must be completely skipped — no pair from Pass 3a.
+        let sender_rep =
+            node_id_generator::type_rep_node_id("domain", "domain", "module_a", "Sender");
+        let receiver_rep =
+            node_id_generator::type_rep_node_id("domain", "domain", "module_b", "Receiver");
+        assert!(
+            !pairs.iter().any(|(src, dst)| src == &sender_rep && dst == &receiver_rep),
+            "negative impl must be skipped in Pass 3a; pairs: {pairs:?}"
+        );
+    }
+
+    // T017 / AC-19 depth-1: method-signature cross-cluster edges appear in depth-1 overview.
+    //
+    // End-to-end test: Sender (module_a) has inherent method with param Receiver (module_b).
+    // render_overview_mermaid must contain a cross-cluster edge module_a → module_b.
+    #[test]
+    fn test_render_overview_inherent_method_param_cross_cluster_edge_emitted() {
+        let krate = make_crate_with_inherent_method_param("domain");
+        let baseline = BaselineDocument::new(
+            domain::tddd::layer_id::LayerId::try_new("domain").unwrap(),
+            CrateName::new("domain").unwrap(),
+            krate,
+        );
+        let layer = domain::tddd::layer_id::LayerId::try_new("domain").unwrap();
+        let style = minimal_style();
+        let output = render_overview_mermaid(&[baseline], &layer, &style).unwrap();
+
+        // Extract mermaid body to avoid matching HTML comment arrows.
+        let fence_open = "```mermaid\n";
+        let fence_start = output.find(fence_open).unwrap() + fence_open.len();
+        let fence_end = output[fence_start..]
+            .find("\n```")
+            .map(|i| fence_start + i + 1)
+            .unwrap_or(output.len());
+        let mermaid_body = &output[fence_start..fence_end];
+
+        // Both cluster nodes must be present.
+        assert!(
+            mermaid_body.contains("domain_module_a"),
+            "domain_module_a cluster node must appear; body:\n{mermaid_body}"
+        );
+        assert!(
+            mermaid_body.contains("domain_module_b"),
+            "domain_module_b cluster node must appear; body:\n{mermaid_body}"
+        );
+        // A cross-cluster edge must connect module_a → module_b.
+        assert!(
+            mermaid_body.contains("domain_module_a --> domain_module_b"),
+            "cross-cluster edge domain_module_a --> domain_module_b must be present (method param); body:\n{mermaid_body}"
+        );
+    }
+
+    // T017 / AC-19 depth-1: trait method param cross-cluster edge appears in depth-1 overview.
+    #[test]
+    fn test_render_overview_trait_method_param_cross_cluster_edge_emitted() {
+        let krate = make_crate_with_trait_method_param("domain");
+        let baseline = BaselineDocument::new(
+            domain::tddd::layer_id::LayerId::try_new("domain").unwrap(),
+            CrateName::new("domain").unwrap(),
+            krate,
+        );
+        let layer = domain::tddd::layer_id::LayerId::try_new("domain").unwrap();
+        let style = minimal_style();
+        let output = render_overview_mermaid(&[baseline], &layer, &style).unwrap();
+
+        let fence_open = "```mermaid\n";
+        let fence_start = output.find(fence_open).unwrap() + fence_open.len();
+        let fence_end = output[fence_start..]
+            .find("\n```")
+            .map(|i| fence_start + i + 1)
+            .unwrap_or(output.len());
+        let mermaid_body = &output[fence_start..fence_end];
+
+        // Both clusters must appear.
+        assert!(
+            mermaid_body.contains("domain_module_a"),
+            "domain_module_a cluster node must appear; body:\n{mermaid_body}"
+        );
+        assert!(
+            mermaid_body.contains("domain_module_b"),
+            "domain_module_b cluster node must appear; body:\n{mermaid_body}"
+        );
+        // Cross-cluster edge from module_a (where Trait lives) → module_b (where Event lives).
+        assert!(
+            mermaid_body.contains("domain_module_a --> domain_module_b"),
+            "cross-cluster edge domain_module_a --> domain_module_b must be present (trait method param); body:\n{mermaid_body}"
+        );
     }
 }
