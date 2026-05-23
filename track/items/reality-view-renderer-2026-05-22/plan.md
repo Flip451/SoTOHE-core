@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
 
-## Tasks (16/17 resolved)
+## Tasks (17/17 resolved)
 
 ### S1 — Domain layer: 3 port + 3 error type + BaselineDocument
 
@@ -109,4 +109,4 @@
 
 - [x] **T015**: adapter 内: method edge 実装 — inherent method (BB: entry subgraph 内包) および Trait method (H': Trait subgraph 内包) の各 method node から、引数の型へ method_param edge、返り値の型へ method_returns edge を引く。FunctionSignature.inputs / output を走査し、own crate 型 (krate.paths lookup で crate_id == 0) のみ entry subgraph へ edge を引く。型解決は Type::ResolvedPath.args (GenericArgs) の再帰走査で行う (syn 不使用)。method node が引数・返り値を持たない場合は edge なし。edge スタイルは設定ファイル [edge.method_param] / [edge.method_returns] を参照する。修正対象: render/entry_subgraph.rs / render/impl_processor.rs (AC-19, AC-20 の method 経路) (`6fde3a59a49786e5779cb1b69bd2edc268d112fa`)
 - [x] **T016**: adapter 内: 既存 edge の型解決を ResolvedPath.args 再帰に変更 — struct field (K decision) / enum variant payload (H decision) / TypeAlias target (N decision) の型解決ロジックを Type::ResolvedPath.args (GenericArgs) 再帰走査に統一し、own crate 型 (krate.paths lookup で crate_id == 0) のみ edge を引くように修正する。primitive (Type::Primitive) / generic 型パラメータ (Type::Generic) / 外部型への edge は生成しない。anonymous node (prim_* / generic_* / anon_*) 生成コードおよびそれらへの edge 生成コードを削除する (syn 不使用)。修正対象: render/entry_subgraph.rs (AC-20 の既存 edge 修正) (`1adc93a29cbcdfbec9c1ebff2cdd254de740f14c`)
-- [~] **T017**: adapter 内: depth-1 overview の edge collector `collect_entry_edge_pairs` (render/mod.rs) に method-signature edge walk (Pass 3) を追加する — inherent method (Impl items: trait_:None / blanket:None / non-negative / non-synthetic) および Trait method (Trait items の Function variant) の FunctionSignature.inputs / output を既存の `collect_resolved_node_ids_from_type` で own crate 型解決し、(src_rep_id, dst_type_rep_id) の cross-cluster pair を生成して既存の cross-cluster フィルタに流す。depth-2 側 (impl_processor の emit_method_signature_edges) のロジックを参照して再利用する。catalogue 宣言型 (BaselineGraphRenderer) は不変。修正対象: render/mod.rs のみ (AC-19 depth-1 経路)
+- [x] **T017**: adapter 内: depth-1 overview の edge collector `collect_entry_edge_pairs` (render/mod.rs) に method-signature edge walk (Pass 3) を追加する — inherent method (Impl items: trait_:None / blanket:None / non-negative / non-synthetic) および Trait method (Trait items の Function variant) の FunctionSignature.inputs / output を既存の `collect_resolved_node_ids_from_type` で own crate 型解決し、(src_rep_id, dst_type_rep_id) の cross-cluster pair を生成して既存の cross-cluster フィルタに流す。depth-2 側 (impl_processor の emit_method_signature_edges) のロジックを参照して再利用する。catalogue 宣言型 (BaselineGraphRenderer) は不変。修正対象: render/mod.rs のみ (AC-19 depth-1 経路) (`572013d366f7a1bc6be5558ba6028e4a9fd855a5`)

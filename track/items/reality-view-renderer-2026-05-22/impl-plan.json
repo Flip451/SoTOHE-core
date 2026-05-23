@@ -100,7 +100,8 @@
     {
       "id": "T017",
       "description": "adapter 内: depth-1 overview の edge collector `collect_entry_edge_pairs` (render/mod.rs) に method-signature edge walk (Pass 3) を追加する — inherent method (Impl items: trait_:None / blanket:None / non-negative / non-synthetic) および Trait method (Trait items の Function variant) の FunctionSignature.inputs / output を既存の `collect_resolved_node_ids_from_type` で own crate 型解決し、(src_rep_id, dst_type_rep_id) の cross-cluster pair を生成して既存の cross-cluster フィルタに流す。depth-2 側 (impl_processor の emit_method_signature_edges) のロジックを参照して再利用する。catalogue 宣言型 (BaselineGraphRenderer) は不変。修正対象: render/mod.rs のみ (AC-19 depth-1 経路)",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "572013d366f7a1bc6be5558ba6028e4a9fd855a5"
     }
   ],
   "plan": {
