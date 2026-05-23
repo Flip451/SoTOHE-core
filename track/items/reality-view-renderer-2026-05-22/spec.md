@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 63, yellow: 0, red: 0 }
+signals: { blue: 65, yellow: 0, red: 0 }
 ---
 
 # reality-view renderer の rustdoc_types::Crate 入力対応 (v3 schema 移行)
@@ -81,6 +81,8 @@ signals: { blue: 63, yellow: 0, red: 0 }
 - [ ] [AC-16] 2 層構成 / 3 層構成 / 独自層名構成の fixture で renderer が正常に動作し、subgraph label に層名がハードコードされていないことを unit test で確認する (layer-agnostic 不変条件の検証) [adr: knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#§4 layer-agnostic 不変条件の継承] [tasks: T012]
 - [ ] [AC-17] blanket 本体 (blanket_impl: None + for_: Type::Generic) が対象 Trait の subgraph 内/近傍に表示される。blanket_impl: Some(_) (展開コピー) は skip され重複表示が発生しない [adr: knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#BB: rustdoc Impl Item の処理 (採択: BB-4-fix1 + blanket 本体 a 案)] [tasks: T008]
 - [ ] [AC-18] `cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全て pass する。新規実装 (BaselineGraphRenderer port + adapter / BaselineDocument / 設定ファイル読み込み / depth 1/2 renderer) の unit test がすべて pass する [adr: knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#良い影響] [tasks: T003, T012]
+- [ ] [AC-19] Inherent method (BB: entry subgraph 内包) および Trait method (H': Trait subgraph 内包) の各 method node から、引数の型へ `method_param` edge、返り値の型へ `method_returns` edge を描く。edge の矢印スタイルは設定ファイル `[edge.method_param]` / `[edge.method_returns]` で定義する。method node が引数・返り値を持たない場合は edge なし [adr: knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#H': Trait method の表現 (Contract Map H' を継承), knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#L: 設定ファイル schema (採択: Reality View 専用ファイル), knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#BB: rustdoc Impl Item の処理 (採択: BB-4-fix1 + blanket 本体 a 案)] [tasks: T015]
+- [ ] [AC-20] field / enum variant payload / TypeAlias target / method param / method return の型に own crate のネストした型が含まれる場合 (例: `Vec<TrackId>` の `TrackId`、`Option<Foo>` の `Foo`)、`rustdoc_types::Type::ResolvedPath.args` を再帰的に辿って leaf の own crate 型を解決し、その entry subgraph へ edge を引く。primitive (`bool` / `u32` 等) / generic 型パラメータ (`T` 等) / own crate に対応 entry subgraph がない外部型 (workspace 外) には edge を引かない。anonymous node (`prim_*` / `generic_*` / `anon_*`) を生成して edge を引く実装は不正とする。syn は使わない (rustdoc `Type` は構造化済みのため、`Type::ResolvedPath.args` の再帰走査で抽出する) [adr: knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#E: renderer の配置層 (Contract Map E を継承、ただし syn は不要), knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#K: struct fields の表現 (Contract Map K を継承), knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#H: enum variant node 化 + payload edge (Contract Map H を継承), knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#H': Trait method の表現 (Contract Map H' を継承), knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md#N: TypeAlias.target の表現 (Contract Map N を継承)] [tasks: T015, T016]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/hexagonal-architecture.md#Layer Dependencies
@@ -93,5 +95,5 @@ signals: { blue: 63, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 63  🟡 0  🔴 0
+🔵 65  🟡 0  🔴 0
 

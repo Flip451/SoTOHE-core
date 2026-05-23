@@ -702,6 +702,50 @@
           "anchor": "良い影響"
         }
       ]
+    },
+    {
+      "id": "AC-19",
+      "text": "Inherent method (BB: entry subgraph 内包) および Trait method (H': Trait subgraph 内包) の各 method node から、引数の型へ `method_param` edge、返り値の型へ `method_returns` edge を描く。edge の矢印スタイルは設定ファイル `[edge.method_param]` / `[edge.method_returns]` で定義する。method node が引数・返り値を持たない場合は edge なし",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "H': Trait method の表現 (Contract Map H' を継承)"
+        },
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "L: 設定ファイル schema (採択: Reality View 専用ファイル)"
+        },
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "BB: rustdoc Impl Item の処理 (採択: BB-4-fix1 + blanket 本体 a 案)"
+        }
+      ]
+    },
+    {
+      "id": "AC-20",
+      "text": "field / enum variant payload / TypeAlias target / method param / method return の型に own crate のネストした型が含まれる場合 (例: `Vec<TrackId>` の `TrackId`、`Option<Foo>` の `Foo`)、`rustdoc_types::Type::ResolvedPath.args` を再帰的に辿って leaf の own crate 型を解決し、その entry subgraph へ edge を引く。primitive (`bool` / `u32` 等) / generic 型パラメータ (`T` 等) / own crate に対応 entry subgraph がない外部型 (workspace 外) には edge を引かない。anonymous node (`prim_*` / `generic_*` / `anon_*`) を生成して edge を引く実装は不正とする。syn は使わない (rustdoc `Type` は構造化済みのため、`Type::ResolvedPath.args` の再帰走査で抽出する)",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "E: renderer の配置層 (Contract Map E を継承、ただし syn は不要)"
+        },
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "K: struct fields の表現 (Contract Map K を継承)"
+        },
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "H: enum variant node 化 + payload edge (Contract Map H を継承)"
+        },
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "H': Trait method の表現 (Contract Map H' を継承)"
+        },
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "N: TypeAlias.target の表現 (Contract Map N を継承)"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -731,7 +775,7 @@
     }
   ],
   "signals": {
-    "blue": 63,
+    "blue": 65,
     "yellow": 0,
     "red": 0
   }
