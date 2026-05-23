@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:344fb695dcd95e55879a6195e424763a22f65494cef5d2e8abc4ea99ca5f9ef0",
+          "at": "2026-05-23T10:11:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 treats Codex's `.git` read-only sandbox as enough to drop post-run scope-violation validation, but that protection only prevents staging/commit/branch writes. The same plan gives Codex shell-level file editing over the workspace and only prompt-injects the scope list, then has the trusted orchestrator commit afterward; out-of-scope working-tree edits could therefore still be produced and later recorded. The ADR should not remove scope-diff validation on the basis of `.git` protection alone.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
+              "line": 65,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:344fb695dcd95e55879a6195e424763a22f65494cef5d2e8abc4ea99ca5f9ef0",
+          "at": "2026-05-23T10:13:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 relies on a launch-time smoke-test as the replacement for post-run validation, but the specified checks only assert that `workspace-write` is requested and that the CLI version is in an allowed range. They do not actually verify the runtime invariant that `.git` is read-only, while later passages both admit the guarantee can break if the smoke-test misses a behavior change and say the D3 smoke-test will detect that condition. This leaves the safety gate internally inconsistent: either the smoke-test must include an actual `.git` write-failure probe, or the ADR should stop claiming D3 detects loss of the sandbox guarantee.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:72d8860cb1b5bf1883a234cce4ef41c4d792d70c012e33383fe1268a3fd0bc70",
+          "at": "2026-05-23T10:16:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 claims scope-boundary compliance is guaranteed by the briefing contract while making post-run scope-diff validation optional, but the same section acknowledges that Codex can edit any file in the workspace. A prompt-only contract plus a possible pre-commit review does not enforce that out-of-scope working-tree edits cannot be recorded by the orchestrator, so the plan either needs a mandatory scope check before commit or must stop treating scope containment as guaranteed.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
+              "line": 68,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:ecbab7db06beda8094390dd7fdeb8284af58da345385d5605264c02a775c48d2",
+          "at": "2026-05-23T10:18:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 claims Codex workspace-write `.git` read-only protection structurally prevents `push` along with stage/commit, but push is a remote write and is not covered by the cited empirical result, which only demonstrates local `.git` mutations such as `git add` failing. Credential isolation is therefore not merely defense-in-depth for push; it is part of the required guarantee. The plan should separate local git mutation prevention from publish prevention so implementers do not rely on `.git` read-only as a push guard.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-1848-review-fix-lead-codex-migration.md",
+              "line": 67,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:b65094aacab9eb278a0d0fcd57a71eb4d829b92d80bce8bbe3888abe59a989d3",
+          "at": "2026-05-23T10:20:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c494ef9b2f3cabd7eeda383989d45d1bdfb3aa66d4fa88b5fd6695775367b15",
+          "at": "2026-05-23T10:22:34Z"
+        }
+      ]
+    }
+  }
+}

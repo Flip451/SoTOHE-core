@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "review-fix-lead-codex-option-2026-05-23",
+  "title": "review-fix-lead の provider を選択可能にする (Claude デフォルト、Codex オプション)",
+  "branch": "track/review-fix-lead-codex-option-2026-05-23",
+  "created_at": "2026-05-23T10:05:32Z",
+  "updated_at": "2026-05-23T10:05:32Z"
+}
