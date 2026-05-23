@@ -447,10 +447,15 @@ fn lookup_cluster<'a>(
 /// - **Trait impl edges** (O-r1 / BB-4-fix1 / J decision): type `-.impl.->` trait edges,
 ///   excluding negative, synthetic, and blanket impls.
 ///
-/// Cross-crate edges within the same layer are resolved correctly by using the crate name
-/// derived from the path (path[0]) rather than the source crate name.  This ensures that
-/// a type in cluster A with a field in cluster B (different crate, same layer) produces a
-/// cross-cluster edge even though `crate_id > 0` in the source rustdoc document.
+/// **T016 / AC-20**: type resolution for field / alias / payload edges now uses recursive
+/// `ResolvedPath.args` traversal (see [`collect_resolved_node_ids_from_type`]).
+/// `Type::Primitive` / `Type::Generic` / types absent from `krate.paths` produce no pairs.
+/// Anonymous nodes (`prim_*` / `generic_*` / `anon_*`) are never generated.
+///
+/// Cross-crate edges within the same layer are resolved correctly: `collect_resolved_node_ids_from_type`
+/// uses `summary.path[0]` as the target crate name (not crate_id == 0 only), so a type
+/// in cluster A with a field in cluster B (different crate, same layer) still produces a
+/// cross-cluster edge.
 ///
 /// Returns a vec of (src_node_id, dst_node_id) pairs.  Callers filter for cross-cluster.
 ///
@@ -504,7 +509,7 @@ fn collect_entry_edge_pairs(baselines: &[BaselineDocument], layer: &str) -> Vec<
             None => continue,
         };
 
-        // Collect outgoing edge targets based on item kind.
+        // Collect outgoing edge targets based on item kind (T016 / AC-20: recursive resolution).
         match &item.inner {
             ItemEnum::Struct(s) => {
                 // K decision: struct fields.
@@ -521,8 +526,11 @@ fn collect_entry_edge_pairs(baselines: &[BaselineDocument], layer: &str) -> Vec<
                 for field_id in field_ids {
                     if let Some(field_item) = krate.index.get(&field_id) {
                         if let ItemEnum::StructField(field_ty) = &field_item.inner {
-                            let dst = resolve_type_node_id(field_ty, krate, layer_str);
-                            pairs.push((src.clone(), dst));
+                            for dst in
+                                collect_resolved_node_ids_from_type(field_ty, krate, layer_str)
+                            {
+                                pairs.push((src.clone(), dst));
+                            }
                         }
                     }
                 }
@@ -540,10 +548,11 @@ fn collect_entry_edge_pairs(baselines: &[BaselineDocument], layer: &str) -> Vec<
                                                 if let ItemEnum::StructField(field_ty) =
                                                     &field_item.inner
                                                 {
-                                                    let dst = resolve_type_node_id(
+                                                    for dst in collect_resolved_node_ids_from_type(
                                                         field_ty, krate, layer_str,
-                                                    );
-                                                    pairs.push((src.clone(), dst));
+                                                    ) {
+                                                        pairs.push((src.clone(), dst));
+                                                    }
                                                 }
                                             }
                                         }
@@ -556,10 +565,11 @@ fn collect_entry_edge_pairs(baselines: &[BaselineDocument], layer: &str) -> Vec<
                                                 if let ItemEnum::StructField(field_ty) =
                                                     &field_item.inner
                                                 {
-                                                    let dst = resolve_type_node_id(
+                                                    for dst in collect_resolved_node_ids_from_type(
                                                         field_ty, krate, layer_str,
-                                                    );
-                                                    pairs.push((src.clone(), dst));
+                                                    ) {
+                                                        pairs.push((src.clone(), dst));
+                                                    }
                                                 }
                                             }
                                         }
@@ -572,9 +582,10 @@ fn collect_entry_edge_pairs(baselines: &[BaselineDocument], layer: &str) -> Vec<
                 }
             }
             ItemEnum::TypeAlias(ta) => {
-                // N decision: alias target.
-                let dst = resolve_type_node_id(&ta.type_, krate, layer_str);
-                pairs.push((src.clone(), dst));
+                // N decision: alias target(s).
+                for dst in collect_resolved_node_ids_from_type(&ta.type_, krate, layer_str) {
+                    pairs.push((src.clone(), dst));
+                }
             }
             _ => {}
         }
@@ -693,51 +704,121 @@ fn collect_entry_edge_pairs(baselines: &[BaselineDocument], layer: &str) -> Vec<
     pairs
 }
 
-/// Resolve a rustdoc `Type` to a mermaid node id for edge target identification.
+/// Collect representative node ids for all **resolved** (own-crate or cross-crate within
+/// the same layer) types referenced directly or nested inside generic arguments in `ty`.
 ///
-/// This is a style-free version of the logic in `entry_subgraph::field_type_node_id`,
-/// extended to handle cross-crate types within the same layer.
+/// **T016 / AC-20** — replaces the old `resolve_type_node_id` single-target helper.  The
+/// key differences from the depth-2 `collect_own_crate_node_ids_from_type` (in
+/// `impl_processor`) are:
 ///
-/// For a `ResolvedPath` target: we use the crate name derived from `summary.path[0]` in
-/// `krate.paths`, rather than the source document's crate name.  This works for both same-crate
-/// and cross-crate targets: same-crate targets have `path[0] == doc.crate_name`, while
-/// cross-crate targets within the same layer have `path[0]` equal to the target crate name.
-/// This correctly handles cross-crate edges within the same layer so they appear in the overview.
+/// - **Cross-crate within same layer is included**: the target crate name is derived from
+///   `summary.path[0]` (not via `crate_id == 0`), so a type from a sibling crate in the
+///   same layer produces a cross-cluster edge in the depth-1 overview.
+/// - **`Type::Primitive` / `Type::Generic`**: produces no node ids (silent skip).
+/// - **`ResolvedPath` not in `krate.paths`**: produces no node ids (silent skip).
+/// - **Recursive traversal**: `ResolvedPath.args` (generic arguments) are traversed, so
+///   nested own-crate types inside `Vec<MyType>`, `Arc<MyType>`, etc. are captured.
+///
+/// Returns a `Vec<String>` of representative node ids.  The vec may be empty (e.g. for
+/// primitives, generics, or types absent from `krate.paths`).
 ///
 /// No panics: all indexing via `.get()` / iterators.
-fn resolve_type_node_id(
+fn collect_resolved_node_ids_from_type(
     ty: &rustdoc_types::Type,
     krate: &rustdoc_types::Crate,
     layer: &str,
-) -> String {
+) -> Vec<String> {
+    let mut out = Vec::new();
+    collect_resolved_node_ids_recursive(ty, krate, layer, &mut out);
+    out
+}
+
+/// Internal recursive helper for [`collect_resolved_node_ids_from_type`].
+fn collect_resolved_node_ids_recursive(
+    ty: &rustdoc_types::Type,
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    out: &mut Vec<String>,
+) {
     use node_id_generator::{module_path_from_summary, type_rep_node_id};
     use rustdoc_types::Type;
     match ty {
         Type::ResolvedPath(path) => {
             if let Some(summary) = krate.paths.get(&path.id) {
-                // Derive the target crate name from the path (path[0]) rather than
-                // using `crate_name` (the source crate), so cross-crate types within
-                // the same layer are resolved to their actual node ids.
+                // Use path[0] as the target crate name (works for both same-crate and
+                // cross-crate within same layer, unlike the crate_id == 0 check in
+                // collect_own_crate_node_ids_from_type which is depth-2 only).
                 if let Some(target_crate) = summary.path.first().map(|s| s.as_str()) {
                     let module_path = module_path_from_summary(&summary.path);
-                    let type_name = summary.path.last().map(|s| s.as_str()).unwrap_or("?");
-                    return type_rep_node_id(layer, target_crate, &module_path, type_name);
+                    if let Some(type_name) = summary.path.last() {
+                        out.push(type_rep_node_id(layer, target_crate, &module_path, type_name));
+                    }
                 }
             }
-            let anon_name = sanitize(&path.path);
-            format!("anon_{anon_name}")
+            // Whether found or not, recurse into generic args (e.g. Vec<MyType> → MyType).
+            if let Some(args) = path.args.as_deref() {
+                collect_resolved_generic_args(args, krate, layer, out);
+            }
         }
-        Type::Primitive(prim) => {
-            let sanitized = sanitize(prim);
-            format!("prim_{sanitized}")
+        Type::Primitive(_) | Type::Generic(_) => {
+            // Primitive (u32, bool, etc.) and generic type params → skip (T016 / AC-20).
         }
-        Type::Generic(g) => {
-            let sanitized = sanitize(g);
-            format!("generic_{sanitized}")
+        Type::BorrowedRef { type_: inner, .. }
+        | Type::RawPointer { type_: inner, .. }
+        | Type::Slice(inner)
+        | Type::Array { type_: inner, .. }
+        | Type::Pat { type_: inner, .. } => {
+            collect_resolved_node_ids_recursive(inner, krate, layer, out);
+        }
+        Type::Tuple(tys) => {
+            for t in tys {
+                collect_resolved_node_ids_recursive(t, krate, layer, out);
+            }
         }
         _ => {
-            format!("anon_type_{}", sanitize(&format!("{ty:?}")))
+            // DynTrait, ImplTrait, QualifiedPath, FunctionPointer, etc.: skip.
         }
+    }
+}
+
+/// Internal helper: descend into [`rustdoc_types::GenericArgs`] for depth-1 edge collection.
+fn collect_resolved_generic_args(
+    args: &rustdoc_types::GenericArgs,
+    krate: &rustdoc_types::Crate,
+    layer: &str,
+    out: &mut Vec<String>,
+) {
+    use rustdoc_types::{AssocItemConstraintKind, GenericArg, GenericArgs, Term};
+    match args {
+        GenericArgs::AngleBracketed { args: ga, constraints } => {
+            for arg in ga {
+                if let GenericArg::Type(t) = arg {
+                    collect_resolved_node_ids_recursive(t, krate, layer, out);
+                }
+            }
+            for constraint in constraints {
+                if let Some(c_args) = constraint.args.as_deref() {
+                    collect_resolved_generic_args(c_args, krate, layer, out);
+                }
+                match &constraint.binding {
+                    AssocItemConstraintKind::Equality(term) => {
+                        if let Term::Type(t) = term {
+                            collect_resolved_node_ids_recursive(t, krate, layer, out);
+                        }
+                    }
+                    AssocItemConstraintKind::Constraint(_) => {}
+                }
+            }
+        }
+        GenericArgs::Parenthesized { inputs, output } => {
+            for t in inputs {
+                collect_resolved_node_ids_recursive(t, krate, layer, out);
+            }
+            if let Some(ret) = output {
+                collect_resolved_node_ids_recursive(ret, krate, layer, out);
+            }
+        }
+        _ => {}
     }
 }
 
@@ -1072,34 +1153,17 @@ pub(super) fn render_clusters_mermaid(
                 (Some(sc), None) => {
                     // Source belongs to a known cluster; destination has no cluster entry.
                     //
-                    // Two sub-cases:
+                    // T016 note: anonymous nodes (`anon_*` / `prim_*` / `generic_*`) are no
+                    // longer generated by the depth-2 renderer or `collect_entry_edge_pairs`.
+                    // This branch now handles only structured node-ids (D-decision prefix
+                    // `T` / `R` / `F` followed by digits) that map to types not in the layer's
+                    // B-r1 node set — e.g. external-library types present in `krate.paths` but
+                    // not rendered as entry subgraphs.  Such edges point to undefined mermaid
+                    // nodes and must be suppressed.
                     //
-                    // (a) Destination is a true anonymous node (`anon_*` / `prim_*` /
-                    //     `generic_*` / `anon_type_*`) — produced when `field_type_node_id`
-                    //     could not find the target in `krate.paths`.  These nodes have no
-                    //     cluster membership by construction and are kept as local references
-                    //     (e.g. external library types not recorded in rustdoc, primitives,
-                    //     generics).
-                    //
-                    // (b) Destination has a structured node-id (D-decision prefix `T` / `R` /
-                    //     `F` followed by digits) — produced when `field_type_node_id` resolved
-                    //     a cross-crate `ResolvedPath` to a concrete rep-node id, but that type
-                    //     is not rendered (e.g. an external-library type that is in `krate.paths`
-                    //     but not in the layer's B-r1 node set).  Such an edge points to an
-                    //     undefined node and must be suppressed regardless of the cluster owner.
-                    //
-                    // In both sub-cases we additionally require that the source belongs to the
-                    // current cluster to avoid edges from a foreign cluster leaking into this
-                    // cluster file.
-                    let dst_is_anonymous = dst_id.starts_with("anon_")
-                        || dst_id.starts_with("prim_")
-                        || dst_id.starts_with("generic_");
-                    if sc == cluster_key && dst_is_anonymous {
-                        edge_lines.push(edge_line.clone());
-                    }
-                    // Otherwise: either the source is from a different cluster, or the
-                    // destination is a structured id that maps to a non-rendered type.
-                    // Suppress in both cases.
+                    // Suppress in all cases: either the source is from a different cluster, or
+                    // the destination is a non-rendered type (structured id not in the map).
+                    let _ = sc; // suppress unused-variable warning
                 }
                 _ => {
                     // Source is anonymous/primitive (no cluster entry in the map).

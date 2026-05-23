@@ -1,20 +1,25 @@
-//! Entry subgraph emission for the baseline-graph renderer (T007 / T008 / T015).
+//! Entry subgraph emission for the baseline-graph renderer (T007 / T008 / T015 / T016).
 //!
 //! Implements the following ADR decisions:
 //!
 //! - **F-r1**: Struct / Enum / Trait / TypeAlias entries are rendered as mermaid
 //!   subgraphs. FunctionEntry is rendered as a standalone callable node (out of scope here).
 //! - **H**: Enum variants are node-ified inside the entry subgraph. Payload edges:
-//!   `VariantKind::Tuple` → `--o` per element; `VariantKind::Struct` → `--o|field_name|`;
-//!   `VariantKind::Plain` → no edge.
+//!   `VariantKind::Tuple` → one `--o` edge per own-crate type found by recursive
+//!   `ResolvedPath.args` traversal; `VariantKind::Struct` → one `--o|field_name|` edge
+//!   per own-crate type; `VariantKind::Plain` → no edge.
+//!   `Type::Primitive` / `Type::Generic` / external types produce no edge (T016 / AC-20).
 //! - **H'**: Trait.items are scanned for `ItemEnum::Function` entries; each becomes a
 //!   method node inside the Trait subgraph.
-//! - **K**: PlainStruct fields → `--o|field_name|` edge per field; TupleStruct fields →
-//!   `--o|.N|` (positional index); `has_stripped_fields: true` or `None` slot → skip;
-//!   Unit → no edge.
-//! - **N**: TypeAlias → undirected `---|alias_of|` edge to the target type subgraph.
-//!   The target is identified by its type_node_id; if the target is not a locally known
-//!   type it is emitted as an anonymous node (best-effort without cross-baseline lookup).
+//! - **K**: PlainStruct fields → `--o|field_name|` edge per own-crate type found by
+//!   recursive `ResolvedPath.args` traversal; TupleStruct fields → `--o|.N|` per own-crate
+//!   type; `has_stripped_fields: true` or `None` slot → skip; Unit → no edge.
+//!   `Type::Primitive` / `Type::Generic` / external types produce no edge (T016 / AC-20).
+//!   Anonymous nodes (`prim_*` / `generic_*` / `anon_*`) are no longer generated (T016).
+//! - **N**: TypeAlias → undirected `---|alias_of|` edge to each own-crate type found by
+//!   recursive `ResolvedPath.args` traversal of the alias target type.
+//!   `Type::Primitive` / `Type::Generic` / external types produce no edge (T016 / AC-20).
+//!   Anonymous nodes (`prim_*` / `generic_*` / `anon_*`) are no longer generated (T016).
 //! - **BB-4-fix1 (T008)**: Inherent impl methods are merged into the target type's entry
 //!   subgraph. The `emit_*_subgraph` functions accept an optional `inherent_method_ids`
 //!   slice; when provided, those method nodes are emitted inside the subgraph before `end`.
@@ -24,6 +29,11 @@
 //!   types extracted from `FunctionSignature.inputs` / `.output` by recursive
 //!   `ResolvedPath.args` traversal (`collect_own_crate_node_ids_from_type`).
 //!   `Type::Primitive` / `Type::Generic` / external types produce no edge.
+//! - **AC-20 (T016 — existing edge paths)**: struct field (K), enum variant payload (H),
+//!   and TypeAlias target (N) edges are now resolved via the same recursive
+//!   `collect_own_crate_node_ids_from_type` utility as method edges (T015).
+//!   Anonymous nodes (`prim_*` / `generic_*` / `anon_*`) are eliminated from all edge
+//!   paths. Only own-crate types (entry subgraph present) receive edges.
 //!
 //! All functions are panic-free (no `unwrap` / `expect` / slice indexing on `[i]`
 //! in production code — only `.get()` / iterators).
@@ -33,14 +43,14 @@
 
 use std::collections::BTreeMap;
 
-use rustdoc_types::{Id, ItemEnum, StructKind, Type, VariantKind, Visibility};
+use rustdoc_types::{Id, ItemEnum, StructKind, VariantKind, Visibility};
 
 use domain::tddd::baseline_document::BaselineDocument;
 use domain::tddd::baseline_graph_ports::BaselineGraphRendererError;
 
 use super::impl_processor::{
     BlanketBodyEntry, build_blanket_body_map, build_inherent_method_map, build_trait_index,
-    emit_all_impl_edges_for_layer,
+    collect_own_crate_node_ids_from_type, emit_all_impl_edges_for_layer,
 };
 use super::node_id_generator::{
     function_node_id, module_path_from_summary, trait_node_id, trait_rep_node_id, type_node_id,
@@ -118,11 +128,14 @@ pub(super) fn emit_struct_subgraph(
         }
     }
 
-    // K decision: struct fields.
-    // The [edge.field] style is looked up lazily — only immediately before the first
-    // edge is emitted — so that structs with no renderable fields (empty plain struct,
-    // all-None tuple struct, has_stripped_fields=true, or Unit) do not fail when
-    // [edge.field] is absent from the style config.
+    // K decision: struct fields (T016 / AC-20).
+    // Type resolution uses collect_own_crate_node_ids_from_type (recursive ResolvedPath.args
+    // traversal, same utility as method edges in T015). Only own-crate types (crate_id == 0,
+    // rendered entry subgraph) receive edges. Primitive / generic / external types are silently
+    // skipped — no anonymous node (`prim_*` / `generic_*` / `anon_*`) is generated.
+    // The [edge.field] style is looked up lazily — only immediately before the first edge is
+    // emitted — so that structs with no renderable fields do not fail when [edge.field] is
+    // absent from the style config (CN-02 fail-closed).
     if let ItemEnum::Struct(s) = &item.inner {
         match &s.kind {
             StructKind::Plain { fields, has_stripped_fields } => {
@@ -131,13 +144,16 @@ pub(super) fn emit_struct_subgraph(
                         if let Some(field_item) = krate.index.get(&field_id) {
                             let field_name = field_item.name.as_deref().unwrap_or("?");
                             if let ItemEnum::StructField(field_ty) = &field_item.inner {
-                                // Lazy lookup: only called when an edge is about to be emitted.
-                                let (field_arrow, _) = edge_arrow_label(&style.edge, "field")?;
-                                let target_id =
-                                    field_type_node_id(field_ty, krate, layer, crate_name);
-                                edge_lines.push(format!(
-                                    "{rep_node_id} {field_arrow}|\"{field_name}\"| {target_id}"
-                                ));
+                                let targets = collect_own_crate_node_ids_from_type(
+                                    field_ty, krate, layer, crate_name,
+                                );
+                                for target_id in &targets {
+                                    // Lazy lookup: only when an edge is about to be emitted.
+                                    let (field_arrow, _) = edge_arrow_label(&style.edge, "field")?;
+                                    edge_lines.push(format!(
+                                        "{rep_node_id} {field_arrow}|\"{field_name}\"| {target_id}"
+                                    ));
+                                }
                             }
                         }
                     }
@@ -150,14 +166,17 @@ pub(super) fn emit_struct_subgraph(
                     if let Some(&field_id) = maybe_id.as_ref() {
                         if let Some(field_item) = krate.index.get(&field_id) {
                             if let ItemEnum::StructField(field_ty) = &field_item.inner {
-                                // Lazy lookup: only called when an edge is about to be emitted.
-                                let (field_arrow, _) = edge_arrow_label(&style.edge, "field")?;
-                                let target_id =
-                                    field_type_node_id(field_ty, krate, layer, crate_name);
+                                let targets = collect_own_crate_node_ids_from_type(
+                                    field_ty, krate, layer, crate_name,
+                                );
                                 let label = format!(".{idx}");
-                                edge_lines.push(format!(
-                                    "{rep_node_id} {field_arrow}|\"{label}\"| {target_id}"
-                                ));
+                                for target_id in &targets {
+                                    // Lazy lookup: only when an edge is about to be emitted.
+                                    let (field_arrow, _) = edge_arrow_label(&style.edge, "field")?;
+                                    edge_lines.push(format!(
+                                        "{rep_node_id} {field_arrow}|\"{label}\"| {target_id}"
+                                    ));
+                                }
                             }
                         }
                     }
@@ -285,26 +304,32 @@ pub(super) fn emit_enum_subgraph(
                 }
             }
 
-            // Payload edges (H decision).
+            // Payload edges (H decision, T016 / AC-20).
+            // Type resolution uses collect_own_crate_node_ids_from_type (recursive
+            // ResolvedPath.args traversal). Only own-crate types receive edges.
+            // Primitive / generic / external types → silent skip (no anon node).
             if let ItemEnum::Variant(variant_data) = &variant_item.inner {
                 match &variant_data.kind {
                     VariantKind::Plain => {
                         // No edge.
                     }
                     VariantKind::Tuple(field_ids) => {
-                        // Each Some(Id) → lookup StructField → `--o` edge (no label).
+                        // Each Some(Id) → lookup StructField → one `--o` edge per own-crate type.
                         for maybe_id in field_ids {
                             if let Some(&fid) = maybe_id.as_ref() {
                                 if let Some(field_item) = krate.index.get(&fid) {
                                     if let ItemEnum::StructField(field_ty) = &field_item.inner {
-                                        // Lazy lookup: only called when an edge is about to be emitted.
-                                        let (payload_arrow, _) =
-                                            edge_arrow_label(&style.edge, "variant_payload")?;
-                                        let target_id =
-                                            field_type_node_id(field_ty, krate, layer, crate_name);
-                                        edge_lines.push(format!(
-                                            "{variant_node_id} {payload_arrow} {target_id}"
-                                        ));
+                                        let targets = collect_own_crate_node_ids_from_type(
+                                            field_ty, krate, layer, crate_name,
+                                        );
+                                        for target_id in &targets {
+                                            // Lazy lookup: only when an edge is about to be emitted.
+                                            let (payload_arrow, _) =
+                                                edge_arrow_label(&style.edge, "variant_payload")?;
+                                            edge_lines.push(format!(
+                                                "{variant_node_id} {payload_arrow} {target_id}"
+                                            ));
+                                        }
                                     }
                                 }
                             }
@@ -314,19 +339,22 @@ pub(super) fn emit_enum_subgraph(
                         // Skip edge emission when the variant has stripped (hidden) fields
                         // (consistent with K decision: has_stripped_fields → render nothing).
                         if !has_stripped_fields {
-                            // Each field → `--o|field_name|` edge (H decision).
+                            // Each field → one `--o|field_name|` edge per own-crate type (H decision).
                             for &fid in fields {
                                 if let Some(field_item) = krate.index.get(&fid) {
                                     let field_name = field_item.name.as_deref().unwrap_or("?");
                                     if let ItemEnum::StructField(field_ty) = &field_item.inner {
-                                        // Lazy lookup: only called when an edge is about to be emitted.
-                                        let (payload_arrow, _) =
-                                            edge_arrow_label(&style.edge, "variant_payload")?;
-                                        let target_id =
-                                            field_type_node_id(field_ty, krate, layer, crate_name);
-                                        edge_lines.push(format!(
-                                            "{variant_node_id} {payload_arrow}|\"{field_name}\"| {target_id}"
-                                        ));
+                                        let targets = collect_own_crate_node_ids_from_type(
+                                            field_ty, krate, layer, crate_name,
+                                        );
+                                        for target_id in &targets {
+                                            // Lazy lookup: only when an edge is about to be emitted.
+                                            let (payload_arrow, _) =
+                                                edge_arrow_label(&style.edge, "variant_payload")?;
+                                            edge_lines.push(format!(
+                                                "{variant_node_id} {payload_arrow}|\"{field_name}\"| {target_id}"
+                                            ));
+                                        }
                                     }
                                 }
                             }
@@ -586,11 +614,17 @@ pub(super) fn emit_type_alias_subgraph(
         }
     }
 
-    // N decision: undirected alias_of edge to the target type.
+    // N decision: undirected alias_of edge(s) to own-crate target types (T016 / AC-20).
+    // Type resolution uses collect_own_crate_node_ids_from_type (recursive ResolvedPath.args
+    // traversal). Only own-crate types receive edges. Primitive / generic / external types →
+    // silent skip (no anonymous node). One edge per own-crate type found in the alias target.
     if let ItemEnum::TypeAlias(alias_data) = &item.inner {
-        let (alias_arrow, _) = edge_arrow_label(&style.edge, "alias")?;
-        let target_id = field_type_node_id(&alias_data.type_, krate, layer, crate_name);
-        edge_lines.push(format!("{rep_node_id} {alias_arrow}|\"alias_of\"| {target_id}"));
+        let targets =
+            collect_own_crate_node_ids_from_type(&alias_data.type_, krate, layer, crate_name);
+        for target_id in &targets {
+            let (alias_arrow, _) = edge_arrow_label(&style.edge, "alias")?;
+            edge_lines.push(format!("{rep_node_id} {alias_arrow}|\"alias_of\"| {target_id}"));
+        }
     }
 
     Ok(())
@@ -985,61 +1019,11 @@ fn build_entry_label(summary_path: &[String], name: &str) -> String {
     format!("{}::{}", middle.join("::"), name)
 }
 
-/// Resolve a `rustdoc_types::Type` to a mermaid node_id for use as an edge endpoint.
-///
-/// For `ResolvedPath` types present in `krate.paths`, returns the **representative node id**
-/// (`__self` suffix) so that edges terminate on the concrete node inside the target subgraph
-/// rather than on the subgraph container itself.  The crate name is derived from
-/// `summary.path[0]` (the first path segment), which correctly handles cross-crate references
-/// within the same layer: the returned node_id is then looked up by the depth-2 cluster filter
-/// (`render_clusters_mermaid` / `lookup_cluster`) to determine whether the edge is intra-cluster
-/// or cross-cluster.  Cross-cluster edges are suppressed per spec IN-15 / AC-14 / CN-07.
-///
-/// Types not found in `krate.paths` (e.g. external library types not recorded by rustdoc)
-/// fall back to `anon_*` and are treated as anonymous nodes by the cluster filter.
-///
-/// For primitive (`prim_*`), generic (`generic_*`), or other types, an anonymous descriptive
-/// node_id is generated (best-effort).
-fn field_type_node_id(
-    ty: &Type,
-    krate: &rustdoc_types::Crate,
-    layer: &str,
-    _crate_name: &str,
-) -> String {
-    match ty {
-        Type::ResolvedPath(path) => {
-            // Look up the target in krate.paths.  Use path[0] as the crate name (same logic as
-            // `resolve_type_node_id` in the depth-1 overview extractor) so that cross-crate
-            // types within the same layer produce the same rep-node id as recorded in
-            // `node_cluster_map`, enabling the depth-2 cluster filter to suppress them.
-            if let Some(summary) = krate.paths.get(&path.id) {
-                if let Some(target_crate) = summary.path.first().map(|s| s.as_str()) {
-                    let module_path = module_path_from_summary(&summary.path);
-                    let type_name = summary.path.last().map(|s| s.as_str()).unwrap_or("?");
-                    // Return the rep-node id (__self) so edges target the concrete node
-                    // inside the target subgraph, not the subgraph container.
-                    return type_rep_node_id(layer, target_crate, &module_path, type_name);
-                }
-            }
-            // Not found in krate.paths — emit an anonymous node using the path string.
-            let anon_name = sanitize(&path.path);
-            format!("anon_{anon_name}")
-        }
-        Type::Primitive(prim) => {
-            // Primitive types (u32, bool, etc.) — emit a shared anonymous node.
-            let sanitized = sanitize(prim);
-            format!("prim_{sanitized}")
-        }
-        Type::Generic(g) => {
-            let sanitized = sanitize(g);
-            format!("generic_{sanitized}")
-        }
-        _ => {
-            // Tuple, Slice, Array, DynTrait, etc. — best-effort fallback.
-            format!("anon_type_{}", sanitize(&format!("{ty:?}")))
-        }
-    }
-}
+// NOTE (T016): `field_type_node_id` has been removed.
+// The single-target anonymous-node approach (`prim_*` / `generic_*` / `anon_*`) has been
+// replaced by `collect_own_crate_node_ids_from_type` (recursive ResolvedPath.args traversal),
+// which produces zero or more own-crate target node ids without ever creating anonymous nodes.
+// All callers in this module now use that utility directly (AC-20).
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -1219,7 +1203,9 @@ include_functions = true
     }
 
     #[test]
-    fn test_emit_struct_subgraph_plain_struct_with_fields_emits_edges() {
+    fn test_emit_struct_subgraph_plain_struct_primitive_field_emits_no_edge() {
+        // T016 / AC-20: primitive field type → no edge (silent skip).
+        // Anonymous nodes (prim_*) must NOT be generated.
         let root_id = Id(0);
         let struct_id = Id(1);
         let field_id = Id(2);
@@ -1280,9 +1266,114 @@ include_functions = true
         )
         .unwrap();
 
-        assert_eq!(edge_lines.len(), 1, "one field → one edge");
-        assert!(edge_lines[0].contains("value"), "edge must reference field name 'value'");
+        // Primitive field → no edge (T016 / AC-20).
+        assert!(
+            edge_lines.is_empty(),
+            "primitive field must produce no edge (T016 / AC-20); got: {edge_lines:?}"
+        );
+        // Also verify no prim_* node appears anywhere in the output.
+        let joined = [subgraph_lines.join("\n"), edge_lines.join("\n")].join("\n");
+        assert!(
+            !joined.contains("prim_"),
+            "no prim_* anonymous node must be generated; got: {joined}"
+        );
+    }
+
+    #[test]
+    fn test_emit_struct_subgraph_plain_struct_own_crate_field_emits_edge() {
+        // T016 / AC-20: own-crate field type → edge to the target's rep-node id.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let field_id = Id(2);
+        let field_type_id = Id(3);
+
+        let field_type = Type::ResolvedPath(rustdoc_types::Path {
+            path: "FieldType".to_string(),
+            id: field_type_id,
+            args: None,
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, field_type_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Plain { fields: vec![field_id], has_stripped_fields: false },
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(field_id, pub_item(field_id, "inner", ItemEnum::StructField(field_type)));
+        index.insert(
+            field_type_id,
+            pub_item(
+                field_type_id,
+                "FieldType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(
+            field_type_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["my_crate".to_string(), "FieldType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = minimal_style();
+
+        emit_struct_subgraph(
+            &doc,
+            struct_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(edge_lines.len(), 1, "own-crate field → one edge; got: {edge_lines:?}");
+        assert!(edge_lines[0].contains("inner"), "edge must reference field name 'inner'");
         assert!(edge_lines[0].contains("--o"), "field edge must use --o arrow");
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "FieldType");
+        assert!(
+            edge_lines[0].contains(&expected_target),
+            "edge must target FieldType rep-node; got: {}; expected target: {}",
+            edge_lines[0],
+            expected_target
+        );
     }
 
     #[test]
@@ -1348,7 +1439,8 @@ include_functions = true
     }
 
     #[test]
-    fn test_emit_struct_subgraph_tuple_struct_emits_positional_edges() {
+    fn test_emit_struct_subgraph_tuple_struct_primitive_fields_emit_no_edges() {
+        // T016 / AC-20: tuple struct with primitive fields → no edge (silent skip).
         let root_id = Id(0);
         let struct_id = Id(1);
         let field0_id = Id(2);
@@ -1410,13 +1502,116 @@ include_functions = true
         )
         .unwrap();
 
-        assert_eq!(edge_lines.len(), 2, "two fields → two positional edges");
-        assert!(edge_lines[0].contains(".0"), "first edge must use .0 label");
-        assert!(edge_lines[1].contains(".1"), "second edge must use .1 label");
+        assert!(
+            edge_lines.is_empty(),
+            "primitive tuple fields → no positional edges (T016 / AC-20); got: {edge_lines:?}"
+        );
     }
 
     #[test]
-    fn test_emit_struct_subgraph_tuple_struct_none_slot_skipped() {
+    fn test_emit_struct_subgraph_tuple_struct_own_crate_field_emits_positional_edge() {
+        // T016 / AC-20: tuple struct with own-crate field type → positional edge.
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let field0_id = Id(2);
+        let field_type_id = Id(3);
+
+        let field_type = Type::ResolvedPath(rustdoc_types::Path {
+            path: "Inner".to_string(),
+            id: field_type_id,
+            args: None,
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, field_type_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyNewtype",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Tuple(vec![Some(field0_id)]),
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(field0_id, pub_item(field0_id, "0", ItemEnum::StructField(field_type)));
+        index.insert(
+            field_type_id,
+            pub_item(
+                field_type_id,
+                "Inner",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(vec!["my_crate", "MyNewtype"], ItemKind::Struct));
+        paths.insert(
+            field_type_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["my_crate".to_string(), "Inner".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = minimal_style();
+
+        emit_struct_subgraph(
+            &doc,
+            struct_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(
+            edge_lines.len(),
+            1,
+            "own-crate tuple field → one positional edge; got: {edge_lines:?}"
+        );
+        assert!(edge_lines[0].contains(".0"), "positional edge must use .0 label");
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "Inner");
+        assert!(
+            edge_lines[0].contains(&expected_target),
+            "edge must target Inner rep-node; edge: {}; expected target: {}",
+            edge_lines[0],
+            expected_target
+        );
+    }
+
+    #[test]
+    fn test_emit_struct_subgraph_tuple_struct_none_slot_skipped_no_edge() {
+        // T016 / AC-20: None slot (stripped field) must be skipped even with own-crate type.
+        // This tests the None-slot skip behavior; the field0 slot has a primitive so no edge.
         let root_id = Id(0);
         let struct_id = Id(1);
         let field0_id = Id(2);
@@ -1479,7 +1674,11 @@ include_functions = true
         )
         .unwrap();
 
-        assert_eq!(edge_lines.len(), 1, "None slot must be skipped; only 1 edge expected");
+        // field0 is primitive → no edge; None slot skipped → no edge. Total: 0.
+        assert!(
+            edge_lines.is_empty(),
+            "None slot + primitive field → no edges (T016 / AC-20); got: {edge_lines:?}"
+        );
     }
 
     #[test]
@@ -1617,7 +1816,8 @@ include_functions = true
     }
 
     #[test]
-    fn test_emit_enum_subgraph_tuple_variant_emits_payload_edges() {
+    fn test_emit_enum_subgraph_tuple_variant_primitive_payload_no_edge() {
+        // T016 / AC-20: tuple variant with primitive payload → no edge.
         let root_id = Id(0);
         let enum_id = Id(1);
         let variant_id = Id(2);
@@ -1688,17 +1888,128 @@ include_functions = true
         )
         .unwrap();
 
-        assert_eq!(edge_lines.len(), 1, "tuple variant with 1 field → 1 payload edge");
-        assert!(edge_lines[0].contains("--o"), "tuple variant payload edge must use --o");
-        // No label for tuple variant (unlabeled edge).
         assert!(
-            !edge_lines[0].contains("field_name"),
-            "tuple variant payload edge must not have a field name label"
+            edge_lines.is_empty(),
+            "primitive tuple variant payload → no edge (T016 / AC-20); got: {edge_lines:?}"
         );
     }
 
     #[test]
-    fn test_emit_enum_subgraph_struct_variant_emits_named_edges() {
+    fn test_emit_enum_subgraph_tuple_variant_own_crate_payload_emits_edge() {
+        // T016 / AC-20: tuple variant with own-crate payload → one unlabeled edge.
+        let root_id = Id(0);
+        let enum_id = Id(1);
+        let variant_id = Id(2);
+        let field_id = Id(3);
+        let payload_type_id = Id(4);
+
+        let field_type = Type::ResolvedPath(rustdoc_types::Path {
+            path: "PayloadType".to_string(),
+            id: payload_type_id,
+            args: None,
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![enum_id, payload_type_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            enum_id,
+            pub_item(
+                enum_id,
+                "MyEnum",
+                ItemEnum::Enum(Enum {
+                    generics: empty_generics(),
+                    variants: vec![variant_id],
+                    impls: vec![],
+                    has_stripped_variants: false,
+                }),
+            ),
+        );
+        index.insert(
+            variant_id,
+            default_vis_item(
+                variant_id,
+                "Wrapped",
+                ItemEnum::Variant(Variant {
+                    kind: VariantKind::Tuple(vec![Some(field_id)]),
+                    discriminant: None,
+                }),
+            ),
+        );
+        index.insert(field_id, pub_item(field_id, "0", ItemEnum::StructField(field_type)));
+        index.insert(
+            payload_type_id,
+            pub_item(
+                payload_type_id,
+                "PayloadType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(enum_id, item_summary(vec!["my_crate", "MyEnum"], ItemKind::Enum));
+        paths.insert(
+            payload_type_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["my_crate".to_string(), "PayloadType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = minimal_style();
+
+        emit_enum_subgraph(
+            &doc,
+            enum_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(
+            edge_lines.len(),
+            1,
+            "own-crate tuple variant → 1 payload edge; got: {edge_lines:?}"
+        );
+        assert!(edge_lines[0].contains("--o"), "tuple variant payload edge must use --o");
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "PayloadType");
+        assert!(
+            edge_lines[0].contains(&expected_target),
+            "edge must target PayloadType rep-node; edge: {}; expected: {}",
+            edge_lines[0],
+            expected_target
+        );
+    }
+
+    #[test]
+    fn test_emit_enum_subgraph_struct_variant_primitive_field_no_edge() {
+        // T016 / AC-20: struct variant with primitive field → no named edge.
         let root_id = Id(0);
         let enum_id = Id(1);
         let variant_id = Id(2);
@@ -1775,10 +2086,129 @@ include_functions = true
         )
         .unwrap();
 
-        assert_eq!(edge_lines.len(), 1, "struct variant with 1 named field → 1 edge");
         assert!(
-            edge_lines[0].contains("username"),
-            "struct variant edge must include field name 'username'"
+            edge_lines.is_empty(),
+            "primitive struct variant field → no edge (T016 / AC-20); got: {edge_lines:?}"
+        );
+    }
+
+    #[test]
+    fn test_emit_enum_subgraph_struct_variant_own_crate_field_emits_named_edge() {
+        // T016 / AC-20: struct variant with own-crate field → named edge.
+        let root_id = Id(0);
+        let enum_id = Id(1);
+        let variant_id = Id(2);
+        let field_id = Id(3);
+        let field_type_id = Id(4);
+
+        let field_type = Type::ResolvedPath(rustdoc_types::Path {
+            path: "UserId".to_string(),
+            id: field_type_id,
+            args: None,
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![enum_id, field_type_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            enum_id,
+            pub_item(
+                enum_id,
+                "MyEnum",
+                ItemEnum::Enum(Enum {
+                    generics: empty_generics(),
+                    variants: vec![variant_id],
+                    impls: vec![],
+                    has_stripped_variants: false,
+                }),
+            ),
+        );
+        index.insert(
+            variant_id,
+            default_vis_item(
+                variant_id,
+                "StructVariant",
+                ItemEnum::Variant(Variant {
+                    kind: VariantKind::Struct {
+                        fields: vec![field_id],
+                        has_stripped_fields: false,
+                    },
+                    discriminant: None,
+                }),
+            ),
+        );
+        index.insert(field_id, pub_item(field_id, "owner_id", ItemEnum::StructField(field_type)));
+        index.insert(
+            field_type_id,
+            pub_item(
+                field_type_id,
+                "UserId",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(enum_id, item_summary(vec!["my_crate", "MyEnum"], ItemKind::Enum));
+        paths.insert(
+            field_type_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["my_crate".to_string(), "UserId".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = minimal_style();
+
+        emit_enum_subgraph(
+            &doc,
+            enum_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(
+            edge_lines.len(),
+            1,
+            "own-crate struct variant field → 1 named edge; got: {edge_lines:?}"
+        );
+        assert!(
+            edge_lines[0].contains("owner_id"),
+            "struct variant edge must include field name 'owner_id'; got: {}",
+            edge_lines[0]
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "UserId");
+        assert!(
+            edge_lines[0].contains(&expected_target),
+            "edge must target UserId rep-node; edge: {}; expected: {}",
+            edge_lines[0],
+            expected_target
         );
     }
 
@@ -2400,7 +2830,8 @@ include_functions = true
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_emit_type_alias_subgraph_emits_alias_of_edge() {
+    fn test_emit_type_alias_subgraph_primitive_target_no_edge() {
+        // T016 / AC-20 / N decision: TypeAlias with primitive target → no alias edge.
         let root_id = Id(0);
         let alias_id = Id(1);
 
@@ -2454,11 +2885,109 @@ include_functions = true
 
         let joined = subgraph_lines.join("\n");
         assert!(joined.contains("MyAlias"), "subgraph must contain alias name");
-        assert_eq!(edge_lines.len(), 1, "TypeAlias must produce exactly 1 alias edge (N decision)");
+        assert!(
+            edge_lines.is_empty(),
+            "TypeAlias with primitive target → no alias edge (T016 / AC-20); got: {edge_lines:?}"
+        );
+    }
+
+    #[test]
+    fn test_emit_type_alias_subgraph_own_crate_target_emits_alias_edge() {
+        // T016 / AC-20 / N decision: TypeAlias pointing to own-crate type → alias_of edge.
+        let root_id = Id(0);
+        let alias_id = Id(1);
+        let target_id = Id(2);
+
+        let target_type = Type::ResolvedPath(rustdoc_types::Path {
+            path: "ConcreteType".to_string(),
+            id: target_id,
+            args: None,
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![alias_id, target_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            alias_id,
+            pub_item(
+                alias_id,
+                "MyAlias",
+                ItemEnum::TypeAlias(TypeAlias { type_: target_type, generics: empty_generics() }),
+            ),
+        );
+        index.insert(
+            target_id,
+            pub_item(
+                target_id,
+                "ConcreteType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(alias_id, item_summary(vec!["my_crate", "MyAlias"], ItemKind::TypeAlias));
+        paths.insert(
+            target_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["my_crate".to_string(), "ConcreteType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = minimal_style();
+
+        emit_type_alias_subgraph(
+            &doc,
+            alias_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        let joined = subgraph_lines.join("\n");
+        assert!(joined.contains("MyAlias"), "subgraph must contain alias name");
+        assert_eq!(
+            edge_lines.len(),
+            1,
+            "TypeAlias with own-crate target → 1 alias_of edge; got: {edge_lines:?}"
+        );
         assert!(edge_lines[0].contains("alias_of"), "alias edge must contain 'alias_of' label");
         assert!(
             edge_lines[0].contains("---"),
             "alias edge must be undirected (---) per N decision"
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "ConcreteType");
+        assert!(
+            edge_lines[0].contains(&expected_target),
+            "alias edge must target ConcreteType rep-node; edge: {}; expected: {}",
+            edge_lines[0],
+            expected_target
         );
     }
 
@@ -2518,11 +3047,19 @@ include_functions = true
 
     #[test]
     fn test_emit_struct_subgraph_missing_field_edge_style_returns_render_failed() {
+        // T016 / CN-02: struct with own-crate field + missing [edge.field] style → RenderFailed.
+        // Primitive fields are silently skipped (no edge), so this test uses a ResolvedPath
+        // pointing to an own-crate type to trigger the style lookup.
         let root_id = Id(0);
         let struct_id = Id(1);
         let field_id = Id(2);
+        let field_type_id = Id(3);
 
-        let field_type = Type::Primitive("u32".to_string());
+        let field_type = Type::ResolvedPath(rustdoc_types::Path {
+            path: "OtherType".to_string(),
+            id: field_type_id,
+            args: None,
+        });
 
         let mut index = HashMap::new();
         index.insert(
@@ -2532,7 +3069,7 @@ include_functions = true
                 "my_crate",
                 ItemEnum::Module(Module {
                     is_crate: true,
-                    items: vec![struct_id],
+                    items: vec![struct_id, field_type_id],
                     is_stripped: false,
                 }),
             ),
@@ -2549,18 +3086,35 @@ include_functions = true
                 }),
             ),
         );
+        index.insert(field_id, pub_item(field_id, "value", ItemEnum::StructField(field_type)));
         index.insert(
-            field_id,
-            pub_item(field_id, "value", ItemEnum::StructField(field_type.clone())),
+            field_type_id,
+            pub_item(
+                field_type_id,
+                "OtherType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
         );
 
         let mut paths = HashMap::new();
         paths.insert(struct_id, item_summary(vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        paths.insert(
+            field_type_id,
+            ItemSummary {
+                crate_id: 0,
+                path: vec!["my_crate".to_string(), "OtherType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
 
         let krate = make_crate(root_id, index, paths);
         let doc = make_baseline("domain", "my_crate", krate);
 
-        // Style config with NO [edge.field] → must fail-closed.
+        // Style config with NO [edge.field] → must fail-closed (CN-02).
         let style: StyleConfig = toml::from_str("[filter]\ninclude_functions = true\n").unwrap();
 
         let mut subgraph_lines = vec![];
@@ -2581,8 +3135,138 @@ include_functions = true
 
         assert!(
             matches!(result, Err(BaselineGraphRendererError::RenderFailed { .. })),
-            "missing [edge.field] must return RenderFailed (CN-02), got {result:?}"
+            "own-crate field + missing [edge.field] must return RenderFailed (CN-02), got {result:?}"
         );
+    }
+
+    // -----------------------------------------------------------------------
+    // T016 / AC-20: generic arg recursion — Vec<OwnType> → edge to OwnType
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_emit_struct_subgraph_generic_arg_own_crate_type_emits_edge() {
+        // A struct field of type Vec<OwnCrateType> — the outer Vec is external,
+        // but the generic argument OwnCrateType is own-crate.
+        // T016 expects: exactly 1 field edge pointing to OwnCrateType (not Vec).
+        use rustdoc_types::{GenericArg, GenericArgs};
+        let root_id = Id(0);
+        let struct_id = Id(1);
+        let field_id = Id(2);
+        let vec_id = Id(3); // std::vec::Vec — external crate_id != 0
+        let inner_id = Id(4); // OwnCrateType — own crate_id == 0
+
+        // Build Vec<OwnCrateType> as a ResolvedPath with one generic type arg.
+        let inner_path = Type::ResolvedPath(rustdoc_types::Path {
+            path: "OwnCrateType".to_string(),
+            id: inner_id,
+            args: None,
+        });
+        let field_type = Type::ResolvedPath(rustdoc_types::Path {
+            path: "Vec".to_string(),
+            id: vec_id,
+            args: Some(Box::new(GenericArgs::AngleBracketed {
+                args: vec![GenericArg::Type(inner_path)],
+                constraints: vec![],
+            })),
+        });
+
+        let mut index = HashMap::new();
+        index.insert(
+            root_id,
+            pub_item(
+                root_id,
+                "my_crate",
+                ItemEnum::Module(Module {
+                    is_crate: true,
+                    items: vec![struct_id, inner_id],
+                    is_stripped: false,
+                }),
+            ),
+        );
+        index.insert(
+            struct_id,
+            pub_item(
+                struct_id,
+                "MyStruct",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Plain { fields: vec![field_id], has_stripped_fields: false },
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+        index.insert(field_id, pub_item(field_id, "items", ItemEnum::StructField(field_type)));
+        index.insert(
+            inner_id,
+            pub_item(
+                inner_id,
+                "OwnCrateType",
+                ItemEnum::Struct(Struct {
+                    kind: StructKind::Unit,
+                    generics: empty_generics(),
+                    impls: vec![],
+                }),
+            ),
+        );
+
+        let mut paths = HashMap::new();
+        paths.insert(struct_id, item_summary(vec!["my_crate", "MyStruct"], ItemKind::Struct));
+        // Vec is external: crate_id != 0
+        paths.insert(
+            vec_id,
+            ItemSummary {
+                crate_id: 1, // not own crate
+                path: vec!["std".to_string(), "vec".to_string(), "Vec".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+        paths.insert(
+            inner_id,
+            ItemSummary {
+                crate_id: 0, // own crate
+                path: vec!["my_crate".to_string(), "OwnCrateType".to_string()],
+                kind: ItemKind::Struct,
+            },
+        );
+
+        let krate = make_crate(root_id, index, paths);
+        let doc = make_baseline("domain", "my_crate", krate);
+
+        let mut subgraph_lines = vec![];
+        let mut edge_lines = vec![];
+        let mut class_attach = vec![];
+        let style = minimal_style();
+
+        emit_struct_subgraph(
+            &doc,
+            struct_id,
+            "domain",
+            &mut subgraph_lines,
+            &mut edge_lines,
+            &mut class_attach,
+            &style,
+            "  ",
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(
+            edge_lines.len(),
+            1,
+            "Vec<OwnCrateType> field → 1 edge to inner own-crate type; got: {edge_lines:?}"
+        );
+        let expected_target = type_rep_node_id("domain", "my_crate", "", "OwnCrateType");
+        assert!(
+            edge_lines[0].contains(&expected_target),
+            "edge must target OwnCrateType (generic arg recursion); edge: {}; expected: {}",
+            edge_lines[0],
+            expected_target
+        );
+        // No anonymous prim_* / anon_* / generic_* nodes
+        let joined = format!("{}\n{}", subgraph_lines.join("\n"), edge_lines.join("\n"));
+        assert!(!joined.contains("prim_"), "no prim_* anonymous nodes (T016)");
+        assert!(!joined.contains("anon_"), "no anon_* anonymous nodes (T016)");
+        assert!(!joined.contains("generic_"), "no generic_* anonymous nodes (T016)");
     }
 
     // -----------------------------------------------------------------------
