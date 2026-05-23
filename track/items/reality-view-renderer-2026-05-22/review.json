@@ -1,6 +1,83 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 161,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
+          "at": "2026-05-22T12:27:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "line": 44,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
+          "at": "2026-05-22T12:31:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:34:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
+          "at": "2026-05-22T12:35:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI composition root still lacks a real success-path test. `test_execute_baseline_graph_branch_guard_passes_for_current_track` only proves the branch guard does not reject; it accepts any loader/renderer/writer failure and skips entirely on non-`track/` branches. That leaves regressions in the new wiring (wrong adapter construction, wrong style-config path, broken writer output path) uncovered in CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 262,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
+          "at": "2026-05-22T21:40:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
+          "at": "2026-05-22T21:42:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
+          "at": "2026-05-22T21:44:40Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -1037,38 +1114,6 @@
         }
       ]
     },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:43:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:45:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:18:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:20:06Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -1165,6 +1210,38 @@
           "findings": [],
           "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
           "at": "2026-05-22T13:58:55Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:45:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:20:06Z"
         }
       ]
     },
@@ -1926,83 +2003,20 @@
           "findings": [],
           "hash": "rvw1:sha256:98e6f45ff2cf180eea32f4229848f400e1886370cda36ab2371db28150262711",
           "at": "2026-05-23T01:28:01Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 161,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1b94162a49ee7309bb856b9b9a228a8d5ad2613034dba38fd5d99d04d70a43b6",
-          "at": "2026-05-22T12:27:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
-              "line": 44,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:e21346a177b3401a8ea017965fd28e9e58666ce3c693744f6aba36dfad3644df",
-          "at": "2026-05-22T12:31:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:34:28Z"
+          "hash": "rvw1:sha256:cbf2a21179ece24f6521809c209e4b68558c3ca44baa103030d577c60f1bc2a5",
+          "at": "2026-05-23T01:48:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d506ae8fe01aeff4408810f7f026994dd538d992ccdeed01b47dcf3bedd12968",
-          "at": "2026-05-22T12:35:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new CLI composition root still lacks a real success-path test. `test_execute_baseline_graph_branch_guard_passes_for_current_track` only proves the branch guard does not reject; it accepts any loader/renderer/writer failure and skips entirely on non-`track/` branches. That leaves regressions in the new wiring (wrong adapter construction, wrong style-config path, broken writer output path) uncovered in CI.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/baseline_graph.rs",
-              "line": 262,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
-          "at": "2026-05-22T21:40:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
-          "at": "2026-05-22T21:42:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9271ab6cd2f2c6cc31a864756d5aab503594482165026316171e16911207578e",
-          "at": "2026-05-22T21:44:40Z"
+          "hash": "rvw1:sha256:cbf2a21179ece24f6521809c209e4b68558c3ca44baa103030d577c60f1bc2a5",
+          "at": "2026-05-23T01:50:47Z"
         }
       ]
     }

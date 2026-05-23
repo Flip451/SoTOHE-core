@@ -705,7 +705,7 @@
     },
     {
       "id": "AC-19",
-      "text": "Inherent method (BB: entry subgraph 内包) および Trait method (H': Trait subgraph 内包) の各 method node から、引数の型へ `method_param` edge、返り値の型へ `method_returns` edge を描く。edge の矢印スタイルは設定ファイル `[edge.method_param]` / `[edge.method_returns]` で定義する。method node が引数・返り値を持たない場合は edge なし",
+      "text": "Inherent method (BB: entry subgraph 内包) および Trait method (H': Trait subgraph 内包) の各 method node から、引数の型へ `method_param` edge、返り値の型へ `method_returns` edge を描く。edge の矢印スタイルは設定ファイル `[edge.method_param]` / `[edge.method_returns]` で定義する。method node が引数・返り値を持たない場合は edge なし。depth-1 overview の cross-cluster edge 集約においても、method の引数・返り値が参照する own crate 型への edge (method_param / method_returns で発生する cluster-to-cluster 依存) を struct field / enum variant payload / TypeAlias / trait impl edge と同様に収集し、cross-cluster edge group に含める。depth-1 概要に method 経由の cross-cluster 依存が漏れることは architecture coupling の underreport に該当し許容しない",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
@@ -718,6 +718,10 @@
         {
           "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
           "anchor": "BB: rustdoc Impl Item の処理 (採択: BB-4-fix1 + blanket 本体 a 案)"
+        },
+        {
+          "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+          "anchor": "U: cluster 構造 + depth 分割 (採択: U-r3)"
         }
       ]
     },
