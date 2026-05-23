@@ -76,6 +76,42 @@
           "findings": [],
           "hash": "rvw1:sha256:1c494ef9b2f3cabd7eeda383989d45d1bdfb3aa66d4fa88b5fd6695775367b15",
           "at": "2026-05-23T10:22:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d0ca693f5c8c163b5244ea93dcce90eed6be00b2f1116f08161a25df3b06edf",
+          "at": "2026-05-23T10:44:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan gives conflicting switch semantics for Codex: GO-01/IN-01 advertises a one-line/provider-only switch to `provider=codex`, but T001 says selecting Codex also requires `model=gpt-5.5`. If the implementation follows the provider-only contract, Codex can inherit the Claude model; if it follows T001, the advertised switch contract is false. Specify whether the model is provider-derived/defaulted or must be edited by the user.",
+              "severity": "P1",
+              "file": "track/items/review-fix-lead-codex-option-2026-05-23/spec.md",
+              "line": 11,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-05 only checks that `GITHUB_TOKEN / SSH 鍵` are not passed as environment variables, but SSH credentials commonly flow through `SSH_AUTH_SOCK`, `HOME`/`~/.ssh`, or key files rather than an `SSH key` env var. This criterion can pass while the fixer still has push credentials, contradicting CN-02/D3's credential isolation guarantee.",
+              "severity": "P1",
+              "file": "track/items/review-fix-lead-codex-option-2026-05-23/spec.md",
+              "line": 43,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:4d0ca693f5c8c163b5244ea93dcce90eed6be00b2f1116f08161a25df3b06edf",
+          "at": "2026-05-23T10:47:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65b29e90400bcee9962bee1660d28ff223d70952b871e5c202f94c0991780405",
+          "at": "2026-05-23T10:50:52Z"
         }
       ]
     }

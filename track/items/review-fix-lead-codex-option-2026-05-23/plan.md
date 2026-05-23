@@ -1,4 +1,49 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # review-fix-lead の provider を選択可能にする (Claude デフォルト、Codex オプション)
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Tasks (0/5 resolved)
+
+### S1 — capability registry: agent-profiles.json に review-fix-lead エントリ追加
+
+> agent-profiles.json に review-fix-lead capability エントリを新設し、provider / model フィールドを追加する。
+> デフォルトは provider=claude で従来動作を維持する。Codex を選ぶ場合は provider=codex に変更する。
+> 他の capability (orchestrator / implementer 等) は変更しない (OS-01)。
+
+- [ ] **T001**: agent-profiles.json に review-fix-lead capability エントリを新設する。provider (claude / codex) と model フィールドを持ち、デフォルトは provider=claude / model=claude-opus-4-7 で従来動作を維持する。Codex を選ぶ場合は provider=codex / model=gpt-5.5 に変更する設計。cargo make ci を通して既存テストへのリグレッションがないことを確認する (IN-01, CN-04, AC-01, AC-08)
+
+### S2 — /track:review コマンドへの provider dispatch 追加
+
+> /track:review が capabilities.review-fix-lead.provider を読んで spawn 経路を分岐する。
+> provider==claude は従来どおり Agent tool (review-fix-lead subagent) を起動する。
+> provider==codex は T003 の Codex 起動 wrapper を Bash 経由で呼び出す。
+> 既存の Claude agent 定義 (.claude/agents/review-fix-lead.md) は残置し、変更しない (IN-06)。
+
+- [ ] **T002**: /track:review コマンド (.claude/commands/track/review.md) に provider-based spawn 経路分岐を追加する。Step 1 で .harness/config/agent-profiles.json の capabilities.review-fix-lead.provider を読み、Step 4 / Step 5 での review-fix-lead 起動を provider==claude なら従来どおり Agent tool (subagent_type: review-fix-lead) で、provider==codex なら T003 で新設する Codex 起動 wrapper を Bash 経由で呼ぶよう分岐する。既存 Claude agent 定義 (.claude/agents/review-fix-lead.md) は変更しない (IN-02, IN-06, CN-04, AC-01)
+
+### S3 — Codex 起動 wrapper: scaffold + smoke-test + return value parser
+
+> cargo make タスクまたは bin/sotp サブコマンドとして Codex 起動 wrapper を新設する。
+> 起動時 smoke-test: workspace-write フラグのアサート + Codex CLI バージョン範囲チェック。
+> --sandbox danger-full-access / --dangerously-bypass-approvals-and-sandbox は起動前に拒否する (CN-01)。
+> GITHUB_TOKEN / SSH 鍵を wrapper 環境から除外して credential isolation を保証する (CN-02)。
+> Codex 終了後に completed / blocked_cross_scope / failed を parse して orchestrator に返す (AC-07)。
+> fixer はファイル編集のみ行い、コミットは trusted orchestrator が既存 guarded wrapper 経由で実施する (CN-03)。
+
+- [ ] **T003**: Codex 起動 wrapper を新設する。形式は cargo make タスク (track-local-review-fix-codex) または bin/sotp サブコマンドのいずれか (ADR D2)。wrapper の責務: (1) orchestrator から渡された briefing file path / scope 名 / scope file list を Codex prompt に inject する、(2) 起動時 smoke-test を実施する: workspace-write フラグが渡されることのアサート + Codex CLI バージョン範囲チェック、(3) codex exec --model <model> --sandbox workspace-write で Codex fixer を起動する、(4) GITHUB_TOKEN / SSH_AUTH_SOCK / SSH 鍵ファイルパス等の push 手段を与えうるクレデンシャルを wrapper 環境から除外して credential isolation を実現する (環境変数の除外に加え、SSH agent socket とファイルシステム上の SSH 鍵が fixer から利用できない状態を保証する)、(5) Codex 終了後に return value (completed / blocked_cross_scope / failed) を parse して orchestrator に返す。--sandbox danger-full-access および --dangerously-bypass-approvals-and-sandbox は起動前アサートで拒否する (IN-03, IN-04, CN-01, CN-02, CN-03, AC-02, AC-03, AC-05, AC-06, AC-07)
+
+### S4 — Codex 用 review-fix-lead briefing template 新設
+
+> .harness/briefings/review-fix-lead-codex.md を新設する。Claude 版と並行して保守するための独立ファイル。
+> tool 指示部: Read → cat 相当 / Grep → grep / rg / Edit → patch 相当の Codex 慣用句に翻訳する。
+> 共有部 (mission / contract / scope ownership / severity policy / workflow / rules) は Claude 版と文面を揃える (CN-05)。
+> cargo make track-local-review 等のシェルコマンドはそのまま引き継ぐ。
+
+- [ ] **T004**: .harness/briefings/review-fix-lead-codex.md を新設する。Claude 版 (.claude/agents/review-fix-lead.md) をそのまま流用せず Codex 用に並行版を作成する。tool 指示部: Read → cat 相当 / Grep → grep / rg 使用指示 / Edit → patch 適用相当の Codex 慣用句に翻訳する。cargo make track-local-review 等のシェルコマンドはそのまま引き継ぐ。共有部 (mission / contract / scope ownership / severity policy 参照 / workflow / architecture guard / rules) は Claude 版と文面を揃える (IN-05, CN-05, AC-04)
+
+### S5 — 最終 integration 確認 + CI gate
+
+> .claude/agents/review-fix-lead.md が削除・変更されていないことを確認する (IN-06)。
+> cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) が全 pass することを確認する (AC-08)。
+> provider=claude のデフォルト動作に変化がなく、既存テストにリグレッションがないことを確認する。
+
+- [ ] **T005**: 最終 integration 確認: .claude/agents/review-fix-lead.md が削除されておらず内容が変更されていないことを確認する (IN-06)。cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) を実行して全 pass を確認する。provider=claude のデフォルト動作が変化していないこと (既存テストにリグレッションがないこと) を確認する (AC-08)
