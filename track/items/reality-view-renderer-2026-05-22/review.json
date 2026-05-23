@@ -1,6 +1,38 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
+          "at": "2026-05-22T11:45:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
+          "at": "2026-05-22T14:20:06Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -829,137 +861,20 @@
           "findings": [],
           "hash": "rvw1:sha256:cfb4335b035129ceee44c864a1f098dad11a76ed59b0d152aca709558b67514d",
           "at": "2026-05-23T03:28:20Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
-          "at": "2026-05-22T12:26:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` writes the overview immediately after rendering it, before rendering the layer's cluster files. If a later `render_cluster` call fails, the method returns `RendererFailed` after `index.md` has already been persisted, so the required load -> render -> write pipeline can leave partial baseline graph output behind.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 283,
-              "category": "correctness"
-            },
-            {
-              "message": "Depth-2 cluster generation is hard-coded to one root cluster per crate: `render_cluster` is always called with an empty module and the writer key is only the crate name. The spec/port contract is per `(crate, top-level module)` cluster with `<crate_name>_<module_seg1>.md`, so crates with top-level modules will miss cluster files and `written_file_count` will be too low.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 292,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
-          "at": "2026-05-22T12:28:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` writes each layer inside the same loop that renders later layers. If rendering succeeds for an earlier layer and then `render_overview` or `render_cluster` fails for a later layer, the method returns `RendererFailed` after already persisting the earlier files. That violates the intended load -> render -> write pipeline and the local guarantee that renderer errors cannot leave partial output; render all filtered layers into memory first, then perform writes only after every render succeeds.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 351,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:98a8be6778601335ec95f7373d6aafa5c23fdcfd02c8ebdf287c4fe9ef27c7c3",
-          "at": "2026-05-22T12:38:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The root-cluster key is emitted as just the crate name, so a writer following the port contract (`<cluster_key>.md`) will create `domain.md` for crate-root items. The track spec/ADR requires crate-root detail files to use `<crate_name>_root.md`; this will put root cluster output at the wrong path once the writer adapter is connected.",
-              "severity": "P1",
-              "file": "libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 345,
-              "category": "spec_mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:e1d49ccfab8024fd3db380515e25489887df02d175ccc5549a345419d5bc20db",
-          "at": "2026-05-22T12:42:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22107f7b0faacadd13b3ec0d1f1f6a4e9ea8cde0db4a9a7570a9eb892b3305bb",
-          "at": "2026-05-22T12:44:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`layer_filter` entries are copied verbatim into `resolved`, so duplicate `LayerId`s are rendered and written multiple times and `rendered_layer_count` is inflated. That makes the baseline-graph workflow behave differently from the contract-map workflow, where duplicates collapse via membership filtering. If repeated layers are meant to be harmless input, this needs deduping before the render/write loop.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/baseline_graph_workflow.rs",
-              "line": 257,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:0ec821a856cbf624e91d3ee6291329023d3f80d1f5e6726bb8a278c74455a730",
-          "at": "2026-05-22T13:31:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
-          "at": "2026-05-22T13:56:06Z"
+          "hash": "rvw1:sha256:0bf6fa68f8fa5abbb95bad9b88de094c828aafd9a0392e6c6ce6bf7eb9801f6b",
+          "at": "2026-05-23T03:37:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
-          "at": "2026-05-22T13:58:55Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
-          "at": "2026-05-22T11:46:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
-          "at": "2026-05-22T11:51:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
-          "at": "2026-05-22T13:29:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
-          "at": "2026-05-22T13:30:19Z"
+          "hash": "rvw1:sha256:0bf6fa68f8fa5abbb95bad9b88de094c828aafd9a0392e6c6ce6bf7eb9801f6b",
+          "at": "2026-05-23T03:38:04Z"
         }
       ]
     },
@@ -2102,35 +2017,134 @@
         }
       ]
     },
-    "other": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:43:11Z"
+          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
+          "at": "2026-05-22T12:26:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` writes the overview immediately after rendering it, before rendering the layer's cluster files. If a later `render_cluster` call fails, the method returns `RendererFailed` after `index.md` has already been persisted, so the required load -> render -> write pipeline can leave partial baseline graph output behind.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 283,
+              "category": "correctness"
+            },
+            {
+              "message": "Depth-2 cluster generation is hard-coded to one root cluster per crate: `render_cluster` is always called with an empty module and the writer key is only the crate name. The spec/port contract is per `(crate, top-level module)` cluster with `<crate_name>_<module_seg1>.md`, so crates with top-level modules will miss cluster files and `written_file_count` will be too low.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 292,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:58afdfc2dac187f1fbfa62181015fca9aa0a849584fd6753f00e34121e98a7c8",
+          "at": "2026-05-22T12:28:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` writes each layer inside the same loop that renders later layers. If rendering succeeds for an earlier layer and then `render_overview` or `render_cluster` fails for a later layer, the method returns `RendererFailed` after already persisting the earlier files. That violates the intended load -> render -> write pipeline and the local guarantee that renderer errors cannot leave partial output; render all filtered layers into memory first, then perform writes only after every render succeeds.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 351,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:98a8be6778601335ec95f7373d6aafa5c23fdcfd02c8ebdf287c4fe9ef27c7c3",
+          "at": "2026-05-22T12:38:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The root-cluster key is emitted as just the crate name, so a writer following the port contract (`<cluster_key>.md`) will create `domain.md` for crate-root items. The track spec/ADR requires crate-root detail files to use `<crate_name>_root.md`; this will put root cluster output at the wrong path once the writer adapter is connected.",
+              "severity": "P1",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 345,
+              "category": "spec_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:e1d49ccfab8024fd3db380515e25489887df02d175ccc5549a345419d5bc20db",
+          "at": "2026-05-22T12:42:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25d049ce4d40fe8a0cec0a35462cfc8a0c05c14ed15513f8ae94d43b25c90846",
-          "at": "2026-05-22T11:45:01Z"
+          "hash": "rvw1:sha256:22107f7b0faacadd13b3ec0d1f1f6a4e9ea8cde0db4a9a7570a9eb892b3305bb",
+          "at": "2026-05-22T12:44:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`layer_filter` entries are copied verbatim into `resolved`, so duplicate `LayerId`s are rendered and written multiple times and `rendered_layer_count` is inflated. That makes the baseline-graph workflow behave differently from the contract-map workflow, where duplicates collapse via membership filtering. If repeated layers are meant to be harmless input, this needs deduping before the render/write loop.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/baseline_graph_workflow.rs",
+              "line": 257,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:0ec821a856cbf624e91d3ee6291329023d3f80d1f5e6726bb8a278c74455a730",
+          "at": "2026-05-22T13:31:49Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:18:45Z"
+          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
+          "at": "2026-05-22T13:56:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:727333cfb27c003181fbf87db0202729c924a9221559c7620325f5fe2a809186",
-          "at": "2026-05-22T14:20:06Z"
+          "hash": "rvw1:sha256:19ff8fde22ee2b0d5871cd3b72943afbcbfc5000b8e7e3013b77274ad602ff67",
+          "at": "2026-05-22T13:58:55Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
+          "at": "2026-05-22T11:46:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b597ff3e32cf17d83c746fdfd49d98aea58eb62d021755e5cd148d45ee47609",
+          "at": "2026-05-22T11:51:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
+          "at": "2026-05-22T13:29:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17b399da23637b41f44a2931f129e8b8c1b5022f61e34f9eeb59ff4ace7aa640",
+          "at": "2026-05-22T13:30:19Z"
         }
       ]
     }
