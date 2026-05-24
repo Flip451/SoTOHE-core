@@ -38,6 +38,87 @@
           "findings": [],
           "hash": "rvw1:sha256:bf3fa632553b8a1de7aa8515793b2169d5fb80c908a5222178bee1990e4c228b",
           "at": "2026-05-24T11:11:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2ed3c224626bdc8dcc2568de67bc6dd7c776532bfc5d8611f008b65551b2110",
+          "at": "2026-05-24T11:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 changes the skill to invoke `cargo make track-local-review` without `--model` and says that wrapper will internally call `sotp review local`, but the task set never assigns any change to the repo-owned make dispatcher/wrapper. T003 only adds the new CLI subcommand and T005 only edits `.claude/commands/track/review.md`, so following the plan leaves the documented command path dependent on a wrapper that is not updated by any task, making AC-01/AC-07 unexecutable through the skill path.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/plan.md",
+              "line": 110,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T005 preserves Step 1 resolution for `capabilities.review-fix-lead`, but the same task/AC-07 also requires `.claude/commands/track/review.md` to contain no provider or model literals such as `codex`, `claude`, or `gpt-*`. Keeping review-fix-lead provider/model dispatch in the skill conflicts with that blanket no-literals requirement unless the plan also moves that dispatch/model passing out of the skill, which no task does.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/plan.md",
+              "line": 106,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a2ed3c224626bdc8dcc2568de67bc6dd7c776532bfc5d8611f008b65551b2110",
+          "at": "2026-05-24T11:32:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S5 says the final `review.md` must contain no provider names or model literals at all, but the task details and AC-07 explicitly keep `review-fix-lead` provider labels and `review-fix-lead.model` references in that same document. This contradiction can send implementers in opposite directions: either preserve the non-reviewer fix-lead dispatch required by AC-07, or remove every provider/model literal as S5/T005(6) states.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/plan.md",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4446646ba3abb6fbe92135f2a731ff7beb29855e586ec016e90919da53e011fc",
+          "at": "2026-05-24T11:39:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 narrows AC-07 correctly in the section preface, saying review-fix-lead dispatch labels such as `provider: codex` / `provider: claude` remain out of scope, but the task checklist then requires all provider/model literals (`\"codex\"`, `\"claude\"`, `\"gpt-*\"`) to disappear from the entire skill body. That contradicts AC-07/spec and can lead the implementer to remove the still-required review-fix-lead dispatch labels instead of only reviewer invocation literals.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/plan.md",
+              "line": 116,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1560ea61ea9ec596f84d73bb84eaa26a7fd29556b1aa658af90c31d56d70cb4a",
+          "at": "2026-05-24T11:42:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-05 claims ClaudeReviewer runs in a read-only mode and cannot perform file edits, but the planned command is only `claude -p --bare --output-format json --json-schema ... --model ... <prompt>`; `--bare` is described in the same artifact set as the reproducibility/minimal-mode flag, not a write-denial mechanism. If T001 implements this command as specified, the plan does not actually enforce the reviewer role's no-write invariant, so the claimed hook-coverage/read-only safety property is false. The task should explicitly constrain Claude's available tools or permission mode so file-edit tools are unavailable.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/spec.md",
+              "line": 37,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:a1f31e3fbfcc68e9375b912f12c97f90e3f1ee6966fd65a117deb68cbaa950c6",
+          "at": "2026-05-24T11:45:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89078c153c07766fb3db5f46bd7960696aecbaf8df192b6b2f0e0301869529ca",
+          "at": "2026-05-24T11:49:32Z"
         }
       ]
     }

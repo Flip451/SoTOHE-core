@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-24T11:51:30Z",
+  "declaration_hash": "03340d0afbf84f5dd5929c19a3e38587b52b307907f32617f8f0e200e0844a9d",
+  "signals": [
+    {
+      "type_name": "ClaudeReviewer",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Reviewer"
+      ]
+    }
+  ]
+}

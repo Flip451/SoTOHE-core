@@ -1,0 +1,70 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "ClaudeReviewer": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "model", "ty": "String" },
+          { "name": "timeout", "ty": "std::time::Duration" },
+          { "name": "base_prompt", "ty": "String" },
+          { "name": "scope_label", "ty": "String" }
+        ],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "model", "ty": "impl Into<String>" },
+            { "name": "timeout", "ty": "std::time::Duration" },
+            { "name": "base_prompt", "ty": "impl Into<String>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "with_scope_label",
+          "receiver": "self",
+          "params": [
+            { "name": "label", "ty": "impl Into<String>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "review_v2::claude_reviewer",
+      "docs": "Claude-backed reviewer implementing the Reviewer usecase port. Spawns `claude -p --bare --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' --model <model> <prompt>` as a subprocess, reads the verdict from stdout envelope's `structured_output` field, and passes it to `parse_review_final_message`. Parallel to CodexReviewer. (IN-01 / CN-01 / CN-05 / CN-06 / AC-02)",
+      "spec_refs": [
+        {
+          "file": "track/items/reviewer-claude-option-2026-05-24/spec.json",
+          "anchor": "IN-01",
+          "hash": "319140feffccc78c4c68eb3d5376ddec169189461f35b3850a3c00591002afbf"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "usecase::review_v2::ports::Reviewer",
+      "for_type": "ClaudeReviewer"
+    }
+  ]
+}
