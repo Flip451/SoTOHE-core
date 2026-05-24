@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f27b4b042b56d0194be97a84b13779e627e25175a47377ded65f412219ee2d86",
+          "at": "2026-05-24T11:06:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 decides to create an independent `pr-reviewer` capability and explicitly rejects putting PR-provider data under the existing `reviewer` entry, but this consequence says migration is only adding settings to the existing `reviewer` entry. That points implementers at the opposite config shape and can reintroduce the `deny_unknown_fields` problem D5 is avoiding.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-2236-reviewer-provider-selectable-claude-option.md",
+              "line": 191,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR claims provider/model literals will disappear from `.claude/commands/**`, but D4 still requires `.claude/commands/track/pr-review.md` to keep the structured provider set as `codex` only. As written, the implementation cannot satisfy both statements without either removing the required PR-review Codex constraint or violating this consequence.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-2236-reviewer-provider-selectable-claude-option.md",
+              "line": 184,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f27b4b042b56d0194be97a84b13779e627e25175a47377ded65f412219ee2d86",
+          "at": "2026-05-24T11:08:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf3fa632553b8a1de7aa8515793b2169d5fb80c908a5222178bee1990e4c228b",
+          "at": "2026-05-24T11:11:04Z"
+        }
+      ]
+    }
+  }
+}
