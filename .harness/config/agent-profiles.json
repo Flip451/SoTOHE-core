@@ -45,8 +45,8 @@
       "provider": "gemini"
     },
     "review-fix-lead": {
-      "provider": "claude",
-      "model": "claude-opus-4-7"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "pr-reviewer": {
       "provider": "codex"

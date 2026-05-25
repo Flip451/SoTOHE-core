@@ -196,32 +196,530 @@ fn collect_literal_spans(s: &str) -> Vec<(usize, usize)> {
     spans
 }
 
-/// Builds a canonical name map from a `Generics` parameter list for use in
-/// `format_type_with_canon`.
+/// Builds a canonical name map and synthetic-param occurrence list from a `Generics`
+/// parameter list for use in `format_type_with_canon`.
 ///
-/// Maps each type and const generic parameter's source name to a positional
-/// placeholder `"#0"`, `"#1"`, … (in declaration order, counting only
-/// type/const params, not lifetime params).  Lifetime parameters are excluded
-/// because `format_type` does not emit them as `Type::Generic` values.
+/// Returns `(name_map, synthetic_order)` where:
+/// - `name_map`: maps each **non-synthetic** type and const generic parameter name to a
+///   positional placeholder `"#0"`, `"#1"`, … (in declaration order, counting only
+///   type/const params, not lifetime params).  Used by `Type::Generic(name)` lookups for
+///   normal named params.
+/// - `synthetic_order`: an occurrence-ordered `Vec<String>` of synthetic `impl Trait`
+///   occurrence keys (those where `is_synthetic == true`), in declaration order.  Each key
+///   starts with its positional placeholder (`"#0"`, `"#1"`, …) and includes the canonical
+///   bound fingerprint, so equal positions with different bounds do not collapse.
 ///
-/// Passing this map to `format_type_with_canon` ensures that renaming a generic
-/// parameter (e.g. `T` → `U`) does not change the formatted string, so two
-/// function signatures that differ only in generic parameter names still compare
-/// as structurally equal — consistent with `generics_structurally_equal`'s
-/// name-independent comparison.
-pub(super) fn build_generic_canon_map(generics: &Generics) -> HashMap<String, String> {
+/// Rustdoc desugars `fn(a: impl Into<String>, b: impl Into<String>)` into two synthetic
+/// `GenericParamDef` entries both named `"impl Into<String>"`.  Storing them in a HashMap
+/// by name causes the second to overwrite the first (key collision).  Separating them into
+/// an ordered list avoids this collision: the A-side codec (`Type::ImplTrait`) and the
+/// C-side rustdoc output (`Type::Generic("impl Into<String>")`) both consume the list
+/// positionally, ensuring the k-th `impl Trait` parameter in the signature maps to the
+/// same placeholder on both sides.
+///
+/// Lifetime parameters are excluded because `format_type` does not emit them as
+/// `Type::Generic` values.
+///
+/// When the input `Generics` has no synthetic params (normal explicit generics only),
+/// `synthetic_order` is empty and the behaviour is identical to the previous
+/// name-map-only version.
+pub(super) fn build_generic_canon_map(
+    generics: &Generics,
+) -> (HashMap<String, String>, Vec<String>) {
     let mut map = HashMap::new();
     let mut idx: usize = 0;
     for p in &generics.params {
         match &p.kind {
-            GenericParamDefKind::Type { .. } | GenericParamDefKind::Const { .. } => {
+            GenericParamDefKind::Type { is_synthetic, .. } => {
+                let placeholder = format!("#{idx}");
+                if !*is_synthetic {
+                    // Normal named type param: insert into name_map for Generic lookup.
+                    map.insert(p.name.clone(), placeholder);
+                }
+                idx += 1;
+            }
+            GenericParamDefKind::Const { .. } => {
+                // Const params are never synthetic (no impl Trait desugaring).
                 map.insert(p.name.clone(), format!("#{idx}"));
                 idx += 1;
             }
             GenericParamDefKind::Lifetime { .. } => {}
         }
     }
-    map
+    let mut synthetic_order: Vec<String> = Vec::new();
+    idx = 0;
+    for p in &generics.params {
+        match &p.kind {
+            GenericParamDefKind::Type { bounds, is_synthetic, .. } => {
+                if *is_synthetic {
+                    // Synthetic impl Trait param: record in occurrence order only.
+                    // Do NOT insert into name_map — duplicate names would collide.
+                    let placeholder = format!("#{idx}");
+                    let bound_sig = format_type_with_canon(&Type::ImplTrait(bounds.clone()), &map);
+                    synthetic_order
+                        .push(format_impl_trait_occurrence_key(&placeholder, &bound_sig));
+                }
+                idx += 1;
+            }
+            GenericParamDefKind::Const { .. } => {
+                idx += 1;
+            }
+            GenericParamDefKind::Lifetime { .. } => {}
+        }
+    }
+    (map, synthetic_order)
+}
+
+fn format_impl_trait_occurrence_key(placeholder: &str, impl_sig: &str) -> String {
+    format!("{placeholder}:{impl_sig}")
+}
+
+fn occurrence_placeholder(occurrence_key: &str) -> &str {
+    occurrence_key.split_once(':').map_or(occurrence_key, |(placeholder, _)| placeholder)
+}
+
+/// Formats a `rustdoc_types::Type` as a short-name string at L1 resolution with an
+/// occurrence cursor for positional `impl Trait` placeholder resolution.
+///
+/// This is the occurrence-aware variant of [`format_type_with_canon`].  It must be used
+/// when the caller needs A-side (`Type::ImplTrait`) and C-side (`Type::Generic("impl ...")`)
+/// representations to produce the same placeholder for the same argument position.
+///
+/// `canon` is the **non-synthetic** name→placeholder map from `build_generic_canon_map`.
+/// `synthetic_order` is the occurrence-ordered synthetic occurrence-key list (also from
+/// `build_generic_canon_map`) for synthetic `impl Trait` params.  This list is populated
+/// on the C-side (rustdoc); on the A-side (catalogue codec) it may be empty.
+/// `cursor` is a shared mutable counter incremented each time an `impl Trait` occurrence
+/// is consumed; the k-th C-side invocation maps to `synthetic_order[k]`, while the A-side
+/// generates the same placeholder prefix and appends its own canonical bound fingerprint
+/// when `use_positional_fallback` is true.
+///
+/// **`use_positional_fallback`:** controls how `Type::ImplTrait` and
+/// `Type::Generic("impl ...")` are rendered when `synthetic_order` is empty:
+/// - `true` (A-side in an A/C asymmetric comparison): generates on-the-fly positional
+///   placeholders as `#(canon.len() + cursor)`, mirroring the placeholder that the C-side
+///   assigns to its synthetic params.  Use this when the COUNTERPART has a non-empty
+///   `synthetic_order`.
+/// - `false` (A-A symmetric comparison or explicit opt-out): falls back to
+///   `format_type_with_canon` which renders `Type::ImplTrait` as its literal bound
+///   string (e.g. `"impl Display"`), preserving bound-content distinction between
+///   different `impl Trait` signatures.
+///
+/// **Supported bounds check:** if an `ImplTrait` carries unsupported bounds
+/// (`Outlives`, `Use`, or HRTB `TraitBound`), the cursor is NOT consumed and the call
+/// falls through to `format_type_with_canon` which returns the `<UNSUPPORTED:ImplTrait>`
+/// sentinel.  This preserves the D3 fail-closed guarantee.
+pub(super) fn format_type_with_canon_occ(
+    ty: &Type,
+    canon: &HashMap<String, String>,
+    synthetic_order: &[String],
+    use_positional_fallback: bool,
+    cursor: &mut usize,
+) -> String {
+    match ty {
+        Type::Generic(name) => {
+            // Check if this is a rustdoc-synthetic impl Trait param (name starts with "impl ").
+            // Consume one occurrence from synthetic_order and return the corresponding placeholder.
+            if name.starts_with("impl ") {
+                if !synthetic_order.is_empty() {
+                    let cur = *cursor;
+                    if let Some(occurrence_key) = synthetic_order.get(cur) {
+                        *cursor += 1;
+                        return occurrence_key.clone();
+                    }
+                    // cursor past the end of the list — fall through.
+                }
+                if use_positional_fallback {
+                    // A-side in A/C comparison: generate placeholder using normal-param count as offset.
+                    let placeholder = format!("#{}", canon.len() + *cursor);
+                    *cursor += 1;
+                    let bound_sig = apply_canon_to_str(name, canon);
+                    return format_impl_trait_occurrence_key(&placeholder, &bound_sig);
+                }
+                // A-A comparison: render as literal (fall through to name_map lookup or literal).
+            }
+            // Normal named generic param: look up in name_map.
+            if let Some(pos) = canon.get(name.as_str()) { pos.clone() } else { name.clone() }
+        }
+        Type::ImplTrait(bounds) => {
+            // A-side: impl Trait declared in catalogue.
+            // Check bounds are supported before consuming the cursor (D3 fail-closed guard).
+            let has_unsupported = bounds.iter().any(|b| match b {
+                rustdoc_types::GenericBound::Outlives(_) | rustdoc_types::GenericBound::Use(_) => {
+                    true
+                }
+                rustdoc_types::GenericBound::TraitBound { generic_params, .. } => {
+                    !generic_params.is_empty()
+                }
+            });
+            if has_unsupported {
+                // Unsupported bounds: do NOT consume cursor — fall through to sentinel.
+                return format_type_with_canon(ty, canon);
+            }
+            // Supported bounds: assign positional placeholder.
+            let bound_sig = format_type_with_canon(ty, canon);
+            if !synthetic_order.is_empty() {
+                // C-side has synthetic params: use the pre-built occurrence list.
+                let cur = *cursor;
+                if let Some(occurrence_key) = synthetic_order.get(cur) {
+                    *cursor += 1;
+                    let placeholder = occurrence_placeholder(occurrence_key);
+                    return format_impl_trait_occurrence_key(placeholder, &bound_sig);
+                }
+                // cursor past the end of the list — fall back to on-the-fly generation.
+            }
+            if use_positional_fallback {
+                // A-side in A/C comparison (counterpart has synthetic params).
+                // Generate placeholder using normal-param count as offset, mirroring C-side assignment.
+                let placeholder = format!("#{}", canon.len() + *cursor);
+                *cursor += 1;
+                return format_impl_trait_occurrence_key(&placeholder, &bound_sig);
+            }
+            // A-A symmetric comparison: fall back to literal bound rendering so that
+            // fn(Display, Into<String>) and fn(Into<String>, Display) produce different strings.
+            bound_sig
+        }
+        // All other variants: delegate to the occurrence-aware inner formatter, threading
+        // the cursor so that any nested ImplTrait or Generic("impl ...") values inside
+        // composite types (e.g. `Vec<impl Trait>`) also consume the shared cursor.
+        other => format_type_with_canon_occ_inner(
+            other,
+            canon,
+            synthetic_order,
+            use_positional_fallback,
+            cursor,
+        ),
+    }
+}
+
+/// Inner recursive helper for [`format_type_with_canon_occ`].
+///
+/// Handles all `Type` variants except `Type::Generic` and `Type::ImplTrait` (which are
+/// handled by the outer function).  Mirrors the matching arms in `format_type_with_canon`
+/// but threads the occurrence cursor and `use_positional_fallback` flag through recursive
+/// calls so that nested `ImplTrait` or `Generic("impl ...")` values inside composite types
+/// (e.g. `Vec<impl Trait>`) also consume the shared cursor with the correct behavior.
+fn format_type_with_canon_occ_inner(
+    ty: &Type,
+    canon: &HashMap<String, String>,
+    synthetic_order: &[String],
+    use_positional_fallback: bool,
+    cursor: &mut usize,
+) -> String {
+    // Macro-like closure to reduce boilerplate in recursive cases.
+    let rec = |t: &Type, c: &mut usize| {
+        format_type_with_canon_occ(t, canon, synthetic_order, use_positional_fallback, c)
+    };
+    match ty {
+        Type::ResolvedPath(p) => {
+            let path_str: &str = &p.path;
+            let display_base = if let Some(sep_pos) = path_str.find("::") {
+                let prefix = &path_str[..sep_pos];
+                let rest = &path_str[sep_pos..];
+                if !canon.is_empty() && canon.contains_key(prefix) {
+                    let canon_prefix = canon.get(prefix).map(|s| s.as_str()).unwrap_or(prefix);
+                    format!("{canon_prefix}{rest}")
+                } else {
+                    p.path.rsplit("::").next().unwrap_or(path_str).to_string()
+                }
+            } else {
+                p.path.clone()
+            };
+            if let Some(args) = &p.args {
+                let rendered = format_generic_args_with_canon_occ(
+                    args,
+                    canon,
+                    synthetic_order,
+                    use_positional_fallback,
+                    cursor,
+                );
+                if rendered.is_empty() {
+                    display_base
+                } else {
+                    format!("{display_base}<{rendered}>")
+                }
+            } else {
+                display_base
+            }
+        }
+        Type::Primitive(name) => name.clone(),
+        Type::BorrowedRef { lifetime, is_mutable, type_: inner } => {
+            let mut_str = if *is_mutable { "mut " } else { "" };
+            let in_hrtb_ctx = canon.contains_key("@BR:");
+            let lt_str = match lifetime.as_deref() {
+                None => String::new(),
+                Some(lt) => {
+                    if let Some(pos) = canon.get(&format!("@BR:{lt}")) {
+                        if pos.is_empty() { String::new() } else { format!("{pos} ") }
+                    } else if in_hrtb_ctx || lt == "'static" {
+                        format!("{lt} ")
+                    } else {
+                        String::new()
+                    }
+                }
+            };
+            format!("&{lt_str}{mut_str}{}", rec(inner, cursor))
+        }
+        Type::Slice(inner) => format!("[{}]", rec(inner, cursor)),
+        Type::Array { type_: inner, len } => {
+            let safe_len = apply_canon_to_str(&len.replace("::", "."), canon);
+            format!("[{}; {}]", rec(inner, cursor), safe_len)
+        }
+        Type::Tuple(tys) if tys.is_empty() => "()".to_string(),
+        Type::Tuple(tys) => {
+            let items: Vec<String> = tys.iter().map(|t| rec(t, cursor)).collect();
+            format!("({})", items.join(", "))
+        }
+        Type::RawPointer { is_mutable, type_: inner } => {
+            let kw = if *is_mutable { "mut" } else { "const" };
+            format!("*{kw} {}", rec(inner, cursor))
+        }
+        Type::DynTrait(dyn_trait) => {
+            let has_hrtb = dyn_trait.traits.iter().any(|pt| !pt.generic_params.is_empty());
+            if has_hrtb {
+                return "<UNSUPPORTED:DynTrait>".to_string();
+            }
+            // Safety: the occurrence cursor (`cursor`) is shared across the whole
+            // type-formatting call and is consumed whenever a `Type::ImplTrait` (A-side)
+            // or `Type::Generic("impl …")` (C-side synthetic rustdoc param) is encountered.
+            //
+            // Neither variant can appear nested inside a `dyn Trait`'s generic args in
+            // valid Rust or valid rustdoc JSON output:
+            //
+            //   • `Type::ImplTrait` — `impl Trait` in a type-argument position (e.g.
+            //     `dyn SomeTrait<impl Foo>` or `dyn SomeTrait<Assoc = impl Foo>`) is not
+            //     accepted by the Rust compiler; the grammar does not allow `impl Trait`
+            //     as a type argument or associated-type binding value inside `dyn Trait`.
+            //
+            //   • `Type::Generic("impl …")` — these are the synthetic generic parameters
+            //     that rustdoc emits when it desugars function-argument-position `impl Trait`
+            //     (e.g. `fn f(x: impl Display)`).  This desugaring is exclusively
+            //     function-level: rustdoc replaces the `impl Trait` arg type with
+            //     `Type::Generic("impl Display")` and adds an `is_synthetic = true`
+            //     `GenericParamDef` to the function's generic list.  This form never
+            //     appears inside the generic args of a `dyn Trait` object type.
+            //
+            // Consequence: `format_generic_args_with_canon_occ` called for each bound
+            // below will never increment `cursor`, so the post-loop `sort_unstable()` does
+            // not reorder any cursor-consuming renderings.  The consume-then-sort pattern
+            // is therefore harmless for this arm.
+            let mut parts: Vec<String> = dyn_trait
+                .traits
+                .iter()
+                .map(|pt| {
+                    let p = &pt.trait_;
+                    let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
+                    let args_str = p
+                        .args
+                        .as_deref()
+                        .map(|a| {
+                            let s = format_generic_args_with_canon_occ(
+                                a,
+                                canon,
+                                synthetic_order,
+                                use_positional_fallback,
+                                cursor,
+                            );
+                            if s.is_empty() { String::new() } else { format!("<{s}>") }
+                        })
+                        .unwrap_or_default();
+                    format!("{short}{args_str}")
+                })
+                .collect();
+            parts.sort_unstable();
+            let rendered = parts.join(" + ");
+            let lifetime_str =
+                dyn_trait.lifetime.as_deref().map(|lt| format!(" + {lt}")).unwrap_or_default();
+            if rendered.is_empty() {
+                format!("dyn _{lifetime_str}")
+            } else {
+                format!("dyn {rendered}{lifetime_str}")
+            }
+        }
+        Type::FunctionPointer(fp) => {
+            if !fp.generic_params.is_empty() {
+                return "<UNSUPPORTED:FunctionPointer>".to_string();
+            }
+            let params: Vec<String> = fp.sig.inputs.iter().map(|(_, t)| rec(t, cursor)).collect();
+            let ret = fp.sig.output.as_ref().map_or_else(|| "()".to_string(), |t| rec(t, cursor));
+            let variadic = if fp.sig.is_c_variadic { ", ..." } else { "" };
+            let constness = if fp.header.is_const { "const " } else { "" };
+            let unsafety = if fp.header.is_unsafe { "unsafe " } else { "" };
+            let abi = format_abi(&fp.header.abi);
+            format!("{abi}{constness}{unsafety}fn({}{})->{ret}", params.join(","), variadic)
+        }
+        Type::Pat { type_: inner, .. } => rec(inner, cursor),
+        Type::QualifiedPath { name, self_type, trait_, args } => {
+            let trait_str = trait_
+                .as_ref()
+                .map(|p| {
+                    let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
+                    let trait_args_str = p
+                        .args
+                        .as_deref()
+                        .map(|a| {
+                            let s = format_generic_args_with_canon_occ(
+                                a,
+                                canon,
+                                synthetic_order,
+                                use_positional_fallback,
+                                cursor,
+                            );
+                            if s.is_empty() { String::new() } else { format!("<{s}>") }
+                        })
+                        .unwrap_or_default();
+                    format!("{short}{trait_args_str}")
+                })
+                .unwrap_or_else(|| "_".to_string());
+            let self_str = rec(self_type, cursor);
+            let args_str = args.as_deref().map_or_else(String::new, |a| {
+                format_generic_args_with_canon_occ(
+                    a,
+                    canon,
+                    synthetic_order,
+                    use_positional_fallback,
+                    cursor,
+                )
+            });
+            if args_str.is_empty() {
+                format!("<{self_str} as {trait_str}>::{name}")
+            } else {
+                format!("<{self_str} as {trait_str}>::{name}<{args_str}>")
+            }
+        }
+        _ => "_".to_string(),
+    }
+}
+
+/// Formats `GenericArgs` with occurrence-aware canonicalization.
+///
+/// Mirrors `format_generic_args_with_canon` but threads the occurrence cursor and
+/// `use_positional_fallback` flag through recursive `format_type_with_canon_occ` calls
+/// so that `impl Trait` argument positions inside generic args are also tracked with
+/// the correct fallback behavior.
+fn format_generic_args_with_canon_occ(
+    args: &GenericArgs,
+    canon: &HashMap<String, String>,
+    synthetic_order: &[String],
+    use_positional_fallback: bool,
+    cursor: &mut usize,
+) -> String {
+    match args {
+        GenericArgs::AngleBracketed { args, constraints } => {
+            let positional: Vec<String> = args
+                .iter()
+                .map(|arg| match arg {
+                    GenericArg::Type(t) => format_type_with_canon_occ(
+                        t,
+                        canon,
+                        synthetic_order,
+                        use_positional_fallback,
+                        cursor,
+                    ),
+                    GenericArg::Lifetime(lt) => {
+                        canon.get(lt.as_str()).cloned().unwrap_or_else(|| lt.clone())
+                    }
+                    GenericArg::Const(c) => apply_canon_to_str(&c.expr.replace("::", "."), canon),
+                    GenericArg::Infer => "_".to_string(),
+                })
+                .collect();
+            let mut sorted_constraints: Vec<_> = constraints.iter().collect();
+            sorted_constraints
+                .sort_by_key(|c| format_assoc_constraint_sort_key_with_canon(c, canon));
+            let constraint_parts: Vec<String> = sorted_constraints
+                .into_iter()
+                .map(|c| {
+                    format_assoc_constraint_with_canon_occ(
+                        c,
+                        canon,
+                        synthetic_order,
+                        use_positional_fallback,
+                        cursor,
+                    )
+                })
+                .collect();
+            let mut parts = positional;
+            parts.extend(constraint_parts);
+            parts.join(", ")
+        }
+        GenericArgs::Parenthesized { inputs, output } => {
+            let params: Vec<String> = inputs
+                .iter()
+                .map(|t| {
+                    format_type_with_canon_occ(
+                        t,
+                        canon,
+                        synthetic_order,
+                        use_positional_fallback,
+                        cursor,
+                    )
+                })
+                .collect();
+            let ret = output.as_ref().map_or_else(
+                || "()".to_string(),
+                |t| {
+                    format_type_with_canon_occ(
+                        t,
+                        canon,
+                        synthetic_order,
+                        use_positional_fallback,
+                        cursor,
+                    )
+                },
+            );
+            format!("({})->{}", params.join(","), ret)
+        }
+        _ => String::new(),
+    }
+}
+
+fn format_assoc_constraint_sort_key_with_canon(
+    c: &rustdoc_types::AssocItemConstraint,
+    canon: &HashMap<String, String>,
+) -> String {
+    match &c.binding {
+        AssocItemConstraintKind::Equality(Term::Type(ty)) => {
+            let rhs = format_type_with_canon(ty, canon);
+            if rhs.is_empty() { c.name.clone() } else { format!("{}={}", c.name, rhs) }
+        }
+        AssocItemConstraintKind::Equality(Term::Constant(cv)) => {
+            let rhs = apply_canon_to_str(&cv.expr.replace("::", "."), canon);
+            if rhs.is_empty() { c.name.clone() } else { format!("{}={}", c.name, rhs) }
+        }
+        AssocItemConstraintKind::Constraint(bounds) => {
+            let rhs = format_generic_bounds_with_canon(bounds, canon);
+            if rhs.is_empty() { c.name.clone() } else { format!("{}:{}", c.name, rhs) }
+        }
+    }
+}
+
+fn format_assoc_constraint_with_canon_occ(
+    c: &rustdoc_types::AssocItemConstraint,
+    canon: &HashMap<String, String>,
+    synthetic_order: &[String],
+    use_positional_fallback: bool,
+    cursor: &mut usize,
+) -> String {
+    match &c.binding {
+        AssocItemConstraintKind::Equality(Term::Type(ty)) => {
+            let rhs = format_type_with_canon_occ(
+                ty,
+                canon,
+                synthetic_order,
+                use_positional_fallback,
+                cursor,
+            );
+            if rhs.is_empty() { c.name.clone() } else { format!("{}={}", c.name, rhs) }
+        }
+        AssocItemConstraintKind::Equality(Term::Constant(cv)) => {
+            let rhs = apply_canon_to_str(&cv.expr.replace("::", "."), canon);
+            if rhs.is_empty() { c.name.clone() } else { format!("{}={}", c.name, rhs) }
+        }
+        AssocItemConstraintKind::Constraint(bounds) => {
+            let rhs = format_generic_bounds_with_canon(bounds, canon);
+            if rhs.is_empty() { c.name.clone() } else { format!("{}:{}", c.name, rhs) }
+        }
+    }
 }
 
 /// Formats a `rustdoc_types::Type` as a short-name string at L1 resolution,
@@ -232,6 +730,11 @@ pub(super) fn build_generic_canon_map(generics: &Generics) -> HashMap<String, St
 /// that two signatures that differ only in generic parameter names — such as
 /// `fn f<T>(x: T)` vs `fn f<U>(x: U)` — produce identical formatted strings and
 /// compare as structurally equal, consistent with `generics_structurally_equal`.
+///
+/// For `Type::ImplTrait` in the absence of occurrence context, this function renders
+/// the bound strings literally (e.g. `"impl Into<String>"`).  When occurrence-aware
+/// formatting is needed (A-side vs C-side `impl Trait` symmetry), use
+/// [`format_type_with_canon_occ`] instead.
 ///
 /// Pass an empty `HashMap` (or use `format_type` directly) when generic name
 /// canonicalization is not desired.
@@ -1836,6 +2339,66 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_format_type_with_canon_occ_reordered_constraints_use_same_placeholders() {
+        fn trait_bound(name: &str) -> rustdoc_types::GenericBound {
+            rustdoc_types::GenericBound::TraitBound {
+                trait_: Path { path: name.to_owned(), id: rustdoc_types::Id(0), args: None },
+                generic_params: vec![],
+                modifier: rustdoc_types::TraitBoundModifier::None,
+            }
+        }
+
+        fn impl_constraint(name: &str, bound_name: &str) -> AssocItemConstraint {
+            AssocItemConstraint {
+                name: name.to_owned(),
+                args: None,
+                binding: AssocItemConstraintKind::Equality(Term::Type(Type::ImplTrait(vec![
+                    trait_bound(bound_name),
+                ]))),
+            }
+        }
+
+        fn resolved_with_constraints(constraints: Vec<AssocItemConstraint>) -> Type {
+            Type::ResolvedPath(Path {
+                path: "Foo".to_owned(),
+                id: rustdoc_types::Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed { args: vec![], constraints })),
+            })
+        }
+
+        let ordered = resolved_with_constraints(vec![
+            impl_constraint("A", "Display"),
+            impl_constraint("B", "Debug"),
+        ]);
+        let reordered = resolved_with_constraints(vec![
+            impl_constraint("B", "Debug"),
+            impl_constraint("A", "Display"),
+        ]);
+        let canon = std::collections::HashMap::new();
+        let mut ordered_cursor = 0;
+        let mut reordered_cursor = 0;
+
+        let ordered_rendered =
+            super::format_type_with_canon_occ(&ordered, &canon, &[], true, &mut ordered_cursor);
+        let reordered_rendered =
+            super::format_type_with_canon_occ(&reordered, &canon, &[], true, &mut reordered_cursor);
+
+        assert_eq!(ordered_cursor, 2, "ordered constraints must consume both impl Trait entries");
+        assert_eq!(
+            reordered_cursor, 2,
+            "reordered constraints must consume both impl Trait entries"
+        );
+        assert_eq!(
+            ordered_rendered, "Foo<A=#0:impl Display, B=#1:impl Debug>",
+            "constraints must be rendered in canonical order before placeholders are assigned"
+        );
+        assert_eq!(
+            ordered_rendered, reordered_rendered,
+            "constraint source order must not change occurrence placeholder assignment"
+        );
+    }
+
     // --- format_generic_bounds_with_canon: HRTB 2-binder arity distinguishes lifetime usage ---
 
     #[test]
@@ -2018,6 +2581,116 @@ mod tests {
             "D5: `for<'a,'b> Fn(&'static str)` and `for<'a,'b> Fn(&str)` must produce \
              distinct fingerprints (concrete vs elided lifetime in 2+-binder context); \
              got: fp_static={fp_static:?} fp_elided={fp_elided:?}"
+        );
+    }
+
+    // --- DynTrait bound-order canonicalization stability ---
+    //
+    // Verifies the "Safety" invariant documented in `format_type_with_canon_occ_inner`'s
+    // `Type::DynTrait` arm: because the occurrence cursor is never consumed inside
+    // `dyn Trait`'s generic args, sorting the rendered bounds after formatting them does
+    // not change which cursor slot any `impl Trait` placeholder is assigned to.  Two
+    // `dyn A + B` and `dyn B + A` objects (identical modulo bound order) must produce the
+    // same canonicalized string and must leave the cursor unchanged.
+
+    fn make_dyn_trait_type(trait_names: &[&str]) -> Type {
+        use rustdoc_types::{DynTrait, Id, Path, PolyTrait};
+        Type::DynTrait(DynTrait {
+            traits: trait_names
+                .iter()
+                .map(|name| PolyTrait {
+                    trait_: Path { path: name.to_string(), id: Id(0), args: None },
+                    generic_params: vec![],
+                })
+                .collect(),
+            lifetime: None,
+        })
+    }
+
+    #[test]
+    fn test_dyn_trait_bound_order_canonicalization_is_stable() {
+        // `dyn Display + Debug` and `dyn Debug + Display` must produce the same
+        // canonicalized string regardless of the source order of the trait bounds.
+        use std::collections::HashMap;
+
+        use super::format_type_with_canon_occ;
+
+        let dyn_ab = make_dyn_trait_type(&["Display", "Debug"]);
+        let dyn_ba = make_dyn_trait_type(&["Debug", "Display"]);
+        let canon: HashMap<String, String> = HashMap::new();
+        let mut cursor_ab = 0usize;
+        let mut cursor_ba = 0usize;
+
+        let result_ab = format_type_with_canon_occ(&dyn_ab, &canon, &[], false, &mut cursor_ab);
+        let result_ba = format_type_with_canon_occ(&dyn_ba, &canon, &[], false, &mut cursor_ba);
+
+        assert_eq!(
+            result_ab, result_ba,
+            "dyn Trait bound order must not affect canonicalized string; \
+             ab={result_ab:?} ba={result_ba:?}"
+        );
+        assert_eq!(
+            cursor_ab, 0,
+            "dyn Trait formatting must not consume the impl Trait occurrence cursor; \
+             cursor advanced to {cursor_ab}"
+        );
+        assert_eq!(
+            cursor_ba, 0,
+            "dyn Trait formatting must not consume the impl Trait occurrence cursor; \
+             cursor advanced to {cursor_ba}"
+        );
+    }
+
+    #[test]
+    fn test_dyn_trait_with_generic_args_does_not_consume_cursor() {
+        // `dyn Foo<u8> + Bar<u16>` and `dyn Bar<u16> + Foo<u8>` (same bounds, different source
+        // order) must produce the same output and must not consume the cursor.
+        use std::collections::HashMap;
+
+        use rustdoc_types::{DynTrait, GenericArg, GenericArgs, Id, Path, PolyTrait};
+
+        use super::format_type_with_canon_occ;
+
+        fn make_poly_trait(name: &str, arg_ty: &str) -> PolyTrait {
+            PolyTrait {
+                trait_: Path {
+                    path: name.to_string(),
+                    id: Id(0),
+                    args: Some(Box::new(GenericArgs::AngleBracketed {
+                        args: vec![GenericArg::Type(Type::Primitive(arg_ty.to_string()))],
+                        constraints: vec![],
+                    })),
+                },
+                generic_params: vec![],
+            }
+        }
+
+        // dyn Foo<u8> + Bar<u16>  (source order: Foo first)
+        let dyn_ab = Type::DynTrait(DynTrait {
+            traits: vec![make_poly_trait("Foo", "u8"), make_poly_trait("Bar", "u16")],
+            lifetime: None,
+        });
+        // dyn Bar<u16> + Foo<u8>  (source order: Bar first — same set, different order)
+        let dyn_ba = Type::DynTrait(DynTrait {
+            traits: vec![make_poly_trait("Bar", "u16"), make_poly_trait("Foo", "u8")],
+            lifetime: None,
+        });
+
+        let canon: HashMap<String, String> = HashMap::new();
+        let mut cursor_ab = 0usize;
+        let mut cursor_ba = 0usize;
+
+        let result_ab = format_type_with_canon_occ(&dyn_ab, &canon, &[], false, &mut cursor_ab);
+        let result_ba = format_type_with_canon_occ(&dyn_ba, &canon, &[], false, &mut cursor_ba);
+
+        assert_eq!(
+            result_ab, result_ba,
+            "dyn Trait with primitive generic args: bound order must not affect output; \
+             ab={result_ab:?} ba={result_ba:?}"
+        );
+        assert_eq!(
+            cursor_ab, 0,
+            "dyn Trait with primitive args must not consume cursor; advanced to {cursor_ab}"
         );
     }
 
