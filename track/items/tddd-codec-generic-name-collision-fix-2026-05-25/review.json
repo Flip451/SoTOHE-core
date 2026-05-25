@@ -16,6 +16,57 @@
           "findings": [],
           "hash": "rvw1:sha256:ce4ca3f6ba69fbd18023ed0f4663cdf4f84c75e4e39430abba0c8bf0c76c0462",
           "at": "2026-05-25T05:18:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001` changes the canon structure in a way that is incompatible with the downstream steps: it proposes a placeholder-keyed map or even a `Vec<(String, String)>`, but `T002`/`T003` still assume `format_type_with_canon` can resolve generic names, and `Type::ImplTrait` has no stable key in the described map to map it to `#0/#1`. As written, the plan does not describe a workable data flow for either generic-name canonicalization or `impl Trait` lookup.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-codec-generic-name-collision-fix-2026-05-25/plan.md",
+              "line": 11,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d821e2dd686e1510a43a63b8482a1c966505e47c5808877ff2ae6a304395a04f",
+          "at": "2026-05-25T05:38:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a706914d6c77b1165434109ac7ccb89b9b52232a6557a71e07872265eeaaf2a6",
+          "at": "2026-05-25T05:43:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S3/T003 says it will fix \"all call sites in generics_eq.rs\", but the task list only names `fn_sigs_structurally_equal`, `build_combined_canon_map`, and `build_where_form_view`. `build_trait_method_map` also formats function signatures through the same helpers, so omitting it leaves the trait/impl-method comparison path on the pre-fix `impl Trait` behavior and makes the \"all call sites\" claim false.",
+              "severity": "P1",
+              "file": "track/items/tddd-codec-generic-name-collision-fix-2026-05-25/plan.md",
+              "line": 22,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:a706914d6c77b1165434109ac7ccb89b9b52232a6557a71e07872265eeaaf2a6",
+          "at": "2026-05-25T05:49:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dac44f92b8bee8272776f31467a779c37f660a74a1bfb1fd1143f1022038fbd",
+          "at": "2026-05-25T05:54:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dac44f92b8bee8272776f31467a779c37f660a74a1bfb1fd1143f1022038fbd",
+          "at": "2026-05-25T05:57:06Z"
         }
       ]
     },

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "format.rs: `build_generic_canon_map` と関連する内部 canon 表現を位置ベース識別に変更する。現行実装は `p.name -> \"#idx\"` の HashMap だけで管理するため、`impl Trait` 引数から rustdoc が生成する同名合成 param（例: `\"impl Into<String>\"` × 2）が HashMap 上で衝突する。修正方針: 通常の named type/const param については既存の名前 lookup（`name -> \"#idx\"`）を維持し、同時に `is_synthetic` な `impl Trait` param については宣言順に `(synthetic_name, placeholder)` を保持する occurrence-ordered 情報を追加する。catalogue 側のように `Type::ImplTrait(bounds)` は存在するが rustdoc synthetic param が存在しない入力では、通常 generic の個数を offset として、関数入力を左から走査しながら同じ occurrence-ordered 情報を補完する。これにより `Type::Generic(\"impl Into<String>\")` と A 側の `Type::ImplTrait(bounds)` は、bound 文字列だけを HashMap key にせず、入力引数の occurrence cursor で `\"#0\"`, `\"#1\"` へ対応付けられる。placeholder を HashMap の key に反転させないこと。Lifetime param は引き続きスキップする。変更は `libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs` の canon 構築ヘルパーに閉じ、呼び出し元の変更は T003 で扱う（CN-01）。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "format.rs: `format_type_with_canon` の `Type::ImplTrait` アームを位置 placeholder 描画に変更する。現行実装は `Type::ImplTrait(bounds)` を `\"impl <bound_strings>\"` というリテラルとして整形する。これは C 側（rustdoc）が生成する `Type::Generic(\"impl Into<String>\")` が canon 経由の位置 placeholder に変換されることと非対称になっており、A 側 codec が ImplTrait をそのまま描画すると C 側と一致しない。修正方針: T001 の occurrence-ordered synthetic param 情報を受け取れる formatter helper を追加し、`Type::ImplTrait(bounds)` では bounds から作った synthetic name（例: `\"impl Into<String>\"`）と現在の occurrence cursor を使って対応する placeholder（`\"#0\"`, `\"#1\"` など）を返す。C 側の `Type::Generic(\"impl Into<String>\")` も同じ cursor を消費して同じ placeholder に正規化する。catalogue 側で occurrence 情報が未登録の場合は、通常 generic の次の位置から cursor が placeholder を割り当てて登録する。occurrence 情報なしで `format_type_with_canon` が単体利用される場合は従来通り bounds リテラルへフォールバックしてよい。`format_type`（canon なし版）は変更しない。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "generics_eq.rs: `build_generic_canon_map` および `format_type_with_canon` を呼ぶ全箇所が T001/T002 の変更後インターフェースに対応していることを確認・修正する。対象箇所: (1) `fn_sigs_structurally_equal` — A 側 / B 側それぞれで canon context と synthetic occurrence cursor を作り、入力引数を左から順に format して `Type::ImplTrait(bounds)` と `Type::Generic(\"impl ...\")` の両方が同じ placeholder を消費するようにする。片側に rustdoc synthetic param がなくても、通常 generic 数を offset にして入力走査から placeholder を補完する。(2) `build_combined_canon_map` — parent_generics と method_generics を順に走査し、通常 param の `name -> placeholder` lookup と synthetic occurrence 情報の両方を結合する。parent と method に跨る同名 param でも placeholder 順序が崩れないことを確認する。(3) `build_where_form_view` — `combined_canon` を受け取り `format_type_with_canon` / `format_generic_bounds_with_canon` を呼ぶ経路で、通常 generic 名の lookupは従来通り働かせ、`Type::ImplTrait` が現れた場合は occurrence 情報があるときだけ位置 placeholder を生成する。(4) `build_trait_method_map` — trait/impl-method 比較パスのエントリポイント。`build_combined_canon_map` および `format_type_with_canon` を呼び出す（`pub(super) fn`、generics_eq.rs:370 付近）ため、T001/T002 の変更後インターフェースを受け取れることを確認する。この関数自体が修正の伝播先になるが、`build_combined_canon_map` / `format_type_with_canon` の変更に依存するため、当該パスへの伝播が実際に機能していることを T004 で trait/impl-method テストケースにより検証する。位置ベース canon 情報が全比較パスに正しく伝播することを保証する。変更は `libs/infrastructure/src/tddd/signal_evaluator_v2/generics_eq.rs` に閉じること（CN-01）。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "unit test 追加 + CI 全体確認。`generics_eq.rs` の `#[cfg(test)] mod tests` に以下のテストを追加する。(a) 単一 `impl Trait` 引数のテスト: `fn(a: impl Into<String>)` を catalogue で宣言した場合に A 側 codec 出力と C 側 rustdoc 出力が構造等値と判定されることを `fn_sigs_structurally_equal` または `format_type_with_canon` ベースの比較で確認する（AC-02 / IN-04）。(b) 同名複数 `impl Trait` 引数のテスト: `fn(a: impl Into<String>, b: impl Into<String>)` で A 側と C 側が構造等値と判定されることを確認する（AC-01 / IN-04）。(c) 順序差異テスト: `fn(a: impl Display, b: impl Into<String>)` と `fn(a: impl Into<String>, b: impl Display)` が構造不一致（false）と判定されることを確認する（AC-03 / CN-02 / IN-04）。(d) リグレッションテスト: 既存の `test_inline_bound_equals_explicit_where_predicate` 等（通常 `T`, `U` generic param）がすべて pass することを確認する（AC-04）。(e) trait/impl-method パステスト: `build_trait_method_map` が使うパス（trait method に `impl Trait` 引数を持つケース）で A 側 codec 出力と C 側 rustdoc 出力が構造等値と判定されること、または同名複数 `impl Trait` が存在しても衝突しないことを確認する。`build_trait_method_map` は `build_combined_canon_map` / `format_type_with_canon` を呼び出すため、T001/T002 修正の伝播が trait/impl-method 比較経路でも正しく機能することを検証する（IN-03 / IN-04）。最後に `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass することを確認する（AC-05）。テストコードは `tests/` 配下ではなく `generics_eq.rs` 内の既存テストモジュールに追記すること。",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "build_generic_canon_map: position-based identification for impl Trait params",
+        "description": [
+          "Change build_generic_canon_map in format.rs to preserve normal name-to-placeholder lookup while also recording synthetic impl Trait parameters in declaration order, eliminating the HashMap key collision that occurs when two impl Trait arguments produce the same synthetic name.",
+          "This is the foundational change that all subsequent steps depend on (IN-01 / CN-04)."
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "S2",
+        "title": "format_type_with_canon: render Type::ImplTrait as position placeholder",
+        "description": [
+          "Change the Type::ImplTrait arm of format_type_with_canon to consume the same occurrence-ordered synthetic placeholder as rustdoc's Type::Generic(\"impl ...\") representation instead of rendering the bound strings as a literal 'impl ...' string.",
+          "This restores symmetry between the A-side (catalogue codec) and C-side (rustdoc Generic) representations (IN-02 / CN-03)."
+        ],
+        "task_ids": ["T002"]
+      },
+      {
+        "id": "S3",
+        "title": "generics_eq.rs: propagate position-based canon map through all comparison paths",
+        "description": [
+          "Verify and fix all call sites in generics_eq.rs (fn_sigs_structurally_equal, build_combined_canon_map, build_where_form_view, build_trait_method_map) so ordinary name lookup and occurrence-ordered impl Trait placeholders from T001/T002 flow correctly through every comparison path, including the trait/impl-method path entered via build_trait_method_map (IN-03 / CN-01 / CN-02)."
+        ],
+        "task_ids": ["T003"]
+      },
+      {
+        "id": "S4",
+        "title": "Unit tests + CI gate",
+        "description": [
+          "Add targeted unit tests covering single impl Trait (AC-02), duplicate same-named impl Trait (AC-01), param-order sensitivity (AC-03), and regression coverage for existing generic param tests (AC-04).",
+          "Final cargo make ci pass confirms AC-05 and validates no regression in the whole evaluator pipeline (IN-04 / CN-02)."
+        ],
+        "task_ids": ["T004"]
+      }
+    ]
+  }
+}
