@@ -7,7 +7,7 @@
 
 > Add ClaudeReviewer struct to libs/infrastructure/src/review_v2/claude_reviewer.rs, implementing the Reviewer usecase port (review / fast_review) via a claude -p subprocess.
 > This is the Phase-2 type-signal Blue transition task: ClaudeReviewer action=add turns Blue when this task is committed.
-> Follows the CodexReviewer pattern: subprocess management, stdout envelope parsing (structured_output field), parse_review_final_message codec reuse, timeout polling, fail-closed design (CN-01 / CN-05 / CN-06). stderr is captured in-memory (no session log file) — symmetric with CN-05's structural read-only contract. --allowedTools enforces read-only at the subprocess level.
+> Follows the CodexReviewer pattern: subprocess management, stdout envelope parsing (structured_output field), parse_review_final_message codec reuse, timeout polling, fail-closed design (CN-01 / CN-05 / CN-06). stderr is captured in-memory (no session log file, consistent with CN-05's read-only intent). The invocation uses best-effort permission-based read-only for the reviewer role: --permission-mode dontAsk auto-denies non-whitelisted tool calls, --disallowedTools Edit Write removes write tools from context, --allowedTools pre-approves the read-only inspection set, and --bare skips auto-discovery of hooks/skills/MCP/CLAUDE.md. In standard environments (no permissive host permissions.allow) write/edit tools are denied. This is NOT a kernel sandbox (claude -p has no sandbox flag) and NOT symmetric with CodexReviewer's --sandbox read-only; host settings could in principle broaden the permission surface (CN-05).
 
 - [x] **T001**: ClaudeReviewer infrastructure adapter を新設する (IN-01 / CN-01 / CN-05 / CN-06 / AC-02 / AC-09)。
 
@@ -17,7 +17,16 @@
 
 (2) `build_full_prompt` ヘルパを `CodexReviewer` と同一パターンで実装する (base_prompt + scope file list の結合)。
 
-(3) `run_review` 内部メソッドを実装する: `claude -p --bare --allowedTools '<read-only 検査ツールセット: Read, Grep, Glob, Bash(git diff:*), Bash(git show:*), Bash(git log:*), Bash(git ls-files:*)>' --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' --model <model> <prompt>` を subprocess として起動し (CN-01)、stdout を読んで JSON エンベロープを serde_json で parse し、`structured_output` フィールドを取り出す。stderr は in-memory で収集する (ファイル書き込みなし、CN-05 の構造的 read-only 契約)。タイムアウトはポーリングループで管理する。
+(3) `run_review` 内部メソッドを実装する: 以下のコマンドを subprocess として起動する (CN-01)。
+
+```
+claude -p --bare --permission-mode dontAsk \
+  --allowedTools Read Grep Glob "Bash(git diff:*)" "Bash(git show:*)" "Bash(git log:*)" "Bash(git ls-files:*)" \
+  --disallowedTools Edit Write \
+  --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' --model <model> <prompt>
+```
+
+reviewer role に対してベストエフォートの permission-based read-only を提供する: `--permission-mode dontAsk` (ホワイトリスト外のツールを自動拒否)、`--disallowedTools Edit Write` (書き込みツールをコンテキストから除去)、`--allowedTools` (読み取り専用の検査ツールセットを事前承認)、`--bare` (hooks/skills/MCP/CLAUDE.md の自動検出をスキップ)。標準的な環境 (ホストの permissions.allow が許容的でない場合) では書き込み・編集ツールは拒否される。これはカーネルサンドボックスではなく (claude -p にサンドボックスフラグはない)、`codex exec --sandbox read-only` と同等ではない; ホスト設定が原則として permission surface を拡大しうる点に注意 (CN-05)。`--allowedTools` のトークンは個別に渡す (スペース区切り、引用符なし ― ただし `Bash(...)` 形式は引用符付きで渡す)。stdout を読んで JSON エンベロープを serde_json で parse し、`structured_output` フィールドを取り出す。stderr は in-memory で収集する (ファイル書き込みなし)。タイムアウトはポーリングループで管理する。
 
 (4) `Reviewer` port の両メソッド (`review` / `fast_review`) を実装する (CN-06)。内部で `run_review` を呼び、`structured_output` 文字列を `parse_review_final_message` に渡し、`convert_raw_to_final` / `convert_raw_to_fast` で domain 型に変換する。`ReviewVerdict` の分類には `classify_review_verdict(timed_out, exit_success, &final_message_state)` を使用する。
 

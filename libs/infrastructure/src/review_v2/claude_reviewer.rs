@@ -1,13 +1,27 @@
 //! Claude-backed implementation of the `Reviewer` usecase port.
 //!
-//! Invokes `claude -p --bare --allowedTools <read-only-set> --output-format json --json-schema
-//! '<schema>' --model <model> <prompt>` as a subprocess and parses the `structured_output` field
-//! from the JSON envelope written to stdout (CN-01 / CN-05 / CN-06).
+//! Invokes `claude -p --bare --permission-mode dontAsk --allowedTools Read Grep Glob
+//! "Bash(git diff:*)" "Bash(git show:*)" "Bash(git log:*)" "Bash(git ls-files:*)"
+//! --disallowedTools Edit Write --output-format json --json-schema '<schema>' --model <model>
+//! <prompt>` as a subprocess and parses the `structured_output` field from the JSON envelope
+//! written to stdout (CN-01 / CN-05 / CN-06).
 //!
-//! This adapter is intentionally write-free:
-//! - `--allowedTools` is restricted to read-only inspection tools only (CN-05: no workspace
-//!   writes). `Edit`, `Write`, and non-whitelisted `Bash(...)` forms are implicitly denied.
-//! - stderr is captured in memory — no session log or output files are written to the workspace.
+//! Best-effort, permission-based read-only invocation for the reviewer role (CN-05):
+//! 1. `--bare`: skips auto-discovery of host hooks, skills, MCP servers, and CLAUDE.md files,
+//!    giving a reproducible invocation environment (CN-01).
+//! 2. `--permission-mode dontAsk`: auto-denies tool calls not on the allow list — in standard
+//!    environments (no permissive host `permissions.allow` overrides) this prevents unlisted
+//!    tools from being invoked.
+//! 3. `--allowedTools <read-only-set>`: pre-approves only file inspection and read-only git tools.
+//! 4. `--disallowedTools Edit Write`: removes write tools from the model's context entirely
+//!    (defense in depth — they cannot be invoked even if the allow set were bypassed).
+//!
+//! Note: unlike `codex exec --sandbox read-only`, `claude -p` has no kernel-level sandbox flag.
+//! Read-only behavior rests on the reviewer role + headless output-only (`-p`) form; a permissive
+//! host `.claude/settings.json` could in principle broaden the tool surface.
+//!
+//! stderr is captured in memory — no session log or output files are written to the workspace
+//! (CN-05).
 
 use std::ffi::OsString;
 use std::io::{BufRead, BufReader};
@@ -39,14 +53,25 @@ pub(crate) const CLAUDE_BIN_ENV: &str = "SOTP_CLAUDE_BIN";
 
 /// Claude-backed reviewer implementation for the `Reviewer` usecase port.
 ///
-/// Spawns a `claude -p --bare --allowedTools <read-only-set> --output-format json --json-schema`
-/// subprocess, feeds it a review prompt (base prompt + scope file list), polls for completion,
-/// and parses the structured JSON verdict from the `structured_output` field of the JSON envelope
-/// on stdout.
+/// Spawns a `claude -p --bare --permission-mode dontAsk --allowedTools <read-only-set>
+/// --disallowedTools Edit Write --output-format json --json-schema` subprocess, feeds it a review
+/// prompt (base prompt + scope file list), polls for completion, and parses the structured JSON
+/// verdict from the `structured_output` field of the JSON envelope on stdout.
 ///
-/// `--allowedTools` is restricted to read-only inspection tools (`Read`, `Grep`, `Glob`,
-/// `Bash(git diff:*)`, etc.), enforcing the CN-05 no-workspace-write contract at the subprocess
-/// level. `Edit`, `Write`, and non-whitelisted `Bash(...)` forms are implicitly denied.
+/// Best-effort, permission-based read-only invocation for the reviewer role (CN-05).
+/// In standard environments (no permissive host `permissions.allow` overrides) write/edit tools
+/// are denied:
+/// - `--bare`: skips auto-discovery of host hooks, skills, MCP servers, and CLAUDE.md files for
+///   a reproducible invocation environment (CN-01).
+/// - `--permission-mode dontAsk`: auto-denies tool calls not on the allow list, preventing
+///   unlisted tools from falling through to a permissive mode.
+/// - `--allowedTools`: pre-approves only read-only inspection tools (`Read`, `Grep`, `Glob`,
+///   `Bash(git diff:*)`, etc.). Each tool is passed as a separate argument.
+/// - `--disallowedTools Edit Write`: removes `Edit` and `Write` from the model's context
+///   entirely (defense in depth).
+///
+/// This is NOT a kernel-level sandbox (unlike `codex exec --sandbox read-only`). `claude -p`
+/// has no sandbox flag; read-only behavior rests on the reviewer role + headless (`-p`) form.
 pub struct ClaudeReviewer {
     /// Claude model name (e.g., `"claude-opus-4-7"`).
     model: String,
@@ -253,29 +278,73 @@ fn claude_bin() -> OsString {
     OsString::from("claude")
 }
 
-/// Read-only tools allowed for the Claude reviewer subprocess (CN-05).
+/// Read-only tools pre-approved for the Claude reviewer subprocess (CN-05).
 ///
-/// Permits file inspection and diff viewing without allowing any mutation:
-/// - `Read`, `Grep`, `Glob`: file content inspection.
+/// Each entry is passed as a **separate argument** after `--allowedTools` (NOT space-joined into
+/// one string). This matches the `claude` CLI's expected argument format where each tool name is
+/// its own positional value.
+///
+/// Best-effort read-only scope (CN-05 — permission-based, NOT a kernel sandbox):
+/// - `Read`, `Grep`, `Glob`: file content inspection tools without write capability.
 /// - `Bash(git diff:*)`, `Bash(git show:*)`, `Bash(git log:*)`, `Bash(git ls-files:*)`:
-///   read-only git queries for diff and history inspection.
+///   git queries for diff and history inspection. Note: these Bash-wrapped git commands could
+///   in principle be invoked with write-capable options (e.g., `git diff --output=<path>`) or
+///   shell redirection, so they do not constitute a hard no-write guarantee. This is accepted
+///   under CN-05's best-effort, permission-based framing.
 ///
-/// `Edit`, `Write`, and all other `Bash(...)` forms are implicitly denied (CN-05).
-const REVIEWER_ALLOWED_TOOLS: &str =
-    "Read,Grep,Glob,Bash(git diff:*),Bash(git show:*),Bash(git log:*),Bash(git ls-files:*)";
+/// `Edit`, `Write`, and all other `Bash(...)` forms are denied by `--permission-mode dontAsk`
+/// and `--disallowedTools Edit Write` (context removal) (CN-05).
+const REVIEWER_ALLOWED_TOOLS: &[&str] = &[
+    "Read",
+    "Grep",
+    "Glob",
+    "Bash(git diff:*)",
+    "Bash(git show:*)",
+    "Bash(git log:*)",
+    "Bash(git ls-files:*)",
+];
+
+/// Write tools explicitly removed from the Claude reviewer's context (CN-05, defense in depth).
+///
+/// Passed as separate arguments after `--disallowedTools`. Even if `--permission-mode dontAsk`
+/// were bypassed, these tools are unavailable to the model.
+const REVIEWER_DISALLOWED_TOOLS: &[&str] = &["Edit", "Write"];
 
 /// Builds the argument list for the `claude -p` invocation.
 ///
-/// Uses `--bare` to disable hooks/MCP/CLAUDE.md auto-detection (CN-01).
-/// Uses `--allowedTools` restricted to read-only inspection tools (CN-05: no workspace writes).
-/// Uses `--output-format json` so verdict appears in `structured_output` field on stdout.
+/// Best-effort, permission-based read-only invocation (CN-05). This is NOT a kernel-level sandbox
+/// (unlike `codex exec --sandbox read-only`); `claude -p` has no sandbox flag.
+/// 1. `--bare`: skips auto-discovery of host hooks, skills, MCP servers, and CLAUDE.md files
+///    (reproducible invocation environment — CN-01).
+/// 2. `--permission-mode dontAsk`: auto-denies tool calls not on the allow list — in standard
+///    environments (no permissive host `permissions.allow` overrides) this prevents unlisted tools
+///    from being invoked.
+/// 3. `--allowedTools <tools...>`: each tool passed as a separate `OsString` argument (not
+///    space-joined) to pre-approve only read-only inspection tools.
+/// 4. `--disallowedTools Edit Write`: removes write tools from the model's context entirely
+///    (defense in depth).
+///
+/// Read-only behavior rests on the reviewer role + headless output-only (`-p`) form; a permissive
+/// host `.claude/settings.json` could in principle broaden the tool surface.
+///
+/// Uses `--output-format json` so the verdict appears in the `structured_output` field on stdout.
 /// Uses `--json-schema` for API-level schema enforcement (grammar-compiled, CN-01).
 fn build_claude_args(model: &str, prompt: &str) -> Vec<OsString> {
-    vec![
+    let mut args = vec![
         OsString::from("-p"),
         OsString::from("--bare"),
+        OsString::from("--permission-mode"),
+        OsString::from("dontAsk"),
         OsString::from("--allowedTools"),
-        OsString::from(REVIEWER_ALLOWED_TOOLS),
+    ];
+    for tool in REVIEWER_ALLOWED_TOOLS {
+        args.push(OsString::from(*tool));
+    }
+    args.push(OsString::from("--disallowedTools"));
+    for tool in REVIEWER_DISALLOWED_TOOLS {
+        args.push(OsString::from(*tool));
+    }
+    args.extend([
         OsString::from("--output-format"),
         OsString::from("json"),
         OsString::from("--json-schema"),
@@ -283,7 +352,8 @@ fn build_claude_args(model: &str, prompt: &str) -> Vec<OsString> {
         OsString::from("--model"),
         OsString::from(model),
         OsString::from(prompt),
-    ]
+    ]);
+    args
 }
 
 /// Spawns the Claude subprocess, capturing stdout and stderr in memory (no files written — CN-05).
@@ -439,9 +509,83 @@ fn extract_structured_output(stdout: &str) -> Option<String> {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
+
+    /// Verifies that `build_claude_args` encodes the CN-05 best-effort read-only contract:
+    /// `--bare`, `--permission-mode dontAsk`, each read-only tool as a separate token after
+    /// `--allowedTools`, and each disallowed tool as a separate token after `--disallowedTools`.
+    ///
+    /// This test is the canonical guard for the security-critical subprocess argv; the
+    /// fake-binary integration tests cannot catch regressions here because the fake binaries
+    /// ignore their arguments.
+    #[test]
+    fn test_build_claude_args_encodes_read_only_contract() {
+        let model = "claude-opus-4-7";
+        let prompt = "Review this.";
+        let args = build_claude_args(model, prompt);
+
+        // Collect as &str slices for readable assertions.
+        let strs: Vec<&str> = args.iter().filter_map(|a| a.to_str()).collect();
+
+        // Required positional prefix flags.
+        assert!(strs.contains(&"-p"), "must pass -p");
+        assert!(strs.contains(&"--bare"), "must pass --bare (CN-05 layer 1)");
+
+        // --permission-mode dontAsk (CN-05 layer 2: auto-deny unlisted tools in standard environments).
+        let pm_idx = strs
+            .iter()
+            .position(|&s| s == "--permission-mode")
+            .expect("--permission-mode must be present");
+        assert_eq!(
+            strs.get(pm_idx + 1).copied(),
+            Some("dontAsk"),
+            "--permission-mode must be followed immediately by dontAsk"
+        );
+
+        // --allowedTools followed by each read-only token as a separate argument (CN-05 layer 3).
+        let at_idx = strs
+            .iter()
+            .position(|&s| s == "--allowedTools")
+            .expect("--allowedTools must be present");
+        for tool in REVIEWER_ALLOWED_TOOLS {
+            assert!(
+                strs[at_idx + 1..].contains(tool),
+                "read-only tool `{tool}` must appear as a separate token after --allowedTools"
+            );
+        }
+
+        // --disallowedTools followed by write tools (CN-05 layer 4: defense in depth).
+        let dt_idx = strs
+            .iter()
+            .position(|&s| s == "--disallowedTools")
+            .expect("--disallowedTools must be present");
+        for tool in REVIEWER_DISALLOWED_TOOLS {
+            assert!(
+                strs[dt_idx + 1..].contains(tool),
+                "disallowed write tool `{tool}` must appear as a separate token after --disallowedTools"
+            );
+        }
+
+        // Model and prompt are present.
+        let model_idx = strs.iter().position(|&s| s == "--model").expect("--model must be present");
+        assert_eq!(
+            strs.get(model_idx + 1).copied(),
+            Some(model),
+            "--model must be followed by the model name"
+        );
+        assert!(strs.contains(&prompt), "prompt must appear as the last argument");
+
+        // Write tools must NOT appear before --disallowedTools (they must only be values of it).
+        for tool in REVIEWER_DISALLOWED_TOOLS {
+            let first_occurrence = strs.iter().position(|&s| s == *tool);
+            assert!(
+                first_occurrence.is_none_or(|i| i > dt_idx),
+                "write tool `{tool}` must not appear before --disallowedTools"
+            );
+        }
+    }
 
     #[test]
     fn test_claude_reviewer_build_full_prompt_with_files() {

@@ -200,54 +200,64 @@
           "findings": [],
           "hash": "rvw1:sha256:8c2ef5e0e560de90595b63b1823e8e49261251d2da1f686d03a22c7171fbbbb7",
           "at": "2026-05-25T00:37:13Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new `Local`/`ClaudeLocal` review entrypoints are added without any regression coverage for the critical branches they introduce. In particular, there is no test exercising `resolve_execution(\"reviewer\", round_type)` / `resolve_execution(\"pr-reviewer\", RoundType::Final)` fail-closed behavior or the claude-local write-first path, so a missing capability, unsupported provider, or write failure can regress silently.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/mod.rs",
-              "line": 44,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:2481b57cca6205529e7109186042c32a21bfbb35f1052453a48737960bdf55fa",
-          "at": "2026-05-24T12:57:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sotp review local` now resolves `agent-profiles.json` from the process current directory instead of the repository root. If the command is invoked from a subdirectory or via a wrapper that changes cwd, profile loading fails and the new provider-selection path cannot run, even though the repo is discoverable. Use repo-root discovery here like the PR workflow does.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/local.rs",
-              "line": 70,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:5d54fa4b6a872b27db4f22334dccdd0201fe3475bf3dcafcf5466fd459e6af1c",
-          "at": "2026-05-24T13:09:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8619211c316cba53b7650f31d21054ba5347211cb850e035868d484512e36478",
-          "at": "2026-05-24T13:14:51Z"
+          "hash": "rvw1:sha256:a0ecf32b62af4c23a1cd2d7d6d2dc8ce9702bf4186bb9abe04f60c425b20e4da",
+          "at": "2026-05-25T01:45:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CN-05 hard read-only contract is now encoded in the subprocess argv here, but the tests in this file only use fake Claude binaries that ignore their arguments. They would still pass if `--permission-mode dontAsk`, the per-token read-only allow list, or `--disallowedTools Edit Write` were removed or malformed, so the security-critical invocation contract is unprotected. Add an argv-capturing fake binary test or a direct `build_claude_args` assertion for the required flags and tool tokens.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 312,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a0ecf32b62af4c23a1cd2d7d6d2dc8ce9702bf4186bb9abe04f60c425b20e4da",
+          "at": "2026-05-25T01:48:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8619211c316cba53b7650f31d21054ba5347211cb850e035868d484512e36478",
-          "at": "2026-05-24T13:19:37Z"
+          "hash": "rvw1:sha256:dfdcc5e16f1d04524e0077dedb48ec60a37a70faefee2d55135a2c49f34e2ce8",
+          "at": "2026-05-25T01:51:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b4a8f29d76340818a685f553b0d8ae87d518959efcb4c434db0f0df26af7b05",
+          "at": "2026-05-25T03:24:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--disallowedTools Edit Write` does not make this invocation read-only while `Bash(git diff:*)` / `Bash(git show:*)` are pre-approved. Those git commands can still write files through normal git options such as `--output=<path>` (and shell redirection remains a risk for Bash tool calls), so a prompt-injected review can mutate or overwrite workspace files in a standard environment even though the adapter claims CN-05 no-workspace-write behavior. Either avoid granting Bash and embed the needed diffs, or route git inspection through a wrapper that rejects write-capable options/redirection before invoking git.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 298,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0b4a8f29d76340818a685f553b0d8ae87d518959efcb4c434db0f0df26af7b05",
+          "at": "2026-05-25T03:30:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace8bb42b318bce1b2187c5646137769016157502e286afc31681c1614a006b9",
+          "at": "2026-05-25T03:33:40Z"
         }
       ]
     },
@@ -490,6 +500,120 @@
           "findings": [],
           "hash": "rvw1:sha256:25d6375e3192ac5f10dd186f251e84603a8887cdbe33f7ea09f7d84860a3cbad",
           "at": "2026-05-25T01:15:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a184375e98966fc4e4367185dfaedc00862b566fb9b2e549c649a9d4dc3bbc76",
+          "at": "2026-05-25T01:45:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ClaudeReviewer catalogue text says hard read-only enforcement uses “three layers” but then enumerates four layers and makes `--allowedTools` layer (3). That conflicts with the spec/plan wording, where the three hard layers are `--bare`, `--permission-mode dontAsk`, and `--disallowedTools`, while `--allowedTools` is only the read-only pre-approval set. This leaves the authoritative catalogue internally inconsistent about the enforcement model.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/infrastructure-types.json",
+              "line": 49,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a184375e98966fc4e4367185dfaedc00862b566fb9b2e549c649a9d4dc3bbc76",
+          "at": "2026-05-25T01:46:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 still says `--allowedTools enforces read-only at the subprocess level`, but the updated T001/CN-05 contract says `--allowedTools` is only a pre-approval allow list and the hard read-only behavior comes from the `--bare` / `--permission-mode dontAsk` / `--disallowedTools Edit Write` combination. This contradiction is in the security-critical summary and can reintroduce the old, rejected interpretation that `--allowedTools` alone is the deny layer. Rewrite the S1 summary to attribute enforcement to the full layered contract.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/impl-plan.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3a0c3d0ea2c4b4bfca1e97e510ea1b16d5b79286a4d90c9d134acfe56e9e4195",
+          "at": "2026-05-25T01:54:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-05 claims `--bare` ignores host `.claude/settings.json`, making the listed three-layer contract a hard read-only equivalent to `codex exec --sandbox read-only`. Current Claude Code docs describe `--bare` as skipping auto-discovery of hooks/skills/plugins/MCP/auto memory/CLAUDE.md, not settings, and `dontAsk` still permits actions matching `permissions.allow` rules. If user/project settings pre-approve broader Bash rules, this plan can allow commands outside the intended read-only git set, so the hard read-only claim needs an explicit settings/tool restriction layer before being treated as structurally enforced. Sources: https://code.claude.com/docs/en/cli-usage and https://code.claude.com/docs/en/permission-modes",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/spec.md",
+              "line": 37,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:a708fb1daa6da1a140d37fcbf247cc5fa4fd5272c554438ab6c3a35f13520f77",
+          "at": "2026-05-25T01:57:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136fd0324b8814c1aa75983734569024af7a33285716995b0aabf3cb449a60d5",
+          "at": "2026-05-25T03:23:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136fd0324b8814c1aa75983734569024af7a33285716995b0aabf3cb449a60d5",
+          "at": "2026-05-25T03:25:08Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new `Local`/`ClaudeLocal` review entrypoints are added without any regression coverage for the critical branches they introduce. In particular, there is no test exercising `resolve_execution(\"reviewer\", round_type)` / `resolve_execution(\"pr-reviewer\", RoundType::Final)` fail-closed behavior or the claude-local write-first path, so a missing capability, unsupported provider, or write failure can regress silently.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 44,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:2481b57cca6205529e7109186042c32a21bfbb35f1052453a48737960bdf55fa",
+          "at": "2026-05-24T12:57:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sotp review local` now resolves `agent-profiles.json` from the process current directory instead of the repository root. If the command is invoked from a subdirectory or via a wrapper that changes cwd, profile loading fails and the new provider-selection path cannot run, even though the repo is discoverable. Use repo-root discovery here like the PR workflow does.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/local.rs",
+              "line": 70,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5d54fa4b6a872b27db4f22334dccdd0201fe3475bf3dcafcf5466fd459e6af1c",
+          "at": "2026-05-24T13:09:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8619211c316cba53b7650f31d21054ba5347211cb850e035868d484512e36478",
+          "at": "2026-05-24T13:14:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8619211c316cba53b7650f31d21054ba5347211cb850e035868d484512e36478",
+          "at": "2026-05-24T13:19:37Z"
         }
       ]
     }

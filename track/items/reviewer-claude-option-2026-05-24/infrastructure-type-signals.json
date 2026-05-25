@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_at": "2026-05-25T01:03:09Z",
-  "declaration_hash": "40700973640b484776d9d2a37004bc71ccf71318334160da18288f3925a4dffb",
+  "declaration_hash": "c457a058350702c5eb219f006f2ca5545d45a566feb342e4e26675d0650af2a5",
   "signals": [
     {
       "type_name": "ClaudeReviewer",
