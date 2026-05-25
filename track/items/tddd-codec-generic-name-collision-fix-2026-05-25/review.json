@@ -73,75 +73,6 @@
         }
       ]
     },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf23a0d4a0b8186f5c0740f9d8972dd298829ecc4fac7ac6195fa5685ab9ddc3",
-          "at": "2026-05-25T06:38:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf23a0d4a0b8186f5c0740f9d8972dd298829ecc4fac7ac6195fa5685ab9ddc3",
-          "at": "2026-05-25T06:41:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`format_generic_args_with_canon_occ` consumes the shared `cursor` while formatting each constraint, then sorts `constraint_parts` afterward. That makes the occurrence numbering depend on the original constraint order, so two semantically identical generic-arg lists that differ only by constraint order can stringify differently and compare unequal even though the final rendering is normalized.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
-              "line": 602,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cf23a0d4a0b8186f5c0740f9d8972dd298829ecc4fac7ac6195fa5685ab9ddc3",
-          "at": "2026-05-25T08:28:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d6d7bc5381894bb1b7dcdf5c97318d6ff9cc340cd689f34279207898ccd1541",
-          "at": "2026-05-25T08:40:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Type::DynTrait` now renders each bound before calling `sort_unstable()`, so the shared impl-Trait cursor is consumed in source order rather than canonical order. If two equivalent trait-object bounds contain nested `impl Trait`/synthetic generic args, reordering the bounds changes which occurrence gets `#0` vs `#1`, and semantically identical types can compare unequal.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
-              "line": 482,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1d6d7bc5381894bb1b7dcdf5c97318d6ff9cc340cd689f34279207898ccd1541",
-          "at": "2026-05-25T09:05:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8fe7f15a3d4fa7deba1b49feb61b5f7755d55dba952b6f81607cd55a07d8dab",
-          "at": "2026-05-25T09:22:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e8fe7f15a3d4fa7deba1b49feb61b5f7755d55dba952b6f81607cd55a07d8dab",
-          "at": "2026-05-25T09:24:50Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -222,6 +153,89 @@
           "findings": [],
           "hash": "rvw1:sha256:7c8c5a232f194c274d25a40b133a6ea907dd9989ee66e79c3e219d341af818e3",
           "at": "2026-05-25T08:58:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9e8247428efb4e80dd9f0f6b0a4520e9128e3f0295e4965242183ab123f5efe",
+          "at": "2026-05-25T09:30:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9e8247428efb4e80dd9f0f6b0a4520e9128e3f0295e4965242183ab123f5efe",
+          "at": "2026-05-25T09:31:50Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf23a0d4a0b8186f5c0740f9d8972dd298829ecc4fac7ac6195fa5685ab9ddc3",
+          "at": "2026-05-25T06:38:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf23a0d4a0b8186f5c0740f9d8972dd298829ecc4fac7ac6195fa5685ab9ddc3",
+          "at": "2026-05-25T06:41:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_generic_args_with_canon_occ` consumes the shared `cursor` while formatting each constraint, then sorts `constraint_parts` afterward. That makes the occurrence numbering depend on the original constraint order, so two semantically identical generic-arg lists that differ only by constraint order can stringify differently and compare unequal even though the final rendering is normalized.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 602,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cf23a0d4a0b8186f5c0740f9d8972dd298829ecc4fac7ac6195fa5685ab9ddc3",
+          "at": "2026-05-25T08:28:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d6d7bc5381894bb1b7dcdf5c97318d6ff9cc340cd689f34279207898ccd1541",
+          "at": "2026-05-25T08:40:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Type::DynTrait` now renders each bound before calling `sort_unstable()`, so the shared impl-Trait cursor is consumed in source order rather than canonical order. If two equivalent trait-object bounds contain nested `impl Trait`/synthetic generic args, reordering the bounds changes which occurrence gets `#0` vs `#1`, and semantically identical types can compare unequal.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "line": 482,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1d6d7bc5381894bb1b7dcdf5c97318d6ff9cc340cd689f34279207898ccd1541",
+          "at": "2026-05-25T09:05:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8fe7f15a3d4fa7deba1b49feb61b5f7755d55dba952b6f81607cd55a07d8dab",
+          "at": "2026-05-25T09:22:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8fe7f15a3d4fa7deba1b49feb61b5f7755d55dba952b6f81607cd55a07d8dab",
+          "at": "2026-05-25T09:24:50Z"
         }
       ]
     }
