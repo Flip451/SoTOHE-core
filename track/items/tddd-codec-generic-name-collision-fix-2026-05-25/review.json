@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4ca3f6ba69fbd18023ed0f4663cdf4f84c75e4e39430abba0c8bf0c76c0462",
+          "at": "2026-05-25T05:06:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4ca3f6ba69fbd18023ed0f4663cdf4f84c75e4e39430abba0c8bf0c76c0462",
+          "at": "2026-05-25T05:18:45Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e24119d42970cd55a9e08876ef8cee76865e819682e4c1da6453b766b3608a41",
+          "at": "2026-05-25T05:02:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e24119d42970cd55a9e08876ef8cee76865e819682e4c1da6453b766b3608a41",
+          "at": "2026-05-25T05:17:24Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b084371539e6d613cc5bfe16a121a8ff94cacce0cf86db7ce9d6f8e0923f09",
+          "at": "2026-05-25T05:16:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7b084371539e6d613cc5bfe16a121a8ff94cacce0cf86db7ce9d6f8e0923f09",
+          "at": "2026-05-25T05:17:00Z"
+        }
+      ]
+    }
+  }
+}

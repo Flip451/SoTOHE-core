@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "tddd-codec-generic-name-collision-fix-2026-05-25",
+  "title": "型シグネチャ codec の generic param 名前衝突の恒久対策",
+  "branch": "track/tddd-codec-generic-name-collision-fix-2026-05-25",
+  "created_at": "2026-05-25T04:41:25Z",
+  "updated_at": "2026-05-25T04:41:25Z"
+}

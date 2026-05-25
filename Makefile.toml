@@ -902,7 +902,10 @@ SCOPE_FILES=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --) shift; break ;;
+    # cargo-make forwards its own `--` separator to the script as a literal
+    # positional arg ($1="--"); skip it instead of breaking, since the real
+    # --flags follow it (there are no trailing positional args in this wrapper).
+    --) shift ;;
     --scope) SCOPE="$2"; shift 2 ;;
     --briefing-file) BRIEFING_FILE="$2"; shift 2 ;;
     --track-id) TRACK_ID="$2"; shift 2 ;;
@@ -1020,6 +1023,21 @@ SAFE_HOME=$(mktemp -d /tmp/review-fix-codex-home.XXXXXX)
 # GITHUB_TOKEN and SSH credentials are still excluded (push-prevention).
 REAL_CODEX_HOME="${CODEX_HOME:-${HOME}/.codex}"
 
+# Tool-version managers (e.g. asdf) resolve their data dir and the global
+# .tool-versions from $HOME. Since we replace HOME with SAFE_HOME, a toolchain
+# shim (here the `codex` binary is an asdf nodejs shim) cannot resolve its real
+# install and exits 126. Pin asdf's data/config dirs to the caller's real
+# location and copy the global .tool-versions into SAFE_HOME so version
+# resolution still works. These are toolchain paths, NOT git credentials — no
+# push capability is exposed (SAFE_HOME still has no .ssh / .git-credentials).
+# On non-asdf hosts the pinned dir simply does not exist and the cp is skipped,
+# so this is a no-op.
+REAL_ASDF_DATA_DIR="${ASDF_DATA_DIR:-${HOME}/.asdf}"
+REAL_ASDF_DIR="${ASDF_DIR:-${HOME}/.asdf}"
+if [ -f "${HOME}/.tool-versions" ]; then
+  cp "${HOME}/.tool-versions" "${SAFE_HOME}/.tool-versions"
+fi
+
 SAFE_ENV_VARS="PATH USER LOGNAME TERM LANG LC_ALL TMPDIR TEMP TMP \
   CARGO_HOME RUSTUP_HOME RUSTUP_TOOLCHAIN CARGO_TARGET_DIR \
   DOCKER_HOST COMPOSE_PROJECT_NAME \
@@ -1033,7 +1051,7 @@ SAFE_ENV_VARS="PATH USER LOGNAME TERM LANG LC_ALL TMPDIR TEMP TMP \
 # real ~/.codex so Codex can find its auth config (login token, stored API key).
 # GIT_SSH_COMMAND blocks SSH key auth as an additional layer (defense-in-depth
 # even if HOME somehow retained .ssh).
-env_args=(env -i "GIT_SSH_COMMAND=/bin/false" "HOME=$SAFE_HOME" "CODEX_HOME=$REAL_CODEX_HOME")
+env_args=(env -i "GIT_SSH_COMMAND=/bin/false" "HOME=$SAFE_HOME" "CODEX_HOME=$REAL_CODEX_HOME" "ASDF_DATA_DIR=$REAL_ASDF_DATA_DIR" "ASDF_DIR=$REAL_ASDF_DIR")
 for VAR in $SAFE_ENV_VARS; do
   if [ -n "${!VAR+set}" ]; then
     env_args+=("$VAR=${!VAR}")
