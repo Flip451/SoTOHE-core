@@ -363,7 +363,7 @@ const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
         ".claude/commands/track/review.md",
         "track review wrapper path",
         &[
-            "cargo make track-local-review -- --model {fast_model} --round-type fast --group",
+            "cargo make track-local-review -- --round-type fast --group",
             "--track-id",
             "--briefing-file tmp/reviewer-runtime/briefing-",
         ],

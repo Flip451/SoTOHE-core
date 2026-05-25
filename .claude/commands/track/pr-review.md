@@ -18,8 +18,9 @@ Arguments:
 
 - Resolve the current track: the current git branch must match `track/<id>`.
 - Read the track's `metadata.json` to confirm track status.
-- Read `.harness/config/agent-profiles.json` to verify the reviewer provider supports structured output.
-- If the provider is not in the structured provider set (currently: `codex`), fail with a clear error message directing the user to use `/track:review` instead.
+- Read `.harness/config/agent-profiles.json` to verify the `pr-reviewer` provider supports structured output.
+- If the `pr-reviewer` provider is not in the structured provider set (currently: `codex`), fail with a clear error message directing the user to use `/track:review` instead.
+- The local-review provider (`capabilities.reviewer.provider`) does not affect this command: `/track:pr-review` resolves `capabilities.pr-reviewer` (default `codex`), so setting `reviewer.provider: claude` for local review leaves PR-based review on Codex Cloud unchanged.
 
 ## Step 1: Push and ensure PR
 

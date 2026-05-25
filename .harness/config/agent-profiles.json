@@ -47,6 +47,9 @@
     "review-fix-lead": {
       "provider": "claude",
       "model": "claude-opus-4-7"
+    },
+    "pr-reviewer": {
+      "provider": "codex"
     }
   }
 }

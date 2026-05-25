@@ -1,9 +1,25 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "03340d0afbf84f5dd5929c19a3e38587b52b307907f32617f8f0e200e0844a9d",
+  "catalogue_declaration_hash": "40700973640b484776d9d2a37004bc71ccf71318334160da18288f3925a4dffb",
   "signals": [
     {
       "type_name": "ClaudeReviewer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewV2CompositionWithClaude",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::run_claude_review_str",
       "signal": "blue"
     }
   ]

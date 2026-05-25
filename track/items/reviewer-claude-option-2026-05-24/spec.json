@@ -28,7 +28,7 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "ClaudeReviewer infrastructure adapter の新設: usecase::review_v2::ports::Reviewer の両メソッド (review / fast_review) を実装し、claude -p --bare --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' --model <model> <prompt> を subprocess として起動する。stdout エンベロープの structured_output フィールドから verdict を取り出して既存の parse_review_final_message codec に渡す",
+        "text": "ClaudeReviewer infrastructure adapter の新設: usecase::review_v2::ports::Reviewer の両メソッド (review / fast_review) を実装し、claude -p --bare --allowedTools '<read-only 検査ツールセット>' --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' --model <model> <prompt> を subprocess として起動する。stdout エンベロープの structured_output フィールドから verdict を取り出して既存の parse_review_final_message codec に渡す",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-23-2236-reviewer-provider-selectable-claude-option.md",
@@ -161,7 +161,7 @@
   "constraints": [
     {
       "id": "CN-01",
-      "text": "ClaudeReviewer は claude -p --bare --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' で起動する。--bare フラグにより hooks / MCP / CLAUDE.md の自動検出を無効化し CI/スクリプト用途での再現性を確保する。--json-schema による API レベルのスキーマ強制 (grammar-compiled) が主要保護となり、briefing 内のインライン指示には依存しない",
+      "text": "ClaudeReviewer は claude -p --bare --allowedTools '<read-only 検査ツールセット>' --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' で起動する。--bare フラグにより hooks / MCP / CLAUDE.md の自動検出を無効化し CI/スクリプト用途での再現性を確保する。--allowedTools により read-only 検査ツール (Read / Grep / Glob / Bash(git diff:*) / Bash(git show:*) / Bash(git log:*) / Bash(git ls-files:*)) のみを許可し、Edit / Write / ホワイトリスト外の Bash を構造的に拒否することでワークスペース書き込みを防ぐ。--json-schema による API レベルのスキーマ強制 (grammar-compiled) が主要保護となり、briefing 内のインライン指示には依存しない",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-23-2236-reviewer-provider-selectable-claude-option.md",
@@ -201,7 +201,7 @@
     },
     {
       "id": "CN-05",
-      "text": "ClaudeReviewer は reviewer role (ファイル編集を行わない読み取り専用役割) で起動する。review-fix-lead が fix 役、reviewer が review 役という役割分担を維持する。claude -p はヘッドレス出力モード (stdout に JSON を出力するサブプロセス) として起動されるため、ワークスペースへのファイル書き込みは役割上行わない。codex exec の --sandbox read-only のようなサンドボックス強制ではなく、reviewer role としての運用上の制約と claude -p の出力専用サブプロセス呼び出し形式の組み合わせによって read-only 相当の動作を担保する。この結果、hook coverage 問題 (workspace-write サンドボックス対比で hooks が fire しない問題) は claude -p 経路では発生しない",
+      "text": "ClaudeReviewer のワークスペース書き込みは、サブプロセスレベルで構造的に禁止する。claude -p --allowedTools により read-only 検査ツール (Read / Grep / Glob / Bash(git diff:*) / Bash(git show:*) / Bash(git log:*) / Bash(git ls-files:*)) のみを許可し、Edit / Write / ホワイトリスト外の Bash を拒否することで、ワークスペースへのファイル書き込みを役割の運用上の制約ではなく仕組みとして防ぐ。これは CodexReviewer が codex exec --sandbox read-only で read-only を強制するのと対称な設計である。review-fix-lead が fix 役、reviewer が review 役という役割分担は引き続き維持する。この結果、hook coverage 問題 (workspace-write サンドボックス対比で hooks が fire しない問題) は claude -p 経路では発生しない (--allowedTools によりファイル書き込みが構造的に拒否されるため)",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-23-2236-reviewer-provider-selectable-claude-option.md",
@@ -239,7 +239,7 @@
     },
     {
       "id": "AC-02",
-      "text": "reviewer.provider=claude に設定して /track:review を実行すると、sotp review local が claude を自動解決し ClaudeReviewer を起動する。ClaudeReviewer は claude -p --bare --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' を subprocess として呼び出し、stdout エンベロープの structured_output フィールドから verdict を取り出して parse_review_final_message で解析する",
+      "text": "reviewer.provider=claude に設定して /track:review を実行すると、sotp review local が claude を自動解決し ClaudeReviewer を起動する。ClaudeReviewer は claude -p --bare --allowedTools '<read-only 検査ツールセット>' --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' を subprocess として呼び出し、stdout エンベロープの structured_output フィールドから verdict を取り出して parse_review_final_message で解析する",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-23-2236-reviewer-provider-selectable-claude-option.md",

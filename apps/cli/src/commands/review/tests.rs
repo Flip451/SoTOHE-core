@@ -1187,3 +1187,242 @@ fn test_is_safe_briefing_path_accepts_dotdot_inside_filename() {
     assert!(is_safe_briefing_path("track/..hidden/file.md"));
     assert!(is_safe_briefing_path("track/review-prompts/v1..2/policy.md"));
 }
+
+// ---------------------------------------------------------------------------
+// resolve_reviewer_for_test: CN-03 fail-closed provider resolution tests
+// ---------------------------------------------------------------------------
+
+use super::local::resolve_reviewer_for_test;
+
+/// Writes an agent-profiles.json at the given path with the provided content.
+fn write_profiles_json(dir: &Path, content: &str) -> PathBuf {
+    use std::io::Write;
+    let config_dir = dir.join(".harness").join("config");
+    fs::create_dir_all(&config_dir).unwrap();
+    let path = config_dir.join("agent-profiles.json");
+    let mut f = fs::File::create(&path).unwrap();
+    f.write_all(content.as_bytes()).unwrap();
+    path
+}
+
+#[test]
+fn resolve_reviewer_fails_closed_when_reviewer_capability_missing() {
+    // CN-03: resolve_execution("reviewer", round_type) returning None → fail-closed error.
+    let dir = tempfile::tempdir().unwrap();
+    // agent-profiles.json has no "reviewer" capability.
+    let path = write_profiles_json(
+        dir.path(),
+        r#"{
+  "schema_version": 1,
+  "providers": { "codex": { "label": "Codex CLI" } },
+  "capabilities": {}
+}"#,
+    );
+    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Fast);
+    assert!(result.is_err(), "expected error when reviewer capability is missing");
+    let err = result.unwrap_err();
+    assert!(
+        err.contains("reviewer capability not defined"),
+        "error must explain that reviewer capability is missing; got: {err}"
+    );
+}
+
+#[test]
+fn resolve_reviewer_fails_closed_when_provider_is_unsupported() {
+    // CN-03: an unknown/unsupported provider → fail-closed error (never run a review
+    // with an unknown provider).
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_profiles_json(
+        dir.path(),
+        r#"{
+  "schema_version": 1,
+  "providers": { "gemini": { "label": "Gemini CLI" } },
+  "capabilities": {
+    "reviewer": { "provider": "gemini", "model": "gemini-2.5-pro" }
+  }
+}"#,
+    );
+    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Final);
+    assert!(result.is_err(), "expected error for unsupported provider");
+    let err = result.unwrap_err();
+    assert!(
+        err.contains("unsupported reviewer provider") && err.contains("gemini"),
+        "error must name the unsupported provider; got: {err}"
+    );
+}
+
+#[test]
+fn resolve_reviewer_succeeds_for_codex_provider() {
+    // CN-03: known provider "codex" → no error.
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_profiles_json(
+        dir.path(),
+        r#"{
+  "schema_version": 1,
+  "providers": { "codex": { "label": "Codex CLI" } },
+  "capabilities": {
+    "reviewer": { "provider": "codex", "model": "gpt-5.4" }
+  }
+}"#,
+    );
+    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Final);
+    assert!(result.is_ok(), "expected Ok for codex provider; got: {:?}", result.err());
+    let resolved = result.unwrap();
+    assert_eq!(resolved.provider, "codex");
+    assert_eq!(resolved.model.as_deref(), Some("gpt-5.4"));
+}
+
+#[test]
+fn resolve_reviewer_succeeds_for_claude_provider() {
+    // CN-03: known provider "claude" → no error.
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_profiles_json(
+        dir.path(),
+        r#"{
+  "schema_version": 1,
+  "providers": { "claude": { "label": "Claude Code" } },
+  "capabilities": {
+    "reviewer": { "provider": "claude", "model": "claude-sonnet-4-6" }
+  }
+}"#,
+    );
+    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Final);
+    assert!(result.is_ok(), "expected Ok for claude provider; got: {:?}", result.err());
+    let resolved = result.unwrap();
+    assert_eq!(resolved.provider, "claude");
+    assert_eq!(resolved.model.as_deref(), Some("claude-sonnet-4-6"));
+}
+
+#[test]
+fn resolve_reviewer_fast_round_uses_fast_model_from_codex_provider() {
+    // AC-04: round_type is passed straight to resolve_execution, so fast_model
+    // is selected automatically for fast rounds.
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_profiles_json(
+        dir.path(),
+        r#"{
+  "schema_version": 1,
+  "providers": { "codex": { "label": "Codex CLI" } },
+  "capabilities": {
+    "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini" }
+  }
+}"#,
+    );
+    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Fast);
+    assert!(result.is_ok(), "expected Ok for fast round; got: {:?}", result.err());
+    let resolved = result.unwrap();
+    assert_eq!(resolved.provider, "codex");
+    assert_eq!(
+        resolved.model.as_deref(),
+        Some("gpt-5.4-mini"),
+        "fast round must select fast_model"
+    );
+}
+
+#[test]
+fn resolve_reviewer_fast_round_mixed_provider_selects_fast_provider() {
+    // AC-04: fast_provider overrides the base provider for fast rounds.
+    let dir = tempfile::tempdir().unwrap();
+    let path = write_profiles_json(
+        dir.path(),
+        r#"{
+  "schema_version": 1,
+  "providers": {
+    "claude": { "label": "Claude Code" },
+    "codex": { "label": "Codex CLI" }
+  },
+  "capabilities": {
+    "reviewer": {
+      "provider": "claude",
+      "model": "claude-opus-4-7",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.4-mini"
+    }
+  }
+}"#,
+    );
+    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Fast);
+    assert!(
+        result.is_ok(),
+        "expected Ok for fast round with fast_provider; got: {:?}",
+        result.err()
+    );
+    let resolved = result.unwrap();
+    assert_eq!(resolved.provider, "codex", "fast round must use fast_provider");
+    assert_eq!(resolved.model.as_deref(), Some("gpt-5.4-mini"));
+}
+
+// ---------------------------------------------------------------------------
+// validate_claude_auto_record_args: CN-02 required-args tests
+// ---------------------------------------------------------------------------
+
+use super::{ClaudeLocalArgs, validate_claude_auto_record_args};
+
+fn make_claude_local_args(
+    track_id: &str,
+    round_type: super::CodexRoundTypeArg,
+    group: &str,
+) -> ClaudeLocalArgs {
+    ClaudeLocalArgs {
+        model: "claude-sonnet-4-6".to_owned(),
+        timeout_seconds: 60,
+        briefing_file: None,
+        prompt: Some("dummy".to_owned()),
+        track_id: track_id.to_owned(),
+        round_type,
+        group: group.to_owned(),
+        items_dir: PathBuf::from("track/items"),
+    }
+}
+
+#[test]
+fn validate_claude_auto_record_args_valid_fast() {
+    // CN-02: --track-id / --round-type / --group are required; valid args pass.
+    let args = make_claude_local_args("my-track-2026-05-24", super::CodexRoundTypeArg::Fast, "cli");
+    let result = validate_claude_auto_record_args(&args);
+    assert!(result.is_ok(), "expected Ok for valid fast args; got: {:?}", result.err());
+    let v = result.unwrap();
+    assert_eq!(v.track_id, "my-track-2026-05-24");
+    assert_eq!(v.round_type_str, "fast");
+    assert_eq!(v.group_name, "cli");
+}
+
+#[test]
+fn validate_claude_auto_record_args_valid_final() {
+    // CN-02: final round args also pass validation.
+    let args =
+        make_claude_local_args("my-track-2026-05-24", super::CodexRoundTypeArg::Final, "domain");
+    let result = validate_claude_auto_record_args(&args);
+    assert!(result.is_ok(), "expected Ok for valid final args; got: {:?}", result.err());
+    let v = result.unwrap();
+    assert_eq!(v.round_type_str, "final");
+}
+
+#[test]
+fn validate_claude_auto_record_args_invalid_track_id_returns_error() {
+    // CN-02: invalid --track-id → fail-closed error.
+    let args = make_claude_local_args("Not A Valid ID!!", super::CodexRoundTypeArg::Fast, "cli");
+    let result = validate_claude_auto_record_args(&args);
+    assert!(result.is_err(), "expected error for invalid track-id");
+    assert!(result.unwrap_err().contains("--track-id"), "error must mention --track-id");
+}
+
+#[test]
+fn validate_claude_auto_record_args_invalid_group_returns_error() {
+    // CN-02: invalid --group (empty/whitespace-only) → fail-closed error.
+    // ReviewGroupName::try_new rejects whitespace-only inputs as EmptyString.
+    let args = make_claude_local_args("my-track-2026-05-24", super::CodexRoundTypeArg::Fast, "   ");
+    let result = validate_claude_auto_record_args(&args);
+    assert!(result.is_err(), "expected error for whitespace-only group name");
+    assert!(result.unwrap_err().contains("--group"), "error must mention --group");
+}
+
+#[test]
+fn validate_claude_auto_record_args_trims_whitespace_from_group() {
+    // validate_auto_record_args_raw trims group before downstream use.
+    let args =
+        make_claude_local_args("my-track-2026-05-24", super::CodexRoundTypeArg::Fast, "  cli  ");
+    let result = validate_claude_auto_record_args(&args);
+    assert!(result.is_ok(), "expected Ok for group with surrounding whitespace");
+    assert_eq!(result.unwrap().group_name, "cli");
+}

@@ -1,23 +1,23 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # reviewer capability の provider を選択可能にする (Codex デフォルト、Claude オプション)
 
-## Tasks (0/6 resolved)
+## Tasks (6/6 resolved)
 
 ### S1 — Infrastructure: ClaudeReviewer adapter (Reviewer port implementation)
 
 > Add ClaudeReviewer struct to libs/infrastructure/src/review_v2/claude_reviewer.rs, implementing the Reviewer usecase port (review / fast_review) via a claude -p subprocess.
 > This is the Phase-2 type-signal Blue transition task: ClaudeReviewer action=add turns Blue when this task is committed.
-> Follows the CodexReviewer pattern: subprocess management, stdout envelope parsing (structured_output field), parse_review_final_message codec reuse, session log, timeout polling, fail-closed design (CN-01 / CN-05 / CN-06).
+> Follows the CodexReviewer pattern: subprocess management, stdout envelope parsing (structured_output field), parse_review_final_message codec reuse, timeout polling, fail-closed design (CN-01 / CN-05 / CN-06). stderr is captured in-memory (no session log file) — symmetric with CN-05's structural read-only contract. --allowedTools enforces read-only at the subprocess level.
 
-- [ ] **T001**: ClaudeReviewer infrastructure adapter を新設する (IN-01 / CN-01 / CN-05 / CN-06 / AC-02 / AC-09)。
+- [x] **T001**: ClaudeReviewer infrastructure adapter を新設する (IN-01 / CN-01 / CN-05 / CN-06 / AC-02 / AC-09)。
 
 実装先: libs/infrastructure/src/review_v2/claude_reviewer.rs。
 
-(1) `ClaudeReviewer { model: String, timeout: Duration, base_prompt: String, scope_label: String }` struct を定義する (infrastructure-types.json で指定された plain_struct に対応)。`new(model: impl Into<String>, timeout: Duration, base_prompt: impl Into<String>) -> Self` および `with_scope_label(self, label: impl Into<String>) -> Self` を実装する。
+(1) `ClaudeReviewer { model: String, timeout: Duration, base_prompt: String, scope_label: String }` struct を定義する (infrastructure-types.json で指定された plain_struct に対応)。コンストラクタは名前付きジェネリクスを使う: `new<M: Into<String>, B: Into<String>>(model: M, timeout: Duration, base_prompt: B) -> Self` および `with_scope_label<S: Into<String>>(self, label: S) -> Self`。型シグネチャのコーデックが同名の `impl Into<String>` 引数を区別できないため、型変数は別名 (M / B / S) で定義する。
 
 (2) `build_full_prompt` ヘルパを `CodexReviewer` と同一パターンで実装する (base_prompt + scope file list の結合)。
 
-(3) `run_review` 内部メソッドを実装する: `claude -p --bare --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' --model <model> <prompt>` を subprocess として起動し (CN-01)、stdout を読んで JSON エンベロープを serde_json で parse し、`structured_output` フィールドを取り出す。セッションログは tmp/reviewer-runtime 下に書き込む。タイムアウトはポーリングループで管理する。
+(3) `run_review` 内部メソッドを実装する: `claude -p --bare --allowedTools '<read-only 検査ツールセット: Read, Grep, Glob, Bash(git diff:*), Bash(git show:*), Bash(git log:*), Bash(git ls-files:*)>' --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' --model <model> <prompt>` を subprocess として起動し (CN-01)、stdout を読んで JSON エンベロープを serde_json で parse し、`structured_output` フィールドを取り出す。stderr は in-memory で収集する (ファイル書き込みなし、CN-05 の構造的 read-only 契約)。タイムアウトはポーリングループで管理する。
 
 (4) `Reviewer` port の両メソッド (`review` / `fast_review`) を実装する (CN-06)。内部で `run_review` を呼び、`structured_output` 文字列を `parse_review_final_message` に渡し、`convert_raw_to_final` / `convert_raw_to_fast` で domain 型に変換する。`ReviewVerdict` の分類には `classify_review_verdict(timed_out, exit_success, &final_message_state)` を使用する。
 
@@ -31,7 +31,7 @@
 > Mirrors codex-local: same auto-record arguments (--track-id / --group / --round-type), same write-first / fail-closed verdict recording via FsReviewStore (CN-02 / AC-03).
 > Exposed as sotp review claude-local; remains a low-level ad-hoc override target (the skill will call sotp review local instead).
 
-- [ ] **T002**: sotp review claude-local サブコマンドと infrastructure 組み立て関数を新設する (IN-02 / CN-02 / AC-03 / AC-09)。
+- [x] **T002**: sotp review claude-local サブコマンドと infrastructure 組み立て関数を新設する (IN-02 / CN-02 / AC-03 / AC-09)。
 
 (1) infrastructure 層: libs/infrastructure/src/review_v2/cli_composition.rs に `ReviewV2CompositionWithClaude` struct および `build_review_v2_with_claude_reviewer` / `build_review_v2_with_claude_reviewer_str` を追加する。シグネチャは `CodexReviewer` 版と対称にする (型パラメータが `ClaudeReviewer` に変わるだけ)。`run_claude_review_str(track_id_str, items_dir, group_str, round_type_str, reviewer: ClaudeReviewer) -> Result<CodexReviewOutcome, String>` を追加する。実装は `run_codex_review_str` を `ClaudeReviewer` に差し替えた同一パターンで動作する。
 
@@ -48,7 +48,7 @@
 > The skill passes only --round-type / --group / --track-id / --briefing-file; no --model / --provider in the skill document (AC-01 / AC-04 / AC-07).
 > Mixed-provider ladder (fast_provider fallback) is handled automatically by resolve_execution (AC-04).
 
-- [ ] **T003**: sotp review local 統合エントリポイントを新設する (IN-03 / CN-03 / CN-04 / AC-01 / AC-04 / AC-09)。
+- [x] **T003**: sotp review local 統合エントリポイントを新設する (IN-03 / CN-03 / CN-04 / AC-01 / AC-04 / AC-09)。
 
 (1) apps/cli/src/commands/review/mod.rs: `ReviewCommand` enum に `Local(LocalArgs)` variant を追加する。
 
@@ -76,7 +76,7 @@
 > Update pr.rs trigger_review / review_cycle to resolve_execution("pr-reviewer", ...) instead of ("reviewer", ...), and clarify validate_reviewer_provider semantics to PR-only scope.
 > Ensures reviewer.provider=claude does not break /track:pr-review (D5 / AC-05 / AC-06).
 
-- [ ] **T004**: pr-reviewer capability を agent-profiles.json に新設し、pr.rs を差し替える (IN-04 / AC-05 / AC-06 / AC-09)。
+- [x] **T004**: pr-reviewer capability を agent-profiles.json に新設し、pr.rs を差し替える (IN-04 / AC-05 / AC-06 / AC-09)。
 
 (1) .harness/config/agent-profiles.json に `"pr-reviewer"` capability を追加する:
 ```json
@@ -101,7 +101,7 @@
 > Update .claude/commands/track/review.md to remove manual reviewer provider/model resolution logic (Step 1) and update reviewer invocation strings to use sotp review local (no --model argument).
 > After this change, review.md contains no reviewer provider names or reviewer model name literals in the reviewer-invocation paths (AC-07). The review-fix-lead dispatch condition labels (provider: codex / provider: claude) and review-fix-lead.model references remain in Step 4/5 — these are the fix-lead dispatch mechanism, not reviewer invocation literals, and are explicitly out of AC-07's scope.
 
-- [ ] **T005**: .claude/commands/track/review.md を更新する (IN-05 / AC-07)。
+- [x] **T005**: .claude/commands/track/review.md を更新する (IN-05 / AC-07)。
 
 (1) Step 1 の reviewer 解決ロジックを完全に削除する: `capabilities.reviewer.provider`, `capabilities.reviewer.fast_model`, `capabilities.reviewer.model` を手動読み取りして `--model` 引数に渡す記述をすべて削除する。
 
@@ -120,7 +120,7 @@
 > Update .claude/commands/track/pr-review.md to reference pr-reviewer capability instead of reviewer.
 > Update .claude/rules/10-guardrails.md Reviewer Capability Constraint section: remove claude-heavy / Explore subagent substitute, add official Claude reviewer path via D3 auto-dispatch (AC-08).
 
-- [ ] **T006**: .claude/commands/track/pr-review.md と .claude/rules/10-guardrails.md を更新する (IN-06 / AC-08)。
+- [x] **T006**: .claude/commands/track/pr-review.md と .claude/rules/10-guardrails.md を更新する (IN-06 / AC-08)。
 
 (1) .claude/commands/track/pr-review.md:
   - `reviewer` capability への言及を `pr-reviewer` capability に変更する (D5 / AC-08)。

@@ -129,13 +129,14 @@ Reference: `knowledge/conventions/shell-parsing.md`
 
 ## Reviewer Capability Constraint
 
-The `reviewer` capability delegates to an external provider defined in `.harness/config/agent-profiles.json`.
+The `reviewer` capability delegates to a provider defined in `.harness/config/agent-profiles.json`.
 Inline review within Claude Code's main context (self-review) is not a substitute for the reviewer capability.
 
-- If the external reviewer (e.g., Codex CLI) fails to return a verdict → **retry** (up to 2 times)
+- The official path for `reviewer.provider: claude` is `sotp review local` (resolved in `/track:review` Step 1), which auto-resolves the provider and dispatches to the `ClaudeReviewer` adapter (a read-only `claude -p` headless subprocess). This is the only sanctioned Claude reviewer path; an ad-hoc `subagent_type: "Explore"` self-review is **never** a substitute for it, under any profile.
+- If the reviewer fails to return a verdict → **retry** (up to 2 times). This applies to both providers: a Codex CLI invocation failure and a `ClaudeReviewer` stdout-envelope parse failure are handled the same way.
 - If retries also fail → **report to the user and ask for a decision**
+- If the `reviewer` capability resolves to no provider (undefined / unresolvable) → fail-closed; do not run the review with an unknown provider.
 - Do not treat inline review in the main context as achieving `zero_findings` and proceed to commit
-- Claude Code subagent (`subagent_type: "Explore"`) as a reviewer substitute is only valid for the `claude-heavy` profile (`reviewer: "claude"`)
 - Distinguish from hook blocks: hook blocks are a prompt formatting issue (work around via file), verdict extraction failures are an external provider execution issue (address via retry)
 
 Operational details live in:
