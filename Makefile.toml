@@ -1068,7 +1068,9 @@ SCOPE_FILES_SECTION="
 You may ONLY modify files within this list:
 $(echo "$SCOPE_FILES" | tr ',' '\n' | sed 's/^/- /')"
 
-PROMPT="$(cat "$BRIEFING_FILE")
+PROMPT="\$review-fix-lead
+
+$(cat "$BRIEFING_FILE")
 
 ---
 

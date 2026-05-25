@@ -13,7 +13,7 @@ use rustdoc_types::{
 
 use super::format::{
     apply_canon_to_str, build_generic_canon_map, format_generic_bounds_with_canon,
-    format_type_with_canon, format_where_predicate_with_canon,
+    format_type_with_canon, format_type_with_canon_occ, format_where_predicate_with_canon,
 };
 
 // ---------------------------------------------------------------------------
@@ -77,7 +77,11 @@ fn build_where_form_view(
     let canon: &HashMap<String, String> = match combined_canon {
         Some(c) => c,
         None => {
-            local_canon = build_generic_canon_map(generics);
+            // build_generic_canon_map returns (name_map, synthetic_order).
+            // build_where_form_view only needs the name_map for where-clause rendering
+            // (where-predicates use Type::Generic with normal names, not ImplTrait).
+            let (name_map, _synthetic_order) = build_generic_canon_map(generics);
+            local_canon = name_map;
             &local_canon
         }
     };
@@ -85,7 +89,15 @@ fn build_where_form_view(
     let mut param_sigs: Vec<String> = Vec::new();
     for p in &generics.params {
         match &p.kind {
-            GenericParamDefKind::Type { default, .. } => {
+            GenericParamDefKind::Type { default, is_synthetic, .. } => {
+                // Synthetic type params are an internal rustdoc artifact from desugaring
+                // `impl Trait` function arguments.  They do not correspond to user-declared
+                // generics and must be excluded from the where-form fingerprint so that the
+                // A-side (catalogue, no synthetic params) and C-side (rustdoc, with synthetic
+                // params) produce the same fingerprint for structurally identical signatures.
+                if *is_synthetic {
+                    continue;
+                }
                 // Bounds intentionally omitted from param identity — they are lifted
                 // into the where-form predicate list so that inline and explicit-where
                 // forms produce the same fingerprint.
@@ -126,8 +138,14 @@ fn build_where_form_view(
     // `where T: A, T: B` form produce the same fingerprint.
     let mut where_form_map: BTreeMap<String, Vec<GenericBound>> = BTreeMap::new();
     // (1) Inline `params[T].bounds` → merged by canonical LHS.
+    // Skip synthetic params: their bounds describe the `impl Trait` constraint, not a
+    // user-declared generic bound.  The A-side has no synthetic params, so including
+    // them on the C-side would break A/C symmetry (see also the param_sigs loop above).
     for p in &generics.params {
-        if let GenericParamDefKind::Type { bounds, .. } = &p.kind {
+        if let GenericParamDefKind::Type { bounds, is_synthetic, .. } = &p.kind {
+            if *is_synthetic {
+                continue;
+            }
             if bounds.is_empty() {
                 continue;
             }
@@ -277,8 +295,10 @@ pub(super) fn traits_structurally_equal(
     // `trait Repo<T>: From<T>`) are rendered as `From<#0>` on both sides, making
     // a rename of `T` → `U` invisible to the comparison.  This mirrors the
     // canon-aware treatment already applied to method and associated-type paths.
-    let a_trait_canon = build_generic_canon_map(&a.generics);
-    let b_trait_canon = build_generic_canon_map(&b.generics);
+    // Supertrait bounds use named generic params (not synthetic impl Trait params),
+    // so only the name_map part of build_generic_canon_map is needed here.
+    let (a_trait_canon, _) = build_generic_canon_map(&a.generics);
+    let (b_trait_canon, _) = build_generic_canon_map(&b.generics);
     let a_bounds = format_generic_bounds_with_canon(&a.bounds, &a_trait_canon);
     let b_bounds = format_generic_bounds_with_canon(&b.bounds, &b_trait_canon);
     // D3 fail-closed: `format_generic_bounds_with_canon` can emit `<UNSUPPORTED:...>`
@@ -308,25 +328,42 @@ pub(super) fn traits_structurally_equal(
     a_methods == b_methods
 }
 
-/// Builds a combined canonical name map from parent (trait/impl) generics and
-/// method-local generics.
+/// Builds a combined canonical name map and synthetic occurrence list from parent
+/// (trait/impl) generics and method-local generics.
 ///
 /// Parent params are assigned `#0`, `#1`, … and method-local params continue
 /// from there (`#N`, `#N+1`, …).  This ensures that a method body that refers
 /// to the enclosing trait's type parameter (e.g. `T` in `trait Repo<T>`) is
 /// mapped to the same positional placeholder as in the other trait definition,
 /// regardless of whether the enclosing parameter is named `T` or `U`.
+///
+/// Returns `(name_map, synthetic_order)` where:
+/// - `name_map`: name→placeholder for non-synthetic type/const params.
+/// - `synthetic_order`: occurrence-ordered synthetic occurrence keys for `impl Trait`
+///   params (combined from parent + method params in declaration order). Each key starts
+///   with the positional placeholder and includes the canonical bound fingerprint.
+///
+/// Parent params come first in the positional sequence; method-local params follow.
+/// Synthetic params from both levels are appended to `synthetic_order` in declaration
+/// order (parent first, then method-local).
 fn build_combined_canon_map(
     parent_generics: Option<&Generics>,
     method_generics: &Generics,
-) -> HashMap<String, String> {
+) -> (HashMap<String, String>, Vec<String>) {
     let mut map = HashMap::new();
     let mut idx: usize = 0;
     // Parent params first.
     if let Some(pg) = parent_generics {
         for p in &pg.params {
             match &p.kind {
-                GenericParamDefKind::Type { .. } | GenericParamDefKind::Const { .. } => {
+                GenericParamDefKind::Type { is_synthetic, .. } => {
+                    let placeholder = format!("#{idx}");
+                    if !*is_synthetic {
+                        map.insert(p.name.clone(), placeholder);
+                    }
+                    idx += 1;
+                }
+                GenericParamDefKind::Const { .. } => {
                     map.insert(p.name.clone(), format!("#{idx}"));
                     idx += 1;
                 }
@@ -337,14 +374,58 @@ fn build_combined_canon_map(
     // Method-local params (continuing the positional sequence).
     for p in &method_generics.params {
         match &p.kind {
-            GenericParamDefKind::Type { .. } | GenericParamDefKind::Const { .. } => {
+            GenericParamDefKind::Type { is_synthetic, .. } => {
+                let placeholder = format!("#{idx}");
+                if !*is_synthetic {
+                    map.insert(p.name.clone(), placeholder);
+                }
+                idx += 1;
+            }
+            GenericParamDefKind::Const { .. } => {
                 map.insert(p.name.clone(), format!("#{idx}"));
                 idx += 1;
             }
             GenericParamDefKind::Lifetime { .. } => {}
         }
     }
-    map
+    let mut synthetic_order: Vec<String> = Vec::new();
+    idx = 0;
+    if let Some(pg) = parent_generics {
+        for p in &pg.params {
+            match &p.kind {
+                GenericParamDefKind::Type { bounds, is_synthetic, .. } => {
+                    if *is_synthetic {
+                        let placeholder = format!("#{idx}");
+                        let bound_sig =
+                            format_type_with_canon(&Type::ImplTrait(bounds.clone()), &map);
+                        synthetic_order.push(format!("{placeholder}:{bound_sig}"));
+                    }
+                    idx += 1;
+                }
+                GenericParamDefKind::Const { .. } => {
+                    idx += 1;
+                }
+                GenericParamDefKind::Lifetime { .. } => {}
+            }
+        }
+    }
+    for p in &method_generics.params {
+        match &p.kind {
+            GenericParamDefKind::Type { bounds, is_synthetic, .. } => {
+                if *is_synthetic {
+                    let placeholder = format!("#{idx}");
+                    let bound_sig = format_type_with_canon(&Type::ImplTrait(bounds.clone()), &map);
+                    synthetic_order.push(format!("{placeholder}:{bound_sig}"));
+                }
+                idx += 1;
+            }
+            GenericParamDefKind::Const { .. } => {
+                idx += 1;
+            }
+            GenericParamDefKind::Lifetime { .. } => {}
+        }
+    }
+    (map, synthetic_order)
 }
 
 // `apply_canon_to_str` is defined in `super::format` (moved there so that
@@ -382,21 +463,44 @@ pub(super) fn build_trait_method_map(
                         // Build a combined canonical map from parent (trait/impl) params and
                         // method-local params so that trait type parameters referenced in the
                         // method body are canonicalized consistently, even when renamed.
-                        let canon = build_combined_canon_map(parent_generics, &f.generics);
+                        // The synthetic_order list carries occurrence keys for impl Trait params
+                        // in declaration order, enabling occurrence-based A/C-side symmetry.
+                        let (canon, synthetic_order) =
+                            build_combined_canon_map(parent_generics, &f.generics);
+                        // Format each param with the occurrence-aware formatter so that
+                        // Type::ImplTrait (A-side) and Type::Generic("impl ...") (C-side)
+                        // consume the same cursor position and produce the same placeholder.
+                        //
+                        // use_positional_fallback: when synthetic_order is empty, this item
+                        // is the A-side (catalogue, Type::ImplTrait).  Setting `true` causes
+                        // Type::ImplTrait to generate on-the-fly positional placeholders (#N)
+                        // that mirror what the C-side produces from its synthetic_order list.
+                        // When synthetic_order is non-empty (C-side), the list is consumed
+                        // directly and the flag is not needed.
+                        let use_positional_fallback = synthetic_order.is_empty();
+                        let mut cursor: usize = 0;
                         let params: Vec<String> = f
                             .sig
                             .inputs
                             .iter()
-                            .map(|(_, ty)| format_type_with_canon(ty, &canon))
+                            .map(|(_, ty)| {
+                                format_type_with_canon_occ(
+                                    ty,
+                                    &canon,
+                                    &synthetic_order,
+                                    use_positional_fallback,
+                                    &mut cursor,
+                                )
+                            })
                             .collect();
                         let ret = f.sig.output.as_ref().map_or_else(
                             || "()".to_string(),
                             |t| format_type_with_canon(t, &canon),
                         );
-                        // D3 fail-closed: `format_type_with_canon` emits `<UNSUPPORTED:ImplTrait>`
-                        // for `impl Trait` types carrying unsupported bounds.  The sentinel would
-                        // compare equal on both sides, yielding a false positive.  Detect it here
-                        // and raise the unsupported flag so the trait pair is rejected.
+                        // D3 fail-closed: `format_type_with_canon_occ` / `format_type_with_canon`
+                        // emit `<UNSUPPORTED:ImplTrait>` for `impl Trait` types carrying unsupported
+                        // bounds.  The sentinel would compare equal on both sides, yielding a false
+                        // positive.  Detect it here and raise the unsupported flag.
                         if params.iter().any(|s| contains_unsupported_sentinel(s))
                             || contains_unsupported_sentinel(&ret)
                         {
@@ -437,7 +541,10 @@ pub(super) fn build_trait_method_map(
                     }
                     ItemEnum::AssocType { generics, bounds, type_ } => {
                         // Build combined canon for associated type (parent + assoc-type-local).
-                        let assoc_canon = build_combined_canon_map(parent_generics, generics);
+                        // AssocType defaults / bounds do not use impl Trait params, so only the
+                        // name_map is needed here.
+                        let (assoc_canon, _assoc_synthetic) =
+                            build_combined_canon_map(parent_generics, generics);
                         // Check for D3 unsupported generics on this associated type, using the
                         // combined canon so parent-generic references in predicates are seen.
                         let (_, _, unsupported_raw) =
@@ -485,8 +592,11 @@ pub(super) fn build_trait_method_map(
                         // (e.g. `trait Foo<N: usize>: const SIZE: usize = N` — `N` maps to
                         // `#0` so renaming `N → M` does not change the signature string).
                         // AssocConst has no local generics, so only the parent map is needed.
-                        let parent_canon =
-                            parent_generics.map(build_generic_canon_map).unwrap_or_default();
+                        // build_generic_canon_map returns (name_map, synthetic_order); take only
+                        // name_map (synthetic params don't appear in associated const types).
+                        let parent_canon = parent_generics
+                            .map(|pg| build_generic_canon_map(pg).0)
+                            .unwrap_or_default();
                         let ty_str = format_type_with_canon(type_, &parent_canon);
                         // D3 fail-closed: an associated-const type containing an unsupported
                         // sentinel means the type itself is outside D3 scope.
@@ -631,16 +741,47 @@ pub(super) fn fn_sigs_structurally_equal(
     // comparing types, so that renaming a type parameter (e.g. `T` → `U`)
     // does not cause a false mismatch.  Both sides map their type params to
     // positional placeholders (`#0`, `#1`, …) via `build_generic_canon_map`.
-    let canon_a = build_generic_canon_map(a_generics);
-    let canon_b = build_generic_canon_map(b_generics);
+    // The synthetic_order list carries occurrence-ordered keys for impl Trait
+    // params so that A-side Type::ImplTrait and C-side Type::Generic("impl ...") both
+    // map to the same placeholder at the same argument position.
+    let (canon_a, synthetic_a) = build_generic_canon_map(a_generics);
+    let (canon_b, synthetic_b) = build_generic_canon_map(b_generics);
+    // When one side has no synthetic params but the other does, we need to handle the
+    // asymmetric case: the side without rustdoc-synthetic params (A-side, catalogue-declared
+    // impl Trait as Type::ImplTrait) needs its own occurrence cursor that advances in sync
+    // with the C-side cursor.  Both synthetic_order lists should have the same length when
+    // the signatures describe the same function; if they differ, the param counts will also
+    // differ and the length check above will catch it.
+    let mut cursor_a: usize = 0;
+    let mut cursor_b: usize = 0;
     // Format each parameter pair and check for unsupported-bound sentinels (D3 fail-closed).
-    // `format_type_with_canon` emits `<UNSUPPORTED:ImplTrait>` when an `impl Trait` type
+    // `format_type_with_canon_occ` emits `<UNSUPPORTED:ImplTrait>` when an `impl Trait` type
     // carries bounds outside ADR `2026-05-13-1153` D3 scope.  Comparing sentinels from
     // both sides would yield a false positive because both produce the same `<UNSUPPORTED:…>`
     // string.  Checking here ensures such signatures fail closed (D3).
+    // use_positional_fallback: when one side has no synthetic params (A-side, catalogue-declared
+    // impl Trait as Type::ImplTrait), it needs to generate on-the-fly positional placeholders that
+    // mirror the C-side assignment.  Set to `true` when the counterpart has synthetic params.
+    // This enables A/C asymmetric comparison (ImplTrait vs Generic("impl ...")).
+    // When both sides have no synthetic params (A-A comparison), set to `false` so that
+    // Type::ImplTrait falls back to literal bound rendering, preserving order-sensitivity.
+    let use_positional_fallback_a = !synthetic_b.is_empty();
+    let use_positional_fallback_b = !synthetic_a.is_empty();
     let params_equal = a_sig.inputs.iter().zip(b_sig.inputs.iter()).all(|((_, at), (_, bt))| {
-        let sa = format_type_with_canon(at, &canon_a);
-        let sb = format_type_with_canon(bt, &canon_b);
+        let sa = format_type_with_canon_occ(
+            at,
+            &canon_a,
+            &synthetic_a,
+            use_positional_fallback_a,
+            &mut cursor_a,
+        );
+        let sb = format_type_with_canon_occ(
+            bt,
+            &canon_b,
+            &synthetic_b,
+            use_positional_fallback_b,
+            &mut cursor_b,
+        );
         // D3 fail-closed: any unsupported sentinel in either side → not equal.
         if contains_unsupported_sentinel(&sa) || contains_unsupported_sentinel(&sb) {
             return false;
@@ -1774,6 +1915,342 @@ mod tests {
             !generics_structurally_equal(&outlives_generics, &plain_generics),
             "D5 fail-closed: `for<'a: 'static> Fn(&'a str)` must NOT equal `for<'a> Fn(&'a str)` \
              (outlives constraint is outside D5 scope)"
+        );
+    }
+
+    // ---------------------------------------------------------------------------
+    // impl Trait codec fix (ADR 2026-05-25-0423 D1): position-based identification
+    // ---------------------------------------------------------------------------
+
+    // Helper: a synthetic type param representing a rustdoc-desugared `impl Trait` arg.
+    // `is_synthetic = true` and `name` is the bound string (e.g. `"impl Into<String>"`).
+    fn synthetic_type_param(name: &str, bounds: Vec<GenericBound>) -> GenericParamDef {
+        GenericParamDef {
+            name: name.to_string(),
+            kind: GenericParamDefKind::Type { bounds, default: None, is_synthetic: true },
+        }
+    }
+
+    // Helper: construct a minimal default FunctionHeader (no qualifiers, Rust ABI).
+    fn default_fn_header() -> rustdoc_types::FunctionHeader {
+        rustdoc_types::FunctionHeader {
+            is_async: false,
+            is_const: false,
+            is_unsafe: false,
+            abi: rustdoc_types::Abi::Rust,
+        }
+    }
+
+    // Helper: a `GenericBound::TraitBound` for a named trait with one angle-bracketed type arg.
+    // Used to build bounds like `Into<String>`.
+    fn trait_bound_with_generic_arg(trait_name: &str, arg_name: &str) -> GenericBound {
+        GenericBound::TraitBound {
+            trait_: Path {
+                path: trait_name.to_string(),
+                id: Id(0),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![rustdoc_types::GenericArg::Type(Type::ResolvedPath(Path {
+                        path: arg_name.to_string(),
+                        id: Id(0),
+                        args: None,
+                    }))],
+                    constraints: vec![],
+                })),
+            },
+            generic_params: vec![],
+            modifier: TraitBoundModifier::None,
+        }
+    }
+
+    /// (a) Single `impl Trait` argument: AC-02 / IN-04.
+    ///
+    /// A-side: `fn(a: impl Into<String>)` → `Type::ImplTrait([Into<String>])` in the sig,
+    /// with empty generics (no synthetic params — the catalogue A-codec does not add them).
+    /// C-side (rustdoc): `Type::Generic("impl Into<String>")` in the sig, with a synthetic
+    /// generic param `"impl Into<String>"` in generics (is_synthetic = true).
+    ///
+    /// `fn_sigs_structurally_equal` must return `true` (Blue) for this pair.
+    #[test]
+    fn test_impl_trait_single_arg_a_side_impl_trait_vs_c_side_generic_equal() {
+        let into_string_bound = trait_bound_with_generic_arg("Into", "String");
+        // A-side: ImplTrait in the param type, empty generics.
+        let a_sig = rustdoc_types::FunctionSignature {
+            inputs: vec![("a".to_string(), Type::ImplTrait(vec![into_string_bound.clone()]))],
+            output: None,
+            is_c_variadic: false,
+        };
+        let a_generics = Generics { params: vec![], where_predicates: vec![] };
+        // C-side: Generic("impl Into<String>") in the param type, synthetic param in generics.
+        let c_sig = rustdoc_types::FunctionSignature {
+            inputs: vec![(
+                "impl_into_string".to_string(),
+                Type::Generic("impl Into<String>".to_string()),
+            )],
+            output: None,
+            is_c_variadic: false,
+        };
+        let c_generics = Generics {
+            params: vec![synthetic_type_param(
+                "impl Into<String>",
+                vec![into_string_bound.clone()],
+            )],
+            where_predicates: vec![],
+        };
+        let hdr = default_fn_header();
+        assert!(
+            super::fn_sigs_structurally_equal(&a_sig, &c_sig, &hdr, &hdr, &a_generics, &c_generics),
+            "single `impl Trait` arg: A-side ImplTrait and C-side Generic must be structurally \
+             equal (AC-02: a-side impl Into<String> == c-side #0)"
+        );
+    }
+
+    /// (b) Duplicate same-named `impl Trait` arguments: AC-01 / IN-04.
+    ///
+    /// `fn(a: impl Into<String>, b: impl Into<String>)`:
+    /// - A-side: two `Type::ImplTrait` params with the same bounds, empty generics.
+    /// - C-side: two `Type::Generic("impl Into<String>")` params, two synthetic params in
+    ///   generics (both named `"impl Into<String>"`, is_synthetic = true).
+    ///
+    /// Before the fix, the HashMap collision caused the second synthetic param to overwrite
+    /// the first, making C-side map both to the same placeholder and compare unequal to
+    /// A-side.  After the fix, each occurrence maps to a distinct placeholder (#0, #1).
+    #[test]
+    fn test_impl_trait_duplicate_same_named_args_equal() {
+        let into_string_bound = trait_bound_with_generic_arg("Into", "String");
+        // A-side: two ImplTrait params, empty generics.
+        let a_sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("a".to_string(), Type::ImplTrait(vec![into_string_bound.clone()])),
+                ("b".to_string(), Type::ImplTrait(vec![into_string_bound.clone()])),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+        let a_generics = Generics { params: vec![], where_predicates: vec![] };
+        // C-side: two Generic("impl Into<String>") params, two synthetic params in generics.
+        let c_sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("param0".to_string(), Type::Generic("impl Into<String>".to_string())),
+                ("param1".to_string(), Type::Generic("impl Into<String>".to_string())),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+        let c_generics = Generics {
+            params: vec![
+                synthetic_type_param("impl Into<String>", vec![into_string_bound.clone()]),
+                synthetic_type_param("impl Into<String>", vec![into_string_bound.clone()]),
+            ],
+            where_predicates: vec![],
+        };
+        let hdr = default_fn_header();
+        assert!(
+            super::fn_sigs_structurally_equal(&a_sig, &c_sig, &hdr, &hdr, &a_generics, &c_generics),
+            "duplicate same-named `impl Trait` args: A-side and C-side must be structurally equal \
+             (AC-01: two impl Into<String> map to #0 and #1 respectively, not both to #0)"
+        );
+    }
+
+    /// (c) Parameter-order distinction test: AC-03 / CN-02.
+    ///
+    /// `fn(a: impl Display, b: impl Into<String>)` vs
+    /// `fn(a: impl Into<String>, b: impl Display)` must be structurally NOT equal.
+    ///
+    /// Position-based identification must preserve param order sensitivity.
+    #[test]
+    fn test_impl_trait_different_order_is_not_equal() {
+        let display_bound = trait_bound("Display");
+        let into_string_bound = trait_bound_with_generic_arg("Into", "String");
+        // Signature 1: (Display, Into<String>)
+        let sig_display_first = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("a".to_string(), Type::ImplTrait(vec![display_bound.clone()])),
+                ("b".to_string(), Type::ImplTrait(vec![into_string_bound.clone()])),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+        // Signature 2: (Into<String>, Display) — reversed order
+        let sig_into_first = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("a".to_string(), Type::ImplTrait(vec![into_string_bound.clone()])),
+                ("b".to_string(), Type::ImplTrait(vec![display_bound.clone()])),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+        // Both sides use empty generics (A-side only, no synthetic params).
+        let empty_generics = Generics { params: vec![], where_predicates: vec![] };
+        let hdr = default_fn_header();
+        assert!(
+            !super::fn_sigs_structurally_equal(
+                &sig_display_first,
+                &sig_into_first,
+                &hdr,
+                &hdr,
+                &empty_generics,
+                &empty_generics
+            ),
+            "param-order distinction: fn(Display, Into<String>) must NOT equal \
+             fn(Into<String>, Display) (AC-03: position-based identification respects order)"
+        );
+    }
+
+    #[test]
+    fn test_impl_trait_different_order_a_side_vs_c_side_is_not_equal() {
+        let display_bound = trait_bound("Display");
+        let into_string_bound = trait_bound_with_generic_arg("Into", "String");
+        let a_sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("a".to_string(), Type::ImplTrait(vec![display_bound.clone()])),
+                ("b".to_string(), Type::ImplTrait(vec![into_string_bound.clone()])),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+        let a_generics = Generics { params: vec![], where_predicates: vec![] };
+        let c_sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("param0".to_string(), Type::Generic("impl Into<String>".to_string())),
+                ("param1".to_string(), Type::Generic("impl Display".to_string())),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+        let c_generics = Generics {
+            params: vec![
+                synthetic_type_param("impl Into<String>", vec![into_string_bound.clone()]),
+                synthetic_type_param("impl Display", vec![display_bound.clone()]),
+            ],
+            where_predicates: vec![],
+        };
+        let hdr = default_fn_header();
+        assert!(
+            !super::fn_sigs_structurally_equal(
+                &a_sig,
+                &c_sig,
+                &hdr,
+                &hdr,
+                &a_generics,
+                &c_generics
+            ),
+            "A/C order distinction: positional impl Trait keys must still include bound identity"
+        );
+    }
+
+    /// (d) Regression: existing generic param tests still pass.
+    ///
+    /// `fn f<T>(x: T)` vs `fn f<U>(x: U)` must still compare equal (name rename invisible).
+    /// This verifies that the position-based fix for synthetic impl Trait params does not
+    /// regress ordinary named generic param comparisons (AC-04).
+    #[test]
+    fn test_normal_generic_param_rename_still_equal_regression() {
+        let type_t = Type::Generic("T".to_string());
+        let type_u = Type::Generic("U".to_string());
+        // A-side: fn(x: T) with <T>
+        let sig_t = rustdoc_types::FunctionSignature {
+            inputs: vec![("x".to_string(), type_t)],
+            output: None,
+            is_c_variadic: false,
+        };
+        let gen_t = Generics { params: vec![type_param("T", vec![])], where_predicates: vec![] };
+        // B-side: fn(x: U) with <U>
+        let sig_u = rustdoc_types::FunctionSignature {
+            inputs: vec![("x".to_string(), type_u)],
+            output: None,
+            is_c_variadic: false,
+        };
+        let gen_u = Generics { params: vec![type_param("U", vec![])], where_predicates: vec![] };
+        let hdr = default_fn_header();
+        assert!(
+            super::fn_sigs_structurally_equal(&sig_t, &sig_u, &hdr, &hdr, &gen_t, &gen_u),
+            "regression (AC-04): fn<T>(T) and fn<U>(U) must still compare equal after \
+             impl Trait position-based fix (normal generic param rename is transparent)"
+        );
+    }
+
+    /// (e) Trait/impl-method path test via `build_trait_method_map`: IN-03 / IN-04.
+    ///
+    /// Constructs a trait with a method that has an `impl Into<String>` parameter.
+    /// A-side: `fn new(a: impl Into<String>)` with empty method generics.
+    /// C-side: `fn new(param0: impl Into<String>)` with a synthetic param in method generics.
+    /// Both sides should produce equal method map entries, confirming that the position-based
+    /// fix propagates correctly through the `build_combined_canon_map` / `format_type_with_canon_occ`
+    /// chain used by `build_trait_method_map`.
+    #[test]
+    fn test_build_trait_method_map_impl_trait_method_equal() {
+        use rustdoc_types::ItemEnum;
+        let into_string_bound = trait_bound_with_generic_arg("Into", "String");
+        // A-side method: fn new(a: impl Into<String>) — ImplTrait in sig, empty generics.
+        let a_fn = rustdoc_types::Function {
+            sig: rustdoc_types::FunctionSignature {
+                inputs: vec![("a".to_string(), Type::ImplTrait(vec![into_string_bound.clone()]))],
+                output: None,
+                is_c_variadic: false,
+            },
+            generics: Generics { params: vec![], where_predicates: vec![] },
+            header: default_fn_header(),
+            has_body: true,
+        };
+        // C-side method: fn new(param0: Generic("impl Into<String>")) — synthetic param in generics.
+        let c_fn = rustdoc_types::Function {
+            sig: rustdoc_types::FunctionSignature {
+                inputs: vec![(
+                    "param0".to_string(),
+                    Type::Generic("impl Into<String>".to_string()),
+                )],
+                output: None,
+                is_c_variadic: false,
+            },
+            generics: Generics {
+                params: vec![synthetic_type_param(
+                    "impl Into<String>",
+                    vec![into_string_bound.clone()],
+                )],
+                where_predicates: vec![],
+            },
+            header: default_fn_header(),
+            has_body: true,
+        };
+        let method_id_a = Id(100);
+        let method_id_c = Id(200);
+        let a_item = Item {
+            id: method_id_a,
+            crate_id: 0,
+            name: Some("new".to_string()),
+            span: None,
+            visibility: rustdoc_types::Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Function(a_fn),
+        };
+        let c_item = Item {
+            id: method_id_c,
+            crate_id: 0,
+            name: Some("new".to_string()),
+            span: None,
+            visibility: rustdoc_types::Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Function(c_fn),
+        };
+        let mut a_index: HashMap<Id, Item> = HashMap::new();
+        a_index.insert(method_id_a, a_item);
+        let mut c_index: HashMap<Id, Item> = HashMap::new();
+        c_index.insert(method_id_c, c_item);
+        let (a_map, a_unsupported) = super::build_trait_method_map(&[method_id_a], &a_index, None);
+        let (c_map, c_unsupported) = super::build_trait_method_map(&[method_id_c], &c_index, None);
+        assert!(!a_unsupported, "A-side method map must not have unsupported generics");
+        assert!(!c_unsupported, "C-side method map must not have unsupported generics");
+        assert_eq!(
+            a_map, c_map,
+            "build_trait_method_map: A-side fn new(impl Into<String>) and C-side must produce \
+             equal method map entries (IN-03 / IN-04: position-based fix propagates through \
+             build_combined_canon_map + format_type_with_canon_occ chain)"
         );
     }
 }
