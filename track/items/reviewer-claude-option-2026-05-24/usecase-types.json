@@ -1,0 +1,46 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "Reviewer": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "review",
+          "receiver": "&self",
+          "params": [
+            { "name": "target", "ty": "&domain::review_v2::ReviewTarget" }
+          ],
+          "returns": "Result<(domain::review_v2::Verdict, domain::review_v2::LogInfo), ReviewerError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fast_review",
+          "receiver": "&self",
+          "params": [
+            { "name": "target", "ty": "&domain::review_v2::ReviewTarget" }
+          ],
+          "returns": "Result<(domain::review_v2::FastVerdict, domain::review_v2::LogInfo), ReviewerError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "review_v2::ports",
+      "docs": "Carried for contract-map edge visibility: ClaudeReviewer (infrastructure) implements this port. Not modified in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

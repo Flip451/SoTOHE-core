@@ -13,16 +13,20 @@ use usecase::review_v2::{ReviewApprovalDecision, ReviewApprovalOutput};
 use usecase::review_workflow::ReviewVerdict;
 
 mod classify;
+mod claude_local;
 mod codex_local;
 mod compose_v2;
 mod files;
+mod local;
 mod results;
 #[cfg(test)]
 mod tests;
 
 use classify::{ClassifyArgs, execute_classify};
+use claude_local::execute_claude_local;
 use codex_local::execute_codex_local;
 use files::{FilesArgs, execute_files};
+use local::{LocalArgs, execute_local};
 use results::execute_results;
 
 const DEFAULT_TIMEOUT_SECONDS: u64 = 1800;
@@ -38,6 +42,10 @@ pub(super) const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 pub enum ReviewCommand {
     /// Run the local Codex-backed reviewer and auto-record verdict to review.json.
     CodexLocal(CodexLocalArgs),
+    /// Run the local Claude-backed reviewer and auto-record verdict to review.json.
+    ClaudeLocal(ClaudeLocalArgs),
+    /// Run the local reviewer with provider auto-resolved from agent-profiles.json.
+    Local(LocalArgs),
     /// Check if review is approved for commit.
     CheckApproved(CheckApprovedArgs),
     /// Show review results: per-scope state summary, optional round history, and a commit hint.
@@ -110,12 +118,53 @@ pub struct CodexLocalArgs {
     pub(super) items_dir: PathBuf,
 }
 
-/// Validated auto-record arguments ready for use after Codex completes.
+/// CLI args for `sotp review claude-local`.
+#[derive(Debug, Args)]
+#[command(group(
+    ArgGroup::new("claude_review_input")
+        .required(true)
+        .args(["briefing_file", "prompt"])
+))]
+pub struct ClaudeLocalArgs {
+    /// Model name for the Claude reviewer.
+    #[arg(long)]
+    pub(super) model: String,
+
+    /// Timeout for the reviewer subprocess in seconds.
+    #[arg(long, default_value_t = DEFAULT_TIMEOUT_SECONDS)]
+    pub(super) timeout_seconds: u64,
+
+    /// Path to a briefing file that the reviewer should read.
+    #[arg(long)]
+    pub(super) briefing_file: Option<PathBuf>,
+
+    /// Inline prompt for the reviewer.
+    #[arg(long)]
+    pub(super) prompt: Option<String>,
+
+    /// Track ID (used for auto-recording verdict to review.json).
+    #[arg(long)]
+    pub(super) track_id: String,
+
+    /// Round type: fast or final.
+    #[arg(long, value_enum)]
+    pub(super) round_type: CodexRoundTypeArg,
+
+    /// Review scope name (e.g., "domain", "infrastructure", "other").
+    #[arg(long)]
+    pub(super) group: String,
+
+    /// Path to track items directory.
+    #[arg(long, default_value = "track/items")]
+    pub(super) items_dir: PathBuf,
+}
+
+/// Validated auto-record arguments ready for use after the reviewer completes.
 ///
 /// Stores all fields as plain strings / standard types so the CLI module
 /// never needs to import domain types (CN-01 / AC-03). The conversion to
 /// `domain::TrackId`, `domain::RoundType`, and `domain::ReviewGroupName`
-/// happens inside `infrastructure::review_v2::run_codex_review_str` when
+/// happens inside `infrastructure::review_v2::run_*_review_str` when
 /// the review cycle is actually executed.
 #[derive(Debug)]
 #[allow(dead_code)] // expected_groups preserved for API compatibility
@@ -126,6 +175,48 @@ pub(super) struct ValidatedAutoRecordArgs {
     pub(super) expected_groups: Vec<String>,
     pub(super) items_dir: PathBuf,
     pub(super) diff_base: String,
+}
+
+/// Shared validation logic for auto-record arguments (raw strings).
+///
+/// Used by both `validate_auto_record_args` (CodexLocalArgs) and
+/// `validate_claude_auto_record_args` (ClaudeLocalArgs).
+///
+/// # Errors
+/// Returns a human-readable error string if args are invalid.
+pub(super) fn validate_auto_record_args_raw(
+    track_id: &str,
+    group: &str,
+    round_type: CodexRoundTypeArg,
+    items_dir: PathBuf,
+) -> Result<ValidatedAutoRecordArgs, String> {
+    // Validate track ID format via infrastructure helper (no domain import needed).
+    infrastructure::review_v2::validate_track_id_str(track_id)
+        .map_err(|e| format!("invalid --track-id: {e}"))?;
+    // Validate group name format via infrastructure helper.
+    infrastructure::review_v2::validate_review_group_name_str(group)
+        .map_err(|e| format!("invalid --group: {e}"))?;
+
+    let round_type_str = match round_type {
+        CodexRoundTypeArg::Fast => "fast",
+        CodexRoundTypeArg::Final => "final",
+    };
+
+    // `validate_review_group_name_str` accepts inputs with leading/trailing
+    // whitespace because `domain::ReviewGroupName::try_new` trims before
+    // validation. Propagate the trimmed value so downstream scope lookup uses
+    // the canonical form (otherwise " domain " would pass validation but then
+    // fail unknown-scope on lookup).
+    let group_name = group.trim().to_owned();
+
+    Ok(ValidatedAutoRecordArgs {
+        track_id: track_id.to_owned(),
+        round_type_str: round_type_str.to_owned(),
+        group_name,
+        expected_groups: Vec::new(),
+        items_dir,
+        diff_base: String::new(),
+    })
 }
 
 /// Validates and parses auto-record arguments from `CodexLocalArgs`.
@@ -139,33 +230,27 @@ pub(super) struct ValidatedAutoRecordArgs {
 pub(super) fn validate_auto_record_args(
     args: &CodexLocalArgs,
 ) -> Result<ValidatedAutoRecordArgs, String> {
-    // Validate track ID format via infrastructure helper (no domain import needed).
-    infrastructure::review_v2::validate_track_id_str(&args.track_id)
-        .map_err(|e| format!("invalid --track-id: {e}"))?;
-    // Validate group name format via infrastructure helper.
-    infrastructure::review_v2::validate_review_group_name_str(&args.group)
-        .map_err(|e| format!("invalid --group: {e}"))?;
+    validate_auto_record_args_raw(
+        &args.track_id,
+        &args.group,
+        args.round_type,
+        args.items_dir.clone(),
+    )
+}
 
-    let round_type_str = match args.round_type {
-        CodexRoundTypeArg::Fast => "fast",
-        CodexRoundTypeArg::Final => "final",
-    };
-
-    // `validate_review_group_name_str` accepts inputs with leading/trailing
-    // whitespace because `domain::ReviewGroupName::try_new` trims before
-    // validation. Propagate the trimmed value so downstream scope lookup uses
-    // the canonical form (otherwise " domain " would pass validation but then
-    // fail unknown-scope on lookup).
-    let group_name = args.group.trim().to_owned();
-
-    Ok(ValidatedAutoRecordArgs {
-        track_id: args.track_id.clone(),
-        round_type_str: round_type_str.to_owned(),
-        group_name,
-        expected_groups: Vec::new(),
-        items_dir: args.items_dir.clone(),
-        diff_base: String::new(),
-    })
+/// Validates and parses auto-record arguments from `ClaudeLocalArgs`.
+///
+/// # Errors
+/// Returns a human-readable error string if args are invalid.
+pub(super) fn validate_claude_auto_record_args(
+    args: &ClaudeLocalArgs,
+) -> Result<ValidatedAutoRecordArgs, String> {
+    validate_auto_record_args_raw(
+        &args.track_id,
+        &args.group,
+        args.round_type,
+        args.items_dir.clone(),
+    )
 }
 
 #[derive(Debug, Args)]
@@ -282,6 +367,8 @@ pub(super) struct OutputLastMessagePath {
 pub fn execute(cmd: ReviewCommand) -> ExitCode {
     match cmd {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
+        ReviewCommand::ClaudeLocal(args) => execute_claude_local(&args),
+        ReviewCommand::Local(args) => execute_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
         ReviewCommand::Results(args) => execute_results(&args),
         ReviewCommand::Classify(args) => execute_classify(&args),

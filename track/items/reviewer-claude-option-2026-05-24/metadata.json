@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "reviewer-claude-option-2026-05-24",
+  "title": "reviewer capability の provider を選択可能にする (Codex デフォルト、Claude オプション)",
+  "branch": "track/reviewer-claude-option-2026-05-24",
+  "created_at": "2026-05-24T11:03:22Z",
+  "updated_at": "2026-05-24T11:03:22Z"
+}

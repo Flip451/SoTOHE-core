@@ -163,6 +163,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [agent-router フックを skill 遵守フックに置換](2026-04-08-1200-remove-agent-router-hook.md) | Accepted | 2026-04-08 |
 | [review-fix-lead の provider を選択可能にする (Claude デフォルト、Codex オプション)](2026-05-23-1848-review-fix-lead-codex-migration.md) | Proposed | 2026-05-23 |
+| [reviewer capability の provider を選択可能にする (Codex デフォルト、Claude オプション)](2026-05-23-2236-reviewer-provider-selectable-claude-option.md) | Proposed | 2026-05-23 |
 
 ### テスト・CI ツーリング
 

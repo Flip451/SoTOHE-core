@@ -1,0 +1,160 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "ClaudeReviewer": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "model", "ty": "M" },
+            { "name": "timeout", "ty": "std::time::Duration" },
+            { "name": "base_prompt", "ty": "B" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [
+            { "name": "M", "bounds": ["Into<String>"] },
+            { "name": "B", "bounds": ["Into<String>"] }
+          ],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "with_scope_label",
+          "receiver": "self",
+          "params": [
+            { "name": "label", "ty": "S" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [
+            { "name": "S", "bounds": ["Into<String>"] }
+          ],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "review_v2::claude_reviewer",
+      "docs": "Claude-backed reviewer implementing the Reviewer usecase port. Spawns `claude -p --bare --permission-mode dontAsk --allowedTools Read Grep Glob 'Bash(git diff:*)' 'Bash(git show:*)' 'Bash(git log:*)' 'Bash(git ls-files:*)' --disallowedTools Edit Write --output-format json --json-schema '<REVIEW_OUTPUT_SCHEMA_JSON>' --model <model> <prompt>` as a subprocess, reads the verdict from stdout envelope's `structured_output` field, and passes it to `parse_review_final_message`. Read-only for the reviewer role is best-effort and permission-based: `claude -p` has no sandbox flag (no kernel-level sandbox equivalent to `codex exec --sandbox read-only`), so this is NOT structurally enforced at the OS level and is NOT symmetric with CodexReviewer's `--sandbox read-only`. The flags used (CN-01): `--bare` skips hooks / MCP / CLAUDE.md auto-detection (does not guarantee that host `permissions.allow` is ignored); `--permission-mode dontAsk` auto-denies tool calls not on the allow list, but actions already registered in the host's `permissions.allow` remain active; `--disallowedTools Edit Write` removes Edit and Write from the model's context (defense-in-depth); `--allowedTools Read Grep Glob Bash(git diff:*) Bash(git show:*) Bash(git log:*) Bash(git ls-files:*)` pre-approves the read-only inspection set. In a standard environment (host `permissions.allow` does not grant write operations) write/edit tools will be denied, but host settings could in principle broaden the permitted surface. Fields are all private (has_stripped_fields: true). `new` uses named generics `M: Into<String>` and `B: Into<String>` so each parameter has a distinct type variable. (IN-01 / CN-01 / CN-05 / CN-06 / AC-02)",
+      "spec_refs": [
+        {
+          "file": "track/items/reviewer-claude-option-2026-05-24/spec.json",
+          "anchor": "IN-01",
+          "hash": "2e884d862079dc2b722d27ae5714137e180f7442d11b63690ce0c893cc9696f6"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewV2CompositionWithClaude": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "review_v2::cli_composition",
+      "docs": "All v2 adapters needed for actual review (ClaudeReviewer). Fields are intentionally private — callers access behaviour through the string-accepting free functions in this module (`run_claude_review_str`, etc.) so that concrete infrastructure types (`ReviewCycle`, `FsReviewStore`, …) are not exposed to the CLI layer (IN-02 / CN-02 / AC-03). Parallel to ReviewV2CompositionWithCodex.",
+      "spec_refs": [
+        {
+          "file": "track/items/reviewer-claude-option-2026-05-24/spec.json",
+          "anchor": "IN-02",
+          "hash": "8ae58cc6cc5943e6ca6bbc8e43b4380e578e2e137dab769a6efc3186b0a11e66"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_id", "ty": "&domain::TrackId" },
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "reviewer", "ty": "ClaudeReviewer" }
+      ],
+      "returns": "Result<ReviewV2CompositionWithClaude, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds the v2 review composition with a real ClaudeReviewer. Returns Err on discovery/config/store failures. Parallel to build_review_v2_with_reviewer. (IN-02 / CN-02 / AC-03)",
+      "spec_refs": [
+        {
+          "file": "track/items/reviewer-claude-option-2026-05-24/spec.json",
+          "anchor": "IN-02",
+          "hash": "8ae58cc6cc5943e6ca6bbc8e43b4380e578e2e137dab769a6efc3186b0a11e66"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer_str": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_id_str", "ty": "&str" },
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "reviewer", "ty": "ClaudeReviewer" }
+      ],
+      "returns": "Result<ReviewV2CompositionWithClaude, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting variant of `build_review_v2_with_claude_reviewer`. Converts `track_id_str` to `TrackId` and delegates. Callers that must not import `domain::TrackId` use this entry point (IN-02 / CN-02 / AC-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/reviewer-claude-option-2026-05-24/spec.json",
+          "anchor": "IN-02",
+          "hash": "8ae58cc6cc5943e6ca6bbc8e43b4380e578e2e137dab769a6efc3186b0a11e66"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::run_claude_review_str": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_id_str", "ty": "&str" },
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "group_str", "ty": "&str" },
+        { "name": "round_type_str", "ty": "&str" },
+        { "name": "reviewer", "ty": "ClaudeReviewer" }
+      ],
+      "returns": "Result<CodexReviewOutcome, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Runs the full Claude review cycle from string inputs. Mirrors run_codex_review_str with ClaudeReviewer in place of CodexReviewer. Encapsulates TrackId, ScopeName, RoundType, ReviewOutcome, Verdict, FastVerdict, ReviewWriter, and ReviewerFinding conversions so the CLI layer never imports these domain types directly (IN-02 / CN-02 / AC-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/reviewer-claude-option-2026-05-24/spec.json",
+          "anchor": "IN-02",
+          "hash": "8ae58cc6cc5943e6ca6bbc8e43b4380e578e2e137dab769a6efc3186b0a11e66"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "usecase::review_v2::ports::Reviewer",
+      "for_type": "ClaudeReviewer"
+    }
+  ]
+}

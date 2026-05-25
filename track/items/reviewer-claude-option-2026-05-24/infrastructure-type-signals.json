@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-25T01:03:09Z",
+  "declaration_hash": "c457a058350702c5eb219f006f2ca5545d45a566feb342e4e26675d0650af2a5",
+  "signals": [
+    {
+      "type_name": "ClaudeReviewer",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Reviewer"
+      ]
+    },
+    {
+      "type_name": "ReviewV2CompositionWithClaude",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer_str",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::run_claude_review_str",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

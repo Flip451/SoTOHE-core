@@ -19,17 +19,24 @@ Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the
 - For exact type signatures / module trees / Mermaid diagrams, treat `## Canonical Blocks` in
   `plan.md` and `knowledge/DESIGN.md` as the source of truth.
 
-## Step 1: Resolve reviewer models
+## Step 1: Resolve dispatch capabilities
 
-Read `.harness/config/agent-profiles.json` `capabilities.reviewer`:
-- `capabilities.reviewer.provider` — invocation route (Codex CLI is the only supported provider; `claude` is unsupported)
-- `capabilities.reviewer.fast_model` — used for `--round-type fast` (falls back to `capabilities.reviewer.model` if absent)
-- `capabilities.reviewer.model` — used for `--round-type final`
+The reviewer invocation resolves its own provider/model. `cargo make track-local-review` routes to
+`sotp review local`, which reads `capabilities.reviewer` from `.harness/config/agent-profiles.json`
+and resolves the reviewer provider/model internally (including the `fast_provider` / `fast_model`
+fallback for `--round-type fast`). The skill never reads or passes the reviewer provider/model —
+Step 4 / Step 5 pass only `--round-type` / `--group` / `--track-id` / `--briefing-file`.
 
-Also read `capabilities.review-fix-lead` to resolve the fixer-loop provider (used by the Step 4 / Step 5 dispatch):
+Read `capabilities.review-fix-lead` to resolve the fixer-loop dispatch (used by the Step 4 / Step 5 dispatch):
 - `capabilities.review-fix-lead.provider` — `claude` (default) launches the `review-fix-lead` subagent; `codex` launches the Codex fixer wrapper instead.
-- `capabilities.review-fix-lead.model` — the fixer model passed to the chosen provider. **When `provider: codex`, this field must also be set to a Codex-compatible model (consistent with the Codex models configured under `capabilities.reviewer`); leaving a Claude model name here will cause `codex exec --model` to receive an invalid (Claude) model name.**
+- `capabilities.review-fix-lead.model` — the fixer model passed to the chosen provider. **When `provider: codex`, this field must also be set to a Codex-compatible model; leaving a Claude model name here will cause `codex exec --model` to receive an invalid model name.**
 - If the `review-fix-lead` capability is absent, default to `provider: claude` (legacy behavior unchanged).
+
+The `provider: codex` fixer wrapper (`track-local-review-fix-codex`, Step 4 / Step 5) runs its own
+internal Codex reviewer and therefore requires an explicit reviewer model via `--reviewer-model`:
+resolve it from `capabilities.reviewer.fast_model` for the fast round and `capabilities.reviewer.model`
+for the final round (falling back to `capabilities.reviewer.model` when `fast_model` is absent). This
+applies only to that fixer branch; the reviewer invocation (`sotp review local`) takes no model argument.
 
 ## Step 2: Determine required scopes
 
@@ -68,7 +75,7 @@ Constraints:
 - The CLI auto-injects scope file list and severity policy. Do NOT hand-author the
   `## Scope-specific severity policy` section: scopes with `briefing_file` configured in
   `track/review-scope.json` (e.g., `plan-artifacts` → `track/review-prompts/plan-artifacts.md`)
-  receive the policy reference automatically via `sotp review codex-local`.
+  receive the policy reference automatically via `sotp review local`.
 
 ## Step 4: Launch review-fix-lead fixers (parallel, fast round)
 
@@ -89,8 +96,8 @@ dispatching on `capabilities.review-fix-lead.provider` (resolved in Step 1):
 Agent prompt minimum content (`provider: claude` path):
 
 - Track id, scope name, briefing path
-- `round_type: fast`, `model: {fast_model}`
-- Reviewer invocation: `cargo make track-local-review -- --model {fast_model} --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md`
+- `round_type: fast`, `model: {review-fix-lead.model}` (resolved from `capabilities.review-fix-lead.model`)
+- Reviewer invocation: `cargo make track-local-review -- --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md`
 - Scope file list (files the agent is allowed to **modify** — this is the agent's modification
   boundary, distinct from the reviewer's scope which the CLI injects automatically): apply
   the CLI classifier logic to the changed file list — exclude `review_operational` and
@@ -118,7 +125,7 @@ Agent statuses:
 When a scope's fast fixer reports `completed`, **immediately** launch the final round for the
 same scope (do not wait for other scopes), dispatching on `capabilities.review-fix-lead.provider`:
 
-- **`provider: claude`** — launch a `review-fix-lead` subagent with `round_type: final`, `model: {model}`.
+- **`provider: claude`** — launch a `review-fix-lead` subagent with `round_type: final`, `model: {review-fix-lead.model}` (resolved from `capabilities.review-fix-lead.model`).
 - **`provider: codex`** — run `cargo make track-local-review-fix-codex -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --track-id {track-id} --round-type final --reviewer-model {model} --model {review-fix-lead.model} --scope-files "{scope-files}"`.
 
 Agent status handling for the `final` agent:

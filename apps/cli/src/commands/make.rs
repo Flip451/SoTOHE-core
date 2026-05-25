@@ -430,9 +430,11 @@ fn dispatch_track_local_plan(raw_args: &[String]) -> Result<ExitCode, CliError> 
 
 fn dispatch_track_local_review(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let words = raw_args_to_words(raw_args);
-    // Filter out leading "--" separator if present
+    // Filter out leading "--" separator if present.
+    // Route to `sotp review local` which auto-resolves provider/model from
+    // agent-profiles.json. The caller does not need to pass --model.
     let filtered: Vec<&str> = words.iter().map(|s| s.as_str()).skip_while(|s| *s == "--").collect();
-    let mut args: Vec<&str> = vec!["review", "codex-local"];
+    let mut args: Vec<&str> = vec!["review", "local"];
     args.extend_from_slice(&filtered);
     run_sotp(&args)
 }

@@ -433,14 +433,19 @@ fn is_codex_bot(login: &str) -> bool {
 }
 
 fn trigger_review<C: GhClient>(pr: &str, client: &C) -> Result<ExitCode, CliError> {
-    // Fail-closed: validate reviewer provider (resolve from repo root)
+    // Fail-closed: validate PR reviewer provider (resolve from repo root).
+    // Uses `pr-reviewer` capability (not `reviewer`) — the PR-based review path
+    // is Codex Cloud only (D5 / AC-05). `reviewer.provider` is not validated here.
     let git_repo = SystemGitRepo::discover()?;
     let profiles_path = git_repo.root().join(AGENT_PROFILES_PATH);
     let profiles =
         AgentProfiles::load(&profiles_path).map_err(|e| CliError::Message(format!("{e}")))?;
-    let resolved = profiles.resolve_execution("reviewer", RoundType::Final).ok_or_else(|| {
-        CliError::Message("reviewer capability not defined in agent-profiles.json".to_owned())
-    })?;
+    let resolved =
+        profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
+            CliError::Message(
+                "pr-reviewer capability not defined in agent-profiles.json".to_owned(),
+            )
+        })?;
     pr_review::validate_reviewer_provider(&resolved.provider)?;
 
     let repo = client.repo_nwo()?;
@@ -728,9 +733,15 @@ fn review_cycle(explicit_track_id: Option<&str>, resume: bool) -> Result<ExitCod
     let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
     let profiles =
         AgentProfiles::load(&profiles_path).map_err(|e| CliError::Message(format!("{e}")))?;
-    let resolved = profiles.resolve_execution("reviewer", RoundType::Final).ok_or_else(|| {
-        CliError::Message("reviewer capability not defined in agent-profiles.json".to_owned())
-    })?;
+    // Uses `pr-reviewer` capability (not `reviewer`) — the PR-based review path is
+    // Codex Cloud only. `validate_reviewer_provider` checks PR-review Codex Cloud
+    // compatibility, not the local reviewer provider (D5 / AC-06).
+    let resolved =
+        profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
+            CliError::Message(
+                "pr-reviewer capability not defined in agent-profiles.json".to_owned(),
+            )
+        })?;
     pr_review::validate_reviewer_provider(&resolved.provider)?;
     let branch = repo
         .current_branch()?

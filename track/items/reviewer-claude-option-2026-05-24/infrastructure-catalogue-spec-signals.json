@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c457a058350702c5eb219f006f2ca5545d45a566feb342e4e26675d0650af2a5",
+  "signals": [
+    {
+      "type_name": "ClaudeReviewer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewV2CompositionWithClaude",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::review_v2::cli_composition::run_claude_review_str",
+      "signal": "blue"
+    }
+  ]
+}

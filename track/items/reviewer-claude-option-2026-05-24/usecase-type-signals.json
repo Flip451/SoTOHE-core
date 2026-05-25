@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-24T14:01:04Z",
+  "declaration_hash": "0b966cbed9160a283026ce201847e9e6641aeafca6570ade5d808510f1242e50",
+  "signals": [
+    {
+      "type_name": "Reviewer",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

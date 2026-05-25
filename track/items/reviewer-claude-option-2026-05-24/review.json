@@ -1,0 +1,621 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClaudeReviewer` is spawned with `--bare` only; there is no permission gate or tool whitelist (`--permission-mode dontAsk` / equivalent), so this subprocess is not structurally prevented from invoking write-capable tools and mutating the workspace. That breaks the read-only/no-write contract for CN-05.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 304,
+              "category": "security"
+            },
+            {
+              "message": "The new public Claude review APIs are added without failure-path test coverage in this module. In particular, there is no test for `fast_review()` or for the fail-closed branches in `run_claude_review_str` (invalid track/scope, subprocess failure, or write-verdict failure), so regressions in the new Claude path can ship unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs",
+              "line": 598,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:be3e5509ecd79e95c7b63d43e490b75c50a3974062892c5798d09facf5edd8e2",
+          "at": "2026-05-24T12:57:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `run_claude_review_str` tests never exercise the intended branches: all three cases pass `../evil` as `track_id_str`, so `TrackId::try_new` fails before scope/round-type validation or any successful auto-record path runs. That leaves the new public Claude helpers without a happy-path test and does not actually verify the fail-closed write-first behavior they are meant to guarantee.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs",
+              "line": 1245,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:48582c5bdb427531ddc586b695a616a607189eb99d24aedd45821981589511ed",
+          "at": "2026-05-24T13:04:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The stdout collector is always joined after the child exits, including the timeout path. If `claude` (or a descendant) keeps the stdout pipe open, `run_claude_child` blocks forever instead of returning `ReviewerError::Timeout`, so the review command can hang despite the timeout.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 389,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3e845e5dc79966769154e78d7961478810aadde786f96b27cb4c0118b48058fa",
+          "at": "2026-05-24T13:15:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Claude entry points are not covered with direct happy-path/error-path tests: `build_review_v2_with_claude_reviewer[_str]` has no coverage at all, and `run_claude_review_str` is only exercised on the `fast` branch. That leaves regressions in the `final` write-to-`review.json` path and the public builder APIs undetected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/cli_composition.rs",
+              "line": 166,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:adab9f0d678d78d89ee22e29ca4bd07ef286dc13583f73394d20212ac8e24676",
+          "at": "2026-05-24T13:23:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78ba3091b99cd71c7d67c2ac6ff95cc855c65bd5e4cb103a5c768c368131b618",
+          "at": "2026-05-24T13:31:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `ClaudeReviewer` creates and writes a session log under `tmp/reviewer-runtime` before spawning Claude. The infrastructure briefing’s CN-05 requires the Claude reviewer path to be read-only/output-only with no workspace file mutation; this direct `File::create` means the adapter can fail in read-only workspaces before producing a verdict and violates the declared Claude subprocess contract. Capture stderr in memory or use a non-workspace temp location if log retention is required.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 301,
+              "category": "read_only_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:78ba3091b99cd71c7d67c2ac6ff95cc855c65bd5e4cb103a5c768c368131b618",
+          "at": "2026-05-24T13:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78ba3091b99cd71c7d67c2ac6ff95cc855c65bd5e4cb103a5c768c368131b618",
+          "at": "2026-05-24T13:38:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d963888839cc53606ea99ef1306283c53c57ca4d48e10e98943f05007f7c3fd5",
+          "at": "2026-05-24T13:52:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81eb31ac0ea3e833a8b719f2288802c27cbacc8b9f206f88136a09191c3433aa",
+          "at": "2026-05-24T14:00:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cabe63633436108ed7bbee8ba0661626b4d8d74375bbc25f7f271e79212721cb",
+          "at": "2026-05-25T00:05:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClaudeReviewer` now creates `tmp/reviewer-runtime/claude-session-*.log` with `File::create` before every subprocess spawn. That is a workspace write on the review path, so the adapter is no longer strictly read-only/output-only as CN-05 requires, and it can fail outright in a read-only workspace before producing a verdict.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 301,
+              "category": "architecture"
+            },
+            {
+              "message": "The new Claude review entrypoints are only exercised on success and basic argument-validation paths. There is still no coverage for the fail-closed branches that matter here: subprocess spawn/timeout/invalid-envelope handling in `ClaudeReviewer::review`/`fast_review`, or review-store write failure in `run_claude_review_str`. That leaves the new provider path regressions undetected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs",
+              "line": 598,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:104af48a754f2224140ee1874d09f825b97a94b5527cf4ee2d0f31b2ef807aff",
+          "at": "2026-05-25T00:16:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:104af48a754f2224140ee1874d09f825b97a94b5527cf4ee2d0f31b2ef807aff",
+          "at": "2026-05-25T00:19:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ClaudeReviewer is supposed to be an output-only/read-only reviewer path, but every invocation creates `tmp/reviewer-runtime/claude-session-*.log` before spawning Claude. That mutates the workspace from inside the adapter, outside the explicit `review.json` auto-record path, so CN-05's no-workspace-write guarantee is not actually upheld. Capture stderr in memory or otherwise avoid creating runtime files from `ClaudeReviewer` itself.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 301,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:104af48a754f2224140ee1874d09f825b97a94b5527cf4ee2d0f31b2ef807aff",
+          "at": "2026-05-25T00:23:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-05 requires the Claude reviewer path to be read-only/no workspace writes, but this invocation only adds `--bare` plus output/schema/model flags and leaves Claude Code's built-in tools/permission mode unconstrained. `--bare` disables hooks/MCP/project discovery; it does not make the subprocess read-only. A reviewer prompt or model error can still attempt write-capable tool use before the post-review hash check detects changes, so the adapter does not structurally enforce the no-mutation contract. Pass an explicit read-only tool/permission configuration, for example disabling tools or allowing only read/list/search tools.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 254,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b7a4fd4040141628c997333ccdc5cb80d3245d87e4dda9177388c4d75ee371b1",
+          "at": "2026-05-25T00:29:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClaudeReviewer` disables every Claude tool with `--tools \"\"`, but the prompt only passes the list of scoped filenames and tells the reviewer to use `git diff` for the actual changes. With all tools disabled and no diff content embedded in the prompt, the Claude process cannot read the repository or inspect the diff, so it can return `zero_findings` without reviewing the changed code. This breaks the reviewer contract; keep the subprocess read-only by allowing only read-only inspection (for example `git diff`) or pass the relevant diff content into the prompt before disabling tools.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 265,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d953acf0ba9a2d6a59ca853f7a239f6453290fc60e778f8d9d35cb3dd60a40a8",
+          "at": "2026-05-25T00:33:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c2ef5e0e560de90595b63b1823e8e49261251d2da1f686d03a22c7171fbbbb7",
+          "at": "2026-05-25T00:37:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ecf32b62af4c23a1cd2d7d6d2dc8ce9702bf4186bb9abe04f60c425b20e4da",
+          "at": "2026-05-25T01:45:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The CN-05 hard read-only contract is now encoded in the subprocess argv here, but the tests in this file only use fake Claude binaries that ignore their arguments. They would still pass if `--permission-mode dontAsk`, the per-token read-only allow list, or `--disallowedTools Edit Write` were removed or malformed, so the security-critical invocation contract is unprotected. Add an argv-capturing fake binary test or a direct `build_claude_args` assertion for the required flags and tool tokens.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 312,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a0ecf32b62af4c23a1cd2d7d6d2dc8ce9702bf4186bb9abe04f60c425b20e4da",
+          "at": "2026-05-25T01:48:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfdcc5e16f1d04524e0077dedb48ec60a37a70faefee2d55135a2c49f34e2ce8",
+          "at": "2026-05-25T01:51:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b4a8f29d76340818a685f553b0d8ae87d518959efcb4c434db0f0df26af7b05",
+          "at": "2026-05-25T03:24:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--disallowedTools Edit Write` does not make this invocation read-only while `Bash(git diff:*)` / `Bash(git show:*)` are pre-approved. Those git commands can still write files through normal git options such as `--output=<path>` (and shell redirection remains a risk for Bash tool calls), so a prompt-injected review can mutate or overwrite workspace files in a standard environment even though the adapter claims CN-05 no-workspace-write behavior. Either avoid granting Bash and embed the needed diffs, or route git inspection through a wrapper that rejects write-capable options/redirection before invoking git.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 298,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0b4a8f29d76340818a685f553b0d8ae87d518959efcb4c434db0f0df26af7b05",
+          "at": "2026-05-25T03:30:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace8bb42b318bce1b2187c5646137769016157502e286afc31681c1614a006b9",
+          "at": "2026-05-25T03:33:40Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69148c2f5988b59b5a74b2ca6466becb499281ef97f9f1c48e290fcae97db632",
+          "at": "2026-05-24T12:57:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 now says `/track:review` never reads or passes the reviewer provider/model because `sotp review local` auto-resolves it, but the Claude fixer prompt still requires `model: {fast_model}` here and `{model}` again for the final round. Those placeholders are no longer resolved except for the Codex fixer-wrapper carve-out, so the documented `provider: claude` path is internally inconsistent and can push the workflow back toward manual reviewer model handling instead of the new auto-resolved local reviewer path.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 99,
+              "category": "internal_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:69148c2f5988b59b5a74b2ca6466becb499281ef97f9f1c48e290fcae97db632",
+          "at": "2026-05-24T12:59:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 1 no longer defines a generic `{model}` placeholder for the final round; it only resolves `capabilities.review-fix-lead.model` for the fixer dispatch and separately resolves reviewer models only for the Codex fixer wrapper. In the `provider: claude` final path, `model: {model}` is therefore undefined and can be interpreted as the reviewer final model (`capabilities.reviewer.model`, currently a GPT model) instead of the Claude fix-lead model, breaking the final review-fix-lead launch. This should match the fast-round wording and use `{review-fix-lead.model}`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 128,
+              "category": "internal-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eaacef9a0113f1700db9c77e1805ad0b4820cddd2ca19eeed4baf72282cffb9e",
+          "at": "2026-05-24T13:02:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38f4b249953ba8d6ba176f95331714e59911e6b21c21e6f75b416b2c1c571829",
+          "at": "2026-05-24T13:04:15Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f27b4b042b56d0194be97a84b13779e627e25175a47377ded65f412219ee2d86",
+          "at": "2026-05-24T11:06:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 decides to create an independent `pr-reviewer` capability and explicitly rejects putting PR-provider data under the existing `reviewer` entry, but this consequence says migration is only adding settings to the existing `reviewer` entry. That points implementers at the opposite config shape and can reintroduce the `deny_unknown_fields` problem D5 is avoiding.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-2236-reviewer-provider-selectable-claude-option.md",
+              "line": 191,
+              "category": "contradiction"
+            },
+            {
+              "message": "The ADR claims provider/model literals will disappear from `.claude/commands/**`, but D4 still requires `.claude/commands/track/pr-review.md` to keep the structured provider set as `codex` only. As written, the implementation cannot satisfy both statements without either removing the required PR-review Codex constraint or violating this consequence.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-23-2236-reviewer-provider-selectable-claude-option.md",
+              "line": 184,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f27b4b042b56d0194be97a84b13779e627e25175a47377ded65f412219ee2d86",
+          "at": "2026-05-24T11:08:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf3fa632553b8a1de7aa8515793b2169d5fb80c908a5222178bee1990e4c228b",
+          "at": "2026-05-24T11:11:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2ed3c224626bdc8dcc2568de67bc6dd7c776532bfc5d8611f008b65551b2110",
+          "at": "2026-05-24T11:29:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 changes the skill to invoke `cargo make track-local-review` without `--model` and says that wrapper will internally call `sotp review local`, but the task set never assigns any change to the repo-owned make dispatcher/wrapper. T003 only adds the new CLI subcommand and T005 only edits `.claude/commands/track/review.md`, so following the plan leaves the documented command path dependent on a wrapper that is not updated by any task, making AC-01/AC-07 unexecutable through the skill path.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/plan.md",
+              "line": 110,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T005 preserves Step 1 resolution for `capabilities.review-fix-lead`, but the same task/AC-07 also requires `.claude/commands/track/review.md` to contain no provider or model literals such as `codex`, `claude`, or `gpt-*`. Keeping review-fix-lead provider/model dispatch in the skill conflicts with that blanket no-literals requirement unless the plan also moves that dispatch/model passing out of the skill, which no task does.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/plan.md",
+              "line": 106,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a2ed3c224626bdc8dcc2568de67bc6dd7c776532bfc5d8611f008b65551b2110",
+          "at": "2026-05-24T11:32:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S5 says the final `review.md` must contain no provider names or model literals at all, but the task details and AC-07 explicitly keep `review-fix-lead` provider labels and `review-fix-lead.model` references in that same document. This contradiction can send implementers in opposite directions: either preserve the non-reviewer fix-lead dispatch required by AC-07, or remove every provider/model literal as S5/T005(6) states.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/plan.md",
+              "line": 102,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4446646ba3abb6fbe92135f2a731ff7beb29855e586ec016e90919da53e011fc",
+          "at": "2026-05-24T11:39:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 narrows AC-07 correctly in the section preface, saying review-fix-lead dispatch labels such as `provider: codex` / `provider: claude` remain out of scope, but the task checklist then requires all provider/model literals (`\"codex\"`, `\"claude\"`, `\"gpt-*\"`) to disappear from the entire skill body. That contradicts AC-07/spec and can lead the implementer to remove the still-required review-fix-lead dispatch labels instead of only reviewer invocation literals.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/plan.md",
+              "line": 116,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1560ea61ea9ec596f84d73bb84eaa26a7fd29556b1aa658af90c31d56d70cb4a",
+          "at": "2026-05-24T11:42:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-05 claims ClaudeReviewer runs in a read-only mode and cannot perform file edits, but the planned command is only `claude -p --bare --output-format json --json-schema ... --model ... <prompt>`; `--bare` is described in the same artifact set as the reproducibility/minimal-mode flag, not a write-denial mechanism. If T001 implements this command as specified, the plan does not actually enforce the reviewer role's no-write invariant, so the claimed hook-coverage/read-only safety property is false. The task should explicitly constrain Claude's available tools or permission mode so file-edit tools are unavailable.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/spec.md",
+              "line": 37,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:a1f31e3fbfcc68e9375b912f12c97f90e3f1ee6966fd65a117deb68cbaa950c6",
+          "at": "2026-05-24T11:45:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89078c153c07766fb3db5f46bd7960696aecbaf8df192b6b2f0e0301869529ca",
+          "at": "2026-05-24T11:49:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ClaudeReviewer::new` is catalogued with phantom generics (`A`, `B`) and a duplicated `Into<String>` bound on `B`, even though the surrounding plan describes it as a plain constructor `new(model: impl Into<String>, timeout: Duration, base_prompt: impl Into<String>)`. That makes the published API self-contradictory and the generated contract docs inaccurate.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/infrastructure-types.json",
+              "line": 26,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:85dbad27f21212b0d6e80be08d6e0d56957d43b68d2eac5874ced56f6918e161",
+          "at": "2026-05-24T14:04:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step (2) tells the CLI to call `infrastructure::review_v2::run_claude_review_str`, but the rest of the plan and the type catalogue place that function under `infrastructure::review_v2::cli_composition::run_claude_review_str`. The namespace in the plan is wrong and points implementers at the wrong import path.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/impl-plan.json",
+              "line": 11,
+              "category": "factual error"
+            },
+            {
+              "message": "The `with_scope_label` entry advertises a generic `S: Into<String>`, but the parameter is still rendered as `impl Into<String>` instead of `S`. That makes the public signature internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/infrastructure-types.json",
+              "line": 34,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:98f6aa7af29704ef567dd589ace6383232038546d10d0d7b8ad55879c87cc89a",
+          "at": "2026-05-25T00:04:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:437ac4ee14f51bdcecfd9280fff1f241ed82d720e12b8b4b0ffd452a57788881",
+          "at": "2026-05-25T00:13:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The newly added composition DTO/functions are traced to spec anchor `IN-01`, but the plan assigns `ReviewV2CompositionWithClaude`, `build_review_v2_with_claude_reviewer*`, and `run_claude_review_str` to T002 / `IN-02` (claude-local composition and auto-record path). `IN-01` only covers the `ClaudeReviewer` adapter itself, so these catalogue spec_refs make the spec/catalogue/impl-plan traceability inconsistent. Repoint the spec_refs/docs for the composition DTO and functions to the `IN-02` requirement and matching hash.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/infrastructure-types.json",
+              "line": 74,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:6528aaa945ef3292742857cbca5089f156fb2e6c8327ba620262a281e42120be",
+          "at": "2026-05-25T00:17:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dc1bc24087557f52548e25ff8baa83d000d31fdbaa30ad8951e3b6b7c86278a5",
+          "at": "2026-05-25T00:24:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25d6375e3192ac5f10dd186f251e84603a8887cdbe33f7ea09f7d84860a3cbad",
+          "at": "2026-05-25T01:15:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a184375e98966fc4e4367185dfaedc00862b566fb9b2e549c649a9d4dc3bbc76",
+          "at": "2026-05-25T01:45:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ClaudeReviewer catalogue text says hard read-only enforcement uses “three layers” but then enumerates four layers and makes `--allowedTools` layer (3). That conflicts with the spec/plan wording, where the three hard layers are `--bare`, `--permission-mode dontAsk`, and `--disallowedTools`, while `--allowedTools` is only the read-only pre-approval set. This leaves the authoritative catalogue internally inconsistent about the enforcement model.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/infrastructure-types.json",
+              "line": 49,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a184375e98966fc4e4367185dfaedc00862b566fb9b2e549c649a9d4dc3bbc76",
+          "at": "2026-05-25T01:46:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 still says `--allowedTools enforces read-only at the subprocess level`, but the updated T001/CN-05 contract says `--allowedTools` is only a pre-approval allow list and the hard read-only behavior comes from the `--bare` / `--permission-mode dontAsk` / `--disallowedTools Edit Write` combination. This contradiction is in the security-critical summary and can reintroduce the old, rejected interpretation that `--allowedTools` alone is the deny layer. Rewrite the S1 summary to attribute enforcement to the full layered contract.",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/impl-plan.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3a0c3d0ea2c4b4bfca1e97e510ea1b16d5b79286a4d90c9d134acfe56e9e4195",
+          "at": "2026-05-25T01:54:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-05 claims `--bare` ignores host `.claude/settings.json`, making the listed three-layer contract a hard read-only equivalent to `codex exec --sandbox read-only`. Current Claude Code docs describe `--bare` as skipping auto-discovery of hooks/skills/plugins/MCP/auto memory/CLAUDE.md, not settings, and `dontAsk` still permits actions matching `permissions.allow` rules. If user/project settings pre-approve broader Bash rules, this plan can allow commands outside the intended read-only git set, so the hard read-only claim needs an explicit settings/tool restriction layer before being treated as structurally enforced. Sources: https://code.claude.com/docs/en/cli-usage and https://code.claude.com/docs/en/permission-modes",
+              "severity": "P1",
+              "file": "track/items/reviewer-claude-option-2026-05-24/spec.md",
+              "line": 37,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:a708fb1daa6da1a140d37fcbf247cc5fa4fd5272c554438ab6c3a35f13520f77",
+          "at": "2026-05-25T01:57:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136fd0324b8814c1aa75983734569024af7a33285716995b0aabf3cb449a60d5",
+          "at": "2026-05-25T03:23:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:136fd0324b8814c1aa75983734569024af7a33285716995b0aabf3cb449a60d5",
+          "at": "2026-05-25T03:25:08Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new `Local`/`ClaudeLocal` review entrypoints are added without any regression coverage for the critical branches they introduce. In particular, there is no test exercising `resolve_execution(\"reviewer\", round_type)` / `resolve_execution(\"pr-reviewer\", RoundType::Final)` fail-closed behavior or the claude-local write-first path, so a missing capability, unsupported provider, or write failure can regress silently.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/mod.rs",
+              "line": 44,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:2481b57cca6205529e7109186042c32a21bfbb35f1052453a48737960bdf55fa",
+          "at": "2026-05-24T12:57:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sotp review local` now resolves `agent-profiles.json` from the process current directory instead of the repository root. If the command is invoked from a subdirectory or via a wrapper that changes cwd, profile loading fails and the new provider-selection path cannot run, even though the repo is discoverable. Use repo-root discovery here like the PR workflow does.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/local.rs",
+              "line": 70,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5d54fa4b6a872b27db4f22334dccdd0201fe3475bf3dcafcf5466fd459e6af1c",
+          "at": "2026-05-24T13:09:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8619211c316cba53b7650f31d21054ba5347211cb850e035868d484512e36478",
+          "at": "2026-05-24T13:14:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8619211c316cba53b7650f31d21054ba5347211cb850e035868d484512e36478",
+          "at": "2026-05-24T13:19:37Z"
+        }
+      ]
+    }
+  }
+}
