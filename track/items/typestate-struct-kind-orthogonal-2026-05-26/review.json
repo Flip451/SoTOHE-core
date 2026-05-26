@@ -1,90 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb3a921f9eb0ff131246f72c4f97a8f2457262a507c5d76a60f42ea8151a636b",
-          "at": "2026-05-26T03:45:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb3a921f9eb0ff131246f72c4f97a8f2457262a507c5d76a60f42ea8151a636b",
-          "at": "2026-05-26T04:05:55Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`struct_kind.shape` is moved into the inner `match`, and the `StructShape::Plain` arm later reads `struct_kind.typestate`. That uses a partially moved value and will not compile for a non-`Copy` `StructKind`, so this breaks the infrastructure codec build path.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
-              "line": 269,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:660764ae7431247ff06ac3146b9ed87451daf44d7b609a61cad6b8732954ab1b",
-          "at": "2026-05-26T03:48:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05f9880ac04741f37a29f484dbb8907799015fce905032ad08cb731222fe03fd",
-          "at": "2026-05-26T03:54:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05f9880ac04741f37a29f484dbb8907799015fce905032ad08cb731222fe03fd",
-          "at": "2026-05-26T04:11:33Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7f7b7c45ff2e0ff93de71fd0feb30125257620eccce5d958d4986ee47e6acfb",
-          "at": "2026-05-26T03:47:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypestateMarker::new` is documented as fallible, including a `# Errors` section that says it returns an error string, but the public API returns `Self` and cannot fail. This contradicts the public API docs checklist for `# Errors` applicability; either remove the fallible/`# Errors` wording or make the constructor actually return a `Result`.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/composite.rs",
-              "line": 94,
-              "category": "public_api_docs"
-            }
-          ],
-          "hash": "rvw1:sha256:c7f7b7c45ff2e0ff93de71fd0feb30125257620eccce5d958d4986ee47e6acfb",
-          "at": "2026-05-26T03:58:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:215ff8449468d1aef7323832199a4303795e1424f1bdb0e2065c7e054ed65f77",
-          "at": "2026-05-26T04:01:18Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -100,6 +16,24 @@
           "findings": [],
           "hash": "rvw1:sha256:c0c1ef2f266eb5335b119e3169f052c118a182328bf6a7e10b2200f3a7c3c118",
           "at": "2026-05-26T04:04:23Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb3a921f9eb0ff131246f72c4f97a8f2457262a507c5d76a60f42ea8151a636b",
+          "at": "2026-05-26T03:45:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb3a921f9eb0ff131246f72c4f97a8f2457262a507c5d76a60f42ea8151a636b",
+          "at": "2026-05-26T04:05:55Z"
         }
       ]
     },
@@ -249,6 +183,86 @@
           "findings": [],
           "hash": "rvw1:sha256:a5072f107179c6e98c2e0b02aa968180c3c21d67fd31774914bfb1d0e4f5fef5",
           "at": "2026-05-26T04:10:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a6d454b0e1c094262342c49840a96d7d70d430bafee0ad32acdf6f5ce7dde61",
+          "at": "2026-05-26T04:26:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a6d454b0e1c094262342c49840a96d7d70d430bafee0ad32acdf6f5ce7dde61",
+          "at": "2026-05-26T04:28:12Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7f7b7c45ff2e0ff93de71fd0feb30125257620eccce5d958d4986ee47e6acfb",
+          "at": "2026-05-26T03:47:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypestateMarker::new` is documented as fallible, including a `# Errors` section that says it returns an error string, but the public API returns `Self` and cannot fail. This contradicts the public API docs checklist for `# Errors` applicability; either remove the fallible/`# Errors` wording or make the constructor actually return a `Result`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/composite.rs",
+              "line": 94,
+              "category": "public_api_docs"
+            }
+          ],
+          "hash": "rvw1:sha256:c7f7b7c45ff2e0ff93de71fd0feb30125257620eccce5d958d4986ee47e6acfb",
+          "at": "2026-05-26T03:58:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:215ff8449468d1aef7323832199a4303795e1424f1bdb0e2065c7e054ed65f77",
+          "at": "2026-05-26T04:01:18Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`struct_kind.shape` is moved into the inner `match`, and the `StructShape::Plain` arm later reads `struct_kind.typestate`. That uses a partially moved value and will not compile for a non-`Copy` `StructKind`, so this breaks the infrastructure codec build path.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "line": 269,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:660764ae7431247ff06ac3146b9ed87451daf44d7b609a61cad6b8732954ab1b",
+          "at": "2026-05-26T03:48:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05f9880ac04741f37a29f484dbb8907799015fce905032ad08cb731222fe03fd",
+          "at": "2026-05-26T03:54:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05f9880ac04741f37a29f484dbb8907799015fce905032ad08cb731222fe03fd",
+          "at": "2026-05-26T04:11:33Z"
         }
       ]
     }
