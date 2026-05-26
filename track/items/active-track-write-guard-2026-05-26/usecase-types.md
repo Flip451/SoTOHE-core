@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreCommitTypeSignalsError | error_type | modify | GitDiscoverFailed, RulesFileMissing, RulesParseError, SymlinkRejected, BranchNotFound, BranchMismatch, TypeSignalsRecomputeFailed | 🟡 | 🔵 |
+| PreCommitTypeSignalsError | error_type | modify | GitDiscoverFailed, RulesFileMissing, RulesParseError, SymlinkRejected, BranchNotFound, BranchMismatch, TypeSignalsRecomputeFailed | 🔵 | 🔵 |
 | TypeSignalsError | error_type | reference | InvalidTrackId, NonActiveTrack, BranchTrackMismatch, LayerBindingsLoad, NoLayers, EvaluationFailed, InconsistentRequest | 🔵 | 🔵 |
 
 ## Application Services
@@ -18,14 +18,14 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreCommitTypeSignalsInteractor | interactor | modify | — | 🟡 | 🔵 |
+| PreCommitTypeSignalsInteractor | interactor | modify | — | 🔵 | 🔵 |
 | TypeSignalsInteractor | interactor | reference | — | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| PreCommitTypeSignalsOutput | dto | modify | — | 🟡 | 🔵 |
+| PreCommitTypeSignalsOutput | dto | modify | — | 🔵 | 🔵 |
 
 ## Commands
 

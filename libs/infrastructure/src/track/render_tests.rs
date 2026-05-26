@@ -2,6 +2,56 @@
 
 use super::*;
 
+/// Initialise a git repository at `dir` on a given branch name.
+///
+/// Used by tests that call `sync_rendered_views` — the branch-based guard
+/// (CN-01) requires a git repository for the root passed to that function.
+///
+/// Uses plain `git` commands (no `infrastructure` adapter dependency in tests).
+fn init_git_repo_on_branch(dir: &std::path::Path, branch: &str) {
+    let run = |args: &[&str]| {
+        let status = std::process::Command::new("git")
+            .args(args)
+            .current_dir(dir)
+            .env("GIT_AUTHOR_NAME", "test")
+            .env("GIT_AUTHOR_EMAIL", "test@example.com")
+            .env("GIT_COMMITTER_NAME", "test")
+            .env("GIT_COMMITTER_EMAIL", "test@example.com")
+            .status()
+            .expect("git command failed");
+        assert!(status.success(), "git {:?} failed with {status}", args);
+    };
+    run(&["init", "-q"]);
+    run(&["config", "user.email", "test@example.com"]);
+    run(&["config", "user.name", "test"]);
+    // Create an initial empty commit so HEAD is on a real branch.
+    run(&["commit", "--allow-empty", "-m", "init", "--no-gpg-sign"]);
+    // Switch to the requested branch.  Use -B (force-create or reset) so that
+    // the command succeeds even when the branch already exists — e.g. when `git
+    // init` defaults to "main" and the test also requests "main".
+    run(&["checkout", "-B", branch]);
+}
+
+/// Initialise a git repository at `dir` and check out a branch named
+/// `track/<track_id>` so that `sync_rendered_views` branch guard passes for
+/// tests that render spec.md or <layer>-types.md.
+///
+/// For tests where the branch should NOT match (e.g. done-track preservation
+/// tests), use `init_git_repo_on_branch(dir, "main")` instead so that the
+/// branch guard returns `Ok(false)` (no fail-closed error, but skips render).
+fn init_git_repo_on_track_branch(dir: &std::path::Path, track_id: &str) {
+    init_git_repo_on_branch(dir, &format!("track/{track_id}"));
+}
+
+fn detach_git_head(dir: &std::path::Path) {
+    let status = std::process::Command::new("git")
+        .args(["checkout", "--detach", "-q", "HEAD"])
+        .current_dir(dir)
+        .status()
+        .expect("git checkout --detach failed");
+    assert!(status.success(), "git checkout --detach failed with {status}");
+}
+
 /// Generates a v5 metadata.json string (no `status` field).
 /// The `status` parameter is accepted for API compatibility but is ignored
 /// since v5 derives status from impl-plan.json at runtime.
@@ -509,6 +559,7 @@ fn render_registry_prefers_legacy_v2_planned_track_over_newer_plan_only() {
 #[test]
 fn sync_rendered_views_writes_plan_and_registry() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
     std::fs::write(
@@ -600,6 +651,7 @@ fn collect_track_snapshots_tie_breaks_same_updated_at_by_track_id() {
 #[test]
 fn sync_rendered_views_omits_unchanged_registry_from_changed_set() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
     std::fs::write(
@@ -1202,6 +1254,7 @@ fn validate_track_document_accepts_id_with_git_substring_in_segment() {
 #[test]
 fn sync_rendered_views_generates_spec_md_from_spec_json() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1275,6 +1328,7 @@ fn sync_rendered_views_skips_spec_md_when_spec_json_absent() {
 #[test]
 fn sync_rendered_views_does_not_overwrite_spec_md_when_already_up_to_date() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1312,6 +1366,7 @@ fn sync_rendered_views_does_not_overwrite_spec_md_when_already_up_to_date() {
 #[test]
 fn sync_rendered_views_continues_on_malformed_spec_json() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1342,6 +1397,7 @@ fn sync_rendered_views_continues_on_malformed_spec_json() {
 #[test]
 fn sync_rendered_views_propagates_error_on_spec_json_unsupported_schema_version() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1419,6 +1475,7 @@ fn write_minimal_style_config_to_root(root: &std::path::Path) {
 #[test]
 fn sync_rendered_views_generates_domain_types_md_from_domain_types_json() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1456,6 +1513,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
     // `<layer>-type-signals.json` file and populate `doc.signals()` before
     // rendering so the markdown reflects the evaluated state.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1514,6 +1572,7 @@ fn sync_rendered_views_ignores_stale_signal_file_when_hash_mismatches() {
     // `spec_states::evaluate_layer_catalogue`; the renderer just avoids
     // misrepresenting the state to a reviewer.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1596,6 +1655,7 @@ fn sync_rendered_views_skips_domain_types_md_when_domain_types_json_absent() {
 #[test]
 fn sync_rendered_views_does_not_overwrite_domain_types_md_when_already_up_to_date() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1629,6 +1689,7 @@ fn sync_rendered_views_does_not_overwrite_domain_types_md_when_already_up_to_dat
 #[test]
 fn sync_rendered_views_continues_on_malformed_domain_types_json() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -1774,7 +1835,13 @@ fn sync_rendered_views_single_track_skips_spec_md_for_done_track() {
     // re-rendered unconditionally because it mirrors task state that
     // actually changes during transitions; spec.md reflects spec.json
     // which does NOT change on a task transition.
+    //
+    // Under the branch-based guard (CN-01), spec.md is skipped when the
+    // current branch does not match `track/<track_id>`. Using "main" here
+    // confirms that branch mismatch preserves the sentinel spec.md — the
+    // same observable behaviour the status-guard previously provided.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_branch(dir.path(), "main");
     let done_dir = dir.path().join("track/items/track-done-spec");
     std::fs::create_dir_all(&done_dir).unwrap();
     // v5 identity-only metadata. Derived status comes from impl-plan.json
@@ -1821,8 +1888,10 @@ fn sync_rendered_views_single_track_skips_spec_md_for_done_track() {
 #[test]
 fn sync_rendered_views_single_track_skips_domain_types_md_for_done_track() {
     // Same legacy-protection rationale as the spec.md case above, but
-    // for `domain-types.md`.
+    // for `domain-types.md`. Under branch-based guard (CN-01), types.md is
+    // skipped when branch does not match `track/<track_id>`.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_branch(dir.path(), "main");
     let done_dir = dir.path().join("track/items/track-done-domain");
     std::fs::create_dir_all(&done_dir).unwrap();
     std::fs::write(
@@ -1905,10 +1974,12 @@ const MULTI_LAYER_ARCH_RULES: &str = r#"{
 #[test]
 fn sync_rendered_views_generates_usecase_types_md_from_usecase_types_json() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
     std::fs::write(dir.path().join("architecture-rules.json"), MULTI_LAYER_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     std::fs::write(
         track_dir.join("metadata.json"),
@@ -1940,10 +2011,12 @@ fn sync_rendered_views_generates_usecase_types_md_from_usecase_types_json() {
 #[test]
 fn sync_rendered_views_generates_infrastructure_types_md_from_infrastructure_types_json() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
     std::fs::write(dir.path().join("architecture-rules.json"), MULTI_LAYER_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     std::fs::write(
         track_dir.join("metadata.json"),
@@ -1979,6 +2052,7 @@ fn sync_rendered_views_generates_multiple_layer_types_md_independently() {
     // present. The loop must render each <layer>-types.md independently (one
     // layer's presence/absence must not affect another's rendering).
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2043,6 +2117,7 @@ fn sync_rendered_views_malformed_layer_json_does_not_block_other_layers() {
     // one layer (usecase) must not prevent the other layers (domain, infrastructure)
     // from rendering their views. This is the cross-layer error isolation guarantee.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2064,6 +2139,7 @@ fn sync_rendered_views_malformed_layer_json_does_not_block_other_layers() {
     std::fs::write(track_dir.join("usecase-types.json"), "{ not valid json }").unwrap();
     std::fs::write(track_dir.join("infrastructure-types.json"), INFRASTRUCTURE_TYPES_JSON_MINIMAL)
         .unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     // Must succeed — malformed usecase JSON must not abort the sync
     let result = sync_rendered_views(dir.path(), Some("track-a"));
@@ -2133,6 +2209,7 @@ fn sync_rendered_views_renders_cat_spec_column_when_signals_fresh_and_opt_in_ena
     // for `TrackId`. The rendered markdown must carry the 6-column header
     // and paint the 🔵 emoji in the Cat-Spec column.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2196,6 +2273,7 @@ fn sync_rendered_views_skips_cat_spec_column_when_opt_in_disabled() {
     // layout if the layer has NOT opted in via `catalogue_spec_signal.enabled`.
     // This is the phased-activation knob per ADR §D5.4.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2252,6 +2330,7 @@ fn sync_rendered_views_errors_on_stale_cat_spec_signals() {
     // View rendering aborts and the caller is expected to run
     // `sotp track catalogue-spec-signals <track_id>` before retrying.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2272,6 +2351,7 @@ fn sync_rendered_views_errors_on_stale_cat_spec_signals() {
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     // Stale: hash does NOT match on-disk catalogue.
     let stale_hash = "0".repeat(64);
@@ -2300,6 +2380,7 @@ fn sync_rendered_views_errors_on_malformed_cat_spec_signals() {
     // not a silent fallback. The view renderer propagates the decode
     // failure and the caller re-runs `sotp track catalogue-spec-signals`.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2320,6 +2401,7 @@ fn sync_rendered_views_errors_on_malformed_cat_spec_signals() {
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     // Malformed JSON.
     std::fs::write(
@@ -2339,6 +2421,7 @@ fn sync_rendered_views_errors_on_missing_cat_spec_signals_when_opt_in() {
     // been generated, view rendering must error and direct the user to
     // `sotp track catalogue-spec-signals <track_id>`.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2358,6 +2441,7 @@ fn sync_rendered_views_errors_on_missing_cat_spec_signals_when_opt_in() {
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
     let msg = err.to_string();
@@ -2445,6 +2529,7 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
     // a hard error (CN-02 fail-closed), so any test that exercises the contract-map
     // render path must provide the config.
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-done-cmap");
     let track_dir = dir.path().join("track/items/track-done-cmap");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2519,6 +2604,7 @@ fn sync_rendered_views_renders_contract_map_for_done_track() {
 #[test]
 fn sync_rendered_views_errors_on_missing_style_config_when_catalogue_present() {
     let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-cmap-no-style");
     let track_dir = dir.path().join("track/items/track-cmap-no-style");
     std::fs::create_dir_all(&track_dir).unwrap();
 
@@ -2564,4 +2650,313 @@ fn adapter_render_rejects_symlinked_style_config() {
         matches!(err, ContractMapRendererError::StyleConfigInvalid { ref path, .. } if path == &symlink_path),
         "expected StyleConfigInvalid for symlinked config, got {err:?}"
     );
+}
+
+// ── Branch-based guard tests for sync_rendered_views (T004 / IN-04 / CN-01) ──
+
+/// Helper: write a minimal v5 metadata.json to `track_dir/<track_id>/metadata.json`.
+fn write_minimal_v5_metadata(items_dir: &std::path::Path, track_id: &str) {
+    let track_dir = items_dir.join(track_id);
+    std::fs::create_dir_all(&track_dir).unwrap();
+    let content = format!(
+        r#"{{
+  "schema_version": 5,
+  "id": "{track_id}",
+  "branch": "track/{track_id}",
+  "title": "Test Track",
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z"
+}}
+"#
+    );
+    std::fs::write(track_dir.join("metadata.json"), content).unwrap();
+}
+
+/// Branch-based guard: `sync_rendered_views` must NOT render spec.md /
+/// types.md for a track whose configured branch does not match the current git
+/// branch. The track directory is created inside a temp dir that is NOT the
+/// real workspace, so git discovery from `root` (the temp dir) fails → the
+/// guard returns `RenderError::InvalidTrackMetadata` (fail-closed, CN-01).
+#[test]
+fn sync_rendered_views_branch_guard_fails_closed_when_git_unavailable() {
+    // Use a temp dir that is NOT a git repo — git discovery fails, guard is
+    // fail-closed and returns InvalidTrackMetadata.
+    let tmp = tempfile::tempdir().unwrap();
+    let root = tmp.path();
+    let items_dir = root.join("track/items");
+    let track_id = "test-track-2026-01-01";
+    write_minimal_v5_metadata(&items_dir, track_id);
+
+    // Write a minimal spec.json so the spec-render branch would be exercised.
+    let spec = r#"{"schema_version": 2, "id": "SP-001", "title": "stub", "items": []}"#;
+    std::fs::write(items_dir.join(track_id).join("spec.json"), spec).unwrap();
+
+    // Write valid architecture-rules.json so the unguarded contract-map pass
+    // does not mask the delayed branch-guard error.
+    std::fs::write(root.join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+
+    let result = sync_rendered_views(root, Some(track_id));
+    // When git is unavailable (not a git repo), the branch guard returns Err.
+    // plan.md is rendered before the guard check, so if git fails the function
+    // returns RenderError::InvalidTrackMetadata (fail-closed, CN-01).
+    assert!(
+        result.is_err(),
+        "branch guard must fail-closed when git is unavailable, got: {result:?}"
+    );
+    let err = result.unwrap_err();
+    assert!(
+        matches!(err, RenderError::InvalidTrackMetadata { .. }),
+        "error must be InvalidTrackMetadata (branch guard fail-closed), got: {err:?}"
+    );
+}
+
+/// Branch-based guard: git discovery failure must fail closed for protected
+/// type catalogues even when spec.json is absent.
+#[test]
+fn sync_rendered_views_branch_guard_fails_closed_for_types_when_git_unavailable() {
+    let tmp = tempfile::tempdir().unwrap();
+    let root = tmp.path();
+    let items_dir = root.join("track/items");
+    let track_id = "test-types-only-guard-2026-01-01";
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+
+    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    std::fs::write(root.join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(root);
+
+    let result = sync_rendered_views(root, Some(track_id));
+
+    assert!(
+        result.is_err(),
+        "branch guard must fail closed for types-only protected content, got: {result:?}"
+    );
+    let err = result.unwrap_err();
+    assert!(
+        matches!(err, RenderError::InvalidTrackMetadata { .. }),
+        "error must be InvalidTrackMetadata (types branch guard fail-closed), got: {err:?}"
+    );
+    assert!(
+        track_dir.join("plan.md").exists(),
+        "plan.md must still render before the delayed branch-guard error"
+    );
+    assert!(
+        !track_dir.join("domain-types.md").exists(),
+        "domain-types.md must not be rendered when git branch lookup fails"
+    );
+}
+
+/// Branch-based guard: protected type catalogues must still fail closed when
+/// git discovery fails even if architecture-rules.json is absent.
+#[test]
+fn sync_rendered_views_branch_guard_fails_closed_for_types_without_arch_rules() {
+    let tmp = tempfile::tempdir().unwrap();
+    let root = tmp.path();
+    let items_dir = root.join("track/items");
+    let track_id = "test-types-no-rules-2026-01-01";
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+
+    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+    let result = sync_rendered_views(root, Some(track_id));
+
+    assert!(
+        result.is_err(),
+        "type catalogue with unavailable git must not be silently skipped without arch rules"
+    );
+    assert!(
+        !track_dir.join("domain-types.md").exists(),
+        "domain-types.md must not be rendered when git branch lookup fails"
+    );
+}
+
+#[test]
+fn sync_rendered_views_branch_guard_fails_closed_for_custom_type_catalogue() {
+    let tmp = tempfile::tempdir().unwrap();
+    let root = tmp.path();
+    let items_dir = root.join("track/items");
+    let track_id = "test-custom-types-guard-2026-01-01";
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+
+    std::fs::write(
+        root.join("architecture-rules.json"),
+        r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"custom.json"}}]}"#,
+    )
+    .unwrap();
+    std::fs::write(track_dir.join("custom.json"), "{}").unwrap();
+
+    let result = sync_rendered_views(root, Some(track_id));
+
+    assert!(
+        matches!(result, Err(RenderError::InvalidTrackMetadata { .. })),
+        "custom configured catalogue must also fail closed when git branch lookup fails: {result:?}"
+    );
+    assert!(
+        !track_dir.join("custom.md").exists(),
+        "custom.md must not be rendered when git branch lookup fails"
+    );
+}
+
+#[test]
+fn sync_rendered_views_branch_guard_allows_plan_only_when_git_unavailable() {
+    let tmp = tempfile::tempdir().unwrap();
+    let root = tmp.path();
+    let items_dir = root.join("track/items");
+    let track_id = "test-plan-only-guard-2026-01-01";
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+
+    std::fs::write(root.join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+
+    let result = sync_rendered_views(root, Some(track_id));
+
+    assert!(
+        result.is_ok(),
+        "git lookup failure must not abort when no protected spec/type inputs exist, got: {result:?}"
+    );
+    assert!(
+        track_dir.join("plan.md").exists(),
+        "plan.md must render even when the protected branch guard cannot read git"
+    );
+}
+
+#[test]
+fn sync_rendered_views_branch_guard_fails_closed_on_detached_head() {
+    let dir = tempfile::tempdir().unwrap();
+    let track_id = "test-detached-head-guard";
+    init_git_repo_on_track_branch(dir.path(), track_id);
+    detach_git_head(dir.path());
+
+    let items_dir = dir.path().join("track/items");
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+    std::fs::write(
+        track_dir.join("spec.json"),
+        r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Detached Head Spec",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#,
+    )
+    .unwrap();
+
+    let result = sync_rendered_views(dir.path(), Some(track_id));
+
+    assert!(
+        matches!(result, Err(RenderError::InvalidTrackMetadata { .. })),
+        "detached HEAD must fail closed instead of becoming a branch mismatch: {result:?}"
+    );
+    assert!(
+        track_dir.join("plan.md").exists(),
+        "plan.md must render before the detached-HEAD branch-guard error"
+    );
+    assert!(
+        !track_dir.join("spec.md").exists(),
+        "spec.md must not render while detached HEAD fails closed"
+    );
+}
+
+/// Branch-based guard: `sync_rendered_views` renders spec.md when the current
+/// branch matches the track's configured branch.
+#[test]
+fn sync_rendered_views_branch_guard_allows_matching_branch() {
+    let dir = tempfile::tempdir().unwrap();
+    let track_id = "test-branch-guard-match";
+    init_git_repo_on_track_branch(dir.path(), track_id);
+
+    let items_dir = dir.path().join("track/items");
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+
+    std::fs::write(
+        track_dir.join("spec.json"),
+        r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Matching Branch Spec",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#,
+    )
+    .unwrap();
+    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
+
+    let changed = sync_rendered_views(dir.path(), Some(track_id)).unwrap();
+
+    assert!(
+        changed.iter().any(|p| p.ends_with("spec.md")),
+        "spec.md should be reported as changed on the matching track branch"
+    );
+    assert!(
+        changed.iter().any(|p| p.ends_with("domain-types.md")),
+        "domain-types.md should be reported as changed on the matching track branch"
+    );
+    let spec_md = std::fs::read_to_string(track_dir.join("spec.md")).unwrap();
+    assert!(spec_md.contains("Matching Branch Spec"));
+    let types_md = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+    assert!(types_md.contains("TrackId"));
+}
+
+/// Branch-based guard: `sync_rendered_views` must NOT render spec.md for a track
+/// whose id is different from the current branch's track-id.
+///
+/// Uses a tempdir with a git repo on branch "main" so git detection works, and
+/// the configured track branch (`track/test-branch-guard-mismatch`) does not
+/// match "main" → the guard correctly rejects spec/types rendering.
+#[test]
+fn sync_rendered_views_branch_guard_rejects_mismatched_track() {
+    let dir = tempfile::tempdir().unwrap();
+    // Use "main" branch — never matches `track/<anything>`.
+    init_git_repo_on_branch(dir.path(), "main");
+
+    let track_id = "test-branch-guard-mismatch";
+    let items_dir = dir.path().join("track/items");
+    write_minimal_v5_metadata(&items_dir, track_id);
+    let track_dir = items_dir.join(track_id);
+
+    // Write a spec.json so the branch guard evaluates (spec block is the first
+    // to resolve the guard in fail-closed mode).
+    let spec =
+        r#"{"schema_version": 2, "title": "stub", "scope": {"in_scope": [], "out_of_scope": []}}"#;
+    std::fs::write(track_dir.join("spec.json"), spec).unwrap();
+
+    // Write architecture-rules.json so load_tddd_layers doesn't fail first.
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
+    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+
+    // Guard must reject: current branch "main" != "track/test-branch-guard-mismatch".
+    // With branch mismatch (`Ok(false)`), spec.md and domain-types.md must NOT be
+    // rendered (spec/types skipped) and the function returns Ok.
+    let result = sync_rendered_views(dir.path(), Some(track_id));
+
+    match result {
+        Ok(changed) => {
+            // Branch mismatch → spec/types skipped → protected views are NOT written.
+            assert!(
+                !track_dir.join("spec.md").exists(),
+                "spec.md must NOT be written for a mismatched-branch track"
+            );
+            assert!(
+                !track_dir.join("domain-types.md").exists(),
+                "domain-types.md must NOT be written for a mismatched-branch track"
+            );
+            assert!(
+                !changed.iter().any(|p| p.ends_with("domain-types.md")),
+                "domain-types.md must not be reported as changed for a mismatched-branch track"
+            );
+            // plan.md is always rendered (outside the guard).
+            let _ = changed;
+        }
+        Err(RenderError::InvalidTrackMetadata { .. }) => {
+            // Also acceptable: guard fail-closed if git branch cannot be read.
+        }
+        Err(e) => {
+            panic!("unexpected error from sync_rendered_views: {e:?}");
+        }
+    }
 }

@@ -4,32 +4,27 @@
     {
       "id": "T001",
       "description": "usecase: PreCommitTypeSignalsOutput / PreCommitTypeSignalsError の型変更。PreCommitTypeSignalsOutput から `frozen: bool` フィールドを削除し、PreCommitTypeSignalsError の `MetadataLoadFailed` / `ImplPlanLoadFailed` variant を `BranchNotFound(String)` / `BranchMismatch(String)` に置き換える。既存のテスト (`test_pre_commit_type_signals_error_variants_exist` / `test_pre_commit_type_signals_interactor_delegates`) を新しい variant とフィールドに合わせて更新する。変更は `libs/usecase/src/pre_commit_type_signals.rs` のみに閉じること（CN-02 / catalogue は domain 不変）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "CLI signals.rs / catalogue_spec_signals.rs: status ベースの frozen guard を branch-based guard に置き換える。`signals.rs` の `ensure_active_track()` を削除し、branch-based validation（`track/<id>` prefix check + track_id suffix match）を同ファイルに `ensure_branch_matches_track(branch: &str, track_id: &str) -> Result<(), CliError>` として導入する。`catalogue_spec_signals.rs` の `ensure_active_track_catalogue()` および `read_track_status_str()` 呼び出しを削除し、代わりに git から現在 branch を読み取って `ensure_branch_matches_track` を呼ぶ。呼び出し元の他の使用箇所（`execute_type_signals_lenient_with_bindings` 内の branch guard はすでに branch-based なので変更不要）。変更は `apps/cli/src/commands/track/tddd/signals.rs` と `apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs` に閉じること（IN-01 / IN-02 / IN-03 / CN-01 / CN-03 / CN-04）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T003",
       "description": "make.rs: run_pre_commit_type_signals の status ベース frozen guard を branch-based guard に置き換える。現在の `read_track_status_str` による `done | archived` チェックを削除し、代わりに `SystemGitRepo::discover().current_branch()` で取得した branch を `track/<track_id>` と照合するバリデーションに変更する。ブランチが一致しない場合は `None` を返すのではなく `Err(CliError::Message(...))` を返す（fail-closed）。`type_signal_bindings_opt` の `None` を使った frozen/guard skip 経路を廃止し、recompute 成功時は bindings を必ず返す形（例: `Result<(ExitCode, Vec<TdddLayerBinding>), CliError>`）へ寄せたうえで、呼び出し元 `dispatch_track_commit_message` の `None` チェックを削除する。PreCommitTypeSignalsOutput.frozen フィールドの参照をすべて削除する。変更は `apps/cli/src/commands/make.rs` に閉じること（IN-01 / IN-02 / IN-03 / CN-01 / CN-04）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T004",
       "description": "infrastructure render.rs: sync_rendered_views の is_done_or_archived guard を branch-based validation に置き換える。`derived_status` を使った `let is_done_or_archived = matches!(derived_status.as_str(), \"done\" | \"archived\")` をブランチ照合ロジックに変更する。具体的には：(1) `SystemGitRepo::discover_from(root)` で現在の git ブランチを取得し、(2) `track/<id>` 形式のブランチと `metadata.json` の `branch` フィールドを照合し、(3) 一致しない場合は `spec.md` / `<layer>-types.md` レンダリングをスキップするのではなく `RenderError::InvalidTrackMetadata` を返す（fail-closed、CN-01）。plan.md は現行通り guard の外でレンダリングし続ける。変更は `libs/infrastructure/src/track/render.rs` に閉じること（IN-04 / CN-01 / CN-03）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "テスト追加 + CI gate。IN-05 のブランチベースバリデーションテスト追加：(a) branch が `track/<track_id>` と一致するケース（許容）、(b) branch が `track/<other_id>` と一致しないケース（拒否）、(c) branch が `track/` prefix を持たないケース（拒否）。対象モジュール：`signals.rs` の `ensure_branch_matches_track` 単体テスト（T002）、`catalogue_spec_signals.rs` の branch-based guard 単体テスト（T002）、`make.rs` の `run_pre_commit_type_signals` branch guard / fail-closed 経路テスト（T003）、`render.rs` の branch-based guard テスト（T004、`render_tests.rs` に追加）。最後に `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass することを確認する（AC-06）。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     }
   ],
   "plan": {

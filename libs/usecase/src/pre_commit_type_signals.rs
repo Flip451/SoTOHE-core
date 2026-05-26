@@ -3,7 +3,7 @@
 //! Wraps the `ConfidenceSignal` classification logic so that CLI
 //! `commands/make.rs` never imports `domain::ConfidenceSignal` directly
 //! (CN-01 / D1). Returns [`PreCommitTypeSignalsOutput`] containing the signal
-//! verdict and optional layer bindings for downstream catalogue-spec steps.
+//! verdict for downstream catalogue-spec steps.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -14,15 +14,15 @@ use thiserror::Error;
 
 /// DTO returned by [`PreCommitTypeSignalsService::run`].
 ///
-/// Contains the overall verdict (pass/blocked), list of red signal names, list
-/// of yellow signal names, and whether the track is frozen (Done/Archived).
+/// Contains the overall verdict (pass/blocked) and lists of red/yellow signal
+/// names. The `frozen` field has been removed: the branch-based guard (IN-02,
+/// CN-04) rejects non-current-branch tracks before reaching this output stage,
+/// so callers no longer need a frozen flag.
 ///
-/// The `frozen` flag lets the caller skip downstream catalogue-spec steps
-/// without re-reading domain state. CLI uses this DTO to produce actionable
-/// pre-commit messages without importing `domain::ConfidenceSignal`.
+/// CLI uses this DTO to produce actionable pre-commit messages without
+/// importing `domain::ConfidenceSignal`.
 pub struct PreCommitTypeSignalsOutput {
     pub blocked: bool,
-    pub frozen: bool,
     pub red_signals: Vec<String>,
     pub yellow_signals: Vec<String>,
 }
@@ -32,8 +32,12 @@ pub struct PreCommitTypeSignalsOutput {
 /// Error type for [`PreCommitTypeSignalsService`].
 ///
 /// Wraps git discover failures, architecture-rules.json parse errors, symlink
-/// guard rejections, and track metadata load failures without leaking domain
+/// guard rejections, and branch validation failures without leaking domain
 /// error types across the usecase boundary.
+///
+/// `MetadataLoadFailed` and `ImplPlanLoadFailed` (from the former status-based
+/// frozen guard) are replaced by `BranchNotFound` and `BranchMismatch` which
+/// reflect the new branch-based guard semantics (IN-02 / CN-04).
 #[derive(Debug, Error)]
 pub enum PreCommitTypeSignalsError {
     #[error("git discover failed: {0}")]
@@ -44,10 +48,10 @@ pub enum PreCommitTypeSignalsError {
     RulesParseError(String),
     #[error("symlink rejected: {0}")]
     SymlinkRejected(String),
-    #[error("metadata load failed: {0}")]
-    MetadataLoadFailed(String),
-    #[error("impl-plan load failed: {0}")]
-    ImplPlanLoadFailed(String),
+    #[error("branch not found: {0}")]
+    BranchNotFound(String),
+    #[error("branch mismatch: {0}")]
+    BranchMismatch(String),
     #[error("type signals recompute failed: {0}")]
     TypeSignalsRecomputeFailed(String),
 }
@@ -59,15 +63,15 @@ pub enum PreCommitTypeSignalsError {
 ///
 /// Driven by the CLI layer. Wraps the `ConfidenceSignal` classification logic
 /// so that `commands/make.rs` never imports `domain::ConfidenceSignal` directly.
-/// Returns [`PreCommitTypeSignalsOutput`] containing the signal verdict and
-/// optional layer bindings for downstream catalogue-spec steps.
+/// Returns [`PreCommitTypeSignalsOutput`] containing the signal verdict for
+/// downstream catalogue-spec steps.
 pub trait PreCommitTypeSignalsService: Send + Sync {
     /// Runs the pre-commit type signal recomputation for the given track.
     ///
     /// # Errors
     ///
-    /// Returns [`PreCommitTypeSignalsError`] on git, rules, metadata, or signal
-    /// recompute failures.
+    /// Returns [`PreCommitTypeSignalsError`] on git, rules, symlink, branch
+    /// validation, or signal recompute failures.
     fn run(
         &self,
         track_id: String,
@@ -130,10 +134,12 @@ mod tests {
         assert!(matches!(e3, PreCommitTypeSignalsError::RulesParseError(_)));
         let e4 = PreCommitTypeSignalsError::SymlinkRejected("sym".to_owned());
         assert!(matches!(e4, PreCommitTypeSignalsError::SymlinkRejected(_)));
-        let e5 = PreCommitTypeSignalsError::MetadataLoadFailed("meta".to_owned());
-        assert!(matches!(e5, PreCommitTypeSignalsError::MetadataLoadFailed(_)));
-        let e6 = PreCommitTypeSignalsError::ImplPlanLoadFailed("plan".to_owned());
-        assert!(matches!(e6, PreCommitTypeSignalsError::ImplPlanLoadFailed(_)));
+        let e5 = PreCommitTypeSignalsError::BranchNotFound("no branch on main".to_owned());
+        assert!(matches!(e5, PreCommitTypeSignalsError::BranchNotFound(_)));
+        let e6 = PreCommitTypeSignalsError::BranchMismatch(
+            "branch track/other != track/this".to_owned(),
+        );
+        assert!(matches!(e6, PreCommitTypeSignalsError::BranchMismatch(_)));
         let e7 = PreCommitTypeSignalsError::TypeSignalsRecomputeFailed("sig".to_owned());
         assert!(matches!(e7, PreCommitTypeSignalsError::TypeSignalsRecomputeFailed(_)));
     }
@@ -143,7 +149,6 @@ mod tests {
         let run_fn = Arc::new(|_: String, _: PathBuf| {
             Ok(PreCommitTypeSignalsOutput {
                 blocked: false,
-                frozen: false,
                 red_signals: Vec::new(),
                 yellow_signals: vec!["TypeFoo".to_owned()],
             })
@@ -151,7 +156,6 @@ mod tests {
         let interactor = PreCommitTypeSignalsInteractor::new(run_fn);
         let out = interactor.run("my-track-2026".to_owned(), PathBuf::new()).unwrap();
         assert!(!out.blocked);
-        assert!(!out.frozen);
         assert!(out.red_signals.is_empty());
         assert_eq!(out.yellow_signals.len(), 1);
     }

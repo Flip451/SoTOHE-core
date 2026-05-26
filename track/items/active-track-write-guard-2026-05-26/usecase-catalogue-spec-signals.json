@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "bdac84363148c8ae8ca4c1a1e44269d99f66a894535012c86cd745f4731295b9",
+  "catalogue_declaration_hash": "604976c22cd4ed08beef7454b3439e91d5b182f04d70dc9dc24f2a4485c775c8",
   "signals": [
     {
       "type_name": "PreCommitTypeSignalsError",

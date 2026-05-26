@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-26T07:17:56Z",
-  "declaration_hash": "bdac84363148c8ae8ca4c1a1e44269d99f66a894535012c86cd745f4731295b9",
+  "generated_at": "2026-05-26T10:17:57Z",
+  "declaration_hash": "604976c22cd4ed08beef7454b3439e91d5b182f04d70dc9dc24f2a4485c775c8",
   "signals": [
     {
       "type_name": "PreCommitTypeSignalsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::error::Error",
@@ -17,7 +17,7 @@
     {
       "type_name": "PreCommitTypeSignalsInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "PreCommitTypeSignalsService"
@@ -26,7 +26,7 @@
     {
       "type_name": "PreCommitTypeSignalsOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

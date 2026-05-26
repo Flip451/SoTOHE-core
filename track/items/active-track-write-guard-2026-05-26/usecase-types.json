@@ -47,12 +47,8 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            {
-              "name": "run_fn",
-              "ty": "Arc<dyn Fn(String, std::path::PathBuf) -> Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError> + Send + Sync>"
-            }
-          ]
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -266,7 +262,7 @@
               "ty": "Arc<dyn Fn(String, std::path::PathBuf) -> Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError> + Send + Sync>"
             }
           ],
-          "returns": "PreCommitTypeSignalsInteractor",
+          "returns": "Self",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
