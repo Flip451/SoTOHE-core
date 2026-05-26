@@ -21,9 +21,9 @@ use crate::CliError;
 
 #[derive(Debug, Subcommand)]
 pub enum PrCommand {
-    /// Push the current track/plan branch to origin.
+    /// Push the current track branch to origin.
     Push(PushArgs),
-    /// Create or reuse a PR for the current track/plan branch.
+    /// Create or reuse a PR for the current track branch.
     EnsurePr(EnsurePrArgs),
     /// Show current PR check status.
     Status(StatusArgs),
@@ -39,14 +39,14 @@ pub enum PrCommand {
 
 #[derive(Debug, Args)]
 pub struct PushArgs {
-    /// Explicit track ID (required on plan/ branches, ignored on track/ branches).
+    /// Deprecated compatibility option; PR commands resolve from the current track branch.
     #[arg(long)]
     pub track_id: Option<String>,
 }
 
 #[derive(Debug, Args)]
 pub struct EnsurePrArgs {
-    /// Explicit track ID (required on plan/ branches, ignored on track/ branches).
+    /// Deprecated compatibility option; PR commands resolve from the current track branch.
     #[arg(long)]
     pub track_id: Option<String>,
     /// Base branch for the PR.
@@ -92,7 +92,7 @@ pub struct PollReviewArgs {
 
 #[derive(Debug, Args)]
 pub struct ReviewCycleArgs {
-    /// Explicit track ID (required on plan/ branches, ignored on track/ branches).
+    /// Deprecated compatibility option; PR commands resolve from the current track branch.
     #[arg(long)]
     pub track_id: Option<String>,
     /// Resume polling from a previously persisted trigger state file.
@@ -181,7 +181,6 @@ fn push(explicit_track_id: Option<&str>) -> Result<ExitCode, CliError> {
 /// Checks that all tasks in the track metadata are resolved (done/skipped).
 ///
 /// Returns `ExitCode::SUCCESS` if the guard passes, `ExitCode::FAILURE` otherwise.
-/// Skips the check for `plan/` branches (planning-only, no code tasks).
 fn ensure_pr(explicit_track_id: Option<&str>, base: &str) -> Result<ExitCode, CliError> {
     let ctx = resolve_branch_context(explicit_track_id)?;
     let client = SystemGhClient;
@@ -748,8 +747,7 @@ fn review_cycle(explicit_track_id: Option<&str>, resume: bool) -> Result<ExitCod
         .ok_or_else(|| CliError::Message("could not determine current branch".to_owned()))?;
     if !branch.starts_with("track/") {
         return Err(CliError::Message(
-            "not on a track branch (expected track/<id>). \
-             For planning-only tracks, run /track:activate <track-id> first."
+            "not on a track branch (expected track/<id>); switch to the track branch and retry."
                 .to_owned(),
         ));
     }

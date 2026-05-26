@@ -205,7 +205,6 @@ fn ensure_pr_with_reuses_existing_pr() {
     let ctx = PrBranchContext {
         branch: "track/my-feature".to_owned(),
         track_id: "my-feature".to_owned(),
-        is_plan_branch: false,
     };
     assert_eq!(ensure_pr_with(&ctx, "main", &client), ExitCode::SUCCESS);
 }
@@ -220,7 +219,6 @@ fn ensure_pr_with_creates_new_pr_when_none_exists() {
     let ctx = PrBranchContext {
         branch: "track/my-feature".to_owned(),
         track_id: "my-feature".to_owned(),
-        is_plan_branch: false,
     };
     assert_eq!(ensure_pr_with(&ctx, "main", &client), ExitCode::SUCCESS);
 }
@@ -234,7 +232,6 @@ fn ensure_pr_with_returns_failure_on_find_error() {
     let ctx = PrBranchContext {
         branch: "track/my-feature".to_owned(),
         track_id: "my-feature".to_owned(),
-        is_plan_branch: false,
     };
     assert_eq!(ensure_pr_with(&ctx, "main", &client), ExitCode::FAILURE);
 }
@@ -249,7 +246,6 @@ fn ensure_pr_with_returns_failure_on_create_error() {
     let ctx = PrBranchContext {
         branch: "track/my-feature".to_owned(),
         track_id: "my-feature".to_owned(),
-        is_plan_branch: false,
     };
     assert_eq!(ensure_pr_with(&ctx, "main", &client), ExitCode::FAILURE);
 }

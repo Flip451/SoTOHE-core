@@ -191,7 +191,7 @@ pub fn validate_planning_only_commit_paths(
         }
 
         return Err(GitWorkflowError::Validation(format!(
-            "planning-only commit for '{}' may not stage '{}'; run /track:activate <track-id> before committing implementation files",
+            "planning-only commit for '{}' may not stage '{}'; switch to a track branch before committing implementation files",
             explicit_track.display_path, path
         )));
     }
@@ -429,7 +429,7 @@ mod tests {
         )
         .unwrap_err();
 
-        assert!(err.to_string().contains("run /track:activate"));
+        assert!(err.to_string().contains("switch to a track branch"));
     }
 
     #[test]

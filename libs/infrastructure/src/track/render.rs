@@ -1,6 +1,7 @@
 //! Rendering and sync of track read-only views (`plan.md`, `registry.md`, `spec.md`, `domain-types.md`) from metadata.json / spec.json / domain-types.json.
 
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use domain::tddd::ContractMapRenderOptions;
 use domain::tddd::{
@@ -434,13 +435,7 @@ fn next_command_for_track(track: &TrackSnapshot) -> String {
     let override_reason = track.track.status_override().map(|o| o.reason()).filter(|_| {
         matches!(status, domain::TrackStatus::Blocked | domain::TrackStatus::Cancelled)
     });
-    let info = domain::track_phase::resolve_phase_from_record(
-        track.track.id().as_ref(),
-        status,
-        track.track.branch().is_some(),
-        track.schema_version,
-        override_reason,
-    );
+    let info = domain::track_phase::resolve_phase_from_record(status, override_reason);
     format!("`{}`", info.next_command)
 }
 
@@ -471,16 +466,8 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
             matches!(track.status().as_ref(), "planned" | "in_progress" | "blocked" | "cancelled")
         })
         .collect();
-    // Deprioritise branchless planning-only tracks (schema_version 3, 4, or 5) so that
-    // an actual in-progress track wins the "Latest active track" slot.
-    // schema_version 2 branchless planned tracks are legacy pre-planning-only behaviour
-    // and are left in normal position (their branch semantics differ).
-    // Branchless planning-only shapes: schema versions 3, 4, and 5.
-    active.sort_by_key(|track| {
-        matches!(track.schema_version, 3..=5)
-            && track.status() == "planned"
-            && track.track.branch().is_none()
-    });
+    // Sort active tracks so in-progress tracks precede planned ones.
+    active.sort_by_key(|track| track.status() == "planned");
     let completed: Vec<_> = tracks.iter().filter(|track| track.status() == "done").collect();
     let archived: Vec<_> = tracks.iter().filter(|track| track.status() == "archived").collect();
 
@@ -488,7 +475,7 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
         "# Track Registry".to_owned(),
         String::new(),
         "> This file lists all tracks and their current status.".to_owned(),
-        "> Auto-updated by `/track:plan`, `/track:plan-only`, `/track:activate`, and `/track:commit`.".to_owned(),
+        "> Auto-updated by `/track:plan` and `/track:commit`.".to_owned(),
         "> `/track:status` uses this file as an entry point to summarize progress.".to_owned(),
         "> Each track is expected to have `spec.md` (or `spec.json`) / `plan.md` / `metadata.json`; `observations.md` is optional.".to_owned(),
         String::new(),
@@ -566,9 +553,7 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
     lines.push(String::new());
     lines.push("---".to_owned());
     lines.push(String::new());
-    lines.push(
-        "Use `/track:plan <feature>` for the standard lane or `/track:plan-only <feature>` when planning should land before activation.".to_owned(),
-    );
+    lines.push("Use `/track:plan <feature>` to start a new track.".to_owned());
     lines.push(String::new());
 
     lines.join("\n")
@@ -839,17 +824,42 @@ pub fn sync_rendered_views(
                 RenderError::InvalidMetadata { path: metadata_path.clone(), source }
             })?
         };
-        let impl_plan_for_status = load_impl_plan_opt(&track_dir)?;
-        let derived_status = if parsed.schema_version == 5 {
-            derive_track_status(impl_plan_for_status.as_ref(), track.status_override()).to_string()
-        } else {
-            // Legacy v2/v3: read explicit `status` from raw JSON.
-            serde_json::from_str::<serde_json::Value>(&json)
+        // Branch-based guard (IN-04 / CN-01 / CN-03): only render spec.md and
+        // <layer>-types.md when the current git branch matches the track's configured
+        // branch (`track/<id>`). This replaces the former `is_done_or_archived`
+        // status guard (done|archived skip) — the protection criterion moves from
+        // "status=done|archived" to "branch does not match current git branch".
+        //
+        // plan.md is rendered unconditionally (outside the guard), because
+        // task-state transitions must always reflect the latest impl-plan.json.
+        // The branch guard applies only to spec.md and <layer>-types.md.
+        //
+        // Fail-closed (CN-01): if git discovery fails or the branch cannot be read,
+        // return `RenderError::InvalidTrackMetadata` rather than skipping silently
+        // when a protected render input (`spec.json` or `*-types.json`) is present.
+        // This error is deferred until after plan.md so task state is still
+        // reflected before protected renders are skipped.
+        let branch_guard_result: Result<bool, String> = {
+            // Derive the expected branch from metadata (track/<id>).
+            let expected_branch = format!("track/{}", parsed.id);
+            // Discover the current git branch from the workspace root (root).
+            let current_branch_opt = Command::new("git")
+                .args(["rev-parse", "--abbrev-ref", "HEAD"])
+                .current_dir(root)
+                .output()
                 .ok()
-                .and_then(|v| v.get("status").and_then(|s| s.as_str()).map(str::to_owned))
-                .unwrap_or_else(|| "planned".to_owned())
+                .filter(|o| o.status.success())
+                .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
+                .filter(|branch| !branch.is_empty() && branch != "HEAD");
+            match current_branch_opt {
+                Some(ref branch) => Ok(branch == &expected_branch),
+                None => Err(format!(
+                    "cannot determine current git branch for branch-based \
+                     guard on track '{}' (fail-closed, CN-01)",
+                    parsed.id
+                )),
+            }
         };
-        let is_done_or_archived = matches!(derived_status.as_str(), "done" | "archived");
         let impl_plan = load_impl_plan_opt(&track_dir)?;
         let rendered = render_plan(&track, impl_plan.as_ref());
         let plan_path = track_dir.join("plan.md");
@@ -863,13 +873,28 @@ pub fn sync_rendered_views(
             changed.push(plan_path);
         }
 
-        // Render spec.md from spec.json if present. Skipped for done/archived
-        // tracks to avoid silently overwriting legacy rendered content with a
-        // newer renderer that may drop fields an older format preserved —
-        // transitions into `done` do NOT touch spec.json, so re-rendering
-        // here would only surface renderer-version drift, not new data.
+        // Render spec.md from spec.json if present. Skipped when the current git
+        // branch does not match the track's configured branch (`track/<id>`):
+        // this protects non-current-branch tracks from being overwritten while
+        // still allowing full re-renders for the active track regardless of status.
+        //
         let spec_json_path = track_dir.join("spec.json");
-        if !is_done_or_archived && spec_json_path.is_file() {
+        let branch_matches_track_for_spec: bool = if spec_json_path.is_file() {
+            match &branch_guard_result {
+                Ok(v) => *v,
+                Err(reason) => {
+                    return Err(RenderError::InvalidTrackMetadata {
+                        path: metadata_path.clone(),
+                        reason: reason.clone(),
+                    });
+                }
+            }
+        } else {
+            // No spec.json — nothing to protect here; types rendering handles its
+            // own protected-input check below.
+            false
+        };
+        if branch_matches_track_for_spec && spec_json_path.is_file() {
             let spec_json_content = std::fs::read_to_string(&spec_json_path)?;
             match spec::codec::decode(&spec_json_content) {
                 Ok(spec_doc) => {
@@ -927,186 +952,243 @@ pub fn sync_rendered_views(
 
         // Render per-layer <layer>-types.md from each <layer>-types.json present.
         // Iterates all tddd.enabled layers in architecture-rules.json via the
-        // existing `parse_tddd_layers` resolver (introduced in tddd-01 Phase 1 Task 7,
-        // already reused by `apps/cli::resolve_layers`). Preserves the 3 patterns
-        // from the original domain-only block:
-        //   - is_done_or_archived guard (skip frozen tracks entirely — architecture-rules.json
-        //     is not loaded for done/archived tracks so a malformed rules file cannot cause
-        //     failures on frozen tracks where type-catalogue rendering is a no-op)
-        //   - rendered_matches drift check (no-op if content unchanged)
-        //   - CatalogueDocumentCodecError::Json (syntax/EOF) warn-and-continue (file may be mid-edit)
-        if !is_done_or_archived {
+        // existing `parse_tddd_layers` resolver. Only renders when the current
+        // git branch matches the track's configured branch (branch_matches_track).
+        // This replaces the former `is_done_or_archived` guard with a branch-based
+        // validation (IN-04 / CN-01 / CN-03 / CN-04).
+        let load_type_bindings = || {
             let arch_rules_path = root.join("architecture-rules.json");
             // `load_tddd_layers` is fail-closed. Missing / symlinked / malformed
             // `architecture-rules.json` are all hard configuration errors —
             // never synthesize a fallback nor silently skip the layer iteration.
-            let bindings = load_tddd_layers(&arch_rules_path, root).map_err(|e| match e {
+            load_tddd_layers(&arch_rules_path, root).map_err(|e| match e {
                 LoadTdddLayersError::Io { source, .. } => RenderError::Io(source),
                 LoadTdddLayersError::Parse(err) => RenderError::Io(std::io::Error::other(format!(
                     "architecture-rules.json: {err}"
                 ))),
-            })?;
-
-            // Guard against duplicate rendered paths: `parse_tddd_layers` rejects
-            // duplicate `catalogue_file` values (exact string match), but two names
-            // like `"foo"` and `"foo.json"` both derive to `foo.md` via
-            // `.rendered_file()`. The duplicate check is placed AFTER the
-            // per-layer opt-out so that a layer whose catalogue file is absent
-            // does not consume the rendered-path slot and accidentally suppress
-            // a later layer whose catalogue file IS present.
-            let mut seen_rendered: std::collections::HashSet<String> =
-                std::collections::HashSet::new();
-            for binding in &bindings {
-                let catalogue_file = binding.catalogue_file();
-                let catalogue_path = track_dir.join(catalogue_file);
-                if !catalogue_path.is_file() {
+            })
+        };
+        let catalogue_path_exists = |path: &Path| -> Result<bool, RenderError> {
+            match path.symlink_metadata() {
+                Ok(metadata) => {
+                    let file_type = metadata.file_type();
+                    Ok(file_type.is_file() || file_type.is_symlink())
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
+                Err(e) => Err(RenderError::Io(e)),
+            }
+        };
+        let has_default_type_catalogue_input = || -> Result<bool, RenderError> {
+            for entry in std::fs::read_dir(&track_dir)? {
+                let entry = entry?;
+                let file_name = entry.file_name();
+                let Some(file_name) = file_name.to_str() else {
+                    continue;
+                };
+                if !file_name.ends_with("-types.json") {
                     continue;
                 }
-                // Only check/reserve the rendered path slot after confirming
-                // the catalogue file exists. This ensures an absent catalogue
-                // does not block a later layer that shares the same rendered name.
-                let rendered_name = binding.rendered_file();
-                if !seen_rendered.insert(rendered_name.clone()) {
-                    eprintln!(
-                        "warning: skipping duplicate rendered path {} for {} (rendered path collision)",
-                        rendered_name,
-                        track_dir.display()
-                    );
-                    continue;
+                if catalogue_path_exists(&entry.path())? {
+                    return Ok(true);
                 }
-                let catalogue_content = std::fs::read_to_string(&catalogue_path)?;
-                // T025 / CN-11: v3-native rendering — all catalogues MUST be schema_version 3.
-                // Decode directly with CatalogueDocumentCodec. A v2 (or other non-v3) catalogue
-                // fails closed (hard error) rather than silently rendering stale v2 content.
-                // Only JSON parse failures are treated as warn-and-skip (file may be mid-edit).
-                let stem = catalogue_path
-                    .file_name()
-                    .and_then(|n| n.to_str())
-                    .and_then(|n| n.strip_suffix("-types.json"))
-                    .map(str::to_owned)
-                    .unwrap_or_else(|| {
-                        catalogue_path.file_stem().and_then(|s| s.to_str()).unwrap_or("").to_owned()
-                    });
-                match CatalogueDocumentCodec::decode(&catalogue_content, &stem) {
-                    Ok(v3_doc) => {
-                        // Load `<layer>-type-signals.json` for the Signal column.
-                        // Non-fatal miss / stale hash falls back to `—` placeholders.
-                        // The authoritative fail-closed path for Missing/Stale lives in
-                        // `spec_states::evaluate_layer_catalogue`.
-                        let v3_signal_path = track_dir.join(binding.signal_file());
-                        // Use `symlink_metadata()` to detect symlinks: `is_file()` follows
-                        // symlinks, which would allow a crafted symlink to inject arbitrary
-                        // file contents. For the view renderer, symlinks fall back to `—`
-                        // (non-fatal miss).
-                        let v3_type_signals_opt: Option<Vec<domain::TypeSignal>> = {
-                            let is_plain = v3_signal_path
-                                .symlink_metadata()
-                                .is_ok_and(|m| m.file_type().is_file());
-                            if is_plain {
-                                std::fs::read_to_string(&v3_signal_path).ok().and_then(|sj| {
-                                    type_signals_codec::decode(&sj).ok().and_then(|sd| {
-                                        let current = type_signals_codec::declaration_hash(
-                                            catalogue_content.as_bytes(),
-                                        );
-                                        if sd.declaration_hash() == current {
-                                            Some(sd.signals().to_vec())
-                                        } else {
-                                            eprintln!(
-                                                "warning: ignoring stale {} for {} \
-                                                 (declaration_hash mismatch) — rendered \
-                                                 signal column will fall back to `—`",
-                                                binding.signal_file(),
-                                                track_dir.display()
-                                            );
-                                            None
-                                        }
-                                    })
-                                })
-                            } else {
-                                None
-                            }
-                        };
-                        // Load `<layer>-catalogue-spec-signals.json` for the
-                        // T020 Cat-Spec column (ADR 2026-04-23-0344 §D2.5).
-                        // Opt-in gated; fail-closed on missing / symlinked /
-                        // malformed / stale — remediation is documented in
-                        // the error message (`sotp track catalogue-spec-signals
-                        // <track_id>`). Opt-out layers render the legacy
-                        // 5-column view (None).
-                        let v3_spec_signals_doc = if binding.catalogue_spec_signal_enabled() {
-                            let spec_path = track_dir.join(binding.catalogue_spec_signal_file());
-                            Some(
-                                type_catalogue_render::load_catalogue_spec_signals_for_view(
-                                    &spec_path,
-                                    catalogue_content.as_bytes(),
-                                )
-                                .map_err(|e| {
-                                    RenderError::Io(std::io::Error::other(e.to_string()))
-                                })?,
-                            )
-                        } else {
-                            None
-                        };
-                        let rendered = type_catalogue_render::render_type_catalogue_v3(
-                            &v3_doc,
-                            catalogue_file,
-                            v3_type_signals_opt.as_deref(),
-                            v3_spec_signals_doc.as_ref(),
-                        );
-                        let rendered_md_path = track_dir.join(binding.rendered_file());
-                        let old_md = match std::fs::read_to_string(&rendered_md_path) {
-                            Ok(content) => Some(content),
-                            Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-                            Err(e) => return Err(RenderError::Io(e)),
-                        };
-                        if old_md
-                            .as_deref()
-                            .is_none_or(|existing| !rendered_matches(existing, &rendered))
-                        {
-                            atomic_write_file(&rendered_md_path, rendered.as_bytes())?;
-                            changed.push(rendered_md_path);
+            }
+            Ok(false)
+        };
+        let has_type_catalogue_input = || -> Result<bool, RenderError> {
+            match load_type_bindings() {
+                Ok(bindings) => {
+                    for binding in &bindings {
+                        if catalogue_path_exists(&track_dir.join(binding.catalogue_file()))? {
+                            return Ok(true);
                         }
                     }
-                    Err(CatalogueDocumentCodecError::Json(ref e))
-                        if e.is_syntax() || e.is_eof() =>
-                    {
-                        // Warn and skip ONLY on true syntax/EOF errors — the file may be
-                        // mid-edit (e.g. unsaved buffer or in-flight write). Data errors
-                        // (missing required fields, wrong types — `e.is_data()`) indicate a
-                        // schema conformance violation and must fail closed per CN-11.
-                        eprintln!(
-                            "warning: skipping {} render for {} (malformed JSON — syntax error \
-                             at line {}, col {})",
-                            binding.rendered_file(),
-                            track_dir.display(),
-                            e.line(),
-                            e.column(),
-                        );
+                    Ok(false)
+                }
+                Err(_) => has_default_type_catalogue_input(),
+            }
+        };
+
+        match &branch_guard_result {
+            Ok(true) => {
+                // Branch matches — render configured type catalogues.
+                let bindings = load_type_bindings()?;
+
+                // Guard against duplicate rendered paths: `parse_tddd_layers` rejects
+                // duplicate `catalogue_file` values (exact string match), but two names
+                // like `"foo"` and `"foo.json"` both derive to `foo.md` via
+                // `.rendered_file()`. The duplicate check is placed AFTER the
+                // per-layer opt-out so that a layer whose catalogue file is absent
+                // does not consume the rendered-path slot and accidentally suppress
+                // a later layer whose catalogue file IS present.
+                let mut seen_rendered: std::collections::HashSet<String> =
+                    std::collections::HashSet::new();
+                for binding in &bindings {
+                    let catalogue_file = binding.catalogue_file();
+                    let catalogue_path = track_dir.join(catalogue_file);
+                    if !catalogue_path.is_file() {
+                        continue;
                     }
-                    Err(e) => {
-                        // Any other error (UnsupportedSchemaVersion, InvalidEntry,
-                        // CrateNameMismatch, or Json data/schema errors) is a hard error.
-                        // CN-11: non-v3 or structurally invalid catalogues must not render
-                        // silently.
-                        return Err(RenderError::Io(std::io::Error::other(format!(
-                            "catalogue {} in {}: {e}",
-                            catalogue_file,
+                    // Only check/reserve the rendered path slot after confirming
+                    // the catalogue file exists. This ensures an absent catalogue
+                    // does not block a later layer that shares the same rendered name.
+                    let rendered_name = binding.rendered_file();
+                    if !seen_rendered.insert(rendered_name.clone()) {
+                        eprintln!(
+                            "warning: skipping duplicate rendered path {} for {} (rendered path collision)",
+                            rendered_name,
                             track_dir.display()
-                        ))));
+                        );
+                        continue;
+                    }
+                    let catalogue_content = std::fs::read_to_string(&catalogue_path)?;
+                    // T025 / CN-11: v3-native rendering — all catalogues MUST be schema_version 3.
+                    // Decode directly with CatalogueDocumentCodec. A v2 (or other non-v3) catalogue
+                    // fails closed (hard error) rather than silently rendering stale v2 content.
+                    // Only JSON parse failures are treated as warn-and-skip (file may be mid-edit).
+                    let stem = catalogue_path
+                        .file_name()
+                        .and_then(|n| n.to_str())
+                        .and_then(|n| n.strip_suffix("-types.json"))
+                        .map(str::to_owned)
+                        .unwrap_or_else(|| {
+                            catalogue_path
+                                .file_stem()
+                                .and_then(|s| s.to_str())
+                                .unwrap_or("")
+                                .to_owned()
+                        });
+                    match CatalogueDocumentCodec::decode(&catalogue_content, &stem) {
+                        Ok(v3_doc) => {
+                            // Load `<layer>-type-signals.json` for the Signal column.
+                            // Non-fatal miss / stale hash falls back to `—` placeholders.
+                            // The authoritative fail-closed path for Missing/Stale lives in
+                            // `spec_states::evaluate_layer_catalogue`.
+                            let v3_signal_path = track_dir.join(binding.signal_file());
+                            // Use `symlink_metadata()` to detect symlinks: `is_file()` follows
+                            // symlinks, which would allow a crafted symlink to inject arbitrary
+                            // file contents. For the view renderer, symlinks fall back to `—`
+                            // (non-fatal miss).
+                            let v3_type_signals_opt: Option<Vec<domain::TypeSignal>> = {
+                                let is_plain = v3_signal_path
+                                    .symlink_metadata()
+                                    .is_ok_and(|m| m.file_type().is_file());
+                                if is_plain {
+                                    std::fs::read_to_string(&v3_signal_path).ok().and_then(|sj| {
+                                        type_signals_codec::decode(&sj).ok().and_then(|sd| {
+                                            let current = type_signals_codec::declaration_hash(
+                                                catalogue_content.as_bytes(),
+                                            );
+                                            if sd.declaration_hash() == current {
+                                                Some(sd.signals().to_vec())
+                                            } else {
+                                                eprintln!(
+                                                    "warning: ignoring stale {} for {} \
+                                                     (declaration_hash mismatch) — rendered \
+                                                     signal column will fall back to `—`",
+                                                    binding.signal_file(),
+                                                    track_dir.display()
+                                                );
+                                                None
+                                            }
+                                        })
+                                    })
+                                } else {
+                                    None
+                                }
+                            };
+                            // Load `<layer>-catalogue-spec-signals.json` for the
+                            // T020 Cat-Spec column (ADR 2026-04-23-0344 §D2.5).
+                            // Opt-in gated; fail-closed on missing / symlinked /
+                            // malformed / stale — remediation is documented in
+                            // the error message (`sotp track catalogue-spec-signals
+                            // <track_id>`). Opt-out layers render the legacy
+                            // 5-column view (None).
+                            let v3_spec_signals_doc = if binding.catalogue_spec_signal_enabled() {
+                                let spec_path =
+                                    track_dir.join(binding.catalogue_spec_signal_file());
+                                Some(
+                                    type_catalogue_render::load_catalogue_spec_signals_for_view(
+                                        &spec_path,
+                                        catalogue_content.as_bytes(),
+                                    )
+                                    .map_err(|e| {
+                                        RenderError::Io(std::io::Error::other(e.to_string()))
+                                    })?,
+                                )
+                            } else {
+                                None
+                            };
+                            let rendered = type_catalogue_render::render_type_catalogue_v3(
+                                &v3_doc,
+                                catalogue_file,
+                                v3_type_signals_opt.as_deref(),
+                                v3_spec_signals_doc.as_ref(),
+                            );
+                            let rendered_md_path = track_dir.join(binding.rendered_file());
+                            let old_md = match std::fs::read_to_string(&rendered_md_path) {
+                                Ok(content) => Some(content),
+                                Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+                                Err(e) => return Err(RenderError::Io(e)),
+                            };
+                            if old_md
+                                .as_deref()
+                                .is_none_or(|existing| !rendered_matches(existing, &rendered))
+                            {
+                                atomic_write_file(&rendered_md_path, rendered.as_bytes())?;
+                                changed.push(rendered_md_path);
+                            }
+                        }
+                        Err(CatalogueDocumentCodecError::Json(ref e))
+                            if e.is_syntax() || e.is_eof() =>
+                        {
+                            // Warn and skip ONLY on true syntax/EOF errors — the file may be
+                            // mid-edit (e.g. unsaved buffer or in-flight write). Data errors
+                            // (missing required fields, wrong types — `e.is_data()`) indicate a
+                            // schema conformance violation and must fail closed per CN-11.
+                            eprintln!(
+                                "warning: skipping {} render for {} (malformed JSON — syntax error \
+                                 at line {}, col {})",
+                                binding.rendered_file(),
+                                track_dir.display(),
+                                e.line(),
+                                e.column(),
+                            );
+                        }
+                        Err(e) => {
+                            // Any other error (UnsupportedSchemaVersion, InvalidEntry,
+                            // CrateNameMismatch, or Json data/schema errors) is a hard error.
+                            // CN-11: non-v3 or structurally invalid catalogues must not render
+                            // silently.
+                            return Err(RenderError::Io(std::io::Error::other(format!(
+                                "catalogue {} in {}: {e}",
+                                catalogue_file,
+                                track_dir.display()
+                            ))));
+                        }
                     }
                 }
             }
-        } // end if !is_done_or_archived
+            Ok(false) => {
+                // Branch mismatch protects type views by skipping their render.
+            }
+            Err(reason) => {
+                if has_type_catalogue_input()? {
+                    return Err(RenderError::InvalidTrackMetadata {
+                        path: metadata_path.clone(),
+                        reason: reason.clone(),
+                    });
+                }
+            }
+        }
 
-        // Render `contract-map.md` unconditionally (outside the done/archived
-        // guard) so the declaration relationship diagram stays fresh even after
-        // a track reaches `done`.  The `!is_done_or_archived` block protects
-        // frozen views whose content is strictly derived from the phase-2 type
-        // design artefacts (`spec.md`, `<layer>-types.md`).  `contract-map.md`
-        // is a *rendered graph* derived from all catalogue data and the
-        // implementation renderer — it must reflect the final post-implementation
-        // state, which may differ from the state captured while the track was
-        // still `in_progress`.
+        // Render `contract-map.md` unconditionally (outside the branch guard)
+        // so the declaration relationship diagram stays fresh regardless of
+        // track status or current branch.  The branch guard above protects
+        // spec.md and <layer>-types.md (frozen views derived from phase-2 type
+        // design artefacts).  `contract-map.md` is a *rendered graph* derived
+        // from all catalogue data and the implementation renderer — it must
+        // reflect the final post-implementation state, which may differ from the
+        // state captured while the track was still `in_progress`.
         //
         // Failure modes (loader error, empty catalogues, unknown layer)
         // are non-fatal: log to stderr and leave the existing file untouched.

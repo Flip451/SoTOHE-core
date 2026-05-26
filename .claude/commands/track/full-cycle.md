@@ -4,8 +4,7 @@ description: Run per-task implement → review → commit loop for the current t
 
 Canonical command for autonomous per-task implementation in the track workflow.
 
-Requires being on a `track/<id>` branch. If on `plan/<id>`, stop and suggest `/track:activate <id>`.
-If on any other branch, stop and suggest switching to the track branch.
+Requires being on a `track/<id>` branch. If on any other branch, stop and suggest switching to the correct track branch.
 
 ## Step 0 (required before any execution step): Build an execution plan
 

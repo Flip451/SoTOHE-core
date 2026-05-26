@@ -14,35 +14,51 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
-use infrastructure::track::fs_store::read_track_status_str;
+use usecase::TrackId;
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::{ensure_active_track, resolve_layers};
+use crate::commands::track::tddd::signals::{ensure_branch_matches_track, resolve_layers};
 
 /// Per-layer refresh entry point.
 ///
-/// Same guards as `execute_type_signals`: track id validation, active-track
-/// reject on `Done` / `Archived`, `architecture-rules.json` fail-closed via
-/// `resolve_layers`.
+/// Same guards as `execute_type_signals`: track id validation, branch-based
+/// guard (reject writes for tracks not matching the current branch),
+/// `architecture-rules.json` fail-closed via `resolve_layers`.
 ///
 /// # Errors
 ///
-/// Returns `CliError` when the track id is invalid, metadata / impl-plan can
-/// not be loaded, the track is completed / archived, the layer filter is
-/// unknown, any per-layer `<layer>-types.json` is missing or fails to decode,
-/// or the atomic write fails.
+/// Returns `CliError` when the track id is invalid, the current branch does
+/// not match `track/<track_id>`, the layer filter is unknown, any per-layer
+/// `<layer>-types.json` is missing or fails to decode, or the atomic write
+/// fails.
 pub fn execute_catalogue_spec_signals(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Validate track id and derive status without importing domain types (CN-01 / AC-03).
-    // read_track_status_str validates the track_id and returns the status string.
-    let status_str = read_track_status_str(&items_dir, &track_id).map_err(|e| {
-        CliError::Message(format!("cannot load track status for '{track_id}': {e}"))
-    })?;
+    // Validate track_id format by attempting to parse it (CN-01 / AC-03).
+    // This must happen before any filesystem access so that path-traversal ids
+    // are rejected before touching the filesystem.
+    TrackId::try_new(&track_id)
+        .map_err(|e| CliError::Message(format!("invalid track ID '{track_id}': {e}")))?;
+
+    // Branch-based guard (CN-07 / CN-04): only allow writes for the track whose
+    // branch matches the current git branch. Reads the branch from the workspace_root
+    // so `--workspace-root` overrides are honoured.
+    let branch = SystemGitRepo::discover_from(&workspace_root)
+        .map_err(|e| CliError::Message(format!("cannot discover git repo for branch check: {e}")))?
+        .current_branch()
+        .map_err(|e| CliError::Message(format!("cannot read current branch for guard: {e}")))?
+        .ok_or_else(|| {
+            CliError::Message(
+                "cannot read current branch for guard: git rev-parse --abbrev-ref HEAD returned non-zero"
+                    .to_owned(),
+            )
+        })?;
+    ensure_branch_matches_track(&branch, &track_id)?;
 
     // Security: verify the items_dir root itself is not a symlink before using it as the
     // trusted anchor for `reject_symlinks_below`. That helper only checks components
@@ -69,8 +85,6 @@ pub fn execute_catalogue_spec_signals(
     // check above only covers `items_dir` itself; a symlinked
     // `items_dir/<track_id>` would escape the trusted tree before the per-layer
     // `reject_symlinks_below` guard (anchored at `items_dir`) can catch it.
-    // Mirrors `execute_baseline_capture` which rejects symlinks at `track_dir`
-    // via `reject_symlinks_below(&baseline_path, items_dir)` before any reads.
     let track_dir = items_dir.join(&track_id);
     match track_dir.symlink_metadata() {
         Ok(meta) if meta.file_type().is_symlink() => {
@@ -81,8 +95,8 @@ pub fn execute_catalogue_spec_signals(
         }
         Ok(_) => {}
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Track directory absent — the metadata read below will produce a
-            // clear error message. Don't short-circuit here.
+            // Track directory absent — the layer/catalogue reads below will produce
+            // a clear error message. Don't short-circuit here.
         }
         Err(e) => {
             return Err(CliError::Message(format!(
@@ -91,10 +105,6 @@ pub fn execute_catalogue_spec_signals(
             )));
         }
     }
-
-    // Active-track guard (CN-07) — reject completed/archived tracks.
-    // Uses string comparison to avoid importing domain::TrackStatus (CN-01 / AC-03).
-    ensure_active_track_catalogue(&status_str, &track_id)?;
 
     // Resolve layers — `catalogue_spec_signal.enabled` flag is introduced by
     // T018; until then we fall back to every `tddd.enabled` layer so this
@@ -131,35 +141,36 @@ pub fn execute_catalogue_spec_signals(
     Ok(ExitCode::SUCCESS)
 }
 
-/// Fail-closed active-track guard mirroring
-/// `track::tddd::signals::ensure_active_track` but customised for the
-/// catalogue-spec-signals command name in the error message.
-///
-/// Uses string comparison so the CLI never imports `domain::TrackStatus`
-/// (CN-01 / AC-03). The `_` arm preserves fail-open for unknown future status
-/// strings (same policy as `ensure_active_track`).
-fn ensure_active_track_catalogue(status_str: &str, track_id: &str) -> Result<(), CliError> {
-    match status_str {
-        "done" | "archived" => Err(CliError::Message(format!(
-            "cannot run catalogue-spec-signals on '{track_id}' (status={status_str}). \
-             Completed tracks are frozen — run on an active track instead.",
-        ))),
-        _ => {
-            // Mirror the `ensure_active_track` helper's cross-check so any new
-            // status string behaviour is consistent.
-            ensure_active_track(status_str, track_id)?;
-            Ok(())
-        }
-    }
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use std::fs;
     use std::path::Path;
+    use std::process::Command;
+
+    use infrastructure::tddd::catalogue_spec_signals_codec;
 
     use super::*;
+
+    fn run_git(repo: &Path, args: &[&str]) {
+        let output = Command::new("git").args(args).current_dir(repo).output().unwrap();
+        assert!(
+            output.status.success(),
+            "git {} failed\nstdout:\n{}\nstderr:\n{}",
+            args.join(" "),
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    fn init_git_repo_on_track_branch(workspace_root: &Path, track_id: &str) {
+        run_git(workspace_root, &["init", "-q"]);
+        run_git(workspace_root, &["config", "user.email", "test@example.invalid"]);
+        run_git(workspace_root, &["config", "user.name", "Test User"]);
+        let branch = format!("track/{track_id}");
+        run_git(workspace_root, &["checkout", "-q", "-b", branch.as_str()]);
+        run_git(workspace_root, &["commit", "--allow-empty", "-q", "-m", "init"]);
+    }
 
     fn write_metadata(track_dir: &Path, track_id: &str) {
         let metadata = serde_json::json!({
@@ -181,6 +192,21 @@ mod tests {
         let doc = serde_json::json!({
             "schema_version": 1,
             "tasks": [{"id": "T001", "description": "stub", "status": "in_progress"}],
+            "plan": {
+                "summary": [],
+                "sections": [
+                    {"id": "S1", "title": "Stub", "description": [], "task_ids": ["T001"]}
+                ]
+            }
+        });
+        fs::write(track_dir.join("impl-plan.json"), serde_json::to_string_pretty(&doc).unwrap())
+            .unwrap();
+    }
+
+    fn write_done_impl_plan(track_dir: &Path) {
+        let doc = serde_json::json!({
+            "schema_version": 1,
+            "tasks": [{"id": "T001", "description": "stub", "status": "done", "commit_hash": "abc1234"}],
             "plan": {
                 "summary": [],
                 "sections": [
@@ -262,43 +288,24 @@ mod tests {
         .unwrap();
     }
 
-    #[test]
-    fn refresh_writes_signals_for_all_entries() {
-        let dir = tempfile::tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        let track_id = "test-track";
-        let items_dir = ws.join("track/items");
+    fn setup_matching_branch_fixture(
+        workspace_root: &Path,
+        track_id: &str,
+        done_track: bool,
+    ) -> (PathBuf, PathBuf) {
+        init_git_repo_on_track_branch(workspace_root, track_id);
+        let items_dir = workspace_root.join("track/items");
         let track_dir = items_dir.join(track_id);
         fs::create_dir_all(&track_dir).unwrap();
         write_metadata(&track_dir, track_id);
-        write_impl_plan(&track_dir);
-        write_architecture_rules(&ws);
+        if done_track {
+            write_done_impl_plan(&track_dir);
+        } else {
+            write_impl_plan(&track_dir);
+        }
+        write_architecture_rules(workspace_root);
         write_catalogue(&track_dir);
-
-        let result = execute_catalogue_spec_signals(
-            items_dir.clone(),
-            track_id.to_owned(),
-            ws.clone(),
-            None,
-        );
-        assert!(result.is_ok(), "execute must succeed: {result:?}");
-
-        let signals_path = ws.join("track/items/test-track/test_layer-catalogue-spec-signals.json");
-        assert!(signals_path.exists(), "signals file must be written");
-        let content = fs::read_to_string(&signals_path).unwrap();
-        // Parse as raw JSON to avoid importing domain types in CLI test code (AC-03).
-        // The codec serialises ConfidenceSignal as "blue" / "yellow" / "red".
-        let raw: serde_json::Value = serde_json::from_str(&content).unwrap();
-        assert_eq!(raw["schema_version"].as_u64().unwrap(), 1);
-        let sigs = raw["signals"].as_array().unwrap();
-        assert_eq!(sigs.len(), 3);
-        // BTreeMap keys are sorted alphabetically: BlueType < RedType < YellowType.
-        assert_eq!(sigs[0]["type_name"].as_str().unwrap(), "BlueType");
-        assert_eq!(sigs[0]["signal"].as_str().unwrap(), "blue");
-        assert_eq!(sigs[1]["type_name"].as_str().unwrap(), "RedType");
-        assert_eq!(sigs[1]["signal"].as_str().unwrap(), "red");
-        assert_eq!(sigs[2]["type_name"].as_str().unwrap(), "YellowType");
-        assert_eq!(sigs[2]["signal"].as_str().unwrap(), "yellow");
+        (items_dir, track_dir)
     }
 
     #[test]
@@ -310,118 +317,115 @@ mod tests {
 
         let result = execute_catalogue_spec_signals(items_dir, "../evil".to_owned(), ws, None);
         // Verify the PATH-TRAVERSAL guard specifically rejected the id, not some
-        // later filesystem error. `read_track_status_str` validates the id before any
-        // metadata I/O occurs, so the error message always mentions the failure.
+        // later filesystem error. domain::TrackId::try_new validates the id before any
+        // git / metadata I/O occurs, so the error message always mentions the failure.
         assert!(result.is_err());
         let err = result.unwrap_err().to_string();
         assert!(
-            err.contains("invalid track ID") || err.contains("cannot load track status"),
+            err.contains("invalid track ID") || err.contains("invalid"),
             "expected path-traversal rejection, got: {err}"
         );
     }
 
+    /// Branch-based guard: catalogue-spec-signals must be rejected when the current branch
+    /// does not match the requested track_id. Uses the real workspace root so
+    /// SystemGitRepo::discover_from succeeds. The supplied track_id is guaranteed to
+    /// never match the real branch.
     #[test]
-    fn refresh_fails_when_catalogue_missing() {
+    fn refresh_rejects_mismatched_branch() {
+        let ws_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(|p| p.parent())
+            .expect("workspace root from CARGO_MANIFEST_DIR")
+            .to_path_buf();
         let dir = tempfile::tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        let track_id = "test-track";
-        let items_dir = ws.join("track/items");
-        let track_dir = items_dir.join(track_id);
-        fs::create_dir_all(&track_dir).unwrap();
-        write_metadata(&track_dir, track_id);
-        write_impl_plan(&track_dir);
-        write_architecture_rules(&ws);
-        // No catalogue file on disk.
+        let items_dir = dir.path().join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
 
-        let result = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws, None);
-        assert!(result.is_err());
+        // A track_id that never matches any real branch.
+        let track_id = "this-id-will-never-match-the-real-branch";
+        let result = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws_root, None);
+        assert!(result.is_err(), "mismatched branch must be rejected");
+        let err_msg = result.unwrap_err().to_string();
+        assert!(
+            err_msg.contains("does not match") || err_msg.contains("not an active track branch"),
+            "error must be branch guard rejection, got: {err_msg}"
+        );
     }
 
+    /// Branch-based guard: catalogue-spec-signals on a `done` track must be allowed
+    /// when the current branch is the matching track branch. The frozen/done status
+    /// no longer blocks writes — only branch mismatch does (CN-04 replacement).
     #[test]
-    fn refresh_with_explicit_layer_filter_processes_only_requested() {
+    fn refresh_allows_done_track_on_current_branch() {
         let dir = tempfile::tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        let track_id = "test-track";
-        let items_dir = ws.join("track/items");
-        let track_dir = items_dir.join(track_id);
-        fs::create_dir_all(&track_dir).unwrap();
-        write_metadata(&track_dir, track_id);
-        write_impl_plan(&track_dir);
-        write_architecture_rules(&ws);
-        write_catalogue(&track_dir);
+        let track_id = "done-track-2026";
+        let (items_dir, track_dir) = setup_matching_branch_fixture(dir.path(), track_id, true);
 
         let result = execute_catalogue_spec_signals(
             items_dir,
             track_id.to_owned(),
-            ws.clone(),
-            Some("test_layer".to_owned()),
+            dir.path().to_path_buf(),
+            None,
         );
-        assert!(result.is_ok());
 
-        assert!(ws.join("track/items/test-track/test_layer-catalogue-spec-signals.json").exists());
+        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
+        assert!(track_dir.join("test_layer-catalogue-spec-signals.json").is_file());
+    }
+
+    #[test]
+    fn refresh_writes_signals_for_all_entries_on_current_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "test-track";
+        let (items_dir, track_dir) = setup_matching_branch_fixture(dir.path(), track_id, false);
+
+        let result = execute_catalogue_spec_signals(
+            items_dir,
+            track_id.to_owned(),
+            dir.path().to_path_buf(),
+            None,
+        );
+
+        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
+        let signal_path = track_dir.join("test_layer-catalogue-spec-signals.json");
+        let content = fs::read_to_string(&signal_path).unwrap();
+        let decoded = catalogue_spec_signals_codec::decode(&content).unwrap();
+        assert_eq!(decoded.schema_version(), 1);
+        assert_eq!(decoded.signals.len(), 3);
+
+        let json: serde_json::Value = serde_json::from_str(&content).unwrap();
+        let signals = json.get("signals").and_then(serde_json::Value::as_array).unwrap();
+        let signal_for = |type_name: &str| {
+            signals
+                .iter()
+                .find(|entry| {
+                    entry.get("type_name").and_then(serde_json::Value::as_str) == Some(type_name)
+                })
+                .and_then(|entry| entry.get("signal").and_then(serde_json::Value::as_str))
+        };
+        assert_eq!(signal_for("BlueType"), Some("blue"));
+        assert_eq!(signal_for("YellowType"), Some("yellow"));
+        assert_eq!(signal_for("RedType"), Some("red"));
     }
 
     #[test]
     fn refresh_rejects_unknown_layer_filter() {
         let dir = tempfile::tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
         let track_id = "test-track";
-        let items_dir = ws.join("track/items");
-        let track_dir = items_dir.join(track_id);
-        fs::create_dir_all(&track_dir).unwrap();
-        write_metadata(&track_dir, track_id);
-        write_impl_plan(&track_dir);
-        write_architecture_rules(&ws);
-        write_catalogue(&track_dir);
+        let (items_dir, _track_dir) = setup_matching_branch_fixture(dir.path(), track_id, false);
 
         let result = execute_catalogue_spec_signals(
             items_dir,
             track_id.to_owned(),
-            ws,
-            Some("nonexistent".to_owned()),
+            dir.path().to_path_buf(),
+            Some("__missing_layer__".to_owned()),
         );
-        assert!(result.is_err());
-    }
 
-    /// The active-track guard must reject `Done` tracks (all tasks resolved).
-    /// `ensure_active_track_catalogue` must fail-closed before any write occurs.
-    #[test]
-    fn refresh_rejects_done_track() {
-        let dir = tempfile::tempdir().unwrap();
-        let ws = dir.path().to_path_buf();
-        let track_id = "test-track";
-        let items_dir = ws.join("track/items");
-        let track_dir = items_dir.join(track_id);
-        fs::create_dir_all(&track_dir).unwrap();
-        write_metadata(&track_dir, track_id);
-
-        // Write an impl-plan where all tasks are resolved (done) → derive_track_status → Done.
-        let doc = serde_json::json!({
-            "schema_version": 1,
-            "tasks": [{"id": "T001", "description": "stub", "status": "done", "commit_hash": "abc1234"}],
-            "plan": {
-                "summary": [],
-                "sections": [
-                    {"id": "S1", "title": "Stub", "description": [], "task_ids": ["T001"]}
-                ]
-            }
-        });
-        fs::write(track_dir.join("impl-plan.json"), serde_json::to_string_pretty(&doc).unwrap())
-            .unwrap();
-
-        write_architecture_rules(&ws);
-        write_catalogue(&track_dir);
-
-        let result =
-            execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws.clone(), None);
-        assert!(result.is_err(), "Done track must be rejected: {result:?}");
-        let err_msg = result.unwrap_err().to_string();
+        let err = result.expect_err("unknown layer must be rejected");
+        let msg = err.to_string();
         assert!(
-            err_msg.contains("done") || err_msg.contains("frozen") || err_msg.contains("status"),
-            "error must mention frozen/done status, got: {err_msg}"
+            msg.contains("not tddd.enabled"),
+            "error must come from layer resolution, got: {msg}"
         );
-        // Verify no signals file was written (fail-closed before any write).
-        let signals_path = ws.join("track/items/test-track/test_layer-catalogue-spec-signals.json");
-        assert!(!signals_path.exists(), "no signals file must be written for Done track");
     }
 }

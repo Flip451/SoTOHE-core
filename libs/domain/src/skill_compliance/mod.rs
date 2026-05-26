@@ -46,15 +46,7 @@ impl ComplianceContext {
 // ---------------------------------------------------------------------------
 
 /// Known `/track:*` commands and their SKILL.md phase reminders.
-/// Ordered longest-first to avoid `/track:plan` matching `/track:plan-only`.
 const SKILL_COMMANDS: &[(&str, &[&str])] = &[
-    (
-        "/track:plan-only",
-        &[
-            "Phase 0-3: Same as /track:plan",
-            "Artifacts created on plan/<id> branch for PR review before activation",
-        ],
-    ),
     (
         "/track:plan",
         &[
@@ -105,7 +97,6 @@ const SKILL_COMMANDS: &[(&str, &[&str])] = &[
             "Attach git note after successful commit",
         ],
     ),
-    ("/track:activate", &["Materialize a planning-only track and switch to its track branch"]),
     ("/track:ci", &["Run cargo make ci for standard CI checks"]),
     ("/track:status", &["Show current track progress from registry.md and metadata.json"]),
     ("/track:archive", &["Archive a completed track, moving it out of active view"]),
@@ -116,8 +107,7 @@ const SKILL_COMMANDS: &[(&str, &[&str])] = &[
 
 /// Detects `/track:*` commands in the prompt and returns the one that
 /// appears earliest in the prompt. When multiple commands start at the
-/// same position, the longest match wins (e.g. `/track:plan-only` over
-/// `/track:plan`).
+/// same position, the longest match wins.
 #[must_use]
 pub fn detect_skill_command(prompt: &str) -> Option<SkillMatch> {
     let prompt_lower = prompt.to_lowercase();

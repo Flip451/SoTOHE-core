@@ -221,18 +221,16 @@ pub trait TrackBlobReader {
 ///
 /// # Behavior
 ///
-/// 1. Reject `plan/` branches (gate does not apply — they carry no code tasks).
-/// 2. Run [`validate_branch_ref`] on the branch name (fail-closed on dangerous
+/// 1. Run [`validate_branch_ref`] on the branch name (fail-closed on dangerous
 ///    characters — `..`, `@{`, `~`, `^`, `:`, whitespace, control chars).
-/// 3. Derive `track_id`: for `track/` branches, strip the prefix and validate
-///    the suffix against [`TrackId`] slug rules (fail-closed on empty suffix,
-///    uppercase letters, `//`, etc.); non-`track/` branches fall back to the
-///    full branch name as a best-effort passthrough.
-/// 4. Read `spec.json` via the reader:
+/// 2. Require a `track/` branch, then strip the prefix and validate the suffix
+///    against [`TrackId`] slug rules (fail-closed on empty suffix, uppercase
+///    letters, `//`, etc.).
+/// 3. Read `spec.json` via the reader:
 ///    - `Found(doc)` → delegate to [`check_spec_doc_signals`] with `strict=true`
 ///    - `NotFound` → BLOCKED (spec.json is required for every track)
 ///    - `FetchError` → BLOCKED
-/// 5. If Stage 1 passes, read `domain-types.json`:
+/// 4. If Stage 1 passes, read `domain-types.json`:
 ///    - `Found(doc)` → delegate to [`check_type_signals`] with `strict=true`
 ///    - `NotFound` → skip (TDDD opt-in)
 ///    - `FetchError` → BLOCKED
@@ -243,34 +241,27 @@ pub fn check_strict_merge_gate<R>(branch: &str, reader: &R) -> VerifyOutcome
 where
     R: TrackBlobReader + SpecElementHashReader,
 {
-    // 1. plan/ branches skip the gate entirely (D6)
-    if branch.starts_with("plan/") {
-        return VerifyOutcome::pass();
-    }
-
-    // 2. Branch-name validation (D4.2, D5.2)
+    // 1. Branch-name validation (D4.2, D5.2)
     if let Err(err) = validate_branch_ref(branch) {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "invalid branch ref: {err}"
         ))]);
     }
 
-    // 3. Derive and validate track_id (fail-closed on malformed track/ suffix).
-    //    For track/ branches, the suffix must be a valid TrackId slug (lowercase,
-    //    digits, hyphens; non-empty; no consecutive hyphens; no trailing hyphen).
-    //    Non-track/ branches fall back to the full branch name (best-effort passthrough).
-    let track_id = if let Some(suffix) = branch.strip_prefix("track/") {
-        if let Err(err) = TrackId::try_new(suffix) {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "invalid track id derived from branch '{branch}': {err}"
-            ))]);
-        }
-        suffix
-    } else {
-        branch
+    // 2. Derive and validate track_id (fail-closed on non-track branches or a
+    //    malformed track/ suffix).
+    let Some(track_id) = branch.strip_prefix("track/") else {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "strict merge gate requires a track/<id> branch (current: {branch})"
+        ))]);
     };
+    if let Err(err) = TrackId::try_new(track_id) {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "invalid track id derived from branch '{branch}': {err}"
+        ))]);
+    }
 
-    // 4. Stage 1: spec.json is required (D5.2).
+    // 3. Stage 1: spec.json is required (D5.2).
     let spec_doc = match reader.read_spec_document(branch, track_id) {
         BlobFetchResult::Found(doc) => doc,
         BlobFetchResult::NotFound => {
@@ -290,7 +281,7 @@ where
         return stage1;
     }
 
-    // 5. Stage 2: multi-layer TDDD gate — loop every `tddd.enabled` layer
+    // 4. Stage 2: multi-layer TDDD gate — loop every `tddd.enabled` layer
     //    read from `architecture-rules.json` on the PR branch blob.
     //    For each layer:
     //      - NotFound → TDDD opt-out for that layer (no finding)
@@ -1131,18 +1122,6 @@ mod tests {
     }
 
     #[test]
-    fn test_u15_plan_branch_passes_without_reading() {
-        // U15: plan/ branch → PASS (D6 skip)
-        let reader = MockTrackBlobReader::new(
-            BlobFetchResult::FetchError("spec must not be read for plan/ branch".to_owned()),
-            BlobFetchResult::FetchError("dt must not be read".to_owned()),
-        );
-        let outcome = check_strict_merge_gate("plan/dummy", &reader);
-        assert!(!outcome.has_errors());
-        assert!(outcome.findings().is_empty());
-    }
-
-    #[test]
     fn test_u16_branch_with_double_dot_blocks() {
         // U16: branch contains `..` → validate_branch_ref rejects
         let reader = MockTrackBlobReader::new(
@@ -1216,17 +1195,17 @@ mod tests {
     }
 
     #[test]
-    fn test_port_contract_non_track_branch_passed_as_is() {
-        // A branch without "track/" prefix: track_id falls back to the full branch name.
+    fn test_non_track_branch_blocks_without_reading() {
         let reader = RecordingTrackBlobReader::new(BlobFetchResult::Found(all_blue_spec()));
-        let _ = check_strict_merge_gate("feature/no-prefix", &reader);
+        let outcome = check_strict_merge_gate("plan/no-prefix", &reader);
 
-        assert_eq!(reader.recorded_spec_branch.borrow().as_deref(), Some("feature/no-prefix"),);
-        // strip_prefix("track/") returns None → falls back to the full branch
-        assert_eq!(reader.recorded_spec_track_id.borrow().as_deref(), Some("feature/no-prefix"),);
+        assert!(outcome.has_errors());
+        assert!(outcome.findings().iter().any(|f| f.message().contains("track/<id> branch")));
+        assert_eq!(reader.recorded_spec_branch.borrow().as_deref(), None);
+        assert_eq!(reader.recorded_spec_track_id.borrow().as_deref(), None);
     }
 
-    // --- Track-id validation (step 3) ---
+    // --- Track-id validation (step 2) ---
 
     #[test]
     fn test_track_bare_suffix_empty_blocks() {

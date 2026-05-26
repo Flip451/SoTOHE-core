@@ -52,19 +52,14 @@ START_HERE_HUMAN.md
 
 ```mermaid
 flowchart TD
-    A["/track:catchup"] --> B{計画方法を選ぶ}
-    B -->|"標準"| P1["/track:plan &lt;feature&gt;"]
-    B -->|"計画だけ先に"| P2["/track:plan-only &lt;feature&gt;"]
-    P1 --> PR{"計画をレビューする?"}
+    A["/track:catchup"] --> B["/track:plan &lt;feature&gt;"]
+    B --> PR{"計画をレビューする?"}
     PR -->|Yes| R1["/track:review（計画レビュー）"]
     R1 --> PC{"計画をコミットする?"}
     PR -->|No| PC
     PC -->|Yes| R1C["/track:commit（計画 artifact）"]
     R1C --> IMPL{実装方法を選ぶ}
     PC -->|No| IMPL
-    P2 --> PM["plan/&lt;id&gt; で PR → main にマージ"]
-    PM --> ACT["/track:activate &lt;track-id&gt;"]
-    ACT --> IMPL
     DS["(任意) /track:type-design"] -.->|"TDDD: 型宣言"| IMPL
     IMPL -->|"対話型"| F["/track:implement"]
     IMPL -->|"自律型"| FC["/track:full-cycle &lt;task&gt;"]
@@ -100,8 +95,6 @@ flowchart TD
 | `/track:revert` | 直近変更の安全な取り消し計画 | 変更を戻す前に影響を整理したい時 |
 | `/track:ci` | 品質ゲート一括実行 | レビュー前・コミット前 |
 | `/track:commit <message>` | ガード付きコミット + 必要時の note 適用 | ユーザー向けの正規コミット経路として使う時 |
-| `/track:plan-only <feature>` | `plan/<id>` ブランチで計画のみ作成 | 計画を PR 経由でレビューしてから main に合流させたい時 |
-| `/track:activate <track-id>` | planning-only track を activate し track branch を作成 | plan-only で作成した計画を実装フェーズへ移行する時 |
 | `/track:archive <id>` | 完了トラックをアーカイブ | 完了済みトラックをレジストリから整理したい時 |
 | `/track:pr` | ブランチ push + PR 作成（既存 PR は再利用） | コミット後に PR を作りたい時 |
 | `/track:merge <pr>` | CI 待ち → PR マージ | PR の CI が通ったらマージしたい時 |
@@ -193,13 +186,6 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
    - 各 phase 完了後に成果物を実物でユーザーへ提示して事後レビュー（事前承認ではなく事後確認）
    - `cargo make ci` は `verify-track-metadata` と `verify-tech-stack` を通して track 状態と tech-stack の整合を検証する
    - そのため、tech stack 未確定のままサンプルトラックをテンプレートへ残してはいけない
-
-   **plan-only 代替レーン**: 計画を実装とは別のブランチでレビューしたい場合は次の手順を使う。
-   - `[Claude Code]` `/track:plan-only <feature>`: `plan/<id>` ブランチを作成し、計画 artifacts を作成（`status: planned`、`branch: null`）
-   - `[Terminal/GitHub]` `plan/<id>` ブランチを push して PR を作成、計画をレビュー
-   - `[GitHub]` PR マージ → 計画 artifacts が main に合流
-   - `[Claude Code]` `/track:activate <track-id>`: `track/<id>` 実装ブランチを作成して実装フェーズへ移行
-   - activate 後は標準フローのステップ 4b 以降で進める
 
 3. (任意) `[Claude Code]` `/track:review`
    - 計画 artifact のレビューを実行する

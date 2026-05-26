@@ -828,16 +828,6 @@ description = "[wrapper] Materialize branch metadata if needed, then switch to a
 command = "bin/sotp"
 args = ["make", "track-branch-switch", "${@}"]
 
-[tasks.track-activate]
-description = "[wrapper] Materialize a planning-only track and switch to its track branch (usage: cargo make track-activate '<track-id>')"
-command = "bin/sotp"
-args = ["make", "track-activate", "${@}"]
-
-[tasks.track-plan-branch]
-description = "[wrapper] Create a plan/<track-id> branch from main for planning-only review (usage: cargo make track-plan-branch '<track-id>')"
-command = "bin/sotp"
-args = ["make", "track-plan-branch", "${@}"]
-
 [tasks.track-resolve]
 description = "[wrapper] Resolve current track phase, next command, and blocker"
 command = "bin/sotp"

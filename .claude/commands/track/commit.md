@@ -42,7 +42,7 @@ Before committing:
    - `track/items/<id>/`
    - `track/tech-stack.md`
    - `knowledge/DESIGN.md`
-   If staged changes exceed that allowlist, stop and require `/track:activate <track-id>` first.
+   If staged changes exceed that allowlist, stop and report the issue.
    Note: `track/registry.md` is gitignored and never committed — it is excluded from this allowlist.
 
 ## Step 2: Guarded commit

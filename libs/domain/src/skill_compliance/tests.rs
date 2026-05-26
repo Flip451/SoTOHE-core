@@ -42,13 +42,6 @@ fn test_detect_skill_command_case_insensitive() {
 }
 
 #[test]
-fn test_detect_skill_command_plan_only() {
-    let result = detect_skill_command("/track:plan-only my-feature");
-    assert!(result.is_some());
-    assert_eq!(result.unwrap().command, "/track:plan-only");
-}
-
-#[test]
 fn test_detect_skill_command_full_cycle() {
     let result = detect_skill_command("/track:full-cycle T01");
     assert!(result.is_some());
@@ -60,13 +53,6 @@ fn test_detect_skill_command_earliest_in_prompt_wins() {
     let result = detect_skill_command("do /track:review then /track:implement");
     assert!(result.is_some());
     assert_eq!(result.unwrap().command, "/track:review");
-}
-
-#[test]
-fn test_detect_skill_command_longest_match_at_same_position() {
-    let result = detect_skill_command("/track:plan-only my-feature");
-    assert!(result.is_some());
-    assert_eq!(result.unwrap().command, "/track:plan-only");
 }
 
 #[test]

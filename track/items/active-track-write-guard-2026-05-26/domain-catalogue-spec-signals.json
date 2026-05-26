@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "be3996314b37eacdf64b1ccbb9c9f93ddb2f03a3516a304510dbf4e9491c0e35",
+  "signals": [
+    {
+      "type_name": "NextCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackPhase",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::track_phase::next_command",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::track_phase::resolve_phase",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::track_phase::resolve_phase_from_record",
+      "signal": "blue"
+    }
+  ]
+}

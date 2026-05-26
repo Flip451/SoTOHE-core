@@ -283,8 +283,6 @@ class MakeWrappersTest(unittest.TestCase):
         for task_header, task_name in (
             ("[tasks.track-branch-create]", "track-branch-create"),
             ("[tasks.track-branch-switch]", "track-branch-switch"),
-            ("[tasks.track-activate]", "track-activate"),
-            ("[tasks.track-plan-branch]", "track-plan-branch"),
             ("[tasks.track-resolve]", "track-resolve"),
         ):
             with self.subTest(task=task_header):

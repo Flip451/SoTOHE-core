@@ -218,13 +218,6 @@ pub trait TaskOperationService: Send + Sync {
 pub(crate) type BranchReaderFn =
     Arc<dyn Fn(&std::path::Path) -> Result<String, String> + Send + Sync>;
 
-/// Port type for reading the `schema_version` of a track from `metadata.json`.
-///
-/// Receives `(items_dir: &Path, track_id: &str)` and returns the schema version
-/// as `u32`, or an error string.
-pub(crate) type TaskSchemaVersionReaderFn =
-    Arc<dyn Fn(&std::path::Path, &str) -> Result<u32, String> + Send + Sync>;
-
 // ── TaskOperationInteractor ───────────────────────────────────────────────────
 
 /// Concrete struct implementing [`TaskOperationService`].
@@ -243,18 +236,12 @@ pub(crate) type TaskSchemaVersionReaderFn =
 /// The injected `branch_reader` closure (supplied at construction time) reads
 /// the current branch without importing an infrastructure type; branch detection
 /// stays outside the usecase layer (hexagonal boundary preserved).
-///
-/// Branchless-activation guard enforcement: `schema_version` is fixed at
-/// construction time and checked before any state mutation to prevent
-/// transitioning planning-only tracks (schema v3–5, no branch) to
-/// implementation statuses before activation.
 pub struct TaskOperationInteractor<S>
 where
     S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync,
 {
     store: Arc<S>,
     branch_reader: Option<BranchReaderFn>,
-    schema_version_reader: Option<TaskSchemaVersionReaderFn>,
 }
 
 impl<S> TaskOperationInteractor<S>
@@ -270,12 +257,8 @@ where
     /// expected branch, returning [`TaskOperationError::BranchGuardFailed`] or
     /// [`TaskOperationError::BranchlessGuardFailed`] on mismatch.
     ///
-    /// The CLI composition root (T011) supplies the real `git rev-parse` reader;
+    /// The CLI composition root supplies the real `git rev-parse` reader;
     /// tests supply a stub closure.
-    ///
-    /// The branchless-activation guard uses `schema_version`: when the value is
-    /// in `3..=5`, branchless tracks are treated as planning-only and transitions
-    /// to `in_progress`, `done`, or `skipped` are rejected before activation.
     ///
     /// # Errors
     ///
@@ -283,17 +266,11 @@ where
     /// branch cannot be determined; the error is surfaced as
     /// [`TaskOperationError::BranchGuardFailed`].
     #[must_use]
-    pub fn new<F>(store: Arc<S>, schema_version: u32, branch_reader: F) -> Self
+    pub fn new<F>(store: Arc<S>, branch_reader: F) -> Self
     where
         F: Fn(&std::path::Path) -> Result<String, String> + Send + Sync + 'static,
     {
-        let schema_reader: TaskSchemaVersionReaderFn =
-            Arc::new(move |_path, _id| Ok(schema_version));
-        Self {
-            store,
-            branch_reader: Some(Arc::new(branch_reader)),
-            schema_version_reader: Some(schema_reader),
-        }
+        Self { store, branch_reader: Some(Arc::new(branch_reader)) }
     }
 
     /// Test-only constructor with an injected `BranchReaderFn` arc.
@@ -303,7 +280,7 @@ where
     #[cfg(test)]
     #[must_use]
     pub(crate) fn with_branch_reader(store: Arc<S>, branch_reader: BranchReaderFn) -> Self {
-        Self { store, branch_reader: Some(branch_reader), schema_version_reader: None }
+        Self { store, branch_reader: Some(branch_reader) }
     }
 }
 
@@ -392,20 +369,6 @@ where
             .map(CommitHash::try_new)
             .transpose()
             .map_err(|e| TaskOperationError::InvalidCommitHash(e.to_string()))?;
-
-        // Branchless-activation guard: prevent transitioning planning-only tracks
-        // (schema v3–5, no branch) to implementation statuses before activation.
-        if let Some(reader) = &self.schema_version_reader {
-            let schema_version = reader(&cmd.items_dir, cmd.track_id.as_str())
-                .map_err(|e| TaskOperationError::StoreFailed(format!("schema version: {e}")))?;
-            crate::track_resolution::reject_branchless_guard(
-                &*self.store,
-                &track_id,
-                &cmd.target_status,
-                schema_version,
-            )
-            .map_err(|e| TaskOperationError::BranchGuardFailed(e.to_string()))?;
-        }
 
         // Enforce branch guard before mutating state.
         enforce_branch_guard(
@@ -851,7 +814,7 @@ mod tests {
         store.impl_plans.lock().unwrap().insert(track.id().clone(), plan);
 
         // Inject a stub that returns the expected branch — guard passes.
-        let interactor = TaskOperationInteractor::new(Arc::clone(&store), 5, |_| {
+        let interactor = TaskOperationInteractor::new(Arc::clone(&store), |_| {
             Ok("track/my-track-2026".to_owned())
         });
         let cmd = TaskTransitionCommand {
@@ -886,7 +849,7 @@ mod tests {
 
         // Inject a reader that returns a mismatched branch.
         let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), 5, |_| Ok("main".to_owned()));
+            TaskOperationInteractor::new(Arc::clone(&store), |_| Ok("main".to_owned()));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -919,7 +882,7 @@ mod tests {
         // No impl-plan: branch guard fires before the domain call.
 
         let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), 5, |_| Ok("HEAD".to_owned()));
+            TaskOperationInteractor::new(Arc::clone(&store), |_| Ok("HEAD".to_owned()));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
@@ -939,8 +902,7 @@ mod tests {
     fn task_operation_error_invalid_track_id_returns_error() {
         let store = Arc::new(StubStore::default());
         // Branch reader is never called: track_id validation fires first.
-        let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), 5, |_| Ok("any".to_owned()));
+        let interactor = TaskOperationInteractor::new(Arc::clone(&store), |_| Ok("any".to_owned()));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: String::new(),
@@ -1012,34 +974,6 @@ mod tests {
         };
         let out = interactor.transition_task(cmd).unwrap();
         assert_eq!(out.track_id, "my-track-2026");
-    }
-
-    #[test]
-    fn task_operation_new_schema_v3_to_5_branchless_track_rejects_in_progress() {
-        // Verify the production constructor new() enforces the branchless activation
-        // guard: a branchless track with schema_version in 3..=5 must not be
-        // transitioned to `in_progress` before activation.
-        let store = Arc::new(StubStore::default());
-        let track = sample_track(); // branchless by construction
-        store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
-        // No impl-plan: the activation guard fires before domain state reads.
-
-        // schema_version = 4 (planning-only, in 3..=5) + no branch → guard must reject.
-        let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), 4, |_| Ok("any-branch".to_owned()));
-        let cmd = TaskTransitionCommand {
-            items_dir: PathBuf::new(),
-            track_id: "my-track-2026".to_owned(),
-            task_id: "T001".to_owned(),
-            target_status: "in_progress".to_owned(),
-            commit_hash: None,
-            skip_branch_check: true, // branch guard irrelevant; testing activation guard
-        };
-        let err = interactor.transition_task(cmd).unwrap_err();
-        assert!(
-            matches!(err, TaskOperationError::BranchGuardFailed(_)),
-            "expected BranchGuardFailed for schema v4 branchless transition, got: {err}"
-        );
     }
 
     #[test]

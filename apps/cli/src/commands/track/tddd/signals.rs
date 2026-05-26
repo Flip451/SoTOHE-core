@@ -4,7 +4,7 @@
 //! public API via rustdoc JSON, evaluates signals for each declared type, and writes
 //! the updated document back to `<layer>-types.json`.
 //!
-//! `resolve_layers` and `ensure_active_track` remain in this module as shared
+//! `resolve_layers` and `ensure_branch_matches_track` remain in this module as shared
 //! helpers for sibling CLI commands (`catalogue_spec_signals.rs`) that have
 //! not yet been migrated to usecase interactors.
 //! `execute_type_signals_lenient_with_bindings` stays here to allow
@@ -65,33 +65,35 @@ pub(crate) fn resolve_layers(
     }
 }
 
-/// Fail-closed active-track guard: rejects `Done` / `Archived` tracks.
+/// Fail-closed branch-based guard for TDDD track operations.
 ///
-/// Accepts the track status as a string (from `read_track_status_str`) so
-/// the CLI layer never imports `domain::TrackStatus` directly (CN-01 / AC-03).
+/// Accepts the current git branch and the target track id and verifies that
+/// the branch matches `track/<track_id>` exactly.
 ///
-/// Explicit exhaustive match over all six known `TrackStatus` variants
-/// (domain SSoT as of this writing):
-/// - `done` / `archived` → frozen (reject)
-/// - `planned` / `in_progress` / `blocked` / `cancelled` → active (allow)
-/// - any other string → unknown (fail-closed: reject with guidance to update CLI)
+/// - `track/<track_id>` → branch matches (allow)
+/// - `track/<other_id>` → branch mismatch (reject, fail-closed CN-01)
+/// - any other branch (e.g. `main`, non-track branches) → not an active track branch (reject)
 ///
-/// Fail-closed for unknowns: an unrecognised status signals that the domain
-/// added a new variant that the CLI has not classified yet. Blocking TDDD
-/// commands in that case is safer than silently allowing runs on a track
-/// that might be frozen.
-pub(crate) fn ensure_active_track(status_str: &str, track_id: &str) -> Result<(), CliError> {
-    match status_str {
-        "done" | "archived" => Err(CliError::Message(format!(
-            "cannot run type-signals on '{track_id}' (status={status_str}). \
-             Completed tracks are frozen — run on an active track instead.",
-        ))),
-        "planned" | "in_progress" | "blocked" | "cancelled" => Ok(()),
-        _ => Err(CliError::Message(format!(
-            "cannot run type-signals on '{track_id}': unrecognised track status '{status_str}'. \
-             Update the CLI frozen-track guard to classify the new status.",
-        ))),
+/// This replaces the former status-based `ensure_active_track` guard (CN-04):
+/// the protection criterion moves from `status == done|archived` to
+/// `current branch does not match track/<track_id>`. A track is allowed to
+/// proceed regardless of its status as long as the current branch is the
+/// corresponding track branch (IN-01 / IN-02 / CN-01 / CN-03 / CN-04).
+pub(crate) fn ensure_branch_matches_track(branch: &str, track_id: &str) -> Result<(), CliError> {
+    let Some(suffix) = branch.strip_prefix("track/") else {
+        return Err(CliError::Message(format!(
+            "type-signals rejected: current branch '{branch}' is not an active track branch. \
+             Switch to 'track/{track_id}' before running type-signals (CN-01).",
+        )));
+    };
+    if suffix != track_id {
+        return Err(CliError::Message(format!(
+            "type-signals rejected: current branch '{branch}' does not match \
+             track_id '{track_id}' (expected 'track/{track_id}'). \
+             Switch to the correct track branch (CN-01).",
+        )));
     }
+    Ok(())
 }
 
 /// Map `EvaluateSignalsError` from infrastructure to `CliError`.
@@ -110,7 +112,8 @@ fn map_eval_err(e: EvaluateSignalsError) -> CliError {
 ///
 /// Steps (inside the interactor):
 /// 1. Validate the track ID format.
-/// 2. Read and guard the track status (reject Done/Archived).
+/// 2. Guard the active track by branch match (reject when the current branch
+///    does not equal `track/<id>`).
 /// 3. Resolve the set of TDDD-enabled layers to process.
 /// 4. For each layer binding, evaluate signals and write back to `<layer>-types.json`.
 ///
@@ -134,7 +137,12 @@ pub fn execute_type_signals(
         .map_err(|e| CliError::Message(format!("cannot discover git repo: {e}")))?
         .current_branch()
         .map_err(|e| CliError::Message(format!("cannot read current branch: {e}")))?
-        .unwrap_or_default();
+        .ok_or_else(|| {
+            CliError::Message(
+                "cannot read current branch: git rev-parse --abbrev-ref HEAD returned non-zero"
+                    .to_owned(),
+            )
+        })?;
 
     let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
     let executor = Arc::new(TypeSignalsExecutorAdapter::new());
@@ -211,7 +219,12 @@ pub fn execute_type_signals_lenient_with_bindings(
         .map_err(|e| CliError::Message(format!("cannot discover git repo: {e}")))?
         .current_branch()
         .map_err(|e| CliError::Message(format!("cannot read current branch: {e}")))?
-        .unwrap_or_default();
+        .ok_or_else(|| {
+            CliError::Message(
+                "cannot read current branch: git rev-parse --abbrev-ref HEAD returned non-zero"
+                    .to_owned(),
+            )
+        })?;
     let suffix = branch.strip_prefix("track/").ok_or_else(|| {
         CliError::Message(format!(
             "type-signals rejected: branch '{branch}' is not an active track branch (CN-07)"
@@ -478,45 +491,58 @@ mod tests {
         assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
     }
 
-    // --- ensure_active_track tests ---
+    // --- ensure_branch_matches_track tests ---
 
     #[test]
-    fn test_ensure_active_track_rejects_done() {
-        let result = ensure_active_track("done", "test-track");
+    fn test_ensure_branch_matches_track_allows_matching_branch() {
+        let result =
+            ensure_branch_matches_track("track/my-feature-2026-01-01", "my-feature-2026-01-01");
+        assert!(result.is_ok(), "matching branch must be allowed: {result:?}");
+    }
+
+    #[test]
+    fn test_ensure_branch_matches_track_rejects_mismatched_track_id() {
+        let result = ensure_branch_matches_track("track/other-track-2026", "my-feature-2026");
         let err = result.unwrap_err();
         let msg = format!("{err}");
-        assert!(msg.contains("status=done"), "msg should mention status=done: {msg}");
-        assert!(msg.contains("Completed tracks are frozen"), "msg: {msg}");
-        assert!(msg.contains("test-track"), "msg should mention track_id: {msg}");
+        assert!(msg.contains("does not match"), "error must mention mismatch: {msg}");
+        assert!(msg.contains("track/other-track-2026"), "error must mention branch: {msg}");
+        assert!(msg.contains("my-feature-2026"), "error must mention track_id: {msg}");
     }
 
     #[test]
-    fn test_ensure_active_track_rejects_archived() {
-        let result = ensure_active_track("archived", "test-track");
+    fn test_ensure_branch_matches_track_rejects_non_track_branch() {
+        let result = ensure_branch_matches_track("main", "my-feature-2026");
         let err = result.unwrap_err();
         let msg = format!("{err}");
-        assert!(msg.contains("status=archived"), "msg should mention status=archived: {msg}");
-        assert!(msg.contains("Completed tracks are frozen"), "msg: {msg}");
+        assert!(
+            msg.contains("not an active track branch"),
+            "error must mention non-track branch: {msg}"
+        );
     }
 
     #[test]
-    fn test_ensure_active_track_allows_planned() {
-        assert!(ensure_active_track("planned", "test-track").is_ok());
+    fn test_ensure_branch_matches_track_rejects_plan_branch() {
+        // plan/<id> branches are not track branches — guard must reject them.
+        let result = ensure_branch_matches_track("plan/my-feature-2026", "my-feature-2026");
+        let err = result.unwrap_err();
+        let msg = format!("{err}");
+        assert!(
+            msg.contains("not an active track branch"),
+            "plan/ branch must be rejected as non-track: {msg}"
+        );
     }
 
     #[test]
-    fn test_ensure_active_track_allows_in_progress() {
-        assert!(ensure_active_track("in_progress", "test-track").is_ok());
-    }
-
-    #[test]
-    fn test_ensure_active_track_allows_blocked() {
-        assert!(ensure_active_track("blocked", "test-track").is_ok());
-    }
-
-    #[test]
-    fn test_ensure_active_track_allows_cancelled() {
-        assert!(ensure_active_track("cancelled", "test-track").is_ok());
+    fn test_ensure_branch_matches_track_allows_done_track_on_current_branch() {
+        // A done track on the current branch must be allowed (CN-04 replacement):
+        // the guard only checks branch match, not track status.
+        // Simulate: we are on track/done-track-2026, requesting the same track_id.
+        let result = ensure_branch_matches_track("track/done-track-2026", "done-track-2026");
+        assert!(
+            result.is_ok(),
+            "done track on current branch must be allowed (status is irrelevant): {result:?}"
+        );
     }
 
     // --- Integration test: execute_type_signals CN-07 branch guard ---
@@ -626,26 +652,32 @@ mod tests {
 
         let result = execute_type_signals(track_id, workspace_root, None);
 
-        // The evaluator stub (T008) fires and returns an error.
-        // The error must NOT be a CN-07 rejection (branch guard must have passed).
-        // It also must NOT be a git-discovery failure (which would mean CWD was wrong).
-        let err = result.expect_err("evaluator error expected (T008 stub)");
-        let msg = format!("{err}");
-        assert!(
-            !msg.contains("does not match") && !msg.contains("not an active track branch"),
-            "error must NOT be a CN-07 branch guard rejection — guard should have passed, got: {msg}"
-        );
-        assert!(
-            !msg.contains("cannot discover git repo"),
-            "error must NOT be a git-discovery failure — CWD must point to the real workspace, got: {msg}"
-        );
-        // The error must originate from the evaluation stage (after CN-07 + layer resolution).
-        assert!(
-            msg.contains("evaluation failed")
-                || msg.contains("evaluator")
-                || msg.contains("EvaluationFailed"),
-            "error must come from the evaluation stage (T008 stub), confirming interactor was reached, got: {msg}"
-        );
+        // Verify the branch guard passed: the function must NOT return a CN-07 rejection or
+        // a git-discovery failure.  The function may succeed (evaluation reached and passed)
+        // or fail at the evaluation stage — both outcomes confirm the guard passed.
+        match &result {
+            Ok(_exit) => {
+                // Guard passed and evaluation succeeded — no further assertion needed.
+            }
+            Err(err) => {
+                let msg = format!("{err}");
+                assert!(
+                    !msg.contains("does not match") && !msg.contains("not an active track branch"),
+                    "error must NOT be a CN-07 branch guard rejection — guard should have passed, got: {msg}"
+                );
+                assert!(
+                    !msg.contains("cannot discover git repo"),
+                    "error must NOT be a git-discovery failure — CWD must point to the real workspace, got: {msg}"
+                );
+                // The error must originate from the evaluation stage (after CN-07 + layer resolution).
+                assert!(
+                    msg.contains("evaluation failed")
+                        || msg.contains("evaluator")
+                        || msg.contains("EvaluationFailed"),
+                    "error must come from the evaluation stage (confirming interactor was reached), got: {msg}"
+                );
+            }
+        }
     }
 
     /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.

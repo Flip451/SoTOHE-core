@@ -8,12 +8,15 @@
 use std::process::ExitCode;
 
 use clap::{Args, ValueEnum};
+use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 use infrastructure::tddd::type_signals_codec;
 use infrastructure::track::symlink_guard;
 use infrastructure::verify::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::execute_type_signals_lenient_with_bindings;
+use crate::commands::track::tddd::signals::{
+    ensure_branch_matches_track, execute_type_signals_lenient_with_bindings,
+};
 
 /// Arguments for `sotp make <task> [args...]`.
 #[derive(Args)]
@@ -46,10 +49,6 @@ pub enum MakeTask {
     TrackBranchCreate,
     /// Switch to an existing track branch.
     TrackBranchSwitch,
-    /// Materialize a planning-only track and switch to its branch.
-    TrackActivate,
-    /// Create a plan/<track-id> branch from main.
-    TrackPlanBranch,
     /// Resolve current track phase.
     TrackResolve,
     /// Push current track/plan branch to origin.
@@ -158,7 +157,6 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
     match args.task {
         MakeTask::TrackBranchCreate => dispatch_track_branch_create(&args.raw_args),
         MakeTask::TrackBranchSwitch => dispatch_track_branch_switch(&args.raw_args),
-        MakeTask::TrackActivate => dispatch_track_activate(&args.raw_args),
         MakeTask::AddAll => dispatch_add_all(),
         MakeTask::Unstage => dispatch_unstage(&args.raw_args),
         MakeTask::TrackAddPaths => dispatch_track_add_paths(),
@@ -181,7 +179,6 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
         MakeTask::TrackReviewResults => dispatch_track_review_results(&args.raw_args),
         MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
-        MakeTask::TrackPlanBranch => dispatch_track_plan_branch(&args.raw_args),
         MakeTask::Commit => dispatch_commit(&args.raw_args),
         MakeTask::Note => dispatch_note(&args.raw_args),
         MakeTask::TrackCommitMessage => dispatch_track_commit_message(),
@@ -221,19 +218,6 @@ fn dispatch_track_branch_switch(raw_args: &[String]) -> Result<ExitCode, CliErro
     let track_id = raw_args_to_single(raw_args)
         .map_err(|_| CliError::Message("error: track-id argument required".to_owned()))?;
     run_sotp(&["track", "branch", "switch", "--items-dir", "track/items", &track_id])
-}
-
-fn dispatch_track_activate(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let track_id = raw_args_to_single(raw_args)
-        .map_err(|_| CliError::Message("error: track-id argument required".to_owned()))?;
-    run_sotp(&["track", "activate", "--items-dir", "track/items", &track_id])
-}
-
-fn dispatch_track_plan_branch(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let track_id = raw_args_to_single(raw_args)
-        .map_err(|_| CliError::Message("error: track-id argument required".to_owned()))?;
-    let branch = format!("plan/{track_id}");
-    run_command("git", &["switch", "-c", &branch, "main"])
 }
 
 fn dispatch_add_all() -> Result<ExitCode, CliError> {
@@ -494,17 +478,14 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
     // (`verify-spec-states-current-local`) always sees a fresh evaluation
     // result. Red signals block the commit here (§D3) with an actionable
     // message, and the commit-message.txt scratch file is preserved.
-    if let Some(track_id) = current_branch_track_id_strict()? {
+    let track_id = current_branch_track_id_required_for_track_commit_message()?;
+    {
         eprintln!(
             "[track-commit-message] Pre-commit: recomputing type signals for '{track_id}'..."
         );
-        // `run_pre_commit_type_signals` returns `Some(bindings)` for active tracks
-        // and `None` for frozen (Done/Archived) tracks. The `None` case propagates
-        // the type-signals step's active-track guard decision to the callee so the
-        // catalogue-spec steps can skip without re-reading `metadata.json` /
-        // `impl-plan.json` — re-reading those files would reopen the TOCTOU window
-        // between the type-signals step and the catalogue-spec steps.
-        let (signals_result, type_signal_bindings_opt) = run_pre_commit_type_signals(&track_id)?;
+        // `run_pre_commit_type_signals` returns bindings for the current track.
+        // The branch-based guard inside ensures only the current-branch track can proceed.
+        let (signals_result, type_signal_bindings) = run_pre_commit_type_signals(&track_id)?;
         if signals_result != ExitCode::SUCCESS {
             return Ok(signals_result);
         }
@@ -516,13 +497,7 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
         // The binary gate (step 2) blocks the commit on ERROR; the refresh
         // (step 3) runs only when step 2 passes so a stale signals file is
         // regenerated before CI and the review guard read it.
-        //
-        // `type_signal_bindings_opt` is `None` when the track is frozen
-        // (Done/Archived). In that case both new steps are skipped, matching
-        // the type-signals step's frozen-track bypass (ADR §D2 / §D3.4).
-        // No second read of `metadata.json` / `impl-plan.json` is required —
-        // the frozen-track decision is propagated via `type_signal_bindings_opt`.
-        if let Some(type_signal_bindings) = type_signal_bindings_opt {
+        {
             // Workspace root discovery: `run_sotp` inherits the caller's CWD,
             // so pass the absolute git-discovered root explicitly so the pre-commit
             // steps behave identically to `run_pre_commit_type_signals`, which
@@ -530,7 +505,6 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
             // Keep paths as `PathBuf` throughout to avoid lossy UTF-8 conversion.
             // Only convert to `&str` at the last moment for subprocess calls
             // that require a string slice.
-            use infrastructure::git_cli::{GitRepository, SystemGitRepo};
             let workspace_root_path = SystemGitRepo::discover()
                 .map_err(|e| {
                     CliError::Message(format!(
@@ -817,41 +791,38 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
 /// step.
 ///
 /// Steps per ADR §D2 / §D3 / §D7:
-/// 1. Fail-closed on missing `architecture-rules.json` (the new pre-commit
+/// 1. Branch-based guard: only proceed when the current git branch matches
+///    `track/<track_id>` (CN-01 / CN-04). Fail-closed on branch mismatch or
+///    missing/non-track branch (reject, do not silently skip).
+/// 2. Fail-closed on missing `architecture-rules.json` (the new pre-commit
 ///    path explicitly does NOT inherit the legacy synthetic-domain fallback
 ///    that `sotp track type-signals` uses — see §D2 last paragraph).
-/// 2. Delegate the recomputation itself to `execute_type_signals`, which
+/// 3. Delegate the recomputation itself to `execute_type_signals`, which
 ///    writes `<layer>-type-signals.json` and re-encodes declaration files
 ///    via the declaration codec (which omits the `signals` field). Symlink guards
 ///    (§D7) are applied inside `execute_type_signals` on both write paths.
-/// 3. After recomputation, read each generated signal file and classify the
+/// 4. After recomputation, read each generated signal file and classify the
 ///    result: Red → BLOCKED (exit 1, commit-message.txt preserved), Yellow
 ///    → warning on stderr + proceed, Blue → silent pass.
 ///
 /// The Red / Yellow classification mirrors the spec.md Behavior Truth Table
 /// for the pre-commit column. Full-route CI verification still runs after
 /// this step (§D2 ordering: recompute → CI → review guard → commit).
-/// Returns the exit code together with an optional layer bindings snapshot.
-/// `Some(bindings)` indicates the track is active; the caller can reuse the
-/// same `architecture-rules.json` parse for subsequent pre-commit steps
-/// (e.g. catalogue-spec signals), eliminating a second read and the TOCTOU
-/// window between the two steps.  `None` indicates the track is frozen
-/// (Done/Archived) or that an early-exit condition (symlink rejection, missing
-/// rules file, etc.) prevented a full recomputation; in both cases the caller
-/// must skip any subsequent active-track-only pre-commit steps without
-/// re-reading `metadata.json` / `impl-plan.json` (which would reopen the
-/// TOCTOU window that `None` is designed to close).
+///
+/// Returns the exit code together with a layer bindings snapshot for the
+/// current track. The caller reuses this snapshot for subsequent pre-commit
+/// steps (catalogue-spec signals), eliminating a second read and closing the
+/// TOCTOU window.
 #[allow(clippy::too_many_lines)]
 fn run_pre_commit_type_signals(
     track_id: &str,
-) -> Result<(ExitCode, Option<Vec<TdddLayerBinding>>), CliError> {
+) -> Result<(ExitCode, Vec<TdddLayerBinding>), CliError> {
     // Resolve the workspace root from the git discovery result, not from the
     // current working directory. Running `/track:commit` (which invokes
     // `bin/sotp make track-commit-message`) from a nested subdirectory must
     // still locate `architecture-rules.json` and `track/items/` at the repo
     // root. `PathBuf::from(".")` would introduce CWD-dependent behavior that
     // silently fail-closes commits launched from subdirectories.
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
     let workspace_root = SystemGitRepo::discover()
         .map_err(|e| {
             CliError::Message(format!(
@@ -860,6 +831,38 @@ fn run_pre_commit_type_signals(
         })?
         .root()
         .to_path_buf();
+
+    // Branch-based guard (CN-01 / CN-04): only proceed when the current git branch
+    // matches `track/<track_id>`. Fail-closed on branch mismatch or non-track branch.
+    // This replaces the former status-based frozen guard (done|archived bypass).
+    {
+        let branch = SystemGitRepo::discover()
+            .map_err(|e| {
+                CliError::Message(format!(
+                    "[track-commit-message] BLOCKED: unable to discover git repository \
+                     root for branch guard: {e}"
+                ))
+            })?
+            .current_branch()
+            .map_err(|e| {
+                CliError::Message(format!(
+                    "[track-commit-message] BLOCKED: cannot read current branch \
+                     for guard: {e}"
+                ))
+            })?
+            .ok_or_else(|| {
+                CliError::Message(
+                    "[track-commit-message] BLOCKED: cannot read current branch for guard: \
+                     git rev-parse --abbrev-ref HEAD returned non-zero"
+                        .to_owned(),
+                )
+            })?;
+        ensure_branch_matches_track(&branch, track_id).map_err(|e| {
+            CliError::Message(format!(
+                "[track-commit-message] BLOCKED: branch guard rejected '{track_id}': {e}"
+            ))
+        })?;
+    }
 
     // ADR §D2 fail-closed: architecture-rules.json must be present and
     // readable. Unlike the legacy `sotp track type-signals` CLI, the
@@ -892,53 +895,17 @@ fn run_pre_commit_type_signals(
                 "[track-commit-message] BLOCKED: architecture-rules.json not found. \
                  Pre-commit type-signal recomputation cannot enumerate TDDD layers."
             );
-            return Ok((ExitCode::from(1), None));
+            return Ok((ExitCode::from(1), Vec::new()));
         }
         Err(e) => {
             eprintln!(
                 "[track-commit-message] BLOCKED: architecture-rules.json symlink rejected: {e}"
             );
-            return Ok((ExitCode::from(1), None));
+            return Ok((ExitCode::from(1), Vec::new()));
         }
     };
 
     let items_dir = workspace_root.join("track").join("items");
-
-    // Active-track guard: Done/Archived tracks have frozen type declarations;
-    // there is nothing to recompute. Skip the pre-commit step gracefully rather
-    // than delegating to `execute_type_signals`, which correctly rejects Done/Archived
-    // tracks with a user-visible error (protecting immutability). The pre-commit path
-    // reaching a Done track is valid during the final done-metadata commit (all tasks
-    // transitioned to done, metadata written, then committed).
-    //
-    // CN-01 / AC-03: use `read_track_status_str` (infrastructure adapter) so this
-    // file does not import domain::TrackId, domain::ImplPlanReader, or
-    // domain::derive_track_status directly.
-    {
-        match infrastructure::track::fs_store::read_track_status_str(&items_dir, track_id) {
-            Ok(status_str) => {
-                if matches!(status_str.as_str(), "done" | "archived") {
-                    // Track is Done or Archived — skip pre-commit type-signal recomputation.
-                    // The frozen track's signal files are already correct from when it was active.
-                    // Return `None` bindings to signal the frozen-track state to the caller so
-                    // it can skip subsequent catalogue-spec steps without re-reading
-                    // `metadata.json` / `impl-plan.json` (which would reopen the TOCTOU window).
-                    eprintln!(
-                        "[track-commit-message] Pre-commit type signals: skipped \
-                         (track '{track_id}' is {status_str} — declarations are frozen)."
-                    );
-                    return Ok((ExitCode::SUCCESS, None));
-                }
-            }
-            Err(e) => {
-                // Metadata read failure is fail-closed: block the commit rather than
-                // silently skipping the pre-commit gate.
-                return Err(CliError::Message(format!(
-                    "[track-commit-message] BLOCKED: cannot read metadata for '{track_id}': {e}"
-                )));
-            }
-        }
-    }
 
     // Delegate to the lenient variant so pre-commit matches CI semantics:
     // a layer without a declaration file is treated as "TDDD not active for
@@ -955,7 +922,7 @@ fn run_pre_commit_type_signals(
     )?;
     if exec_result != ExitCode::SUCCESS {
         eprintln!("[track-commit-message] BLOCKED: type-signals recomputation returned non-zero");
-        return Ok((exec_result, None));
+        return Ok((exec_result, Vec::new()));
     }
 
     // Classify against the same `bindings_snapshot` the recompute saw.
@@ -1052,7 +1019,7 @@ fn run_pre_commit_type_signals(
                 binding.catalogue_file(),
                 binding.signal_file(),
             );
-            return Ok((ExitCode::from(1), None));
+            return Ok((ExitCode::from(1), Vec::new()));
         }
         // ADR §D7 read-path symlink guard: reject symlinks on the signal file
         // before reading so that a symlink-swap after recomputation cannot
@@ -1068,7 +1035,7 @@ fn run_pre_commit_type_signals(
                      and read.",
                     signal_path.display()
                 );
-                return Ok((ExitCode::from(1), None));
+                return Ok((ExitCode::from(1), Vec::new()));
             }
             Err(e) => {
                 return Err(CliError::Message(format!(
@@ -1121,7 +1088,7 @@ fn run_pre_commit_type_signals(
              then re-run /track:commit"
         );
         eprintln!("[track-commit-message] commit-message.txt is preserved for your next attempt.");
-        return Ok((ExitCode::from(1), None));
+        return Ok((ExitCode::from(1), Vec::new()));
     }
 
     if !yellow_names.is_empty() {
@@ -1132,7 +1099,7 @@ fn run_pre_commit_type_signals(
     }
 
     eprintln!("[track-commit-message] Pre-commit type signals: OK");
-    Ok((ExitCode::SUCCESS, Some(bindings_snapshot)))
+    Ok((ExitCode::SUCCESS, bindings_snapshot))
 }
 
 fn dispatch_set_commit_hash(raw_args: &[String]) -> Result<ExitCode, CliError> {
@@ -1159,6 +1126,49 @@ fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
     let head_sha = infrastructure::review_v2::persist_commit_hash_for_track(track_id)?;
     eprintln!("[track-commit-message] Recorded .commit_hash: {head_sha}");
     Ok(())
+}
+
+/// Resolves the track ID for `track-commit-message` pre-commit guards.
+///
+/// Unlike [`current_branch_track_id_strict`], this helper is fail-closed:
+/// `track-commit-message` may only proceed from `track/<id>`. Non-track
+/// branches, detached HEAD, and branch read failures are rejected before CI
+/// or commit execution.
+fn current_branch_track_id_required_for_track_commit_message() -> Result<String, CliError> {
+    let branch = SystemGitRepo::discover()
+        .map_err(|e| {
+            CliError::Message(format!(
+                "[track-commit-message] BLOCKED: unable to discover git repository \
+                 root for branch guard: {e}"
+            ))
+        })?
+        .current_branch()
+        .map_err(|e| {
+            CliError::Message(format!(
+                "[track-commit-message] BLOCKED: cannot read current branch for guard: {e}"
+            ))
+        })?
+        .ok_or_else(|| {
+            CliError::Message(
+                "[track-commit-message] BLOCKED: cannot read current branch for guard: \
+                 git rev-parse --abbrev-ref HEAD returned non-zero"
+                    .to_owned(),
+            )
+        })?;
+
+    let track_id =
+        usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)).map_err(|e| {
+            CliError::Message(format!(
+                "[track-commit-message] BLOCKED: current branch is not an active track \
+                 branch for commit guard: {e}"
+            ))
+        })?;
+    ensure_branch_matches_track(&branch, &track_id).map_err(|e| {
+        CliError::Message(format!(
+            "[track-commit-message] BLOCKED: branch guard rejected '{track_id}': {e}"
+        ))
+    })?;
+    Ok(track_id)
 }
 
 /// Resolves the track ID from the current git branch (strict mode).

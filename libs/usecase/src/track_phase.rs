@@ -78,17 +78,6 @@ pub trait TrackPhaseService: Send + Sync {
     ) -> Result<TrackPhaseOutput, TrackPhaseError>;
 }
 
-// ── SchemaVersionReaderFn ─────────────────────────────────────────────────────
-
-/// Port type for reading the `schema_version` of a track.
-///
-/// The function receives `(items_dir, track_id: &str)` and returns the schema version
-/// as a `u32`, or an error string if the version cannot be determined.
-/// Using `&str` keeps `domain::TrackId` out of the public API; the closure
-/// can convert internally if needed.
-pub(crate) type SchemaVersionReaderFn =
-    Arc<dyn Fn(&std::path::Path, &str) -> Result<u32, String> + Send + Sync>;
-
 // ── TrackPhaseInteractor ──────────────────────────────────────────────────────
 
 /// Concrete struct implementing [`TrackPhaseService`].
@@ -102,47 +91,21 @@ pub(crate) type SchemaVersionReaderFn =
 ///
 /// Constructs `domain::TrackId` internally, calls `domain::track_phase::resolve_phase`,
 /// and returns [`TrackPhaseOutput`].
-///
-/// The CLI composition root passes the actual schema version from
-/// `metadata.json` to [`Self::new`].
 pub struct TrackPhaseInteractor<S>
 where
     S: TrackReader + ImplPlanReader + Send + Sync,
 {
     store: Arc<S>,
-    schema_version_reader: SchemaVersionReaderFn,
 }
 
 impl<S> TrackPhaseInteractor<S>
 where
     S: TrackReader + ImplPlanReader + Send + Sync,
 {
-    /// Creates a new interactor that always resolves to the given `schema_version`.
-    ///
-    /// The CLI composition root reads the actual schema version from
-    /// `metadata.json` and passes it here.
-    ///
-    /// # Schema version guidance
-    ///
-    /// - Schema v3–5: branchless planning-only tracks (resolve as `ReadyToActivate`
-    ///   when planned). Pass the real version, not a guess.
-    /// - Schema v1–2: legacy tracks (resolve as `Planning` for branchless planned).
+    /// Creates a new interactor.
     #[must_use]
-    pub fn new(store: Arc<S>, schema_version: u32) -> Self {
-        let reader: SchemaVersionReaderFn = Arc::new(move |_path, _id| Ok(schema_version));
-        Self { store, schema_version_reader: reader }
-    }
-
-    /// Test-only constructor that injects a custom schema version reader.
-    ///
-    /// Used by unit tests to verify error propagation when the reader fails.
-    #[cfg(test)]
-    #[must_use]
-    pub(crate) fn with_schema_version_reader(
-        store: Arc<S>,
-        schema_version_reader: SchemaVersionReaderFn,
-    ) -> Self {
-        Self { store, schema_version_reader }
+    pub fn new(store: Arc<S>) -> Self {
+        Self { store }
     }
 }
 
@@ -153,7 +116,7 @@ where
     fn resolve(
         &self,
         track_id: String,
-        items_dir: PathBuf,
+        _items_dir: PathBuf,
     ) -> Result<TrackPhaseOutput, TrackPhaseError> {
         let id = TrackId::try_new(&track_id)
             .map_err(|e| TrackPhaseError::InvalidTrackId(e.to_string()))?;
@@ -169,13 +132,7 @@ where
             .load_impl_plan(&id)
             .map_err(|e| TrackPhaseError::ImplPlanLoadFailed(e.to_string()))?;
 
-        // Obtain the schema_version via the injected reader.
-        // `resolve_phase` uses schema_version for the `is_branchless_activatable`
-        // check (`matches!(schema_version, 3..=5) && track.branch().is_none()`).
-        let schema_version = (self.schema_version_reader)(&items_dir, id.as_ref())
-            .map_err(TrackPhaseError::ImplPlanLoadFailed)?;
-
-        let info = resolve_phase(&track, schema_version, impl_plan.as_ref());
+        let info = resolve_phase(&track, impl_plan.as_ref());
 
         Ok(TrackPhaseOutput {
             phase: info.phase.to_string(),
@@ -242,26 +199,13 @@ mod tests {
         ImplPlanDocument::new(vec![task], PlanView::new(vec![], vec![section])).unwrap()
     }
 
-    /// Creates a stub `SchemaVersionReaderFn` that always returns the given version.
-    fn stub_schema_reader(version: u32) -> SchemaVersionReaderFn {
-        Arc::new(move |_items_dir, _track_id| Ok(version))
-    }
-
-    /// Creates a stub `SchemaVersionReaderFn` that always returns an error.
-    fn failing_schema_reader() -> SchemaVersionReaderFn {
-        Arc::new(|_items_dir, _track_id| Err("schema version unavailable".to_owned()))
-    }
-
     #[test]
     fn track_phase_interactor_resolve_returns_output_for_known_track() {
         let store = Arc::new(StubStore::default());
         let track = sample_track();
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
 
-        let interactor = TrackPhaseInteractor::with_schema_version_reader(
-            Arc::clone(&store),
-            stub_schema_reader(5),
-        );
+        let interactor = TrackPhaseInteractor::new(Arc::clone(&store));
         let out = interactor.resolve(TRACK_ID.to_owned(), PathBuf::new()).unwrap();
         // No impl-plan → Planned phase
         assert!(!out.phase.is_empty());
@@ -276,10 +220,7 @@ mod tests {
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
         store.impl_plans.lock().unwrap().insert(track.id().clone(), plan);
 
-        let interactor = TrackPhaseInteractor::with_schema_version_reader(
-            Arc::clone(&store),
-            stub_schema_reader(5),
-        );
+        let interactor = TrackPhaseInteractor::new(Arc::clone(&store));
         let out = interactor.resolve(TRACK_ID.to_owned(), PathBuf::new()).unwrap();
         assert_eq!(out.phase, "Ready to Ship");
     }
@@ -287,10 +228,7 @@ mod tests {
     #[test]
     fn track_phase_interactor_resolve_returns_not_found_for_unknown_track() {
         let store = Arc::new(StubStore::default());
-        let interactor = TrackPhaseInteractor::with_schema_version_reader(
-            Arc::clone(&store),
-            stub_schema_reader(5),
-        );
+        let interactor = TrackPhaseInteractor::new(Arc::clone(&store));
         let err = interactor.resolve("nonexistent".to_owned(), PathBuf::new()).unwrap_err();
         assert!(matches!(err, TrackPhaseError::TrackNotFound(_)));
     }
@@ -298,60 +236,8 @@ mod tests {
     #[test]
     fn track_phase_interactor_resolve_returns_invalid_id_for_empty_string() {
         let store = Arc::new(StubStore::default());
-        let interactor = TrackPhaseInteractor::new(Arc::clone(&store), 5);
+        let interactor = TrackPhaseInteractor::new(Arc::clone(&store));
         let err = interactor.resolve(String::new(), PathBuf::new()).unwrap_err();
         assert!(matches!(err, TrackPhaseError::InvalidTrackId(_)));
-    }
-
-    #[test]
-    fn track_phase_interactor_resolve_returns_error_when_schema_reader_fails() {
-        // When the schema version reader returns an error, the interactor propagates it.
-        let store = Arc::new(StubStore::default());
-        let track = sample_track();
-        store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
-
-        let interactor = TrackPhaseInteractor::with_schema_version_reader(
-            Arc::clone(&store),
-            failing_schema_reader(),
-        );
-        let err = interactor.resolve(TRACK_ID.to_owned(), PathBuf::new()).unwrap_err();
-        assert!(
-            matches!(err, TrackPhaseError::ImplPlanLoadFailed(_)),
-            "expected ImplPlanLoadFailed on schema reader error, got: {err}"
-        );
-    }
-
-    #[test]
-    fn track_phase_interactor_resolve_schema_v5_branchless_returns_ready_to_activate() {
-        // Schema v5, branchless (no branch), no impl-plan → ReadyToActivate.
-        // v3-5 branchless tracks must activate before implementation.
-        let store = Arc::new(StubStore::default());
-        let track = sample_track(); // branchless
-        store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
-
-        let interactor = TrackPhaseInteractor::new(Arc::clone(&store), 5);
-        let out = interactor.resolve(TRACK_ID.to_owned(), PathBuf::new()).unwrap();
-        // Branchless + schema 5 + planned → ReadyToActivate (not Planning)
-        assert_eq!(out.phase, "Ready to Activate");
-    }
-
-    #[test]
-    fn track_phase_interactor_new_legacy_schema_v2_branchless_returns_planning() {
-        // Schema v2 (legacy, not in 3..=5), branchless, no impl-plan → Planning phase.
-        // This verifies that new() uses the caller-provided schema_version and does
-        // not hardcode 5; a regression that ignores the version would incorrectly
-        // return "Ready to Activate" for legacy tracks.
-        let store = Arc::new(StubStore::default());
-        let track = sample_track(); // branchless
-        store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
-
-        let interactor = TrackPhaseInteractor::new(Arc::clone(&store), 2);
-        let out = interactor.resolve(TRACK_ID.to_owned(), PathBuf::new()).unwrap();
-        // Legacy schema v2 + branchless + planned → Planning (not ReadyToActivate)
-        assert_ne!(
-            out.phase, "Ready to Activate",
-            "legacy schema v2 must not resolve to ReadyToActivate; got: {}",
-            out.phase
-        );
     }
 }

@@ -276,22 +276,20 @@ fn execute_plan_artifact_refs(args: PlanArtifactRefsArgs) -> VerifyOutcome {
 
 /// Resolve the active track directory from the current git branch name.
 ///
-/// Accepts both `track/<id>` and `plan/<id>` branches (the canonical
-/// `resolve_track_or_plan_id_from_branch` helper is reused so the branch
-/// detection logic stays in one place). The returned path is anchored to the
-/// repo root discovered via `SystemGitRepo::discover`, so this function works
-/// correctly regardless of which subdirectory the process is invoked from.
+/// Accepts only `track/<id>` branches; `plan/<id>` and other branch forms
+/// return `None`. The returned path is anchored to the repo root discovered
+/// via `SystemGitRepo::discover`, so this function works correctly regardless
+/// of which subdirectory the process is invoked from.
 ///
 /// Returns `None` when:
 /// - Not inside a git repository
-/// - Not on a `track/*` or `plan/*` branch (including detached HEAD / main)
+/// - Not on a `track/<id>` branch (including detached HEAD / main)
 /// - The resolved `track/items/<id>` directory does not exist on disk
 fn resolve_active_track_dir() -> Option<std::path::PathBuf> {
     use infrastructure::git_cli::GitRepository as _;
     let repo = infrastructure::git_cli::SystemGitRepo::discover().ok()?;
     let branch = repo.current_branch().ok()??;
-    let track_id =
-        usecase::track_resolution::resolve_track_or_plan_id_from_branch(Some(&branch)).ok()?;
+    let track_id = usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)).ok()?;
     let track_dir = repo.root().join("track/items").join(&track_id);
     if track_dir.is_dir() { Some(track_dir) } else { None }
 }

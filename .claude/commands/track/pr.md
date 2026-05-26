@@ -21,6 +21,4 @@ This executes `sotp pr push` followed by `sotp pr ensure-pr`.
 After execution, report:
 1. Push result
 2. PR number and URL (created or reused)
-3. Recommended next command:
-   - For `track/` branches: `/track:merge <pr>` or `/track:pr-review`
-   - For `plan/` branches: merge the PR, then `/track:activate <track-id>`
+3. Recommended next command: `/track:merge <pr>` or `/track:pr-review`

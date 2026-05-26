@@ -1,7 +1,7 @@
 use crate::CliError;
 
 use super::*;
-use usecase::track_resolution::resolve_track_or_plan_id_from_branch;
+use usecase::track_resolution::resolve_track_id_from_branch;
 
 pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
     match action {
@@ -40,12 +40,11 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
     }
 }
 
-/// Detect the active track id from the current git branch using the shared
-/// lenient resolver (`resolve_track_or_plan_id_from_branch`). Both
-/// `track/<id>` and `plan/<id>` branches map to the same bare track id; any
-/// other branch (e.g. `main`, detached HEAD) or git failure resolves to
-/// `None` so the caller can fall back to registry-only mode without
-/// surfacing an error.
+/// Detect the active track id from the current git branch.
+///
+/// Only `track/<id>` branches are resolved; any other branch (e.g. `main`,
+/// detached HEAD) or git failure resolves to `None` so the caller can fall
+/// back to registry-only mode without surfacing an error.
 ///
 /// Uses `project_root` as the working directory for the underlying git
 /// command so that auto-detection is consistent with `--project-root`
@@ -60,7 +59,7 @@ fn detect_track_id_from_branch(project_root: &std::path::Path) -> Option<String>
         return None;
     }
     let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    resolve_track_or_plan_id_from_branch(Some(&branch)).ok()
+    resolve_track_id_from_branch(Some(&branch)).ok()
 }
 
 #[cfg(test)]
@@ -133,13 +132,6 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         let root = init_repo_on_branch(&tmp, "track/my-feature-2026-04-10");
         assert_eq!(detect_track_id_from_branch(&root), Some("my-feature-2026-04-10".to_owned()));
-    }
-
-    #[test]
-    fn detect_track_id_from_branch_resolves_plan_branch() {
-        let tmp = tempfile::tempdir().unwrap();
-        let root = init_repo_on_branch(&tmp, "plan/proposal-2026-04-10");
-        assert_eq!(detect_track_id_from_branch(&root), Some("proposal-2026-04-10".to_owned()));
     }
 
     #[test]

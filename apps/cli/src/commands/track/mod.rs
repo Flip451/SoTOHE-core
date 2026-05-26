@@ -5,14 +5,11 @@ use std::process::ExitCode;
 use std::sync::Arc;
 
 use clap::{Args, Subcommand};
-use infrastructure::git_cli::{
-    GitRepository, SystemGitRepo, TrackBranchRecord, load_explicit_track_branch_from_items_dir,
-};
+use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 use infrastructure::track::fs_store::FsTrackStore;
 use infrastructure::track::render;
-use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase};
 
-mod activate;
+mod branch_ops;
 mod resolve;
 mod signals;
 mod state_ops;
@@ -74,122 +71,6 @@ pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
     }
 }
 
-/// Reads `schema_version` from `<items_dir>/<track_id>/metadata.json` as a
-/// pure JSON parse — no domain types required.
-///
-/// Falls back to `u32::MAX` (fail-safe sentinel) when the file is absent,
-/// unreadable, or lacks the field. Using `u32::MAX` keeps the branchless
-/// guard active for unknown files (guard fires for schema_version >= 3).
-/// Returning `2` would silently exempt the track from the guard — an unsafe
-/// default. Callers that specifically need "is this a legacy track?" should
-/// treat `u32::MAX` as "unknown / non-legacy".
-pub(crate) fn read_schema_version_from_json(items_dir: &std::path::Path, track_id: &str) -> u32 {
-    let path = items_dir.join(track_id).join("metadata.json");
-    let content = std::fs::read_to_string(&path).unwrap_or_default();
-    serde_json::from_str::<serde_json::Value>(&content)
-        .ok()
-        .and_then(|v| v.get("schema_version").and_then(serde_json::Value::as_u64))
-        .and_then(|n| u32::try_from(n).ok())
-        .unwrap_or(u32::MAX)
-}
-
-/// Derives the track status string from `impl-plan.json` and `metadata.json`
-/// as pure JSON — no domain types required.
-///
-/// Logic mirrors `domain::derive_track_status`:
-/// - If `status_override` is set → return its kind string ("blocked", "cancelled", etc.)
-/// - If no impl-plan (file absent) → "planned"
-/// - If impl-plan exists but is unreadable or malformed → "unknown" (fail-safe,
-///   callers that require a specific status should treat "unknown" as an error)
-/// - If any task is "in_progress" → "in_progress"
-/// - If all tasks are "done" or "skipped" (at least one task present) → "done"
-/// - All tasks "todo" → "planned"
-/// - Otherwise → "in_progress" (tasks present but mixed todo/in_progress/done/skipped)
-pub(crate) fn derive_track_status_from_json(items_dir: &std::path::Path, track_id: &str) -> String {
-    // Check status_override in metadata.json.
-    // The wire format uses `status_override.status` (e.g. "blocked" / "cancelled"),
-    // not `status_override.kind`. See infrastructure::track::codec for the encoding.
-    let metadata_path = items_dir.join(track_id).join("metadata.json");
-    if let Ok(content) = std::fs::read_to_string(&metadata_path) {
-        if let Ok(meta) = serde_json::from_str::<serde_json::Value>(&content) {
-            if let Some(status) =
-                meta.get("status_override").and_then(|o| o.get("status")).and_then(|s| s.as_str())
-            {
-                return status.to_lowercase();
-            }
-        }
-    }
-
-    // Read impl-plan.json.
-    let impl_plan_path = items_dir.join(track_id).join("impl-plan.json");
-    // File absent = planning-only track (no impl-plan yet) → "planned".
-    // File present but unreadable/malformed → "unknown" (fail-safe: callers that check
-    // for "planned" will treat "unknown" as a blocking condition).
-    let content = match std::fs::read_to_string(&impl_plan_path) {
-        Ok(s) => s,
-        Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
-            return "planned".to_owned();
-        }
-        Err(_) => {
-            return "unknown".to_owned();
-        }
-    };
-    let Ok(doc) = serde_json::from_str::<serde_json::Value>(&content) else {
-        return "unknown".to_owned();
-    };
-
-    // If the tasks field is absent or not an array in a present impl-plan.json,
-    // return "unknown" (fail-safe). Returning "planned" for a corrupted but
-    // parseable impl-plan would allow activation of an inconsistent track.
-    let tasks = match doc.get("tasks").and_then(|t| t.as_array()) {
-        Some(arr) => arr,
-        None => return "unknown".to_owned(),
-    };
-    if tasks.is_empty() {
-        return "planned".to_owned();
-    }
-
-    let mut has_in_progress = false;
-    let mut has_resolved = false; // any task in done or skipped
-    let mut all_resolved = true; // every task is done or skipped
-
-    for task in tasks {
-        // Fail-closed: missing/non-string `status`, or an unrecognized status string,
-        // means the impl-plan.json cannot be classified deterministically. Returning
-        // "unknown" forces the caller (e.g., `/track:activate`) to reject the track
-        // instead of silently treating malformed data as `planned` / `in_progress`.
-        let Some(status) = task.get("status").and_then(|s| s.as_str()) else {
-            return "unknown".to_owned();
-        };
-        match status {
-            "in_progress" => {
-                has_in_progress = true;
-                all_resolved = false;
-            }
-            "todo" => {
-                all_resolved = false;
-            }
-            "done" | "skipped" => {
-                has_resolved = true;
-            }
-            _ => return "unknown".to_owned(),
-        }
-    }
-
-    // Mirrors domain::derive_track_status exactly:
-    // 1. all tasks resolved (done OR skipped) → Done.
-    //    No requirement for at least one done — all-skipped is also a resolved plan.
-    if all_resolved {
-        return "done".to_owned();
-    }
-    // 2. any in_progress, or any resolved alongside unresolved tasks → InProgress.
-    if has_in_progress || has_resolved {
-        return "in_progress".to_owned();
-    }
-    // 3. all tasks todo (none resolved, none in_progress) → Planned.
-    "planned".to_owned()
-}
-
 pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
     let items_name = items_dir.file_name().and_then(|name| name.to_str());
     let track_dir = items_dir.parent();
@@ -197,7 +78,19 @@ pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBu
     let project_root = track_dir.and_then(std::path::Path::parent);
 
     match (items_name, track_name, project_root) {
-        (Some("items"), Some("track"), Some(root)) => Ok(root.to_path_buf()),
+        (Some("items"), Some("track"), Some(root)) => {
+            // When items_dir is a bare relative path like "track/items", Path::parent()
+            // returns an empty path ("") rather than ".".  An empty path passed to
+            // Command::current_dir causes ENOENT on spawn (e.g. in render.rs's git
+            // branch discovery).  Normalise the empty root to "." so all callers get
+            // a usable current-directory path, consistent with how relative joins
+            // elsewhere in the render pipeline behave.
+            if root.as_os_str().is_empty() {
+                Ok(PathBuf::from("."))
+            } else {
+                Ok(root.to_path_buf())
+            }
+        }
         _ => Err(format!(
             "--items-dir must point to '<project-root>/track/items'; got {}",
             items_dir.display()
@@ -236,9 +129,6 @@ pub enum TrackCommand {
         #[command(subcommand)]
         action: BranchAction,
     },
-
-    /// Materialize a planning-only track into its track branch and switch to it.
-    Activate(ActivateArgs),
 
     /// Resolve the current track phase, next command, and blocker.
     Resolve(ResolveArgs),
@@ -621,28 +511,6 @@ pub struct ResolveArgs {
     track_id: Option<String>,
 }
 
-#[derive(Debug, Args, Clone)]
-pub struct ActivateArgs {
-    /// Path to the track items root directory (e.g., `track/items`).
-    #[arg(long, default_value = "track/items")]
-    items_dir: PathBuf,
-
-    /// Track ID used to form the branch name `track/<track-id>`.
-    track_id: String,
-}
-
-/// Activation mode for [`super::activate::execute_activate`].
-///
-/// `Create` is intentionally absent: branch creation (`sotp track branch create`) runs through
-/// the independent [`super::activate::execute_branch_create`] path so that branch-only bootstrap
-/// can never generate an activation commit on `main`. See
-/// `knowledge/adr/2026-04-22-1432-branch-create-commit-ordering.md` §D1-D2.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(super) enum BranchMode {
-    Switch,
-    Auto,
-}
-
 #[derive(Debug, Subcommand)]
 pub enum ViewAction {
     /// Validate metadata.json files under the repository.
@@ -684,8 +552,7 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             commit_hash,
             skip_branch_check,
         ),
-        TrackCommand::Branch { action } => activate::execute_branch(action),
-        TrackCommand::Activate(args) => activate::execute_activate(args, BranchMode::Auto),
+        TrackCommand::Branch { action } => branch_ops::execute_branch(action),
         TrackCommand::Resolve(args) => resolve::execute_resolve(args),
         TrackCommand::Views { action } => views::execute_views(action),
         TrackCommand::AddTask {

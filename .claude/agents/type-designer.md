@@ -63,13 +63,13 @@ Translate the track's ADR (design decisions) and spec.json (behavioral contract)
 The type-designer **owns each `<layer>-types.json` and its derived views for this track**, executed in the canonical order **baseline → catalogue → signals → views**:
 
 1. captures baselines of the current code state
-2. writes the catalogue files directly (informed by ADR + spec + reconnaissance from the pre-catalogue type-graph reads — see the Internal pipeline below)
+2. writes the catalogue files directly (informed by ADR + spec + reconnaissance from the pre-catalogue baseline-graph reads — see the Internal pipeline below)
 3. generates the catalogue → spec signal JSON via `bin/sotp track catalogue-spec-signals` and evaluates the type → spec signal via `bin/sotp track type-signals`, capturing per-layer blue / yellow / red counts
-4. regenerates the per-layer rendered views (contract-map md, `<layer>-types.md` via `sync_rendered_views`, plus the type-graph reconnaissance views from step 2's pre-work)
+4. regenerates the per-layer rendered views (contract-map md, `<layer>-types.md` via `sync_rendered_views`, plus the baseline-graph reconnaissance views from step 2's pre-work)
 
 The orchestrator receives the per-layer signal counts from step 3 and decides whether Phase 2 passes.
 
-**Reconnaissance first**: every layer pass begins with the reconnaissance procedure defined in the Internal pipeline (baseline-capture → type-graph at depth=1 + depth=2 → Read both depth outputs) so the catalogue draft is grounded in the existing workspace inventory before any kind / action decision is made. This reconnaissance is **internal preparation only** — the inventory and intermediate outputs are NOT echoed back to the orchestrator's final message. The reconnaissance step **must not be skipped**: it is a precondition for sound kind selection and for distinguishing `add` (no pre-existing type) from `modify` / `reference` / `delete` (pre-existing type) actions.
+**Reconnaissance first**: every layer pass begins with the reconnaissance procedure defined in the Internal pipeline (baseline-capture → baseline-graph rendering depth=1 + depth=2 → Read both depth outputs) so the catalogue draft is grounded in the existing workspace inventory before any kind / action decision is made. This reconnaissance is **internal preparation only** — the inventory and intermediate outputs are NOT echoed back to the orchestrator's final message. The reconnaissance step **must not be skipped**: it is a precondition for sound kind selection and for distinguishing `add` (no pre-existing type) from `modify` / `reference` / `delete` (pre-existing type) actions.
 
 ## Boundary with other capabilities
 
@@ -102,21 +102,17 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
    ```
    `baseline-capture` is **first-write-wins**: on the first invocation for this track it snapshots the workspace state so subsequent phases can compute `add` / `modify` / `reference` / `delete` against it; on later invocations it leaves the existing baseline untouched (no re-capture). The action semantics depend on this — running the command at incremental sessions is safe (it just no-ops), but the baseline is **the snapshot from the track's first capture**, not the current code state.
 
-2. **Render type-graph at depth=1** (overview):
+2. **Render the baseline graph (Reality View)** — depth=1 overview + depth=2 detail in one command:
    ```
-   bin/sotp track type-graph <id> --cluster-depth 1 --edges all [--layer <layer_id>]
+   bin/sotp track baseline-graph <id> [--layers <layer_id>]
    ```
-   Outputs to `track/items/<id>/<layer>-graph-d1/` — the depth-suffixed directory keeps depth=1 and depth=2 outputs from overwriting each other.
+   `baseline-graph` (Reality View, ADR `2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation`) renders both depths from the rustdoc baseline in a **single** invocation: depth=1 overview to `track/items/<id>/<layer>-graph-d1/index.md` and depth=2 cluster detail to `track/items/<id>/<layer>-graph-d2/<cluster>.md`. Cluster = top-level module (fixed) — there is no `--cluster-depth` flag. Requires the baselines captured in step 1. (`--layers` takes a comma-separated id list; omit it to render every `tddd.enabled` layer.)
 
-3. **Render type-graph at depth=2** (detail):
-   ```
-   bin/sotp track type-graph <id> --cluster-depth 2 --edges all [--layer <layer_id>]
-   ```
-   Outputs to `track/items/<id>/<layer>-graph-d2/`.
+3. **(produced by step 2)** — depth=2 detail is emitted by the same `baseline-graph` invocation as depth=1; no separate depth command is needed.
 
 4. **Read depth=1 output** — absorb the layer overview from `track/items/<id>/<layer>-graph-d1/index.md` and the per-cluster files it links to. Useful for small layers where depth=2 over-partitions into many tiny clusters.
 
-5. **Read depth=2 output** — absorb the layer detail from `track/items/<id>/<layer>-graph-d2/index.md` and the per-cluster files it links to. Useful for large layers where depth=1 hits the per-cluster node cap and truncates. Steps 4 and 5 may be performed in either order — depth-suffixed paths keep both outputs available simultaneously.
+5. **Read depth=2 output** — absorb the layer detail from the per-cluster files `track/items/<id>/<layer>-graph-d2/<cluster>.md`. Useful for large layers where depth=1 hits the per-cluster node cap and truncates. Steps 4 and 5 may be performed in either order — depth-suffixed paths keep both outputs available simultaneously.
 
    From steps 4–5 combined, absorb:
    - which types already exist (vs. what the ADR / spec requires to be added)
@@ -157,8 +153,8 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
     Steps that must have completed in the current session before 12a Glob checks proceed:
 
     - Step 1 (`bin/sotp track baseline-capture`) — produces `<layer>-types-baseline.json`; Bash exit 0 required
-    - Step 2 (`bin/sotp track type-graph ... --cluster-depth 1`) — produces `<layer>-graph-d1/`; Bash exit 0 required
-    - Step 3 (`bin/sotp track type-graph ... --cluster-depth 2`) — produces `<layer>-graph-d2/`; Bash exit 0 required
+    - Step 2 (`bin/sotp track baseline-graph`) — produces `<layer>-graph-d1/index.md` (depth=1) AND `<layer>-graph-d2/<cluster>.md` (depth=2) in a single command; Bash exit 0 required
+    - Step 3 — no separate command; depth=2 is produced by step 2's `baseline-graph` invocation
     - Step 7 (Write/Edit tool call that wrote `<layer>-types.json`) — the catalogue file must have been written by this agent in this session; a pre-existing file from a prior session is NOT a valid receipt
     - Step 8 (`bin/sotp track catalogue-spec-signals`) — produces `<layer>-catalogue-spec-signals.json`; Bash exit 0 required
     - Step 9 (`bin/sotp track type-signals`) — produces `<layer>-type-signals.json`; Bash exit 0 required
@@ -168,8 +164,8 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
     After confirming each step above completed in this session, for **each processed layer** verify the following 7 paths resolve via `Glob`:
 
     - `track/items/<id>/<layer>-types-baseline.json` (step 1)
-    - `track/items/<id>/<layer>-graph-d1/index.md` (step 2)
-    - `track/items/<id>/<layer>-graph-d2/index.md` (step 3)
+    - `track/items/<id>/<layer>-graph-d1/index.md` (step 2, depth=1 overview)
+    - `track/items/<id>/<layer>-graph-d2/` (step 2, depth=2 — a directory of per-cluster `<cluster>.md` files; depth=2 has no `index.md`)
     - `track/items/<id>/<layer>-types.json` (step 7)
     - `track/items/<id>/<layer>-catalogue-spec-signals.json` (step 8)
     - `track/items/<id>/<layer>-type-signals.json` (step 9)
@@ -541,9 +537,9 @@ Phase 2 evaluation:
 
 Pre-condition: the entry **IS in baseline (B)** and **this track will NOT change it**.
 
-**Requirement**: the catalogue declaration identifies the entry by name (Phase 1 verifies the identity exists in B); it is included so that edges that touch it (`trait_impls`, `params[].ty`, `supertrait_bounds`, etc.) are exposed in the contract-map / type-graph rendering — *not* because the entry itself changes.
+**Requirement**: the catalogue declaration identifies the entry by name (Phase 1 verifies the identity exists in B); it is included so that edges that touch it (`trait_impls`, `params[].ty`, `supertrait_bounds`, etc.) are exposed in the contract-map / baseline-graph rendering — *not* because the entry itself changes.
 
-**Phase 2 signal note**: For `reference` entries, Phase 1 seeds S with **B's item** (the baseline snapshot), not the A-side catalogue declaration. Phase 2 compares B's item vs C (current rustdoc), so the catalogue declaration's `methods` / `fields` content does NOT affect Phase 2 structural equality. An empty `methods: []` for a trait with real methods is fine for signals. Accurate method enumeration matters only for rendering completeness (contract-map / type-graph edge visibility).
+**Phase 2 signal note**: For `reference` entries, Phase 1 seeds S with **B's item** (the baseline snapshot), not the A-side catalogue declaration. Phase 2 compares B's item vs C (current rustdoc), so the catalogue declaration's `methods` / `fields` content does NOT affect Phase 2 structural equality. An empty `methods: []` for a trait with real methods is fine for signals. Accurate method enumeration matters only for rendering completeness (contract-map / baseline-graph edge visibility).
 
 Phase 2 evaluation:
 - `reference` × `Match` → Skip (suppressed from report — matching reference entries are noise-filtered; not counted as 🔵)
@@ -951,9 +947,9 @@ The `kind` field MUST match the deleted type's ACTUAL kind from the baseline (e.
 
 ### Pattern 8: `reference` entry (carried for edge exposure)
 
-A `reference` entry is for a **pre-existing workspace type already in baseline** that this track does not modify. It is included only so that edges that reference it (`trait_impls`, `params[].ty`, etc.) appear in the contract-map / type-graph rendering.
+A `reference` entry is for a **pre-existing workspace type already in baseline** that this track does not modify. It is included only so that edges that reference it (`trait_impls`, `params[].ty`, etc.) appear in the contract-map / baseline-graph rendering.
 
-A `reference` entry does NOT need to enumerate all methods for Phase 2 signals — Phase 2 compares the baseline item (B) against the current source (C), not the catalogue declaration (A). Methods / fields in the catalogue declaration matter only for rendering completeness (so that edges appear in the contract-map and type-graph). Enumerate methods when edge visibility is needed; an empty `methods: []` is acceptable when no rendering fidelity is required.
+A `reference` entry does NOT need to enumerate all methods for Phase 2 signals — Phase 2 compares the baseline item (B) against the current source (C), not the catalogue declaration (A). Methods / fields in the catalogue declaration matter only for rendering completeness (so that edges appear in the contract-map and baseline-graph). Enumerate methods when edge visibility is needed; an empty `methods: []` is acceptable when no rendering fidelity is required.
 
 ```jsonc
 "traits": {
@@ -995,9 +991,9 @@ A `reference` entry does NOT need to enumerate all methods for Phase 2 signals �
 
 ## Scope Ownership
 
-- **Writes permitted**: `track/items/<id>/<layer>-types.json` (direct Write via Write/Edit tool, per enabled layer). Baseline files (`<layer>-types-baseline.json`), type-graph output (`<layer>-graph-d<depth>/` directory in cluster mode, or `<layer>-graph.md` in flat mode), contract-map (`contract-map.md`), per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`), per-layer type → spec signal JSON (`<layer>-type-signals.json`), and per-layer catalogue view (`<layer>-types.md`) are generated by `bin/sotp` CLI commands or `cargo make track-sync-views` — do NOT write these directly via Write/Edit.
+- **Writes permitted**: `track/items/<id>/<layer>-types.json` (direct Write via Write/Edit tool, per enabled layer). Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), contract-map (`contract-map.md`), per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`), per-layer type → spec signal JSON (`<layer>-type-signals.json`), and per-layer catalogue view (`<layer>-types.md`) are generated by `bin/sotp` CLI commands or `cargo make track-sync-views` — do NOT write these directly via Write/Edit.
 - **Writes forbidden**: any other track's artifacts, other subagents' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `cargo make track-sync-views` (Step 11), which is required by this pipeline.
-- **Bash usage**: restricted to `bin/sotp` CLI invocations and `cargo make track-sync-views` required by the internal pipeline (`bin/sotp track baseline-capture`, `bin/sotp track type-graph`, `bin/sotp track contract-map`, `bin/sotp track catalogue-spec-signals`, `bin/sotp track type-signals`, `cargo make track-sync-views`, `bin/sotp verify catalogue-spec-signals`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
+- **Bash usage**: restricted to `bin/sotp` CLI invocations and `cargo make track-sync-views` required by the internal pipeline (`bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp track catalogue-spec-signals`, `bin/sotp track type-signals`, `cargo make track-sync-views`, `bin/sotp verify catalogue-spec-signals`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).
 - If architectural clarification is needed (decisions not in the ADR), note it in `## Open Questions` and advise the orchestrator to consult the `adr-editor` agent rather than improvising.
 

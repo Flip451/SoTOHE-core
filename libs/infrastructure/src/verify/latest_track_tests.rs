@@ -21,14 +21,34 @@ fn write_file(root: &Path, rel: &str, content: &str) {
 /// v5 has no `status`, `tasks`, or `plan` fields. Status is derived from
 /// `impl-plan.json` + `status_override` at runtime.
 fn make_metadata_v5(id: &str, branch_json: &str, status_override_json: &str) -> String {
+    make_metadata_v5_with_updated_at(
+        id,
+        branch_json,
+        "2026-01-15T00:00:00+00:00",
+        status_override_json,
+    )
+}
+
+fn make_metadata_v5_with_updated_at(
+    id: &str,
+    branch_json: &str,
+    updated_at: &str,
+    status_override_json: &str,
+) -> String {
     format!(
-        r#"{{"schema_version":5,"id":"{id}","title":"Track {id}","created_at":"2026-01-01T00:00:00+00:00","updated_at":"2026-01-15T00:00:00+00:00","branch":{branch_json}{status_override_json}}}"#
+        r#"{{"schema_version":5,"id":"{id}","title":"Track {id}","created_at":"2026-01-01T00:00:00+00:00","updated_at":"{updated_at}","branch":{branch_json}{status_override_json}}}"#
     )
 }
 
 /// Minimal valid `impl-plan.json` content for test fixtures that need an
 /// activated (branched) track without caring about the plan contents.
 const MINIMAL_IMPL_PLAN_JSON: &str = r#"{"schema_version":1,"plan":{"summary":[],"sections":[]}}"#;
+
+const IN_PROGRESS_IMPL_PLAN_JSON: &str = r#"{
+  "schema_version": 1,
+  "tasks": [{"id": "T001", "description": "Build feature", "status": "in_progress"}],
+  "plan": {"summary": [], "sections": [{"id": "S1", "title": "Build", "description": [], "task_ids": ["T001"]}]}
+}"#;
 
 fn setup_track(root: &Path, id: &str, branch: Option<&str>) {
     let dir = root.join(TRACK_ITEMS_DIR).join(id);
@@ -42,7 +62,9 @@ fn setup_track(root: &Path, id: &str, branch: Option<&str>) {
 }
 
 fn setup_track_planned(root: &Path, id: &str) {
-    // v5 planning-only: no branch, no impl-plan.json → status derives to "planned".
+    // v5 track with no branch and no impl-plan.json → status derives to "planned".
+    // Branchless tracks can no longer be created (plan-only lane removed); this
+    // helper is retained for legacy-compatibility tests.
     setup_track(root, id, None);
 }
 
@@ -181,24 +203,75 @@ fn test_placeholder_in_fenced_block_ignored() {
 }
 
 #[test]
-fn test_selection_priority_v5_active_branch_highest() {
-    // v5 + branch + not-done => priority 2
-    assert_eq!(selection_priority("in_progress", Some("track/feat"), 5), 2);
-    // v5 + planned + no branch => priority 1
-    assert_eq!(selection_priority("planned", None, 5), 1);
-    // v5 + done + branch => priority 0
-    assert_eq!(selection_priority("done", Some("track/feat"), 5), 0);
-    // Active branch beats branchless planned
-    assert!(
-        selection_priority("in_progress", Some("track/feat"), 5)
-            > selection_priority("planned", None, 5)
+fn test_selection_priority_matches_registry_planned_last_order() {
+    // In-progress / blocked / cancelled sort ahead of planned, matching registry Current Focus.
+    assert_eq!(selection_priority("planned"), 1);
+    assert_eq!(selection_priority("in_progress"), 2);
+    assert_eq!(selection_priority("blocked"), 2);
+    assert_eq!(selection_priority("cancelled"), 2);
+    // done / archived => priority 0
+    assert_eq!(selection_priority("done"), 0);
+    assert_eq!(selection_priority("archived"), 0);
+    // Unrecognized status => priority 0 (treated as inactive)
+    assert_eq!(selection_priority("unknown"), 0);
+}
+
+#[test]
+fn test_latest_track_prefers_in_progress_over_newer_planned() {
+    let tmp = TempDir::new().unwrap();
+
+    let planned_dir = tmp.path().join(TRACK_ITEMS_DIR).join("newer-planned");
+    fs::create_dir_all(&planned_dir).unwrap();
+    let planned_meta = make_metadata_v5_with_updated_at(
+        "newer-planned",
+        r#""track/newer-planned""#,
+        "2026-01-20T00:00:00+00:00",
+        "",
     );
+    fs::write(planned_dir.join("metadata.json"), planned_meta).unwrap();
+
+    let in_progress_dir = tmp.path().join(TRACK_ITEMS_DIR).join("older-in-progress");
+    fs::create_dir_all(&in_progress_dir).unwrap();
+    let in_progress_meta = make_metadata_v5_with_updated_at(
+        "older-in-progress",
+        r#""track/older-in-progress""#,
+        "2026-01-10T00:00:00+00:00",
+        "",
+    );
+    fs::write(in_progress_dir.join("metadata.json"), in_progress_meta).unwrap();
+    fs::write(in_progress_dir.join("impl-plan.json"), IN_PROGRESS_IMPL_PLAN_JSON).unwrap();
+
+    let latest = latest_track_dir(tmp.path()).unwrap().unwrap();
+    assert_eq!(latest.file_name().and_then(|name| name.to_str()), Some("older-in-progress"));
+}
+
+#[test]
+fn test_latest_track_tie_breaks_same_timestamp_by_track_id_ascending() {
+    let tmp = TempDir::new().unwrap();
+
+    for id in ["track-b", "track-a"] {
+        let track_dir = tmp.path().join(TRACK_ITEMS_DIR).join(id);
+        fs::create_dir_all(&track_dir).unwrap();
+        let metadata = make_metadata_v5_with_updated_at(
+            id,
+            &format!(r#""track/{id}""#),
+            "2026-01-10T00:00:00+00:00",
+            "",
+        );
+        fs::write(track_dir.join("metadata.json"), metadata).unwrap();
+        fs::write(track_dir.join("impl-plan.json"), IN_PROGRESS_IMPL_PLAN_JSON).unwrap();
+    }
+
+    let latest = latest_track_dir(tmp.path()).unwrap().unwrap();
+    assert_eq!(latest.file_name().and_then(|name| name.to_str()), Some("track-a"));
 }
 
 #[test]
 fn test_v5_branchless_planned_valid() {
     let tmp = TempDir::new().unwrap();
-    // v5 planning-only: no branch, no impl-plan.json → status derives to "planned".
+    // v5 track with no branch (legacy state): no impl-plan.json → status derives to "planned".
+    // Plan-only lane is removed; this test verifies that branchless legacy data does not
+    // break verification (impl-plan.json absent → pre-Phase-3 → artifact checks are skipped).
     setup_track_planned(tmp.path(), "planning-track");
     write_file(
         tmp.path(),

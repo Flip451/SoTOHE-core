@@ -1,0 +1,775 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "ActivateTrackOutcome": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Activated",    "payload": { "kind": "unit" } },
+          { "name": "AlreadyActive","payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_activation",
+      "docs": "Deleted: track_activation.rs module removed (IN-09 / IN-16: activate use-case dependency, plan-only/activate lane expunged). Was the outcome enum for ActivateTrackUseCase.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "611f6bc0861e419a918492f6f76d74f9a455f22d3bfa62ed77de55231ea194f7"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ActivateTrackUseCase": {
+      "action": "delete",
+      "role": "UseCase",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "track_activation",
+      "docs": "Deleted: track_activation.rs module removed (IN-09 / IN-16: activate use-case dependency, plan-only/activate lane expunged). Was the use case struct for track activation.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "611f6bc0861e419a918492f6f76d74f9a455f22d3bfa62ed77de55231ea194f7"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PrBranchContext": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "branch",   "ty": "String" },
+            { "name": "track_id", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pr_workflow",
+      "docs": "Context resolved from the current git branch for PR operations. is_plan_branch field removed (IN-11 / IN-16: plan-only/activate lane expunged; plan/ prefix handling deleted). branch and track_id are free-text strings — raw String justified (opaque branch/id values, no domain concept requiring validation at this boundary).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PreCommitTypeSignalsError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "GitDiscoverFailed", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "RulesFileMissing",  "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "RulesParseError",   "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "SymlinkRejected",   "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "BranchNotFound",    "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "BranchMismatch",    "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "TypeSignalsRecomputeFailed", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_commit_type_signals",
+      "docs": "Error type for PreCommitTypeSignalsService. MetadataLoadFailed and ImplPlanLoadFailed (from the status-based frozen guard) are removed and replaced by BranchNotFound / BranchMismatch (branch-based guard, IN-02). GitDiscoverFailed / RulesFileMissing / RulesParseError / SymlinkRejected / TypeSignalsRecomputeFailed remain unchanged. Error message strings carry free-text diagnostics — no domain concept, raw String justified.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-01",
+          "hash": "103c63d90c96ebe50765d2fcb40a94e5dd840fd3dcc1664167d97370f872e423"
+        },
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-02",
+          "hash": "2faa1829c8ecdbd214d1bd1c3be5921545d97b5bbf3b592fbc3768d0cdc1ced7"
+        },
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "CN-04",
+          "hash": "2542dc751de89497d46b2c7d2e3d0438261f4fe898d8e7c94110722226d3f4f3"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PreCommitTypeSignalsInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "pre_commit_type_signals",
+      "docs": "Concrete struct implementing PreCommitTypeSignalsService. The injected run_fn closure removes all frozen/status-based logic and performs the pre-commit branch validation described by IN-02. Missing/non-track branch state maps to PreCommitTypeSignalsError::BranchNotFound, branch/track mismatch maps to PreCommitTypeSignalsError::BranchMismatch, and TypeSignalsRecomputeFailed is reserved for recomputation failures after the branch guard has passed.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-01",
+          "hash": "103c63d90c96ebe50765d2fcb40a94e5dd840fd3dcc1664167d97370f872e423"
+        },
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-02",
+          "hash": "2faa1829c8ecdbd214d1bd1c3be5921545d97b5bbf3b592fbc3768d0cdc1ced7"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PreCommitTypeSignalsOutput": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "blocked",        "ty": "bool" },
+            { "name": "red_signals",    "ty": "Vec<String>" },
+            { "name": "yellow_signals", "ty": "Vec<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pre_commit_type_signals",
+      "docs": "DTO returned by PreCommitTypeSignalsService::run. frozen: bool is removed: the branch-based guard (IN-02, CN-04) rejects non-current-branch tracks before reaching this output stage, so callers no longer need a frozen flag. blocked: bool remains (red signals present). red_signals / yellow_signals carry free-text signal names — raw Vec<String> justified (opaque diagnostic labels, no domain constraint). Dto placed in usecase per R1 — pure pass-through DTO with no serde dependency, conveying use-case result across the usecase boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-01",
+          "hash": "103c63d90c96ebe50765d2fcb40a94e5dd840fd3dcc1664167d97370f872e423"
+        },
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "CN-04",
+          "hash": "2542dc751de89497d46b2c7d2e3d0438261f4fe898d8e7c94110722226d3f4f3"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TaskOperationInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "Concrete struct implementing TaskOperationService. Generic over S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync. schema_version field/param removed (IN-11 / IN-16: plan-only/activate lane expunged; branchless guard logic using schema_version deleted). Private fields stripped.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TrackPhaseInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "track_phase",
+      "docs": "Concrete struct implementing TrackPhaseService. Generic over S: TrackReader + ImplPlanReader + Send + Sync. schema_version_reader field removed (IN-11 / IN-16: plan-only/activate lane expunged; ReadyToActivate phase resolution removed). Private fields stripped.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TrackResolutionError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "DetachedHead",           "payload": { "kind": "unit" } },
+          { "name": "NotTrackBranch",          "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "NoBranch",               "payload": { "kind": "unit" } },
+          { "name": "InvalidTrackId",          "payload": { "kind": "tuple", "fields": ["String", "domain::ValidationError"] } },
+          { "name": "UnsupportedTargetStatus", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "TrackNotFound",           "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "ReadError",               "payload": { "kind": "tuple", "fields": ["domain::TrackReadError"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "docs": "Errors returned by track resolution functions. NotActivated variant removed (IN-11 / IN-16: plan-only/activate lane expunged; resolve_track_or_plan_id_from_branch and related functions deleted). ValidationError and TrackReadError are cross-crate refs from domain.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTrackId",
+            "payload": { "kind": "struct", "fields": [ { "name": "reason", "ty": "String" } ] }
+          },
+          {
+            "name": "NonActiveTrack",
+            "payload": { "kind": "struct", "fields": [ { "name": "branch", "ty": "String" } ] }
+          },
+          {
+            "name": "BranchTrackMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "branch",   "ty": "String" },
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "LayerBindingsLoad",
+            "payload": { "kind": "struct", "fields": [ { "name": "reason", "ty": "String" } ] }
+          },
+          { "name": "NoLayers", "payload": { "kind": "unit" } },
+          {
+            "name": "EvaluationFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "String" },
+                { "name": "reason",   "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "InconsistentRequest",
+            "payload": { "kind": "struct", "fields": [ { "name": "reason", "ty": "String" } ] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "type_signals",
+      "docs": "Error variants for TypeSignalsService::run. Already implements the branch-based guard in the baseline (NonActiveTrack / BranchTrackMismatch). Carried for contract-map edge visibility. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TypeSignalsInteractor": {
+      "action": "reference",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            {
+              "name": "layer_bindings",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "executor",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::TypeSignalsExecutorPort>"
+            }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "type_signals",
+      "docs": "Interactor implementing TypeSignalsService with the existing branch-based active-track guard. Already present in baseline with NonActiveTrack / BranchTrackMismatch checking. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TypeSignalsRequest": {
+      "action": "reference",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir",      "ty": "std::path::PathBuf" },
+            { "name": "track_id",       "ty": "String" },
+            { "name": "branch",         "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer",          "ty": "Option<String>" },
+            { "name": "lenient",        "ty": "bool" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "type_signals",
+      "docs": "CQRS command DTO for TypeSignalsService::run. The branch field carries the current git branch for the existing branch-based guard. Already present in baseline. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "WorktreeGuardError": {
+      "action": "delete",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "DirtyWorktree",      "payload": { "kind": "tuple", "fields": ["Vec<String>"] } },
+          { "name": "WorktreeReadFailed", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "worktree_guard",
+      "docs": "Deleted: worktree_guard.rs module removed (IN-09 / IN-16: activate use-case dependency, plan-only/activate lane expunged). Was the error type for worktree guard functions.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "611f6bc0861e419a918492f6f76d74f9a455f22d3bfa62ed77de55231ea194f7"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "PreCommitTypeSignalsService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id",       "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "pre_commit_type_signals",
+      "docs": "Application service trait for the pre-commit type-signal recomputation use case. Interface unchanged; carried for contract-map edge visibility. The implementation (PreCommitTypeSignalsInteractor) changes but the trait contract is identical.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TypeSignalsService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "request", "ty": "TypeSignalsRequest" }
+          ],
+          "returns": "Result<(), TypeSignalsError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "type_signals",
+      "docs": "Application service trait for the sotp track type-signals use case. Already implements the existing branch-based guard via TypeSignalsInteractor. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "usecase::track_resolution::reject_branchless_guard": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), TrackResolutionError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: reject_branchless_guard removed (IN-11 / IN-16: plan-only/activate lane expunged; branchless guard logic using schema_version deleted from track_resolution.rs).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::track_resolution::reject_branchless_guard_by_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), TrackResolutionError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: reject_branchless_guard_by_str removed (IN-11 / IN-16: plan-only/activate lane expunged).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::track_resolution::reject_branchless_implementation_transition": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), TrackResolutionError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: reject_branchless_implementation_transition removed (IN-11 / IN-16: plan-only/activate lane expunged).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::track_resolution::reject_branchless_implementation_transition_by_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), TrackResolutionError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: reject_branchless_implementation_transition_by_str removed (IN-11 / IN-16: plan-only/activate lane expunged).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::track_resolution::resolve_track_or_plan_id_from_branch": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<String, TrackResolutionError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: resolve_track_or_plan_id_from_branch removed (IN-11 / IN-16: plan-only/activate lane expunged; plan/ prefix handling deleted).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-11",
+          "hash": "23ec1e3f211426f3e538912c2e2b959dff6df754b826a13c9b6f9339bb85bb9d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::worktree_guard::ensure_clean_worktree": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), WorktreeGuardError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: worktree_guard.rs module removed (IN-09 / IN-16: activate use-case dependency, plan-only/activate lane expunged). Was a worktree guard function.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "611f6bc0861e419a918492f6f76d74f9a455f22d3bfa62ed77de55231ea194f7"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::worktree_guard::parse_dirty_worktree_paths": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Vec<String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: worktree_guard.rs module removed (IN-09 / IN-16: activate use-case dependency, plan-only/activate lane expunged). Was a worktree guard function.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "611f6bc0861e419a918492f6f76d74f9a455f22d3bfa62ed77de55231ea194f7"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::worktree_guard::validate_clean_worktree": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), WorktreeGuardError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: worktree_guard.rs module removed (IN-09 / IN-16: activate use-case dependency, plan-only/activate lane expunged). Was a worktree guard function.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-09",
+          "hash": "611f6bc0861e419a918492f6f76d74f9a455f22d3bfa62ed77de55231ea194f7"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "TaskOperationInteractor",
+      "impl_generics": [
+        {
+          "name": "S",
+          "bounds": [
+            "domain::TrackReader",
+            "domain::TrackWriter",
+            "domain::ImplPlanReader",
+            "domain::ImplPlanWriter",
+            "Send",
+            "Sync"
+          ]
+        }
+      ],
+      "impl_where_predicates": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "store", "ty": "std::sync::Arc<S>" },
+            { "name": "branch_reader", "ty": "F" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [
+            {
+              "name": "F",
+              "bounds": [
+                "Fn(&std::path::Path) -> Result<String, String>",
+                "Send",
+                "Sync",
+                "'static"
+              ]
+            }
+          ],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "TrackPhaseInteractor",
+      "impl_generics": [
+        {
+          "name": "S",
+          "bounds": [
+            "domain::TrackReader",
+            "domain::ImplPlanReader",
+            "Send",
+            "Sync"
+          ]
+        }
+      ],
+      "impl_where_predicates": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "store", "ty": "std::sync::Arc<S>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "PreCommitTypeSignalsInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "run_fn",
+              "ty": "Arc<dyn Fn(String, std::path::PathBuf) -> Result<PreCommitTypeSignalsOutput, PreCommitTypeSignalsError> + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "layer_bindings",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "executor",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::TypeSignalsExecutorPort>"
+            }
+          ],
+          "returns": "TypeSignalsInteractor",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "PreCommitTypeSignalsService",
+      "for_type": "PreCommitTypeSignalsInteractor"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "TypeSignalsService",
+      "for_type": "TypeSignalsInteractor"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PreCommitTypeSignalsError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "PreCommitTypeSignalsError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "PreCommitTypeSignalsError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TypeSignalsError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TypeSignalsError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "TypeSignalsError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PrBranchContext"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "PrBranchContext"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "PrBranchContext"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "PrBranchContext"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TrackResolutionError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TrackResolutionError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "TrackResolutionError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::convert::From<domain::TrackReadError>",
+      "for_type": "TrackResolutionError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "TaskOperationService",
+      "for_type": "TaskOperationInteractor"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "TrackPhaseService",
+      "for_type": "TrackPhaseInteractor"
+    }
+  ]
+}

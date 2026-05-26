@@ -19,13 +19,10 @@ pub(super) fn execute_add_task(
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let schema_version = read_schema_version_from_json(&items_dir, &track_id);
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
     let repo_dir_for_reader = repo_dir.clone();
-    let service = usecase::task_ops::TaskOperationInteractor::new(
-        Arc::clone(&store),
-        schema_version,
-        move |_items_dir| {
+    let service =
+        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), move |_items_dir| {
             let output = std::process::Command::new("git")
                 .args(["rev-parse", "--abbrev-ref", "HEAD"])
                 .current_dir(&repo_dir_for_reader)
@@ -36,8 +33,7 @@ pub(super) fn execute_add_task(
                 return Err(format!("git rev-parse failed: {stderr}"));
             }
             Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
-        },
-    );
+        });
 
     // If --after is provided but not a valid TaskId (format: T followed by one
     // or more digits that fit in u64), silently ignore it and append to the end
@@ -87,13 +83,10 @@ pub(super) fn execute_set_override(
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let schema_version = read_schema_version_from_json(&items_dir, &track_id);
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
     let repo_dir_for_reader = repo_dir.clone();
-    let service = usecase::task_ops::TaskOperationInteractor::new(
-        Arc::clone(&store),
-        schema_version,
-        move |_items_dir| {
+    let service =
+        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), move |_items_dir| {
             let output = std::process::Command::new("git")
                 .args(["rev-parse", "--abbrev-ref", "HEAD"])
                 .current_dir(&repo_dir_for_reader)
@@ -104,8 +97,7 @@ pub(super) fn execute_set_override(
                 return Err(format!("git rev-parse failed: {stderr}"));
             }
             Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
-        },
-    );
+        });
 
     let cmd = usecase::task_ops::SetOverrideCommand {
         items_dir,
@@ -135,13 +127,10 @@ pub(super) fn execute_clear_override(
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    let schema_version = read_schema_version_from_json(&items_dir, &track_id);
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
     let repo_dir_for_reader = repo_dir.clone();
-    let service = usecase::task_ops::TaskOperationInteractor::new(
-        Arc::clone(&store),
-        schema_version,
-        move |_items_dir| {
+    let service =
+        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), move |_items_dir| {
             let output = std::process::Command::new("git")
                 .args(["rev-parse", "--abbrev-ref", "HEAD"])
                 .current_dir(&repo_dir_for_reader)
@@ -152,8 +141,7 @@ pub(super) fn execute_clear_override(
                 return Err(format!("git rev-parse failed: {stderr}"));
             }
             Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
-        },
-    );
+        });
 
     let cmd = usecase::task_ops::ClearOverrideCommand {
         items_dir,
