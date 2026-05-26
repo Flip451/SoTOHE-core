@@ -1,0 +1,127 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "RenderError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": { "kind": "tuple", "fields": ["std::io::Error"] }
+          },
+          {
+            "name": "InvalidMetadata",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path",   "ty": "std::path::PathBuf" },
+                { "name": "source", "ty": "CodecError" }
+              ]
+            }
+          },
+          {
+            "name": "OutOfSync",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path",   "ty": "std::path::PathBuf" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path",           "ty": "std::path::PathBuf" },
+                { "name": "schema_version", "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidTrackMetadata",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path",   "ty": "std::path::PathBuf" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track::render",
+      "docs": "Error type for sync_rendered_views and related rendering functions. Carried for contract-map edge visibility (sync_rendered_views -> RenderError edge). No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::track::render::sync_rendered_views": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root",     "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "Option<&str>" }
+      ],
+      "returns": "Result<Vec<std::path::PathBuf>, RenderError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Renders and syncs per-track view files (plan.md, spec.md, <layer>-types.md). Modified: the is_done_or_archived status-based guard (matches!(status, 'done' | 'archived')) is replaced with branch-based validation. spec.md and <layer>-types.md rendering now checks whether the track's configured branch (track/<id>) matches the current git branch, rather than checking status. This implements IN-04: sync-views now protects non-current-branch tracks via branch validation (fail-closed) instead of status guard.",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-04",
+          "hash": "5a642bcd01228eba794f458f63d438cfaa324d7174113c884d0fb02960937d71"
+        },
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-01",
+          "hash": "103c63d90c96ebe50765d2fcb40a94e5dd840fd3dcc1664167d97370f872e423"
+        },
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "CN-01",
+          "hash": "e53530422dadadb224466eb97f5d0b18ba73ed62636d8e6961cefc3a10c4de40"
+        },
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "493d7673e5aa265876f759b580282776b0def56bd2ca2275146cc4c8ca1d7fac"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RenderError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RenderError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "RenderError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<std::io::Error>",
+      "for_type": "RenderError"
+    }
+  ]
+}

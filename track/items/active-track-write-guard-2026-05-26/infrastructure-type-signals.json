@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-26T07:17:57Z",
+  "declaration_hash": "6e43d263a5b229005ef12cbc7f9381e6394c0f6cb8b4a549f79f52b56374293a",
+  "signals": [
+    {
+      "type_name": "infrastructure::track::render::sync_rendered_views",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RenderError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
