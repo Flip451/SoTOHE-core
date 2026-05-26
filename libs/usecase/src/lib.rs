@@ -30,12 +30,10 @@ pub mod review_workflow;
 pub mod skill_compliance;
 pub mod task_completion;
 pub mod task_ops;
-pub mod track_activation;
 pub mod track_phase;
 pub mod track_resolution;
 pub mod type_signals;
 pub mod verify_adr_signals;
-pub mod worktree_guard;
 
 use std::sync::Arc;
 

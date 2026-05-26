@@ -1,7 +1,19 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "604976c22cd4ed08beef7454b3439e91d5b182f04d70dc9dc24f2a4485c775c8",
+  "catalogue_declaration_hash": "17158977ee8c3322bcf3705d059f3ce75fbbae80d6c0011648c89ebb0ff7624e",
   "signals": [
+    {
+      "type_name": "ActivateTrackOutcome",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ActivateTrackUseCase",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PrBranchContext",
+      "signal": "blue"
+    },
     {
       "type_name": "PreCommitTypeSignalsError",
       "signal": "blue"
@@ -12,6 +24,18 @@
     },
     {
       "type_name": "PreCommitTypeSignalsOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackPhaseInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackResolutionError",
       "signal": "blue"
     },
     {
@@ -27,11 +51,47 @@
       "signal": "blue"
     },
     {
+      "type_name": "WorktreeGuardError",
+      "signal": "blue"
+    },
+    {
       "type_name": "PreCommitTypeSignalsService",
       "signal": "blue"
     },
     {
       "type_name": "TypeSignalsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::track_resolution::reject_branchless_guard",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::track_resolution::reject_branchless_guard_by_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::track_resolution::reject_branchless_implementation_transition",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::track_resolution::reject_branchless_implementation_transition_by_str",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::track_resolution::resolve_track_or_plan_id_from_branch",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::worktree_guard::ensure_clean_worktree",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::worktree_guard::parse_dirty_worktree_paths",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::worktree_guard::validate_clean_worktree",
       "signal": "blue"
     }
   ]

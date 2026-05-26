@@ -18,16 +18,11 @@ pub(super) fn execute_transition(
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    // Read schema_version from metadata.json (pure JSON, no domain types needed).
-    let schema_version = read_schema_version_from_json(&items_dir, &track_id);
-
     // Build store and branch reader for TaskOperationInteractor.
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
     let repo_dir_for_reader = repo_dir.clone();
-    let service = usecase::task_ops::TaskOperationInteractor::new(
-        Arc::clone(&store),
-        schema_version,
-        move |_items_dir| {
+    let service =
+        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), move |_items_dir| {
             // Read the current branch from git for the branch guard.
             let output = std::process::Command::new("git")
                 .args(["rev-parse", "--abbrev-ref", "HEAD"])
@@ -39,8 +34,7 @@ pub(super) fn execute_transition(
                 return Err(format!("git rev-parse failed: {stderr}"));
             }
             Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
-        },
-    );
+        });
 
     let cmd = usecase::task_ops::TaskTransitionCommand {
         items_dir,

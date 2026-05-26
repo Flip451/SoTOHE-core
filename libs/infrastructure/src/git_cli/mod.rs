@@ -400,7 +400,7 @@ fn read_metadata(path: &Path) -> Result<BranchMetadata, String> {
     }
     if illegal_v3_branchless_track(&raw, &metadata) {
         return Err(format!(
-            "Cannot read or parse metadata.json in {}: Illegal branchless v3 metadata; run /track:activate <track-id>",
+            "Cannot read or parse metadata.json in {}: Illegal branchless v3 metadata; materialize a track branch before committing implementation tasks",
             path.display()
         ));
     }

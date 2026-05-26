@@ -1,36 +1,127 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
+    "cli": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both new 'allowed on current branch' tests are inert: they build fixtures but never invoke `execute_catalogue_spec_signals`, so the success path for the rewritten branch guard and catalogue-spec file writes is no longer exercised. A regression in the matching-branch path would still pass this suite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "line": 309,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:6c674fd8e2fcbd04905c571393c40f05a444a4970dd7135aa5bf98cdc00709e4",
+          "at": "2026-05-26T08:36:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`current_branch()` is folded into `unwrap_or_default()` here, so a git branch-read failure is treated the same as an ordinary non-track branch and rejected with the mismatch path. That contradicts the briefing’s fail-closed requirement for git discover/branch-read failures, and it can silently mask repo/git errors instead of surfacing them. The same pattern is repeated in the catalogue-spec and pre-commit call sites.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 140,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:c48af89045ba5a77aec30d86651bcea919233981507dd1e1aeee7278c460f8fa",
+          "at": "2026-05-26T08:45:51Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
-          "at": "2026-05-26T08:35:19Z"
+          "hash": "rvw1:sha256:42a79062f2a53946826f8fe458f2addbafa478e03fd5619d3f3088ee4d5169b6",
+          "at": "2026-05-26T08:51:42Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The public `PreCommitTypeSignalsService` contract still documents fields/errors that this change removed: it says the output contains optional layer bindings, and the `run` errors mention metadata failures even though `PreCommitTypeSignalsOutput` now only carries blocked/red/yellow signals and the metadata/impl-plan variants were replaced by branch errors. This leaves a contradictory usecase API contract for callers implementing the new branch-guard flow.",
+              "message": "`track-commit-message` still fail-opens before the new branch guard: when `current_branch_track_id_strict()` returns `None` for `main`, a detached/non-track branch, or a git branch-read failure, this `if let` simply skips `run_pre_commit_type_signals` and continues to CI/commit. That means the required branch-based guard never rejects non-track branches for the make pre-commit path, contrary to the new fail-closed `track/<id>`-only policy.",
               "severity": "P1",
-              "file": "libs/usecase/src/pre_commit_type_signals.rs",
-              "line": 66,
-              "category": "api-contract"
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 500,
+              "category": "branch_guard"
             }
           ],
-          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
-          "at": "2026-05-26T08:37:33Z"
+          "hash": "rvw1:sha256:42a79062f2a53946826f8fe458f2addbafa478e03fd5619d3f3088ee4d5169b6",
+          "at": "2026-05-26T08:54:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:200f6a5013b8b43178d44624ef0df8b7aa6737dc7eb422357d6b27d201a0d9a2",
-          "at": "2026-05-26T08:39:48Z"
+          "hash": "rvw1:sha256:a43710342f05fafb0268fe9942022f3eed7054981d85fde874c21225b8fdbf81",
+          "at": "2026-05-26T09:00:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebc5ea739215df254c1fef45a456c730382c1c07df9b50085746fe7aa7336100",
+          "at": "2026-05-26T10:41:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebc5ea739215df254c1fef45a456c730382c1c07df9b50085746fe7aa7336100",
+          "at": "2026-05-26T10:44:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:394c132a84a4c16f4c794a2c42e53a9048e4c4fb2bedfcfb8509d21b1612ce7b",
+          "at": "2026-05-26T14:03:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The PR subcommand help still advertises `track/plan` branch support and `--track-id` for `plan/` branches, but `resolve_branch_context` now delegates to `resolve_pr_branch`, which rejects every non-`track/<id>` branch and ignores the explicit track ID. Users following this help on a removed `plan/<id>` lane will get a hard error instead of the documented push/ensure/review behavior, so the plan-lane expunge is left with a stale public CLI contract.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/pr.rs",
+              "line": 24,
+              "category": "broken user-facing reference"
+            }
+          ],
+          "hash": "rvw1:sha256:394c132a84a4c16f4c794a2c42e53a9048e4c4fb2bedfcfb8509d21b1612ce7b",
+          "at": "2026-05-26T14:07:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae8ceab544068dcb94e3be628d53bc126c1f9a75040acb37cf8cfbf7b625cfb2",
+          "at": "2026-05-26T14:11:10Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8fc9e37c5a5673e26964c3319fc539932d09f38575e4a927bd548214e15efef7",
+          "at": "2026-05-26T14:00:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8fc9e37c5a5673e26964c3319fc539932d09f38575e4a927bd548214e15efef7",
+          "at": "2026-05-26T14:03:24Z"
         }
       ]
     },
@@ -208,6 +299,71 @@
           "findings": [],
           "hash": "rvw1:sha256:982f9beab3cddb59783424c97fd6920b9037ffd2717e294bd296e0607daec6cf",
           "at": "2026-05-26T12:08:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cecdcf146b0abd82b65810c2e3645b3f098eb2e2578fedf4f4e54ae8f0ab9154",
+          "at": "2026-05-26T14:01:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cecdcf146b0abd82b65810c2e3645b3f098eb2e2578fedf4f4e54ae8f0ab9154",
+          "at": "2026-05-26T14:04:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.json` names the removed phase as `ReadyToActivate`, but this scope's spec and implementation plan both use `TrackPhase::ActivateTrack` ([spec.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/active-track-write-guard-2026-05-26/spec.json#L145), [impl-plan.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/active-track-write-guard-2026-05-26/impl-plan.json#L48)). The same `ReadyToActivate` wording also appears in [usecase-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/active-track-write-guard-2026-05-26/usecase-types.json#L210), so the generated catalogue is internally inconsistent about which enum arm is being deleted and could point implementers at the wrong variant.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/active-track-write-guard-2026-05-26/domain-types.json",
+              "line": 22,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:4d5dd548e450dfa9257ff38e8f106494d9563f03fad9c2be8862d0af976884f2",
+          "at": "2026-05-26T15:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1850a8f1aa9958640edd3f8cb03211be151ba23f483ad37ab6d30e6beb1616b",
+          "at": "2026-05-26T15:58:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`WorktreeGuardError` and the `usecase::worktree_guard::*` delete entries are traced to `IN-11`, but `IN-11` is specifically about removing `plan/<id>` branch handling from shared modules like `pr_workflow`, `merge_gate`, `task_completion`, and `track_resolution`. The entries themselves describe deleting the worktree cleanliness guard because it was part of the activate lane, which is a different requirement, so the catalogue now points these deletions at the wrong spec element.",
+              "severity": "P1",
+              "file": "track/items/active-track-write-guard-2026-05-26/usecase-types.json",
+              "line": 360,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:e1850a8f1aa9958640edd3f8cb03211be151ba23f483ad37ab6d30e6beb1616b",
+          "at": "2026-05-26T16:03:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ca57521975c5f5090e7597a4c482beb85b4b69ee3195d1af261be65c25e3bed",
+          "at": "2026-05-26T16:20:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ca57521975c5f5090e7597a4c482beb85b4b69ee3195d1af261be65c25e3bed",
+          "at": "2026-05-26T16:24:33Z"
         }
       ]
     },
@@ -374,83 +530,148 @@
           "findings": [],
           "hash": "rvw1:sha256:55493c0a15bc21f4248f616c31528db98b9f12e4f625c968e1cd0b2729d85440",
           "at": "2026-05-26T09:33:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Dropping the branchless-planning tie-breaker makes `render_registry` able to surface a newer branchless v5 planned track as `Latest active track` again, even though `libs/infrastructure/src/verify/latest_track.rs` still treats branchless planned v3/v4/v5 tracks as lower-priority placeholders. The registry and verifier now disagree on which active track should win.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 470,
+              "category": "contradiction"
+            },
+            {
+              "message": "The replacement test no longer verifies the `Current Focus` row or the recommended command for the branchless fixture; it only matches the generic `/track:status` footer, so it would still pass if the current-focus ordering regressed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
+              "line": 475,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5f80742cf381cc133e57e4360924c1cf1643153a3747dd9b0a4cb2f0ee4b55f1",
+          "at": "2026-05-26T14:04:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`selection_priority()` now treats `planned`, `in_progress`, `blocked`, and `cancelled` as the same priority, so `latest_track_dir()` will pick whichever active track has the newest `updated_at`. That no longer matches `render_registry()`'s planned-last ordering (`libs/infrastructure/src/track/render.rs:469-470`), so a newer planned track can become the verifier's \"latest track\" while the registry still surfaces an older in-progress track. In a mixed repo, `verify()` can therefore skip artifact validation for the wrong track.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 457,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d8d2d41e092fa1327992d02f9d4d370ccf662808731dd6e635820fc1b389a82a",
+          "at": "2026-05-26T14:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test no longer exercises the ordering it is meant to protect: with only a single snapshot, it will pass even if `render_registry` stops putting planned tracks after in-progress/blocked/cancelled tracks. The deleted multi-track assertions were the only coverage for the Current Focus sort.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
+              "line": 465,
+              "category": "tests"
+            },
+            {
+              "message": "`latest_track_dir` still breaks same-timestamp ties in the opposite direction from `render_registry`: snapshots are sorted by `track.id()` ascending before rendering (`render.rs:342-345`), but the verification path ranks equal `(priority, updated_at)` entries by `dir_name` and picks the lexicographically larger one (`latest_track.rs:150-153`). If two active tracks share an `updated_at`, `registry.md` and verification can disagree on which track is latest.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 152,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:8ce298280bfa2568a469f811281dac317286e3a02e4bdbc7c3097eed259ac88b",
+          "at": "2026-05-26T14:30:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74d8e1c1690449d83d1a2ac442d30588a167573a27cfb7a5db835a8547ee30fc",
+          "at": "2026-05-26T14:36:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74d8e1c1690449d83d1a2ac442d30588a167573a27cfb7a5db835a8547ee30fc",
+          "at": "2026-05-26T14:39:51Z"
         }
       ]
     },
-    "cli": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Both new 'allowed on current branch' tests are inert: they build fixtures but never invoke `execute_catalogue_spec_signals`, so the success path for the rewritten branch guard and catalogue-spec file writes is no longer exercised. A regression in the matching-branch path would still pass this suite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
-              "line": 309,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:6c674fd8e2fcbd04905c571393c40f05a444a4970dd7135aa5bf98cdc00709e4",
-          "at": "2026-05-26T08:36:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`current_branch()` is folded into `unwrap_or_default()` here, so a git branch-read failure is treated the same as an ordinary non-track branch and rejected with the mismatch path. That contradicts the briefing’s fail-closed requirement for git discover/branch-read failures, and it can silently mask repo/git errors instead of surfacing them. The same pattern is repeated in the catalogue-spec and pre-commit call sites.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 140,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:c48af89045ba5a77aec30d86651bcea919233981507dd1e1aeee7278c460f8fa",
-          "at": "2026-05-26T08:45:51Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:42a79062f2a53946826f8fe458f2addbafa478e03fd5619d3f3088ee4d5169b6",
-          "at": "2026-05-26T08:51:42Z"
+          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
+          "at": "2026-05-26T08:35:19Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`track-commit-message` still fail-opens before the new branch guard: when `current_branch_track_id_strict()` returns `None` for `main`, a detached/non-track branch, or a git branch-read failure, this `if let` simply skips `run_pre_commit_type_signals` and continues to CI/commit. That means the required branch-based guard never rejects non-track branches for the make pre-commit path, contrary to the new fail-closed `track/<id>`-only policy.",
+              "message": "The public `PreCommitTypeSignalsService` contract still documents fields/errors that this change removed: it says the output contains optional layer bindings, and the `run` errors mention metadata failures even though `PreCommitTypeSignalsOutput` now only carries blocked/red/yellow signals and the metadata/impl-plan variants were replaced by branch errors. This leaves a contradictory usecase API contract for callers implementing the new branch-guard flow.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/make.rs",
-              "line": 500,
-              "category": "branch_guard"
+              "file": "libs/usecase/src/pre_commit_type_signals.rs",
+              "line": 66,
+              "category": "api-contract"
             }
           ],
-          "hash": "rvw1:sha256:42a79062f2a53946826f8fe458f2addbafa478e03fd5619d3f3088ee4d5169b6",
-          "at": "2026-05-26T08:54:58Z"
+          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
+          "at": "2026-05-26T08:37:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a43710342f05fafb0268fe9942022f3eed7054981d85fde874c21225b8fdbf81",
-          "at": "2026-05-26T09:00:04Z"
+          "hash": "rvw1:sha256:200f6a5013b8b43178d44624ef0df8b7aa6737dc7eb422357d6b27d201a0d9a2",
+          "at": "2026-05-26T08:39:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ebc5ea739215df254c1fef45a456c730382c1c07df9b50085746fe7aa7336100",
-          "at": "2026-05-26T10:41:57Z"
+          "hash": "rvw1:sha256:ebd5807fa408beac3219083e7f04f9fd861245b9977b8b6d2c5972dc28f73587",
+          "at": "2026-05-26T14:02:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After removing the `plan/` short-circuit, this gate still treats any non-`track/` branch as a valid track identifier by falling back to the full branch name. A PR from `plan/foo` can therefore reach the strict merge gate instead of being rejected as outside the track workflow, and can pass if the expected blobs exist. For the lane expunge, non-`track/` refs should fail closed here rather than being evaluated as best-effort track IDs.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 263,
+              "category": "logic"
+            },
+            {
+              "message": "`plan/` branches now fall through this function because the old short-circuit was removed, but the track id derivation still accepts non-`track/` branches as `track_id_str = branch`. That leaves `plan/foo` eligible to pass the task-completion guard if an impl-plan with resolved tasks is present, instead of failing closed as a non-track PR head. Reject non-`track/` branches before reading impl-plan.json.",
+              "severity": "P1",
+              "file": "libs/usecase/src/task_completion.rs",
+              "line": 48,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:ebd5807fa408beac3219083e7f04f9fd861245b9977b8b6d2c5972dc28f73587",
+          "at": "2026-05-26T14:05:37Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ebc5ea739215df254c1fef45a456c730382c1c07df9b50085746fe7aa7336100",
-          "at": "2026-05-26T10:44:58Z"
+          "hash": "rvw1:sha256:4d1bcc0c927be10fb0f760fec8554d8a7d72c7d47deed5857c17580dd43c6906",
+          "at": "2026-05-26T14:09:38Z"
         }
       ]
     },
@@ -469,6 +690,38 @@
           "findings": [],
           "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
           "at": "2026-05-26T07:16:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d975ca3094873ed033e445b50e167888c853955e2ff332d106afb72f723ea397",
+          "at": "2026-05-26T14:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d975ca3094873ed033e445b50e167888c853955e2ff332d106afb72f723ea397",
+          "at": "2026-05-26T14:06:14Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5a95b61d9eb2abbc82dcc7f8bfa0523d9c23587773ae69ff03138e789f24212",
+          "at": "2026-05-26T13:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5a95b61d9eb2abbc82dcc7f8bfa0523d9c23587773ae69ff03138e789f24212",
+          "at": "2026-05-26T14:01:38Z"
         }
       ]
     }

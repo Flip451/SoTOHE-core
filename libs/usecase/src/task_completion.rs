@@ -19,14 +19,13 @@ use crate::merge_gate::{BlobFetchResult, TrackBlobReader};
 ///
 /// # Behavior
 ///
-/// 1. `plan/` branches → PASS (plan-only branches carry no implementation tasks)
-/// 2. `validate_branch_ref` → fail-closed on dangerous characters
+/// 1. `validate_branch_ref` → fail-closed on dangerous characters
+/// 2. Non-`track/` branches rejected fail-closed
 /// 3. `track/` prefix stripped and validated via `TrackId::try_new`
 /// 4. `reader.read_impl_plan(branch, track_id)`:
 ///    - `Found(doc)` → check `all_tasks_resolved()`; report unresolved task IDs
-///    - `NotFound` → BLOCKED (activated `track/*` branches must carry impl-plan.json;
-///      `plan/*` branches already short-circuited at step 1, so a missing impl-plan
-///      here is an activated track with no task list — a merge bypass path)
+///    - `NotFound` → BLOCKED (`track/*` branches must carry impl-plan.json;
+///      a missing impl-plan is a track with no task list — a merge bypass path)
 ///    - `FetchError` → BLOCKED
 ///
 /// This function is a thin orchestration that delegates all I/O to the
@@ -39,37 +38,32 @@ pub fn check_tasks_resolved_from_git_ref(
     branch: &str,
     reader: &impl TrackBlobReader,
 ) -> VerifyOutcome {
-    // 1. plan/ branches skip the gate entirely
-    if branch.starts_with("plan/") {
-        return VerifyOutcome::pass();
-    }
-
-    // 2. Branch-ref validation
+    // 1. Branch-ref validation
     if let Err(err) = validate_branch_ref(branch) {
         return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
             "invalid branch ref: {err}"
         ))]);
     }
 
-    // 3. Resolve and validate track_id
-    let track_id_str = branch.strip_prefix("track/").unwrap_or(branch);
-    if branch.starts_with("track/") {
-        if let Err(err) = TrackId::try_new(track_id_str) {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "invalid track id derived from branch '{branch}': {err}"
-            ))]);
-        }
+    // 2-3. Require track/ and validate the derived track_id.
+    let Some(track_id_str) = branch.strip_prefix("track/") else {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "task-completion gate requires a track/<id> branch (current: {branch})"
+        ))]);
+    };
+    if let Err(err) = TrackId::try_new(track_id_str) {
+        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+            "invalid track id derived from branch '{branch}': {err}"
+        ))]);
     }
 
     // 4. Fetch and inspect impl-plan.json.
     //
-    // `plan/*` branches short-circuit at step 1 (planning-only, no tasks yet).
-    // `track/*` branches reach this point only after activation, at which
-    // point impl-plan.json is required — it is the SSoT for the task list
-    // that this gate must enforce. Treating a missing impl-plan.json as
+    // `track/*` branches must carry impl-plan.json — it is the SSoT for the
+    // task list that this gate enforces. Treating a missing impl-plan.json as
     // `pass()` would silently bypass the "all tasks resolved" check, letting
-    // a merge proceed on an activated track that never produced its task
-    // plan (or whose plan was deleted). Fail closed instead.
+    // a merge proceed on a track that never produced its task plan (or whose
+    // plan was deleted). Fail closed instead.
     let impl_plan = match reader.read_impl_plan(branch, track_id_str) {
         BlobFetchResult::Found(doc) => doc,
         BlobFetchResult::NotFound => {
@@ -199,16 +193,7 @@ mod tests {
         ImplPlanDocument::new(vec![], PlanView::new(vec![], vec![])).unwrap()
     }
 
-    // --- K1–K7 test matrix ---
-
-    #[test]
-    fn test_k1_plan_branch_short_circuits() {
-        // K1: plan/ branch → PASS (reader never called)
-        let reader = MockReader::unreachable();
-        let outcome = check_tasks_resolved_from_git_ref("plan/dummy", &reader);
-        assert!(!outcome.has_errors());
-        assert!(outcome.findings().is_empty());
-    }
+    // --- K2–K8 test matrix ---
 
     #[test]
     fn test_k2_impl_plan_all_resolved_passes() {
@@ -233,10 +218,9 @@ mod tests {
 
     #[test]
     fn test_k4_impl_plan_not_found_blocks_on_track_branch() {
-        // K4: impl-plan.json NotFound on an activated `track/*` branch → BLOCKED.
-        // planning-only `plan/*` branches short-circuit at step 1 before ever
-        // reaching the reader; by the time `read_impl_plan` runs we are on
-        // an activated track, so a missing impl-plan.json is a merge bypass.
+        // K4: impl-plan.json NotFound on a `track/*` branch → BLOCKED.
+        // By the time `read_impl_plan` runs we are on a track branch, so a
+        // missing impl-plan.json is a merge bypass.
         let reader = MockReader::new(BlobFetchResult::NotFound);
         let outcome = check_tasks_resolved_from_git_ref("track/foo", &reader);
         assert!(outcome.has_errors(), "{outcome:?}");
@@ -271,6 +255,14 @@ mod tests {
         let reader = MockReader::unreachable();
         let outcome = check_tasks_resolved_from_git_ref("", &reader);
         assert!(outcome.has_errors());
+    }
+
+    #[test]
+    fn test_non_track_branch_blocks_without_reading() {
+        let reader = MockReader::unreachable();
+        let outcome = check_tasks_resolved_from_git_ref("plan/foo", &reader);
+        assert!(outcome.has_errors());
+        assert!(outcome.findings()[0].message().contains("track/<id> branch"));
     }
 
     #[test]

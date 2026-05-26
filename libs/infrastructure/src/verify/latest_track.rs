@@ -15,7 +15,8 @@ const TRACK_ITEMS_DIR: &str = "track/items";
 const TRACK_ARCHIVE_DIR: &str = "track/archive";
 
 /// Type alias to reduce repetition in metadata-loading signatures.
-type TrackMeta = (i64, String, Option<String>, u32);
+/// Contains `(updated_at_unix_secs, status)`.
+type TrackMeta = (i64, String);
 
 /// Type alias for file-validator function pointers used in the verify loop.
 type FileValidator = fn(&Path, &Path) -> Vec<VerifyFinding>;
@@ -128,8 +129,10 @@ fn latest_track_dir(root: &Path) -> Result<Option<PathBuf>, Vec<VerifyFinding>> 
     let archive_root = root.join(TRACK_ARCHIVE_DIR);
 
     let mut latest_dir: Option<PathBuf> = None;
-    // Rank tuple: (priority, updated_at_secs, dir_name)
-    let mut latest_rank: (u32, i64, String) = (0, i64::MIN, String::new());
+    // Rank tuple: (priority, updated_at_secs, dir_name). Higher priority and
+    // newer timestamps win; equal timestamps tie-break by lower dir_name to
+    // match registry snapshot ordering.
+    let mut latest_rank: Option<(u32, i64, String)> = None;
     let mut errors: Vec<VerifyFinding> = Vec::new();
 
     for dir_path in dirs {
@@ -144,13 +147,21 @@ fn latest_track_dir(root: &Path) -> Result<Option<PathBuf>, Vec<VerifyFinding>> 
                 continue;
             }
             Ok(None) => continue, // archived status, skip
-            Ok(Some((updated_at_secs, status, branch, schema_version))) => {
-                let priority = selection_priority(&status, branch.as_deref(), schema_version);
+            Ok(Some((updated_at_secs, status))) => {
+                let priority = selection_priority(&status);
                 let dir_name =
                     dir_path.file_name().and_then(|n| n.to_str()).unwrap_or("").to_owned();
-                let rank = (priority, updated_at_secs, dir_name);
-                if rank > latest_rank {
-                    latest_rank = rank;
+                let should_replace = match &latest_rank {
+                    None => true,
+                    Some((best_priority, best_updated_at, best_dir_name)) => {
+                        (priority, updated_at_secs) > (*best_priority, *best_updated_at)
+                            || (priority == *best_priority
+                                && updated_at_secs == *best_updated_at
+                                && dir_name < *best_dir_name)
+                    }
+                };
+                if should_replace {
+                    latest_rank = Some((priority, updated_at_secs, dir_name));
                     latest_dir = Some(dir_path);
                 }
             }
@@ -168,7 +179,7 @@ fn latest_track_dir(root: &Path) -> Result<Option<PathBuf>, Vec<VerifyFinding>> 
 /// Returns `Ok(None)` if the track should be skipped (archived status).
 /// Returns `Err(findings)` for malformed metadata.
 ///
-/// On success returns `(updated_at_unix_secs, status, branch, schema_version)`.
+/// On success returns `(updated_at_unix_secs, status)`.
 fn load_track_metadata(
     track_dir: &Path,
     root: &Path,
@@ -291,9 +302,7 @@ fn load_track_metadata(
         }
     };
 
-    let branch = obj.get("branch").and_then(|v| v.as_str()).map(|s| s.to_owned());
-
-    Ok(Some((updated_at_secs, status, branch, schema_version)))
+    Ok(Some((updated_at_secs, status)))
 }
 
 /// Parse an ISO 8601 timestamp and return Unix seconds.
@@ -450,29 +459,18 @@ fn load_impl_plan_from_dir(track_dir: &Path) -> Result<Option<domain::ImplPlanDo
 /// Compute track selection priority.
 ///
 /// Returns:
-/// - `2` when the track has a branch and is not done, or is branchless but
-///   actively in-progress (status is active and not `planned`).
-/// - `1` when the track is branchless v3/v4 and `planned` (planning-only).
-///   These are deprioritised so that a branchful active track always wins.
-/// - `0` otherwise (done, archived, or unrecognized).
-fn selection_priority(status: &str, branch: Option<&str>, schema_version: u32) -> u32 {
-    let branch_name = branch.map(|b| b.trim()).unwrap_or("");
-    let has_branch = !branch_name.is_empty();
-    let is_active = status != "done" && status != "archived";
-
-    if has_branch && is_active {
-        return 2;
+/// - `2` when the track is active and past planning (`in_progress`, `blocked`, or `cancelled`).
+/// - `1` when the track is `planned`.
+/// - `0` otherwise (`done`, `archived`, or unrecognized status).
+///
+/// This mirrors registry rendering, where planned tracks sort after other active tracks.
+/// Tiebreaking is done by `updated_at` timestamp.
+fn selection_priority(status: &str) -> u32 {
+    match status {
+        "in_progress" | "blocked" | "cancelled" => 2,
+        "planned" => 1,
+        _ => 0,
     }
-    // Branchless track with active status that is NOT a planning-only placeholder.
-    // v3/v4/v5 tracks in "planned" state are planning-only (priority 1).
-    // All other branchless active tracks get priority 2.
-    if !has_branch && is_active && !(matches!(schema_version, 3..=5) && status == "planned") {
-        return 2;
-    }
-    if !has_branch && status == "planned" {
-        return 1;
-    }
-    0
 }
 
 // ---------------------------------------------------------------------------

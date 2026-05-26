@@ -11,9 +11,8 @@ Execution:
 - Resolve the current track in this order:
   1. If the current git branch matches `track/<id>`, use that track.
   2. Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`).
-  3. If no materialized active track exists, fall back to the latest branchless planning-only track (`status=planned`, `branch=null`).
 - Read the current track's `spec.md`, `plan.md`, and `metadata.json` before implementation.
-- If the resolved track is branchless planning-only (`status=planned`, `branch=null`), stop immediately and instruct the user to run `/track:activate <track-id>`. Do not transition tasks, do not write implementation code, and do not treat this as an implicit branch-creation step.
+- If no materialized active track is found on a `track/<id>` branch, stop immediately and report the situation. Do not transition tasks, do not write implementation code.
 - Read every convention file listed in the `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy tracks without `spec.json`) before writing code.
 - For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer `## Canonical Blocks` in `plan.md` and `knowledge/DESIGN.md` over surrounding prose.
 - **ADR pre-check**: If `spec.md` or `plan.md` references an ADR (`knowledge/adr/*.md`), read the ADR and verify that the target task's description is consistent with the ADR's design (layer placement, error types, behavioral contracts). If discrepancies are found, fix the plan (`metadata.json` + `track-sync-views`) before writing code. ADR is the SSoT for design decisions — do not override ADR layer placement or omit ADR-specified types.
@@ -33,7 +32,7 @@ Execution:
 
 Behavior:
 - This command is the canonical replacement for legacy team-implement style flow.
-- Planning-only tracks must pass through `/track:activate <track-id>` first.
+- Implementation requires being on a `track/<id>` branch.
 - After execution, summarize:
   1. Implemented scope
   2. Updated `metadata.json` task states (todo → in_progress → done, or blocked in_progress)

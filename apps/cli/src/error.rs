@@ -27,9 +27,6 @@ pub enum CliError {
     PrWorkflow(#[from] usecase::pr_workflow::PrWorkflowError),
 
     #[error("{0}")]
-    WorktreeGuard(#[from] usecase::worktree_guard::WorktreeGuardError),
-
-    #[error("{0}")]
     ReviewWorkflow(#[from] usecase::review_workflow::ReviewWorkflowError),
 
     #[error("{0}")]

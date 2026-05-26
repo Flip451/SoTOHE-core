@@ -176,8 +176,6 @@ const EXPECTED_CARGO_MAKE_ALLOW: &[(&str, &str)] = &[
     ("Bash(cargo make track-sync-views:*)", "cargo make track-sync-views permission"),
     ("Bash(cargo make track-branch-create:*)", "cargo make track-branch-create permission"),
     ("Bash(cargo make track-branch-switch:*)", "cargo make track-branch-switch permission"),
-    ("Bash(cargo make track-activate:*)", "cargo make track-activate permission"),
-    ("Bash(cargo make track-plan-branch:*)", "cargo make track-plan-branch permission"),
     ("Bash(cargo make track-resolve:*)", "cargo make track-resolve permission"),
     (
         "Bash(cargo make architecture-rules-workspace-members)",

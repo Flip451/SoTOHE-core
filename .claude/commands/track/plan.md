@@ -250,7 +250,6 @@ On completion, present:
 5. Suggested next commands:
    - Standard lane: `/track:implement` → `/track:review` → `/track:commit`, or `/track:full-cycle`
    - Planning-review-first: `/track:review` → `/track:commit` to review planning artifacts before implementation
-   - Plan-only lane: `/track:plan-only <feature>` + `/track:activate <track-id>`
 
 ## References
 

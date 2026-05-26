@@ -2,9 +2,175 @@
   "schema_version": 3,
   "crate_name": "domain",
   "layer": "domain",
-  "types": {},
+  "types": {
+    "TrackPhase": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Planning",    "payload": { "kind": "unit" } },
+          { "name": "InProgress",  "payload": { "kind": "unit" } },
+          { "name": "ReadyToShip", "payload": { "kind": "unit" } },
+          { "name": "Blocked",     "payload": { "kind": "unit" } },
+          { "name": "Cancelled",   "payload": { "kind": "unit" } },
+          { "name": "Archived",    "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_phase",
+      "docs": "User-facing workflow phase. ReadyToActivate variant removed in this track (IN-12 / IN-16: plan-only/activate lane expunged).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-12",
+          "hash": "4ae0829c647990ee22364be985e339d5804bbb269b8f62bf49de4b3a873d15e2"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "NextCommand": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Implement",      "payload": { "kind": "unit" } },
+          { "name": "Done",           "payload": { "kind": "unit" } },
+          { "name": "PlanNewFeature", "payload": { "kind": "unit" } },
+          { "name": "Status",         "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_phase",
+      "docs": "Recommended next command for the track workflow. ActivateTrack variant removed in this track (IN-12 / IN-16: plan-only/activate lane expunged).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-12",
+          "hash": "4ae0829c647990ee22364be985e339d5804bbb269b8f62bf49de4b3a873d15e2"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "traits": {},
-  "functions": {},
+  "functions": {
+    "domain::track_phase::resolve_phase": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track",     "ty": "&TrackMetadata" },
+        { "name": "impl_plan", "ty": "Option<&ImplPlanDocument>" }
+      ],
+      "returns": "TrackPhaseInfo",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Resolves the user-facing phase for a track. schema_version param removed (IN-12 / IN-16: plan-only/activate lane expunged, ReadyToActivate phase removed).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-12",
+          "hash": "4ae0829c647990ee22364be985e339d5804bbb269b8f62bf49de4b3a873d15e2"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "domain::track_phase::resolve_phase_from_record": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "status",          "ty": "TrackStatus" },
+        { "name": "override_reason", "ty": "Option<&str>" }
+      ],
+      "returns": "TrackPhaseInfo",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Resolves phase from lightweight record fields. schema_version param removed (IN-12 / IN-16: plan-only/activate lane expunged).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-12",
+          "hash": "4ae0829c647990ee22364be985e339d5804bbb269b8f62bf49de4b3a873d15e2"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "domain::track_phase::next_command": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track",     "ty": "&TrackMetadata" },
+        { "name": "impl_plan", "ty": "Option<&ImplPlanDocument>" }
+      ],
+      "returns": "NextCommand",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Returns the recommended next command for registry rendering. schema_version param removed (IN-12 / IN-16: plan-only/activate lane expunged).",
+      "spec_refs": [
+        {
+          "file": "track/items/active-track-write-guard-2026-05-26/spec.json",
+          "anchor": "IN-12",
+          "hash": "4ae0829c647990ee22364be985e339d5804bbb269b8f62bf49de4b3a873d15e2"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [],
-  "trait_impls": []
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TrackPhase"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TrackPhase"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TrackPhase"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TrackPhase"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TrackPhase"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "NextCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "NextCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "NextCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "NextCommand"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "NextCommand"
+    }
+  ]
 }

@@ -26,19 +26,15 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
             .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?,
     };
 
-    // Validate the track ID before any filesystem probing — `read_schema_version_from_json`
-    // does `items_dir.join(track_id)` and would otherwise let a caller traverse outside
+    // Validate the track ID before any filesystem probing.
+    // `items_dir.join(track_id)` would otherwise let a caller traverse outside
     // `track/items` with values like `..` or absolute paths.
     super::validate_track_id_str(&effective_track_id)
         .map_err(|err| CliError::Message(format!("resolve failed: invalid track id: {err}")))?;
 
-    // Read schema_version from metadata.json (pure JSON, no domain types needed).
-    let schema_version = read_schema_version_from_json(&items_dir, &effective_track_id);
-
     // Use TrackPhaseInteractor (usecase service) to resolve the phase.
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let service =
-        usecase::track_phase::TrackPhaseInteractor::new(Arc::clone(&store), schema_version);
+    let service = usecase::track_phase::TrackPhaseInteractor::new(Arc::clone(&store));
 
     let info = service
         .resolve(effective_track_id, items_dir)

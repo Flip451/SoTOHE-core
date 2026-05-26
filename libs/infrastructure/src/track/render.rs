@@ -435,13 +435,7 @@ fn next_command_for_track(track: &TrackSnapshot) -> String {
     let override_reason = track.track.status_override().map(|o| o.reason()).filter(|_| {
         matches!(status, domain::TrackStatus::Blocked | domain::TrackStatus::Cancelled)
     });
-    let info = domain::track_phase::resolve_phase_from_record(
-        track.track.id().as_ref(),
-        status,
-        track.track.branch().is_some(),
-        track.schema_version,
-        override_reason,
-    );
+    let info = domain::track_phase::resolve_phase_from_record(status, override_reason);
     format!("`{}`", info.next_command)
 }
 
@@ -472,16 +466,8 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
             matches!(track.status().as_ref(), "planned" | "in_progress" | "blocked" | "cancelled")
         })
         .collect();
-    // Deprioritise branchless planning-only tracks (schema_version 3, 4, or 5) so that
-    // an actual in-progress track wins the "Latest active track" slot.
-    // schema_version 2 branchless planned tracks are legacy pre-planning-only behaviour
-    // and are left in normal position (their branch semantics differ).
-    // Branchless planning-only shapes: schema versions 3, 4, and 5.
-    active.sort_by_key(|track| {
-        matches!(track.schema_version, 3..=5)
-            && track.status() == "planned"
-            && track.track.branch().is_none()
-    });
+    // Sort active tracks so in-progress tracks precede planned ones.
+    active.sort_by_key(|track| track.status() == "planned");
     let completed: Vec<_> = tracks.iter().filter(|track| track.status() == "done").collect();
     let archived: Vec<_> = tracks.iter().filter(|track| track.status() == "archived").collect();
 
@@ -489,7 +475,7 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
         "# Track Registry".to_owned(),
         String::new(),
         "> This file lists all tracks and their current status.".to_owned(),
-        "> Auto-updated by `/track:plan`, `/track:plan-only`, `/track:activate`, and `/track:commit`.".to_owned(),
+        "> Auto-updated by `/track:plan` and `/track:commit`.".to_owned(),
         "> `/track:status` uses this file as an entry point to summarize progress.".to_owned(),
         "> Each track is expected to have `spec.md` (or `spec.json`) / `plan.md` / `metadata.json`; `observations.md` is optional.".to_owned(),
         String::new(),
@@ -567,9 +553,7 @@ pub fn render_registry(tracks: &[TrackSnapshot]) -> String {
     lines.push(String::new());
     lines.push("---".to_owned());
     lines.push(String::new());
-    lines.push(
-        "Use `/track:plan <feature>` for the standard lane or `/track:plan-only <feature>` when planning should land before activation.".to_owned(),
-    );
+    lines.push("Use `/track:plan <feature>` to start a new track.".to_owned());
     lines.push(String::new());
 
     lines.join("\n")

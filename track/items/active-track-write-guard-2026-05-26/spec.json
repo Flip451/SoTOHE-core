@@ -112,7 +112,7 @@
       },
       {
         "id": "IN-09",
-        "text": "`usecase::track_activation::ActivateTrackUseCase` および `libs/usecase/src/track_activation.rs` モジュールを削除する（`BranchAction::Switch` の独立した実装はこのユースケースを必要としない）",
+        "text": "`usecase::track_activation::ActivateTrackUseCase` および `libs/usecase/src/track_activation.rs` モジュールを削除する。また、activate ユースケースの依存モジュールである `libs/usecase/src/worktree_guard.rs`（`ensure_clean_worktree` / `parse_dirty_worktree_paths` / `validate_clean_worktree` 等の worktree guard 関数群を含む）も合わせて削除する。`BranchAction::Switch` の独立した実装はこれらのユースケースモジュールを必要としない",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
@@ -123,6 +123,66 @@
       {
         "id": "IN-10",
         "text": "`Makefile.toml` の `track-activate` タスクと `track-plan-branch` タスクを削除する。`dispatch_track_activate` と `dispatch_track_plan_branch` ディスパッチャ（`apps/cli/src/commands/make.rs`）および対応する `MakeTask::TrackActivate` / `MakeTask::TrackPlanBranch` variant も削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "`pr_workflow.rs` / `merge_gate.rs` / `task_completion.rs` / `track_resolution.rs` など共有ユースケースモジュールが持つ `plan/` プレフィックス対応のハンドリングロジック（`plan/<id>` ブランチ判定・分岐・関連エラーパス）を削除する。`/track:plan-only` と `/track:activate` を除去したことで `plan/<id>` ブランチを生成する手段が失われるため、到達不能になったコードパスを除去し、孤立した参照を残さない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-12",
+        "text": "`libs/domain/src/track_phase.rs` にある 2 つの enum から activate 関連 variant をそれぞれ削除する。(a) `NextCommand` enum から `NextCommand::ActivateTrack` variant を削除する。(b) `TrackPhase` enum から `TrackPhase::ReadyToActivate` variant を削除する。削除後は、これらの variant を参照しているすべてのマッチアームおよびパターンも合わせて除去する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-13",
+        "text": "`libs/domain/src/skill_compliance/mod.rs`（または同モジュール内）の skill-compliance 検出エントリのうち `/track:plan-only` と `/track:activate` に対応するものを削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-14",
+        "text": "`.claude/settings.json` の `permissions.allow` および `apps/cli/src/commands/verify/orchestra.rs`（または同等のオーケストラガード検証コード）から `track-activate` / `track-plan-branch` のパーミッションエントリを削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-15",
+        "text": "`git_cli` / `git_workflow` / `track_resolution` / `pr_workflow` / `render.rs` などのエラーメッセージ・レンダーテキスト、および `.claude/commands/track/plan.md` / `.claude/rules/07-dev-environment.md` 等のドキュメント内にある `/track:activate` / `/track:plan-only` / `track-activate` / `track-plan-branch` への参照を除去する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-16",
+        "text": "IN-11 〜 IN-15 の削除対象コードに紐づくテスト（`plan/` ブランチハンドリング、`NextCommand::ActivateTrack` および `TrackPhase::ReadyToActivate`、skill-compliance activate/plan-only エントリ、パーミッションエントリ、activate 参照文字列を検証するテスト）をすべて削除する",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
@@ -178,16 +238,6 @@
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-0518-active-track-write-guard.md",
-            "anchor": "D1"
-          }
-        ]
-      },
-      {
-        "id": "OS-06",
-        "text": "`pr_workflow.rs` / `merge_gate.rs` / `task_completion.rs` / `track_resolution.rs` などの共有モジュールが保持する `plan/` プレフィックス対応の除去: これらのモジュールは `/track:plan-only` 専用ではなく、`plan/<id>` ブランチが将来または既存の別経路で生成された場合にも汎用的に使われうる。`/track:plan-only` と `/track:activate` のコマンド・ソース・Makefile タスクを削除すれば `plan/` ブランチを作る手段は失われるが、共有モジュール内の `plan/` ハンドリングの除去は本 track のスコープ外とする",
-        "adr_refs": [
-          {
-            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
             "anchor": "D1"
           }
         ]
@@ -382,6 +432,16 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-13",
+      "text": "リポジトリ全体に対して `/track:activate` / `/track:plan-only` / `track-activate` / `track-plan-branch` / `execute_activate` / `track_activation` / `worktree_guard` をグレップしたとき、`knowledge/adr/**`（過去の決定記録）とこのトラック自身の成果物（`track/items/active-track-write-guard-2026-05-26/{spec.json,spec.md,impl-plan.json,plan.md}` など）以外でヒットがゼロである",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -407,7 +467,7 @@
     }
   ],
   "signals": {
-    "blue": 35,
+    "blue": 41,
     "yellow": 0,
     "red": 0
   }

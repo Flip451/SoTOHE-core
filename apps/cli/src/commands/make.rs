@@ -49,10 +49,6 @@ pub enum MakeTask {
     TrackBranchCreate,
     /// Switch to an existing track branch.
     TrackBranchSwitch,
-    /// Materialize a planning-only track and switch to its branch.
-    TrackActivate,
-    /// Create a plan/<track-id> branch from main.
-    TrackPlanBranch,
     /// Resolve current track phase.
     TrackResolve,
     /// Push current track/plan branch to origin.
@@ -161,7 +157,6 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
     match args.task {
         MakeTask::TrackBranchCreate => dispatch_track_branch_create(&args.raw_args),
         MakeTask::TrackBranchSwitch => dispatch_track_branch_switch(&args.raw_args),
-        MakeTask::TrackActivate => dispatch_track_activate(&args.raw_args),
         MakeTask::AddAll => dispatch_add_all(),
         MakeTask::Unstage => dispatch_unstage(&args.raw_args),
         MakeTask::TrackAddPaths => dispatch_track_add_paths(),
@@ -184,7 +179,6 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
         MakeTask::TrackReviewResults => dispatch_track_review_results(&args.raw_args),
         MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
-        MakeTask::TrackPlanBranch => dispatch_track_plan_branch(&args.raw_args),
         MakeTask::Commit => dispatch_commit(&args.raw_args),
         MakeTask::Note => dispatch_note(&args.raw_args),
         MakeTask::TrackCommitMessage => dispatch_track_commit_message(),
@@ -224,19 +218,6 @@ fn dispatch_track_branch_switch(raw_args: &[String]) -> Result<ExitCode, CliErro
     let track_id = raw_args_to_single(raw_args)
         .map_err(|_| CliError::Message("error: track-id argument required".to_owned()))?;
     run_sotp(&["track", "branch", "switch", "--items-dir", "track/items", &track_id])
-}
-
-fn dispatch_track_activate(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let track_id = raw_args_to_single(raw_args)
-        .map_err(|_| CliError::Message("error: track-id argument required".to_owned()))?;
-    run_sotp(&["track", "activate", "--items-dir", "track/items", &track_id])
-}
-
-fn dispatch_track_plan_branch(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let track_id = raw_args_to_single(raw_args)
-        .map_err(|_| CliError::Message("error: track-id argument required".to_owned()))?;
-    let branch = format!("plan/{track_id}");
-    run_command("git", &["switch", "-c", &branch, "main"])
 }
 
 fn dispatch_add_all() -> Result<ExitCode, CliError> {

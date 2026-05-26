@@ -42,6 +42,12 @@
       "description": "コマンド定義ファイル削除 + ドキュメント参照クリーンアップ。(1) `.claude/commands/track/plan-only.md` と `.claude/commands/track/activate.md` を削除（AC-07）。(2) `DEVELOPER_AI_WORKFLOW.md`: mermaid フローチャートの plan-only / activate ノードとエッジ、§0.4 コマンド比較表の `/track:plan-only` / `/track:activate` 行、§3.1 「plan-only 代替レーン」ブロックを削除。(3) `.claude/commands/track/done.md`: 「no active tracks → /track:plan-only」推奨文言を削除。(4) `.claude/commands/track/status.md`: 「branchless planning-only → /track:activate」推奨ルールを削除。(5) `.claude/commands/track/implement.md` / `full-cycle.md`: 「planning-only tracks must pass through /track:activate」参照を削除。(6) `.claude/commands/track/pr.md`: 「For plan/ branches: merge the PR, then /track:activate」ヒントを削除。(7) `apps/cli/src/commands/pr.rs`: `/track:activate` ヒント・エラーテキストを削除（存在する場合）。`cargo make ci` pass を確認（AC-07 を検証）。",
       "status": "todo",
       "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "residual lane footprint の完全削除 + transition.rs clippy 修正（T006 + T007 + T008 の一括 ci gate）。(1) clippy 修正: `apps/cli/src/commands/track/transition.rs` で T006 移動後の `reject_branchless_guard_*` テストが `execute_transition` 本番関数より前に配置されている items-after-test-module エラーを修正する（テストブロックをファイル末尾へ移動）。(2) IN-11: `pr_workflow.rs` / `merge_gate.rs` / `task_completion.rs` / `track_resolution.rs` 等の共有ユースケースモジュールから `plan/<id>` ブランチ判定・分岐・関連エラーパスを削除する。(3) IN-12: `libs/domain/src/track_phase.rs` にある 2 つの enum から activate 関連 variant をそれぞれ削除する: `NextCommand` enum から `NextCommand::ActivateTrack` variant を削除し、`TrackPhase` enum から `TrackPhase::ReadyToActivate` variant を削除する。削除後は、これらの variant を参照しているすべてのマッチアームおよびパターンも合わせて除去する。(4) IN-13: `libs/domain/src/skill_compliance/mod.rs`（または同等モジュール）の skill-compliance 検出エントリのうち `/track:plan-only` と `/track:activate` に対応するものを削除する。(5) IN-14: `.claude/settings.json` の `permissions.allow` から `track-activate` / `track-plan-branch` エントリを削除し、`apps/cli/src/commands/verify/orchestra.rs`（または同等の検証コード）からも対応するパーミッションエントリを削除する。(6) IN-15: `git_cli` / `git_workflow` / `track_resolution` / `pr_workflow` / `render.rs` 等のエラーメッセージ・レンダーテキスト、および `.claude/commands/track/plan.md` / `.claude/rules/07-dev-environment.md` ドキュメント内の `/track:activate` / `/track:plan-only` / `track-activate` / `track-plan-branch` 参照を除去する。(7) IN-16: IN-11〜IN-15 の削除対象コードに紐づくすべてのテスト（`plan/` ブランチハンドリング、`NextCommand::ActivateTrack` および `TrackPhase::ReadyToActivate`、skill-compliance activate/plan-only エントリ、パーミッションエントリ、activate 参照文字列を検証するテスト）を削除する。(8) AC-13: リポジトリ全体 grep で `/track:activate` / `/track:plan-only` / `track-activate` / `track-plan-branch` / `execute_activate` / `track_activation` / `worktree_guard` が `knowledge/adr/**` とこのトラック自身の成果物以外でヒットゼロになることを確認したうえで `cargo make ci` を実行して pass することを確認する。T006 + T007 + T008 は互いに密結合したコンパイル単位として一括実装する。",
+      "status": "todo",
+      "commit_hash": null
     }
   ],
   "plan": {
@@ -122,6 +128,23 @@
         ],
         "task_ids": [
           "T007"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "residual footprint expunge: plan/ branch handlers, NextCommand::ActivateTrack + TrackPhase::ReadyToActivate, skill-compliance entries, permissions, error-message refs, and coupled tests",
+        "description": [
+          "Remove plan/<id> branch handling from pr_workflow.rs / merge_gate.rs / task_completion.rs / track_resolution.rs (IN-11).",
+          "Delete NextCommand::ActivateTrack from the NextCommand enum and TrackPhase::ReadyToActivate from the TrackPhase enum, plus all match arms referencing either variant (IN-12).",
+          "Remove skill-compliance detector entries for /track:plan-only and /track:activate (IN-13).",
+          "Remove track-activate / track-plan-branch permission entries from .claude/settings.json and orchestra.rs (IN-14).",
+          "Purge /track:activate, /track:plan-only, track-activate, track-plan-branch references from error messages, render text, and doc files (IN-15).",
+          "Delete all tests coupled to the removed code (IN-16).",
+          "Fix transition.rs clippy items-after-test-module ordering error introduced during T006 test relocation.",
+          "T006 + T007 + T008 are implemented as one tightly-coupled bundle; AC-13 grep zero-hit check and cargo make ci are the final gates (AC-13)."
+        ],
+        "task_ids": [
+          "T008"
         ]
       }
     ]

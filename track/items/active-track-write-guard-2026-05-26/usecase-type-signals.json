@@ -1,8 +1,20 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-26T12:10:18Z",
-  "declaration_hash": "604976c22cd4ed08beef7454b3439e91d5b182f04d70dc9dc24f2a4485c775c8",
+  "generated_at": "2026-05-26T16:27:15Z",
+  "declaration_hash": "17158977ee8c3322bcf3705d059f3ce75fbbae80d6c0011648c89ebb0ff7624e",
   "signals": [
+    {
+      "type_name": "PrBranchContext",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
     {
       "type_name": "PreCommitTypeSignalsError",
       "kind_tag": "error_type",
@@ -28,6 +40,102 @@
       "kind_tag": "dto",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TaskOperationService"
+      ]
+    },
+    {
+      "type_name": "TrackPhaseInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TrackPhaseService"
+      ]
+    },
+    {
+      "type_name": "TrackResolutionError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<TrackReadError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ActivateTrackOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ActivateTrackUseCase",
+      "kind_tag": "use_case",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "WorktreeGuardError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::track_resolution::reject_branchless_guard",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::track_resolution::reject_branchless_guard_by_str",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::track_resolution::reject_branchless_implementation_transition",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::track_resolution::reject_branchless_implementation_transition_by_str",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::track_resolution::resolve_track_or_plan_id_from_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::worktree_guard::ensure_clean_worktree",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::worktree_guard::parse_dirty_worktree_paths",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "usecase::worktree_guard::validate_clean_worktree",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "PreCommitTypeSignalsService",

@@ -463,16 +463,60 @@ fn render_registry_places_active_completed_and_archived() {
 }
 
 #[test]
-fn render_registry_routes_branchless_planning_track_to_activate() {
-    // v5 branchless planned track → no branch, derived_status = "planned"
-    let plan_only_json =
+fn render_registry_shows_branchless_track_as_latest_active() {
+    // v5 branchless planned track (legacy state; plan-only lane removed).
+    // Branchless tracks still show up in Current Focus as an active planned track,
+    // with `/track:implement` as the next command (same as any other planned track).
+    let branchless_json =
         sample_metadata_json_with_branch("track-a", "planned", "2026-03-13T02:00:00Z", "[]", None);
     let snapshot =
-        make_snapshot_v5(&plan_only_json, "planned", 5, PathBuf::from("track/items/track-a"));
+        make_snapshot_v5(&branchless_json, "planned", 5, PathBuf::from("track/items/track-a"));
     let rendered = render_registry(&[snapshot]);
 
-    assert!(rendered.contains("/track:activate track-a"));
-    assert!(rendered.contains("/track:plan-only <feature>"));
+    // Current Focus section must show the track as latest active.
+    assert!(
+        rendered.contains("- Latest active track: `track-a`"),
+        "branchless planned track must appear as latest active:\n{rendered}"
+    );
+    // Next command for a planned track (with or without branch) is /track:implement.
+    assert!(
+        rendered.contains("- Next recommended command: `/track:implement`"),
+        "next command for planned track must be /track:implement:\n{rendered}"
+    );
+    // The track must also appear in the Active Tracks table.
+    assert!(
+        rendered.contains("| track-a |"),
+        "branchless planned track must appear in active tracks table:\n{rendered}"
+    );
+}
+
+#[test]
+fn render_registry_prefers_in_progress_over_newer_planned_current_focus() {
+    let planned_json =
+        sample_metadata_json("track-planned", "planned", "2026-03-13T03:00:00Z", "[]");
+    let in_progress_json =
+        sample_metadata_json("track-active", "in_progress", "2026-03-13T02:00:00Z", "[]");
+    let planned_snapshot =
+        make_snapshot_v5(&planned_json, "planned", 5, PathBuf::from("track/items/track-planned"));
+    let in_progress_snapshot = make_snapshot_v5(
+        &in_progress_json,
+        "in_progress",
+        5,
+        PathBuf::from("track/items/track-active"),
+    );
+
+    let rendered = render_registry(&[planned_snapshot, in_progress_snapshot]);
+
+    assert!(
+        rendered.contains("- Latest active track: `track-active`"),
+        "in-progress track must stay in Current Focus ahead of newer planned track:\n{rendered}"
+    );
+    let active_row = rendered.find("| track-active |").unwrap();
+    let planned_row = rendered.find("| track-planned |").unwrap();
+    assert!(
+        active_row < planned_row,
+        "active table must preserve planned-last ordering:\n{rendered}"
+    );
 }
 
 #[test]
@@ -490,70 +534,6 @@ fn render_registry_keeps_legacy_v2_branchless_planned_track_on_implement() {
     let rendered = render_registry(&[snapshot]);
 
     assert!(rendered.contains("/track:implement"));
-    assert!(!rendered.contains("/track:activate track-a"));
-}
-
-#[test]
-fn render_registry_prefers_materialized_active_track_in_current_focus() {
-    // Both are v5: no branch (plan-only) vs with branch (materialized).
-    let plan_only_json = sample_metadata_json_with_branch(
-        "track-plan-only",
-        "planned",
-        "2026-03-13T03:00:00Z",
-        "[]",
-        None,
-    );
-    let materialized_json =
-        sample_metadata_json("track-materialized", "planned", "2026-03-13T02:00:00Z", "[]");
-    let plan_only_snap = make_snapshot_v5(
-        &plan_only_json,
-        "planned",
-        5,
-        PathBuf::from("track/items/track-plan-only"),
-    );
-    let materialized_snap = make_snapshot_v5(
-        &materialized_json,
-        "planned",
-        5,
-        PathBuf::from("track/items/track-materialized"),
-    );
-    let rendered = render_registry(&[plan_only_snap, materialized_snap]);
-
-    assert!(rendered.contains("- Latest active track: `track-materialized`"));
-    assert!(rendered.contains("- Next recommended command: `/track:implement`"));
-}
-
-#[test]
-fn render_registry_prefers_legacy_v2_planned_track_over_newer_plan_only() {
-    // Legacy v2 (no branch) vs v5 plan-only (no branch, schema_version 5).
-    // The v2 legacy track should be preferred (lower priority sort key).
-    let legacy_json = sample_metadata_json_with_schema_and_branch(
-        2,
-        "track-legacy",
-        "planned",
-        "2026-03-13T02:00:00Z",
-        r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
-        None,
-    );
-    let plan_only_json = sample_metadata_json_with_branch(
-        "track-plan-only",
-        "planned",
-        "2026-03-13T03:00:00Z",
-        "[]",
-        None,
-    );
-    let legacy_snap =
-        make_snapshot_legacy(&legacy_json, 2, PathBuf::from("track/items/track-legacy"));
-    let plan_only_snap = make_snapshot_v5(
-        &plan_only_json,
-        "planned",
-        5,
-        PathBuf::from("track/items/track-plan-only"),
-    );
-    let rendered = render_registry(&[plan_only_snap, legacy_snap]);
-
-    assert!(rendered.contains("- Latest active track: `track-legacy`"));
-    assert!(rendered.contains("- Next recommended command: `/track:implement`"));
 }
 
 #[test]
