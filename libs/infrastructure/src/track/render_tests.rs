@@ -1381,7 +1381,7 @@ const DOMAIN_TYPES_JSON_MINIMAL: &str = r#"{
     "TrackId": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "tuple_struct", "fields": ["String"] }
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
   "traits": {},
@@ -1872,7 +1872,7 @@ const USECASE_TYPES_JSON_MINIMAL: &str = r#"{
     "TrackReader": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "tuple_struct", "fields": ["String"] }
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
   "traits": {},
@@ -1887,7 +1887,7 @@ const INFRASTRUCTURE_TYPES_JSON_MINIMAL: &str = r#"{
     "FsTrackStore": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "tuple_struct", "fields": ["String"] }
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
   "traits": {},
@@ -2399,7 +2399,7 @@ const DOMAIN_TYPES_WITH_ENUM_VARIANTS: &str = r#"{
         "EnumVariantDeclaration": {
           "action": "add",
           "role": "ValueObject",
-          "kind": {"kind": "plain_struct", "fields": [], "has_stripped_fields": false},
+          "kind": {"kind": "struct", "shape": {"kind": "plain"}},
           "methods": [],
           "module_path": "",
           "spec_refs": [],

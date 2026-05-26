@@ -1,6 +1,6 @@
 //! Domain → DTO conversions for [`CatalogueDocument`] (encode path).
 
-use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker};
+use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2, TypestateMarker};
 use domain::tddd::catalogue_v2::entries::{
     FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
@@ -15,8 +15,8 @@ use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos
 use super::CatalogueDocumentCodecError;
 use super::dto::{
     BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
-    MethodDeclarationDto, MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto,
-    TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
+    MethodDeclarationDto, MethodGenericParamDto, ParamDto, StructShapeDto, TraitEntryDto,
+    TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
     WherePredicateDeclDto,
 };
 
@@ -80,24 +80,30 @@ pub(super) fn type_entry_to_dto(
 
 fn type_kind_to_dto(kind: &TypeKindV2) -> TypeKindDto {
     match kind {
-        TypeKindV2::UnitStruct => TypeKindDto::UnitStruct,
-        TypeKindV2::TupleStruct { fields, has_stripped_fields } => TypeKindDto::TupleStruct {
-            fields: fields.iter().map(|ty| ty.as_str().to_owned()).collect(),
-            has_stripped_fields: *has_stripped_fields,
+        TypeKindV2::Struct(struct_kind) => TypeKindDto::Struct {
+            shape: struct_shape_to_dto(&struct_kind.shape),
+            typestate: struct_kind.typestate.as_ref().map(typestate_marker_to_dto),
         },
-        TypeKindV2::PlainStruct { fields, has_stripped_fields, typestate } => {
-            TypeKindDto::PlainStruct {
-                fields: fields.iter().map(field_decl_to_dto).collect(),
-                has_stripped_fields: *has_stripped_fields,
-                typestate: typestate.as_ref().map(typestate_marker_to_dto),
-            }
-        }
         TypeKindV2::Enum { variants } => {
             TypeKindDto::Enum { variants: variants.iter().map(variant_decl_to_dto).collect() }
         }
         TypeKindV2::TypeAlias { target } => {
             TypeKindDto::TypeAlias { target: target.as_str().to_owned() }
         }
+    }
+}
+
+fn struct_shape_to_dto(shape: &StructShape) -> StructShapeDto {
+    match shape {
+        StructShape::Unit => StructShapeDto::Unit,
+        StructShape::Tuple { fields, has_stripped_fields } => StructShapeDto::Tuple {
+            fields: fields.iter().map(|ty| ty.as_str().to_owned()).collect(),
+            has_stripped_fields: *has_stripped_fields,
+        },
+        StructShape::Plain { fields, has_stripped_fields } => StructShapeDto::Plain {
+            fields: fields.iter().map(field_decl_to_dto).collect(),
+            has_stripped_fields: *has_stripped_fields,
+        },
     }
 }
 

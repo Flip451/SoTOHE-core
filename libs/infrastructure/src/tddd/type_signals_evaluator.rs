@@ -671,7 +671,7 @@ fn worse_signal(a: ConfidenceSignal, b: ConfidenceSignal) -> ConfidenceSignal {
 /// for v3 `DataRole` entries. The kind_tag values are the historically-established
 /// set grandfathered by ADR `2026-04-12-1200-strict-spec-signal-gate-v2`:
 ///
-/// - `TypeKindV2::PlainStruct { typestate: Some(_), .. }` → `"typestate"`
+/// - `TypeKindV2::Struct(StructKind { typestate: Some(_), .. })` (any shape) → `"typestate"`
 /// - `TypeKindV2::Enum { .. }` + `DataRole::ErrorType` → `"error_type"`
 /// - `TypeKindV2::Enum { .. }` otherwise → `"enum"`
 /// - Struct/TypeAlias with `Entity | AggregateRoot | Specification | ValueObject`
@@ -682,15 +682,17 @@ fn worse_signal(a: ConfidenceSignal, b: ConfidenceSignal) -> ConfidenceSignal {
 ///   `Command` → `"command"`, `Query` → `"query"`, `Dto` → `"dto"`,
 ///   `ErrorType` (non-enum) → `"error_type"`, `SecondaryAdapter` → `"secondary_adapter"`
 fn data_role_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
-    // Typestate detection: PlainStruct with a typestate marker.
-    if let TypeKindV2::PlainStruct { typestate: Some(_), .. } = kind {
-        return "typestate";
+    // Typestate detection: Struct (any shape) with a typestate marker.
+    if let TypeKindV2::Struct(sk) = kind {
+        if sk.typestate.is_some() {
+            return "typestate";
+        }
     }
     // Enum kind: role determines error_type vs enum.
     if matches!(kind, TypeKindV2::Enum { .. }) {
         return if matches!(role, DataRole::ErrorType) { "error_type" } else { "enum" };
     }
-    // UnitStruct / TupleStruct / PlainStruct / TypeAlias: role-based mapping.
+    // Struct (no typestate) / TypeAlias: role-based mapping.
     match role {
         DataRole::ValueObject
         | DataRole::Entity
@@ -746,7 +748,11 @@ const fn function_role_kind_tag(_role: FunctionRole) -> &'static str {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use domain::tddd::catalogue_v2::roles::FunctionRole;
+    use domain::tddd::catalogue_v2::composite::{
+        StructKind, StructShape, TypestateMarker, TypestateTransitions,
+    };
+    use domain::tddd::catalogue_v2::identifiers::{MethodName, TypeName, TypeRef};
+    use domain::tddd::catalogue_v2::roles::{DataRole, FunctionRole};
 
     use super::*;
 
@@ -760,5 +766,66 @@ mod tests {
     fn test_function_role_kind_tag_returns_free_function_for_all_variants() {
         assert_eq!(function_role_kind_tag(FunctionRole::FreeFunction), "free_function");
         assert_eq!(function_role_kind_tag(FunctionRole::UseCaseFunction), "free_function");
+    }
+
+    // -----------------------------------------------------------------------
+    // T005 / AC-01: unit struct + typestate → kind_tag "typestate"
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_data_role_kind_tag_unit_struct_with_typestate_returns_typestate() {
+        // AC-01: a unit struct carrying a typestate marker must be classified as "typestate".
+        let marker = TypestateMarker::new(
+            TypeName::new("LockMachine").unwrap(),
+            TypestateTransitions::new(vec![MethodName::new("unlock").unwrap()]),
+        );
+        let kind = TypeKindV2::Struct(StructKind::new(StructShape::Unit, Some(marker)));
+        assert_eq!(data_role_kind_tag(DataRole::ValueObject, &kind), "typestate");
+    }
+
+    // -----------------------------------------------------------------------
+    // T005 / AC-02: tuple struct + typestate → kind_tag "typestate"
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_data_role_kind_tag_tuple_struct_with_typestate_returns_typestate() {
+        // AC-02: a tuple struct carrying a typestate marker must be classified as "typestate".
+        let marker = TypestateMarker::new(
+            TypeName::new("ApprovalMachine").unwrap(),
+            TypestateTransitions::new(vec![MethodName::new("approve").unwrap()]),
+        );
+        let kind = TypeKindV2::Struct(StructKind::new(
+            StructShape::Tuple {
+                fields: vec![TypeRef::new("Uuid").unwrap()],
+                has_stripped_fields: false,
+            },
+            Some(marker),
+        ));
+        assert_eq!(data_role_kind_tag(DataRole::ValueObject, &kind), "typestate");
+    }
+
+    // -----------------------------------------------------------------------
+    // T005 / AC-07 regression: plain struct + typestate → kind_tag "typestate"
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_data_role_kind_tag_plain_struct_with_typestate_returns_typestate() {
+        // AC-07: existing plain struct + typestate must still be classified as "typestate".
+        let marker = TypestateMarker::new(
+            TypeName::new("ReviewMachine").unwrap(),
+            TypestateTransitions::new(vec![]),
+        );
+        let kind = TypeKindV2::Struct(StructKind::new(
+            StructShape::Plain { fields: vec![], has_stripped_fields: false },
+            Some(marker),
+        ));
+        assert_eq!(data_role_kind_tag(DataRole::ValueObject, &kind), "typestate");
+    }
+
+    #[test]
+    fn test_data_role_kind_tag_unit_struct_without_typestate_returns_role_tag() {
+        // Without typestate, a unit struct falls through to role-based mapping.
+        let kind = TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
+        assert_eq!(data_role_kind_tag(DataRole::ValueObject, &kind), "value_object");
     }
 }

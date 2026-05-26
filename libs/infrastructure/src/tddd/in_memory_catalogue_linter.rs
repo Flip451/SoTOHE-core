@@ -92,7 +92,7 @@ use domain::tddd::catalogue_linter::{
     CatalogueLinterRuleKind,
 };
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, ContractRole, DataRole, FunctionRole, TypeKindV2,
+    CatalogueDocument, ContractRole, DataRole, FunctionRole, StructShape, TypeKindV2,
 };
 
 // ---------------------------------------------------------------------------
@@ -104,7 +104,7 @@ use domain::tddd::catalogue_v2::{
 /// This is a self-contained definition of the grandfathered kind-tag mapping.
 /// Lint rules targeting v2 kind tags fire for v3 entries equivalently:
 ///
-/// 1. `PlainStruct { typestate: Some(_) }` → `"typestate"`
+/// 1. `Struct(StructKind { typestate: Some(_), .. })` (any shape) → `"typestate"`
 /// 2. `Enum { .. }` with `ErrorType` role → `"error_type"`
 /// 3. `Enum { .. }` with other role → `"enum"`
 /// 4. All other shapes → v2-compat role mapping via `data_role_kind_tag_v2compat`
@@ -114,7 +114,7 @@ use domain::tddd::catalogue_v2::{
 /// stub rendered all three as `ValueObject` shape).
 fn type_entry_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
     match kind {
-        TypeKindV2::PlainStruct { typestate: Some(_), .. } => "typestate",
+        TypeKindV2::Struct(sk) if sk.typestate.is_some() => "typestate",
         TypeKindV2::Enum { .. } if matches!(role, DataRole::ErrorType) => "error_type",
         TypeKindV2::Enum { .. } => "enum",
         _ => data_role_kind_tag_v2compat(role),
@@ -395,9 +395,11 @@ impl CatalogueLinter for InMemoryCatalogueLinter {
                 // `expected_members` and `expected_variants` rules can fire on v3
                 // entries equivalently to the v2 linter.
                 let (members_len, variants_len) = match &type_entry.kind {
-                    TypeKindV2::UnitStruct => (Some(0), None),
-                    TypeKindV2::PlainStruct { fields, .. } => (Some(fields.len()), None),
-                    TypeKindV2::TupleStruct { fields, .. } => (Some(fields.len()), None),
+                    TypeKindV2::Struct(sk) => match &sk.shape {
+                        StructShape::Unit => (Some(0), None),
+                        StructShape::Tuple { fields, .. } => (Some(fields.len()), None),
+                        StructShape::Plain { fields, .. } => (Some(fields.len()), None),
+                    },
                     TypeKindV2::Enum { variants } => (None, Some(variants.len())),
                     TypeKindV2::TypeAlias { .. } => (None, None),
                 };
@@ -471,7 +473,8 @@ mod tests {
     use domain::tddd::catalogue_v2::roles::ContractRole;
     use domain::tddd::catalogue_v2::{
         CatalogueDocument, CrateName, DataRole, ItemAction, MethodDeclaration, MethodName,
-        ModulePath, SelfReceiver, TraitEntry, TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
+        ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitName, TypeEntry,
+        TypeKindV2, TypeName, TypeRef,
     };
     use domain::tddd::layer_id::LayerId;
 
@@ -494,11 +497,10 @@ mod tests {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -520,11 +522,10 @@ mod tests {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![method],
 
             module_path: ModulePath::root(),
@@ -576,11 +577,10 @@ mod tests {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::DomainService,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -804,11 +804,10 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![field],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![field], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),

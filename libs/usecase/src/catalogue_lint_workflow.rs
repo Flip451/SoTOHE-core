@@ -237,11 +237,11 @@ mod tests {
         CatalogueLintViolation, CatalogueLinterError, CatalogueLinterRule, CatalogueLinterRuleKind,
     };
     use domain::tddd::catalogue_ports::{CatalogueLoader, CatalogueLoaderError};
-    use domain::tddd::catalogue_v2::TypeKindV2;
     use domain::tddd::catalogue_v2::document::CatalogueDocument;
     use domain::tddd::catalogue_v2::entries::TypeEntry;
     use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
     use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::layer_id::LayerId;
     use mockall::{mock, predicate};
 
@@ -298,11 +298,10 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
 
                 module_path: ModulePath::root(),

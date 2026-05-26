@@ -1706,7 +1706,7 @@ mod tests {
     -> BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)> {
         use domain::tddd::LayerId;
         use domain::tddd::catalogue_v2::CatalogueDocument;
-        use domain::tddd::catalogue_v2::composite::TypeKindV2;
+        use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
         use domain::tddd::catalogue_v2::entries::TypeEntry;
         use domain::tddd::catalogue_v2::identifiers::{CrateName, ModulePath, TypeName};
         use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
@@ -1717,11 +1717,10 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),

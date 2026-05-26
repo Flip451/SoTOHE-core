@@ -259,15 +259,15 @@ mod tests {
           "action": "add",
           "role": "ValueObject",
           "kind": {
-            "kind": "tuple_struct",
-            "fields": ["u64"]
+            "kind": "struct",
+            "shape": { "kind": "tuple", "fields": ["u64"] }
           },
           "module_path": "domain::user"
         },
         "User": {
           "action": "add",
           "role": "Entity",
-          "kind": { "kind": "plain_struct" },
+          "kind": { "kind": "struct", "shape": { "kind": "plain" } },
           "module_path": "domain::user"
         }
       },

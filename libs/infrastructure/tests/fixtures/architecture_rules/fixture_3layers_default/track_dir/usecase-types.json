@@ -7,9 +7,8 @@
       "action": "add",
       "role": "UseCase",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [],
-        "has_stripped_fields": false
+        "kind": "struct",
+        "shape": { "kind": "plain" }
       },
       "methods": [],
       "module_path": "",

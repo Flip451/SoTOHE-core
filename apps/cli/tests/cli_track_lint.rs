@@ -50,7 +50,7 @@ const CATALOGUE_EMPTY_METHODS: &str = r#"{
     "MyValueObject": {
       "action": "add",
       "role": "ValueObject",
-      "kind": {"kind": "plain_struct", "fields": [], "has_stripped_fields": false},
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
       "methods": [],
       "module_path": "",
       "spec_refs": [],
@@ -72,7 +72,7 @@ const CATALOGUE_WITH_METHODS: &str = r#"{
     "MethodfulObject": {
       "action": "add",
       "role": "ValueObject",
-      "kind": {"kind": "plain_struct", "fields": [], "has_stripped_fields": false},
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
       "methods": [
         {"name": "validate", "receiver": "&self", "params": [], "returns": "()", "is_async": false}
       ],

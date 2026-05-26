@@ -273,7 +273,9 @@ mod tests {
         CrateName, FunctionName, FunctionPath, TraitName, TypeName,
     };
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
-    use domain::tddd::catalogue_v2::{MethodDeclaration, ModulePath, TypeKindV2};
+    use domain::tddd::catalogue_v2::{
+        MethodDeclaration, ModulePath, StructKind, StructShape, TypeKindV2,
+    };
     use mockall::{mock, predicate};
 
     use super::*;
@@ -336,11 +338,10 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
 
                 module_path: ModulePath::root(),

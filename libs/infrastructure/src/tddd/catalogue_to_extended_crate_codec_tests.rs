@@ -2,7 +2,7 @@
 
 use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::composite::TypeKindV2;
+use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
 use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
 use domain::tddd::catalogue_v2::methods::{
     MethodDeclaration, MethodGenericParam, ParamDeclaration,
@@ -89,15 +89,17 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![FieldDecl::new(
-                    FieldName::new("value").unwrap(),
-                    // "42invalid" is not a valid Rust type expression.
-                    TypeRef::new("String").unwrap(),
-                )],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("value").unwrap(),
+                        // "42invalid" is not a valid Rust type expression.
+                        TypeRef::new("String").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
             methods: vec![MethodDeclaration {
                 name: MethodName::new("get_value").unwrap(),
                 receiver: Some(SelfReceiver::SharedRef),
@@ -139,17 +141,19 @@ fn test_encode_struct_fields_are_promoted_to_struct_field_items() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![
-                    FieldDecl::new(
-                        FieldName::new("email").unwrap(),
-                        TypeRef::new("String").unwrap(),
-                    ),
-                    FieldDecl::new(FieldName::new("id").unwrap(), TypeRef::new("u32").unwrap()),
-                ],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![
+                        FieldDecl::new(
+                            FieldName::new("email").unwrap(),
+                            TypeRef::new("String").unwrap(),
+                        ),
+                        FieldDecl::new(FieldName::new("id").unwrap(), TypeRef::new("u32").unwrap()),
+                    ],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -217,11 +221,10 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![
                 MethodDeclaration::new(
                     MethodName::new("new").unwrap(),
@@ -277,11 +280,10 @@ fn test_encode_paths_includes_module_path_segments() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::from_segments(vec!["review".to_string()]).unwrap(),
@@ -309,11 +311,10 @@ fn test_encode_paths_crate_root_type_has_two_segment_path() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -345,14 +346,16 @@ fn test_encode_field_with_generic_type_ref_creates_resolved_path_with_args() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![FieldDecl::new(
-                    FieldName::new("items").unwrap(),
-                    TypeRef::new("Vec<String>").unwrap(),
-                )],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("items").unwrap(),
+                        TypeRef::new("Vec<String>").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -381,14 +384,16 @@ fn test_encode_std_prelude_type_creates_std_external_crate_entry() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![FieldDecl::new(
-                    FieldName::new("name").unwrap(),
-                    TypeRef::new("String").unwrap(),
-                )],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("name").unwrap(),
+                        TypeRef::new("String").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -415,14 +420,16 @@ fn test_encode_undeclared_type_ref_field_gets_unresolved_marker_id() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![FieldDecl::new(
-                    FieldName::new("error").unwrap(),
-                    TypeRef::new("DomainError").unwrap(),
-                )],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain {
+                    fields: vec![FieldDecl::new(
+                        FieldName::new("error").unwrap(),
+                        TypeRef::new("DomainError").unwrap(),
+                    )],
+                    has_stripped_fields: false,
+                },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -451,11 +458,10 @@ fn test_encode_item_actions_contains_declared_action() {
         TypeEntry {
             action: ItemAction::Modify,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -482,11 +488,10 @@ fn test_encode_trait_impl_origin_crate_registered_in_external_crates() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: None,
@@ -782,11 +787,10 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![method],
 
             module_path: ModulePath::root(),
@@ -936,11 +940,10 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![method],
 
             module_path: ModulePath::root(),
@@ -1886,11 +1889,10 @@ fn test_trait_impl_block_generics_encoded_correctly() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: None,
@@ -1959,11 +1961,10 @@ fn test_inherent_impl_block_generics_encoded_correctly() {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),

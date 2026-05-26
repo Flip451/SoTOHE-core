@@ -107,7 +107,7 @@ mod tests {
     use super::*;
     use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::composite::{
-        TypeKindV2, TypestateMarker, TypestateTransitions,
+        StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
     };
     use domain::tddd::catalogue_v2::entries::{InherentImplDeclV2, TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::identifiers::{
@@ -255,11 +255,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -367,11 +366,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::from_segments(vec!["submod".to_string()]).unwrap(),
                 docs: None,
@@ -497,11 +495,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -537,11 +534,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -556,11 +552,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::from_segments(vec!["user".to_string()]).unwrap(),
                 docs: None,
@@ -614,11 +609,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: Some(marker),
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    Some(marker),
+                )),
                 methods: vec![approve_method],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -633,11 +627,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -673,11 +666,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -786,11 +778,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -850,11 +841,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -870,11 +860,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![field],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![field], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -906,11 +895,13 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Dto,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![field],
-                    has_stripped_fields: true, // stripped — no field edge
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![field],
+                        has_stripped_fields: true, // stripped — no field edge
+                    },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -950,11 +941,10 @@ include_function_roles = []
                 TypeEntry {
                     action: ItemAction::Add,
                     role: DataRole::ValueObject,
-                    kind: TypeKindV2::PlainStruct {
-                        fields: vec![],
-                        has_stripped_fields: false,
-                        typestate: None,
-                    },
+                    kind: TypeKindV2::Struct(StructKind::new(
+                        StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                        None,
+                    )),
                     methods: vec![],
                     module_path: ModulePath::root(),
                     docs: None,
@@ -969,11 +959,17 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::TupleStruct {
-                    // Use two declared types so both positional edges (.0, .1) are emitted.
-                    fields: vec![TypeRef::new("UserId").unwrap(), TypeRef::new("GroupId").unwrap()],
-                    has_stripped_fields: false,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Tuple {
+                        // Use two declared types so both positional edges (.0, .1) are emitted.
+                        fields: vec![
+                            TypeRef::new("UserId").unwrap(),
+                            TypeRef::new("GroupId").unwrap(),
+                        ],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1017,11 +1013,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1073,11 +1068,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::SecondaryAdapter,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1114,11 +1108,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1234,11 +1227,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::SecondaryAdapter,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1277,11 +1269,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1326,11 +1317,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Delete,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1345,11 +1335,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1404,11 +1393,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::SecondaryAdapter,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1501,11 +1489,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![field],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![field], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1556,11 +1543,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::DomainService,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![method_with_generic_params],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1604,11 +1590,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Delete,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1625,11 +1610,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![field],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![field], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1677,11 +1661,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Dto,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1707,11 +1690,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::DomainService,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![render_method],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1755,11 +1737,10 @@ include_function_roles = []
                 TypeEntry {
                     action: ItemAction::Add,
                     role: DataRole::ValueObject,
-                    kind: TypeKindV2::PlainStruct {
-                        fields: vec![],
-                        has_stripped_fields: false,
-                        typestate: None,
-                    },
+                    kind: TypeKindV2::Struct(StructKind::new(
+                        StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                        None,
+                    )),
                     methods: vec![],
                     module_path: ModulePath::root(),
                     docs: None,
@@ -1783,11 +1764,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::DomainService,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![render_method],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1835,11 +1815,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1864,11 +1843,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::DomainService,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![method_with_vec_param],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1909,11 +1887,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1938,11 +1915,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::DomainService,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![method_with_option_param],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -1999,11 +1975,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::DomainService,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![method],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -2066,11 +2041,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::SecondaryAdapter,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![new_method],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -2164,11 +2138,10 @@ include_function_roles = []
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,

@@ -229,38 +229,28 @@ pub(super) struct TypeEntryDto {
 ///
 /// Uses `#[serde(tag = "kind")]` so JSON looks like:
 /// ```json
-/// { "kind": "unit_struct" }
-/// { "kind": "tuple_struct", "fields": [...], "has_stripped_fields": true }
-/// { "kind": "plain_struct", "fields": [...], "has_stripped_fields": false, "typestate": { ... } }
+/// { "kind": "struct", "shape": { "kind": "unit" } }
+/// { "kind": "struct", "shape": { "kind": "tuple", "fields": [...], "has_stripped_fields": true }, "typestate": { ... } }
+/// { "kind": "struct", "shape": { "kind": "plain", "fields": [...], "has_stripped_fields": false }, "typestate": { ... } }
 /// { "kind": "enum", "variants": [...] }
 /// { "kind": "type_alias", "target": "..." }
 /// ```
+///
+/// Breaking change (CN-02): the old `unit_struct` / `tuple_struct` / `plain_struct` wire tags
+/// are replaced by `kind: "struct"` + `shape` field. Active-track catalogues are migrated in T004.
+/// Non-active track catalogues are not touched (OS-02).
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(tag = "kind", deny_unknown_fields)]
 pub(super) enum TypeKindDto {
-    /// A unit struct (`pub struct Foo;`). No fields.
-    #[serde(rename = "unit_struct")]
-    UnitStruct,
-    /// A tuple struct (positional fields — unnamed, referenced by `.0`, `.1`, …).
-    #[serde(rename = "tuple_struct")]
-    TupleStruct {
-        /// Positional field types as plain strings (e.g. `["String", "i32"]`).
-        /// No `name` key — tuple fields are unnamed.
-        #[serde(default)]
-        fields: Vec<String>,
-        /// `true` when the struct has at least one private field rustdoc omits.
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        has_stripped_fields: bool,
-    },
-    /// A plain named-field struct.
-    #[serde(rename = "plain_struct")]
-    PlainStruct {
-        #[serde(default)]
-        fields: Vec<FieldDeclDto>,
-        /// `true` when the struct has at least one private field rustdoc omits.
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        has_stripped_fields: bool,
-        /// Optional typestate membership marker.
+    /// Any struct shape with an optional orthogonal typestate marker.
+    ///
+    /// `shape` encodes the Rust-level form (Unit / Tuple / Plain).
+    /// `typestate` is `Some` when this struct is a typestate state.
+    #[serde(rename = "struct")]
+    Struct {
+        /// The Rust-level structural form of this struct.
+        shape: StructShapeDto,
+        /// Optional typestate membership marker. Orthogonal to shape.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         typestate: Option<TypestateMarkerDto>,
     },
@@ -273,6 +263,42 @@ pub(super) enum TypeKindDto {
     /// A type alias.
     #[serde(rename = "type_alias")]
     TypeAlias { target: String },
+}
+
+/// Wire format for `StructShape`.
+///
+/// Uses `#[serde(tag = "kind")]` so JSON looks like:
+/// ```json
+/// { "kind": "unit" }
+/// { "kind": "tuple", "fields": [...], "has_stripped_fields": true }
+/// { "kind": "plain", "fields": [...], "has_stripped_fields": false }
+/// ```
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(tag = "kind", deny_unknown_fields)]
+pub(super) enum StructShapeDto {
+    /// A unit struct. No fields.
+    #[serde(rename = "unit")]
+    Unit,
+    /// A tuple struct (positional unnamed fields).
+    #[serde(rename = "tuple")]
+    Tuple {
+        /// Positional field types as plain strings (e.g. `["String", "i32"]`).
+        /// No `name` key — tuple fields are unnamed.
+        #[serde(default)]
+        fields: Vec<String>,
+        /// `true` when the struct has at least one private field rustdoc omits.
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        has_stripped_fields: bool,
+    },
+    /// A plain named-field struct.
+    #[serde(rename = "plain")]
+    Plain {
+        #[serde(default)]
+        fields: Vec<FieldDeclDto>,
+        /// `true` when the struct has at least one private field rustdoc omits.
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        has_stripped_fields: bool,
+    },
 }
 
 /// Wire format for `TypestateMarker`.

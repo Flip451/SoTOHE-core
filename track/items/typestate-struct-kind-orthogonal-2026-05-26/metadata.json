@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "typestate-struct-kind-orthogonal-2026-05-26",
+  "title": "typestate は struct 形状と直交配置する — 全 struct 形状を typestate 状態にする",
+  "branch": "track/typestate-struct-kind-orthogonal-2026-05-26",
+  "created_at": "2026-05-26T01:13:52Z",
+  "updated_at": "2026-05-26T01:13:52Z"
+}

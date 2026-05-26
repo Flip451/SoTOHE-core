@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-26T04:12:40Z",
+  "declaration_hash": "997dda44d4e1f2a7763aff635bea29d15423a7c19f40b7814e0cca0b3d1bc09f",
+  "signals": [
+    {
+      "type_name": "CatalogueDocumentCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueDocumentCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -114,7 +114,7 @@ mod tests {
                 "BadType": {
                     "action": "add",
                     "role": "ValueObject",
-                    "kind": { "kind": "unit_struct" },
+                    "kind": { "kind": "struct", "shape": { "kind": "unit" } },
                     "spec_refs": [
                         {
                             "file": "track/items/x/spec.json",
@@ -363,7 +363,7 @@ mod tests {
                 "GoodType": {
                     "action": "add",
                     "role": "ValueObject",
-                    "kind": { "kind": "unit_struct" },
+                    "kind": { "kind": "struct", "shape": { "kind": "unit" } },
                     "spec_refs": [
                         {
                             "file": "track/items/test-track/spec.json",

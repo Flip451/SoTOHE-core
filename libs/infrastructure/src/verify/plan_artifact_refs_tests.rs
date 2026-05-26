@@ -213,7 +213,7 @@ fn test_spec_ref_with_valid_anchor_passes() {
     "MyType": {{
       "action": "add",
       "role": "ValueObject",
-      "kind": {{ "kind": "unit_struct" }},
+      "kind": {{ "kind": "struct", "shape": {{ "kind": "unit" }} }},
       "spec_refs": [
         {{
           "file": "track/items/test-track/spec.json",
@@ -247,7 +247,7 @@ fn test_spec_ref_with_missing_spec_file_reports_error() {
     "MyType": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "unit_struct" },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
         {
           "file": "track/items/nonexistent/spec.json",
@@ -280,7 +280,7 @@ fn test_spec_ref_with_unresolved_anchor_reports_error() {
     "MyType": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "unit_struct" },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
         {
           "file": "track/items/test-track/spec.json",
@@ -320,7 +320,7 @@ fn test_spec_ref_with_hash_mismatch_reports_error() {
     "MyType": {{
       "action": "add",
       "role": "ValueObject",
-      "kind": {{ "kind": "unit_struct" }},
+      "kind": {{ "kind": "struct", "shape": {{ "kind": "unit" }} }},
       "spec_refs": [
         {{
           "file": "track/items/test-track/spec.json",
@@ -360,7 +360,7 @@ fn test_empty_spec_refs_on_catalogue_entry_passes() {
     "MyType": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "unit_struct" }
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
   "traits": {},
@@ -799,7 +799,7 @@ const V3_CATALOGUE_DOMAIN: &str = r#"{
     "MyType": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "plain_struct" },
+      "kind": { "kind": "struct", "shape": { "kind": "plain" } },
       "docs": "A simple value object."
     }
   },

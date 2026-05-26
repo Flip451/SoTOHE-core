@@ -458,7 +458,7 @@ mod tests {
     "MyType": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "plain_struct" },
+      "kind": { "kind": "struct", "shape": { "kind": "plain" } },
       "docs": "A simple value object."
     }
   },

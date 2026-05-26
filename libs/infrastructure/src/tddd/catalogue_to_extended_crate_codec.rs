@@ -35,7 +35,7 @@ use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
     BoundOp, CatalogueDocument, CrateName, FunctionPath, MethodDeclaration, MethodGenericParam,
-    ModulePath, SelfReceiver, TraitName, TypeKindV2, TypeName, WherePredicateDecl,
+    ModulePath, SelfReceiver, StructShape, TraitName, TypeKindV2, TypeName, WherePredicateDecl,
 };
 use domain::tddd::extended_crate::ExtendedCrate;
 use rustdoc_types::{
@@ -266,27 +266,32 @@ impl Encoder {
                 })?;
             let action = entry.action;
             match entry.kind.clone() {
-                TypeKindV2::UnitStruct => {
-                    state.encode_unit_struct(type_id, type_name, entry)?;
-                }
-                TypeKindV2::TupleStruct { fields, has_stripped_fields } => {
-                    state.encode_tuple_struct(
-                        type_id,
-                        type_name,
-                        entry,
-                        fields,
-                        has_stripped_fields,
-                    )?;
-                }
-                TypeKindV2::PlainStruct { fields, has_stripped_fields, typestate } => {
-                    state.encode_plain_struct(
-                        type_id,
-                        type_name,
-                        entry,
-                        fields,
-                        has_stripped_fields,
-                        typestate,
-                    )?;
+                TypeKindV2::Struct(struct_kind) => {
+                    let domain::tddd::catalogue_v2::StructKind { shape, typestate } = struct_kind;
+                    match shape {
+                        StructShape::Unit => {
+                            state.encode_unit_struct(type_id, type_name, entry)?;
+                        }
+                        StructShape::Tuple { fields, has_stripped_fields } => {
+                            state.encode_tuple_struct(
+                                type_id,
+                                type_name,
+                                entry,
+                                fields,
+                                has_stripped_fields,
+                            )?;
+                        }
+                        StructShape::Plain { fields, has_stripped_fields } => {
+                            state.encode_plain_struct(
+                                type_id,
+                                type_name,
+                                entry,
+                                fields,
+                                has_stripped_fields,
+                                typestate,
+                            )?;
+                        }
+                    }
                 }
                 TypeKindV2::Enum { variants } => {
                     state.encode_enum(type_id, type_name, entry, variants)?;
