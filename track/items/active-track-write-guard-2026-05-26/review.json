@@ -107,6 +107,295 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5a95b61d9eb2abbc82dcc7f8bfa0523d9c23587773ae69ff03138e789f24212",
+          "at": "2026-05-26T13:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5a95b61d9eb2abbc82dcc7f8bfa0523d9c23587773ae69ff03138e789f24212",
+          "at": "2026-05-26T14:01:38Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
+          "at": "2026-05-26T07:14:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
+          "at": "2026-05-26T07:16:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d975ca3094873ed033e445b50e167888c853955e2ff332d106afb72f723ea397",
+          "at": "2026-05-26T14:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d975ca3094873ed033e445b50e167888c853955e2ff332d106afb72f723ea397",
+          "at": "2026-05-26T14:06:14Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: the fail-closed branch guard is only surfaced when `spec.json` exists. In a workspace that has protected type catalogues (`architecture-rules.json` + `<layer>-types.json`) but no spec, a git lookup failure is downgraded to `false` and the function returns `Ok`, silently skipping type rendering instead of returning `InvalidTrackMetadata`. That violates the briefing’s CN-01 requirement for types-only tracks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 902,
+              "category": "correctness"
+            },
+            {
+              "message": "P1: the new mismatched-branch test does not actually cover the types half of the guard. It never writes any `<layer>-types.json` and only asserts that `spec.md` is absent, so a regression that still renders `*-types.md` on the wrong branch would pass unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "line": 2768,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b88d49c6aed0037046474d30daab4e3d88baf66f62eb02c9e72e46d9e42004b2",
+          "at": "2026-05-26T08:34:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The git-failure arm aborts the whole sync as soon as any `*-types.json` is present, so callers in a non-git workspace never reach the unconditional `contract-map.md` render. That regresses the existing done-track contract-map path and also suppresses the style-config error surfaced by `render_contract_map_view`; the fail-closed branch should be narrowed or deferred until after the unguarded render.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 1153,
+              "category": "correctness"
+            },
+            {
+              "message": "The new 'matching branch' test is a placeholder: it only reads the current branch and writes fixtures into a temp dir, but never calls `sync_rendered_views` or asserts any rendered output. The branch-match success path is therefore still untested.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
+              "line": 2773,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c6392ffae3dd4a7a5528ea1791499af979cc0ba086e56bc5ec81132f0866fb19",
+          "at": "2026-05-26T08:45:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fail-closed branch error is only deferred when `architecture-rules.json` exists and a type catalogue is discovered. If git lookup fails on a track that has protected `*-types.json` inputs but no rules file, `sync_rendered_views` returns `Ok` after rendering `plan.md` and silently skips the protected views, which contradicts the new CN-01 fail-closed behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 1173,
+              "category": "correctness"
+            },
+            {
+              "message": "`track_dir_contains_type_catalogue()` only treats entries with `DirEntry::file_type().is_file()` as catalogues. That misses symlinked `*-types.json` files, even though the render loop later accepts them via `catalogue_path.is_file()`. As a result, a symlinked protected catalogue can bypass the deferred branch error when git lookup fails and the sync will succeed without rendering the view.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 54,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:6b692575970124fc31cc5143fd8e9876ed4173b33bda8e8b21d253a53af89a5c",
+          "at": "2026-05-26T08:52:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`git` lookup failures are only converted into `InvalidTrackMetadata` when `spec.json` exists or `track_dir_contains_type_catalogue()` finds a readable `*-types.json` file. On a non-git checkout with only `plan.md`/`registry.md` inputs, `sync_rendered_views` now succeeds instead of failing closed, which contradicts the branch-guard requirement in the briefing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 1178,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:61728a0fb48a3a89d3e5f288808f5dee5c25b7e0584a21e6e69bcd9ced73a849",
+          "at": "2026-05-26T08:59:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Branch-read failures are only surfaced after `render_contract_map_view()`. If `architecture-rules.json` or the contract-map style config is missing/malformed, that error wins and the intended fail-closed `InvalidTrackMetadata` for git lookup failure is never returned. The brief says the branch error should be deferred only until after `plan.md`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 1156,
+              "category": "correctness"
+            },
+            {
+              "message": "`sync_rendered_views(track_id)` now requires a git repo even for registry-only refreshes, but the unchanged tests at `sync_rendered_views_writes_plan_and_registry` and `sync_rendered_views_omits_unchanged_registry_from_changed_set` still use plain tempdirs without `init_git_repo_on_branch()`. They will now return `InvalidTrackMetadata` before their assertions, so the test suite regresses.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
+              "line": 573,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:27e38f8068f8b15993e87935ef40d6e4516c5e5380ed72145b681f5fa3b1a250",
+          "at": "2026-05-26T09:07:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`git rev-parse --abbrev-ref HEAD` returns success with `HEAD` in detached-HEAD checkouts, so this branch guard treats a non-branch checkout as a normal mismatch (`Ok(false)`) instead of failing closed. That silently skips `spec.md`/`<layer>-types.md` on detached CI/worktree checkouts even when the active track should be rendered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "line": 861,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2740aad228125b237ee25ae6fef61ece909d1da193de5f8ec3228b475d7a361a",
+          "at": "2026-05-26T09:12:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44621fa870015a087ba56a00306e52f033423131682b9338220027b128ae5fb3",
+          "at": "2026-05-26T09:19:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The branch guard now returns an InvalidTrackMetadata error immediately after plan.md whenever git branch lookup fails, even when there are no protected inputs to render. That makes plan-only or spec/types-absent calls fail instead of simply updating plan.md/registry.md, despite the guard being scoped to spec.md and <layer>-types.md; it also breaks existing tests such as the spec-absent/types-absent plan-only cases that call sync_rendered_views outside a git repo. Delay the fail-closed error until a spec.json or configured type catalogue actually needs the protected branch decision.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 891,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:44621fa870015a087ba56a00306e52f033423131682b9338220027b128ae5fb3",
+          "at": "2026-05-26T09:23:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`has_type_catalogue_input` detects protected type inputs by scanning only filenames ending in `-types.json`, but the renderer’s actual input set comes from `architecture-rules.json` and `TdddLayerBinding::catalogue_file()`, which supports custom simple filenames such as `custom.json` and renders them to `custom.md`. With `spec.json` absent, git branch lookup failing, and a configured custom catalogue present, this check returns false and `sync_rendered_views` succeeds after `plan.md` while silently skipping the protected rendered type view instead of failing closed. That leaves supported custom catalogue files outside the new CN-01 branch guard.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 994,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ff883d3b1f765a14cb7aa703ea752f1ec399e5edb1bde1aafdae75040cde5be7",
+          "at": "2026-05-26T09:29:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55493c0a15bc21f4248f616c31528db98b9f12e4f625c968e1cd0b2729d85440",
+          "at": "2026-05-26T09:33:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Dropping the branchless-planning tie-breaker makes `render_registry` able to surface a newer branchless v5 planned track as `Latest active track` again, even though `libs/infrastructure/src/verify/latest_track.rs` still treats branchless planned v3/v4/v5 tracks as lower-priority placeholders. The registry and verifier now disagree on which active track should win.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render.rs",
+              "line": 470,
+              "category": "contradiction"
+            },
+            {
+              "message": "The replacement test no longer verifies the `Current Focus` row or the recommended command for the branchless fixture; it only matches the generic `/track:status` footer, so it would still pass if the current-focus ordering regressed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
+              "line": 475,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5f80742cf381cc133e57e4360924c1cf1643153a3747dd9b0a4cb2f0ee4b55f1",
+          "at": "2026-05-26T14:04:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`selection_priority()` now treats `planned`, `in_progress`, `blocked`, and `cancelled` as the same priority, so `latest_track_dir()` will pick whichever active track has the newest `updated_at`. That no longer matches `render_registry()`'s planned-last ordering (`libs/infrastructure/src/track/render.rs:469-470`), so a newer planned track can become the verifier's \"latest track\" while the registry still surfaces an older in-progress track. In a mixed repo, `verify()` can therefore skip artifact validation for the wrong track.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 457,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d8d2d41e092fa1327992d02f9d4d370ccf662808731dd6e635820fc1b389a82a",
+          "at": "2026-05-26T14:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test no longer exercises the ordering it is meant to protect: with only a single snapshot, it will pass even if `render_registry` stops putting planned tracks after in-progress/blocked/cancelled tracks. The deleted multi-track assertions were the only coverage for the Current Focus sort.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
+              "line": 465,
+              "category": "tests"
+            },
+            {
+              "message": "`latest_track_dir` still breaks same-timestamp ties in the opposite direction from `render_registry`: snapshots are sorted by `track.id()` ascending before rendering (`render.rs:342-345`), but the verification path ranks equal `(priority, updated_at)` entries by `dir_name` and picks the lexicographically larger one (`latest_track.rs:150-153`). If two active tracks share an `updated_at`, `registry.md` and verification can disagree on which track is latest.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
+              "line": 152,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:8ce298280bfa2568a469f811281dac317286e3a02e4bdbc7c3097eed259ac88b",
+          "at": "2026-05-26T14:30:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74d8e1c1690449d83d1a2ac442d30588a167573a27cfb7a5db835a8547ee30fc",
+          "at": "2026-05-26T14:36:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:74d8e1c1690449d83d1a2ac442d30588a167573a27cfb7a5db835a8547ee30fc",
+          "at": "2026-05-26T14:39:51Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -364,245 +653,20 @@
           "findings": [],
           "hash": "rvw1:sha256:8ca57521975c5f5090e7597a4c482beb85b4b69ee3195d1af261be65c25e3bed",
           "at": "2026-05-26T16:24:33Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: the fail-closed branch guard is only surfaced when `spec.json` exists. In a workspace that has protected type catalogues (`architecture-rules.json` + `<layer>-types.json`) but no spec, a git lookup failure is downgraded to `false` and the function returns `Ok`, silently skipping type rendering instead of returning `InvalidTrackMetadata`. That violates the briefing’s CN-01 requirement for types-only tracks.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
-              "line": 902,
-              "category": "correctness"
-            },
-            {
-              "message": "P1: the new mismatched-branch test does not actually cover the types half of the guard. It never writes any `<layer>-types.json` and only asserts that `spec.md` is absent, so a regression that still renders `*-types.md` on the wrong branch would pass unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
-              "line": 2768,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b88d49c6aed0037046474d30daab4e3d88baf66f62eb02c9e72e46d9e42004b2",
-          "at": "2026-05-26T08:34:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The git-failure arm aborts the whole sync as soon as any `*-types.json` is present, so callers in a non-git workspace never reach the unconditional `contract-map.md` render. That regresses the existing done-track contract-map path and also suppresses the style-config error surfaced by `render_contract_map_view`; the fail-closed branch should be narrowed or deferred until after the unguarded render.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 1153,
-              "category": "correctness"
-            },
-            {
-              "message": "The new 'matching branch' test is a placeholder: it only reads the current branch and writes fixtures into a temp dir, but never calls `sync_rendered_views` or asserts any rendered output. The branch-match success path is therefore still untested.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render_tests.rs",
-              "line": 2773,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:c6392ffae3dd4a7a5528ea1791499af979cc0ba086e56bc5ec81132f0866fb19",
-          "at": "2026-05-26T08:45:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The fail-closed branch error is only deferred when `architecture-rules.json` exists and a type catalogue is discovered. If git lookup fails on a track that has protected `*-types.json` inputs but no rules file, `sync_rendered_views` returns `Ok` after rendering `plan.md` and silently skips the protected views, which contradicts the new CN-01 fail-closed behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
-              "line": 1173,
-              "category": "correctness"
-            },
-            {
-              "message": "`track_dir_contains_type_catalogue()` only treats entries with `DirEntry::file_type().is_file()` as catalogues. That misses symlinked `*-types.json` files, even though the render loop later accepts them via `catalogue_path.is_file()`. As a result, a symlinked protected catalogue can bypass the deferred branch error when git lookup fails and the sync will succeed without rendering the view.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
-              "line": 54,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:6b692575970124fc31cc5143fd8e9876ed4173b33bda8e8b21d253a53af89a5c",
-          "at": "2026-05-26T08:52:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`git` lookup failures are only converted into `InvalidTrackMetadata` when `spec.json` exists or `track_dir_contains_type_catalogue()` finds a readable `*-types.json` file. On a non-git checkout with only `plan.md`/`registry.md` inputs, `sync_rendered_views` now succeeds instead of failing closed, which contradicts the branch-guard requirement in the briefing.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
-              "line": 1178,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:61728a0fb48a3a89d3e5f288808f5dee5c25b7e0584a21e6e69bcd9ced73a849",
-          "at": "2026-05-26T08:59:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Branch-read failures are only surfaced after `render_contract_map_view()`. If `architecture-rules.json` or the contract-map style config is missing/malformed, that error wins and the intended fail-closed `InvalidTrackMetadata` for git lookup failure is never returned. The brief says the branch error should be deferred only until after `plan.md`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 1156,
-              "category": "correctness"
-            },
-            {
-              "message": "`sync_rendered_views(track_id)` now requires a git repo even for registry-only refreshes, but the unchanged tests at `sync_rendered_views_writes_plan_and_registry` and `sync_rendered_views_omits_unchanged_registry_from_changed_set` still use plain tempdirs without `init_git_repo_on_branch()`. They will now return `InvalidTrackMetadata` before their assertions, so the test suite regresses.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render_tests.rs",
-              "line": 573,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:27e38f8068f8b15993e87935ef40d6e4516c5e5380ed72145b681f5fa3b1a250",
-          "at": "2026-05-26T09:07:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`git rev-parse --abbrev-ref HEAD` returns success with `HEAD` in detached-HEAD checkouts, so this branch guard treats a non-branch checkout as a normal mismatch (`Ok(false)`) instead of failing closed. That silently skips `spec.md`/`<layer>-types.md` on detached CI/worktree checkouts even when the active track should be rendered.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
-              "line": 861,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2740aad228125b237ee25ae6fef61ece909d1da193de5f8ec3228b475d7a361a",
-          "at": "2026-05-26T09:12:32Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:44621fa870015a087ba56a00306e52f033423131682b9338220027b128ae5fb3",
-          "at": "2026-05-26T09:19:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The branch guard now returns an InvalidTrackMetadata error immediately after plan.md whenever git branch lookup fails, even when there are no protected inputs to render. That makes plan-only or spec/types-absent calls fail instead of simply updating plan.md/registry.md, despite the guard being scoped to spec.md and <layer>-types.md; it also breaks existing tests such as the spec-absent/types-absent plan-only cases that call sync_rendered_views outside a git repo. Delay the fail-closed error until a spec.json or configured type catalogue actually needs the protected branch decision.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 891,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:44621fa870015a087ba56a00306e52f033423131682b9338220027b128ae5fb3",
-          "at": "2026-05-26T09:23:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`has_type_catalogue_input` detects protected type inputs by scanning only filenames ending in `-types.json`, but the renderer’s actual input set comes from `architecture-rules.json` and `TdddLayerBinding::catalogue_file()`, which supports custom simple filenames such as `custom.json` and renders them to `custom.md`. With `spec.json` absent, git branch lookup failing, and a configured custom catalogue present, this check returns false and `sync_rendered_views` succeeds after `plan.md` while silently skipping the protected rendered type view instead of failing closed. That leaves supported custom catalogue files outside the new CN-01 branch guard.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 994,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ff883d3b1f765a14cb7aa703ea752f1ec399e5edb1bde1aafdae75040cde5be7",
-          "at": "2026-05-26T09:29:31Z"
+          "hash": "rvw1:sha256:598a8e20e16bee6a9eb7fa68becf35dc6d59a5d2fc6b75d9e3438d99e2f30ddc",
+          "at": "2026-05-26T16:34:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:55493c0a15bc21f4248f616c31528db98b9f12e4f625c968e1cd0b2729d85440",
-          "at": "2026-05-26T09:33:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Dropping the branchless-planning tie-breaker makes `render_registry` able to surface a newer branchless v5 planned track as `Latest active track` again, even though `libs/infrastructure/src/verify/latest_track.rs` still treats branchless planned v3/v4/v5 tracks as lower-priority placeholders. The registry and verifier now disagree on which active track should win.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render.rs",
-              "line": 470,
-              "category": "contradiction"
-            },
-            {
-              "message": "The replacement test no longer verifies the `Current Focus` row or the recommended command for the branchless fixture; it only matches the generic `/track:status` footer, so it would still pass if the current-focus ordering regressed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render_tests.rs",
-              "line": 475,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:5f80742cf381cc133e57e4360924c1cf1643153a3747dd9b0a4cb2f0ee4b55f1",
-          "at": "2026-05-26T14:04:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`selection_priority()` now treats `planned`, `in_progress`, `blocked`, and `cancelled` as the same priority, so `latest_track_dir()` will pick whichever active track has the newest `updated_at`. That no longer matches `render_registry()`'s planned-last ordering (`libs/infrastructure/src/track/render.rs:469-470`), so a newer planned track can become the verifier's \"latest track\" while the registry still surfaces an older in-progress track. In a mixed repo, `verify()` can therefore skip artifact validation for the wrong track.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/latest_track.rs",
-              "line": 457,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d8d2d41e092fa1327992d02f9d4d370ccf662808731dd6e635820fc1b389a82a",
-          "at": "2026-05-26T14:24:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This test no longer exercises the ordering it is meant to protect: with only a single snapshot, it will pass even if `render_registry` stops putting planned tracks after in-progress/blocked/cancelled tracks. The deleted multi-track assertions were the only coverage for the Current Focus sort.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/render_tests.rs",
-              "line": 465,
-              "category": "tests"
-            },
-            {
-              "message": "`latest_track_dir` still breaks same-timestamp ties in the opposite direction from `render_registry`: snapshots are sorted by `track.id()` ascending before rendering (`render.rs:342-345`), but the verification path ranks equal `(priority, updated_at)` entries by `dir_name` and picks the lexicographically larger one (`latest_track.rs:150-153`). If two active tracks share an `updated_at`, `registry.md` and verification can disagree on which track is latest.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/latest_track.rs",
-              "line": 152,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:8ce298280bfa2568a469f811281dac317286e3a02e4bdbc7c3097eed259ac88b",
-          "at": "2026-05-26T14:30:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74d8e1c1690449d83d1a2ac442d30588a167573a27cfb7a5db835a8547ee30fc",
-          "at": "2026-05-26T14:36:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:74d8e1c1690449d83d1a2ac442d30588a167573a27cfb7a5db835a8547ee30fc",
-          "at": "2026-05-26T14:39:51Z"
+          "hash": "rvw1:sha256:598a8e20e16bee6a9eb7fa68becf35dc6d59a5d2fc6b75d9e3438d99e2f30ddc",
+          "at": "2026-05-26T16:36:26Z"
         }
       ]
     },
@@ -672,56 +736,6 @@
           "findings": [],
           "hash": "rvw1:sha256:4d1bcc0c927be10fb0f760fec8554d8a7d72c7d47deed5857c17580dd43c6906",
           "at": "2026-05-26T14:09:38Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
-          "at": "2026-05-26T07:14:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
-          "at": "2026-05-26T07:16:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d975ca3094873ed033e445b50e167888c853955e2ff332d106afb72f723ea397",
-          "at": "2026-05-26T14:03:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d975ca3094873ed033e445b50e167888c853955e2ff332d106afb72f723ea397",
-          "at": "2026-05-26T14:06:14Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f5a95b61d9eb2abbc82dcc7f8bfa0523d9c23587773ae69ff03138e789f24212",
-          "at": "2026-05-26T13:52:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f5a95b61d9eb2abbc82dcc7f8bfa0523d9c23587773ae69ff03138e789f24212",
-          "at": "2026-05-26T14:01:38Z"
         }
       ]
     }
