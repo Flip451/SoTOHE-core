@@ -1,0 +1,23 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4baab2c3174439464bc8b1f87eec474c5cc6b45d5aad7a0f83d6913797871c4",
+          "at": "2026-05-26T01:19:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4baab2c3174439464bc8b1f87eec474c5cc6b45d5aad7a0f83d6913797871c4",
+          "at": "2026-05-26T01:21:56Z"
+        }
+      ]
+    }
+  }
+}
