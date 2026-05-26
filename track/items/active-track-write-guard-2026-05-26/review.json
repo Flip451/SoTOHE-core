@@ -1,21 +1,213 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
-          "at": "2026-05-26T07:14:08Z"
+          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
+          "at": "2026-05-26T08:35:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `PreCommitTypeSignalsService` contract still documents fields/errors that this change removed: it says the output contains optional layer bindings, and the `run` errors mention metadata failures even though `PreCommitTypeSignalsOutput` now only carries blocked/red/yellow signals and the metadata/impl-plan variants were replaced by branch errors. This leaves a contradictory usecase API contract for callers implementing the new branch-guard flow.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_commit_type_signals.rs",
+              "line": 66,
+              "category": "api-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
+          "at": "2026-05-26T08:37:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
-          "at": "2026-05-26T07:16:26Z"
+          "hash": "rvw1:sha256:200f6a5013b8b43178d44624ef0df8b7aa6737dc7eb422357d6b27d201a0d9a2",
+          "at": "2026-05-26T08:39:48Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a59a38fca55ff9823cf4f72247c7b89bae2bbe9285dd368da0cda47c0960d909",
+          "at": "2026-05-26T05:37:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a59a38fca55ff9823cf4f72247c7b89bae2bbe9285dd368da0cda47c0960d909",
+          "at": "2026-05-26T05:39:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.json` cites `CN-07` as the branch-based guard in multiple docs entries (see lines 60, 178, 201, and 250), but this track's spec only defines `CN-01`..`CN-04`. That makes the reference unresolved and the contract notes internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/active-track-write-guard-2026-05-26/usecase-types.json",
+              "line": 60,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d6ca2b325f4e6363c6e19969f3367c750aefb30fa8f1b4be671420308f78da8b",
+          "at": "2026-05-26T06:09:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:268ccd9c4e302969e10ece136eb7eb8abe6fbbe9a930a313e1eeebdf2b0812fe",
+          "at": "2026-05-26T06:18:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 gives two incompatible control-flow contracts for branch mismatch: it first requires `run_pre_commit_type_signals` to return `Err(CliError::Message(...))` instead of `None`, then says `type_signal_bindings_opt` `None` should mean guard failure while also removing the caller's `None` check. The plan needs one coherent fail-closed path; as written, implementers can either keep a silent skip or remove the only handling for the guard failure state.",
+              "severity": "P1",
+              "file": "track/items/active-track-write-guard-2026-05-26/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            },
+            {
+              "message": "T005 omits tests for the `make.rs` branch guard even though T003 adds branch validation to `run_pre_commit_type_signals` and AC-04 depends on the pre-commit path. The plan can satisfy T005 with tests for `signals.rs`, `catalogue_spec_signals.rs`, and `render.rs` while leaving the new pre-commit fail-closed behavior untested.",
+              "severity": "P1",
+              "file": "track/items/active-track-write-guard-2026-05-26/impl-plan.json",
+              "line": 30,
+              "category": "test coverage gap"
+            },
+            {
+              "message": "IN-01 explicitly covers removing the status guard from all artifact-writing actions including `sync-views`, but the coverage map lists only T001-T003. T004 is the task that changes `sync_rendered_views`, so the generated coverage can mark IN-01 complete without the sync-views change that IN-01 itself requires.",
+              "severity": "P1",
+              "file": "track/items/active-track-write-guard-2026-05-26/task-coverage.json",
+              "line": 4,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:268ccd9c4e302969e10ece136eb7eb8abe6fbbe9a930a313e1eeebdf2b0812fe",
+          "at": "2026-05-26T06:22:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The usecase catalogue gives conflicting guidance for the new branch guard: `PreCommitTypeSignalsError` adds explicit `BranchNotFound` / `BranchMismatch` variants as the replacement for the old frozen guard, but the `PreCommitTypeSignalsInteractor` docs say branch mismatch is delegated to `TypeSignalsInteractor` and surfaced only as `TypeSignalsRecomputeFailed`. That leaves implementers with two incompatible error contracts for the same pre-commit branch mismatch path, so the plan should pick one propagation model and make the catalogue/impl-plan agree.",
+              "severity": "P1",
+              "file": "track/items/active-track-write-guard-2026-05-26/usecase-types.json",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b368901f226b5d31aa7ff11ac93c56a9208641c9f6b025be6143fc3417f4b872",
+          "at": "2026-05-26T06:27:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3611f7ec5e203346c1f5ac60ff578529b2137cbfa67bb377aea828d7bcb9c1b",
+          "at": "2026-05-26T06:34:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:649b0ff41b72ef81921c322f5111071eed00805435b903bf2d0c14d168ebf98f",
+          "at": "2026-05-26T08:34:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:649b0ff41b72ef81921c322f5111071eed00805435b903bf2d0c14d168ebf98f",
+          "at": "2026-05-26T08:37:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ed0171ddff94ff5666723ae8bc5fc8ef101da8a29ca67d28a3af77c0f94b2da",
+          "at": "2026-05-26T10:40:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ed0171ddff94ff5666723ae8bc5fc8ef101da8a29ca67d28a3af77c0f94b2da",
+          "at": "2026-05-26T10:42:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Related note mislabels `knowledge/adr/2026-05-26-0518-active-track-write-guard.md` as a \"render guard\". That ADR is about replacing the frozen status gate with branch-based write validation, so the description is semantically wrong and can mislead readers about why the two ADRs are related.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+              "line": 26,
+              "category": "broken reference"
+            }
+          ],
+          "hash": "rvw1:sha256:ea1885e5cc0bc5279383bb57a9769db6d7f9f9a24bcf4d51696478cde58799c3",
+          "at": "2026-05-26T11:35:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62af14d6c34eadd005934e0623c3807c4e50f1b5b06037ac4c6ed39090dd8ae4",
+          "at": "2026-05-26T11:36:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62af14d6c34eadd005934e0623c3807c4e50f1b5b06037ac4c6ed39090dd8ae4",
+          "at": "2026-05-26T11:38:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7ad1ce5d4498fa23bdf6ac039e82775f0b51badbe9d165a2502e4c72cfa5fca",
+          "at": "2026-05-26T12:03:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S6 claims the T006 compile unit covers `IN-06 partial`, but `IN-06` is specifically the deletion of `.claude/commands/track/plan-only.md` and `.claude/commands/track/activate.md`, while T006 only covers CLI/usecase/Makefile code deletion and `task-coverage.json` maps `IN-06` solely to T007. This leaves the plan artifacts with conflicting requirement-to-task ownership; remove `IN-06 partial` from S6 or move the command-file deletion into T006.",
+              "severity": "P1",
+              "file": "track/items/active-track-write-guard-2026-05-26/impl-plan.json",
+              "line": 110,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d7ad1ce5d4498fa23bdf6ac039e82775f0b51badbe9d165a2502e4c72cfa5fca",
+          "at": "2026-05-26T12:05:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:982f9beab3cddb59783424c97fd6920b9037ffd2717e294bd296e0607daec6cf",
+          "at": "2026-05-26T12:08:18Z"
         }
       ]
     },
@@ -262,184 +454,21 @@
         }
       ]
     },
-    "plan-artifacts": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a59a38fca55ff9823cf4f72247c7b89bae2bbe9285dd368da0cda47c0960d909",
-          "at": "2026-05-26T05:37:33Z"
+          "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
+          "at": "2026-05-26T07:14:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a59a38fca55ff9823cf4f72247c7b89bae2bbe9285dd368da0cda47c0960d909",
-          "at": "2026-05-26T05:39:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase-types.json` cites `CN-07` as the branch-based guard in multiple docs entries (see lines 60, 178, 201, and 250), but this track's spec only defines `CN-01`..`CN-04`. That makes the reference unresolved and the contract notes internally inconsistent.",
-              "severity": "P1",
-              "file": "track/items/active-track-write-guard-2026-05-26/usecase-types.json",
-              "line": 60,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:d6ca2b325f4e6363c6e19969f3367c750aefb30fa8f1b4be671420308f78da8b",
-          "at": "2026-05-26T06:09:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:268ccd9c4e302969e10ece136eb7eb8abe6fbbe9a930a313e1eeebdf2b0812fe",
-          "at": "2026-05-26T06:18:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 gives two incompatible control-flow contracts for branch mismatch: it first requires `run_pre_commit_type_signals` to return `Err(CliError::Message(...))` instead of `None`, then says `type_signal_bindings_opt` `None` should mean guard failure while also removing the caller's `None` check. The plan needs one coherent fail-closed path; as written, implementers can either keep a silent skip or remove the only handling for the guard failure state.",
-              "severity": "P1",
-              "file": "track/items/active-track-write-guard-2026-05-26/impl-plan.json",
-              "line": 18,
-              "category": "contradiction"
-            },
-            {
-              "message": "T005 omits tests for the `make.rs` branch guard even though T003 adds branch validation to `run_pre_commit_type_signals` and AC-04 depends on the pre-commit path. The plan can satisfy T005 with tests for `signals.rs`, `catalogue_spec_signals.rs`, and `render.rs` while leaving the new pre-commit fail-closed behavior untested.",
-              "severity": "P1",
-              "file": "track/items/active-track-write-guard-2026-05-26/impl-plan.json",
-              "line": 30,
-              "category": "test coverage gap"
-            },
-            {
-              "message": "IN-01 explicitly covers removing the status guard from all artifact-writing actions including `sync-views`, but the coverage map lists only T001-T003. T004 is the task that changes `sync_rendered_views`, so the generated coverage can mark IN-01 complete without the sync-views change that IN-01 itself requires.",
-              "severity": "P1",
-              "file": "track/items/active-track-write-guard-2026-05-26/task-coverage.json",
-              "line": 4,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:268ccd9c4e302969e10ece136eb7eb8abe6fbbe9a930a313e1eeebdf2b0812fe",
-          "at": "2026-05-26T06:22:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The usecase catalogue gives conflicting guidance for the new branch guard: `PreCommitTypeSignalsError` adds explicit `BranchNotFound` / `BranchMismatch` variants as the replacement for the old frozen guard, but the `PreCommitTypeSignalsInteractor` docs say branch mismatch is delegated to `TypeSignalsInteractor` and surfaced only as `TypeSignalsRecomputeFailed`. That leaves implementers with two incompatible error contracts for the same pre-commit branch mismatch path, so the plan should pick one propagation model and make the catalogue/impl-plan agree.",
-              "severity": "P1",
-              "file": "track/items/active-track-write-guard-2026-05-26/usecase-types.json",
-              "line": 60,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b368901f226b5d31aa7ff11ac93c56a9208641c9f6b025be6143fc3417f4b872",
-          "at": "2026-05-26T06:27:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c3611f7ec5e203346c1f5ac60ff578529b2137cbfa67bb377aea828d7bcb9c1b",
-          "at": "2026-05-26T06:34:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:649b0ff41b72ef81921c322f5111071eed00805435b903bf2d0c14d168ebf98f",
-          "at": "2026-05-26T08:34:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:649b0ff41b72ef81921c322f5111071eed00805435b903bf2d0c14d168ebf98f",
-          "at": "2026-05-26T08:37:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ed0171ddff94ff5666723ae8bc5fc8ef101da8a29ca67d28a3af77c0f94b2da",
-          "at": "2026-05-26T10:40:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ed0171ddff94ff5666723ae8bc5fc8ef101da8a29ca67d28a3af77c0f94b2da",
-          "at": "2026-05-26T10:42:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Related note mislabels `knowledge/adr/2026-05-26-0518-active-track-write-guard.md` as a \"render guard\". That ADR is about replacing the frozen status gate with branch-based write validation, so the description is semantically wrong and can mislead readers about why the two ADRs are related.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
-              "line": 26,
-              "category": "broken reference"
-            }
-          ],
-          "hash": "rvw1:sha256:ea1885e5cc0bc5279383bb57a9769db6d7f9f9a24bcf4d51696478cde58799c3",
-          "at": "2026-05-26T11:35:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62af14d6c34eadd005934e0623c3807c4e50f1b5b06037ac4c6ed39090dd8ae4",
-          "at": "2026-05-26T11:36:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62af14d6c34eadd005934e0623c3807c4e50f1b5b06037ac4c6ed39090dd8ae4",
-          "at": "2026-05-26T11:38:35Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
-          "at": "2026-05-26T08:35:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The public `PreCommitTypeSignalsService` contract still documents fields/errors that this change removed: it says the output contains optional layer bindings, and the `run` errors mention metadata failures even though `PreCommitTypeSignalsOutput` now only carries blocked/red/yellow signals and the metadata/impl-plan variants were replaced by branch errors. This leaves a contradictory usecase API contract for callers implementing the new branch-guard flow.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_commit_type_signals.rs",
-              "line": 66,
-              "category": "api-contract"
-            }
-          ],
-          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
-          "at": "2026-05-26T08:37:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:200f6a5013b8b43178d44624ef0df8b7aa6737dc7eb422357d6b27d201a0d9a2",
-          "at": "2026-05-26T08:39:48Z"
+          "hash": "rvw1:sha256:1b5db9fde5058c3247ede6d55e0f6983390488f9a0db45491f27bb0c2d4872dd",
+          "at": "2026-05-26T07:16:26Z"
         }
       ]
     }

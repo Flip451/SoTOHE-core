@@ -30,6 +30,18 @@
       "description": "テスト追加 + CI gate。IN-05 のブランチベースバリデーションテスト追加：(a) branch が `track/<track_id>` と一致するケース（許容）、(b) branch が `track/<other_id>` と一致しないケース（拒否）、(c) branch が `track/` prefix を持たないケース（拒否）。対象モジュール：`signals.rs` の `ensure_branch_matches_track` 単体テスト（T002）、`catalogue_spec_signals.rs` の branch-based guard 単体テスト（T002）、`make.rs` の `run_pre_commit_type_signals` branch guard / fail-closed 経路テスト（T003）、`render.rs` の branch-based guard テスト（T004、`render_tests.rs` に追加）。最後に `cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass することを確認する（AC-06）。",
       "status": "done",
       "commit_hash": "372720001f629b19a235d85b5bde9417488fb066"
+    },
+    {
+      "id": "T006",
+      "description": "CLI + usecase: plan-only / activate レーンのコアコード削除（コンパイル単位として一括）。(1) `apps/cli/src/commands/track/activate.rs`: `BranchAction::Switch` に独立した `execute_branch_switch` 実装（既存の `branch_exists` + `preflight_branch_operation` + `git switch` のみ）を追加し、`execute_branch` の Switch アームをそこへ差し替える。`execute_activate` および activation 専用ヘルパー群（`activation_*` 関数群、`allow_materialized_activation`、`should_persist_activation_side_effects`、`activation_requires_clean_worktree`、`allowed_activation_dirty_paths`、`persist_activation_commit`、`ensure_clean_worktree`、`git_dirty_worktree_paths`、`activation_artifacts_dirty`、`find_latest_activation_commit`、`is_ancestor`、`activation_switch_label`）を削除する。`reject_branchless_guard_*` の 3 つのテストを `transition.rs` の `#[cfg(test)]` ブロックへ移動する（これらは `track_resolution` のテストであり activate 固有でない）。(2) `apps/cli/src/commands/track/mod.rs`: `TrackCommand::Activate` variant・`ActivateArgs` struct・`BranchMode` enum・`derive_track_status_from_json` 関数（activate 専用）を削除。`use usecase::track_activation::{ActivateTrackOutcome, ActivateTrackUseCase}` import と `TrackCommand::Activate` dispatch arm を削除。(3) `apps/cli/src/commands/make.rs`: `MakeTask::TrackActivate`・`MakeTask::TrackPlanBranch` variant・`dispatch_track_activate`・`dispatch_track_plan_branch` 関数を削除し、`run` マッチアームも除去。(4) `libs/usecase/src/track_activation.rs` を削除。`libs/usecase/src/worktree_guard.rs` を削除。`libs/usecase/src/lib.rs` から `pub mod track_activation;` と `pub mod worktree_guard;` を削除。(5) `Makefile.toml` から `[tasks.track-activate]` と `[tasks.track-plan-branch]` を削除。`cargo make ci` pass を確認（AC-08 / AC-09 / AC-10 / AC-11 / AC-12 / CN-05）。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "コマンド定義ファイル削除 + ドキュメント参照クリーンアップ。(1) `.claude/commands/track/plan-only.md` と `.claude/commands/track/activate.md` を削除（AC-07）。(2) `DEVELOPER_AI_WORKFLOW.md`: mermaid フローチャートの plan-only / activate ノードとエッジ、§0.4 コマンド比較表の `/track:plan-only` / `/track:activate` 行、§3.1 「plan-only 代替レーン」ブロックを削除。(3) `.claude/commands/track/done.md`: 「no active tracks → /track:plan-only」推奨文言を削除。(4) `.claude/commands/track/status.md`: 「branchless planning-only → /track:activate」推奨ルールを削除。(5) `.claude/commands/track/implement.md` / `full-cycle.md`: 「planning-only tracks must pass through /track:activate」参照を削除。(6) `.claude/commands/track/pr.md`: 「For plan/ branches: merge the PR, then /track:activate」ヒントを削除。(7) `apps/cli/src/commands/pr.rs`: `/track:activate` ヒント・エラーテキストを削除（存在する場合）。`cargo make ci` pass を確認（AC-07 を検証）。",
+      "status": "todo",
+      "commit_hash": null
     }
   ],
   "plan": {
@@ -87,6 +99,29 @@
         ],
         "task_ids": [
           "T005"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "plan-only / activate lane removal: source code + usecase deletion",
+        "description": [
+          "Delete execute_activate and all activation-specific helpers from activate.rs; give BranchAction::Switch its own simple git-switch implementation.",
+          "Delete libs/usecase/src/track_activation.rs and worktree_guard.rs. Remove TrackCommand::Activate, ActivateArgs, BranchMode, MakeTask::TrackActivate, MakeTask::TrackPlanBranch, and the corresponding Makefile.toml tasks.",
+          "This is a tightly-coupled compile unit: all deletions must land together for cargo make ci to pass (IN-07, IN-08, IN-09, IN-10, CN-05, AC-08, AC-09, AC-10, AC-11, AC-12)."
+        ],
+        "task_ids": [
+          "T006"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "plan-only / activate lane removal: command files + doc references",
+        "description": [
+          "Delete .claude/commands/track/plan-only.md and .claude/commands/track/activate.md.",
+          "Remove all /track:plan-only and /track:activate references from DEVELOPER_AI_WORKFLOW.md and the affected .claude/commands/track/*.md files (IN-06 partial, AC-07)."
+        ],
+        "task_ids": [
+          "T007"
         ]
       }
     ]

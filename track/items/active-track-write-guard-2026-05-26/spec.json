@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "version": "1.0",
-  "title": "完了済みトラック保護を frozen から現在ブランチ紐付きバリデーションへ置換",
+  "title": "完了済みトラック保護を frozen から現在ブランチ紐付きバリデーションへ置換 + plan-only / activate レーン削除",
   "goal": [
     {
       "id": "GO-01",
@@ -9,6 +9,16 @@
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-26-0518-active-track-write-guard.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "現在使われておらず保守コストになっている `/track:plan-only` と `/track:activate` の 2 段階ワークフローレーンを削除する。これらのコマンド定義、ソースモジュール、および専用の Makefile タスクを除去し、コードベースをシンプルに保つ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
           "anchor": "D1"
         }
       ]
@@ -69,6 +79,56 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`.claude/commands/track/plan-only.md` と `.claude/commands/track/activate.md` のコマンド定義ファイルを削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "`TrackCommand::Activate` variant（`apps/cli/src/commands/track/mod.rs`）と `execute_activate` / その専用ヘルパー関数群（`BranchMode::Auto` コードパス、activation resume marker、plan branch preflight など activation 固有の処理）を `apps/cli/src/commands/track/activate.rs` から削除する。`BranchAction::Switch` のルーティングは引き続き動作しなければならない（IN-08 を参照）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`track branch switch`（`BranchAction::Switch`）は削除後も動作しなければならない。現状は `execute_activate` を `BranchMode::Switch` で呼び出すことで実装されているため、activate 専用コードを除去した後は `BranchAction::Switch` 向けの独立した実装（既存ブランチへの `git switch` のみを行うシンプルなパス）を残す",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "`usecase::track_activation::ActivateTrackUseCase` および `libs/usecase/src/track_activation.rs` モジュールを削除する（`BranchAction::Switch` の独立した実装はこのユースケースを必要としない）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "`Makefile.toml` の `track-activate` タスクと `track-plan-branch` タスクを削除する。`dispatch_track_activate` と `dispatch_track_plan_branch` ディスパッチャ（`apps/cli/src/commands/make.rs`）および対応する `MakeTask::TrackActivate` / `MakeTask::TrackPlanBranch` variant も削除する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -118,6 +178,16 @@
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-0518-active-track-write-guard.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "`pr_workflow.rs` / `merge_gate.rs` / `task_completion.rs` / `track_resolution.rs` などの共有モジュールが保持する `plan/` プレフィックス対応の除去: これらのモジュールは `/track:plan-only` 専用ではなく、`plan/<id>` ブランチが将来または既存の別経路で生成された場合にも汎用的に使われうる。`/track:plan-only` と `/track:activate` のコマンド・ソース・Makefile タスクを削除すれば `plan/` ブランチを作る手段は失われるが、共有モジュール内の `plan/` ハンドリングの除去は本 track のスコープ外とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
             "anchor": "D1"
           }
         ]
@@ -174,6 +244,16 @@
         {
           "file": "knowledge/conventions/workflow-ceremony-minimization.md",
           "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "plan-only / activate レーンを除去した後も `track branch switch`（`sotp track branch switch <id>`）は引き続き動作しなければならない。削除対象の activate 専用コードと switch パスを明確に分離し、switch の振る舞いにリグレッションを起こさない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
         }
       ]
     }
@@ -242,6 +322,66 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`.claude/commands/track/plan-only.md` と `.claude/commands/track/activate.md` が存在しない。`/track:plan-only` と `/track:activate` コマンドは呼び出し不可能な状態になっている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "`sotp track activate` サブコマンドが存在しない（`sotp track --help` のサブコマンド一覧に `activate` が表示されない）。`TrackCommand::Activate` variant が削除されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`cargo make track-activate` および `cargo make track-plan-branch` タスクが存在しない（`Makefile.toml` から削除されている）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`usecase::track_activation` モジュールが存在しない（`libs/usecase/src/track_activation.rs` が削除されており、`lib.rs` からも参照されていない）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`sotp track branch switch <id>` が正常に動作する。既存の `track/<id>` ブランチへの切り替えができ、存在しないブランチに対してはエラーで拒否される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "`sotp track branch create <id>` が正常に動作する（`track branch create` のリグレッションがない）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -267,7 +407,7 @@
     }
   ],
   "signals": {
-    "blue": 21,
+    "blue": 35,
     "yellow": 0,
     "red": 0
   }
