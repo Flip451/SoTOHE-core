@@ -197,7 +197,19 @@ pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBu
     let project_root = track_dir.and_then(std::path::Path::parent);
 
     match (items_name, track_name, project_root) {
-        (Some("items"), Some("track"), Some(root)) => Ok(root.to_path_buf()),
+        (Some("items"), Some("track"), Some(root)) => {
+            // When items_dir is a bare relative path like "track/items", Path::parent()
+            // returns an empty path ("") rather than ".".  An empty path passed to
+            // Command::current_dir causes ENOENT on spawn (e.g. in render.rs's git
+            // branch discovery).  Normalise the empty root to "." so all callers get
+            // a usable current-directory path, consistent with how relative joins
+            // elsewhere in the render pipeline behave.
+            if root.as_os_str().is_empty() {
+                Ok(PathBuf::from("."))
+            } else {
+                Ok(root.to_path_buf())
+            }
+        }
         _ => Err(format!(
             "--items-dir must point to '<project-root>/track/items'; got {}",
             items_dir.display()

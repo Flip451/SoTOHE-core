@@ -1,6 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
+          "at": "2026-05-26T08:35:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `PreCommitTypeSignalsService` contract still documents fields/errors that this change removed: it says the output contains optional layer bindings, and the `run` errors mention metadata failures even though `PreCommitTypeSignalsOutput` now only carries blocked/red/yellow signals and the metadata/impl-plan variants were replaced by branch errors. This leaves a contradictory usecase API contract for callers implementing the new branch-guard flow.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pre_commit_type_signals.rs",
+              "line": 66,
+              "category": "api-contract"
+            }
+          ],
+          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
+          "at": "2026-05-26T08:37:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:200f6a5013b8b43178d44624ef0df8b7aa6737dc7eb422357d6b27d201a0d9a2",
+          "at": "2026-05-26T08:39:48Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -121,6 +154,20 @@
           "findings": [],
           "hash": "rvw1:sha256:649b0ff41b72ef81921c322f5111071eed00805435b903bf2d0c14d168ebf98f",
           "at": "2026-05-26T08:37:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ed0171ddff94ff5666723ae8bc5fc8ef101da8a29ca67d28a3af77c0f94b2da",
+          "at": "2026-05-26T10:40:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ed0171ddff94ff5666723ae8bc5fc8ef101da8a29ca67d28a3af77c0f94b2da",
+          "at": "2026-05-26T10:42:05Z"
         }
       ]
     },
@@ -290,39 +337,6 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
-          "at": "2026-05-26T08:35:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The public `PreCommitTypeSignalsService` contract still documents fields/errors that this change removed: it says the output contains optional layer bindings, and the `run` errors mention metadata failures even though `PreCommitTypeSignalsOutput` now only carries blocked/red/yellow signals and the metadata/impl-plan variants were replaced by branch errors. This leaves a contradictory usecase API contract for callers implementing the new branch-guard flow.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pre_commit_type_signals.rs",
-              "line": 66,
-              "category": "api-contract"
-            }
-          ],
-          "hash": "rvw1:sha256:1ae27f9fe905685d52e646c1f6541dbbbf19b098282a8391ee11aa1959857201",
-          "at": "2026-05-26T08:37:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:200f6a5013b8b43178d44624ef0df8b7aa6737dc7eb422357d6b27d201a0d9a2",
-          "at": "2026-05-26T08:39:48Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -383,6 +397,20 @@
           "findings": [],
           "hash": "rvw1:sha256:a43710342f05fafb0268fe9942022f3eed7054981d85fde874c21225b8fdbf81",
           "at": "2026-05-26T09:00:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebc5ea739215df254c1fef45a456c730382c1c07df9b50085746fe7aa7336100",
+          "at": "2026-05-26T10:41:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebc5ea739215df254c1fef45a456c730382c1c07df9b50085746fe7aa7336100",
+          "at": "2026-05-26T10:44:58Z"
         }
       ]
     }

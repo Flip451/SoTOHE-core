@@ -924,6 +924,15 @@ mod tests {
     }
 
     #[test]
+    fn resolve_project_root_returns_dot_for_relative_track_items_path() {
+        // When items_dir is the bare relative path "track/items" (no leading ancestor
+        // component), Path::parent() resolves the grandparent to an empty path "".
+        // resolve_project_root must return "." instead of "" so that callers can pass
+        // the result to Command::current_dir without triggering ENOENT (empty cwd).
+        assert_eq!(resolve_project_root(Path::new("track/items")), Ok(PathBuf::from(".")));
+    }
+
+    #[test]
     fn reject_branchless_guard_blocks_planning_only_tracks_via_fs_store() {
         let dir = tempfile::tempdir().unwrap();
         write_track_metadata(dir.path(), 3, None);
