@@ -1,0 +1,133 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "CatalogueDocumentCodec": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "unit_struct"
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "CatalogueDocumentCodec",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "decode",
+          "receiver": null,
+          "params": [
+            { "name": "json", "ty": "&str" },
+            { "name": "filename_stem", "ty": "&str" }
+          ],
+          "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "encode",
+          "receiver": null,
+          "params": [
+            { "name": "doc", "ty": "&domain::tddd::catalogue_v2::CatalogueDocument" }
+          ],
+          "returns": "Result<String, CatalogueDocumentCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::catalogue_document_codec",
+      "docs": "Stateless codec converting between CatalogueDocument and JSON. Internal decode/encode logic updated in this track (IN-02) to support the new StructKind/StructShape domain types; the public API surface is unchanged.",
+      "spec_refs": [
+        {
+          "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/spec.json",
+          "anchor": "IN-02",
+          "hash": "0780b5fbafe6382d3856faac8f63bfdafe7a7cffdd6dfdd2c6acf42d62a01b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueDocumentCodecError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Json", "payload": { "kind": "tuple", "fields": ["serde_json::Error"] } },
+          { "name": "Io", "payload": { "kind": "tuple", "fields": ["std::io::Error"] } },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "actual", "ty": "u32" },
+                { "name": "expected", "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidEntry",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "entry_name", "ty": "String" },
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "CrateNameMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "expected", "ty": "String" },
+                { "name": "actual", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "CrossCrateFunctionPath",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "key", "ty": "String" },
+                { "name": "expected_crate", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_document_codec",
+      "docs": "Error type for CatalogueDocumentCodec operations. Carried for edge exposure in the contract-map. Variants are unchanged by this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

@@ -16,6 +16,108 @@
           "findings": [],
           "hash": "rvw1:sha256:d4baab2c3174439464bc8b1f87eec474c5cc6b45d5aad7a0f83d6913797871c4",
           "at": "2026-05-26T01:21:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is self-contradictory: it redefines `TypeKindDto` as a single `Struct` variant with `serde tag = \"struct\"`, but then says `type_kind_to_dto` must keep emitting the legacy `unit_struct` / `tuple_struct` / `plain_struct` JSON. It also asks `CatalogueToExtendedCrateCodec` to propagate typestate through `encode_unit_struct` / `encode_tuple_struct`, even though the rustdoc `StructKind` output has no typestate slot. As written, the codec behavior cannot be implemented consistently.",
+              "severity": "P1",
+              "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-04 says the signal evaluator must be updated alongside the linter, but the task graph only assigns T002/T003 and never creates a task for the evaluator-side `TypeKindV2` typestate matching. That leaves the `signal evaluator` part of the requirement uncovered, so the Blue acceptance criteria for unit/tuple typestate states cannot be reached by the planned work alone.",
+              "severity": "P1",
+              "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/task-coverage.json",
+              "line": 7,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7f85ae9477ef9728e49719bdc8d904e3643947e31892a1b4a50808cf866cdaa7",
+          "at": "2026-05-26T01:52:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ddbaa030825605571d0edce4fb7eca6ded1fa54e0d4bf58d9fb172343b4f8274",
+          "at": "2026-05-26T01:58:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 tells implementers to migrate `domain-types.json`'s `TypeKindV2.kind` entry to a `kind: \"struct\"` schema, but the same plan's domain catalogue defines the new `TypeKindV2` as an enum with `Struct(StructKind)`, `Enum`, and `TypeAlias`. That `kind: \"struct\"` shape belongs to the DTO/wire representation described in T002, not to the domain type catalogue entry, so following T004 would corrupt the catalogue instead of migrating it.",
+              "severity": "P1",
+              "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-05 and AC-06 require malformed catalogue declarations to be rejected at parse time, but task coverage maps both only to T001, which is the domain schema change. The plan itself places DTO/decode parsing in T002 and tests in T005, so the current coverage lets the plan complete without assigning the parse-boundary rejection or its tests to any relevant task.",
+              "severity": "P1",
+              "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/task-coverage.json",
+              "line": 28,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ddbaa030825605571d0edce4fb7eca6ded1fa54e0d4bf58d9fb172343b4f8274",
+          "at": "2026-05-26T02:02:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03/AC-04 require the codec to attach a typestate marker when encoding `rustdoc_types::StructKind::Unit`/`Tuple`, but the implementation plan explicitly says rustdoc `StructKind` has no typestate slot and the marker must not be mixed into A-side `ExtendedCrate` encoding. T005 then covers these ACs with CatalogueDocument JSON round-trip tests instead. This makes the acceptance criteria and task plan contradictory: either AC-03/AC-04 should target the JSON/domain round-trip, or the plan must define where the marker is supplied and evaluated for rustdoc-derived shapes.",
+              "severity": "P1",
+              "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/spec.json",
+              "line": 196,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:63498c8b9a3327897ae84c774cdda440dbbf5c76ae8ac642bbb030cd587b8081",
+          "at": "2026-05-26T02:07:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 makes the active catalogue migration a no-op, but T002 explicitly says the old `unit_struct` / `tuple_struct` / `plain_struct` wire formats will no longer be output and that T004 must migrate the active catalogues. The scoped active catalogues still contain old wire tags such as `plain_struct` and `unit_struct`, so leaving them “unchanged” makes the plan internally contradictory and likely leaves the catalogues incompatible once the new DTO lands.",
+              "severity": "P1",
+              "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:77604efe513898be98e10a9fa89f711bb3b873498a2d61d1472a682805456d73",
+          "at": "2026-05-26T02:11:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26629ba5b8398b31f0a40245900f38bc765fd2e9c0221e8225a0fa95f3fc8ecd",
+          "at": "2026-05-26T02:15:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26629ba5b8398b31f0a40245900f38bc765fd2e9c0221e8225a0fa95f3fc8ecd",
+          "at": "2026-05-26T02:25:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26629ba5b8398b31f0a40245900f38bc765fd2e9c0221e8225a0fa95f3fc8ecd",
+          "at": "2026-05-26T02:28:53Z"
         }
       ]
     }

@@ -1,0 +1,227 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "StructKind": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [
+          { "name": "shape", "ty": "StructShape" },
+          { "name": "typestate", "ty": "Option<TypestateMarker>" }
+        ],
+        "has_stripped_fields": false,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::composite",
+      "docs": "Struct kind with orthogonal typestate marker. Groups the three struct shapes (Unit / Tuple / Plain) under a single type so that typestate membership can be expressed for any struct shape, not just PlainStruct. The `shape` field encodes the Rust-level form; `typestate` is `Some` when this struct is a state in a typestate machine.",
+      "spec_refs": [
+        {
+          "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/spec.json",
+          "anchor": "IN-01",
+          "hash": "cf0d2f6f1082ccfd65e31e76838d2d8e5718e37cd9442126ea82591ca40b4596"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "StructShape": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unit",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Tuple",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "fields", "ty": "Vec<TypeRef>" },
+                { "name": "has_stripped_fields", "ty": "bool" }
+              ]
+            }
+          },
+          {
+            "name": "Plain",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "fields", "ty": "Vec<FieldDecl>" },
+                { "name": "has_stripped_fields", "ty": "bool" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::composite",
+      "docs": "The Rust-level structural form of a struct. Unit has no fields (structurally unrepresentable to attach fields). Tuple has positional unnamed fields. Plain has named fields. Each variant carries only the fields valid for that struct form, making illegal combinations structurally unrepresentable.",
+      "spec_refs": [
+        {
+          "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/spec.json",
+          "anchor": "IN-01",
+          "hash": "cf0d2f6f1082ccfd65e31e76838d2d8e5718e37cd9442126ea82591ca40b4596"
+        },
+        {
+          "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/spec.json",
+          "anchor": "AC-05",
+          "hash": "c91f98903a9b6e8736e034e956b030cfc1900d4bd56bdabdcc2fb24635c3f45f"
+        },
+        {
+          "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/spec.json",
+          "anchor": "AC-06",
+          "hash": "be5d3d253e39a7a9de24f2394d134b0a531046eb50b95d13d75646df7230c394"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TypeKindV2": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Struct",
+            "payload": { "kind": "tuple", "fields": ["StructKind"] }
+          },
+          {
+            "name": "Enum",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "variants", "ty": "Vec<VariantDecl>" }
+              ]
+            }
+          },
+          {
+            "name": "TypeAlias",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "target", "ty": "TypeRef" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::composite",
+      "docs": "Language-level kind for TypeEntry. Reduced from 5 flat variants to 3: Struct (with orthogonal typestate via StructKind), Enum, and TypeAlias. The three struct shapes (Unit / Tuple / Plain) are now captured in StructShape inside StructKind, making typestate membership expressible for any struct shape.",
+      "spec_refs": [
+        {
+          "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/spec.json",
+          "anchor": "IN-01",
+          "hash": "cf0d2f6f1082ccfd65e31e76838d2d8e5718e37cd9442126ea82591ca40b4596"
+        },
+        {
+          "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/spec.json",
+          "anchor": "AC-07",
+          "hash": "6c1e94e62df0e0989ec3c6fd8b693d2b3b67040a8b52ce7bdf5018f04dd1146d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TypestateMarker": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::composite",
+      "docs": "Typestate membership marker. Carried by StructKind (previously only by TypeKindV2::PlainStruct). state_name names the typestate machine; transitions lists the transition methods.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "TypestateTransitions": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "plain_struct",
+        "fields": [],
+        "has_stripped_fields": true,
+        "typestate": null
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::composite",
+      "docs": "Transition specification for a typestate state. Holds the method names that produce the next typestate.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "StructKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "StructKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "StructKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "StructKind"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "StructShape"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "StructShape"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "StructShape"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "StructShape"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TypeKindV2"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TypeKindV2"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TypeKindV2"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TypeKindV2"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "66d6dcf5eeea9c8b4646bebc3466bbfccad13a1569dfaed7975a47e19d0a7791",
+  "signals": [
+    {
+      "type_name": "CatalogueDocumentCodec",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueDocumentCodecError",
+      "signal": "blue"
+    }
+  ]
+}
