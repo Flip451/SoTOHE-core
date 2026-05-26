@@ -4,32 +4,27 @@
     {
       "id": "T001",
       "description": "domain 層: `TypeKindV2` を 5 variant → 3 variant に変更し、`StructKind` / `StructShape` を新規追加する。`libs/domain/src/tddd/catalogue_v2/composite.rs` で現行の `UnitStruct` / `TupleStruct { fields, has_stripped_fields }` / `PlainStruct { fields, has_stripped_fields, typestate }` 3 つの struct variant を削除し、新たに `Struct(StructKind)` variant に統合する。`StructShape` enum (Unit / Tuple { fields, has_stripped_fields } / Plain { fields, has_stripped_fields }) と `StructKind { shape: StructShape, typestate: Option<TypestateMarker> }` struct を同ファイルに追加する。既存の `Enum` / `TypeAlias` variant は変更しない。`TypestateMarker` / `TypestateTransitions` は変更しない。derive の更新（Debug, Clone, PartialEq, Eq for StructKind / StructShape）も含む。既存テストのうち 5-variant 前提のものは新スキーマに合わせて書き直す。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "infrastructure 層 / JSON codec: DTO と decode / encode を新スキーマに対応させる。`libs/infrastructure/src/tddd/catalogue_document_codec/dto.rs` の `TypeKindDto` を変更: `UnitStruct` / `TupleStruct` / `PlainStruct` 3 variant を outer `kind: \"struct\"` の `Struct { shape: StructShapeDto, typestate: Option<TypestateMarkerDto> }` variant に統合し、`StructShapeDto` を `Unit` / `Tuple { fields, has_stripped_fields }` / `Plain { fields, has_stripped_fields }` として追加する。これにより Unit は fields を持てず、Tuple / Plain の field 形状も DTO 上で分離される。`decode.rs` の `type_kind_from_dto` を新 DTO に対応させ、Unit / Tuple / Plain の 3 shape と typestate marker を復元して `TypeKindV2::Struct(StructKind { shape, typestate })` に変換する。`encode.rs` の `type_kind_to_dto` を新 variant パターン `TypeKindV2::Struct(kind)` にあわせて更新し、新しい `Struct` DTO (`kind: \"struct\"` + `shape`) を出力する。既存の `unit_struct` / `tuple_struct` / `plain_struct` wire format は継続出力せず、CN-02 の破壊的スキーマ変更として T004 でアクティブ catalogue を移行する。`catalogue_to_extended_crate_codec.rs` の `match entry.kind.clone()` アームを `TypeKindV2::Struct(kind)` に変更し、`kind.shape` によって `encode_unit_struct` / `encode_tuple_struct` / `encode_plain_struct` を呼び分ける。typestate marker は rustdoc `StructKind` に表現先がないため A 側 ExtendedCrate の構造 encode には混ぜず、CatalogueDocument JSON DTO と domain 型、および signal evaluator 側で保持・評価する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T003",
       "description": "infrastructure 層 / linter・signal evaluator: `in_memory_catalogue_linter.rs` の `type_entry_kind_tag` 関数を新スキーマに対応させる。現行の `TypeKindV2::PlainStruct { typestate: Some(_), .. } => \"typestate\"` パターンを `TypeKindV2::Struct(kind) if kind.typestate.is_some() => \"typestate\"` に変更する。`expected_members` フィールド長を計算している `EntryFieldLengths` 構築ロジック (PlainStruct / TupleStruct / UnitStruct ごとの分岐) を `TypeKindV2::Struct(kind)` から `kind.shape` で分岐するよう変更する。あわせて `libs/infrastructure/src/tddd/type_signals_evaluator.rs` と関連する signal evaluator v2 の `TypeKindV2` typestate 判定を新スキーマに更新し、unit / tuple / plain のいずれも `kind.typestate.is_some()` なら typestate として評価されるようにする。既存のリントルールと signal 評価に対するリグレッションを生まないことを確認する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T004",
       "description": "アクティブトラックのカタログファイルを新スキーマに移行する。T001 / T002 が完了し新 DTO が読み書き可能になった後、`track/items/typestate-struct-kind-orthogonal-2026-05-26/domain-types.json` と `track/items/typestate-struct-kind-orthogonal-2026-05-26/infrastructure-types.json` の TypeEntry `kind` payload を走査し、旧 wire tag (`kind: \"unit_struct\"` / `kind: \"tuple_struct\"` / `kind: \"plain_struct\"`) を新 wire 表現 (`kind: \"struct\"` + `shape: Unit | Tuple | Plain` + `typestate`) に移行する。Plain shape の `fields` / `has_stripped_fields` は `shape` 側へ移し、既存 `typestate` は `StructKind` 相当の共通位置へ保持する。Unit は fields を持たない形で出力し、Tuple は positional field list のみを保持する。`domain-types.json` の `TypeKindV2.kind` エントリ (action: modify) 自体は domain 型定義として `kind: \"enum\"` のまま、variants が `Struct(StructKind)` / `Enum` / `TypeAlias` の 3 variant になっていることを確認する。enum variant payload の `kind: \"struct\"` は VariantPayload の表現であり、TypeEntry.kind の struct wire 表現とは別物として扱う。usecase は空カタログのため変更不要であることを確認する。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "テスト追加: unit struct / tuple struct な typestate 状態型が新スキーマで正しく宣言・評価できることを確認するテストを追加する。(a) domain 層テスト (`composite.rs` または新規テストファイル): `TypeKindV2::Struct(StructKind { shape: StructShape::Unit, typestate: Some(marker) })` が構築・比較できることを確認するテスト。`TypeKindV2::Struct(StructKind { shape: StructShape::Tuple { ... }, typestate: Some(marker) })` のテスト。既存 Plain + typestate パターン (regression) のテスト。(b) infrastructure 層テスト (`catalogue_document_codec` の既存テストや decode/encode round-trip テスト): unit struct + typestate の新 `kind: \"struct\"` JSON decode → domain 変換 → JSON encode が一致すること (AC-03 / AC-04 の codec パス確認)。tuple struct + typestate の同様の round-trip テスト。plain struct + typestate の regression テスト (AC-07)。(c) signal evaluator テスト: unit / tuple / plain の typestate 状態型が `kind.typestate.is_some()` によって typestate として分類され、Blue 評価になることを確認する。(d) `cargo make ci` (fmt-check + clippy + nextest + deny + check-layers + verify-*) が pass することを最終確認する (AC-08)。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     }
   ],
   "plan": {
@@ -43,7 +38,9 @@
           "Collapse the five flat variants of TypeKindV2 into three: Struct(StructKind), Enum, TypeAlias.",
           "This is the foundational change that all infrastructure and catalogue migration tasks depend on (IN-01, CN-03, CN-04, AC-05, AC-06)."
         ],
-        "task_ids": ["T001"]
+        "task_ids": [
+          "T001"
+        ]
       },
       {
         "id": "S2",
@@ -52,7 +49,9 @@
           "Update the JSON DTO (TypeKindDto), decode path (type_kind_from_dto), encode path (type_kind_to_dto), and the CatalogueToExtendedCrateCodec match on TypeKindV2 to handle the new Struct(StructKind) variant.",
           "Preserve typestate in the CatalogueDocument DTO/domain round-trip, while keeping the A-side ExtendedCrate struct encoding shape-only because rustdoc StructKind has no typestate slot (IN-02, AC-03, AC-04, CN-03)."
         ],
-        "task_ids": ["T002"]
+        "task_ids": [
+          "T002"
+        ]
       },
       {
         "id": "S3",
@@ -60,7 +59,9 @@
         "description": [
           "Update type_entry_kind_tag, EntryFieldLengths construction, and signal evaluator TypeKindV2 typestate matching to pattern-match on TypeKindV2::Struct(kind) and delegate to kind.shape / kind.typestate for per-shape logic (IN-04, CN-03)."
         ],
-        "task_ids": ["T003"]
+        "task_ids": [
+          "T003"
+        ]
       },
       {
         "id": "S4",
@@ -69,7 +70,9 @@
           "Migrate the active track catalogue files to the new schema JSON format once the schema and codec are stable (IN-03, CN-02).",
           "Non-active tracks are protected and must not be modified (OS-02)."
         ],
-        "task_ids": ["T004"]
+        "task_ids": [
+          "T004"
+        ]
       },
       {
         "id": "S5",
@@ -78,7 +81,9 @@
           "Add unit tests for unit struct + typestate and tuple struct + typestate declaration and evaluation, covering AC-01 through AC-08.",
           "Final cargo make ci pass confirms no regression and overall correctness (IN-05, AC-08)."
         ],
-        "task_ids": ["T005"]
+        "task_ids": [
+          "T005"
+        ]
       }
     ]
   }

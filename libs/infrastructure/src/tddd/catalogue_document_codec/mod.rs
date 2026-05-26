@@ -289,7 +289,7 @@ fn derive_filename_stem(path: &Path) -> String {
 mod tests {
     use super::*;
     use domain::tddd::catalogue_v2::ItemAction;
-    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
 
     fn minimal_v3_json(crate_name: &str, layer: &str) -> String {
@@ -350,7 +350,7 @@ mod tests {
     "UserId": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "plain_struct", "fields": [] }
+      "kind": { "kind": "struct", "shape": { "kind": "plain", "fields": [] } }
     }
   },
   "traits": {},
@@ -361,7 +361,9 @@ mod tests {
         let entry = doc.types.values().next().unwrap();
         assert_eq!(entry.action, ItemAction::Add);
         assert_eq!(entry.role, DataRole::ValueObject);
-        assert!(matches!(entry.kind, TypeKindV2::PlainStruct { .. }));
+        assert!(
+            matches!(&entry.kind, TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Plain { .. }))
+        );
     }
 
     #[test]
@@ -374,7 +376,7 @@ mod tests {
     "Marker": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "unit_struct" }
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
   "traits": {},
@@ -383,7 +385,9 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         assert_eq!(doc.types.len(), 1);
         let entry = doc.types.values().next().unwrap();
-        assert!(matches!(entry.kind, TypeKindV2::UnitStruct));
+        assert!(
+            matches!(&entry.kind, TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Unit))
+        );
     }
 
     #[test]
@@ -396,7 +400,7 @@ mod tests {
     "UserId": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "tuple_struct", "fields": ["String"] }
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } }
     }
   },
   "traits": {},
@@ -405,12 +409,15 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
         match &entry.kind {
-            TypeKindV2::TupleStruct { fields, has_stripped_fields } => {
-                assert_eq!(fields.len(), 1);
-                assert_eq!(fields[0].as_str(), "String");
-                assert!(!has_stripped_fields);
-            }
-            _ => panic!("expected TupleStruct"),
+            TypeKindV2::Struct(sk) => match &sk.shape {
+                StructShape::Tuple { fields, has_stripped_fields } => {
+                    assert_eq!(fields.len(), 1);
+                    assert_eq!(fields[0].as_str(), "String");
+                    assert!(!has_stripped_fields);
+                }
+                _ => panic!("expected Tuple shape"),
+            },
+            _ => panic!("expected Struct kind"),
         }
     }
 
@@ -425,8 +432,8 @@ mod tests {
       "action": "add",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [],
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [] },
         "typestate": { "state_name": "ReviewMachine", "transition_methods": ["approve"] }
       }
     }
@@ -437,11 +444,13 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let entry = doc.types.values().next().unwrap();
         match &entry.kind {
-            TypeKindV2::PlainStruct { typestate: Some(ts), .. } => {
+            TypeKindV2::Struct(sk) => {
+                assert!(sk.typestate.is_some(), "expected typestate to be Some");
+                let ts = sk.typestate.as_ref().unwrap();
                 assert_eq!(ts.state_name().as_str(), "ReviewMachine");
                 assert_eq!(ts.transitions().transition_methods().len(), 1);
             }
-            _ => panic!("expected PlainStruct with typestate"),
+            _ => panic!("expected Struct kind with typestate"),
         }
     }
 
@@ -613,7 +622,7 @@ mod tests {
     "UserId": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "tuple_struct", "fields": ["String"] },
+      "kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["String"] } },
       "methods": [],
       "module_path": ""
     }
@@ -801,10 +810,34 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_unit_struct_has_no_fields_variant_so_illegal_state_is_structurally_impossible() {
-        // UnitStruct has no `fields` field in the DTO — the schema enforces absence of fields
-        // at the structural level. An old-format `kind: "struct", pattern: "unit"` entry would
-        // fail with an unknown-variant error because "struct" is no longer a valid kind tag.
+    fn test_decode_new_struct_unit_shape_succeeds() {
+        // The new wire format uses `kind: "struct", shape: { "kind": "unit" }`.
+        // The old `kind: "unit_struct"` format is no longer valid (CN-02 breaking change).
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Marker": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(result.is_ok(), "new struct+unit shape decodes successfully: {result:?}");
+        let entry = result.unwrap().types.into_values().next().unwrap();
+        assert!(
+            matches!(&entry.kind, TypeKindV2::Struct(sk) if matches!(sk.shape, StructShape::Unit))
+        );
+    }
+
+    #[test]
+    fn test_decode_old_unit_struct_wire_tag_fails() {
+        // The old `kind: "unit_struct"` wire tag is no longer supported after CN-02 breaking change.
         let json = r#"{
   "schema_version": 3,
   "crate_name": "domain",
@@ -820,9 +853,106 @@ mod tests {
   "functions": {}
 }"#;
         let result = CatalogueDocumentCodec::decode(json, "domain");
-        assert!(result.is_ok(), "unit_struct decodes successfully: {result:?}");
-        let entry = result.unwrap().types.into_values().next().unwrap();
-        assert!(matches!(entry.kind, TypeKindV2::UnitStruct));
+        assert!(result.is_err(), "old unit_struct wire tag must be rejected: {result:?}");
+    }
+
+    // -----------------------------------------------------------------------
+    // T005 / AC-03: unit struct + typestate round-trip
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_unit_struct_with_typestate_round_trips() {
+        // AC-03: `kind: "struct"` + `shape: {"kind": "unit"}` + `typestate` decode → domain → encode round-trip.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Locked": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" },
+        "typestate": { "state_name": "LockMachine", "transition_methods": ["unlock"] }
+      },
+      "methods": [],
+      "module_path": ""
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        // A-side retains typestate marker.
+        let sk = match &entry.kind {
+            domain::tddd::catalogue_v2::TypeKindV2::Struct(sk) => sk,
+            _ => panic!("expected Struct"),
+        };
+        assert!(
+            matches!(sk.shape, domain::tddd::catalogue_v2::StructShape::Unit),
+            "shape must be Unit"
+        );
+        assert!(sk.typestate.is_some(), "typestate marker must be present");
+        assert_eq!(sk.typestate.as_ref().unwrap().state_name().as_str(), "LockMachine");
+        // Round-trip: encode → decode must produce the same doc.
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
+    }
+
+    // -----------------------------------------------------------------------
+    // T005 / AC-04: tuple struct + typestate round-trip
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_tuple_struct_with_typestate_round_trips() {
+        // AC-04: `kind: "struct"` + `shape: {"kind": "tuple", ...}` + `typestate` decode → domain → encode round-trip.
+        let json = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Pending": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": ["Uuid"] },
+        "typestate": { "state_name": "ApprovalMachine", "transition_methods": ["approve", "reject"] }
+      },
+      "methods": [],
+      "module_path": ""
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types.values().next().unwrap();
+        // A-side retains typestate marker.
+        let sk = match &entry.kind {
+            domain::tddd::catalogue_v2::TypeKindV2::Struct(sk) => sk,
+            _ => panic!("expected Struct"),
+        };
+        assert!(
+            matches!(sk.shape, domain::tddd::catalogue_v2::StructShape::Tuple { .. }),
+            "shape must be Tuple"
+        );
+        assert!(sk.typestate.is_some(), "typestate marker must be present");
+        assert_eq!(sk.typestate.as_ref().unwrap().state_name().as_str(), "ApprovalMachine");
+        // The tuple shape retains the positional fields.
+        if let domain::tddd::catalogue_v2::StructShape::Tuple { fields, .. } = &sk.shape {
+            assert_eq!(fields.len(), 1);
+            assert_eq!(fields[0].as_str(), "Uuid");
+        } else {
+            panic!("expected Tuple shape");
+        }
+        // Round-trip: encode → decode must produce the same doc.
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2);
     }
 
     #[test]
@@ -900,7 +1030,7 @@ mod tests {
     "Foo": {{
       "action": "add",
       "role": "ValueObject",
-      "kind": {{ "kind": "plain_struct", "fields": [] }},
+      "kind": {{ "kind": "struct", "shape": {{ "kind": "plain" }} }},
       "methods": [
         {{
           "name": "do_something",
@@ -960,7 +1090,7 @@ mod tests {
     "UserId": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "unit_struct" },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
       "spec_refs": [
         { "file": "track/items/x/spec.json", "anchor": "IN-01", "hash": "0000000000000000000000000000000000000000000000000000000000000000" }
       ],
@@ -1060,7 +1190,7 @@ mod tests {
     "Marker": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "unit_struct" }
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
   "traits": {},
@@ -2225,7 +2355,7 @@ mod tests {
     "Foo": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "plain_struct", "fields": [] }
+      "kind": { "kind": "struct", "shape": { "kind": "plain" } }
     }
   },
   "traits": {},
@@ -2299,7 +2429,7 @@ mod tests {
     "Foo": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "plain_struct", "fields": [] }
+      "kind": { "kind": "struct", "shape": { "kind": "plain" } }
     }
   },
   "traits": {},

@@ -51,7 +51,7 @@ pub(super) fn emit_entry<'a>(
     layer: &str,
     crate_name: &str,
 ) -> Result<(), ContractMapRendererError> {
-    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::variants::VariantPayload;
 
     match entry {
@@ -80,8 +80,12 @@ pub(super) fn emit_entry<'a>(
             // T006: methods from TypeEntry.methods.
             // Collect transition method names for typestate (Decision G-2'b).
             let transition_method_names: Vec<&str> =
-                if let TypeKindV2::PlainStruct { typestate: Some(ref ts), .. } = type_entry.kind {
-                    ts.transitions().transition_methods().iter().map(|m| m.as_str()).collect()
+                if let TypeKindV2::Struct(ref sk) = type_entry.kind {
+                    if let Some(ref ts) = sk.typestate {
+                        ts.transitions().transition_methods().iter().map(|m| m.as_str()).collect()
+                    } else {
+                        vec![]
+                    }
                 } else {
                     vec![]
                 };
@@ -219,24 +223,25 @@ pub(super) fn emit_entry<'a>(
             // (e.g. a field `result: Result<OkType, ErrType>` → edges to both).
             // `edge_arrow_label` is deferred until we know an edge will be emitted
             // (fail-closed per CN-02 — missing [edge.field] only errors when it would be used).
-            if let TypeKindV2::PlainStruct { ref fields, has_stripped_fields, .. } = type_entry.kind
-            {
-                if !has_stripped_fields && !fields.is_empty() {
-                    for field in fields {
-                        let target_ids = resolve_type_ref_node_ids(
-                            field.ty.as_str(),
-                            node_index,
-                            crate_name,
-                            None, // struct fields have no Self context
-                        );
-                        for target_id in &target_ids {
-                            let (arrow, _) = edge_arrow_label(&style.edge, "field")?;
-                            edge_lines.push(edge_line(
-                                &rep_node_id,
-                                arrow,
-                                Some(field.name.as_str()),
-                                target_id,
-                            ));
+            if let TypeKindV2::Struct(ref sk) = type_entry.kind {
+                if let StructShape::Plain { ref fields, has_stripped_fields } = sk.shape {
+                    if !has_stripped_fields && !fields.is_empty() {
+                        for field in fields {
+                            let target_ids = resolve_type_ref_node_ids(
+                                field.ty.as_str(),
+                                node_index,
+                                crate_name,
+                                None, // struct fields have no Self context
+                            );
+                            for target_id in &target_ids {
+                                let (arrow, _) = edge_arrow_label(&style.edge, "field")?;
+                                edge_lines.push(edge_line(
+                                    &rep_node_id,
+                                    arrow,
+                                    Some(field.name.as_str()),
+                                    target_id,
+                                ));
+                            }
                         }
                     }
                 }
@@ -249,24 +254,26 @@ pub(super) fn emit_entry<'a>(
             // A single positional field type may yield edges to MULTIPLE declared types.
             // `edge_arrow_label` is deferred until we know an edge will be emitted
             // (fail-closed per CN-02 — missing [edge.field] only errors when it would be used).
-            if let TypeKindV2::TupleStruct { ref fields, has_stripped_fields } = type_entry.kind {
-                if !has_stripped_fields && !fields.is_empty() {
-                    for (idx, field_ty) in fields.iter().enumerate() {
-                        let positional_label = format!(".{idx}");
-                        let target_ids = resolve_type_ref_node_ids(
-                            field_ty.as_str(),
-                            node_index,
-                            crate_name,
-                            None, // tuple struct fields have no Self context
-                        );
-                        for target_id in &target_ids {
-                            let (arrow, _) = edge_arrow_label(&style.edge, "field")?;
-                            edge_lines.push(edge_line(
-                                &rep_node_id,
-                                arrow,
-                                Some(&positional_label),
-                                target_id,
-                            ));
+            if let TypeKindV2::Struct(ref sk) = type_entry.kind {
+                if let StructShape::Tuple { ref fields, has_stripped_fields } = sk.shape {
+                    if !has_stripped_fields && !fields.is_empty() {
+                        for (idx, field_ty) in fields.iter().enumerate() {
+                            let positional_label = format!(".{idx}");
+                            let target_ids = resolve_type_ref_node_ids(
+                                field_ty.as_str(),
+                                node_index,
+                                crate_name,
+                                None, // tuple struct fields have no Self context
+                            );
+                            for target_id in &target_ids {
+                                let (arrow, _) = edge_arrow_label(&style.edge, "field")?;
+                                edge_lines.push(edge_line(
+                                    &rep_node_id,
+                                    arrow,
+                                    Some(&positional_label),
+                                    target_id,
+                                ));
+                            }
                         }
                     }
                 }
@@ -279,11 +286,13 @@ pub(super) fn emit_entry<'a>(
                 class_attach.push(format!("class {rep_node_id} {}", rs.class));
             }
 
-            // T009: [pattern.Typestate] overlay_class for typestate PlainStruct.
+            // T009: [pattern.Typestate] overlay_class for typestate structs (any shape).
             // Also attached to the representative node.
-            if let TypeKindV2::PlainStruct { typestate: Some(_), .. } = type_entry.kind {
-                if let Some(ps) = style.pattern.get("Typestate") {
-                    class_attach.push(format!("class {rep_node_id} {}", ps.overlay_class));
+            if let TypeKindV2::Struct(ref sk) = type_entry.kind {
+                if sk.typestate.is_some() {
+                    if let Some(ps) = style.pattern.get("Typestate") {
+                        class_attach.push(format!("class {rep_node_id} {}", ps.overlay_class));
+                    }
                 }
             }
         }

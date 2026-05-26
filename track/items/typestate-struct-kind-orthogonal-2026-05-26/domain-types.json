@@ -7,15 +7,31 @@
       "action": "add",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [
-          { "name": "shape", "ty": "StructShape" },
-          { "name": "typestate", "ty": "Option<TypestateMarker>" }
-        ],
-        "has_stripped_fields": false,
-        "typestate": null
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "shape", "ty": "StructShape" },
+            { "name": "typestate", "ty": "Option<TypestateMarker>" }
+          ]
+        }
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "shape", "ty": "StructShape" },
+            { "name": "typestate", "ty": "Option<TypestateMarker>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Creates a new StructKind with the given shape and typestate marker."
+        }
+      ],
       "module_path": "tddd::catalogue_v2::composite",
       "docs": "Struct kind with orthogonal typestate marker. Groups the three struct shapes (Unit / Tuple / Plain) under a single type so that typestate membership can be expressed for any struct shape, not just PlainStruct. The `shape` field encodes the Rust-level form; `typestate` is `Some` when this struct is a state in a typestate machine.",
       "spec_refs": [
@@ -132,10 +148,8 @@
       "action": "reference",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [],
-        "has_stripped_fields": true,
-        "typestate": null
+        "kind": "struct",
+        "shape": { "kind": "plain", "has_stripped_fields": true }
       },
       "methods": [],
       "module_path": "tddd::catalogue_v2::composite",
@@ -147,10 +161,8 @@
       "action": "reference",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [],
-        "has_stripped_fields": true,
-        "typestate": null
+        "kind": "struct",
+        "shape": { "kind": "plain", "has_stripped_fields": true }
       },
       "methods": [],
       "module_path": "tddd::catalogue_v2::composite",

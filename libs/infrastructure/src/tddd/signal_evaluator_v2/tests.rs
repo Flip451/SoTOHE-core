@@ -1664,7 +1664,10 @@ fn test_t008_a_id_remap_resolves_collisions() {
             b_bar_id,
             Some("Bar"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: empty_generics(),
                 impls: vec![b_impl_id],
             }),
@@ -1724,7 +1727,10 @@ fn test_t008_a_id_remap_resolves_collisions() {
             a_foo_id,
             Some("Foo"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: empty_generics(),
                 impls: vec![a_impl_id],
             }),
@@ -1904,7 +1910,10 @@ fn test_t008_a_id_remap_built_after_pre_step_includes_parent_types() {
             a_foo_id,
             Some("Foo"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: empty_generics(),
                 impls: vec![a_foo_impl_id],
             }),
@@ -1939,7 +1948,10 @@ fn test_t008_a_id_remap_built_after_pre_step_includes_parent_types() {
             a_bar_id,
             Some("Bar"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: empty_generics(),
                 impls: vec![a_bar_impl_id],
             }),
@@ -2994,7 +3006,10 @@ fn test_t012_excluded_impl_variants_still_excluded() {
             external_type_id,
             Some("ExtType"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: empty_generics(),
                 impls: vec![],
             }),
@@ -3094,7 +3109,10 @@ fn test_t012_excluded_impl_variants_still_excluded() {
             external_type_id,
             Some("ExtType"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: empty_generics(),
                 impls: vec![],
             }),
@@ -3434,7 +3452,7 @@ fn test_t043_hrtb_function_pointer_binders_preserved() {
 /// verifies the full A-codec → evaluator pipeline.
 #[test]
 fn test_impl_block_generics_symmetric_compare_blue() {
-    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::TypeEntry;
     use domain::tddd::catalogue_v2::methods::MethodGenericParam;
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
@@ -3471,11 +3489,10 @@ fn test_impl_block_generics_symmetric_compare_blue() {
         TypeEntry {
             action: domain::tddd::catalogue_v2::ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: None,
@@ -3558,7 +3575,10 @@ fn test_impl_block_generics_symmetric_compare_blue() {
             foo_id,
             Some("Foo"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: Generics { params: vec![], where_predicates: vec![] },
                 impls: vec![impl_id],
             }),
@@ -3674,7 +3694,7 @@ fn test_impl_block_generics_symmetric_compare_blue() {
 /// so the existing Blue evaluation is retained.
 #[test]
 fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
-    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
@@ -3707,11 +3727,10 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
         TypeEntry {
             action: domain::tddd::catalogue_v2::ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: None,
@@ -3786,7 +3805,10 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
             foo_id,
             Some("Foo"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: Generics { params: vec![], where_predicates: vec![] },
                 impls: vec![impl_id],
             }),
@@ -4271,7 +4293,7 @@ fn test_t009_for_external_impl_for_is_not_overwritten_with_self_crate_id() {
 #[test]
 #[allow(clippy::panic)]
 fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
-    use domain::tddd::catalogue_v2::composite::TypeKindV2;
+    use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use domain::tddd::catalogue_v2::entries::{TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
@@ -4313,11 +4335,10 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
         TypeEntry {
             action: domain::tddd::catalogue_v2::ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: None,
@@ -4406,7 +4427,10 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
             self_type_c_id,
             Some("SelfType"),
             ItemEnum::Struct(Struct {
-                kind: StructKind::Plain { fields: vec![], has_stripped_fields: false },
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
                 generics: empty_generics(),
                 impls: vec![impl_a_id],
             }),

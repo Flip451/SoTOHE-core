@@ -251,7 +251,7 @@ fn catalogue_spec_signal_emoji(signal: ConfidenceSignal) -> String {
 /// 4. All other shapes → role-based mapping via [`data_role_display_tag`]
 fn type_entry_display_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
     match kind {
-        TypeKindV2::PlainStruct { typestate: Some(_), .. } => "typestate",
+        TypeKindV2::Struct(sk) if sk.typestate.is_some() => "typestate",
         TypeKindV2::Enum { .. } if matches!(role, DataRole::ErrorType) => "error_type",
         TypeKindV2::Enum { .. } => "enum",
         _ => data_role_display_tag(role),
@@ -404,7 +404,10 @@ fn v3_type_entry_details(
     doc_trait_impls: &[domain::tddd::catalogue_v2::TraitImplDeclV2],
 ) -> String {
     match &entry.kind {
-        TypeKindV2::PlainStruct { typestate: Some(ts), .. } => {
+        TypeKindV2::Struct(sk) if sk.typestate.is_some() => {
+            let Some(ts) = sk.typestate.as_ref() else {
+                return "\u{2014}".to_owned(); // unreachable: guard is_some above
+            };
             let methods = ts.transitions().transition_methods();
             if methods.is_empty() {
                 "\u{2205} (terminal)".to_owned() // ∅ (terminal)
@@ -750,8 +753,8 @@ mod tests {
 
     fn make_v3_doc_with_value_object(type_name: &str) -> CatalogueDocument {
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, TypeEntry, TypeKindV2,
-            TypeName,
+            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
+            StructShape, TypeEntry, TypeKindV2, TypeName,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
@@ -760,11 +763,10 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -833,8 +835,8 @@ mod tests {
         // Build a catalogue with two types: "AType" (index 0) and "ZType" (index 1).
         // BTreeMap iterates in sorted order, so "AType" < "ZType".
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, TypeEntry, TypeKindV2,
-            TypeName,
+            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
+            StructShape, TypeEntry, TypeKindV2, TypeName,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
@@ -843,11 +845,10 @@ mod tests {
         let plain_entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
 
             module_path: ModulePath::root(),
@@ -884,8 +885,8 @@ mod tests {
         // signals doc the declaration-hash check did not catch. The defensive
         // `type_name` guard must fall back to "—" rather than painting 🔵 onto AType.
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, TypeEntry, TypeKindV2,
-            TypeName,
+            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
+            StructShape, TypeEntry, TypeKindV2, TypeName,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
@@ -896,11 +897,10 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::ValueObject,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
 
                 module_path: ModulePath::root(),
@@ -931,8 +931,8 @@ mod tests {
         // evaluator under the v2-compat `"value_object"` key — is still matched
         // via `section_to_signal_kind_tag`.
         use domain::tddd::catalogue_v2::{
-            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, TypeEntry, TypeKindV2,
-            TypeName,
+            CatalogueDocument, CrateName, DataRole, ItemAction, ModulePath, StructKind,
+            StructShape, TypeEntry, TypeKindV2, TypeName,
         };
         use domain::tddd::layer_id::LayerId;
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
@@ -943,11 +943,10 @@ mod tests {
             TypeEntry {
                 action: ItemAction::Add,
                 role: DataRole::Entity,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
 
                 module_path: ModulePath::root(),

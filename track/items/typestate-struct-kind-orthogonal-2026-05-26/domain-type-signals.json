@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-26T02:30:19Z",
-  "declaration_hash": "696909737719d7275fdf14287bd037749d5ad00639fa3c93475a141f271418e3",
+  "generated_at": "2026-05-26T04:12:37Z",
+  "declaration_hash": "eacc2fd3c2cbdc8da45b3e975011e3f77f9b6a37fe9f26487768b85bb7e5449c",
   "signals": [
     {
       "type_name": "StructKind",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -18,9 +18,9 @@
     {
       "type_name": "StructShape",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -30,7 +30,7 @@
     {
       "type_name": "TypeKindV2",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

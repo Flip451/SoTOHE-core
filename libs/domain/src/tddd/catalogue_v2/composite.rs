@@ -1,30 +1,28 @@
-//! Flat type kind enum for the catalogue v2 schema.
+//! Type kind enum for the catalogue v2 schema.
 //!
 //! Implements:
-//! - [`TypestateMarker`]: marker carried by `TypeKindV2::PlainStruct` when the struct
-//!   is a typestate state. Replaces the old `CompositePattern::TypestateState` embedding.
+//! - [`TypestateMarker`]: typestate membership marker, now carried by `StructKind` so that
+//!   any struct shape (unit / tuple / plain) can be a typestate state.
 //! - [`TypestateTransitions`]: transition specification for a typestate state.
-//! - [`TypeKindV2`]: language-level kind for `TypeEntry`. 5 self-contained variants,
-//!   each carrying only the fields semantically valid for that kind. ADR 1 D7.
+//! - [`StructShape`]: the Rust-level structural form of a struct (Unit / Tuple / Plain).
+//! - [`StructKind`]: groups the three struct shapes under a single type with an orthogonal
+//!   optional `typestate` marker. ADR `knowledge/adr/2026-05-26-1002-typestate-struct-kind-orthogonal.md` D1.
+//! - [`TypeKindV2`]: language-level kind for `TypeEntry`. 3 variants:
+//!   `Struct(StructKind)`, `Enum`, `TypeAlias`.
 //!
 //! No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
-//! the domain layer is serialization-free. The infrastructure codec (T003) handles JSON.
+//! the domain layer is serialization-free. The infrastructure codec handles JSON.
 //!
 //! ## Design rationale
 //!
-//! The old `TypeKindV2::Struct { pattern: CompositePattern, fields }` mixed structural
-//! kind (`Unit`) with DDD-semantic patterns (`TypestateState`, `Newtype`) in a single
-//! category-error enum.  The flat redesign eliminates this by giving each variant only
-//! the fields that are semantically valid for it:
+//! The old flat 5-variant design placed `TypestateMarker` only on `PlainStruct`, making it
+//! impossible to declare a unit struct or tuple struct as a typestate state.  The new design
+//! groups all three struct shapes into `StructKind { shape: StructShape, typestate }`, making
+//! typestate membership expressible for any struct shape while keeping shape-specific
+//! field constraints structurally unrepresentable (e.g. `StructShape::Unit` has no `fields`
+//! payload — attaching fields to a unit struct is a compile-time impossibility).
 //!
-//! - `UnitStruct`: no fields possible — illegal state `Unit + non-empty fields` is
-//!   structurally unrepresentable.
-//! - `TupleStruct { fields, has_stripped_fields }`: mirrors `rustdoc_types::StructKind::Tuple`.
-//!   Newtype semantic is structurally a `TupleStruct` with one field; detection deferred
-//!   to lint layer (T013+), not the schema.
-//! - `PlainStruct { fields, has_stripped_fields, typestate }`: mirrors `StructKind::Plain`.
-//!   An optional `TypestateMarker` encodes typestate membership without polluting other
-//!   struct kinds.
+//! - `Struct(StructKind)`: any struct shape with an orthogonal typestate marker.
 //! - `Enum { variants }`: sum type (unchanged).
 //! - `TypeAlias { target }`: type alias (unchanged).
 
@@ -68,17 +66,18 @@ impl std::fmt::Display for TypestateTransitions {
 }
 
 // ---------------------------------------------------------------------------
-// TypestateMarker — typestate membership marker for PlainStruct
+// TypestateMarker — typestate membership marker carried by StructKind
 // ---------------------------------------------------------------------------
 
-/// Typestate membership marker carried by `TypeKindV2::PlainStruct`.
+/// Typestate membership marker carried by [`StructKind`].
 ///
-/// When present (`typestate: Some(TypestateMarker { .. })`), the plain struct
-/// is a state in a typestate machine. The `state_name` field names the typestate
-/// machine (the root type that the states belong to), and `transitions` lists
-/// the methods that produce the next state.
+/// When present (`typestate: Some(TypestateMarker { .. })`), the struct
+/// (of any shape — unit, tuple, or plain) is a state in a typestate machine.
+/// The `state_name` field names the typestate machine (the root type that the
+/// states belong to), and `transitions` lists the methods that produce the next
+/// state.
 ///
-/// Fields are private with fallible constructor and accessor methods (CN-09).
+/// Fields are private with constructor and accessor methods.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypestateMarker {
     /// The name of the typestate machine this state belongs to.
@@ -90,12 +89,7 @@ pub struct TypestateMarker {
 }
 
 impl TypestateMarker {
-    /// Creates a new `TypestateMarker`.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error string if `state_name` is empty or whitespace-only
-    /// (validated via [`TypeName`] construction).
+    /// Creates a new `TypestateMarker` from already-validated components.
     pub fn new(state_name: TypeName, transitions: TypestateTransitions) -> Self {
         Self { state_name, transitions }
     }
@@ -120,75 +114,110 @@ impl std::fmt::Display for TypestateMarker {
 }
 
 // ---------------------------------------------------------------------------
-// TypeKindV2 — language-level kind for TypeEntry
+// StructShape — Rust-level structural form of a struct
 // ---------------------------------------------------------------------------
 
-/// Language-level kind for `TypeEntry`.
+/// The Rust-level structural form of a struct.
 ///
-/// Named `TypeKindV2` to avoid collision with `domain::schema::TypeKind` (which is
-/// scheduled for deletion in T008). The `catalogue_v2` module uses short names as
-/// BTreeMap keys, so both would appear as `TypeKind` in the catalogue; the V2 suffix
-/// distinguishes them at the catalogue level (ADR 1 D7; see `domain-types.json`
-/// `TypeKindV2.informal_grounds`).
+/// Each variant carries only the fields valid for that struct form, making
+/// illegal combinations structurally unrepresentable:
 ///
-/// 5 self-contained variants. Each variant carries only the fields semantically
-/// valid for it — illegal field combinations are structurally unrepresentable.
-///
-/// - `UnitStruct`: a unit struct (`pub struct Foo;`) with no fields. Fields cannot
-///   be attached — the variant has no `fields` payload.
-/// - `TupleStruct { fields, has_stripped_fields }`: a tuple struct (positional fields).
-///   Mirrors `rustdoc_types::StructKind::Tuple`. Newtypes (`struct Foo(Bar)`) are
-///   structurally a `TupleStruct` with a single field; semantic detection is deferred
-///   to the lint layer (T013+), not the schema.
-/// - `PlainStruct { fields, has_stripped_fields, typestate }`: a plain named-field
-///   struct. Mirrors `rustdoc_types::StructKind::Plain`. An optional `TypestateMarker`
-///   encodes typestate membership without affecting other struct kinds.
-/// - `Enum { variants }`: a sum / enum type.
-/// - `TypeAlias { target }`: a type alias.
+/// - `Unit`: a unit struct (`pub struct Foo;`). No fields are possible —
+///   the structural absence of a `fields` payload makes `Unit + non-empty
+///   fields` a compile-time impossibility (AC-05).
+/// - `Tuple`: a tuple struct (`pub struct Foo(Bar, Baz)`). Uses `Vec<TypeRef>`
+///   instead of `Vec<FieldDecl>` because tuple fields are positional and unnamed.
+///   Fabricating names would be misleading (AC-06).
+/// - `Plain`: a plain named-field struct (`pub struct Foo { bar: Bar }`).
+///   Uses `Vec<FieldDecl>` which requires named fields.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TypeKindV2 {
-    /// A unit struct (`pub struct Foo;`).
-    ///
-    /// No fields are possible — the structural absence of a `fields` payload
-    /// makes `UnitStruct + non-empty fields` a compile-time impossibility.
-    UnitStruct,
-    /// A tuple struct (`pub struct Foo(Bar, Baz)`).
+pub enum StructShape {
+    /// A unit struct. No fields.
+    Unit,
+    /// A tuple struct (positional unnamed fields).
     ///
     /// Mirrors `rustdoc_types::StructKind::Tuple`.
-    /// - `fields`: the positional field types (unnamed — tuple fields are `.0`, `.1`, ...).
-    /// - `has_stripped_fields`: `true` when rustdoc omits private fields from
-    ///   the documentation output. Stored here (not in a nested struct) to keep
-    ///   the schema flat and match the rustdoc representation.
-    ///
-    /// Using `Vec<TypeRef>` instead of `Vec<FieldDecl>` makes illegal states
-    /// unrepresentable: tuple fields are positional and have no user-visible names,
-    /// so fabricating names (e.g. `"0"`, `"inner"`) would be misleading and wrong.
-    TupleStruct {
+    Tuple {
         /// Positional field types (unnamed; index-addressable as `.0`, `.1`, …).
         fields: Vec<TypeRef>,
         /// `true` when the struct has at least one private field that rustdoc
         /// omits from the documentation output.
         has_stripped_fields: bool,
     },
-    /// A plain named-field struct (`pub struct Foo { bar: Bar }`).
+    /// A plain named-field struct.
     ///
     /// Mirrors `rustdoc_types::StructKind::Plain`.
-    /// - `fields`: the named field declarations.
-    /// - `has_stripped_fields`: `true` when rustdoc omits private fields.
-    /// - `typestate`: optional typestate membership marker. Present when this
-    ///   struct is a state in a typestate machine.
-    PlainStruct {
+    Plain {
         /// Named field declarations.
         fields: Vec<FieldDecl>,
         /// `true` when the struct has at least one private field that rustdoc
         /// omits from the documentation output.
         has_stripped_fields: bool,
-        /// Optional typestate membership marker.
-        ///
-        /// When `Some`, this struct is a state in the named typestate machine.
-        /// When `None`, this is a plain struct with no typestate relationship.
-        typestate: Option<TypestateMarker>,
     },
+}
+
+// ---------------------------------------------------------------------------
+// StructKind — struct shape + orthogonal typestate marker
+// ---------------------------------------------------------------------------
+
+/// Groups the three struct shapes under a single type with an orthogonal
+/// optional typestate membership marker.
+///
+/// `shape` encodes the Rust-level form of the struct. `typestate` is `Some`
+/// when this struct is a state in a typestate machine, regardless of shape.
+///
+/// This design makes typestate membership expressible for any struct shape
+/// (unit / tuple / plain) while keeping the structural constraints of each
+/// shape intact — a `StructShape::Unit` still has no `fields` payload.
+///
+/// ADR: `knowledge/adr/2026-05-26-1002-typestate-struct-kind-orthogonal.md` D1.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StructKind {
+    /// The Rust-level structural form of this struct.
+    pub shape: StructShape,
+    /// Optional typestate membership marker.
+    ///
+    /// `Some` when this struct is a state in the named typestate machine.
+    /// `None` when this is a plain struct with no typestate relationship.
+    /// Orthogonal to shape: any struct form can carry a typestate marker.
+    pub typestate: Option<TypestateMarker>,
+}
+
+impl StructKind {
+    /// Creates a new `StructKind` with the given shape and typestate marker.
+    #[must_use]
+    pub fn new(shape: StructShape, typestate: Option<TypestateMarker>) -> Self {
+        Self { shape, typestate }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// TypeKindV2 — language-level kind for TypeEntry
+// ---------------------------------------------------------------------------
+
+/// Language-level kind for `TypeEntry`.
+///
+/// Named `TypeKindV2` to avoid collision with `domain::schema::TypeKind` (which is
+/// scheduled for deletion). The `catalogue_v2` module uses short names as
+/// BTreeMap keys, so both would appear as `TypeKind` in the catalogue; the V2 suffix
+/// distinguishes them at the catalogue level.
+///
+/// 3 variants. The former flat 5-variant design (UnitStruct / TupleStruct /
+/// PlainStruct / Enum / TypeAlias) is replaced by grouping all struct shapes into
+/// `Struct(StructKind)` so that typestate membership can be expressed for any
+/// struct shape (ADR `2026-05-26-1002-typestate-struct-kind-orthogonal.md` D1).
+///
+/// - `Struct(StructKind)`: any struct shape with an orthogonal typestate marker.
+/// - `Enum { variants }`: a sum / enum type.
+/// - `TypeAlias { target }`: a type alias.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TypeKindV2 {
+    /// Any struct shape, with an optional orthogonal typestate membership marker.
+    ///
+    /// The `StructKind` wrapper groups `StructShape` (Unit / Tuple / Plain) with
+    /// `Option<TypestateMarker>` so that typestate membership is expressible
+    /// regardless of shape.
+    Struct(StructKind),
     /// A sum / enum type.
     Enum {
         /// The enum variants.
@@ -261,97 +290,203 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // TypeKindV2 — UnitStruct
+    // Helper: build a TypestateMarker for tests
     // -----------------------------------------------------------------------
 
-    #[test]
-    fn test_type_kind_v2_unit_struct_matches_unit_struct() {
-        let kind = TypeKindV2::UnitStruct;
-        assert!(matches!(kind, TypeKindV2::UnitStruct));
-    }
-
-    #[test]
-    fn test_type_kind_v2_unit_struct_not_equal_to_plain_struct() {
-        let unit = TypeKindV2::UnitStruct;
-        let plain =
-            TypeKindV2::PlainStruct { fields: vec![], has_stripped_fields: false, typestate: None };
-        assert_ne!(unit, plain);
+    fn make_marker(state_name: &str, methods: &[&str]) -> TypestateMarker {
+        let name = TypeName::new(state_name).unwrap();
+        let ms = methods.iter().map(|m| MethodName::new(*m).unwrap()).collect();
+        TypestateMarker::new(name, TypestateTransitions::new(ms))
     }
 
     // -----------------------------------------------------------------------
-    // TypeKindV2 — TupleStruct
+    // StructShape — Unit (AC-05: no fields structurally)
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_type_kind_v2_tuple_struct_holds_fields_and_stripped_flag() {
-        let field_ty = TypeRef::new("String").unwrap();
-        let fields = vec![field_ty.clone()];
-        let kind = TypeKindV2::TupleStruct { fields: fields.clone(), has_stripped_fields: false };
-        match &kind {
-            TypeKindV2::TupleStruct { fields: k_fields, has_stripped_fields: k_stripped } => {
-                assert_eq!(k_fields.len(), 1);
-                assert_eq!(k_fields[0], field_ty);
-                assert!(!k_stripped);
+    fn test_struct_shape_unit_has_no_fields_structurally() {
+        // StructShape::Unit has no `fields` payload — attaching fields is impossible at the type level.
+        let shape = StructShape::Unit;
+        assert!(matches!(shape, StructShape::Unit));
+        // There is no `shape.fields` accessor because Unit has no fields payload.
+    }
+
+    // -----------------------------------------------------------------------
+    // StructShape — Tuple (AC-06: no named fields structurally)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_struct_shape_tuple_holds_type_refs_not_field_decls() {
+        // StructShape::Tuple uses Vec<TypeRef>, not Vec<FieldDecl> — named fields cannot be attached.
+        let field_ty = TypeRef::new("Uuid").unwrap();
+        let shape =
+            StructShape::Tuple { fields: vec![field_ty.clone()], has_stripped_fields: false };
+        match &shape {
+            StructShape::Tuple { fields, has_stripped_fields } => {
+                assert_eq!(fields.len(), 1);
+                assert_eq!(fields[0], field_ty);
+                assert!(!has_stripped_fields);
             }
-            _ => panic!("expected TupleStruct"),
+            _ => panic!("expected Tuple"),
         }
     }
 
     #[test]
-    fn test_type_kind_v2_tuple_struct_with_stripped_fields() {
-        let kind = TypeKindV2::TupleStruct { fields: vec![], has_stripped_fields: true };
-        assert!(matches!(kind, TypeKindV2::TupleStruct { has_stripped_fields: true, .. }));
+    fn test_struct_shape_tuple_with_stripped_fields() {
+        let shape = StructShape::Tuple { fields: vec![], has_stripped_fields: true };
+        assert!(matches!(shape, StructShape::Tuple { has_stripped_fields: true, .. }));
     }
 
     // -----------------------------------------------------------------------
-    // TypeKindV2 — PlainStruct
+    // StructShape — Plain
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_type_kind_v2_plain_struct_no_typestate() {
+    fn test_struct_shape_plain_holds_named_field_decls() {
         let field_name = FieldName::new("email").unwrap();
         let field_ty = TypeRef::new("String").unwrap();
         let fields = vec![FieldDecl::new(field_name.clone(), field_ty.clone())];
-        let kind = TypeKindV2::PlainStruct {
-            fields: fields.clone(),
-            has_stripped_fields: false,
-            typestate: None,
-        };
-        match &kind {
-            TypeKindV2::PlainStruct { fields: k_fields, has_stripped_fields, typestate } => {
+        let shape = StructShape::Plain { fields: fields.clone(), has_stripped_fields: false };
+        match &shape {
+            StructShape::Plain { fields: k_fields, has_stripped_fields } => {
                 assert_eq!(k_fields.len(), 1);
                 assert_eq!(k_fields[0].name, field_name);
                 assert!(!has_stripped_fields);
-                assert!(typestate.is_none());
             }
-            _ => panic!("expected PlainStruct"),
+            _ => panic!("expected Plain"),
         }
     }
 
+    // -----------------------------------------------------------------------
+    // StructKind — orthogonal typestate placement
+    // -----------------------------------------------------------------------
+
     #[test]
-    fn test_type_kind_v2_plain_struct_with_typestate_marker() {
-        let state_name = TypeName::new("ReviewMachine").unwrap();
-        let m = MethodName::new("start").unwrap();
-        let transitions = TypestateTransitions::new(vec![m]);
-        let marker = TypestateMarker::new(state_name.clone(), transitions);
-        let kind = TypeKindV2::PlainStruct {
-            fields: vec![],
-            has_stripped_fields: false,
-            typestate: Some(marker.clone()),
-        };
+    fn test_struct_kind_unit_with_typestate_marker_succeeds() {
+        // AC-01: unit struct can carry a typestate marker
+        let marker = make_marker("LockMachine", &["lock", "unlock"]);
+        let kind = StructKind::new(StructShape::Unit, Some(marker.clone()));
+        assert!(matches!(kind.shape, StructShape::Unit));
+        assert_eq!(kind.typestate.as_ref().unwrap().state_name().as_str(), "LockMachine");
+    }
+
+    #[test]
+    fn test_struct_kind_tuple_with_typestate_marker_succeeds() {
+        // AC-02: tuple struct can carry a typestate marker
+        let field_ty = TypeRef::new("Uuid").unwrap();
+        let marker = make_marker("PendingMachine", &["activate"]);
+        let kind = StructKind::new(
+            StructShape::Tuple { fields: vec![field_ty], has_stripped_fields: false },
+            Some(marker.clone()),
+        );
+        assert!(matches!(kind.shape, StructShape::Tuple { .. }));
+        assert_eq!(kind.typestate.as_ref().unwrap().state_name().as_str(), "PendingMachine");
+    }
+
+    #[test]
+    fn test_struct_kind_plain_with_typestate_marker_succeeds() {
+        // AC-07 regression: plain struct typestate still works
+        let field_name = FieldName::new("value").unwrap();
+        let field_ty = TypeRef::new("String").unwrap();
+        let marker = make_marker("ReviewMachine", &["start"]);
+        let kind = StructKind::new(
+            StructShape::Plain {
+                fields: vec![FieldDecl::new(field_name, field_ty)],
+                has_stripped_fields: false,
+            },
+            Some(marker.clone()),
+        );
+        assert!(matches!(kind.shape, StructShape::Plain { .. }));
+        assert_eq!(kind.typestate.as_ref().unwrap().state_name().as_str(), "ReviewMachine");
+    }
+
+    #[test]
+    fn test_struct_kind_unit_no_typestate() {
+        let kind = StructKind::new(StructShape::Unit, None);
+        assert!(matches!(kind.shape, StructShape::Unit));
+        assert!(kind.typestate.is_none());
+    }
+
+    #[test]
+    fn test_struct_kind_equality_same_shape_and_typestate() {
+        let k1 = StructKind::new(StructShape::Unit, None);
+        let k2 = StructKind::new(StructShape::Unit, None);
+        assert_eq!(k1, k2);
+    }
+
+    #[test]
+    fn test_struct_kind_inequality_different_shape() {
+        let k_unit = StructKind::new(StructShape::Unit, None);
+        let k_tuple = StructKind::new(
+            StructShape::Tuple { fields: vec![], has_stripped_fields: false },
+            None,
+        );
+        assert_ne!(k_unit, k_tuple);
+    }
+
+    // -----------------------------------------------------------------------
+    // TypeKindV2 — Struct variant
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_type_kind_v2_struct_unit_matches() {
+        let kind = TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
+        assert!(matches!(kind, TypeKindV2::Struct(_)));
+    }
+
+    #[test]
+    fn test_type_kind_v2_struct_unit_not_equal_to_struct_plain() {
+        let unit = TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
+        let plain = TypeKindV2::Struct(StructKind::new(
+            StructShape::Plain { fields: vec![], has_stripped_fields: false },
+            None,
+        ));
+        assert_ne!(unit, plain);
+    }
+
+    #[test]
+    fn test_type_kind_v2_struct_tuple_holds_fields() {
+        let field_ty = TypeRef::new("String").unwrap();
+        let kind = TypeKindV2::Struct(StructKind::new(
+            StructShape::Tuple { fields: vec![field_ty.clone()], has_stripped_fields: false },
+            None,
+        ));
         match &kind {
-            TypeKindV2::PlainStruct { typestate: Some(ts), .. } => {
-                assert_eq!(ts.state_name(), &state_name);
-            }
-            _ => panic!("expected PlainStruct with typestate"),
+            TypeKindV2::Struct(sk) => match &sk.shape {
+                StructShape::Tuple { fields, has_stripped_fields } => {
+                    assert_eq!(fields.len(), 1);
+                    assert_eq!(fields[0], field_ty);
+                    assert!(!has_stripped_fields);
+                }
+                _ => panic!("expected Tuple shape"),
+            },
+            _ => panic!("expected Struct"),
         }
     }
 
     #[test]
-    fn test_type_kind_v2_plain_struct_with_stripped_fields() {
-        let kind =
-            TypeKindV2::PlainStruct { fields: vec![], has_stripped_fields: true, typestate: None };
-        assert!(matches!(kind, TypeKindV2::PlainStruct { has_stripped_fields: true, .. }));
+    fn test_type_kind_v2_struct_plain_no_typestate() {
+        let field_name = FieldName::new("email").unwrap();
+        let field_ty = TypeRef::new("String").unwrap();
+        let kind = TypeKindV2::Struct(StructKind::new(
+            StructShape::Plain {
+                fields: vec![FieldDecl::new(field_name.clone(), field_ty)],
+                has_stripped_fields: false,
+            },
+            None,
+        ));
+        match &kind {
+            TypeKindV2::Struct(sk) => {
+                assert!(sk.typestate.is_none());
+                match &sk.shape {
+                    StructShape::Plain { fields, .. } => {
+                        assert_eq!(fields[0].name, field_name);
+                    }
+                    _ => panic!("expected Plain shape"),
+                }
+            }
+            _ => panic!("expected Struct"),
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -394,46 +529,39 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // Illegal-state prevention: structural enforcement
+    // Illegal-state prevention: structural enforcement (AC-05, AC-06)
     // -----------------------------------------------------------------------
 
     #[test]
-    fn test_unit_struct_has_no_fields_structurally() {
-        // UnitStruct has no `fields` payload — no way to attach fields at the type level.
-        // This test documents the structural guarantee.
-        let kind = TypeKindV2::UnitStruct;
-        assert!(matches!(kind, TypeKindV2::UnitStruct));
-        // There is no `kind.fields` accessor because UnitStruct has no fields field.
+    fn test_unit_shape_has_no_fields_structurally() {
+        // AC-05: StructShape::Unit has no `fields` payload.
+        let kind = TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
+        assert!(
+            matches!(kind, TypeKindV2::Struct(ref sk) if matches!(sk.shape, StructShape::Unit))
+        );
+        // There is no `sk.shape.fields` accessor because Unit has no fields payload.
     }
 
     #[test]
-    fn test_typestate_only_on_plain_struct() {
-        // typestate: Option<TypestateMarker> only exists on PlainStruct.
-        // UnitStruct and TupleStruct cannot carry a typestate marker.
-        let unit = TypeKindV2::UnitStruct;
-        let tuple = TypeKindV2::TupleStruct { fields: vec![], has_stripped_fields: false };
-        // Confirm neither variant has a typestate field by destructuring.
-        assert!(matches!(unit, TypeKindV2::UnitStruct));
-        assert!(matches!(tuple, TypeKindV2::TupleStruct { .. }));
+    fn test_tuple_shape_uses_type_refs_not_field_decls() {
+        // AC-06: StructShape::Tuple uses Vec<TypeRef>, not Vec<FieldDecl>.
+        // Named fields cannot be attached to a Tuple shape.
+        let kind = TypeKindV2::Struct(StructKind::new(
+            StructShape::Tuple { fields: vec![], has_stripped_fields: false },
+            None,
+        ));
+        assert!(
+            matches!(kind, TypeKindV2::Struct(ref sk) if matches!(sk.shape, StructShape::Tuple { .. }))
+        );
     }
 
     #[test]
-    fn test_all_five_variants_are_distinct() {
-        let unit = TypeKindV2::UnitStruct;
-        let tuple = TypeKindV2::TupleStruct { fields: vec![], has_stripped_fields: false };
-        let plain =
-            TypeKindV2::PlainStruct { fields: vec![], has_stripped_fields: false, typestate: None };
+    fn test_all_three_variants_are_distinct() {
+        let struct_ = TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
         let enum_ = TypeKindV2::Enum { variants: vec![] };
         let alias = TypeKindV2::TypeAlias { target: TypeRef::new("u32").unwrap() };
-        assert_ne!(unit, tuple);
-        assert_ne!(unit, plain);
-        assert_ne!(unit, enum_);
-        assert_ne!(unit, alias);
-        assert_ne!(tuple, plain);
-        assert_ne!(tuple, enum_);
-        assert_ne!(tuple, alias);
-        assert_ne!(plain, enum_);
-        assert_ne!(plain, alias);
+        assert_ne!(struct_, enum_);
+        assert_ne!(struct_, alias);
         assert_ne!(enum_, alias);
     }
 }

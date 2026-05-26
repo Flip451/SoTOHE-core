@@ -30,6 +30,7 @@ subgraph domain["domain"]
   subgraph T24_domain_domain_StructKind["tddd::catalogue_v2::composite::StructKind"]
     direction TB
     T24_domain_domain_StructKind__self[StructKind]
+    T24_domain_domain_StructKind_new([new])
   end
   subgraph T25_domain_domain_StructShape["tddd::catalogue_v2::composite::StructShape"]
     direction TB
@@ -82,6 +83,9 @@ subgraph infrastructure["infrastructure"]
   end
   end
 end
+T24_domain_domain_StructKind_new --o T25_domain_domain_StructShape__self
+T24_domain_domain_StructKind_new --o T29_domain_domain_TypestateMarker__self
+T24_domain_domain_StructKind_new --> T24_domain_domain_StructKind__self
 T24_domain_domain_StructKind__self --o|shape| T25_domain_domain_StructShape__self
 T24_domain_domain_StructKind__self --o|typestate| T29_domain_domain_TypestateMarker__self
 T24_domain_domain_TypeKindV2_Struct --o T24_domain_domain_StructKind__self
@@ -89,6 +93,7 @@ T52_infrastructure_infrastructure_CatalogueDocumentCodec_new --> T52_infrastruct
 T52_infrastructure_infrastructure_CatalogueDocumentCodec_decode --> T57_infrastructure_infrastructure_CatalogueDocumentCodecError__self
 T52_infrastructure_infrastructure_CatalogueDocumentCodec_load --> T57_infrastructure_infrastructure_CatalogueDocumentCodecError__self
 T52_infrastructure_infrastructure_CatalogueDocumentCodec_encode --> T57_infrastructure_infrastructure_CatalogueDocumentCodecError__self
+class T24_domain_domain_StructKind_new method_node
 class T24_domain_domain_StructKind__self value_object
 class T25_domain_domain_StructShape_Unit variant_node
 class T25_domain_domain_StructShape_Tuple variant_node

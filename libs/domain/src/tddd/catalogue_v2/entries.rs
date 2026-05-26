@@ -213,6 +213,7 @@ pub struct InherentImplDeclV2 {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::*;
+    use crate::tddd::catalogue_v2::composite::{StructKind, StructShape};
     use crate::tddd::catalogue_v2::identifiers::{
         CrateName, FieldName, MethodName, ModulePath, ParamName, TypeName, TypeRef,
     };
@@ -229,11 +230,10 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: None,
@@ -252,11 +252,10 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::Entity,
-            kind: TypeKindV2::PlainStruct {
-                fields: fields.clone(),
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: fields.clone(), has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: Some("A domain entity.".to_string()),
@@ -264,12 +263,15 @@ mod tests {
             informal_grounds: vec![],
         };
         match &entry.kind {
-            TypeKindV2::PlainStruct { fields: k_fields, has_stripped_fields, typestate } => {
-                assert!(!has_stripped_fields);
-                assert!(typestate.is_none());
-                assert_eq!(k_fields.len(), 1);
-            }
-            _ => panic!("expected PlainStruct kind"),
+            TypeKindV2::Struct(sk) => match &sk.shape {
+                StructShape::Plain { fields: k_fields, has_stripped_fields } => {
+                    assert!(!has_stripped_fields);
+                    assert!(sk.typestate.is_none());
+                    assert_eq!(k_fields.len(), 1);
+                }
+                _ => panic!("expected Plain shape"),
+            },
+            _ => panic!("expected Struct kind"),
         }
         assert_eq!(entry.docs, Some("A domain entity.".to_string()));
     }
@@ -288,7 +290,10 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::TupleStruct { fields: vec![field_ty], has_stripped_fields: false },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Tuple { fields: vec![field_ty], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![method.clone()],
             module_path: ModulePath::root(),
             docs: None,
@@ -306,11 +311,10 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Modify,
             role: DataRole::AggregateRoot,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: module_path.clone(),
             docs: None,
@@ -343,11 +347,10 @@ mod tests {
             let entry = TypeEntry {
                 action: ItemAction::Add,
                 role,
-                kind: TypeKindV2::PlainStruct {
-                    fields: vec![],
-                    has_stripped_fields: false,
-                    typestate: None,
-                },
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
                 methods: vec![],
                 module_path: ModulePath::root(),
                 docs: None,
@@ -762,11 +765,10 @@ mod tests {
         let entry = TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: None,

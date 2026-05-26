@@ -186,7 +186,7 @@ impl CatalogueDocument {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::*;
-    use crate::tddd::catalogue_v2::composite::TypeKindV2;
+    use crate::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
     use crate::tddd::catalogue_v2::entries::TypeEntry;
     use crate::tddd::catalogue_v2::identifiers::{FunctionName, ModulePath, TypeRef};
     use crate::tddd::catalogue_v2::roles::{DataRole, FunctionRole, ItemAction};
@@ -208,11 +208,10 @@ mod tests {
         TypeEntry {
             action: ItemAction::Add,
             role: DataRole::ValueObject,
-            kind: TypeKindV2::PlainStruct {
-                fields: vec![],
-                has_stripped_fields: false,
-                typestate: None,
-            },
+            kind: TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
             methods: vec![],
             module_path: ModulePath::root(),
             docs: None,

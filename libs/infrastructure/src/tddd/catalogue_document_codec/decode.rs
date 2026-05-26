@@ -7,7 +7,9 @@ use std::collections::HashSet;
 use std::str::FromStr;
 
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::composite::{TypeKindV2, TypestateMarker, TypestateTransitions};
+use domain::tddd::catalogue_v2::composite::{
+    StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
+};
 use domain::tddd::catalogue_v2::entries::{
     FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
 };
@@ -25,8 +27,8 @@ use crate::tddd::spec_ground_codec::{informal_grounds_from_dtos, spec_refs_from_
 use super::CatalogueDocumentCodecError;
 use super::dto::{
     BoundOpDto, CatalogueDocumentDto, FieldDeclDto, FunctionEntryDto, InherentImplDeclDto,
-    MethodDeclarationDto, MethodGenericParamDto, ParamDto, TraitEntryDto, TraitImplDto,
-    TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
+    MethodDeclarationDto, MethodGenericParamDto, ParamDto, StructShapeDto, TraitEntryDto,
+    TraitImplDto, TypeEntryDto, TypeKindDto, TypestateMarkerDto, VariantDeclDto, VariantPayloadDto,
     WherePredicateDeclDto,
 };
 
@@ -166,24 +168,10 @@ fn type_kind_from_dto(
     };
 
     match dto {
-        TypeKindDto::UnitStruct => Ok(TypeKindV2::UnitStruct),
-        TypeKindDto::TupleStruct { fields, has_stripped_fields } => {
-            let fields = fields
-                .into_iter()
-                .map(|ty| {
-                    TypeRef::new(ty.clone())
-                        .map_err(|e| err(format!("invalid tuple_struct field type '{ty}': {e}")))
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            Ok(TypeKindV2::TupleStruct { fields, has_stripped_fields })
-        }
-        TypeKindDto::PlainStruct { fields, has_stripped_fields, typestate } => {
-            let fields = fields
-                .into_iter()
-                .map(|f| field_decl_from_dto(name, f))
-                .collect::<Result<Vec<_>, _>>()?;
+        TypeKindDto::Struct { shape, typestate } => {
+            let shape = struct_shape_from_dto(name, shape)?;
             let typestate = typestate.map(|ts| typestate_marker_from_dto(name, ts)).transpose()?;
-            Ok(TypeKindV2::PlainStruct { fields, has_stripped_fields, typestate })
+            Ok(TypeKindV2::Struct(StructKind::new(shape, typestate)))
         }
         TypeKindDto::Enum { variants } => {
             let variants = variants
@@ -196,6 +184,37 @@ fn type_kind_from_dto(
             let target = TypeRef::new(target.clone())
                 .map_err(|e| err(format!("invalid type_alias target '{}': {e}", target)))?;
             Ok(TypeKindV2::TypeAlias { target })
+        }
+    }
+}
+
+fn struct_shape_from_dto(
+    name: &str,
+    dto: StructShapeDto,
+) -> Result<StructShape, CatalogueDocumentCodecError> {
+    let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
+        entry_name: name.to_owned(),
+        reason,
+    };
+
+    match dto {
+        StructShapeDto::Unit => Ok(StructShape::Unit),
+        StructShapeDto::Tuple { fields, has_stripped_fields } => {
+            let fields = fields
+                .into_iter()
+                .map(|ty| {
+                    TypeRef::new(ty.clone())
+                        .map_err(|e| err(format!("invalid tuple field type '{ty}': {e}")))
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(StructShape::Tuple { fields, has_stripped_fields })
+        }
+        StructShapeDto::Plain { fields, has_stripped_fields } => {
+            let fields = fields
+                .into_iter()
+                .map(|f| field_decl_from_dto(name, f))
+                .collect::<Result<Vec<_>, _>>()?;
+            Ok(StructShape::Plain { fields, has_stripped_fields })
         }
     }
 }

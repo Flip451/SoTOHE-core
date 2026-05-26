@@ -549,7 +549,7 @@ mod tests {
     "TrackId": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "unit_struct" }
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
   "traits": {},
@@ -567,7 +567,7 @@ mod tests {
     "TrackId": {
       "action": "add",
       "role": "ValueObject",
-      "kind": { "kind": "unit_struct" }
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } }
     }
   },
   "traits": {},
