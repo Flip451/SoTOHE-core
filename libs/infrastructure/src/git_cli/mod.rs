@@ -4,6 +4,7 @@ use std::process::{Command, Output};
 
 use serde::Deserialize;
 use thiserror::Error;
+use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
 pub(crate) mod show;
 
@@ -228,6 +229,26 @@ impl domain::WorktreeReader for SystemGitRepo {
             }));
         }
         Ok(String::from_utf8_lossy(&output.stdout).into_owned())
+    }
+}
+
+impl BranchReaderPort for SystemGitRepo {
+    /// Returns the current git branch name by delegating to [`GitRepository::current_branch`].
+    ///
+    /// Passes `Some("HEAD")` through for detached HEAD (as reported by
+    /// `git rev-parse --abbrev-ref HEAD`). Returns `None` when the underlying
+    /// git command exits non-zero and no branch can be determined (e.g. empty
+    /// repository with no commits). Returns an error only when git cannot be
+    /// spawned or an I/O failure prevents the command from running.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`BranchReadError::ReadFailed`] if the underlying git operation
+    /// cannot complete (I/O error, git not found, etc.).
+    fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
+        // Delegate to GitRepository::current_branch() which already handles the
+        // rev-parse --abbrev-ref HEAD invocation.  Map GitError to BranchReadError.
+        GitRepository::current_branch(self).map_err(|e| BranchReadError::ReadFailed(e.to_string()))
     }
 }
 
@@ -461,6 +482,8 @@ mod tests {
     use std::sync::{Mutex, OnceLock};
 
     use rstest::rstest;
+
+    use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
     use super::{
         GitRepository, SystemGitRepo, collect_track_branch_claims, load_explicit_track_branch,
@@ -715,5 +738,52 @@ mod tests {
         let claims = collect_track_branch_claims(dir.path()).unwrap();
         assert_eq!(claims.len(), 1);
         assert_eq!(claims[0].track_name, "valid");
+    }
+
+    // ── BranchReaderPort tests ────────────────────────────────────────────────
+
+    /// Happy path: `BranchReaderPort::current_branch` returns `Some(branch_name)` for
+    /// a named branch.  Creates a temporary repo, makes an initial commit, creates a
+    /// named branch and checks out to it, then verifies the adapter reports that name.
+    #[test]
+    fn branch_reader_port_returns_branch_name_on_named_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init"]);
+        // Set local identity so `git commit` succeeds in CI environments without
+        // a global git config.
+        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
+        run_git(dir.path(), &["config", "user.name", "Test"]);
+        // Need at least one commit so that rev-parse --abbrev-ref HEAD succeeds.
+        run_git(dir.path(), &["commit", "--allow-empty", "-m", "init"]);
+        run_git(dir.path(), &["checkout", "-b", "track/test-branch"]);
+
+        let repo = SystemGitRepo::discover_from(dir.path()).unwrap();
+        let branch = BranchReaderPort::current_branch(&repo).unwrap();
+
+        assert_eq!(branch, Some("track/test-branch".to_owned()));
+    }
+
+    /// Error mapping: `BranchReaderPort::current_branch` maps `GitError` to
+    /// `BranchReadError::ReadFailed` when the git command cannot be run (I/O failure).
+    ///
+    /// After the repo root directory is removed, `git rev-parse --abbrev-ref HEAD`
+    /// fails to spawn (or immediately errors), causing `GitRepository::current_branch` to
+    /// return `Err(GitError::Spawn { .. })`.  The adapter must map that to
+    /// `Err(BranchReadError::ReadFailed(...))`.
+    #[test]
+    fn branch_reader_port_maps_git_spawn_error_to_branch_read_error() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init"]);
+        let repo = SystemGitRepo::discover_from(dir.path()).unwrap();
+        // Drop the temp dir, making the root path invalid so that subsequent
+        // git spawns fail with an I/O error.
+        drop(dir);
+
+        let result = BranchReaderPort::current_branch(&repo);
+
+        assert!(
+            matches!(result, Err(BranchReadError::ReadFailed(_))),
+            "expected BranchReadError::ReadFailed, got: {result:?}"
+        );
     }
 }

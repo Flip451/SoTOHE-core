@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SystemGitRepo | secondary_adapter | reference | impl BranchReaderPort, impl Debug, impl Clone | 🟡 | 🔵 |
+| SystemGitRepo | secondary_adapter | reference | impl BranchReaderPort, impl Debug, impl Clone | 🔵 | 🔵 |
 

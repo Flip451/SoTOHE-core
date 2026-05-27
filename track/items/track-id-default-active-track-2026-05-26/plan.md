@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
 
-## Tasks (0/9 resolved)
+## Tasks (1/9 resolved)
 
 ### S1 — usecase: port + interactor for active-track resolution
 
@@ -9,14 +9,14 @@
 > Re-use the existing resolve_track_id_from_branch for the parse rule so no new resolution logic is introduced (IN-04, IN-05, CN-04, CN-05).
 > Include unit tests using a stub BranchReaderPort to verify the resolution cases (track branch, non-track branch, detached HEAD via Some("HEAD"), and no branch via None) without git I/O (IN-10, AC-08).
 
-- [ ] **T001**: usecase: add BranchReaderPort, BranchReadError, ActiveTrackResolveError, ActiveTrackResolveService, ActiveTrackResolveInteractor to libs/usecase/src/track_resolution.rs. BranchReaderPort is the secondary port (current_branch() -> Result<Option<String>, BranchReadError>), passing through Some("HEAD") for detached HEAD and using None only when no branch name can be determined. ActiveTrackResolveInteractor holds Arc<dyn BranchReaderPort> and delegates to the existing resolve_track_id_from_branch for the parse rule (IN-04, IN-05). Implement standard trait impls for both error types (Debug, Display, Error, From). Add unit tests for the new types: (a) track/<id> branch resolves correctly, (b) main branch returns NotTrackBranch, (c) detached HEAD (Some("HEAD") from current_branch) returns DetachedHead, and (d) None from current_branch returns NoBranch. These tests use a stub BranchReaderPort — no git I/O (IN-10, AC-08). Keep changes within libs/usecase/src/track_resolution.rs (CN-04, CN-05).
+- [x] **T001**: usecase: add BranchReaderPort, BranchReadError, ActiveTrackResolveError, ActiveTrackResolveService, ActiveTrackResolveInteractor to libs/usecase/src/track_resolution.rs. BranchReaderPort is the secondary port (current_branch() -> Result<Option<String>, BranchReadError>), passing through Some("HEAD") for detached HEAD and using None only when no branch name can be determined. ActiveTrackResolveInteractor holds Arc<dyn BranchReaderPort> and delegates to the existing resolve_track_id_from_branch for the parse rule (IN-04, IN-05). Implement standard trait impls for both error types (Debug, Display, Error, From). Add unit tests for the new types: (a) track/<id> branch resolves correctly, (b) main branch returns NotTrackBranch, (c) detached HEAD (Some("HEAD") from current_branch) returns DetachedHead, and (d) None from current_branch returns NoBranch. These tests use a stub BranchReaderPort — no git I/O (IN-10, AC-08). Keep changes within libs/usecase/src/track_resolution.rs (CN-04, CN-05). (`dffe739b287035812229683cdf30d588c6bbe996`)
 
 ### S2 — infrastructure: SystemGitRepo implements BranchReaderPort
 
 > Add the BranchReaderPort trait impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs by delegating to the existing GitRepository::current_branch() method and mapping the error to BranchReadError::ReadFailed.
 > This completes the port inversion: the usecase layer declares the port; the infrastructure layer provides the adapter (IN-04, IN-06, CN-05).
 
-- [ ] **T002**: infrastructure: add BranchReaderPort impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs. SystemGitRepo::current_branch() already exists on GitRepository; wire it as the BranchReaderPort impl by delegating to that method and mapping the error type to BranchReadError::ReadFailed (IN-04, IN-06, CN-05). Ensure the trait impl is exported from the infrastructure crate public API. Keep changes within libs/infrastructure/src/git_cli/ (one impl block). This task is a prerequisite for T003 (CLI wiring) and T004 (write-guard integration).
+- [~] **T002**: infrastructure: add BranchReaderPort impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs. SystemGitRepo::current_branch() already exists on GitRepository; wire it as the BranchReaderPort impl by delegating to that method and mapping the error type to BranchReadError::ReadFailed (IN-04, IN-06, CN-05). Ensure the trait impl is exported from the infrastructure crate public API. Keep changes within libs/infrastructure/src/git_cli/ (one impl block). This task is a prerequisite for T003 (CLI wiring) and T004 (write-guard integration).
 
 ### S3 — usecase: replace write-guard closure injection with BranchReaderPort
 

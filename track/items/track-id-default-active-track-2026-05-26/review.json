@@ -1,6 +1,109 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This adds a new public `BranchReaderPort` implementation on `SystemGitRepo`, but there are no tests in `git_cli/mod.rs` covering the happy path or the error mapping for this adapter. That leaves the new public API unverified and makes regressions in the delegation/mapping easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 235,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:74f62715d75176547bca2ff4bd84d8131bbf2e930e49a974d5d34b83c83c0f15",
+          "at": "2026-05-27T05:14:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This patch is no longer limited to the single impl block requested in CN-05: it appends unit tests under `mod tests`, so the change surface extends beyond the allowed block.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 743,
+              "category": "architecture"
+            },
+            {
+              "message": "The new `BranchReaderPort` adapter has no test for the only error branch (`GitError` -> `BranchReadError::ReadFailed`). The added tests cover the success path and the `Ok(None)` path only, so an error-mapping regression would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 748,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dfdea60bafe4d19709647aeedb23f86b066ab755183a46d6e7d034ac9d33165c",
+          "at": "2026-05-27T05:19:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This patch exceeds the briefing's CN-05 boundary: it adds a new `#[cfg(test)]` test block after the adapter impl, even though T002 was supposed to stay within a single `impl BranchReaderPort for SystemGitRepo` block in `libs/infrastructure/src/git_cli/` only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 743,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
+          "at": "2026-05-27T05:25:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`branch_reader_port_returns_none_for_empty_repo_with_no_commits` is built on the wrong Git assumption: `git init` creates an unborn branch with a known current branch name, so this path is not a reliable `None` case and is likely to fail in CI. Use a scenario where `current_branch` באמת cannot resolve a branch name instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
+              "line": 766,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
+          "at": "2026-05-27T05:29:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
+          "at": "2026-05-27T05:32:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
+          "at": "2026-05-27T05:36:06Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:35:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:38:08Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -221,24 +324,57 @@
           "findings": [],
           "hash": "rvw1:sha256:f7f6f61e4137cc16e22be799f6486d8bae227c99eb74b20ed6e310af5c20fd52",
           "at": "2026-05-27T04:45:33Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `SystemGitRepo` row is marked blue in `infrastructure-types.md`, but its corresponding task T002 is still `todo` in `impl-plan.json`. Under the plan-artifacts policy, only actually implemented task types should turn blue, so this creates an internal status mismatch.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/infrastructure-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a89a89f403bee22a398a07e474c89d231cf2dc5020c8d5a636fcec35343bc334",
+          "at": "2026-05-27T05:14:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SystemGitRepo` is marked blue here, but the corresponding implementation task `T002` is still `in_progress` in `impl-plan.json` and still unresolved in `plan.md`. That makes the type-signal overstate completion; it should stay yellow until the task is actually done.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/infrastructure-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1dc0c50315ef9d1027eabeb3d8739f8bfeb22263591991667220b5eafad12b38",
+          "at": "2026-05-27T05:17:12Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
-          "at": "2026-05-27T04:35:36Z"
+          "hash": "rvw1:sha256:215968f31df2ec8139e416255a8ae99a2d91f1e805ab94722d5031674893876b",
+          "at": "2026-05-27T05:18:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
-          "at": "2026-05-27T04:38:08Z"
+          "hash": "rvw1:sha256:215968f31df2ec8139e416255a8ae99a2d91f1e805ab94722d5031674893876b",
+          "at": "2026-05-27T05:37:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1dc0c50315ef9d1027eabeb3d8739f8bfeb22263591991667220b5eafad12b38",
+          "at": "2026-05-27T06:27:00Z"
         }
       ]
     }
