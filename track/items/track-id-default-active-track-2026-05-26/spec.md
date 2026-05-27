@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 52, yellow: 0, red: 0 }
+signals: { blue: 53, yellow: 0, red: 0 }
 ---
 
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
@@ -32,7 +32,7 @@ signals: { blue: 52, yellow: 0, red: 0 }
 
 ### Out of Scope
 - [OS-01] ブランチ移動系コマンド（`track branch create` / `track branch switch`）への既定解決の適用: これらは「現在いないトラック」を対象に動くコマンドであり、現在ブランチからの導出は意味をなさないか誤りになるため、track-id は明示必須のままとする [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D3]
-- [OS-02] CI 環境での detached HEAD やブランチ外バッチ処理への対応: ブランチに紐づかない文脈での fail-closed 以外の挙動（サイレントスキップや警告止まり）は本 track のスコープ外とする（ADR Reassess When に記載） [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1]
+- [OS-02] CI 環境での detached HEAD やブランチ外バッチ処理への一般的な対応: 非トラックブランチで fail-closed 以外の挙動（サイレントスキップや警告止まり）を設計する一般的な仕組みは本 track のスコープ外とする（ADR Reassess When に記載）。ただし、ci-local が呼ぶ 4 つのトラック検証チェック（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）が非トラックブランチ上でスキップする挙動（CN-01 の例外として文書化）は本 track のスコープ内で対処する [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1]
 - [OS-03] 複数トラックを同時に操作するユースケースへの対応: 「現在ブランチ = 単一トラック」という前提が崩れる複数トラック並行操作への対応は本 track のスコープ外とする（ADR Reassess When に記載） [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1]
 - [OS-04] rejected alternative B（shell 側にブランチ解決を置き続ける）の実装: Makefile タスクに shell ボイラープレートを追加・維持するアプローチは採用しない [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2]
 - [OS-05] rejected alternative C（環境変数 `SOTP_TRACK_ID` 等で track-id を引き回す）の実装: 環境変数ベースの設定管理は採用しない [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1]
@@ -41,7 +41,7 @@ signals: { blue: 52, yellow: 0, red: 0 }
 - [OS-08] rejected alternative B（shell 側でブランチ解決しコマンドに渡す）をラッパーに採用すること: `cargo make track-local-review` や `cargo make track-commit-message` のラッパー内で `git rev-parse` + プレフィックス除去を行い、解決済み track-id をコマンドへ渡す形は採用しない（D4 の bare chain 方針と矛盾し、解決規則の二重化を再導入する） [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D4]
 
 ## Constraints
-- [CN-01] track-id を省略しかつ現在ブランチがトラックブランチ（`track/<id>`）でない場合（`main` / detached HEAD など）は fail-closed とする: サイレントスキップや警告に留めず明示エラーで停止し、明示 track-id の指定を促す。ただし、トラック文脈を必須としないコマンド固有の no-track モードは文書化された例外として許容する。具体例として、`track views sync` は明示 `--track-id` がなく active track も解決できない場合に registry-only モードを維持できる [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T001, T004, T005, T006, T007]
+- [CN-01] track-id を省略しかつ現在ブランチがトラックブランチ（`track/<id>`）でない場合（`main` / detached HEAD など）は fail-closed とする: サイレントスキップや警告に留めず明示エラーで停止し、明示 track-id の指定を促す。ただし、トラック文脈を必須としないコマンド固有の no-track モードは文書化された例外として許容する。文書化された例外の一覧: (1) `track views sync` — 明示 `--track-id` がなく active track も解決できない場合に registry-only モードを維持できる; (2) ci-local の CI 検証チェック 4 種（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）— 検証するトラックが存在しない非トラックブランチ（`main` 等）ではスキップ（`[SKIP]` exit 0）する。操作コマンド（`transition` / `signals` 等）はこの例外の対象外であり、引き続き fail-closed のままとする [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T001, T004, T005, T006, T007, T012]
 - [CN-02] 明示 track-id は常に優先される: 引数で track-id を渡した場合はそれを使う。ブランチに紐づかない文脈や別トラックを明示的に対象にしたい場合のために、明示経路は維持する [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T004, T005]
 - [CN-03] 省略時に導出した id は定義上現在ブランチと一致するため、`2026-05-26-0518-active-track-write-guard.md` のブランチ紐付きバリデーションを自動的に満たす。明示 id がブランチと一致しない書き込み系コマンドは write-guard が拒否し、その escape hatch（`--skip-branch-check`）は従来どおり機能する [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1, knowledge/adr/2026-05-26-0518-active-track-write-guard.md#D1] [tasks: T001, T003]
 - [CN-04] 「現在ブランチからアクティブトラックを解決する」操作は usecase 層の操作として公開する。配置は hexagonal architecture と `2026-04-30-0848-cli-via-usecase-only.md` の cli-via-usecase 方針に従い、cli は composition root として wiring を行う薄い層に留まる [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2, knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md#D1] [tasks: T001, T002]
@@ -70,6 +70,7 @@ signals: { blue: 52, yellow: 0, red: 0 }
 - [ ] [AC-13] `cargo make track-local-review` の bare chain 中、いずれかのコマンドが失敗した場合に後続コマンドが実行されず、chain 全体がエラーで終了する [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D4] [tasks: T008, T007]
 - [ ] [AC-14] `.claude/commands/track/*.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、および `Makefile.toml` のタスク説明において、D1 により自己解決が可能になったコマンドに対する明示的な `--track-id` 指定の例示・記述が除去されている。別トラックを対象にする場面など、明示指定が意味を持つ文脈にはオプション表記として残っている [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T009, T007]
 - [ ] [AC-15] git の現在ブランチ取得 (`git rev-parse --abbrev-ref HEAD` を `std::process::Command::new("git")` 経由で直接呼ぶ) がワークスペース内で `libs/infrastructure/src/git_cli/mod.rs` の `SystemGitRepo` ポート実装 1 箇所のみに存在する。具体的に: (a) `libs/infrastructure/src/track/render.rs`（`sync_rendered_views` 内）が `GitRepository::current_branch()` 経由でブランチを読んでおり、直接シェルアウトを含まない。(b) `apps/cli/src/commands/make.rs`（`current_branch_track_id_strict` または相当するヘルパー内）が `GitRepository::current_branch()` 経由でブランチを読んでおり、直接シェルアウトを含まない。IN-06 のポート統一が infrastructure 層および cli 層まで完全に適用されていることを確認できる [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2] [tasks: T010]
+- [ ] [AC-16] `cargo make ci` が `main`（非トラックブランチ）上で pass する。ci-local が呼ぶ 4 つのトラック検証チェック（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）は、解決すべきアクティブトラックが存在しない非トラックブランチ上でスキップ（`[SKIP]` exit 0）し、CI 全体をブロックしない。本 track のマージ後にデフォルトブランチ CI が壊れないことを確認できる [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T012]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/hexagonal-architecture.md#Layer Dependencies
@@ -82,5 +83,5 @@ signals: { blue: 52, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 52  🟡 0  🔴 0
+🔵 53  🟡 0  🔴 0
 

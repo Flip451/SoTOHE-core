@@ -202,7 +202,7 @@
       },
       {
         "id": "OS-02",
-        "text": "CI 環境での detached HEAD やブランチ外バッチ処理への対応: ブランチに紐づかない文脈での fail-closed 以外の挙動（サイレントスキップや警告止まり）は本 track のスコープ外とする（ADR Reassess When に記載）",
+        "text": "CI 環境での detached HEAD やブランチ外バッチ処理への一般的な対応: 非トラックブランチで fail-closed 以外の挙動（サイレントスキップや警告止まり）を設計する一般的な仕組みは本 track のスコープ外とする（ADR Reassess When に記載）。ただし、ci-local が呼ぶ 4 つのトラック検証チェック（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）が非トラックブランチ上でスキップする挙動（CN-01 の例外として文書化）は本 track のスコープ内で対処する",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
@@ -275,7 +275,7 @@
   "constraints": [
     {
       "id": "CN-01",
-      "text": "track-id を省略しかつ現在ブランチがトラックブランチ（`track/<id>`）でない場合（`main` / detached HEAD など）は fail-closed とする: サイレントスキップや警告に留めず明示エラーで停止し、明示 track-id の指定を促す。ただし、トラック文脈を必須としないコマンド固有の no-track モードは文書化された例外として許容する。具体例として、`track views sync` は明示 `--track-id` がなく active track も解決できない場合に registry-only モードを維持できる",
+      "text": "track-id を省略しかつ現在ブランチがトラックブランチ（`track/<id>`）でない場合（`main` / detached HEAD など）は fail-closed とする: サイレントスキップや警告に留めず明示エラーで停止し、明示 track-id の指定を促す。ただし、トラック文脈を必須としないコマンド固有の no-track モードは文書化された例外として許容する。文書化された例外の一覧: (1) `track views sync` — 明示 `--track-id` がなく active track も解決できない場合に registry-only モードを維持できる; (2) ci-local の CI 検証チェック 4 種（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）— 検証するトラックが存在しない非トラックブランチ（`main` 等）ではスキップ（`[SKIP]` exit 0）する。操作コマンド（`transition` / `signals` 等）はこの例外の対象外であり、引き続き fail-closed のままとする",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
@@ -570,6 +570,16 @@
           "anchor": "D2"
         }
       ]
+    },
+    {
+      "id": "AC-16",
+      "text": "`cargo make ci` が `main`（非トラックブランチ）上で pass する。ci-local が呼ぶ 4 つのトラック検証チェック（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）は、解決すべきアクティブトラックが存在しない非トラックブランチ上でスキップ（`[SKIP]` exit 0）し、CI 全体をブロックしない。本 track のマージ後にデフォルトブランチ CI が壊れないことを確認できる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -599,7 +609,7 @@
     }
   ],
   "signals": {
-    "blue": 52,
+    "blue": 53,
     "yellow": 0,
     "red": 0
   }
