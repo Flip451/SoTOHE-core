@@ -1,6 +1,247 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74b02e48a578b3bcc82378c1f0511a7a3e5aa594804aaa432a9c48dab13f3cd",
+          "at": "2026-05-27T07:39:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:428183f7c16e186ec951369f5678d1b50883252a97c1821fe218ba6eb05e0414",
+          "at": "2026-05-27T13:03:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:428183f7c16e186ec951369f5678d1b50883252a97c1821fe218ba6eb05e0414",
+          "at": "2026-05-27T13:05:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This bullet conflates plain and tuple struct shapes. In the codec, only plain shapes use `fields[].ty`; tuple shapes store `fields` as plain strings (`Vec<String>`) with no `ty` field. As written, the convention teaches an invalid schema shape for tuple structs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 205,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:2b1c7da5d64e0ac718e33d4b430c1079fdf8c6ec153f6d479fb87587c617447f",
+          "at": "2026-05-27T14:56:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/agents/type-designer.md:403` overstates tuple behavior. The codec and domain model support `StructShape::Tuple { has_stripped_fields: true }`, so tuple structs with private fields are not guaranteed to length-mismatch. The follow-on advice to avoid tuple shape for dependency-holding structs is therefore incorrect.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 403,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2b1c7da5d64e0ac718e33d4b430c1079fdf8c6ec153f6d479fb87587c617447f",
+          "at": "2026-05-27T14:59:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd09a05cba5019ffd2aead0ca096cc95d90b7fe68d5051705ccf5fa395b10dd5",
+          "at": "2026-05-27T15:05:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new R9 bullet at [knowledge/conventions/type-designer-kind-selection.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md#L205) says `kind.shape.fields[].ty` for both plain and tuple shapes, but `StructShapeDto::Tuple` stores tuple fields as bare strings, not `{ ty }` objects. That wording would send authors toward a nonexistent schema path for tuple newtypes and contradict the codec DTO.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 205,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:be38469269a097c78f2cc8a30d4fb3fc1ef2e3044df4f0a9b679103e80954dd9",
+          "at": "2026-05-27T15:43:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4345fb35dfccd1be2c2f50d1224493512f396dae16f81e02393a2261e7683721",
+          "at": "2026-05-27T15:50:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This inline bad example still shows a struct as `kind: { \"kind\": \"struct\" }` with no nested `shape`. CN-02 makes `shape` mandatory for every struct kind, and the briefing explicitly requires every struct kind JSON example to use the new `struct` + `shape` wire format. Even in a bad design example, this now teaches a schema-invalid catalogue shape rather than only the intended typestate-design violation.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 281,
+              "category": "schema contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4345fb35dfccd1be2c2f50d1224493512f396dae16f81e02393a2261e7683721",
+          "at": "2026-05-27T15:55:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:909639766b6b874504e7e9eb4bbafebc742e6879d93d323cff9bd17447f7ecef",
+          "at": "2026-05-27T15:58:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `--track-id` from the Step 2 / Step 4 / Step 6 examples makes the documented flow depend on `resolve_track_id(None)`, which only accepts `track/<id>` branches. Step 0 still says the review target can be `track/<id>` or `plan/<id>`, so the new bare invocations now fail on the documented `plan/<id>` path. Either keep an explicit track-id override for plan branches or remove `plan/<id>` from the supported branch set.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 44,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
+          "at": "2026-05-27T16:16:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
+          "at": "2026-05-27T16:17:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The happy-path commands now omit `--track-id`, but the same document still says `/track:review` can run from either `track/<id>` or `plan/<id>` branches. The underlying active-track resolver accepts only `track/<id>` branches, so from a `plan/<id>` branch this bare `cargo make track-review-results` invocation fails instead of using the extracted `{track-id}`. Either remove the `plan/<id>` promise from the command contract or keep passing an explicit `--track-id` for that path.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 44,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
+          "at": "2026-05-27T16:20:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The command still advertises `plan/<id>` branches as valid review targets, and this new Step 2 fallback explicitly tells the operator to pass `--track-id` on `plan/<id>`, but the later happy-path commands now omit it unconditionally. `sotp review local`, `review results`, and `check-approved` only auto-resolve from `track/<id>` branches, so following this document from a `plan/<id>` branch will get through Step 2 only to fail at Step 4 or Step 6. Either constrain `/track:review` to `track/<id>` branches or carry the same explicit `--track-id` fallback through the later invocations.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 47,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:9bf9ac600cd9261ee1957b3f1109a5cd89509b58293313d20ec4cb41969454af",
+          "at": "2026-05-27T16:23:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23d3e5f2d4ceb8b14057096c6ff37f374aebf349d99e1f2ea8fbfcc21e517d25",
+          "at": "2026-05-27T16:26:18Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:35:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:38:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
+          "at": "2026-05-27T06:43:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
+          "at": "2026-05-27T06:51:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `tmp/track-commit/track-dir.txt` from `TRANSIENT_AUTOMATION_FILES` does not change behavior while `TRANSIENT_AUTOMATION_DIRS` still contains `tmp`. `validate_stage_path_entries` still rejects every `tmp/**` path, so the track-dir file remains transient/excluded and the intended cleanup is not actually realized.",
+              "severity": "P1",
+              "file": "libs/usecase/src/git_workflow.rs",
+              "line": 15,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
+          "at": "2026-05-27T12:42:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `tmp/track-commit/track-dir.txt` from `TRANSIENT_AUTOMATION_FILES` is ineffective while `TRANSIENT_AUTOMATION_DIRS` still contains `tmp`. `validate_stage_path_entries` still rejects every `tmp/**` path, so the track-dir file remains blocked and the intended cleanup never takes effect.",
+              "severity": "P1",
+              "file": "libs/usecase/src/git_workflow.rs",
+              "line": 15,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
+          "at": "2026-05-27T12:44:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
+          "at": "2026-05-27T12:47:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
+          "at": "2026-05-27T12:50:27Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -449,6 +690,80 @@
           "findings": [],
           "hash": "rvw1:sha256:aa1c68851ef309dd5b380e848f19506a1716b61f1a4137e8a3e4c6d335f30b2e",
           "at": "2026-05-27T21:43:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b3854b18a44a67de2ebb81c8ed89af616279d8fb2281427c1d5599a902b3ea0",
+          "at": "2026-05-27T22:05:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b3854b18a44a67de2ebb81c8ed89af616279d8fb2281427c1d5599a902b3ea0",
+          "at": "2026-05-27T22:06:32Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
+          "at": "2026-05-27T08:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
+          "at": "2026-05-27T08:51:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:38:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
+          "at": "2026-05-27T13:02:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
+          "at": "2026-05-27T13:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
+          "at": "2026-05-27T16:14:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
+          "at": "2026-05-27T16:16:14Z"
         }
       ]
     },
@@ -758,307 +1073,6 @@
           "findings": [],
           "hash": "rvw1:sha256:8fa9594561a1064f110293d6b5d83078573fe9ed942efe045df74eca5f8ad5ec",
           "at": "2026-05-27T21:59:31Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c74b02e48a578b3bcc82378c1f0511a7a3e5aa594804aaa432a9c48dab13f3cd",
-          "at": "2026-05-27T07:39:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:428183f7c16e186ec951369f5678d1b50883252a97c1821fe218ba6eb05e0414",
-          "at": "2026-05-27T13:03:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:428183f7c16e186ec951369f5678d1b50883252a97c1821fe218ba6eb05e0414",
-          "at": "2026-05-27T13:05:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This bullet conflates plain and tuple struct shapes. In the codec, only plain shapes use `fields[].ty`; tuple shapes store `fields` as plain strings (`Vec<String>`) with no `ty` field. As written, the convention teaches an invalid schema shape for tuple structs.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 205,
-              "category": "schema"
-            }
-          ],
-          "hash": "rvw1:sha256:2b1c7da5d64e0ac718e33d4b430c1079fdf8c6ec153f6d479fb87587c617447f",
-          "at": "2026-05-27T14:56:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.claude/agents/type-designer.md:403` overstates tuple behavior. The codec and domain model support `StructShape::Tuple { has_stripped_fields: true }`, so tuple structs with private fields are not guaranteed to length-mismatch. The follow-on advice to avoid tuple shape for dependency-holding structs is therefore incorrect.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 403,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2b1c7da5d64e0ac718e33d4b430c1079fdf8c6ec153f6d479fb87587c617447f",
-          "at": "2026-05-27T14:59:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd09a05cba5019ffd2aead0ca096cc95d90b7fe68d5051705ccf5fa395b10dd5",
-          "at": "2026-05-27T15:05:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new R9 bullet at [knowledge/conventions/type-designer-kind-selection.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md#L205) says `kind.shape.fields[].ty` for both plain and tuple shapes, but `StructShapeDto::Tuple` stores tuple fields as bare strings, not `{ ty }` objects. That wording would send authors toward a nonexistent schema path for tuple newtypes and contradict the codec DTO.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 205,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:be38469269a097c78f2cc8a30d4fb3fc1ef2e3044df4f0a9b679103e80954dd9",
-          "at": "2026-05-27T15:43:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4345fb35dfccd1be2c2f50d1224493512f396dae16f81e02393a2261e7683721",
-          "at": "2026-05-27T15:50:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This inline bad example still shows a struct as `kind: { \"kind\": \"struct\" }` with no nested `shape`. CN-02 makes `shape` mandatory for every struct kind, and the briefing explicitly requires every struct kind JSON example to use the new `struct` + `shape` wire format. Even in a bad design example, this now teaches a schema-invalid catalogue shape rather than only the intended typestate-design violation.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 281,
-              "category": "schema contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:4345fb35dfccd1be2c2f50d1224493512f396dae16f81e02393a2261e7683721",
-          "at": "2026-05-27T15:55:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:909639766b6b874504e7e9eb4bbafebc742e6879d93d323cff9bd17447f7ecef",
-          "at": "2026-05-27T15:58:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `--track-id` from the Step 2 / Step 4 / Step 6 examples makes the documented flow depend on `resolve_track_id(None)`, which only accepts `track/<id>` branches. Step 0 still says the review target can be `track/<id>` or `plan/<id>`, so the new bare invocations now fail on the documented `plan/<id>` path. Either keep an explicit track-id override for plan branches or remove `plan/<id>` from the supported branch set.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 44,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
-          "at": "2026-05-27T16:16:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
-          "at": "2026-05-27T16:17:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The happy-path commands now omit `--track-id`, but the same document still says `/track:review` can run from either `track/<id>` or `plan/<id>` branches. The underlying active-track resolver accepts only `track/<id>` branches, so from a `plan/<id>` branch this bare `cargo make track-review-results` invocation fails instead of using the extracted `{track-id}`. Either remove the `plan/<id>` promise from the command contract or keep passing an explicit `--track-id` for that path.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 44,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
-          "at": "2026-05-27T16:20:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The command still advertises `plan/<id>` branches as valid review targets, and this new Step 2 fallback explicitly tells the operator to pass `--track-id` on `plan/<id>`, but the later happy-path commands now omit it unconditionally. `sotp review local`, `review results`, and `check-approved` only auto-resolve from `track/<id>` branches, so following this document from a `plan/<id>` branch will get through Step 2 only to fail at Step 4 or Step 6. Either constrain `/track:review` to `track/<id>` branches or carry the same explicit `--track-id` fallback through the later invocations.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 47,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:9bf9ac600cd9261ee1957b3f1109a5cd89509b58293313d20ec4cb41969454af",
-          "at": "2026-05-27T16:23:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23d3e5f2d4ceb8b14057096c6ff37f374aebf349d99e1f2ea8fbfcc21e517d25",
-          "at": "2026-05-27T16:26:18Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
-          "at": "2026-05-27T08:50:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
-          "at": "2026-05-27T08:51:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
-          "at": "2026-05-27T09:34:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
-          "at": "2026-05-27T09:38:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
-          "at": "2026-05-27T13:02:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
-          "at": "2026-05-27T13:03:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
-          "at": "2026-05-27T16:14:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
-          "at": "2026-05-27T16:16:14Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
-          "at": "2026-05-27T04:35:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
-          "at": "2026-05-27T04:38:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
-          "at": "2026-05-27T06:43:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
-          "at": "2026-05-27T06:51:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `tmp/track-commit/track-dir.txt` from `TRANSIENT_AUTOMATION_FILES` does not change behavior while `TRANSIENT_AUTOMATION_DIRS` still contains `tmp`. `validate_stage_path_entries` still rejects every `tmp/**` path, so the track-dir file remains transient/excluded and the intended cleanup is not actually realized.",
-              "severity": "P1",
-              "file": "libs/usecase/src/git_workflow.rs",
-              "line": 15,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
-          "at": "2026-05-27T12:42:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `tmp/track-commit/track-dir.txt` from `TRANSIENT_AUTOMATION_FILES` is ineffective while `TRANSIENT_AUTOMATION_DIRS` still contains `tmp`. `validate_stage_path_entries` still rejects every `tmp/**` path, so the track-dir file remains blocked and the intended cleanup never takes effect.",
-              "severity": "P1",
-              "file": "libs/usecase/src/git_workflow.rs",
-              "line": 15,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
-          "at": "2026-05-27T12:44:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
-          "at": "2026-05-27T12:47:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
-          "at": "2026-05-27T12:50:27Z"
         }
       ]
     },

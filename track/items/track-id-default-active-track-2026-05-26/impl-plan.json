@@ -70,8 +70,8 @@
     {
       "id": "T012",
       "description": "CLI: fix the main-CI regression for AC-16 — make the four ci-local CI verify checks (verify spec-states / verify catalogue-spec-refs / verify catalogue-spec-signals / verify plan-artifact-refs) skip (exit 0, print a [SKIP] message) on a non-track branch (no active track resolvable), so cargo make ci passes on main. Implement as a CLI control-flow change in apps/cli/src/commands/verify.rs per the Phase-2 design: when active-track resolution returns the not-a-track-branch error family (NotTrackBranch / DetachedHead / NoBranch), emit [SKIP] and return ExitCode::SUCCESS; real failures (BranchRead / InvalidTrackId / etc.) stay fail-closed. verify catalogue-spec-signals currently resolves the track inside infrastructure — add a CLI-dispatch conditional using ActiveTrackResolveInteractor (same pattern as the other three verify subcommands) to skip on no-track before delegating to the infrastructure path. Operation commands (transition, signals, etc.) and direct invocations with an explicit-but-invalid track keep fail-closed (D1 / CN-01). No new types; this is pure CLI control-flow. Add unit tests for the skip path: stub BranchReaderPort returning a non-track branch name or None to verify all four subcommands emit [SKIP] and exit 0. Do NOT reintroduce shell branch-parsing in the Makefile (AC-11). Covers AC-16, within CN-01's documented exception.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "5b786cb3801a8cd72630c3bf61ad3a4c794d5d29"
     }
   ],
   "plan": {
