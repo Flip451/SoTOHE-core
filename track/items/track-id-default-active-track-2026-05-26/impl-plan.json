@@ -34,7 +34,8 @@
     {
       "id": "T006",
       "description": "Makefile + verify CLI cleanup: remove shell boilerplate from *-local tasks. Remove the BRANCH=$(git ...); TRACK_ID=\"${BRANCH#track/}\" pattern, TRACK_DIR / SPEC_PATH construction, and the now-dead plan/* case arms from: verify-plan-artifact-refs-local, verify-catalogue-spec-refs-local, check-catalogue-spec-signals-local, verify-spec-states-current-local. Replace each shell branch-resolve block with a direct `cargo run --quiet -p cli -- <subcommand>` call that passes no pre-resolved track argument/path. For verify-plan-artifact-refs-local, omit --track-dir and rely on the shared active-track resolver path from IN-09; for verify-catalogue-spec-refs-local, omit --track and rely on the optional --track flow from IN-03; for check-catalogue-spec-signals-local, rely on its current-branch lookup after consolidating that lookup onto the shared ActiveTrackResolveInteractor path. For verify-spec-states-current-local, first change `verify spec-states` so its spec path argument is optional; when omitted, resolve the active track via ActiveTrackResolveInteractor and verify `track/items/<id>/spec.md`. On non-track branches, do not preserve skip behavior: let the CLI return a clear fail-closed error and propagate the non-zero exit code (CN-01). Verify this by testing a non-track branch dry-run on main and confirming failure rather than [SKIP]. This satisfies IN-08, AC-04, AC-10 (IN-08, AC-04, AC-10).",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "f49581015834f22933838a25516b1cf1b975115c"
     },
     {
       "id": "T007",

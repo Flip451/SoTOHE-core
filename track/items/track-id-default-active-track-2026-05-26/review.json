@@ -16,17 +16,20 @@
           "findings": [],
           "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
           "at": "2026-05-27T08:51:48Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:34:54Z"
+        },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c74b02e48a578b3bcc82378c1f0511a7a3e5aa594804aaa432a9c48dab13f3cd",
-          "at": "2026-05-27T07:39:13Z"
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:38:33Z"
         }
       ]
     },
@@ -188,6 +191,179 @@
           "findings": [],
           "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
           "at": "2026-05-27T06:51:16Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SystemGitRepo::discover_from(&project_root)` is run before `TaskOperationInteractor::new` here, so every `skip_branch_check = false` add/set/clear mutation now requires a git repository even when the interactor would have skipped the branch guard for a branchless track. That regresses valid branchless operations and also changes validation precedence (for example, a bad `task_id` can now surface as a git-discovery error if the repo is missing). The same eager-discovery pattern repeats at lines 84 and 125.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "line": 23,
+              "category": "correctness"
+            },
+            {
+              "message": "The same eager `SystemGitRepo::discover_from(&project_root)` happens before `TaskOperationInteractor` is invoked here, so transition now depends on git discovery even in cases where the use case would have rejected bad input first or skipped the branch guard for a branchless track. That breaks valid non-git/branchless transition flows and changes error precedence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/transition.rs",
+              "line": 26,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c93fdc4e96124ba2f6d729f028c4c97da29a347b28807edd378cbabf32f9100d",
+          "at": "2026-05-27T06:42:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1c4462cc394fc4ec18bc6372e86c1e68b2795718741b5cff6bf0edbf9b6e49",
+          "at": "2026-05-27T06:46:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1c4462cc394fc4ec18bc6372e86c1e68b2795718741b5cff6bf0edbf9b6e49",
+          "at": "2026-05-27T06:51:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_track_id()` always calls `SystemGitRepo::discover()` on the process CWD. That is fine for the plain `track/*` commands, but it makes the new omitted-`track-id` path inconsistent for the `--workspace-root` commands in this file (`type-signals`, `baseline-graph`, `contract-map`, `catalogue-spec-signals`, `catalogue-impl-signals`, `baseline-capture`): if the CLI is launched from a different checkout or subdirectory, the helper can resolve a different active track than the workspace the command actually operates on, so the later workspace-root branch guards can fail or target the wrong track.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "line": 90,
+              "category": "correctness"
+            },
+            {
+              "message": "The added `resolve_track_id` tests short-circuit on repo discovery/current-branch failures and on non-matching branch shapes, so on detached HEAD, main, or any non-git CI environment they can all pass without exercising either the active-branch default or the fail-closed path. That leaves the new behavior required by the brief effectively unverified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "line": 753,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:dda64a646d881e42f30b0d7889956162b17d2c4b1d5a15926cabdd4dede04fb6",
+          "at": "2026-05-27T07:19:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aabad2484bed5d4091c8ef4a7286a779930ebe26f2f176af96df7a352a84072e",
+          "at": "2026-05-27T07:27:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aabad2484bed5d4091c8ef4a7286a779930ebe26f2f176af96df7a352a84072e",
+          "at": "2026-05-27T07:34:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `--track` is omitted, this resolves the active track from the process CWD via `resolve_track_id(args.track)`, but `CatalogueSpecRefsArgs` already carries `workspace_root`. If the command is invoked from a different checkout or wrapper, it can resolve the wrong track (or fail spuriously) instead of using the workspace being verified. Anchor branch discovery to `workspace_root` here.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 227,
+              "category": "correctness"
+            },
+            {
+              "message": "An explicit `--track-id` still goes through the `Some(id) => Some(id)` fast path and is passed straight to `sync_rendered_views`, which joins it into `track/items/<id>` without validation. A malformed id like `../../tmp` can escape the intended directory and write outside the workspace. Validate the explicit id before calling `sync_rendered_views`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/views.rs",
+              "line": 29,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:5e86bfeab501ad1c172b806af236dcebe548d1f9a00841052959f43105e7563e",
+          "at": "2026-05-27T07:58:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f6a9afe72ead347b7dd31bda8896467c40c6b092252d62ddd16844bb3cc3a7c",
+          "at": "2026-05-27T08:20:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f6a9afe72ead347b7dd31bda8896467c40c6b092252d62ddd16844bb3cc3a7c",
+          "at": "2026-05-27T08:26:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6c5007de1894a7f2c03e626e74e35a7f7b885f06e745d4cf75293381183bd09",
+          "at": "2026-05-27T08:51:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f6c5007de1894a7f2c03e626e74e35a7f7b885f06e745d4cf75293381183bd09",
+          "at": "2026-05-27T08:56:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dispatch_track_commit_message` now treats non-track branches, detached HEAD, and branch-lookup failures as `Ok(None)` via `current_branch_track_id_strict()`, so the `review check-approved` gate is skipped entirely unless a `track/<id>` branch is detected. That is a regression from the previous fail-closed behavior and lets `cargo make track-commit-message` succeed on `main`/detached HEAD without running the approval check or persisting `.commit_hash`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/make.rs",
+              "line": 519,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:2d095968c83d5130b19068a5f35e96a1fc996680b0d7ad336d3872fbc1a7944b",
+          "at": "2026-05-27T09:34:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:555a154d4737d651cd66c1d1c222d308c540830f01fca11922d8a1e55f55a6e7",
+          "at": "2026-05-27T09:40:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:555a154d4737d651cd66c1d1c222d308c540830f01fca11922d8a1e55f55a6e7",
+          "at": "2026-05-27T10:08:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:555a154d4737d651cd66c1d1c222d308c540830f01fca11922d8a1e55f55a6e7",
+          "at": "2026-05-27T10:18:53Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74b02e48a578b3bcc82378c1f0511a7a3e5aa594804aaa432a9c48dab13f3cd",
+          "at": "2026-05-27T07:39:13Z"
         }
       ]
     },
@@ -533,132 +709,20 @@
           "findings": [],
           "hash": "rvw1:sha256:87b94ed08cd467aad7896ea7d2add3dab70f7abf7ee793eb70621fded7a68f5d",
           "at": "2026-05-27T09:05:49Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SystemGitRepo::discover_from(&project_root)` is run before `TaskOperationInteractor::new` here, so every `skip_branch_check = false` add/set/clear mutation now requires a git repository even when the interactor would have skipped the branch guard for a branchless track. That regresses valid branchless operations and also changes validation precedence (for example, a bad `task_id` can now surface as a git-discovery error if the repo is missing). The same eager-discovery pattern repeats at lines 84 and 125.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
-              "line": 23,
-              "category": "correctness"
-            },
-            {
-              "message": "The same eager `SystemGitRepo::discover_from(&project_root)` happens before `TaskOperationInteractor` is invoked here, so transition now depends on git discovery even in cases where the use case would have rejected bad input first or skipped the branch guard for a branchless track. That breaks valid non-git/branchless transition flows and changes error precedence.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/transition.rs",
-              "line": 26,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c93fdc4e96124ba2f6d729f028c4c97da29a347b28807edd378cbabf32f9100d",
-          "at": "2026-05-27T06:42:06Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ab1c4462cc394fc4ec18bc6372e86c1e68b2795718741b5cff6bf0edbf9b6e49",
-          "at": "2026-05-27T06:46:59Z"
+          "hash": "rvw1:sha256:baf5b1808ae08c29af29fc58ae2650943cf4a7ba4ec8f7e93232fdb7db509c31",
+          "at": "2026-05-27T10:20:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ab1c4462cc394fc4ec18bc6372e86c1e68b2795718741b5cff6bf0edbf9b6e49",
-          "at": "2026-05-27T06:51:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_track_id()` always calls `SystemGitRepo::discover()` on the process CWD. That is fine for the plain `track/*` commands, but it makes the new omitted-`track-id` path inconsistent for the `--workspace-root` commands in this file (`type-signals`, `baseline-graph`, `contract-map`, `catalogue-spec-signals`, `catalogue-impl-signals`, `baseline-capture`): if the CLI is launched from a different checkout or subdirectory, the helper can resolve a different active track than the workspace the command actually operates on, so the later workspace-root branch guards can fail or target the wrong track.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
-              "line": 90,
-              "category": "correctness"
-            },
-            {
-              "message": "The added `resolve_track_id` tests short-circuit on repo discovery/current-branch failures and on non-matching branch shapes, so on detached HEAD, main, or any non-git CI environment they can all pass without exercising either the active-branch default or the fail-closed path. That leaves the new behavior required by the brief effectively unverified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
-              "line": 753,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:dda64a646d881e42f30b0d7889956162b17d2c4b1d5a15926cabdd4dede04fb6",
-          "at": "2026-05-27T07:19:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aabad2484bed5d4091c8ef4a7286a779930ebe26f2f176af96df7a352a84072e",
-          "at": "2026-05-27T07:27:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aabad2484bed5d4091c8ef4a7286a779930ebe26f2f176af96df7a352a84072e",
-          "at": "2026-05-27T07:34:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "When `--track` is omitted, this resolves the active track from the process CWD via `resolve_track_id(args.track)`, but `CatalogueSpecRefsArgs` already carries `workspace_root`. If the command is invoked from a different checkout or wrapper, it can resolve the wrong track (or fail spuriously) instead of using the workspace being verified. Anchor branch discovery to `workspace_root` here.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/verify.rs",
-              "line": 227,
-              "category": "correctness"
-            },
-            {
-              "message": "An explicit `--track-id` still goes through the `Some(id) => Some(id)` fast path and is passed straight to `sync_rendered_views`, which joins it into `track/items/<id>` without validation. A malformed id like `../../tmp` can escape the intended directory and write outside the workspace. Validate the explicit id before calling `sync_rendered_views`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/views.rs",
-              "line": 29,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:5e86bfeab501ad1c172b806af236dcebe548d1f9a00841052959f43105e7563e",
-          "at": "2026-05-27T07:58:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f6a9afe72ead347b7dd31bda8896467c40c6b092252d62ddd16844bb3cc3a7c",
-          "at": "2026-05-27T08:20:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f6a9afe72ead347b7dd31bda8896467c40c6b092252d62ddd16844bb3cc3a7c",
-          "at": "2026-05-27T08:26:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f6c5007de1894a7f2c03e626e74e35a7f7b885f06e745d4cf75293381183bd09",
-          "at": "2026-05-27T08:51:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f6c5007de1894a7f2c03e626e74e35a7f7b885f06e745d4cf75293381183bd09",
-          "at": "2026-05-27T08:56:47Z"
+          "hash": "rvw1:sha256:baf5b1808ae08c29af29fc58ae2650943cf4a7ba4ec8f7e93232fdb7db509c31",
+          "at": "2026-05-27T10:22:37Z"
         }
       ]
     }
