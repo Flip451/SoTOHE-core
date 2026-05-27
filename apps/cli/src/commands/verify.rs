@@ -20,7 +20,10 @@ pub struct SpecVerifyArgs {
 #[derive(Args)]
 pub struct SpecStatesArgs {
     /// Path to the spec.md file to verify.
-    spec_path: PathBuf,
+    /// When omitted, the active track is resolved from the current branch name
+    /// and `track/items/<id>/spec.md` is verified. Fail-closed on non-track
+    /// branches (CN-01, IN-08, AC-10).
+    spec_path: Option<PathBuf>,
     /// Strict mode (merge gate): Yellow signals also fail. Default: only Red fails.
     #[arg(long)]
     strict: bool,
@@ -199,20 +202,32 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
             ("verify spec signals", infrastructure::verify::spec_signals::verify(&args.spec_path))
         }
         VerifyCommand::SpecStates(args) => {
+            // Resolve the spec path: use explicit value when given, or derive
+            // from the active track branch (IN-08, AC-10, CN-01).
+            let spec_path = match args.spec_path {
+                Some(p) => p,
+                None => match resolve_active_spec_path() {
+                    Ok(p) => p,
+                    Err(msg) => {
+                        eprintln!("{msg}");
+                        return ExitCode::FAILURE;
+                    }
+                },
+            };
             // Resolve trusted_root via the infrastructure-layer helper.
             // All filesystem I/O (git discover, .git walk-up, symlink
             // verification) lives in `infrastructure::verify::trusted_root`;
             // the CLI is a pure composition root that maps Result → finding.
             let outcome =
-                match infrastructure::verify::trusted_root::resolve_trusted_root(&args.spec_path) {
+                match infrastructure::verify::trusted_root::resolve_trusted_root(&spec_path) {
                     Ok(trusted_root) => infrastructure::verify::spec_states::verify(
-                        &args.spec_path,
+                        &spec_path,
                         args.strict,
                         &trusted_root,
                     ),
                     Err(e) => VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                         "cannot resolve trusted_root for {}: {e}",
-                        args.spec_path.display()
+                        spec_path.display()
                     ))]),
                 };
             ("verify spec states", outcome)
@@ -319,6 +334,46 @@ fn resolve_active_track_dir() -> Option<std::path::PathBuf> {
     if track_dir.is_dir() { Some(track_dir) } else { None }
 }
 
+/// Resolve the spec.md path for the active track from the current git branch.
+///
+/// Uses the shared `ActiveTrackResolveInteractor` (IN-09) to obtain the active
+/// track id, then constructs `track/items/<id>/spec.md` relative to the repo
+/// root.  Fail-closed: returns `Err` with a user-facing message when not on a
+/// track branch or when the resolved spec.md does not exist on disk (CN-01,
+/// IN-08, AC-10).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when:
+/// - Not inside a git repository.
+/// - Not on a `track/<id>` branch (including detached HEAD / main).
+/// - The resolved `track/items/<id>/spec.md` does not exist on disk.
+fn resolve_active_spec_path() -> Result<std::path::PathBuf, String> {
+    use std::sync::Arc;
+
+    use infrastructure::git_cli::GitRepository as _;
+    use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
+    let repo = infrastructure::git_cli::SystemGitRepo::discover()
+        .map_err(|e| format!("cannot discover git repository: {e}"))?;
+    let repo_root = repo.root().to_path_buf();
+    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
+    let track_id = interactor.resolve_active_track().map_err(|e| {
+        format!(
+            "{e}\nHint: provide an explicit spec-path argument, or switch to a \
+             track/<id> branch so the active track can be resolved automatically."
+        )
+    })?;
+    let spec_path = repo_root.join("track/items").join(&track_id).join("spec.md");
+    if spec_path.exists() {
+        Ok(spec_path)
+    } else {
+        Err(format!(
+            "resolved spec path does not exist: {} (track: {track_id})",
+            spec_path.display()
+        ))
+    }
+}
+
 /// Check catalogue-spec signal gate results for each tddd-enabled layer.
 ///
 /// Thin delegation to the infrastructure layer which handles all domain type
@@ -406,7 +461,7 @@ mod tests {
         match cli.cmd {
             VerifyCommand::SpecStates(args) => {
                 assert!(args.strict, "--strict must be parsed as true");
-                assert_eq!(args.spec_path.to_str().unwrap(), "spec.md");
+                assert_eq!(args.spec_path.as_deref().and_then(|p| p.to_str()), Some("spec.md"));
             }
             _ => panic!("expected SpecStates variant"),
         }
@@ -421,6 +476,47 @@ mod tests {
             }
             _ => panic!("expected SpecStates variant"),
         }
+    }
+
+    #[test]
+    fn test_spec_states_spec_path_is_optional_in_clap() {
+        // When spec_path is omitted, clap must accept the invocation and parse strict=false.
+        let cli = TestCli::try_parse_from(["sotp", "spec-states"]).unwrap();
+        match cli.cmd {
+            VerifyCommand::SpecStates(args) => {
+                assert!(args.spec_path.is_none(), "spec_path must be None when omitted");
+                assert!(!args.strict, "strict must default to false");
+            }
+            _ => panic!("expected SpecStates variant"),
+        }
+    }
+
+    #[test]
+    fn test_spec_states_omitted_spec_path_with_strict_flag() {
+        // --strict alone (no spec path) must also be accepted by clap.
+        let cli = TestCli::try_parse_from(["sotp", "spec-states", "--strict"]).unwrap();
+        match cli.cmd {
+            VerifyCommand::SpecStates(args) => {
+                assert!(args.spec_path.is_none(), "spec_path must be None when omitted");
+                assert!(args.strict, "--strict must be parsed as true");
+            }
+            _ => panic!("expected SpecStates variant"),
+        }
+    }
+
+    #[test]
+    fn test_spec_states_omitted_spec_path_returns_non_panic_outcome() {
+        // With spec_path omitted, resolve_active_spec_path runs.
+        // On a track/* branch with an existing spec.md → runs verify (may pass or fail).
+        // On a non-track branch → returns ExitCode::FAILURE (fail-closed, CN-01).
+        // On git failure → returns ExitCode::FAILURE.
+        // The important invariant is no panic and a deterministic exit code.
+        let exit =
+            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: None, strict: false }));
+        assert!(
+            exit == ExitCode::SUCCESS || exit == ExitCode::FAILURE,
+            "omitted spec_path must produce a deterministic exit code without panicking"
+        );
     }
 
     #[test]
@@ -694,8 +790,10 @@ mod tests {
              | Draft | Initial state |\n",
         )
         .unwrap();
-        let exit =
-            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
+        let exit = execute(VerifyCommand::SpecStates(SpecStatesArgs {
+            spec_path: Some(spec),
+            strict: false,
+        }));
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 
@@ -706,8 +804,10 @@ mod tests {
         // Spec with frontmatter but no ## Domain States section.
         std::fs::write(&spec, "---\nversion: \"1.0\"\n---\n# Overview\n\nNo states here.\n")
             .unwrap();
-        let exit =
-            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
+        let exit = execute(VerifyCommand::SpecStates(SpecStatesArgs {
+            spec_path: Some(spec),
+            strict: false,
+        }));
         assert_eq!(exit, ExitCode::FAILURE);
     }
 
@@ -775,8 +875,10 @@ mod tests {
         )
         .unwrap();
         write_matching_signal_file(tmp.path(), "domain-types.json", "domain-type-signals.json");
-        let exit =
-            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: false }));
+        let exit = execute(VerifyCommand::SpecStates(SpecStatesArgs {
+            spec_path: Some(spec),
+            strict: false,
+        }));
         assert_eq!(exit, ExitCode::SUCCESS, "yellow signal must pass in default (non-strict) mode");
     }
 
@@ -800,8 +902,10 @@ mod tests {
         )
         .unwrap();
         write_matching_signal_file(tmp.path(), "domain-types.json", "domain-type-signals.json");
-        let exit =
-            execute(VerifyCommand::SpecStates(SpecStatesArgs { spec_path: spec, strict: true }));
+        let exit = execute(VerifyCommand::SpecStates(SpecStatesArgs {
+            spec_path: Some(spec),
+            strict: true,
+        }));
         assert_eq!(exit, ExitCode::FAILURE, "yellow signal must fail in strict (merge-gate) mode");
     }
 
@@ -915,7 +1019,8 @@ mod tests {
         // Exercises the full git-based branch-resolution path with default args.
         // - On a `track/*` branch with a valid track structure → runs signal check (may pass
         //   or fail depending on the real repo state, but must not panic).
-        // - On a non-`track/*` branch → returns an Info finding and ExitCode::SUCCESS (SKIP).
+        // - On a non-`track/*` branch → fail-closed: returns an error finding and ExitCode::FAILURE
+        //   (CN-01, IN-08: no SKIP behaviour on non-track branches).
         // - On git failure → returns an error finding and ExitCode::FAILURE.
         // The important invariant is no panic and a deterministic exit code.
         let exit = execute(VerifyCommand::CatalogueSpecSignals(CatalogueSpecSignalsArgs {

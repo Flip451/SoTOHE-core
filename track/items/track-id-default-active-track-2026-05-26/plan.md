@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
 
-## Tasks (4/9 resolved)
+## Tasks (5/9 resolved)
 
 ### S1 — usecase: port + interactor for active-track resolution
 
@@ -40,7 +40,7 @@
 > Change --track-id and --track flags to Option<String> for all remaining affected commands: Lint, review CodexLocal / ClaudeLocal / Local / CheckApproved / Results / Classify / Files, and verify CatalogueSpecRefs (IN-02, IN-03, CN-01, CN-02).
 > Consolidate the bespoke auto-detect implementations in views.rs and verify PlanArtifactRefs onto the shared interactor path (IN-09, AC-04), while preserving track views sync's registry-only fallback when no active track is present.
 
-- [ ] **T005**: CLI batch 2: make track-id optional for the remaining flag-based commands. Affected: (a) flag --track-id commands in apps/cli/src/commands/track/mod.rs and apps/cli/src/commands/review/: Lint (track_id field in the clap struct), review CodexLocal / ClaudeLocal / Local / CheckApproved / Results / Classify / Files (track_id / --track-id fields). Change to Option<String> and add ActiveTrackResolveInteractor wiring at each composition root. (b) flag --track command in apps/cli/src/commands/verify.rs: CatalogueSpecRefsArgs.track field. Change to Option<String>; resolve None via ActiveTrackResolveInteractor. (c) Remove the individual auto-detect implementations in views.rs (ViewAction::Sync --track-id is already Option<String> with bespoke impl) and in verify.rs PlanArtifactRefsArgs (already Option<PathBuf> with bespoke impl), replacing them with the shared interactor path (IN-09). Fail-closed on non-track branch for track-targeted commands and verify plan-artifact-refs (CN-01, AC-01, AC-04); preserve track views sync's registry-only mode when no explicit --track-id is provided and no active track is resolvable, because that path has no track target to fail closed against. Keep under 500 lines per commit; this task may be split across two commits if the diff exceeds that threshold.
+- [x] **T005**: CLI batch 2: make track-id optional for the remaining flag-based commands. Affected: (a) flag --track-id commands in apps/cli/src/commands/track/mod.rs and apps/cli/src/commands/review/: Lint (track_id field in the clap struct), review CodexLocal / ClaudeLocal / Local / CheckApproved / Results / Classify / Files (track_id / --track-id fields). Change to Option<String> and add ActiveTrackResolveInteractor wiring at each composition root. (b) flag --track command in apps/cli/src/commands/verify.rs: CatalogueSpecRefsArgs.track field. Change to Option<String>; resolve None via ActiveTrackResolveInteractor. (c) Remove the individual auto-detect implementations in views.rs (ViewAction::Sync --track-id is already Option<String> with bespoke impl) and in verify.rs PlanArtifactRefsArgs (already Option<PathBuf> with bespoke impl), replacing them with the shared interactor path (IN-09). Fail-closed on non-track branch for track-targeted commands and verify plan-artifact-refs (CN-01, AC-01, AC-04); preserve track views sync's registry-only mode when no explicit --track-id is provided and no active track is resolvable, because that path has no track target to fail closed against. Keep under 500 lines per commit; this task may be split across two commits if the diff exceeds that threshold. (`de4bd9586bf444767cf4aa08d1a368c05c1cae13`)
 
 ### S6 — Makefile: strip shell boilerplate from *-local verify tasks
 
