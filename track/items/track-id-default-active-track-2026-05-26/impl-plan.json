@@ -40,7 +40,8 @@
     {
       "id": "T007",
       "description": "Final integration and CI gate. Run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix any compilation, lint, or test failures introduced by T001-T006, T008, and T009. Verify acceptance criteria: (a) sotp track signals with no track-id on track/<id> branch uses the branch id (AC-01); (b) on main branch without explicit id, the command exits with a clear NotTrackBranch error (AC-02); (c) explicit track-id overrides branch resolution (AC-03); (d) cargo run -p cli -- verify catalogue-spec-refs works without --track on track/<id> branch (AC-04); (e) git rev-parse shelling-out removed from the usecase / CLI path (AC-05, AC-06); (f) track branch create / switch still require explicit track-id — clap reports missing arg (AC-07); (g) unit tests for ActiveTrackResolveInteractor pass (AC-08); (h) cargo make ci passes (AC-09); (i) Makefile plan/* dead case arms are gone (AC-10); (j) track-local-review wrapper holds no BRANCH=$(git ...) shell parsing (AC-11); (k) track-local-review and track-commit-message run the same regen sequence via the shared track-active-gate task, and check-approved hash-mismatch is structurally eliminated (AC-12); (l) failing chain step stops the chain (AC-13); (m) explicit --track-id examples removed from docs/workflow where command self-resolves; explicit form retained as noted option where meaningful (AC-14). No source code changes beyond fixes — this task is gate-only except for trivial fixups (AC-09).",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "fdf55559f1ba6f2a9096fce73784b70c52e8d6ee"
     },
     {
       "id": "T008",
@@ -51,7 +52,8 @@
     {
       "id": "T009",
       "description": "Operational-docs cleanup: remove explicit --track-id from documentation where commands now self-resolve. Edit the following files to drop examples, step descriptions, and command invocations that pass an explicit --track-id (or equivalent positional track_id) to commands that now self-resolve from the current branch: .claude/commands/track/*.md (all affected command docs), track/workflow.md, DEVELOPER_AI_WORKFLOW.md, and Makefile.toml task description comments. Where a documented invocation has meaning only because it targets a different track (e.g., explicitly operating on a non-current track), retain the explicit form as a noted option rather than removing it. The goal is to align the docs with the D1 contract: the standard/happy-path examples show commands without --track-id, and only the cross-track or disambiguation use-cases retain the explicit form. This task depends on T004 and T005 (the underlying commands must already self-resolve before the docs can truthfully omit the flag). Satisfies IN-13, AC-14.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "fdf55559f1ba6f2a9096fce73784b70c52e8d6ee"
     },
     {
       "id": "T010",
