@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-27T11:50:50Z",
-  "declaration_hash": "600a95e2c581fe018f474176660e1ef2cbcdeb7226c70d061d38ba9b8a00f0e6",
+  "generated_at": "2026-05-27T13:14:52Z",
+  "declaration_hash": "c451724a5853bf233eee2c4c2f99f7d80f2be5ee0da997bbd5058633e1a891d7",
   "signals": [
     {
       "type_name": "ActiveTrackResolveError",
@@ -49,6 +49,18 @@
       "found_type": true
     },
     {
+      "type_name": "ExplicitTrackBranch",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "TaskOperationInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
@@ -56,6 +68,24 @@
       "found_items": [
         "TaskOperationService"
       ]
+    },
+    {
+      "type_name": "TrackBranchClaim",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "usecase::git_workflow::validate_planning_only_commit_paths",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "TaskOperationService",

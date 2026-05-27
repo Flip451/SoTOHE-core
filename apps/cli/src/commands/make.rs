@@ -524,7 +524,7 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
         CliError::Message(
             "[track-commit-message] BLOCKED: not on a track/<id> branch; \
              check-approved guard requires a track branch. \
-             Switch to your track branch or pass the track-id explicitly."
+             Switch to your track branch."
                 .to_owned(),
         )
     })?;

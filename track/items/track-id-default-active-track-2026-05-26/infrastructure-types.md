@@ -1,5 +1,11 @@
 <!-- Generated from infrastructure-types.json — DO NOT EDIT DIRECTLY -->
 
+## DTOs
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| TrackBranchRecord | dto | modify | — | 🔵 | 🔵 |
+
 ## Secondary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |

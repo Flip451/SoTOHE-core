@@ -40,8 +40,7 @@
     {
       "id": "T007",
       "description": "Final integration and CI gate. Run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix any compilation, lint, or test failures introduced by T001-T006, T008, and T009. Verify acceptance criteria: (a) sotp track signals with no track-id on track/<id> branch uses the branch id (AC-01); (b) on main branch without explicit id, the command exits with a clear NotTrackBranch error (AC-02); (c) explicit track-id overrides branch resolution (AC-03); (d) cargo run -p cli -- verify catalogue-spec-refs works without --track on track/<id> branch (AC-04); (e) git rev-parse shelling-out removed from the usecase / CLI path (AC-05, AC-06); (f) track branch create / switch still require explicit track-id — clap reports missing arg (AC-07); (g) unit tests for ActiveTrackResolveInteractor pass (AC-08); (h) cargo make ci passes (AC-09); (i) Makefile plan/* dead case arms are gone (AC-10); (j) track-local-review wrapper holds no BRANCH=$(git ...) shell parsing (AC-11); (k) track-local-review and track-commit-message run the same regen sequence via the shared track-active-gate task, and check-approved hash-mismatch is structurally eliminated (AC-12); (l) failing chain step stops the chain (AC-13); (m) explicit --track-id examples removed from docs/workflow where command self-resolves; explicit form retained as noted option where meaningful (AC-14). No source code changes beyond fixes — this task is gate-only except for trivial fixups (AC-09).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T008",
@@ -52,20 +51,18 @@
     {
       "id": "T009",
       "description": "Operational-docs cleanup: remove explicit --track-id from documentation where commands now self-resolve. Edit the following files to drop examples, step descriptions, and command invocations that pass an explicit --track-id (or equivalent positional track_id) to commands that now self-resolve from the current branch: .claude/commands/track/*.md (all affected command docs), track/workflow.md, DEVELOPER_AI_WORKFLOW.md, and Makefile.toml task description comments. Where a documented invocation has meaning only because it targets a different track (e.g., explicitly operating on a non-current track), retain the explicit form as a noted option rather than removing it. The goal is to align the docs with the D1 contract: the standard/happy-path examples show commands without --track-id, and only the cross-track or disambiguation use-cases retain the explicit form. This task depends on T004 and T005 (the underlying commands must already self-resolve before the docs can truthfully omit the flag). Satisfies IN-13, AC-14.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T010",
       "description": "infrastructure + CLI: port-route the two remaining raw git shellouts in render.rs and make.rs through SystemGitRepo (IN-06 completion + AC-15). GAP-1: libs/infrastructure/src/track/render.rs — the sync_rendered_views branch guard that calls std::process::Command::new(\"git\").args([\"rev-parse\",\"--abbrev-ref\",\"HEAD\"]) must be replaced with SystemGitRepo::discover_from(root)?.current_branch() via the GitRepository port established in T002. GAP-2: apps/cli/src/commands/make.rs — the current_branch_track_id_strict helper (called at ~line 522 and ~line 553) that issues the same raw shellout must be replaced with SystemGitRepo::discover()?.current_branch(); the stale doc comment referencing the removed plan/<id> branch format must also be updated. Both sites already delegate branch-name parsing to usecase::track_resolution::resolve_track_id_from_branch; only the git READ must move to the port. After this task there must be zero occurrences of std::process::Command::new(\"git\") with rev-parse --abbrev-ref HEAD outside libs/infrastructure/src/git_cli/mod.rs in the workspace. T010 must be sequenced before T011 or verified to touch non-overlapping regions of make.rs. Covers IN-06 (completion) + AC-15.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "0f17f3cc05ab063ee0fa33af395290faee01b003"
     },
     {
       "id": "T011",
       "description": "usecase + CLI + infrastructure + docs: root-and-branch removal of planning-only commit machinery (IN-14). The implementer must verify each item against real code before deleting (cross-reference tmp/planning-only-removal-footprint.md). (1) libs/usecase/src/git_workflow.rs: delete validate_planning_only_commit_paths; delete the v3 branchless planning-only if-block inside verify_explicit_track_branch; delete ExplicitTrackBranch.schema_version field; remove the tmp/track-commit/track-dir.txt entry from TRANSIENT_AUTOMATION_FILES; delete related tests. (2) apps/cli/src/commands/git.rs: delete load_optional_track_dir; remove the track-dir.txt auto-detection block and the validate_planning_only_commit_paths call+import from require_explicit_track_selector_on_non_track_branch — the fail-closed reject behavior for non-track-branch commits must be retained; rewrite any regression test that relied on track-dir.txt auto-detection to pass --track-dir directly instead. Also update the commit-gate error message in apps/cli/src/commands/make.rs that references the removed selector (the message may touch the same file as T010 but at a different location; the implementer must confirm non-overlapping diff regions or sequence after T010). (3) libs/infrastructure/src/git_cli/mod.rs: delete illegal_v3_branchless_track, invalid_v3_non_null_branch, REQUIRED_V3_METADATA_FIELDS; delete the v3 guard blocks inside read_metadata; delete the schema_version fields on BranchMetadata and TrackBranchRecord and the default_schema_version helper; update test fixtures that use v3 format to use v5 format. All construction sites for BranchMetadata / TrackBranchRecord must be updated in the same commit because field removal is a compile-breaking change. (4) docs: remove planning-only lane wording from .claude/commands/track/commit.md; remove /track:plan-only and /track:activate references from track/workflow.md that were not removed by T007 (if any). Run cargo make ci as the final gate. Covers IN-14.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {

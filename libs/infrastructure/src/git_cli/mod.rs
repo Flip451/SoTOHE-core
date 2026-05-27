@@ -262,32 +262,13 @@ pub struct TrackBranchRecord {
     pub track_name: String,
     pub branch: Option<String>,
     pub status: Option<String>,
-    pub schema_version: u32,
 }
 
 #[derive(Debug, Deserialize)]
 struct BranchMetadata {
-    #[serde(default = "default_schema_version")]
-    schema_version: u32,
     branch: Option<String>,
     status: Option<String>,
 }
-
-const fn default_schema_version() -> u32 {
-    2
-}
-
-const REQUIRED_V3_METADATA_FIELDS: &[&str] = &[
-    "schema_version",
-    "branch",
-    "id",
-    "title",
-    "status",
-    "created_at",
-    "updated_at",
-    "tasks",
-    "plan",
-];
 
 pub fn load_explicit_track_branch(
     root: &Path,
@@ -333,7 +314,6 @@ pub fn load_explicit_track_branch_from_items_dir(
             .to_owned(),
         branch: metadata.branch,
         status: metadata.status,
-        schema_version: metadata.schema_version,
     })
 }
 
@@ -365,7 +345,6 @@ pub fn collect_track_branch_claims(root: &Path) -> Result<Vec<TrackBranchRecord>
                     .to_owned(),
                 branch: metadata.branch,
                 status: metadata.status,
-                schema_version: metadata.schema_version,
             });
         }
     }
@@ -390,87 +369,8 @@ fn read_metadata(path: &Path) -> Result<BranchMetadata, String> {
     let content = fs::read_to_string(path).map_err(|err| {
         format!("Cannot read or parse metadata.json in {}: {err}", path.display())
     })?;
-    let raw: serde_json::Value = serde_json::from_str(&content).map_err(|err| {
-        format!("Cannot read or parse metadata.json in {}: {err}", path.display())
-    })?;
-    if raw.get("schema_version").and_then(serde_json::Value::as_u64) == Some(3) {
-        let Some(object) = raw.as_object() else {
-            return Err(format!(
-                "Cannot read or parse metadata.json in {}: metadata.json must be a JSON object",
-                path.display()
-            ));
-        };
-        if let Some(missing) =
-            REQUIRED_V3_METADATA_FIELDS.iter().find(|field| !object.contains_key(**field))
-        {
-            return Err(format!(
-                "Cannot read or parse metadata.json in {}: Missing required field '{}'",
-                path.display(),
-                missing
-            ));
-        }
-    }
-    let metadata: BranchMetadata = serde_json::from_value(raw.clone()).map_err(|err| {
-        format!("Cannot read or parse metadata.json in {}: {err}", path.display())
-    })?;
-    if invalid_v3_non_null_branch(&raw) {
-        return Err(format!(
-            "Cannot read or parse metadata.json in {}: Invalid v3 branch value; expected 'track/<id>' or null",
-            path.display()
-        ));
-    }
-    if illegal_v3_branchless_track(&raw, &metadata) {
-        return Err(format!(
-            "Cannot read or parse metadata.json in {}: Illegal branchless v3 metadata; materialize a track branch before committing implementation tasks",
-            path.display()
-        ));
-    }
-    Ok(metadata)
-}
-
-fn illegal_v3_branchless_track(raw: &serde_json::Value, metadata: &BranchMetadata) -> bool {
-    if metadata.schema_version != 3 || metadata.branch.is_some() {
-        return false;
-    }
-
-    if raw.get("status_override").is_some_and(|value| !value.is_null()) {
-        return true;
-    }
-
-    match metadata.status.as_deref() {
-        Some("planned") => match raw.get("tasks") {
-            None => false,
-            Some(serde_json::Value::Array(tasks)) => !tasks.iter().all(|task| {
-                task.as_object()
-                    .and_then(|object| object.get("status"))
-                    .and_then(serde_json::Value::as_str)
-                    == Some("todo")
-            }),
-            Some(_) => true,
-        },
-        _ => true,
-    }
-}
-
-fn invalid_v3_non_null_branch(raw: &serde_json::Value) -> bool {
-    if raw.get("schema_version").and_then(serde_json::Value::as_u64) != Some(3) {
-        return false;
-    }
-
-    let Some(branch) = raw.get("branch") else {
-        return false;
-    };
-    if branch.is_null() {
-        return false;
-    }
-
-    match branch.as_str() {
-        Some(value) => {
-            let trimmed = value.trim();
-            trimmed.is_empty() || !trimmed.starts_with("track/")
-        }
-        None => true,
-    }
+    serde_json::from_str(&content)
+        .map_err(|err| format!("Cannot read or parse metadata.json in {}: {err}", path.display()))
 }
 
 #[cfg(test)]
@@ -480,8 +380,6 @@ mod tests {
     use std::path::PathBuf;
     use std::process::Command;
     use std::sync::{Mutex, OnceLock};
-
-    use rstest::rstest;
 
     use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
@@ -580,11 +478,8 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/example");
         fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":null,"title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        )
-        .unwrap();
+        fs::write(track_dir.join("metadata.json"), r#"{"branch":null,"status":"planned"}"#)
+            .unwrap();
 
         let record = load_explicit_track_branch(dir.path(), &track_dir).unwrap();
 
@@ -599,7 +494,7 @@ mod tests {
         fs::create_dir_all(&track_dir).unwrap();
         fs::write(
             track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":"track/example","title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
+            r#"{"branch":"track/example","status":"in_progress"}"#,
         )
         .unwrap();
 
@@ -607,94 +502,6 @@ mod tests {
             load_explicit_track_branch_from_items_dir(dir.path(), &items_dir, &track_dir).unwrap();
 
         assert_eq!(record.display_path, "custom/track/items/example");
-    }
-
-    #[rstest]
-    #[case::missing_branch(
-        r#"{"schema_version":3,"status":"planned"}"#,
-        "Missing required field 'branch'"
-    )]
-    #[case::missing_title(
-        r#"{"schema_version":3,"id":"example","status":"planned","branch":null,"created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        "Missing required field 'title'"
-    )]
-    fn load_explicit_track_branch_rejects_v3_track_missing_required_field(
-        #[case] metadata_json: &str,
-        #[case] expected_error: &str,
-    ) {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(track_dir.join("metadata.json"), metadata_json).unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains(expected_error));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_rejects_illegal_branchless_v3_track() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":null,"title":"Example","status":"in_progress","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        )
-        .unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains("Illegal branchless v3 metadata"));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_rejects_branchless_v3_track_with_status_override() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":null,"title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]},"status_override":{"status":"blocked","reason":"waiting"}}"#,
-        )
-        .unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains("Illegal branchless v3 metadata"));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_allows_branchless_v3_track_with_null_status_override() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":null,"title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]},"status_override":null}"#,
-        )
-        .unwrap();
-
-        let metadata = load_explicit_track_branch(dir.path(), &track_dir).unwrap();
-
-        assert_eq!(metadata.branch, None);
-        assert_eq!(metadata.status.as_deref(), Some("planned"));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_rejects_invalid_non_track_v3_branch() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":"feature/foo","title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        )
-        .unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains("Invalid v3 branch value"));
     }
 
     #[test]

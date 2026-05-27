@@ -3,6 +3,60 @@
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {
+    "ExplicitTrackBranch": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "display_path",    "ty": "String" },
+            { "name": "expected_branch", "ty": "Option<String>" },
+            { "name": "status",          "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Data carrier for a branch specification read from metadata.json. Used by verify_explicit_track_branch. schema_version field removed (T011: planning-only removal). Declared as Dto because it crosses the infrastructure→usecase boundary as a plain data record without serde derives (usecase △ with this justification).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-14",
+          "hash": "a4e2c43d1be3d32eb8d2f20a16812448e8b60c38478303d3e857cd79bdeb301d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TrackBranchClaim": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_name", "ty": "String" },
+            { "name": "branch",     "ty": "Option<String>" },
+            { "name": "status",     "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Data carrier representing one track's branch claim from metadata.json. Used by verify_auto_detected_branch. schema_version field removed (T011: planning-only removal). Declared as Dto for same reason as ExplicitTrackBranch.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-14",
+          "hash": "a4e2c43d1be3d32eb8d2f20a16812448e8b60c38478303d3e857cd79bdeb301d"
+        }
+      ],
+      "informal_grounds": []
+    },
     "ActiveTrackResolveError": {
       "action": "add",
       "role": "ErrorType",
@@ -276,6 +330,24 @@
     }
   },
   "functions": {
+    "usecase::git_workflow::validate_planning_only_commit_paths": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted in T011 (planning-only removal). Baseline had this function; T011 removed it entirely.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-14",
+          "hash": "a4e2c43d1be3d32eb8d2f20a16812448e8b60c38478303d3e857cd79bdeb301d"
+        }
+      ],
+      "informal_grounds": []
+    },
     "usecase::track_resolution::resolve_track_id_from_branch": {
       "action": "reference",
       "role": "FreeFunction",
@@ -343,6 +415,46 @@
     }
   ],
   "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ExplicitTrackBranch"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ExplicitTrackBranch"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ExplicitTrackBranch"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ExplicitTrackBranch"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TrackBranchClaim"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TrackBranchClaim"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TrackBranchClaim"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TrackBranchClaim"
+    },
     {
       "action": "add",
       "trait_ref": "ActiveTrackResolveService",

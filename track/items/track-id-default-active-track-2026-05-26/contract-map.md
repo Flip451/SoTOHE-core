@@ -28,6 +28,17 @@ subgraph domain["domain"]
 end
 subgraph usecase["usecase"]
   direction TB
+  subgraph usecase_usecase_module_git_workflow["usecase::git_workflow"]
+    direction TB
+  subgraph T35_usecase_usecase_ExplicitTrackBranch["git_workflow::ExplicitTrackBranch"]
+    direction TB
+    T35_usecase_usecase_ExplicitTrackBranch__self[ExplicitTrackBranch]
+  end
+  subgraph T32_usecase_usecase_TrackBranchClaim["git_workflow::TrackBranchClaim"]
+    direction TB
+    T32_usecase_usecase_TrackBranchClaim__self[TrackBranchClaim]
+  end
+  end
   subgraph usecase_usecase_module_task_ops["usecase::task_ops"]
     direction TB
   subgraph T39_usecase_usecase_TaskOperationInteractor["task_ops::TaskOperationInteractor"]
@@ -94,6 +105,10 @@ subgraph infrastructure["infrastructure"]
     direction TB
     T43_infrastructure_infrastructure_SystemGitRepo__self[SystemGitRepo]
   end
+  subgraph T47_infrastructure_infrastructure_TrackBranchRecord["git_cli::TrackBranchRecord"]
+    direction TB
+    T47_infrastructure_infrastructure_TrackBranchRecord__self[TrackBranchRecord]
+  end
   end
 end
 T39_usecase_usecase_TaskOperationInteractor_new --> T39_usecase_usecase_TaskOperationInteractor__self
@@ -106,6 +121,8 @@ F71_usecase_usecase_usecase__track_resolution__resolve_track_id_from_branch --> 
 T44_usecase_usecase_ActiveTrackResolveInteractor__self -.impl.-> R41_usecase_usecase_ActiveTrackResolveService__self
 T39_usecase_usecase_TaskOperationInteractor__self -.impl.-> R36_usecase_usecase_TaskOperationService__self
 T43_infrastructure_infrastructure_SystemGitRepo__self -.impl.-> R32_usecase_usecase_BranchReaderPort__self
+class T35_usecase_usecase_ExplicitTrackBranch__self dto
+class T32_usecase_usecase_TrackBranchClaim__self dto
 class T39_usecase_usecase_TaskOperationInteractor_new method_node
 class T39_usecase_usecase_TaskOperationInteractor__self interactor
 class R36_usecase_usecase_TaskOperationService_transition_task method_node
@@ -135,4 +152,5 @@ class R32_usecase_usecase_BranchReaderPort__self secondary_port
 class F71_usecase_usecase_usecase__track_resolution__resolve_track_id_from_branch free_function
 class F71_usecase_usecase_usecase__track_resolution__resolve_track_id_from_branch function_node
 class T43_infrastructure_infrastructure_SystemGitRepo__self secondary_adapter
+class T47_infrastructure_infrastructure_TrackBranchRecord__self dto
 ```

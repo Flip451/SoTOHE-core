@@ -28,9 +28,17 @@
 | ActiveTrackResolveInteractor | interactor | — | — | 🟡 | 🔵 |
 | TaskOperationInteractor | interactor | modify | — | 🟡 | 🔵 |
 
+## DTOs
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| ExplicitTrackBranch | dto | modify | — | 🔵 | 🔵 |
+| TrackBranchClaim | dto | modify | — | 🔵 | 🔵 |
+
 ## Free Functions
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| usecase::git_workflow::validate_planning_only_commit_paths | free_function | delete | fn() -> Result<(), String> | 🔵 | 🔵 |
 | usecase::track_resolution::resolve_track_id_from_branch | free_function | reference | fn(branch: Option<&str>) -> Result<String, TrackResolutionError> | 🔵 | 🔵 |
 

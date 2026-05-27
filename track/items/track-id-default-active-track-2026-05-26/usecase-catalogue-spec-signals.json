@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "600a95e2c581fe018f474176660e1ef2cbcdeb7226c70d061d38ba9b8a00f0e6",
+  "catalogue_declaration_hash": "c451724a5853bf233eee2c4c2f99f7d80f2be5ee0da997bbd5058633e1a891d7",
   "signals": [
     {
       "type_name": "ActiveTrackResolveError",
@@ -15,7 +15,15 @@
       "signal": "blue"
     },
     {
+      "type_name": "ExplicitTrackBranch",
+      "signal": "blue"
+    },
+    {
       "type_name": "TaskOperationInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackBranchClaim",
       "signal": "blue"
     },
     {
@@ -32,6 +40,10 @@
     },
     {
       "type_name": "TaskOperationService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::git_workflow::validate_planning_only_commit_paths",
       "signal": "blue"
     },
     {
