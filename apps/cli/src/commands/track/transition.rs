@@ -2,6 +2,38 @@ use crate::CliError;
 
 use super::*;
 use usecase::task_ops::TaskOperationService as _;
+use usecase::track_resolution::{BranchReadError, BranchReaderPort};
+
+#[derive(Debug)]
+struct LazyBranchReader {
+    project_root: PathBuf,
+}
+
+impl LazyBranchReader {
+    fn new(project_root: PathBuf) -> Self {
+        Self { project_root }
+    }
+}
+
+impl BranchReaderPort for LazyBranchReader {
+    fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
+        let repo = SystemGitRepo::discover_from(&self.project_root).map_err(|e| {
+            BranchReadError::ReadFailed(format!("failed to discover git repo: {e}"))
+        })?;
+        BranchReaderPort::current_branch(&repo)
+    }
+}
+
+fn build_branch_reader(
+    project_root: &std::path::Path,
+    skip_branch_check: bool,
+) -> Option<Arc<dyn BranchReaderPort>> {
+    if skip_branch_check {
+        None
+    } else {
+        Some(Arc::new(LazyBranchReader::new(project_root.to_path_buf())))
+    }
+}
 
 pub(super) fn execute_transition(
     items_dir: PathBuf,
@@ -14,27 +46,15 @@ pub(super) fn execute_transition(
     // Validate track_id as a safe slug before any filesystem probe.
     validate_track_id_str(&track_id).map_err(CliError::Message)?;
 
-    // Preserve items_dir for branch guard and project root resolution.
+    // Preserve items_dir for project root resolution.
     let repo_dir = items_dir.clone();
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
-    // Build store and branch reader for TaskOperationInteractor.
+    // Build store and BranchReaderPort for TaskOperationInteractor.
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let repo_dir_for_reader = repo_dir.clone();
+    let branch_reader = build_branch_reader(&project_root, skip_branch_check);
     let service =
-        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), move |_items_dir| {
-            // Read the current branch from git for the branch guard.
-            let output = std::process::Command::new("git")
-                .args(["rev-parse", "--abbrev-ref", "HEAD"])
-                .current_dir(&repo_dir_for_reader)
-                .output()
-                .map_err(|e| format!("failed to run git: {e}"))?;
-            if !output.status.success() {
-                let stderr = String::from_utf8_lossy(&output.stderr);
-                return Err(format!("git rev-parse failed: {stderr}"));
-            }
-            Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
-        });
+        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
 
     let cmd = usecase::task_ops::TaskTransitionCommand {
         items_dir,

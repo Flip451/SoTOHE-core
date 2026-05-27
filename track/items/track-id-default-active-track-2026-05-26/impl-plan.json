@@ -10,7 +10,8 @@
     {
       "id": "T002",
       "description": "infrastructure: add BranchReaderPort impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs. SystemGitRepo::current_branch() already exists on GitRepository; wire it as the BranchReaderPort impl by delegating to that method and mapping the error type to BranchReadError::ReadFailed (IN-04, IN-06, CN-05). Ensure the trait impl is exported from the infrastructure crate public API. Keep changes within libs/infrastructure/src/git_cli/ (one impl block). This task is a prerequisite for T003 (CLI wiring) and T004 (write-guard integration).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "e66ec101dd214706e7a7fd477fecc52607e8cf44"
     },
     {
       "id": "T003",

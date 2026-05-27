@@ -1,6 +1,38 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:35:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:38:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
+          "at": "2026-05-27T06:43:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
+          "at": "2026-05-27T06:51:16Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -83,24 +115,6 @@
           "findings": [],
           "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
           "at": "2026-05-27T05:36:06Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
-          "at": "2026-05-27T04:35:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
-          "at": "2026-05-27T04:38:08Z"
         }
       ]
     },
@@ -375,6 +389,60 @@
           "findings": [],
           "hash": "rvw1:sha256:1dc0c50315ef9d1027eabeb3d8739f8bfeb22263591991667220b5eafad12b38",
           "at": "2026-05-27T06:27:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b21bfdf1826558c02fd5e98bf51182e160454b8e58407e5531baad85bbe8882a",
+          "at": "2026-05-27T06:53:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b21bfdf1826558c02fd5e98bf51182e160454b8e58407e5531baad85bbe8882a",
+          "at": "2026-05-27T06:55:11Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SystemGitRepo::discover_from(&project_root)` is run before `TaskOperationInteractor::new` here, so every `skip_branch_check = false` add/set/clear mutation now requires a git repository even when the interactor would have skipped the branch guard for a branchless track. That regresses valid branchless operations and also changes validation precedence (for example, a bad `task_id` can now surface as a git-discovery error if the repo is missing). The same eager-discovery pattern repeats at lines 84 and 125.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "line": 23,
+              "category": "correctness"
+            },
+            {
+              "message": "The same eager `SystemGitRepo::discover_from(&project_root)` happens before `TaskOperationInteractor` is invoked here, so transition now depends on git discovery even in cases where the use case would have rejected bad input first or skipped the branch guard for a branchless track. That breaks valid non-git/branchless transition flows and changes error precedence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/transition.rs",
+              "line": 26,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c93fdc4e96124ba2f6d729f028c4c97da29a347b28807edd378cbabf32f9100d",
+          "at": "2026-05-27T06:42:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1c4462cc394fc4ec18bc6372e86c1e68b2795718741b5cff6bf0edbf9b6e49",
+          "at": "2026-05-27T06:46:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1c4462cc394fc4ec18bc6372e86c1e68b2795718741b5cff6bf0edbf9b6e49",
+          "at": "2026-05-27T06:51:47Z"
         }
       ]
     }

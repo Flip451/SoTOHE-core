@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
 
-## Tasks (1/9 resolved)
+## Tasks (2/9 resolved)
 
 ### S1 — usecase: port + interactor for active-track resolution
 
@@ -16,7 +16,7 @@
 > Add the BranchReaderPort trait impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs by delegating to the existing GitRepository::current_branch() method and mapping the error to BranchReadError::ReadFailed.
 > This completes the port inversion: the usecase layer declares the port; the infrastructure layer provides the adapter (IN-04, IN-06, CN-05).
 
-- [~] **T002**: infrastructure: add BranchReaderPort impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs. SystemGitRepo::current_branch() already exists on GitRepository; wire it as the BranchReaderPort impl by delegating to that method and mapping the error type to BranchReadError::ReadFailed (IN-04, IN-06, CN-05). Ensure the trait impl is exported from the infrastructure crate public API. Keep changes within libs/infrastructure/src/git_cli/ (one impl block). This task is a prerequisite for T003 (CLI wiring) and T004 (write-guard integration).
+- [x] **T002**: infrastructure: add BranchReaderPort impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs. SystemGitRepo::current_branch() already exists on GitRepository; wire it as the BranchReaderPort impl by delegating to that method and mapping the error type to BranchReadError::ReadFailed (IN-04, IN-06, CN-05). Ensure the trait impl is exported from the infrastructure crate public API. Keep changes within libs/infrastructure/src/git_cli/ (one impl block). This task is a prerequisite for T003 (CLI wiring) and T004 (write-guard integration). (`e66ec101dd214706e7a7fd477fecc52607e8cf44`)
 
 ### S3 — usecase: replace write-guard closure injection with BranchReaderPort
 
