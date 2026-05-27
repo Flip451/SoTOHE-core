@@ -139,6 +139,44 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-11",
+        "text": "`cargo make track-local-review` ラッパーを bare chain として実装する: `sotp track type-signals → sotp track catalogue-spec-signals → sotp track views sync → sotp review local` の順に各コマンドを呼び出し、ラッパー自身は track-id を保持しない。`BRANCH=$(git ...); TRACK_ID=\"${BRANCH#track/}\"` のような shell でのブランチ解析をラッパー・Makefile 側に一切置かない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-12",
+        "text": "`cargo make track-commit-message` の pre-commit ゲートを `cargo make track-local-review` と同じ bare chain 形式にする: `sotp track type-signals → sotp track catalogue-spec-signals → sotp track views sync` を chain した後にコミット処理を続け、review と commit の両ゲートで同じ手順（同じコマンド列）が使われるようにする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-13",
+        "text": "運用ドキュメント（`.claude/commands/track/*.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、`Makefile.toml` のタスク説明）から、コマンドが現在ブランチから自己解決するようになったことで不要になった明示的な `--track-id` 指定の記述を除去する。別トラックを明示的に対象にする意味を持つ箇所（例: 別トラックへの切り替えを説明する文脈）はオプションとして残す",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -209,6 +247,16 @@
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
             "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-08",
+        "text": "rejected alternative B（shell 側でブランチ解決しコマンドに渡す）をラッパーに採用すること: `cargo make track-local-review` や `cargo make track-commit-message` のラッパー内で `git rev-parse` + プレフィックス除去を行い、解決済み track-id をコマンドへ渡す形は採用しない（D4 の bare chain 方針と矛盾し、解決規則の二重化を再導入する）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D4"
           }
         ]
       }
@@ -310,6 +358,50 @@
         {
           "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
           "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-09",
+      "text": "bare chain の各ステップは fail-closed で連結する: chain の途中ステップが失敗した場合は後続ステップを実行しない。部分的に更新された状態でレビューやコミットを進め、後でハッシュずれが発覚する事態を防ぐ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-10",
+      "text": "ラッパー（`cargo make track-local-review` / `cargo make track-commit-message`）は track-id に関する知識を持たない。各 `sotp` サブコマンドが D1 の省略時解決を自分で行うため、ラッパーは track-id を shell で解析・保持・渡しをしない。各コマンドにオーケストレーション責務を追加することも行わない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-11",
+      "text": "regen ゲート列（`sotp track type-signals` → `sotp track catalogue-spec-signals` → `sotp track views sync`）は単一の共有 `cargo make` タスクに一元定義し、`track-local-review` と `track-commit-message` の両ラッパーはその共有タスクを依存として呼び出す。同じ列を両ラッパーに重複定義しない。片方だけ変更されて pre-review と pre-commit が非対称になる回帰を構造的に防ぐ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-12",
+      "text": "`cargo make track-commit-message` の bare chain 化は、regen 系コマンドの呼び出し形（shell 解決から裸の自己解決コマンドへの変更）のみを変える。commit ゲートが持つ厳格な検査 — フル `cargo make ci`、および `check-approved`（レビュー未承認なら fail-closed で BLOCK）— は一切削除・弱体化しない。D4 は pre-review に regen ゲートを追加するものであり、commit ゲートを緩めるものではない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
         }
       ]
     }
@@ -418,6 +510,46 @@
           "anchor": "D2"
         }
       ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`cargo make track-local-review` の実装において、ラッパー自身が track-id を shell で解析・保持する処理が存在しない。`BRANCH=$(git ...); TRACK_ID=\"${BRANCH#track/}\"` のような式が含まれていない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "`cargo make track-local-review` と `cargo make track-commit-message` のシグナル再生成ステップが対称である: 両者ともに `sotp track type-signals` → `sotp track catalogue-spec-signals` → `sotp track views sync` の同じコマンド列を実行する。review が承認した時点のシグナル状態と commit ゲートが観測するシグナル状態が一致し、`*-types.md` シグナル列のハッシュずれによる `check-approved` ブロックが構造的に発生しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "`cargo make track-local-review` の bare chain 中、いずれかのコマンドが失敗した場合に後続コマンドが実行されず、chain 全体がエラーで終了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "`.claude/commands/track/*.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、および `Makefile.toml` のタスク説明において、D1 により自己解決が可能になったコマンドに対する明示的な `--track-id` 指定の例示・記述が除去されている。別トラックを対象にする場面など、明示指定が意味を持つ文脈にはオプション表記として残っている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -447,7 +579,7 @@
     }
   ],
   "signals": {
-    "blue": 38,
+    "blue": 50,
     "yellow": 0,
     "red": 0
   }

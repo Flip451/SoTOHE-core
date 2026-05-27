@@ -192,6 +192,53 @@
           "findings": [],
           "hash": "rvw1:sha256:e768f73b6a23bed12dcad5d1e9beae4c3c1a13746b82228f5f6d7bec32d1ae69",
           "at": "2026-05-27T02:24:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51aaa82be5f31b2a43731b47a58c0e071b3eb14dcce8b4fc197768b51c43709a",
+          "at": "2026-05-27T04:37:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: D4 describes the review tail as `sotp review`, and the same command name is propagated into IN-11/T008, but the CLI review operation is subcommand-based (`sotp review local`, `codex-local`, etc.); there is no executable parent `sotp review` command. If the plan is implemented as written, `track-local-review` will call an invalid command and fail to record the review. Name the concrete review subcommand or wrapper tail consistently across ADR/spec/plan.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+              "line": 77,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:51aaa82be5f31b2a43731b47a58c0e071b3eb14dcce8b4fc197768b51c43709a",
+          "at": "2026-05-27T04:40:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7f6f61e4137cc16e22be799f6486d8bae227c99eb74b20ed6e310af5c20fd52",
+          "at": "2026-05-27T04:45:33Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:35:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:38:08Z"
         }
       ]
     }

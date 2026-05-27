@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-27T02:25:36Z",
+  "generated_at": "2026-05-27T04:51:26Z",
   "declaration_hash": "600a95e2c581fe018f474176660e1ef2cbcdeb7226c70d061d38ba9b8a00f0e6",
   "signals": [
     {
       "type_name": "ActiveTrackResolveError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<BranchReadError>",
         "core::convert::From<TrackResolutionError>",
         "core::error::Error",
@@ -20,23 +20,23 @@
       "type_name": "ActiveTrackResolveInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "ActiveTrackResolveService"
       ]
     },
     {
       "type_name": "ActiveTrackResolveService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "BranchReadError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -45,8 +45,8 @@
     {
       "type_name": "BranchReaderPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TaskOperationInteractor",
