@@ -105,8 +105,9 @@ pub struct CatalogueSpecSignalsArgs {
 #[derive(Args)]
 pub struct CatalogueSpecRefsArgs {
     /// Track ID (directory name under items_dir).
+    /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    track: String,
+    track: Option<String>,
 
     /// Path to the track items root directory.
     #[arg(long, default_value = "track/items")]
@@ -220,12 +221,27 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
             ("verify plan artifact refs", execute_plan_artifact_refs(args))
         }
         VerifyCommand::CatalogueSpecRefs(args) => {
+            // Resolve track id: use explicit value when given (CN-02),
+            // or fall back to the active track from the current branch.
+            // Anchored to workspace_root so that git discovery is consistent
+            // with the workspace being verified (not the process CWD).
+            // Fail-closed on non-track branch (CN-01, AC-01, AC-04).
+            let track_id = match crate::commands::track::resolve_track_id_from_root(
+                args.track,
+                &args.workspace_root,
+            ) {
+                Ok(id) => id,
+                Err(msg) => {
+                    eprintln!("{msg}");
+                    return ExitCode::FAILURE;
+                }
+            };
             // This subcommand has its own exit code (no findings → 0, findings → 1)
             // and emits formatted lines to stderr directly, so it bypasses
             // the shared `VerifyOutcome` printing path.
             return match crate::commands::verify_catalogue_spec_refs::execute_verify_catalogue_spec_refs(
                 args.items_dir,
-                args.track,
+                track_id,
                 args.workspace_root,
                 args.skip_stale,
             ) {
@@ -276,21 +292,30 @@ fn execute_plan_artifact_refs(args: PlanArtifactRefsArgs) -> VerifyOutcome {
 
 /// Resolve the active track directory from the current git branch name.
 ///
-/// Accepts only `track/<id>` branches; `plan/<id>` and other branch forms
-/// return `None`. The returned path is anchored to the repo root discovered
-/// via `SystemGitRepo::discover`, so this function works correctly regardless
+/// Uses the shared `ActiveTrackResolveInteractor` (IN-09: consolidates
+/// individual auto-detect implementations onto the shared interactor path).
+/// The returned path is anchored to the repo root discovered via
+/// `SystemGitRepo::discover`, so this function works correctly regardless
 /// of which subdirectory the process is invoked from.
+///
+/// Fail-closed: returns `None` only when not inside a git repository or the
+/// resolved track directory does not exist on disk. Non-track branches and
+/// detached HEAD return `None` so the caller can surface a clear error.
 ///
 /// Returns `None` when:
 /// - Not inside a git repository
 /// - Not on a `track/<id>` branch (including detached HEAD / main)
 /// - The resolved `track/items/<id>` directory does not exist on disk
 fn resolve_active_track_dir() -> Option<std::path::PathBuf> {
+    use std::sync::Arc;
+
     use infrastructure::git_cli::GitRepository as _;
+    use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
     let repo = infrastructure::git_cli::SystemGitRepo::discover().ok()?;
-    let branch = repo.current_branch().ok()??;
-    let track_id = usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)).ok()?;
-    let track_dir = repo.root().join("track/items").join(&track_id);
+    let repo_root = repo.root().to_path_buf();
+    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
+    let track_id = interactor.resolve_active_track().ok()?;
+    let track_dir = repo_root.join("track/items").join(&track_id);
     if track_dir.is_dir() { Some(track_dir) } else { None }
 }
 

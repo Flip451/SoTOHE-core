@@ -62,7 +62,7 @@ fn fake_args(
         briefing_file,
         prompt,
         output_last_message: Some(output_last_message),
-        track_id: "test-track".to_owned(),
+        track_id: Some("test-track".to_owned()),
         round_type: super::CodexRoundTypeArg::Final,
         group: "other".to_owned(),
         items_dir: PathBuf::from("track/items"),
@@ -379,7 +379,7 @@ fn run_codex_local_cleans_auto_managed_artifacts_when_spawn_fails() {
         briefing_file: None,
         prompt: Some("Review this implementation.".to_owned()),
         output_last_message: None,
-        track_id: "test-track".to_owned(),
+        track_id: Some("test-track".to_owned()),
         round_type: super::CodexRoundTypeArg::Final,
         group: "other".to_owned(),
         items_dir: PathBuf::from("track/items"),
@@ -711,7 +711,7 @@ fn check_approved_approved_path_exits_success_with_ok_message() {
     let _cwd = CurrentDirGuard::change_to(dir.path());
 
     // Empty diff → "Other" scope is NotRequired(Empty) → Approved.
-    let args = CheckApprovedArgs { items_dir, track_id: "test-track".to_string() };
+    let args = CheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
     let exit = execute_check_approved(&args);
     assert_eq!(exit, std::process::ExitCode::SUCCESS);
 }
@@ -733,7 +733,7 @@ fn check_approved_bypass_path_exits_success_with_warn_message() {
     fs::create_dir_all(&domain_src).unwrap();
     fs::write(domain_src.join("lib.rs"), "// untracked").unwrap();
 
-    let args = CheckApprovedArgs { items_dir, track_id: "test-track".to_string() };
+    let args = CheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
     let exit = execute_check_approved(&args);
     assert_eq!(exit, std::process::ExitCode::SUCCESS);
 }
@@ -761,7 +761,7 @@ fn check_approved_blocked_path_exits_failure_with_blocked_message() {
     // review_operational in the scope config excludes this file from scope classification.
     fs::write(track_dir.join("review.json"), r#"{"schema_version":2,"scopes":{}}"#).unwrap();
 
-    let args = CheckApprovedArgs { items_dir, track_id: "test-track".to_string() };
+    let args = CheckApprovedArgs { items_dir, track_id: Some("test-track".to_string()) };
     let exit = execute_check_approved(&args);
     assert_eq!(exit, std::process::ExitCode::FAILURE);
 }
@@ -853,7 +853,7 @@ fn make_codex_local_args_for_validation(
         briefing_file: None,
         prompt: Some("dummy".to_owned()),
         output_last_message: None,
-        track_id: track_id.to_owned(),
+        track_id: Some(track_id.to_owned()),
         round_type,
         group: group.to_owned(),
         items_dir: PathBuf::from("track/items"),
@@ -1368,7 +1368,7 @@ fn make_claude_local_args(
         timeout_seconds: 60,
         briefing_file: None,
         prompt: Some("dummy".to_owned()),
-        track_id: track_id.to_owned(),
+        track_id: Some(track_id.to_owned()),
         round_type,
         group: group.to_owned(),
         items_dir: PathBuf::from("track/items"),

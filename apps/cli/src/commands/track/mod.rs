@@ -85,7 +85,7 @@ pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
 /// # Errors
 ///
 /// Returns a human-readable error string when the track-id cannot be resolved.
-pub(super) fn resolve_track_id(explicit_id: Option<String>) -> Result<String, String> {
+pub(crate) fn resolve_track_id(explicit_id: Option<String>) -> Result<String, String> {
     match explicit_id {
         Some(id) => Ok(id),
         None => {
@@ -101,7 +101,7 @@ pub(super) fn resolve_track_id(explicit_id: Option<String>) -> Result<String, St
 /// This is for commands whose target tree is selected by `--workspace-root`.
 /// The omitted track-id path must read the branch from that same workspace
 /// rather than from the process current directory.
-fn resolve_track_id_from_root(
+pub(crate) fn resolve_track_id_from_root(
     explicit_id: Option<String>,
     workspace_root: &Path,
 ) -> Result<String, String> {
@@ -517,8 +517,9 @@ pub enum TrackCommand {
     /// Exits with code 1 when any violations are found, 0 when none.
     Lint {
         /// Track ID (directory name under `track/items`).
+        /// When omitted, resolved from the current git branch (`track/<id>`).
         #[arg(long)]
-        track_id: String,
+        track_id: Option<String>,
 
         /// Layer ID to lint (e.g. `domain`, `usecase`, `infrastructure`).
         #[arg(long)]
@@ -752,7 +753,9 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             })
         }
         TrackCommand::Lint { track_id, layer_id, workspace_root } => {
-            tddd::lint::execute_lint(workspace_root, track_id, layer_id)
+            resolve_track_id_from_root(track_id, &workspace_root)
+                .map_err(CliError::Message)
+                .and_then(|tid| tddd::lint::execute_lint(workspace_root, tid, layer_id))
         }
         TrackCommand::CatalogueImplSignals { track_id, workspace_root, layer } => {
             let resolved =

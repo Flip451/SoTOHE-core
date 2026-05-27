@@ -22,6 +22,8 @@ pub(super) fn execute_results(args: &ResultsArgs) -> ExitCode {
 }
 
 fn run_results(args: &ResultsArgs) -> Result<String, String> {
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+
     // Map ResultsLimit to Option<u32>:
     //   Zero        → None (state summary only)
     //   Count(n)    → Some(n)
@@ -40,7 +42,7 @@ fn run_results(args: &ResultsArgs) -> Result<String, String> {
     };
 
     infrastructure::review_v2::render_review_results_str(
-        &args.track_id,
+        &track_id,
         &args.items_dir,
         args.scope.as_deref(),
         limit,
@@ -59,7 +61,7 @@ mod tests {
     fn results_limit_zero_maps_to_none() {
         let args = super::super::ResultsArgs {
             items_dir: std::path::PathBuf::from("track/items"),
-            track_id: "t".to_owned(),
+            track_id: Some("t".to_owned()),
             scope: None,
             all: false,
             limit: ResultsLimit::Zero,

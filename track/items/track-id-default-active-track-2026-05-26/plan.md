@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
 
-## Tasks (3/9 resolved)
+## Tasks (4/9 resolved)
 
 ### S1 — usecase: port + interactor for active-track resolution
 
@@ -33,7 +33,7 @@
 > Consolidate the existing bespoke auto-detect in resolve.rs onto the shared interactor path (IN-09).
 > Add command/helper coverage for explicit track-id priority when a value is supplied (IN-10, AC-03).
 
-- [ ] **T004**: CLI batch 1: make track-id optional for positional-arg commands and wire ActiveTrackResolveInteractor. Affected commands in apps/cli/src/commands/track/mod.rs and submodules: TrackCommand::Transition, AddTask, SetOverride, ClearOverride, NextTask, TaskCounts, Signals, TypeSignals, TypeGraph, BaselineGraph, ContractMap, CatalogueSpecSignals, CatalogueImplSignals, SpecElementHash, and BaselineCapture. Change `track_id: String` to `track_id: Option<String>` for each. In the command handler, resolve None via ActiveTrackResolveInteractor (wired at composition root with Arc<SystemGitRepo::discover()>). When Some, use the explicit value directly (CN-02). Add command/helper tests that prove explicit track-id priority is preserved when a value is supplied, alongside the active-branch default tests from T001 (IN-10, AC-03). Also remove the now-redundant individual auto-detect implementation in resolve.rs (ResolveArgs already uses Option<String>) by replacing its bespoke auto-detect with the shared interactor path (IN-09). Fail-closed on non-track branch: error message must prompt the user to provide an explicit track-id (CN-01, AC-01, AC-02, AC-03). Keep under 500 lines total diff; split submodule changes per file if needed for reviewability.
+- [x] **T004**: CLI batch 1: make track-id optional for positional-arg commands and wire ActiveTrackResolveInteractor. Affected commands in apps/cli/src/commands/track/mod.rs and submodules: TrackCommand::Transition, AddTask, SetOverride, ClearOverride, NextTask, TaskCounts, Signals, TypeSignals, TypeGraph, BaselineGraph, ContractMap, CatalogueSpecSignals, CatalogueImplSignals, SpecElementHash, and BaselineCapture. Change `track_id: String` to `track_id: Option<String>` for each. In the command handler, resolve None via ActiveTrackResolveInteractor (wired at composition root with Arc<SystemGitRepo::discover()>). When Some, use the explicit value directly (CN-02). Add command/helper tests that prove explicit track-id priority is preserved when a value is supplied, alongside the active-branch default tests from T001 (IN-10, AC-03). Also remove the now-redundant individual auto-detect implementation in resolve.rs (ResolveArgs already uses Option<String>) by replacing its bespoke auto-detect with the shared interactor path (IN-09). Fail-closed on non-track branch: error message must prompt the user to provide an explicit track-id (CN-01, AC-01, AC-02, AC-03). Keep under 500 lines total diff; split submodule changes per file if needed for reviewability. (`a73a371a7d62f689b8eec2e31b84d93f893ed74b`)
 
 ### S5 — CLI: make track-id optional — flag-arg commands and verify subcommands
 

@@ -102,8 +102,9 @@ pub struct CodexLocalArgs {
     pub(super) output_last_message: Option<PathBuf>,
 
     /// Track ID (used for auto-recording verdict to review.json).
+    /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    pub(super) track_id: String,
+    pub(super) track_id: Option<String>,
 
     /// Round type: fast or final.
     #[arg(long, value_enum)]
@@ -143,8 +144,9 @@ pub struct ClaudeLocalArgs {
     pub(super) prompt: Option<String>,
 
     /// Track ID (used for auto-recording verdict to review.json).
+    /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    pub(super) track_id: String,
+    pub(super) track_id: Option<String>,
 
     /// Round type: fast or final.
     #[arg(long, value_enum)]
@@ -224,33 +226,30 @@ pub(super) fn validate_auto_record_args_raw(
 /// All record fields are now required (auto-record is always on). Validation
 /// is performed using the infrastructure crate's string-based parsing helpers
 /// so that no domain types appear in the CLI module (CN-01 / AC-03).
+/// When `track_id` is `None`, the active track is resolved from the current
+/// git branch (CN-01, AC-01).
 ///
 /// # Errors
 /// Returns a human-readable error string if args are invalid.
 pub(super) fn validate_auto_record_args(
     args: &CodexLocalArgs,
 ) -> Result<ValidatedAutoRecordArgs, String> {
-    validate_auto_record_args_raw(
-        &args.track_id,
-        &args.group,
-        args.round_type,
-        args.items_dir.clone(),
-    )
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    validate_auto_record_args_raw(&track_id, &args.group, args.round_type, args.items_dir.clone())
 }
 
 /// Validates and parses auto-record arguments from `ClaudeLocalArgs`.
+///
+/// When `track_id` is `None`, the active track is resolved from the current
+/// git branch (CN-01, AC-01).
 ///
 /// # Errors
 /// Returns a human-readable error string if args are invalid.
 pub(super) fn validate_claude_auto_record_args(
     args: &ClaudeLocalArgs,
 ) -> Result<ValidatedAutoRecordArgs, String> {
-    validate_auto_record_args_raw(
-        &args.track_id,
-        &args.group,
-        args.round_type,
-        args.items_dir.clone(),
-    )
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    validate_auto_record_args_raw(&track_id, &args.group, args.round_type, args.items_dir.clone())
 }
 
 #[derive(Debug, Args)]
@@ -260,8 +259,9 @@ pub struct CheckApprovedArgs {
     items_dir: PathBuf,
 
     /// Track ID.
+    /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    track_id: String,
+    track_id: Option<String>,
 }
 
 /// Round-type filter for `sotp review results --round-type ...`.
@@ -315,8 +315,9 @@ pub struct ResultsArgs {
     pub(super) items_dir: PathBuf,
 
     /// Track ID.
+    /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    pub(super) track_id: String,
+    pub(super) track_id: Option<String>,
 
     /// Show only the named scope (mutually exclusive with `--all`).
     #[arg(long)]
@@ -431,6 +432,7 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 }
 
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<ReviewApprovalOutput, String> {
-    infrastructure::review_v2::check_approved_str(&args.track_id, &args.items_dir)
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    infrastructure::review_v2::check_approved_str(&track_id, &args.items_dir)
         .map_err(|e| format!("{e}"))
 }

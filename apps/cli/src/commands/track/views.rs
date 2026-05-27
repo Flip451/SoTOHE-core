@@ -1,7 +1,11 @@
+use std::sync::Arc;
+
+use infrastructure::git_cli::SystemGitRepo;
+use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
+
 use crate::CliError;
 
 use super::*;
-use usecase::track_resolution::resolve_track_id_from_branch;
 
 pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
     match action {
@@ -14,14 +18,23 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
         }
         ViewAction::Sync { project_root, track_id } => {
             // If `--track-id` was not given, try to detect the active track from
-            // the current git branch (`track/<id>` or `plan/<id>`). This makes
+            // the current git branch (`track/<id>`). This makes
             // `cargo make track-sync-views` "do the right thing" inside an
             // active track checkout without requiring the caller to repeat the
             // track id. When the current branch is not a track/plan branch
-            // (e.g., on `main`), fall back to the registry-only mode.
+            // (e.g., on `main`), or when git is unavailable, fall back to
+            // registry-only mode (CN-01 documented exception: no-track mode
+            // is preserved for track views sync because registry.md is
+            // track-independent).
+            //
+            // Explicit ids are validated before use to prevent path-traversal
+            // via malformed inputs (e.g. `../../tmp`) reaching sync_rendered_views.
             let resolved_track_id = match track_id {
-                Some(id) => Some(id),
-                None => detect_track_id_from_branch(&project_root),
+                Some(id) => {
+                    super::validate_track_id_str(&id).map_err(CliError::Message)?;
+                    Some(id)
+                }
+                None => detect_active_track_from_branch(&project_root),
             };
             let changed = render::sync_rendered_views(&project_root, resolved_track_id.as_deref())
                 .map_err(|err| CliError::Message(format!("sync-views failed: {err}")))?;
@@ -40,26 +53,20 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
     }
 }
 
-/// Detect the active track id from the current git branch.
+/// Detect the active track id from the current git branch via the shared
+/// `ActiveTrackResolveInteractor` (IN-09: consolidates individual auto-detect
+/// implementations onto the shared interactor path).
 ///
 /// Only `track/<id>` branches are resolved; any other branch (e.g. `main`,
 /// detached HEAD) or git failure resolves to `None` so the caller can fall
 /// back to registry-only mode without surfacing an error.
 ///
-/// Uses `project_root` as the working directory for the underlying git
-/// command so that auto-detection is consistent with `--project-root`
-/// invocations and does not depend on the process CWD.
-fn detect_track_id_from_branch(project_root: &std::path::Path) -> Option<String> {
-    let output = std::process::Command::new("git")
-        .args(["rev-parse", "--abbrev-ref", "HEAD"])
-        .current_dir(project_root)
-        .output()
-        .ok()?;
-    if !output.status.success() {
-        return None;
-    }
-    let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    resolve_track_id_from_branch(Some(&branch)).ok()
+/// Uses `project_root` for git discovery so that auto-detection is consistent
+/// with `--project-root` invocations and does not depend on the process CWD.
+fn detect_active_track_from_branch(project_root: &std::path::Path) -> Option<String> {
+    let repo = SystemGitRepo::discover_from(project_root).ok()?;
+    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
+    interactor.resolve_active_track().ok()
 }
 
 #[cfg(test)]
@@ -71,7 +78,7 @@ mod tests {
     /// Initialise a temporary git repository with a single commit on `main`
     /// and then check out `branch_name` (which may use a slash-separated
     /// namespace such as `track/foo` or `plan/bar`). Returns the path to
-    /// the repo root so callers can hand it to `detect_track_id_from_branch`.
+    /// the repo root so callers can hand it to `detect_active_track_from_branch`.
     fn init_repo_on_branch(tmp: &tempfile::TempDir, branch_name: &str) -> std::path::PathBuf {
         let root = tmp.path().to_path_buf();
         // Initialise a repo with `main` as the default branch so the branch
@@ -128,32 +135,35 @@ mod tests {
     }
 
     #[test]
-    fn detect_track_id_from_branch_resolves_track_branch() {
+    fn detect_active_track_from_branch_resolves_track_branch() {
         let tmp = tempfile::tempdir().unwrap();
         let root = init_repo_on_branch(&tmp, "track/my-feature-2026-04-10");
-        assert_eq!(detect_track_id_from_branch(&root), Some("my-feature-2026-04-10".to_owned()));
+        assert_eq!(
+            detect_active_track_from_branch(&root),
+            Some("my-feature-2026-04-10".to_owned())
+        );
     }
 
     #[test]
-    fn detect_track_id_from_branch_returns_none_on_main() {
+    fn detect_active_track_from_branch_returns_none_on_main() {
         let tmp = tempfile::tempdir().unwrap();
         let root = init_repo_on_branch(&tmp, "main");
-        assert_eq!(detect_track_id_from_branch(&root), None);
+        assert_eq!(detect_active_track_from_branch(&root), None);
     }
 
     #[test]
-    fn detect_track_id_from_branch_returns_none_on_feature_branch() {
+    fn detect_active_track_from_branch_returns_none_on_feature_branch() {
         let tmp = tempfile::tempdir().unwrap();
         let root = init_repo_on_branch(&tmp, "feature/unrelated");
-        assert_eq!(detect_track_id_from_branch(&root), None);
+        assert_eq!(detect_active_track_from_branch(&root), None);
     }
 
     #[test]
-    fn detect_track_id_from_branch_returns_none_outside_git_repo() {
+    fn detect_active_track_from_branch_returns_none_outside_git_repo() {
         // `tempdir()` produces an empty directory — no `.git` anywhere up
-        // the tree inside the tmpfs-backed path, so git rev-parse fails
+        // the tree inside the tmpfs-backed path, so git discover fails
         // and auto-detection must silently return None.
         let tmp = tempfile::tempdir().unwrap();
-        assert_eq!(detect_track_id_from_branch(tmp.path()), None);
+        assert_eq!(detect_active_track_from_branch(tmp.path()), None);
     }
 }

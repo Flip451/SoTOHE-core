@@ -19,8 +19,9 @@ use super::compose_v2;
 #[derive(Debug, Args)]
 pub struct ClassifyArgs {
     /// Track ID (used to expand `<track-id>` placeholders in scope patterns).
+    /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    pub(super) track_id: String,
+    pub(super) track_id: Option<String>,
 
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
@@ -45,6 +46,8 @@ pub(super) fn execute_classify(args: &ClassifyArgs) -> ExitCode {
 }
 
 fn run_classify(args: &ClassifyArgs) -> Result<String, String> {
+    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+
     // Pre-validate all paths and collect every error before delegating to the
     // interactor. `classify_by_strings` short-circuits on the first invalid
     // path; collecting errors here restores the multi-error reporting that the
@@ -52,7 +55,7 @@ fn run_classify(args: &ClassifyArgs) -> Result<String, String> {
     validate_all_paths(&args.paths)?;
 
     let interactor =
-        compose_v2::build_scope_query_interactor_no_diff_str(&args.track_id, &args.items_dir)?;
+        compose_v2::build_scope_query_interactor_no_diff_str(&track_id, &args.items_dir)?;
 
     let classifications = interactor
         .classify_by_strings(args.paths.clone())
