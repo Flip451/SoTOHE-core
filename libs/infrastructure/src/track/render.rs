@@ -1,7 +1,6 @@
 //! Rendering and sync of track read-only views (`plan.md`, `registry.md`, `spec.md`, `domain-types.md`) from metadata.json / spec.json / domain-types.json.
 
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 use domain::tddd::ContractMapRenderOptions;
 use domain::tddd::{
@@ -11,6 +10,7 @@ use domain::{ImplPlanDocument, TaskCoverageDocument, TrackId, TrackMetadata, der
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
+use crate::git_cli::{GitRepository, SystemGitRepo};
 use crate::spec;
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::tddd::contract_map_adapter::FsCatalogueLoader;
@@ -842,15 +842,14 @@ pub fn sync_rendered_views(
         let branch_guard_result: Result<bool, String> = {
             // Derive the expected branch from metadata (track/<id>).
             let expected_branch = format!("track/{}", parsed.id);
-            // Discover the current git branch from the workspace root (root).
-            let current_branch_opt = Command::new("git")
-                .args(["rev-parse", "--abbrev-ref", "HEAD"])
-                .current_dir(root)
-                .output()
+            // Discover the current git branch from the workspace root (root) via
+            // the GitRepository port (IN-06 / AC-15). Filters out detached HEAD
+            // ("HEAD") and empty strings to preserve the original guard semantics.
+            let current_branch_opt: Option<String> = SystemGitRepo::discover_from(root)
                 .ok()
-                .filter(|o| o.status.success())
-                .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
-                .filter(|branch| !branch.is_empty() && branch != "HEAD");
+                .and_then(|r| r.current_branch().ok())
+                .flatten()
+                .filter(|b| !b.is_empty() && b != "HEAD");
             match current_branch_opt {
                 Some(ref branch) => Ok(branch == &expected_branch),
                 None => Err(format!(

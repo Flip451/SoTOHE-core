@@ -8,6 +8,7 @@
 use std::process::ExitCode;
 
 use clap::{Args, ValueEnum};
+use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
 use crate::CliError;
 
@@ -599,27 +600,22 @@ fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
 /// Resolves the track ID from the current git branch (strict mode).
 ///
 /// Returns `Ok(Some(id))` only when the branch matches `track/<id>` and the
-/// id passes [`TrackId`] validation. Plan-phase branches (`plan/<id>`)
-/// intentionally resolve to `Ok(None)` because the make-task callers
-/// (review check-approved, post-commit hash persistence) only apply once a
-/// track has progressed past the planning phase. Non-track branches (e.g.
-/// `main`) and git failures also resolve to `Ok(None)`.
+/// id passes [`TrackId`] validation. Non-track branches (e.g. `main`) and
+/// git failures resolve to `Ok(None)`.
 ///
 /// Returns `Err` when the branch matches `track/<id>` but the `<id>` fails
 /// validation: in that case the callers must not silently skip the review
 /// guard (fail-closed).
 ///
-/// Internally delegates parsing to
+/// Reads the current branch via the [`GitRepository`] port (IN-06 / AC-15),
+/// then delegates parsing to
 /// [`usecase::track_resolution::resolve_track_id_from_branch`] so the
 /// branch-name semantics stay consistent with the rest of the workflow.
 fn current_branch_track_id_strict() -> Result<Option<String>, CliError> {
-    let output =
-        std::process::Command::new("git").args(["rev-parse", "--abbrev-ref", "HEAD"]).output().ok();
-    let Some(output) = output else { return Ok(None) };
-    if !output.status.success() {
-        return Ok(None);
-    }
-    let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+    let branch = match SystemGitRepo::discover().and_then(|r| r.current_branch()) {
+        Ok(Some(b)) => b,
+        Ok(None) | Err(_) => return Ok(None),
+    };
     match usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)) {
         Ok(id) => Ok(Some(id)),
         Err(usecase::track_resolution::TrackResolutionError::InvalidTrackId(slug, _)) => {
