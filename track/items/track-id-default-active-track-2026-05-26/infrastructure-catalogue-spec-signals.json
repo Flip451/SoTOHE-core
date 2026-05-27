@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e3a949b6490baa79dd2e83c39db706d78b501dd3d94d4f74d25782807c23e99c",
+  "signals": [
+    {
+      "type_name": "SystemGitRepo",
+      "signal": "blue"
+    }
+  ]
+}

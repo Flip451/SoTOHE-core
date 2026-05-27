@@ -16,6 +16,182 @@
           "findings": [],
           "hash": "rvw1:sha256:9e78c88160c2755c530111ec14307182c923d49c8b2487a6a6b519a428b35650",
           "at": "2026-05-27T00:08:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 conflates the branch-resolution path for `verify-plan-artifact-refs-local` with the `track-id` optionality work in IN-01/IN-02/IN-03. That task is driven by the `--track-dir` flow in IN-09, so describing it as something the IN-01/02/03 changes will resolve is a semantic error and points the implementation at the wrong resolver.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "line": 49,
+              "category": "factual error"
+            },
+            {
+              "message": "T006 asks the Makefile tasks to both preserve `[SKIP]` / ‘skip gracefully’ behavior on non-track branches and also propagate a non-zero exit code with fail-closed semantics. Those requirements conflict, so the task cannot be implemented as written without choosing one behavior and dropping the other.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "line": 49,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e359aa0c671abb6b33613a7b8156af33619e14af874ac1e923f4bcf0adfb8135",
+          "at": "2026-05-27T00:44:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a00b0a4342119c611069d3d17db66e93b5adc15bfc068fc46ac7daed50da8ec",
+          "at": "2026-05-27T00:49:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 treats TypeSignals, TypeGraph, BaselineGraph, ContractMap, CatalogueSpecSignals, SpecElementHash, BaselineCapture, and CatalogueImplSignals as flag `--track-id` commands, while spec IN-01 classifies those same commands as positional `track_id` commands and task coverage maps IN-01 only to T004. This leaves the spec, coverage, and implementation plan disagreeing about which task/spec element owns those CLI changes.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "line": 42,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-10 requires adding tests for three cases, including explicit track-id priority, but T001 only adds resolver tests for track branch, non-track branch, and detached HEAD. T007 merely verifies acceptance criteria as the final gate, so no implementation task actually adds the explicit-track-id-priority test required by the spec.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2a00b0a4342119c611069d3d17db66e93b5adc15bfc068fc46ac7daed50da8ec",
+          "at": "2026-05-27T00:54:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 pulls `track views sync` into the shared resolver replacement and then says to fail closed on non-track branches “in all cases”. That conflicts with the ADR/spec intent for commands with meaningful no-track behavior: `track views sync` has a registry-only mode when no active track is present, so forcing fail-closed here would break that path instead of documenting/preserving the exception.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fd815e3f83a4f71b383ec80763a1886e79f20e5fdf29895b7ee43cbd9882b1bf",
+          "at": "2026-05-27T01:00:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 says it covers all remaining flag-based commands but only lists `review codex-local`, `review claude-local`, `review check-approved`, and `review results`. The current review command set also has track-targeted `review local`, `review files`, and `review classify` commands with required `--track-id`; following this plan would leave those commands mandatory and outside the shared active-track resolver path, contradicting GO-01/IN-02's intent to make track-targeting `--track-id` commands optional. Add these commands to T005 coverage or explicitly mark them out of scope with a rationale.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b6af5ab3abe54bf15213eebf4a8f8321a77e16f84d83365642504bcc3d649ebb",
+          "at": "2026-05-27T01:05:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "BranchReaderPort is documented to return `None` for detached HEAD, while AC-08 requires the detached-HEAD case to produce `DetachedHead` and T001 says the interactor delegates to `resolve_track_id_from_branch`. The existing parser treats `None` as the separate `NoBranch` case, so following this contract will either fail AC-08 or require an undocumented remapping. Specify whether the port should pass through `Some(\"HEAD\")` for detached HEAD or the interactor should translate `None` to `DetachedHead`.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/usecase-types.json",
+              "line": 203,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-06 requires removing direct `git rev-parse` reads from `track views sync`, make helpers, and the write-guard injection path, but the coverage map assigns IN-06 only to T002/T003. T002 just adds the adapter impl and T003 covers the write-guard path; neither mapped task owns the views-sync or make-helper portions of IN-06. Add the tasks that actually cover those surfaces, such as T005/T006, or add a task that explicitly owns the remaining IN-06 work.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/task-coverage.json",
+              "line": 9,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:516c5735066bd3abbdb59c6483a6a8415562bfebc8bc4cb9e92be45724edbc39",
+          "at": "2026-05-27T01:09:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 removes the branch-derived arguments for `verify-spec-states-current-local` and says to replace the block with a direct CLI call after that command's current-track lookup is consolidated, but the plan never assigns any task/spec item to make `verify spec-states` resolve the active track itself. IN-09 only covers `track resolve`, `track views sync`, and `verify plan-artifact-refs`, while IN-03 covers `verify catalogue-spec-refs`; nothing creates the no-argument current-track path needed for `verify-spec-states-current-local`. As written, the Makefile cleanup is not executable for that task without an unplanned CLI change.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "line": 50,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:dcd7bb4539604dc4528f64048f162252fe331eac4bf87bb9ff13281f6df2b2d0",
+          "at": "2026-05-27T01:15:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71862526c512ef83720fe998236293991438a350b2e3f8a5b96447740ce562fd",
+          "at": "2026-05-27T01:20:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f13e7ace6312287dc6f312744fad8fdd820653d2dc251d659d9963d6fed4becd",
+          "at": "2026-05-27T01:39:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 says any omitted track-id on a non-`track/<id>` branch must fail closed, but T005 explicitly preserves `track views sync` registry-only mode when no `--track-id` is provided and no active track is resolvable. Because IN-09 brings `track views sync` into this plan, the artifacts define conflicting behavior for that command; the spec needs to document the registry-only exception or the task needs to remove it.",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+              "line": 220,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f13e7ace6312287dc6f312744fad8fdd820653d2dc251d659d9963d6fed4becd",
+          "at": "2026-05-27T01:42:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 still states that any omitted track-id on a non-`track/<id>` branch must fail closed, but T005 explicitly preserves `track views sync` registry-only mode when no active track is resolvable. That leaves the plan internally contradictory: implementers cannot both enforce this blanket constraint and keep the documented registry-only exception. The spec needs to document that command-specific exception (and any affected acceptance text should align with it).",
+              "severity": "P1",
+              "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+              "line": 220,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f13e7ace6312287dc6f312744fad8fdd820653d2dc251d659d9963d6fed4becd",
+          "at": "2026-05-27T01:52:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a3316a8b1fce5e664e29de7a5b13303f4e1f832f6bd518388f6c497543e7f56",
+          "at": "2026-05-27T02:14:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e768f73b6a23bed12dcad5d1e9beae4c3c1a13746b82228f5f6d7bec32d1ae69",
+          "at": "2026-05-27T02:24:52Z"
         }
       ]
     }

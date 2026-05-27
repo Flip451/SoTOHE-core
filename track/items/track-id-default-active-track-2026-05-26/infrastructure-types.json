@@ -1,0 +1,46 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "SystemGitRepo": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "root", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_cli",
+      "docs": "Filesystem git adapter. Implements BranchReaderPort (added in this track, via usecase::track_resolution::BranchReaderPort) in addition to the pre-existing GitRepository and domain::WorktreeReader impls. Struct shape and inherent methods are unchanged.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "usecase::track_resolution::BranchReaderPort",
+      "for_type": "SystemGitRepo"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SystemGitRepo"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SystemGitRepo"
+    }
+  ]
+}

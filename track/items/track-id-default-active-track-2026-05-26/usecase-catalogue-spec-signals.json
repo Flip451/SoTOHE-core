@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "600a95e2c581fe018f474176660e1ef2cbcdeb7226c70d061d38ba9b8a00f0e6",
+  "signals": [
+    {
+      "type_name": "ActiveTrackResolveError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ActiveTrackResolveInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BranchReadError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackResolutionError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ActiveTrackResolveService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::track_resolution::resolve_track_id_from_branch",
+      "signal": "blue"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-27T02:25:36Z",
+  "declaration_hash": "600a95e2c581fe018f474176660e1ef2cbcdeb7226c70d061d38ba9b8a00f0e6",
+  "signals": [
+    {
+      "type_name": "ActiveTrackResolveError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::convert::From<BranchReadError>",
+        "core::convert::From<TrackResolutionError>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ActiveTrackResolveInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ActiveTrackResolveService"
+      ]
+    },
+    {
+      "type_name": "ActiveTrackResolveService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "BranchReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "TaskOperationService"
+      ]
+    },
+    {
+      "type_name": "TaskOperationService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TrackResolutionError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "usecase::track_resolution::resolve_track_id_from_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
