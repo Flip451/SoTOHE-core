@@ -25,8 +25,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ActiveTrackResolveInteractor | interactor | — | — | 🟡 | 🔵 |
-| TaskOperationInteractor | interactor | modify | — | 🟡 | 🔵 |
+| ActiveTrackResolveInteractor | interactor | — | — | 🔵 | 🔵 |
+| TaskOperationInteractor | interactor | modify | — | 🔵 | 🔵 |
 
 ## DTOs
 

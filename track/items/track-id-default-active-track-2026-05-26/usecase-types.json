@@ -97,10 +97,8 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "branch_reader", "ty": "std::sync::Arc<dyn BranchReaderPort>" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -402,8 +400,8 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "store", "ty": "std::sync::Arc<S>" },
-            { "name": "branch_reader", "ty": "std::sync::Arc<dyn BranchReaderPort>" }
+            { "name": "store", "ty": "Arc<S>" },
+            { "name": "branch_reader", "ty": "Option<Arc<dyn BranchReaderPort>>" }
           ],
           "returns": "Self",
           "is_async": false,

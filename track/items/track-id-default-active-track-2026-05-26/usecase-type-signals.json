@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-27T13:14:52Z",
-  "declaration_hash": "c451724a5853bf233eee2c4c2f99f7d80f2be5ee0da997bbd5058633e1a891d7",
+  "generated_at": "2026-05-27T16:02:55Z",
+  "declaration_hash": "2a243de16224bc63f0ada1b142f32bf35b5e999d09af906d8c5cf88695409ae3",
   "signals": [
     {
       "type_name": "ActiveTrackResolveError",
@@ -19,7 +19,7 @@
     {
       "type_name": "ActiveTrackResolveInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "ActiveTrackResolveService"
@@ -63,7 +63,7 @@
     {
       "type_name": "TaskOperationInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "TaskOperationService"

@@ -11,7 +11,7 @@ tools:
   - WebFetch
   - WebSearch
 description: |
-  Phase 2 writer for /track:type-design. Translates the track's ADR (design decisions) and spec.json (behavioral contract) into per-layer `<layer>-types.json` entries (schema_version: 3) — picking the role value (per-section role space) and the `kind` discriminator (`unit_struct` / `tuple_struct` / `plain_struct` / `enum` / `type_alias`), authoring methods / fields / params / returns, and setting `action` fields. Runs the canonical pipeline internally: **capture baselines → write the catalogue files → evaluate type-signals → render views**. Mirrors the `type-designer` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
+  Phase 2 writer for /track:type-design. Translates the track's ADR (design decisions) and spec.json (behavioral contract) into per-layer `<layer>-types.json` entries (schema_version: 3) — picking the role value (per-section role space) and the `kind` discriminator (`struct` with `shape` `unit`/`tuple`/`plain`, `enum`, or `type_alias`), authoring methods / fields / params / returns, and setting `action` fields. Runs the canonical pipeline internally: **capture baselines → write the catalogue files → evaluate type-signals → render views**. Mirrors the `type-designer` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
 ---
 
 # Type-Designer Agent
@@ -54,8 +54,8 @@ A draft that violates any convention rule must be self-rejected before the orche
 
 Translate the track's ADR (design decisions) and spec.json (behavioral contract) into **per-layer TDDD catalogue entries** (`<layer>-types.json`). For each type the spec and ADR require:
 
-- Pick the correct `role` value (from the per-section role space — see the **v3 Schema Reference** below) and the `kind` discriminator (`unit_struct` / `tuple_struct` / `plain_struct` / `enum` / `type_alias`)
-- Author entry fields (`methods`, `kind.fields`, `kind.variants`, `kind.typestate`, `generics`, `where_predicates`, `params`, `returns`) and top-level impl entries (`trait_impls`, `inherent_impls`)
+- Pick the correct `role` value (from the per-section role space — see the **v3 Schema Reference** below) and the `kind` discriminator (`struct` with `shape` `unit`/`tuple`/`plain`, `enum`, or `type_alias`)
+- Author entry fields (`methods`, `kind.shape.fields`, `kind.variants`, `kind.typestate`, `generics`, `where_predicates`, `params`, `returns`) and top-level impl entries (`trait_impls`, `inherent_impls`)
 - Set `action` (add / modify / reference / delete) against the existing baseline
 - Cite upstream SoT via structured refs (`spec_refs[]` for spec elements, `informal_grounds[]` for unpersisted grounds that still need promotion before merge)
 - Ensure in-crate type references use **last-segment names only** (e.g., `TrackId`, not `<this-crate>::track::TrackId`) — paths that lack a `crate::` / `self::` / `super::` prefix but contain `::` are treated by the A-codec as cross-crate FQNs; using a bare multi-segment path for an in-crate type produces an unresolved cross-crate reference instead of resolving locally. Cross-crate references use FQN with `::` (e.g., `<other-crate>::module::TypeName`), where `<other-crate>` is the workspace crate name from `architecture-rules.json`. Standard-library types not in the A-codec auto-resolve set (e.g. `std::path::PathBuf`) must use their full path even when the usage context is within the same crate — they are NOT in-crate types.
@@ -261,7 +261,7 @@ This section is a derived reference for the v3 catalogue schema fields enumerate
 {
   "action": "add" | "modify" | "reference" | "delete",
   "role":   "<type-section role value>",
-  "kind":   { "kind": "<unit_struct|tuple_struct|plain_struct|enum|type_alias>", ... },
+  "kind":   { "kind": "<struct|enum|type_alias>", ... },
   "methods":           [<MethodDeclaration>, ...],
   "module_path":       "<path::segments>",
   "docs":              "<optional docstring>" | null,
@@ -363,28 +363,22 @@ or with impl-block-level generics:
 
 `role` MUST be one of the **2 function-section role values**: `FreeFunction` | `UseCaseFunction`.
 
-### The `kind` field (5 valid discriminators)
+### The `kind` field (3 top-level discriminators: `struct` / `enum` / `type_alias`)
+
+A struct's Rust-level form (unit / tuple / plain) is carried in a nested `shape`; its typestate membership is an **orthogonal** sibling (`typestate`), so **any** struct shape can be a typestate state. The old `unit_struct` / `tuple_struct` / `plain_struct` wire tags are **removed** (CN-02) — the codec (`deny_unknown_fields`) rejects them; always write `"kind": "struct"` and put the form in `shape`.
 
 ```json
-// 1. Unit struct — `pub struct Foo;`
-"kind": { "kind": "unit_struct" }
-
-// 2. Tuple struct — `pub struct Foo(Bar, Baz);`
-"kind": {
-  "kind": "tuple_struct",
-  "fields": ["<TypeRef>", "<TypeRef>"],
-  "has_stripped_fields": false
+// 1. Struct — always `"kind": "struct"`; the `shape` (unit | tuple | plain) is nested.
+//    `typestate` is an OPTIONAL sibling of `shape` (omit unless this struct is a typestate state).
+"kind": { "kind": "struct", "shape": { "kind": "unit" } }                                                          // pub struct Foo;
+"kind": { "kind": "struct", "shape": { "kind": "tuple", "fields": ["<TypeRef>"], "has_stripped_fields": false } }  // pub struct Foo(Bar);
+"kind": {                                                                                                          // pub struct Foo { bar: Bar }
+  "kind": "struct",
+  "shape": { "kind": "plain", "fields": [{ "name": "<FieldName>", "ty": "<TypeRef>" }], "has_stripped_fields": false },
+  "typestate": { "state_name": "<TypestateMachineName>", "transition_methods": ["<MethodName>"] }
 }
 
-// 3. Plain (named-field) struct — `pub struct Foo { bar: Bar }`
-"kind": {
-  "kind": "plain_struct",
-  "fields": [{ "name": "<FieldName>", "ty": "<TypeRef>" }],
-  "has_stripped_fields": false,
-  "typestate": null | { "state_name": "<TypestateMachineName>", "transition_methods": ["<MethodName>"] }
-}
-
-// 4. Enum — `pub enum Foo { Bar, Baz(T), Qux { field: T } }`
+// 2. Enum — `pub enum Foo { Bar, Baz(T), Qux { field: T } }`
 "kind": {
   "kind": "enum",
   "variants": [
@@ -394,11 +388,36 @@ or with impl-block-level generics:
   ]
 }
 
-// 5. Type alias — `pub type Foo = Bar<Baz>;`
+// 3. Type alias — `pub type Foo = Bar<Baz>;`
 "kind": { "kind": "type_alias", "target": "<TypeRef>" }
 ```
 
-`kind: "unit_struct"` with non-empty fields is **structurally impossible** — the `unit_struct` shape carries no `fields` payload at the schema level, so the illegal state cannot be expressed. The canonical wire format for a Unit enum variant includes `"payload": {"kind": "unit"}`; omitting `payload` is accepted by the decoder (defaults to Unit) but is non-canonical.
+A `unit` shape carries no `fields` payload at the schema level, so a unit struct with fields is structurally impossible to express. `typestate` and `has_stripped_fields` default to absent/`false` (the codec omits them when unset); write them explicitly only when they apply. The canonical wire format for a Unit enum variant includes `"payload": {"kind": "unit"}`; omitting `payload` is accepted by the decoder (defaults to Unit) but is non-canonical.
+
+#### `has_stripped_fields`: private (non-`pub`) fields
+
+rustdoc **omits private fields** from the public API JSON and sets `has_stripped_fields: true` on the C-side struct shape. The catalogue (A-side) MUST mirror this, or the type → source signal stays 🟡 **forever — even after the type is fully implemented** — because the structural-equality evaluator returns `Mismatch` the instant the flag differs (`structural_eq.rs`: `if asf != bsf { return false; }`):
+
+- In `fields`, list **only the `pub` fields** — private fields are absent on both sides, so never list them.
+- Set `"has_stripped_fields": true` **iff the struct has ≥1 private field**. Leaving it `false` on a struct that actually has a private field is a permanent 🟡 — the single most common interactor / service-wrapper miss.
+- **`tuple` shape caveat**: the codec encodes `has_stripped_fields: true` for a tuple shape by appending a single trailing `None` placeholder to the field vector. Because the catalogue does not record the exact position of each private field, the trailing-`None` representation will mismatch rustdoc's actual `None`-slot layout whenever any private field is not at the trailing position — producing a permanent 🟡. A dependency-holding struct must therefore use a `plain` shape, not a tuple.
+- **Never declare the same inherent method in both `TypeEntry.methods` and a top-level `inherent_impls` entry** — the contract-map renderer aggregates inherent methods from both, so a method present in both double-renders. Declare each inherent method once; for interactors / service-wrappers, put the constructor in a top-level `inherent_impls` entry (consistent with generic interactors, whose `impl_generics` can only be expressed via `inherent_impls`).
+
+**Interactor / service-wrapper (the canonical `has_stripped_fields: true` case)** — a struct whose only field is a private injected dependency (`std::sync::Arc<dyn …Port>`, an inner service) has **all** fields private: declare `fields: []` + `has_stripped_fields: true` with `methods: []`, declare the constructor in a top-level `inherent_impls` entry, and declare the implemented ApplicationService as a top-level `trait_impls` entry:
+
+```json
+"ActiveTrackResolveInteractor": {
+  "action":  "add",
+  "role":    "Interactor",
+  "kind":    { "kind": "struct", "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true } },
+  "methods": [],
+  "module_path": "track_resolution", "docs": null, "spec_refs": [], "informal_grounds": []
+}
+// + top-level arrays:
+//   "inherent_impls": [ { "type_name": "ActiveTrackResolveInteractor", "methods": [
+//     { "name": "new", "receiver": null, "params": [{ "name": "branch_reader", "ty": "std::sync::Arc<dyn BranchReaderPort>" }], "returns": "Self", "is_async": false, "generics": [], "has_default_impl": false, "where_predicates": [] } ] } ]
+//   "trait_impls":    [ { "trait_ref": "ActiveTrackResolveService", "for_type": "ActiveTrackResolveInteractor" } ]
+```
 
 ### MethodDeclaration shape
 
@@ -464,12 +483,12 @@ subject is a named type (struct / enum / alias)?
       ├── CQRS query                                               → "Query"
       └── secondary adapter — struct implementing SecondaryPort    → "SecondaryAdapter"
 
-    kind (Rust syntactic form) — the 5 `kind` discriminator values:
-      ├── `pub struct Foo;`                            → "unit_struct"
-      ├── `pub struct Foo(A, B);`                      → "tuple_struct" + fields, has_stripped_fields
-      ├── `pub struct Foo { … }`                       → "plain_struct" + fields, has_stripped_fields, typestate?
-      │     └─ state-machine member?                     typestate: { "state_name": "<TypestateMachineName>", "transition_methods": [...] }
-      │        + sibling "enum" wrapper listing all states (heterogeneous Vec / persistence)
+    kind (Rust syntactic form) — `kind` is `struct` / `enum` / `type_alias`; a struct's form lives in nested `shape`:
+      ├── `pub struct Foo;`                            → "struct" + shape { "kind": "unit" }
+      ├── `pub struct Foo(A, B);`                      → "struct" + shape { "kind": "tuple", fields, has_stripped_fields }
+      ├── `pub struct Foo { … }`                       → "struct" + shape { "kind": "plain", fields, has_stripped_fields }
+      │     └─ state-machine member?                     + orthogonal "typestate": { "state_name": "<TypestateMachineName>", "transition_methods": [...] }
+      │        (typestate is a sibling of shape — applies to ANY shape; + sibling "enum" wrapper listing all states)
       ├── `pub enum Foo { … }`                         → "enum" + variants
       │     └─ payload per variant                       payload omitted (Unit) | { "kind": "tuple", "fields": [...] } | { "kind": "struct", "fields": [...] }
       └── `pub type Foo = Bar<Baz>;`                   → "type_alias" + target
@@ -477,14 +496,14 @@ subject is a named type (struct / enum / alias)?
 
 ### Other principles
 
-- **Primitive obsession** → wrap in a TypeEntry with `role: "ValueObject"` and `kind` of `plain_struct` or `tuple_struct`, with validation in the constructor
+- **Primitive obsession** → wrap in a TypeEntry with `role: "ValueObject"` and a `struct` `shape` of `plain` or `tuple`, with validation in the constructor
 - **Trait direction** (independent of which layer hosts the trait — the legal layer assignment follows from the convention's R1 matrix):
   - Driven port (adapter implements; e.g. repository, store, writer) → trait-section role `"SecondaryPort"`
   - Primary port (external actor drives; e.g. CLI handler, HTTP handler) → trait-section role `"ApplicationService"`
   - DDD specification predicate → trait-section role `"SpecificationPort"`
 - **Error types** → TypeEntry with `role: "ErrorType"` + `kind: { "kind": "enum", "variants": [...] }`; use thiserror variants; avoid `Box<dyn Error>` in core / port-hosting layers
 - **Serde discipline** — core / port-hosting layers (where the convention places `"ValueObject"` and port traits) stay serde-free; serde / DTO conversion lives in adapter-tier layers. The catalogue codec operates in an adapter tier — never in a serde-free tier. Which layer is "core" vs "adapter" comes from `architecture-rules.json` + the convention's R1 matrix
-- **Typestate cluster** → one `PlainStruct { typestate: Some(...) }` per state + one `Enum` wrapper listing the typestate names (heterogeneous Vec / persistence boundary)
+- **Typestate cluster** → one struct per state, each with its `typestate` marker set (orthogonal to `shape` — any shape works) + one `Enum` wrapper listing the typestate names (heterogeneous Vec / persistence boundary)
 
 ## Action Semantics (strong claims)
 
@@ -496,7 +515,7 @@ Pre-condition: the entry is **NOT in baseline (B)**. This track introduces it.
 
 **Requirement**: the catalogue declaration must be **structurally identical** with the rust source produced in this track. All of the following must be enumerated:
 
-- `methods` (for traits and structs — `TraitEntry.methods` AND `TypeEntry.methods` for inherent impls), `fields` (for plain_struct / tuple_struct), `params` / `returns` (for functions / methods)
+- `methods` (for traits and structs — `TraitEntry.methods` AND `TypeEntry.methods` for inherent impls), `fields` (for `plain` / `tuple` struct shapes), `params` / `returns` (for functions / methods)
 - `has_default_impl` on each `MethodDeclaration` in a `TraitEntry`: `true` for trait methods with a default body, `false` for required methods (for inherent methods in `TypeEntry` the codec always sets `has_body: true` regardless of `has_default_impl` — inherent methods always have a body in Rust; write `has_default_impl: false`)
 - `trait_impls` / `inherent_impls` (**top-level arrays**, not `TypeEntry` fields — Phase 2 compares impl identity; an impl whose `for_type` (for `trait_impls`) or `type_name` (for `inherent_impls`) names this entry must be declared as a top-level entry; incomplete declarations cause impl-drift signals → 🟡 / 🔴)
   - **Derive- and macro-generated impls are NOT exempt from declaration.** `#[derive(Debug, Clone, PartialEq, Eq, Hash, Default, ...)]`, `#[derive(thiserror::Error)]` (which generates `core::fmt::Display` + `core::error::Error`), `#[from]` on an enum variant (which generates `core::convert::From<…>`), and serde derives (`serde::Serialize` / `serde::Deserialize`) all emit **real impl blocks that appear in rustdoc**. Each is part of the type's contract surface and MUST be declared as a top-level `trait_impls` entry, e.g. `{ "action": "add", "trait_ref": "core::fmt::Debug", "for_type": "MyType" }`. Treating these as "boilerplate that needn't be declared" is a recurring, **wrong** instinct — once the type exists in source, every undeclared derive/macro impl surfaces as an extra-item 🟡/🔴, and the catalogue is incomplete per the requirement above. For the established pattern, consult existing tracks' `<layer>-types.json` `trait_impls` arrays (per the "worked example" pointer below), where derive impls such as `core::fmt::Debug` / `core::clone::Clone` / `core::default::Default` / `core::fmt::Display` / `core::error::Error` are declared as explicit entries. This applies identically to `modify` entries (see below).
@@ -521,7 +540,7 @@ Pre-condition: the entry **IS in baseline (B)** and **this track will change its
 - **for `TraitEntry` methods: `MethodDeclaration.has_default_impl` must reflect the post-modification state** — `true` if the trait method has a default body, `false` if it is required. A trait method that flips between required and default changes the structural equality; wrong value → `Mismatch_Modify` → 🟡. For `TypeEntry` inherent methods, the codec always sets `has_body: true` regardless of `has_default_impl` (inherent methods always have a body); always write `has_default_impl: false`
 - **trait must declare correct `supertrait_bounds`** (Phase 2 compares bounds; wrong or missing bounds → `Mismatch_Modify` → 🟡)
 - **all impl blocks for the struct must be declared** as top-level `trait_impls` entries (using `for_type`) and `inherent_impls` entries (using `type_name`) naming the struct (incomplete impl declarations produce impl-drift signals → 🟡 / 🔴)
-- **struct must declare ALL fields** in `kind.fields` (partial fields → length mismatch → 🟡)
+- **struct must declare ALL fields** in `kind.shape.fields` (partial fields → length mismatch → 🟡)
 - **enum must declare ALL variants** in `kind.variants`, each with the correct `payload` shape (missing variant or wrong payload → 🟡)
 - **type alias must restate the correct `kind.target`** — the post-modification target type (wrong target → 🟡)
 - **function must declare ALL params and the returns** (partial signature → 🟡)
@@ -563,7 +582,7 @@ A pre-existing entry's `kind` axis switching across partitions (non-trait ↔ tr
 1. One `delete` entry for the old kind under the original partition (`types` or `traits`)
 2. One `add` entry for the new kind under the new partition
 
-Same-partition `kind` changes (e.g., `PlainStruct` ↔ `Enum` within `types`) use `action: modify` in place.
+Same-partition `kind` changes (e.g., a `struct` shape ↔ `enum` within `types`) use `action: modify` in place.
 
 ## Catalogue Pattern Cookbook (v3)
 
@@ -577,7 +596,7 @@ Patterns 1 and 3 show complete `schema_version: 3` documents. Patterns 2, 4–8 
 
 ### Pattern 1: Typestate cluster + enum wrapper (state machine + heterogeneous Vec)
 
-ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | Deprecated`. One `PlainStruct { typestate: Some(...) }` per state + one `Enum` wrapper.
+ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | Deprecated`. One struct per state with its `typestate` marker set (orthogonal to `shape`) + one `Enum` wrapper.
 
 ```json
 {
@@ -589,11 +608,14 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
       "action": "add",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [
-          { "name": "common", "ty": "AdrDecisionCommon" }
-        ],
-        "has_stripped_fields": false,
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "common", "ty": "AdrDecisionCommon" }
+          ],
+          "has_stripped_fields": false
+        },
         "typestate": { "state_name": "AdrDecisionLifecycle", "transition_methods": ["accept"] }
       },
       "methods": [
@@ -617,9 +639,12 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
       "action": "add",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [{ "name": "common", "ty": "AdrDecisionCommon" }],
-        "has_stripped_fields": false,
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [{ "name": "common", "ty": "AdrDecisionCommon" }],
+          "has_stripped_fields": false
+        },
         "typestate": { "state_name": "AdrDecisionLifecycle", "transition_methods": ["implement"] }
       },
       "methods": [
@@ -642,12 +667,15 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
       "action": "add",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [
-          { "name": "common",         "ty": "AdrDecisionCommon" },
-          { "name": "implemented_in", "ty": "String" }
-        ],
-        "has_stripped_fields": false,
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "common",         "ty": "AdrDecisionCommon" },
+            { "name": "implemented_in", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        },
         "typestate": { "state_name": "AdrDecisionLifecycle", "transition_methods": [] }
       },
       "methods": [],
@@ -659,12 +687,15 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
       "action": "add",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [
-          { "name": "common",        "ty": "AdrDecisionCommon" },
-          { "name": "superseded_by", "ty": "String" }
-        ],
-        "has_stripped_fields": false,
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "common",        "ty": "AdrDecisionCommon" },
+            { "name": "superseded_by", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        },
         "typestate": { "state_name": "AdrDecisionLifecycle", "transition_methods": [] }
       },
       "methods": [],
@@ -676,9 +707,12 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
       "action": "add",
       "role": "ValueObject",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [{ "name": "common", "ty": "AdrDecisionCommon" }],
-        "has_stripped_fields": false,
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [{ "name": "common", "ty": "AdrDecisionCommon" }],
+          "has_stripped_fields": false
+        },
         "typestate": { "state_name": "AdrDecisionLifecycle", "transition_methods": [] }
       },
       "methods": [],
@@ -710,7 +744,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
 }
 ```
 
-Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a `PlainStruct { status: DecisionStatus, implemented_in: Option<String>, superseded_by: Option<String> }`. That shape permits `Proposed { superseded_by: Some(...) }` — runtime invariants only. Per `.claude/rules/04-coding-principles.md` § Enum-first / § Typestate, use a typestate cluster instead.
+Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a plain-shape struct `{ status: DecisionStatus, implemented_in: Option<String>, superseded_by: Option<String> }`. That shape permits `Proposed { superseded_by: Some(...) }` — runtime invariants only. Per `.claude/rules/04-coding-principles.md` § Enum-first / § Typestate, use a typestate cluster instead.
 
 ### Pattern 2: Pure enum with variant payloads (finite values, no transitions)
 
@@ -720,10 +754,8 @@ Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a 
     "action": "add",
     "role": "ValueObject",
     "kind": {
-      "kind": "plain_struct",
-      "fields": [{ "name": "message", "ty": "String" }],
-      "has_stripped_fields": false,
-      "typestate": null
+      "kind": "struct",
+      "shape": { "kind": "plain", "fields": [{ "name": "message", "ty": "String" }], "has_stripped_fields": false }
     },
     "methods": [],
     "module_path": "result", "docs": null, "spec_refs": [], "informal_grounds": []
@@ -806,10 +838,8 @@ The core-tier crate declares the port + error type; an adapter-tier crate declar
       "action": "add",
       "role": "SecondaryAdapter",
       "kind": {
-        "kind": "plain_struct",
-        "fields": [{ "name": "adr_dir", "ty": "std::path::PathBuf" }],
-        "has_stripped_fields": false,
-        "typestate": null
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [{ "name": "adr_dir", "ty": "std::path::PathBuf" }], "has_stripped_fields": false }
       },
       "methods": [],
       "module_path": "adr::fs",
@@ -913,7 +943,7 @@ For LHS forms that the inline `bounds` field cannot express (e.g. `where Vec<T>:
 
 ### Pattern 6: Type alias entry
 
-A `type_alias` entry is for a genuine Rust `pub type` declaration — a named alias for an existing type, with no validation or newtype semantics. **Do not use `type_alias` for validated IDs or newtypes** (self-check item 8): those must use `kind: tuple_struct` (single-field newtype with a constructor that validates) or `kind: plain_struct` with a `value()` accessor.
+A `type_alias` entry is for a genuine Rust `pub type` declaration — a named alias for an existing type, with no validation or newtype semantics. **Do not use `type_alias` for validated IDs or newtypes** (self-check item 8): those must use a `tuple` shape (single-field newtype with a validating constructor) or a `plain` shape with a `value()` accessor.
 
 ```jsonc
 "types": {
@@ -929,14 +959,14 @@ A `type_alias` entry is for a genuine Rust `pub type` declaration — a named al
 
 ### Pattern 7: `delete` entry (excluded from S during Phase 1)
 
-The `kind` field MUST match the deleted type's ACTUAL kind from the baseline (e.g. `plain_struct` if `LegacyConfig` was a named-field struct). Using the wrong kind makes the delete record structurally unfaithful and produces misleading rendered views.
+The `kind` field MUST match the deleted type's ACTUAL kind from the baseline (e.g. a `plain` shape if `LegacyConfig` was a named-field struct). Using the wrong shape makes the delete record structurally unfaithful and produces misleading rendered views.
 
 ```jsonc
 "types": {
   "LegacyConfig": {
     "action": "delete",
     "role":   "Dto",
-    "kind":   { "kind": "plain_struct", "fields": [{ "name": "value", "ty": "String" }], "has_stripped_fields": false, "typestate": null },
+    "kind":   { "kind": "struct", "shape": { "kind": "plain", "fields": [{ "name": "value", "ty": "String" }], "has_stripped_fields": false } },
     "methods": [],
     "module_path": "legacy",
     "docs": "Superseded by ConfigV2 in this track (ADR …).",
@@ -982,11 +1012,11 @@ A `reference` entry does NOT need to enumerate all methods for Phase 2 signals �
 1. Every entry under `types: { ... }` has `role:` set to one of the 13 type-section role values. Using a trait-section or function-section role triggers parse-time failure.
 2. Every entry under `traits: { ... }` has `role:` set to one of the 3 trait-section role values.
 3. Every entry under `functions: { ... }` has `role:` set to one of the 2 function-section role values — and the BTreeMap key is a function path with format `<this-crate>::[<module_path>::]<function_name>` (module segments optional; e.g. `"<this-crate>::register_user"` at crate root, `"<this-crate>::merge_gate::check_strict_merge_gate"` with module). **`<this-crate>` MUST equal the document's own `crate_name`** — the codec rejects any function path key that does not start with `{crate_name}::`.
-4. Every type carrying state-specific data with transitions uses a `PlainStruct { typestate: Some(...) }` cluster + `Enum` wrapper; no flat-enum + `Option<...>` field design.
+4. Every type carrying state-specific data with transitions uses a per-state struct cluster with the `typestate` marker set (orthogonal to `shape`) + `Enum` wrapper; no flat-enum + `Option<...>` field design.
 5. Every `action: modify` trait / struct / function lists ALL methods / fields / params and returns — partial declaration is the most common source of 🟡 findings.
 6. Generic wrapper types in `returns` / `params[].ty` use concrete type arguments (`Result<T, E>`, `Option<T>`, not bare `Result` / `Option`). Non-generic concrete types (`String`, `bool`, `AcceptedDecision`) do not require generic parameters.
 7. Cross-crate references use FQN (`<other-crate>::module::TypeName`); in-crate references use last-segment names.
-8. No `kind: type_alias` for primitives that should be validated newtypes — newtypes are `kind: tuple_struct` (single field) or `kind: plain_struct` with a `value()` accessor.
+8. No `kind: type_alias` for primitives that should be validated newtypes — newtypes are a `tuple` shape (single field) or a `plain` shape with a `value()` accessor.
 9. Core / port-hosting layers (per the convention's R1 matrix) have NO serde imports — serde conversion lives in adapter-tier DTOs.
 
 ## Scope Ownership
