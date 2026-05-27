@@ -76,8 +76,8 @@
     {
       "id": "T013",
       "description": "CLI: make the optional track-id a uniform --track-id flag across all IN-01 commands and rename verify catalogue-spec-refs's --track to --track-id (D5). The four write commands (transition / add-task / set-override / clear-override) in apps/cli/src/commands/track/mod.rs already use #[arg(long)] track_id: Option<String> from T004 — leave those unchanged. Change the remaining eleven read/query commands that T004 left as optional positional args: signals / type-signals / type-graph / baseline-graph / contract-map / catalogue-spec-signals / catalogue-impl-signals / spec-element-hash / baseline-capture / next-task / task-counts. For each, change the clap annotation from a bare positional field to #[arg(long)] track_id: Option<String>, so they accept --track-id instead of a positional argument. In apps/cli/src/commands/verify.rs, rename CatalogueSpecRefsArgs.track (--track flag) to track_id (#[arg(long = \"track-id\")]) to match the unified flag name (IN-03, D5). Update any affected unit tests that passed an explicit track-id as a positional argument in test invocations; regen/self-resolving invocations that pass no track-id are unaffected. Update any cargo make wrappers or call sites in the codebase that supplied an explicit track-id positionally to these commands (if any). Leave --track-dir (a path arg in git commit-from-file / verify plan-artifact-refs) unchanged. No new types. Covers D5, IN-01 (flag-form dimension), AC-03 (flag name unification), IN-03.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "d76584ab6520df37c408c2d5fb105748887e5a2b"
     }
   ],
   "plan": {

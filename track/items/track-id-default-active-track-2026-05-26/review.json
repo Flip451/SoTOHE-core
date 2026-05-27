@@ -324,6 +324,388 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74b02e48a578b3bcc82378c1f0511a7a3e5aa594804aaa432a9c48dab13f3cd",
+          "at": "2026-05-27T07:39:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:428183f7c16e186ec951369f5678d1b50883252a97c1821fe218ba6eb05e0414",
+          "at": "2026-05-27T13:03:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:428183f7c16e186ec951369f5678d1b50883252a97c1821fe218ba6eb05e0414",
+          "at": "2026-05-27T13:05:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This bullet conflates plain and tuple struct shapes. In the codec, only plain shapes use `fields[].ty`; tuple shapes store `fields` as plain strings (`Vec<String>`) with no `ty` field. As written, the convention teaches an invalid schema shape for tuple structs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 205,
+              "category": "schema"
+            }
+          ],
+          "hash": "rvw1:sha256:2b1c7da5d64e0ac718e33d4b430c1079fdf8c6ec153f6d479fb87587c617447f",
+          "at": "2026-05-27T14:56:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/agents/type-designer.md:403` overstates tuple behavior. The codec and domain model support `StructShape::Tuple { has_stripped_fields: true }`, so tuple structs with private fields are not guaranteed to length-mismatch. The follow-on advice to avoid tuple shape for dependency-holding structs is therefore incorrect.",
+              "severity": "P1",
+              "file": ".claude/agents/type-designer.md",
+              "line": 403,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2b1c7da5d64e0ac718e33d4b430c1079fdf8c6ec153f6d479fb87587c617447f",
+          "at": "2026-05-27T14:59:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd09a05cba5019ffd2aead0ca096cc95d90b7fe68d5051705ccf5fa395b10dd5",
+          "at": "2026-05-27T15:05:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new R9 bullet at [knowledge/conventions/type-designer-kind-selection.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md#L205) says `kind.shape.fields[].ty` for both plain and tuple shapes, but `StructShapeDto::Tuple` stores tuple fields as bare strings, not `{ ty }` objects. That wording would send authors toward a nonexistent schema path for tuple newtypes and contradict the codec DTO.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 205,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:be38469269a097c78f2cc8a30d4fb3fc1ef2e3044df4f0a9b679103e80954dd9",
+          "at": "2026-05-27T15:43:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4345fb35dfccd1be2c2f50d1224493512f396dae16f81e02393a2261e7683721",
+          "at": "2026-05-27T15:50:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This inline bad example still shows a struct as `kind: { \"kind\": \"struct\" }` with no nested `shape`. CN-02 makes `shape` mandatory for every struct kind, and the briefing explicitly requires every struct kind JSON example to use the new `struct` + `shape` wire format. Even in a bad design example, this now teaches a schema-invalid catalogue shape rather than only the intended typestate-design violation.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 281,
+              "category": "schema contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4345fb35dfccd1be2c2f50d1224493512f396dae16f81e02393a2261e7683721",
+          "at": "2026-05-27T15:55:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:909639766b6b874504e7e9eb4bbafebc742e6879d93d323cff9bd17447f7ecef",
+          "at": "2026-05-27T15:58:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `--track-id` from the Step 2 / Step 4 / Step 6 examples makes the documented flow depend on `resolve_track_id(None)`, which only accepts `track/<id>` branches. Step 0 still says the review target can be `track/<id>` or `plan/<id>`, so the new bare invocations now fail on the documented `plan/<id>` path. Either keep an explicit track-id override for plan branches or remove `plan/<id>` from the supported branch set.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 44,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
+          "at": "2026-05-27T16:16:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
+          "at": "2026-05-27T16:17:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The happy-path commands now omit `--track-id`, but the same document still says `/track:review` can run from either `track/<id>` or `plan/<id>` branches. The underlying active-track resolver accepts only `track/<id>` branches, so from a `plan/<id>` branch this bare `cargo make track-review-results` invocation fails instead of using the extracted `{track-id}`. Either remove the `plan/<id>` promise from the command contract or keep passing an explicit `--track-id` for that path.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 44,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
+          "at": "2026-05-27T16:20:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The command still advertises `plan/<id>` branches as valid review targets, and this new Step 2 fallback explicitly tells the operator to pass `--track-id` on `plan/<id>`, but the later happy-path commands now omit it unconditionally. `sotp review local`, `review results`, and `check-approved` only auto-resolve from `track/<id>` branches, so following this document from a `plan/<id>` branch will get through Step 2 only to fail at Step 4 or Step 6. Either constrain `/track:review` to `track/<id>` branches or carry the same explicit `--track-id` fallback through the later invocations.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 47,
+              "category": "workflow"
+            }
+          ],
+          "hash": "rvw1:sha256:9bf9ac600cd9261ee1957b3f1109a5cd89509b58293313d20ec4cb41969454af",
+          "at": "2026-05-27T16:23:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23d3e5f2d4ceb8b14057096c6ff37f374aebf349d99e1f2ea8fbfcc21e517d25",
+          "at": "2026-05-27T16:26:18Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This adds a new public `BranchReaderPort` implementation on `SystemGitRepo`, but there are no tests in `git_cli/mod.rs` covering the happy path or the error mapping for this adapter. That leaves the new public API unverified and makes regressions in the delegation/mapping easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 235,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:74f62715d75176547bca2ff4bd84d8131bbf2e930e49a974d5d34b83c83c0f15",
+          "at": "2026-05-27T05:14:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This patch is no longer limited to the single impl block requested in CN-05: it appends unit tests under `mod tests`, so the change surface extends beyond the allowed block.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 743,
+              "category": "architecture"
+            },
+            {
+              "message": "The new `BranchReaderPort` adapter has no test for the only error branch (`GitError` -> `BranchReadError::ReadFailed`). The added tests cover the success path and the `Ok(None)` path only, so an error-mapping regression would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 748,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dfdea60bafe4d19709647aeedb23f86b066ab755183a46d6e7d034ac9d33165c",
+          "at": "2026-05-27T05:19:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This patch exceeds the briefing's CN-05 boundary: it adds a new `#[cfg(test)]` test block after the adapter impl, even though T002 was supposed to stay within a single `impl BranchReaderPort for SystemGitRepo` block in `libs/infrastructure/src/git_cli/` only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 743,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
+          "at": "2026-05-27T05:25:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`branch_reader_port_returns_none_for_empty_repo_with_no_commits` is built on the wrong Git assumption: `git init` creates an unborn branch with a known current branch name, so this path is not a reliable `None` case and is likely to fail in CI. Use a scenario where `current_branch` באמת cannot resolve a branch name instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
+              "line": 766,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
+          "at": "2026-05-27T05:29:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
+          "at": "2026-05-27T05:32:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
+          "at": "2026-05-27T05:36:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new error path tells users to \"provide an explicit track-id\", but `verify catalogue-spec-signals` has no track-id argument. On a non-track branch this remediation is impossible within this command, so the failure message contradicts the CLI surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 399,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:694fed682e06f9e80604ae933d4d859dab31d3ecb1e8fe961a7e9f19fa70a532",
+          "at": "2026-05-27T08:51:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
+          "at": "2026-05-27T08:56:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On non-track branches this error still includes the shared resolver text `provide an explicit track-id` via `{e}`, but `verify catalogue-spec-signals` exposes no `--track` or `--track-id` argument. The remediation is impossible for this command, so the failure message contradicts the CLI surface; suppress or map that nested resolver detail here and keep the actionable hint to switch to a `track/<id>` branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 399,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
+          "at": "2026-05-27T09:00:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a99d2131400483ab69730db29bc3eda51b88c72408470baedcbc410ae098728",
+          "at": "2026-05-27T09:03:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
+          "at": "2026-05-27T11:46:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
+          "at": "2026-05-27T11:48:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
+          "at": "2026-05-27T12:42:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
+          "at": "2026-05-27T12:44:49Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
+          "at": "2026-05-27T08:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
+          "at": "2026-05-27T08:51:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:38:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
+          "at": "2026-05-27T13:02:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
+          "at": "2026-05-27T13:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
+          "at": "2026-05-27T16:14:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
+          "at": "2026-05-27T16:16:14Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -800,388 +1182,20 @@
           "findings": [],
           "hash": "rvw1:sha256:378db026d81eff32a68fc5053db0f249be0131b69eeea668c8eac1c5fa4257ec",
           "at": "2026-05-27T22:52:50Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This adds a new public `BranchReaderPort` implementation on `SystemGitRepo`, but there are no tests in `git_cli/mod.rs` covering the happy path or the error mapping for this adapter. That leaves the new public API unverified and makes regressions in the delegation/mapping easy to miss.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 235,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:74f62715d75176547bca2ff4bd84d8131bbf2e930e49a974d5d34b83c83c0f15",
-          "at": "2026-05-27T05:14:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This patch is no longer limited to the single impl block requested in CN-05: it appends unit tests under `mod tests`, so the change surface extends beyond the allowed block.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 743,
-              "category": "architecture"
-            },
-            {
-              "message": "The new `BranchReaderPort` adapter has no test for the only error branch (`GitError` -> `BranchReadError::ReadFailed`). The added tests cover the success path and the `Ok(None)` path only, so an error-mapping regression would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 748,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dfdea60bafe4d19709647aeedb23f86b066ab755183a46d6e7d034ac9d33165c",
-          "at": "2026-05-27T05:19:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This patch exceeds the briefing's CN-05 boundary: it adds a new `#[cfg(test)]` test block after the adapter impl, even though T002 was supposed to stay within a single `impl BranchReaderPort for SystemGitRepo` block in `libs/infrastructure/src/git_cli/` only.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 743,
-              "category": "scope"
-            }
-          ],
-          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
-          "at": "2026-05-27T05:25:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`branch_reader_port_returns_none_for_empty_repo_with_no_commits` is built on the wrong Git assumption: `git init` creates an unborn branch with a known current branch name, so this path is not a reliable `None` case and is likely to fail in CI. Use a scenario where `current_branch` באמת cannot resolve a branch name instead.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/git_cli/mod.rs",
-              "line": 766,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
-          "at": "2026-05-27T05:29:14Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
-          "at": "2026-05-27T05:32:20Z"
+          "hash": "rvw1:sha256:cbaf107e2d1ce0311b43339cc69d0fbb4158e0a8eb335ee787274958e91a9120",
+          "at": "2026-05-27T22:55:27Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
-          "at": "2026-05-27T05:36:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new error path tells users to \"provide an explicit track-id\", but `verify catalogue-spec-signals` has no track-id argument. On a non-track branch this remediation is impossible within this command, so the failure message contradicts the CLI surface.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-              "line": 399,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:694fed682e06f9e80604ae933d4d859dab31d3ecb1e8fe961a7e9f19fa70a532",
-          "at": "2026-05-27T08:51:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
-          "at": "2026-05-27T08:56:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On non-track branches this error still includes the shared resolver text `provide an explicit track-id` via `{e}`, but `verify catalogue-spec-signals` exposes no `--track` or `--track-id` argument. The remediation is impossible for this command, so the failure message contradicts the CLI surface; suppress or map that nested resolver detail here and keep the actionable hint to switch to a `track/<id>` branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-              "line": 399,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
-          "at": "2026-05-27T09:00:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a99d2131400483ab69730db29bc3eda51b88c72408470baedcbc410ae098728",
-          "at": "2026-05-27T09:03:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
-          "at": "2026-05-27T11:46:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
-          "at": "2026-05-27T11:48:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
-          "at": "2026-05-27T12:42:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
-          "at": "2026-05-27T12:44:49Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c74b02e48a578b3bcc82378c1f0511a7a3e5aa594804aaa432a9c48dab13f3cd",
-          "at": "2026-05-27T07:39:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:428183f7c16e186ec951369f5678d1b50883252a97c1821fe218ba6eb05e0414",
-          "at": "2026-05-27T13:03:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:428183f7c16e186ec951369f5678d1b50883252a97c1821fe218ba6eb05e0414",
-          "at": "2026-05-27T13:05:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This bullet conflates plain and tuple struct shapes. In the codec, only plain shapes use `fields[].ty`; tuple shapes store `fields` as plain strings (`Vec<String>`) with no `ty` field. As written, the convention teaches an invalid schema shape for tuple structs.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 205,
-              "category": "schema"
-            }
-          ],
-          "hash": "rvw1:sha256:2b1c7da5d64e0ac718e33d4b430c1079fdf8c6ec153f6d479fb87587c617447f",
-          "at": "2026-05-27T14:56:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.claude/agents/type-designer.md:403` overstates tuple behavior. The codec and domain model support `StructShape::Tuple { has_stripped_fields: true }`, so tuple structs with private fields are not guaranteed to length-mismatch. The follow-on advice to avoid tuple shape for dependency-holding structs is therefore incorrect.",
-              "severity": "P1",
-              "file": ".claude/agents/type-designer.md",
-              "line": 403,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2b1c7da5d64e0ac718e33d4b430c1079fdf8c6ec153f6d479fb87587c617447f",
-          "at": "2026-05-27T14:59:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd09a05cba5019ffd2aead0ca096cc95d90b7fe68d5051705ccf5fa395b10dd5",
-          "at": "2026-05-27T15:05:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new R9 bullet at [knowledge/conventions/type-designer-kind-selection.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md#L205) says `kind.shape.fields[].ty` for both plain and tuple shapes, but `StructShapeDto::Tuple` stores tuple fields as bare strings, not `{ ty }` objects. That wording would send authors toward a nonexistent schema path for tuple newtypes and contradict the codec DTO.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 205,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:be38469269a097c78f2cc8a30d4fb3fc1ef2e3044df4f0a9b679103e80954dd9",
-          "at": "2026-05-27T15:43:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4345fb35dfccd1be2c2f50d1224493512f396dae16f81e02393a2261e7683721",
-          "at": "2026-05-27T15:50:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This inline bad example still shows a struct as `kind: { \"kind\": \"struct\" }` with no nested `shape`. CN-02 makes `shape` mandatory for every struct kind, and the briefing explicitly requires every struct kind JSON example to use the new `struct` + `shape` wire format. Even in a bad design example, this now teaches a schema-invalid catalogue shape rather than only the intended typestate-design violation.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 281,
-              "category": "schema contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:4345fb35dfccd1be2c2f50d1224493512f396dae16f81e02393a2261e7683721",
-          "at": "2026-05-27T15:55:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:909639766b6b874504e7e9eb4bbafebc742e6879d93d323cff9bd17447f7ecef",
-          "at": "2026-05-27T15:58:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `--track-id` from the Step 2 / Step 4 / Step 6 examples makes the documented flow depend on `resolve_track_id(None)`, which only accepts `track/<id>` branches. Step 0 still says the review target can be `track/<id>` or `plan/<id>`, so the new bare invocations now fail on the documented `plan/<id>` path. Either keep an explicit track-id override for plan branches or remove `plan/<id>` from the supported branch set.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 44,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
-          "at": "2026-05-27T16:16:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
-          "at": "2026-05-27T16:17:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The happy-path commands now omit `--track-id`, but the same document still says `/track:review` can run from either `track/<id>` or `plan/<id>` branches. The underlying active-track resolver accepts only `track/<id>` branches, so from a `plan/<id>` branch this bare `cargo make track-review-results` invocation fails instead of using the extracted `{track-id}`. Either remove the `plan/<id>` promise from the command contract or keep passing an explicit `--track-id` for that path.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 44,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c2a776d0b5aa2aa32a65c5b6861f561e56e6c8e38ca6852659e2c4c8a2fcb9f0",
-          "at": "2026-05-27T16:20:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The command still advertises `plan/<id>` branches as valid review targets, and this new Step 2 fallback explicitly tells the operator to pass `--track-id` on `plan/<id>`, but the later happy-path commands now omit it unconditionally. `sotp review local`, `review results`, and `check-approved` only auto-resolve from `track/<id>` branches, so following this document from a `plan/<id>` branch will get through Step 2 only to fail at Step 4 or Step 6. Either constrain `/track:review` to `track/<id>` branches or carry the same explicit `--track-id` fallback through the later invocations.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 47,
-              "category": "workflow"
-            }
-          ],
-          "hash": "rvw1:sha256:9bf9ac600cd9261ee1957b3f1109a5cd89509b58293313d20ec4cb41969454af",
-          "at": "2026-05-27T16:23:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23d3e5f2d4ceb8b14057096c6ff37f374aebf349d99e1f2ea8fbfcc21e517d25",
-          "at": "2026-05-27T16:26:18Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
-          "at": "2026-05-27T08:50:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
-          "at": "2026-05-27T08:51:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
-          "at": "2026-05-27T09:34:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
-          "at": "2026-05-27T09:38:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
-          "at": "2026-05-27T13:02:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
-          "at": "2026-05-27T13:03:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
-          "at": "2026-05-27T16:14:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
-          "at": "2026-05-27T16:16:14Z"
+          "hash": "rvw1:sha256:cbaf107e2d1ce0311b43339cc69d0fbb4158e0a8eb335ee787274958e91a9120",
+          "at": "2026-05-27T22:56:44Z"
         }
       ]
     },
