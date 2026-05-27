@@ -323,14 +323,14 @@ fn dispatch_track_next_task(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let track_id = raw_args_to_single(raw_args).map_err(|_| {
         CliError::Message("error: usage: sotp make track-next-task <track-id>".to_owned())
     })?;
-    run_sotp(&["track", "next-task", "--items-dir", "track/items", &track_id])
+    run_sotp(&["track", "next-task", "--items-dir", "track/items", "--track-id", &track_id])
 }
 
 fn dispatch_track_task_counts(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let track_id = raw_args_to_single(raw_args).map_err(|_| {
         CliError::Message("error: usage: sotp make track-task-counts <track-id>".to_owned())
     })?;
-    run_sotp(&["track", "task-counts", "--items-dir", "track/items", &track_id])
+    run_sotp(&["track", "task-counts", "--items-dir", "track/items", "--track-id", &track_id])
 }
 
 fn dispatch_track_transition(raw_args: &[String]) -> Result<ExitCode, CliError> {

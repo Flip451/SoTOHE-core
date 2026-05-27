@@ -278,6 +278,7 @@ pub enum TrackCommand {
 
         /// Track ID (directory name under items_dir).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
     },
 
@@ -289,6 +290,7 @@ pub enum TrackCommand {
 
         /// Track ID (directory name under items_dir).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
     },
 
@@ -300,6 +302,7 @@ pub enum TrackCommand {
 
         /// Track ID (directory name under items_dir).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
     },
 
@@ -307,6 +310,7 @@ pub enum TrackCommand {
     TypeSignals {
         /// Track ID (directory name under `workspace_root/track/items`).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
 
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
@@ -336,6 +340,7 @@ pub enum TrackCommand {
 
         /// Track ID (directory name under items_dir).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
 
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
@@ -375,6 +380,7 @@ pub enum TrackCommand {
 
         /// Track ID (directory name under items_dir).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
@@ -403,6 +409,7 @@ pub enum TrackCommand {
 
         /// Track ID (directory name under items_dir).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
@@ -431,6 +438,7 @@ pub enum TrackCommand {
 
         /// Track ID (directory name under items_dir).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
@@ -459,6 +467,7 @@ pub enum TrackCommand {
 
         /// Track ID (directory name under items_dir).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
 
         /// Optional single-anchor lookup. When omitted, every element is emitted.
@@ -482,6 +491,7 @@ pub enum TrackCommand {
         /// The track items directory is always derived as
         /// `<workspace_root>/track/items` inside the interactor.
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
 
         /// Workspace root directory used for architecture-rules.json resolution
@@ -547,6 +557,7 @@ pub enum TrackCommand {
     CatalogueImplSignals {
         /// Track ID (directory name under `track/items`).
         /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
         track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).

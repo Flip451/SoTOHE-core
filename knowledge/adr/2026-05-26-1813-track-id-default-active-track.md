@@ -16,6 +16,9 @@ decisions:
   - id: D4
     user_decision_ref: "chat_segment:pre-review-gate-via-cargo-make-wrapper:2026-05-27"
     status: proposed
+  - id: D5
+    user_decision_ref: "chat_segment:optional-track-id-uniform-flag:2026-05-27"
+    status: proposed
 ---
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
 
@@ -93,6 +96,16 @@ track-commit-message: track-active-gate → cargo make ci → check-approved →
 - **fail-closed の維持**: chain の途中ステップが失敗した場合は後続ステップを実行せずに停止する。部分的に更新された状態でレビューを進めて後でハッシュずれが発覚するよりも、失敗を明示して停止する。
 - **regen 列の DRY 定義**: regen ゲート列（type-signals → catalogue-spec-signals → sync-views）は共有タスクに一元定義し、`track-local-review` と `track-commit-message` の両ラッパーがそれを呼び出す。同じ列を両ラッパーに重複定義しない。これにより、片方のゲートだけ変更されて pre-review と pre-commit が非対称になる回帰を構造的に防ぐ。
 - **commit ゲートの検査内容は不変**: `cargo make track-commit-message` の bare chain 化は、regen 系コマンド（type-signals / catalogue-spec-signals / sync-views）の呼び出し形（shell 解決 → 裸の自己解決コマンド）のみを変える。commit ゲートが持つ厳格な検査 — フル `cargo make ci`、および `check-approved`（レビュー未承認なら fail-closed で BLOCK）— は一切削除・弱体化しない。D4 は pre-review に regen ゲートを**追加**するものであり、commit ゲートを緩めるものではない。bare chain 化によってこれらの検査が落ちる回帰は fail-open であり禁止する。
+
+### D5: 明示 track-id 上書きの形式は統一フラグ `--track-id` とし、全コマンドで名前を揃える
+
+D1 で「明示指定は上書きとして残す」と決定したが、その *形式*（位置引数かフラグか）と *名前* は D1 の範囲外だった。PR #142 の @codex レビューでコマンド間の不統一が指摘されたため、この次元の設計を明示的に決定する。
+
+- **フラグ形式を採用する**: 対象コマンド（D3 の IN-01 コマンド群: `transition` / `signals` / `type-signals` / `type-graph` / `baseline-graph` / `contract-map` / `catalogue-spec-signals` / `catalogue-impl-signals` / `spec-element-hash` / `baseline-capture` / `add-task` / `set-override` / `clear-override` / `next-task` / `task-counts`）に対して、明示 track-id 上書きを**位置引数ではなくフラグ `--track-id`** として公開する。
+  - 複数の位置引数を持つコマンド（例: `transition <track_id> <task_id> <status>`）では、先頭の位置引数を省略可能にすると後続の必須位置引数との境界が曖昧になり、clap がパースを誤る。フラグにすることでこの曖昧さを回避できる。
+  - 明示 track-id 上書きは「現在ブランチ外のトラックを対象にしたい」まれなケースであり、フラグの若干の冗長さは許容できる。省略時の自動解決が大多数の用途を担うため、フラグの記述量が問題になる頻度は低い。
+- **フラグ名を `--track-id` に統一する**: すべての track 対象コマンドでフラグ名を `--track-id` に揃える。現状で `--track` という別名を持つ `verify catalogue-spec-refs` は、`--track-id` に改名する。この統一により、コマンドをまたいでフラグ名を使い分ける必要がなくなる。
+- **`--track-dir` は対象外**: `git commit-from-file` / `verify plan-artifact-refs` の `--track-dir` は track-id スラグではなくファイルシステムパスを受け取る引数であり、別の概念である。この名前統一の対象に含めない。
 
 ## Rejected Alternatives
 

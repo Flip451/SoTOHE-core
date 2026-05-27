@@ -38,11 +38,15 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "位置引数 `track_id: String`（必須）として定義されている track 系サブコマンド（`transition` / `signals` / `type-signals` / `type-graph` / `baseline-graph` / `contract-map` / `catalogue-spec-signals` / `catalogue-impl-signals` / `spec-element-hash` / `baseline-capture` / `add-task` / `set-override` / `clear-override` / `next-task` / `task-counts` など）の引数を `Option<String>` へ変更する",
+        "text": "位置引数 `track_id: String`（必須）として定義されている track 系サブコマンド（`transition` / `signals` / `type-signals` / `type-graph` / `baseline-graph` / `contract-map` / `catalogue-spec-signals` / `catalogue-impl-signals` / `spec-element-hash` / `baseline-capture` / `add-task` / `set-override` / `clear-override` / `next-task` / `task-counts` など）の引数を、省略可能な `--track-id` フラグ（`Option<String>`）へ変更する。位置引数ではなくフラグに統一する理由: (a) IN-02 が対象とするコマンド群（`lint` / `review *` など）はすでに `--track-id` フラグ形式であり、両グループを同じフラグ名に揃えることで CLI 全体の一貫性を保つ; (b) `transition <track_id> <task_id> <status>` のような複数位置引数を取るコマンドでは、省略可能な引数を最初の位置に置くと clap が後続の位置引数と曖昧になるため、フラグが適切; (c) 明示的な track-id 指定は「別トラックへのクロス操作」という稀なケースであり、そのような上書き用途にはフラグが自然で読みやすい",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
             "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D5"
           }
         ]
       },
@@ -58,11 +62,15 @@
       },
       {
         "id": "IN-03",
-        "text": "フラグ `--track: String`（必須）として定義されている `verify catalogue-spec-refs` の引数を `Option<String>` へ変更する",
+        "text": "フラグ `--track: String`（必須）として定義されている `verify catalogue-spec-refs` の引数を、`--track-id: Option<String>` へ変更する。フラグ名を `--track` から `--track-id` へ改名する（D5 の全コマンド統一決定による）",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
             "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D5"
           }
         ]
       },
@@ -439,11 +447,15 @@
     },
     {
       "id": "AC-03",
-      "text": "明示 track-id を渡した場合は、現在ブランチに関わらずその id が使われる。例: `main` ブランチ上で `sotp track signals my-track` を実行した場合に `my-track` を対象とする",
+      "text": "明示 track-id を渡した場合は、現在ブランチに関わらずその id が使われる。例: `main` ブランチ上で `sotp track signals --track-id my-track` を実行した場合に `my-track` を対象とする。`--track-id` フラグ形式は IN-01〜IN-03 のすべての対象コマンド群で共通である（IN-03 の `verify catalogue-spec-refs` も含め `--track-id` 名に統一する）",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
           "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D5"
         }
       ]
     },

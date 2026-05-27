@@ -72,6 +72,12 @@
       "description": "CLI: fix the main-CI regression for AC-16 — make the four ci-local CI verify checks (verify spec-states / verify catalogue-spec-refs / verify catalogue-spec-signals / verify plan-artifact-refs) skip (exit 0, print a [SKIP] message) on a non-track branch (no active track resolvable), so cargo make ci passes on main. Implement as a CLI control-flow change in apps/cli/src/commands/verify.rs per the Phase-2 design: when active-track resolution returns the not-a-track-branch error family (NotTrackBranch / DetachedHead / NoBranch), emit [SKIP] and return ExitCode::SUCCESS; real failures (BranchRead / InvalidTrackId / etc.) stay fail-closed. verify catalogue-spec-signals currently resolves the track inside infrastructure — add a CLI-dispatch conditional using ActiveTrackResolveInteractor (same pattern as the other three verify subcommands) to skip on no-track before delegating to the infrastructure path. Operation commands (transition, signals, etc.) and direct invocations with an explicit-but-invalid track keep fail-closed (D1 / CN-01). No new types; this is pure CLI control-flow. Add unit tests for the skip path: stub BranchReaderPort returning a non-track branch name or None to verify all four subcommands emit [SKIP] and exit 0. Do NOT reintroduce shell branch-parsing in the Makefile (AC-11). Covers AC-16, within CN-01's documented exception.",
       "status": "done",
       "commit_hash": "5b786cb3801a8cd72630c3bf61ad3a4c794d5d29"
+    },
+    {
+      "id": "T013",
+      "description": "CLI: make the optional track-id a uniform --track-id flag across all IN-01 commands and rename verify catalogue-spec-refs's --track to --track-id (D5). The four write commands (transition / add-task / set-override / clear-override) in apps/cli/src/commands/track/mod.rs already use #[arg(long)] track_id: Option<String> from T004 — leave those unchanged. Change the remaining eleven read/query commands that T004 left as optional positional args: signals / type-signals / type-graph / baseline-graph / contract-map / catalogue-spec-signals / catalogue-impl-signals / spec-element-hash / baseline-capture / next-task / task-counts. For each, change the clap annotation from a bare positional field to #[arg(long)] track_id: Option<String>, so they accept --track-id instead of a positional argument. In apps/cli/src/commands/verify.rs, rename CatalogueSpecRefsArgs.track (--track flag) to track_id (#[arg(long = \"track-id\")]) to match the unified flag name (IN-03, D5). Update any affected unit tests that passed an explicit track-id as a positional argument in test invocations; regen/self-resolving invocations that pass no track-id are unaffected. Update any cargo make wrappers or call sites in the codebase that supplied an explicit track-id positionally to these commands (if any). Leave --track-dir (a path arg in git commit-from-file / verify plan-artifact-refs) unchanged. No new types. Covers D5, IN-01 (flag-form dimension), AC-03 (flag name unification), IN-03.",
+      "status": "todo",
+      "commit_hash": null
     }
   ],
   "plan": {
@@ -208,6 +214,19 @@
         ],
         "task_ids": [
           "T012"
+        ]
+      },
+      {
+        "id": "S12",
+        "title": "CLI: uniform --track-id flag for all IN-01 commands + rename --track to --track-id (D5)",
+        "description": [
+          "Change the eleven read/query commands in apps/cli/src/commands/track/mod.rs (signals / type-signals / type-graph / baseline-graph / contract-map / catalogue-spec-signals / catalogue-impl-signals / spec-element-hash / baseline-capture / next-task / task-counts) from optional positional args (left as-is by T004) to #[arg(long)] track_id: Option<String>, so they accept --track-id instead of a positional value (IN-01 flag-form dimension, D5).",
+          "The four write commands (transition / add-task / set-override / clear-override) already carry #[arg(long)] from T004 — leave those unchanged.",
+          "Rename CatalogueSpecRefsArgs.track (--track) to track_id (#[arg(long = \"track-id\")]) in apps/cli/src/commands/verify.rs to complete the flag-name unification required by IN-03 and D5.",
+          "Update unit tests that passed a track-id as a positional argument, and any cargo make wrappers or call sites that supplied an explicit positional track-id. Leave --track-dir unchanged. No new types (AC-03 flag-name dimension, D5)."
+        ],
+        "task_ids": [
+          "T013"
         ]
       }
     ]

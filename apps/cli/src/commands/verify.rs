@@ -110,7 +110,7 @@ pub struct CatalogueSpecRefsArgs {
     /// Track ID (directory name under items_dir).
     /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    track: Option<String>,
+    track_id: Option<String>,
 
     /// Path to the track items root directory.
     #[arg(long, default_value = "track/items")]
@@ -272,8 +272,8 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
             // Anchored to workspace_root so that git discovery is consistent
             // with the workspace being verified (not the process CWD).
             // AC-16: skip (exit 0) when not on a track branch (CN-01 exception for CI reads).
-            // Explicit value (args.track is Some) → skip detection is bypassed; fail-closed as before.
-            if args.track.is_none() {
+            // Explicit value (args.track_id is Some) → skip detection is bypassed; fail-closed as before.
+            if args.track_id.is_none() {
                 match resolve_ci_verify_track_id_from_root(&args.workspace_root) {
                     Ok(None) => {
                         return print_skip(
@@ -292,7 +292,7 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
                 }
             }
             let track_id = match crate::commands::track::resolve_track_id_from_root(
-                args.track,
+                args.track_id,
                 &args.workspace_root,
             ) {
                 Ok(id) => id,
@@ -626,10 +626,10 @@ fn dispatch_plan_artifact_refs_with_resolver(
 /// `execute()`, returning `Some(ExitCode::SUCCESS)` on skip and `None` on fall-through.
 #[cfg(test)]
 fn dispatch_catalogue_spec_refs_skip_with_resolver(
-    track: Option<String>,
+    track_id: Option<String>,
     resolver: impl Fn() -> Result<Option<String>, String>,
 ) -> Option<ExitCode> {
-    if track.is_none() {
+    if track_id.is_none() {
         match resolver() {
             Ok(None) => {
                 return Some(print_skip(
@@ -1803,11 +1803,11 @@ mod tests {
 
     #[test]
     fn test_dispatch_catalogue_spec_refs_explicit_track_bypasses_skip() {
-        // When --track is given explicitly, the resolver is NOT called and the
+        // When --track-id is given explicitly, the resolver is NOT called and the
         // arm must return None (fall through to the full verify path).
         let result =
             dispatch_catalogue_spec_refs_skip_with_resolver(Some("my-track".to_owned()), || {
-                panic!("resolver must not be called when track is explicit")
+                panic!("resolver must not be called when track_id is explicit")
             });
         assert_eq!(
             result, None,
