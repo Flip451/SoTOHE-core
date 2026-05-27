@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "track-id-default-active-track-2026-05-26",
+  "title": "track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする",
+  "branch": "track/track-id-default-active-track-2026-05-26",
+  "created_at": "2026-05-26T23:57:40Z",
+  "updated_at": "2026-05-26T23:57:40Z"
+}

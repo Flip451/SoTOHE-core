@@ -118,6 +118,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [sotp track branch create: main 上の activation commit regression 修正](2026-04-22-1432-branch-create-commit-ordering.md) | — | 2026-04-22 |
 | [verification.md を observations.md に改名 — 役割を手動観測ログに限定](2026-04-24-2356-verification-md-rename-observations-md.md) | — | 2026-04-24 |
 | [verify チェーンを file 存在ベースの phase 責務分離に揃える](2026-04-27-0324-phase-aware-verify-gates.md) | — | 2026-04-27 |
+| [plan-only / activate ワークフローレーンの削除](2026-05-26-1123-remove-plan-only-activate-lane.md) | Proposed | 2026-05-26 |
+| [track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする](2026-05-26-1813-track-id-default-active-track.md) | Proposed | 2026-05-26 |
 
 ### ADR 運用
 
