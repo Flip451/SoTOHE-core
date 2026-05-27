@@ -10,7 +10,7 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
     // Auto-detect is only safe when items_dir is the default (track/items
-    // relative to CWD), because auto_detect uses SystemGitRepo::discover
+    // relative to CWD), because the shared resolver uses SystemGitRepo::discover
     // from CWD.  When a custom --items-dir is supplied, require explicit id.
     let is_default_items_dir = items_dir == std::path::Path::new("track/items");
 
@@ -22,7 +22,8 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
                     .to_owned(),
             ));
         }
-        None => auto_detect_track_id_from_branch()
+        // Delegate to the shared interactor path (IN-09: removes bespoke auto-detect).
+        None => super::resolve_track_id(None)
             .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?,
     };
 
@@ -48,15 +49,4 @@ pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
     }
 
     Ok(ExitCode::SUCCESS)
-}
-
-/// Auto-detect track ID from the current git branch.
-///
-/// Git I/O stays here in the CLI layer; pure branch-name parsing is
-/// delegated to `usecase::track_resolution::resolve_track_id_from_branch`.
-fn auto_detect_track_id_from_branch() -> Result<String, String> {
-    let repo = SystemGitRepo::discover().map_err(|e| e.to_string())?;
-    let branch = repo.current_branch().map_err(|e| e.to_string())?;
-    usecase::track_resolution::resolve_track_id_from_branch(branch.as_deref())
-        .map_err(|e| e.to_string())
 }

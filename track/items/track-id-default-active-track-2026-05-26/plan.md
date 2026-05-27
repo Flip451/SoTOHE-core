@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
 
-## Tasks (2/9 resolved)
+## Tasks (3/9 resolved)
 
 ### S1 — usecase: port + interactor for active-track resolution
 
@@ -24,7 +24,7 @@
 > Replace the closure parameter with Arc<dyn BranchReaderPort> and update the CLI call sites (transition.rs, state_ops.rs) to pass SystemGitRepo (IN-07, CN-05).
 > This consolidates validation and default resolution onto the same port-based path as T001-T002, eliminating the remaining direct git shelling-out from usecase-facing handlers.
 
-- [ ] **T003**: usecase: replace the BranchReaderFn closure injection in TaskOperationInteractor with Arc<dyn BranchReaderPort>. TaskOperationInteractor::new currently accepts a closure `move |_items_dir| { Command::new("git").args(["rev-parse","--abbrev-ref","HEAD"]) ... }` for the branch guard (IN-07, CN-05). Replace this with Arc<dyn BranchReaderPort> as the second constructor parameter. Update the internal branch-reading call to invoke BranchReaderPort::current_branch() instead. Update all call sites in apps/cli/src/commands/track/ (transition.rs, state_ops.rs) to pass Arc::new(SystemGitRepo::discover_from(...)) as the BranchReaderPort. This removes the last direct git rev-parse shelling-out from usecase-facing command handlers. Keep changes within libs/usecase/src/task_ops.rs plus the CLI call sites that wire the interactor (IN-07, CN-05).
+- [x] **T003**: usecase: replace the BranchReaderFn closure injection in TaskOperationInteractor with Arc<dyn BranchReaderPort>. TaskOperationInteractor::new currently accepts a closure `move |_items_dir| { Command::new("git").args(["rev-parse","--abbrev-ref","HEAD"]) ... }` for the branch guard (IN-07, CN-05). Replace this with Arc<dyn BranchReaderPort> as the second constructor parameter. Update the internal branch-reading call to invoke BranchReaderPort::current_branch() instead. Update all call sites in apps/cli/src/commands/track/ (transition.rs, state_ops.rs) to pass Arc::new(SystemGitRepo::discover_from(...)) as the BranchReaderPort. This removes the last direct git rev-parse shelling-out from usecase-facing command handlers. Keep changes within libs/usecase/src/task_ops.rs plus the CLI call sites that wire the interactor (IN-07, CN-05). (`9e8b31aba10e2a5501e043c4f83db11f033d0626`)
 
 ### S4 — CLI: make track-id optional — positional-arg commands
 

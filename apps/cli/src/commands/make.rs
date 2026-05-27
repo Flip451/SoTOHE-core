@@ -360,6 +360,7 @@ fn dispatch_track_transition(raw_args: &[String]) -> Result<ExitCode, CliError> 
         "transition",
         "--items-dir",
         &items_dir,
+        "--track-id",
         &track_id_str,
         task_id,
         target_status,
@@ -377,7 +378,7 @@ fn dispatch_track_add_task(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let track_id = words.first().ok_or_else(|| CliError::Message(usage.to_owned()))?;
     let desc = words.get(1).ok_or_else(|| CliError::Message(usage.to_owned()))?;
     let mut args: Vec<&str> =
-        vec!["track", "add-task", "--items-dir", "track/items", track_id, desc];
+        vec!["track", "add-task", "--items-dir", "track/items", "--track-id", track_id, desc];
     for w in words.get(2..).unwrap_or_default() {
         args.push(w);
     }
@@ -392,12 +393,19 @@ fn dispatch_track_set_override(raw_args: &[String]) -> Result<ExitCode, CliError
     let extra: Vec<&str> = words.get(2..).unwrap_or_default().iter().map(|s| s.as_str()).collect();
     if status == "clear" {
         let mut args: Vec<&str> =
-            vec!["track", "clear-override", "--items-dir", "track/items", track_id];
+            vec!["track", "clear-override", "--items-dir", "track/items", "--track-id", track_id];
         args.extend_from_slice(&extra);
         run_sotp(&args)
     } else {
-        let mut args: Vec<&str> =
-            vec!["track", "set-override", "--items-dir", "track/items", track_id, status];
+        let mut args: Vec<&str> = vec![
+            "track",
+            "set-override",
+            "--items-dir",
+            "track/items",
+            "--track-id",
+            track_id,
+            status,
+        ];
         args.extend_from_slice(&extra);
         run_sotp(&args)
     }

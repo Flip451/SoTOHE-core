@@ -1,13 +1,16 @@
 //! CLI subcommand for track operations using FsTrackStore.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Arc;
 
 use clap::{Args, Subcommand};
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+use infrastructure::git_cli::SystemGitRepo;
 use infrastructure::track::fs_store::FsTrackStore;
 use infrastructure::track::render;
+use usecase::track_resolution::{
+    ActiveTrackResolveInteractor, ActiveTrackResolveService as _, BranchReaderPort,
+};
 
 mod branch_ops;
 mod resolve;
@@ -71,6 +74,66 @@ pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
     }
 }
 
+/// Resolves a track ID from an explicit value or from the current git branch.
+///
+/// When `explicit_id` is `Some`, returns it directly (CN-02: explicit value
+/// takes priority). When `None`, invokes `ActiveTrackResolveInteractor` with a
+/// `SystemGitRepo` wired at composition root to read the current branch (D2).
+/// Fail-closed on non-track branches: returns an error with a message that
+/// prompts the user to provide an explicit track-id (CN-01, AC-01, AC-02).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when the track-id cannot be resolved.
+pub(super) fn resolve_track_id(explicit_id: Option<String>) -> Result<String, String> {
+    match explicit_id {
+        Some(id) => Ok(id),
+        None => {
+            let repo = SystemGitRepo::discover()
+                .map_err(|e| format!("cannot discover git repository: {e}"))?;
+            resolve_track_id_with_branch_reader(None, Arc::new(repo))
+        }
+    }
+}
+
+/// Resolves a track ID using git discovery rooted at a workspace path.
+///
+/// This is for commands whose target tree is selected by `--workspace-root`.
+/// The omitted track-id path must read the branch from that same workspace
+/// rather than from the process current directory.
+fn resolve_track_id_from_root(
+    explicit_id: Option<String>,
+    workspace_root: &Path,
+) -> Result<String, String> {
+    match explicit_id {
+        Some(id) => Ok(id),
+        None => {
+            let repo = SystemGitRepo::discover_from(workspace_root).map_err(|e| {
+                format!("cannot discover git repository from {}: {e}", workspace_root.display())
+            })?;
+            resolve_track_id_with_branch_reader(None, Arc::new(repo))
+        }
+    }
+}
+
+fn resolve_track_id_with_branch_reader(
+    explicit_id: Option<String>,
+    branch_reader: Arc<dyn BranchReaderPort>,
+) -> Result<String, String> {
+    match explicit_id {
+        Some(id) => Ok(id),
+        None => {
+            let interactor = ActiveTrackResolveInteractor::new(branch_reader);
+            interactor.resolve_active_track().map_err(|e| {
+                format!(
+                    "{e}\nHint: provide an explicit track-id argument, or switch to a \
+                     track branch (track/<id>) first."
+                )
+            })
+        }
+    }
+}
+
 pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
     let items_name = items_dir.file_name().and_then(|name| name.to_str());
     let track_dir = items_dir.parent();
@@ -107,7 +170,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Task ID (e.g., T1, T2).
         task_id: String,
@@ -146,7 +211,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Task description.
         description: String,
@@ -171,7 +238,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Override status: blocked or cancelled.
         status: String,
@@ -192,7 +261,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Skip branch validation.
         #[arg(long, default_value_t = false)]
@@ -206,7 +277,8 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
     },
 
     /// Show task status counts for a track (JSON output).
@@ -216,7 +288,8 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
     },
 
     /// Evaluate spec.md source tags and store results in metadata.json spec_signals.
@@ -226,13 +299,15 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
     },
 
     /// Evaluate domain type signals via rustdoc schema export and store results in domain-types.json.
     TypeSignals {
         /// Track ID (directory name under `workspace_root/track/items`).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
         ///
@@ -260,7 +335,8 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
         #[arg(long, default_value = ".")]
@@ -298,7 +374,8 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
@@ -325,7 +402,8 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
@@ -352,7 +430,8 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
@@ -379,7 +458,8 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
 
         /// Optional single-anchor lookup. When omitted, every element is emitted.
         #[arg(long)]
@@ -401,7 +481,8 @@ pub enum TrackCommand {
         ///
         /// The track items directory is always derived as
         /// `<workspace_root>/track/items` inside the interactor.
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
 
         /// Workspace root directory used for architecture-rules.json resolution
         /// and the default rustdoc source. Defaults to current directory.
@@ -464,7 +545,8 @@ pub enum TrackCommand {
     /// (ADR 2026-05-11-2330 §D3).
     CatalogueImplSignals {
         /// Track ID (directory name under `track/items`).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
@@ -544,14 +626,16 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             target_status,
             commit_hash,
             skip_branch_check,
-        } => transition::execute_transition(
-            items_dir,
-            track_id,
-            task_id,
-            target_status,
-            commit_hash,
-            skip_branch_check,
-        ),
+        } => resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
+            transition::execute_transition(
+                items_dir,
+                tid,
+                task_id,
+                target_status,
+                commit_hash,
+                skip_branch_check,
+            )
+        }),
         TrackCommand::Branch { action } => branch_ops::execute_branch(action),
         TrackCommand::Resolve(args) => resolve::execute_resolve(args),
         TrackCommand::Views { action } => views::execute_views(action),
@@ -562,31 +646,39 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             section,
             after,
             skip_branch_check,
-        } => state_ops::execute_add_task(
-            items_dir,
-            track_id,
-            description,
-            section,
-            after,
-            skip_branch_check,
-        ),
+        } => resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
+            state_ops::execute_add_task(
+                items_dir,
+                tid,
+                description,
+                section,
+                after,
+                skip_branch_check,
+            )
+        }),
         TrackCommand::SetOverride { items_dir, track_id, status, reason, skip_branch_check } => {
-            state_ops::execute_set_override(items_dir, track_id, status, reason, skip_branch_check)
+            resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
+                state_ops::execute_set_override(items_dir, tid, status, reason, skip_branch_check)
+            })
         }
         TrackCommand::ClearOverride { items_dir, track_id, skip_branch_check } => {
-            state_ops::execute_clear_override(items_dir, track_id, skip_branch_check)
+            resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
+                state_ops::execute_clear_override(items_dir, tid, skip_branch_check)
+            })
         }
-        TrackCommand::NextTask { items_dir, track_id } => {
-            state_ops::execute_next_task(items_dir, track_id)
-        }
-        TrackCommand::TaskCounts { items_dir, track_id } => {
-            state_ops::execute_task_counts(items_dir, track_id)
-        }
-        TrackCommand::Signals { items_dir, track_id } => {
-            signals::execute_signals(items_dir, track_id)
-        }
+        TrackCommand::NextTask { items_dir, track_id } => resolve_track_id(track_id)
+            .map_err(CliError::Message)
+            .and_then(|tid| state_ops::execute_next_task(items_dir, tid)),
+        TrackCommand::TaskCounts { items_dir, track_id } => resolve_track_id(track_id)
+            .map_err(CliError::Message)
+            .and_then(|tid| state_ops::execute_task_counts(items_dir, tid)),
+        TrackCommand::Signals { items_dir, track_id } => resolve_track_id(track_id)
+            .map_err(CliError::Message)
+            .and_then(|tid| signals::execute_signals(items_dir, tid)),
         TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
-            tddd::signals::execute_type_signals(track_id, workspace_root, layer)
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| tddd::signals::execute_type_signals(tid, workspace_root, layer))
         }
         TrackCommand::TypeGraph {
             items_dir,
@@ -595,27 +687,38 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             layer,
             cluster_depth,
             edges,
-        } => tddd::graph::execute_type_graph(
-            items_dir,
-            track_id,
-            workspace_root,
-            layer,
-            cluster_depth,
-            edges,
-        ),
+        } => {
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::graph::execute_type_graph(
+                    items_dir,
+                    tid,
+                    workspace_root,
+                    layer,
+                    cluster_depth,
+                    edges,
+                )
+            })
+        }
         TrackCommand::BaselineGraph { items_dir, track_id, workspace_root, layers } => {
-            tddd::baseline_graph::execute_baseline_graph(
-                items_dir,
-                track_id,
-                workspace_root,
-                layers,
-            )
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::baseline_graph::execute_baseline_graph(items_dir, tid, workspace_root, layers)
+            })
         }
         TrackCommand::ContractMap { items_dir, track_id, workspace_root, layers } => {
-            tddd::contract_map::execute_contract_map(items_dir, track_id, workspace_root, layers)
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::contract_map::execute_contract_map(items_dir, tid, workspace_root, layers)
+            })
         }
         TrackCommand::SpecElementHash { items_dir, track_id, anchor } => {
-            tddd::spec_element_hash::execute_spec_element_hash(items_dir, track_id, anchor)
+            resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
+                tddd::spec_element_hash::execute_spec_element_hash(items_dir, tid, anchor)
+            })
         }
         TrackCommand::BaselineCapture {
             track_id,
@@ -623,30 +726,44 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             source_workspace,
             layer,
             force,
-        } => tddd::baseline::execute_baseline_capture(
-            track_id,
-            workspace_root,
-            source_workspace,
-            layer,
-            force,
-        ),
+        } => {
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::baseline::execute_baseline_capture(
+                    tid,
+                    workspace_root,
+                    source_workspace,
+                    layer,
+                    force,
+                )
+            })
+        }
         TrackCommand::CatalogueSpecSignals { items_dir, track_id, workspace_root, layer } => {
-            tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
-                items_dir,
-                track_id,
-                workspace_root,
-                layer,
-            )
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
+                    items_dir,
+                    tid,
+                    workspace_root,
+                    layer,
+                )
+            })
         }
         TrackCommand::Lint { track_id, layer_id, workspace_root } => {
             tddd::lint::execute_lint(workspace_root, track_id, layer_id)
         }
         TrackCommand::CatalogueImplSignals { track_id, workspace_root, layer } => {
-            tddd::catalogue_impl_signals::execute_catalogue_impl_signals(
-                track_id,
-                workspace_root,
-                layer,
-            )
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::catalogue_impl_signals::execute_catalogue_impl_signals(
+                    tid,
+                    workspace_root,
+                    layer,
+                )
+            })
         }
     };
     match result {
@@ -655,5 +772,89 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             eprintln!("{err}");
             err.exit_code()
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use usecase::track_resolution::BranchReadError;
+
+    #[derive(Debug)]
+    struct StubBranchReader {
+        branch: Option<String>,
+    }
+
+    impl StubBranchReader {
+        fn new(branch: Option<&str>) -> Self {
+            Self { branch: branch.map(str::to_owned) }
+        }
+    }
+
+    impl BranchReaderPort for StubBranchReader {
+        fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
+            Ok(self.branch.clone())
+        }
+    }
+
+    fn branch_reader(branch: Option<&str>) -> Arc<dyn BranchReaderPort> {
+        Arc::new(StubBranchReader::new(branch))
+    }
+
+    // --- resolve_track_id ---
+
+    /// AC-03 / CN-02: explicit track-id is returned as-is, regardless of branch.
+    #[test]
+    fn test_resolve_track_id_with_explicit_value_returns_it_directly() {
+        let result = resolve_track_id(Some("my-feature-2026".to_owned()));
+        assert_eq!(result.unwrap(), "my-feature-2026");
+    }
+
+    /// CN-02: explicit track-id priority is preserved even when on a track branch.
+    #[test]
+    fn test_resolve_track_id_explicit_value_takes_priority_over_branch() {
+        let result = resolve_track_id_with_branch_reader(
+            Some("explicit-id".to_owned()),
+            branch_reader(Some("track/branch-id")),
+        );
+        assert_eq!(result.unwrap(), "explicit-id");
+    }
+
+    /// AC-01 / CN-01: when track_id is None and on a track branch, the branch
+    /// suffix is returned.
+    #[test]
+    fn test_resolve_track_id_none_on_track_branch_returns_branch_id() {
+        let result = resolve_track_id_with_branch_reader(
+            None,
+            branch_reader(Some("track/active-track-2026")),
+        );
+        assert!(result.is_ok(), "expected Ok on track branch, got: {result:?}");
+        assert_eq!(result.unwrap(), "active-track-2026");
+    }
+
+    /// AC-02 / CN-01: when track_id is None and on a non-track branch (e.g. main),
+    /// an error is returned with a hint to provide an explicit track-id.
+    #[test]
+    fn test_resolve_track_id_none_on_non_track_branch_returns_error_with_hint() {
+        let result = resolve_track_id_with_branch_reader(None, branch_reader(Some("main")));
+        assert!(result.is_err(), "expected Err on non-track branch");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("Hint:") || err_msg.contains("provide an explicit track-id"),
+            "error must prompt user to provide explicit track-id, got: {err_msg}"
+        );
+    }
+
+    /// AC-02 / CN-01: detached HEAD is also fail-closed with the explicit-id hint.
+    #[test]
+    fn test_resolve_track_id_none_on_detached_head_returns_error_with_hint() {
+        let result = resolve_track_id_with_branch_reader(None, branch_reader(Some("HEAD")));
+        assert!(result.is_err(), "expected Err on detached HEAD");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("detached HEAD") && err_msg.contains("provide an explicit track-id"),
+            "error must mention detached HEAD and explicit track-id hint, got: {err_msg}"
+        );
     }
 }

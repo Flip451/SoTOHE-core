@@ -6,6 +6,7 @@
 use crate::CliError;
 
 use super::*;
+use infrastructure::git_cli::GitRepository;
 
 pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError> {
     match action {
