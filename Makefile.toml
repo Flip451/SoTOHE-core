@@ -754,12 +754,12 @@ command = "bin/sotp"
 args = ["make", "track-resolve", "${@}"]
 
 [tasks.track-pr-push]
-description = "[wrapper] Push current track/plan branch to origin (plan/ branches require track-id arg)"
+description = "[wrapper] Push current track branch to origin"
 command = "bin/sotp"
 args = ["make", "track-pr-push", "${@}"]
 
 [tasks.track-pr-ensure]
-description = "[wrapper] Create or reuse a PR for the current track/plan branch (plan/ branches require track-id arg)"
+description = "[wrapper] Create or reuse a PR for the current track branch"
 command = "bin/sotp"
 args = ["make", "track-pr-ensure", "${@}"]
 
