@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 50, yellow: 0, red: 0 }
+signals: { blue: 52, yellow: 0, red: 0 }
 ---
 
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
@@ -20,7 +20,7 @@ signals: { blue: 50, yellow: 0, red: 0 }
 - [IN-03] フラグ `--track: String`（必須）として定義されている `verify catalogue-spec-refs` の引数を `Option<String>` へ変更する [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T005]
 - [IN-04] 「現在ブランチからアクティブトラックを解決する」操作を usecase 層の操作として公開する。usecase はブランチ読み取りをポート（branch reader port）として受け取り、cli は composition root として `SystemGitRepo` アダプタを wiring して渡す。これにより解決ロジックが git 実体なしで単体テスト可能になる [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2] [tasks: T001, T002]
 - [IN-05] 既存の `usecase::track_resolution::resolve_track_id_from_branch` を省略時解決の中核ロジックとして再利用する。解決処理を新規実装せず重複させない [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2] [tasks: T001]
-- [IN-06] git ブランチ読み取りを infrastructure の `GitRepository` ポート経由に統一する。`track views sync`・`make` ヘルパー・write-guard 注入リーダーに残る `git rev-parse` の直接シェルアウトを取り除き、ポート経由の読み取りに置き換える [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2] [tasks: T002, T003, T005, T006]
+- [IN-06] git ブランチ読み取りを infrastructure の `GitRepository` ポート経由に統一する。`track views sync`・`make` ヘルパー・write-guard 注入リーダーに残る `git rev-parse` の直接シェルアウトを取り除き、ポート経由の読み取りに置き換える [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2] [tasks: T002, T003, T005, T006, T010]
 - [IN-07] active-track-write-guard（`2026-05-26-0518-active-track-write-guard.md`）が usecase interactor へのクロージャ注入で行うブランチ読み取りを、本 ADR の単一解決経路（ポート経由）に統合する。バリデーション（明示 id の照合）と既定値解決（省略時の導出）が同じ解決を共有し、git 読み取りは `GitRepository` ポート 1 本に集約する [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2, knowledge/adr/2026-05-26-0518-active-track-write-guard.md#D1] [tasks: T003]
 - [IN-08] `Makefile.toml` の `*-local` タスク（`verify-plan-artifact-refs-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-spec-states-current-local` ほか）に散在する shell でのブランチ解析ボイラープレート（`BRANCH=$(git ...); TRACK_ID="${BRANCH#track/}"; TRACK_DIR="track/items/$TRACK_ID"` / `SPEC_PATH="track/items/$TRACK_ID/spec.md"` 相当）を除去する。track-id や pre-resolved spec path を渡さずに `cargo run -p cli -- verify catalogue-spec-refs` / `cargo run -p cli -- verify spec-states` のように呼べるようにする [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2] [tasks: T006]
 - [IN-09] 既に省略時自動解決に対応している `track resolve`（位置引数 `Option<String>`）・`track views sync`（`--track-id: Option<String>`）・`verify plan-artifact-refs`（`--track-dir: Option<PathBuf>`）の個別実装を、本 ADR の単一共有経路に統合し、重複を除去する [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2] [tasks: T004, T005]
@@ -28,6 +28,7 @@ signals: { blue: 50, yellow: 0, red: 0 }
 - [IN-11] `cargo make track-local-review` ラッパーを bare chain として実装する: `sotp track type-signals → sotp track catalogue-spec-signals → sotp track views sync → sotp review local` の順に各コマンドを呼び出し、ラッパー自身は track-id を保持しない。`BRANCH=$(git ...); TRACK_ID="${BRANCH#track/}"` のような shell でのブランチ解析をラッパー・Makefile 側に一切置かない [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D4, knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T008]
 - [IN-12] `cargo make track-commit-message` の pre-commit ゲートを `cargo make track-local-review` と同じ bare chain 形式にする: `sotp track type-signals → sotp track catalogue-spec-signals → sotp track views sync` を chain した後にコミット処理を続け、review と commit の両ゲートで同じ手順（同じコマンド列）が使われるようにする [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D4, knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T008]
 - [IN-13] 運用ドキュメント（`.claude/commands/track/*.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、`Makefile.toml` のタスク説明）から、コマンドが現在ブランチから自己解決するようになったことで不要になった明示的な `--track-id` 指定の記述を除去する。別トラックを明示的に対象にする意味を持つ箇所（例: 別トラックへの切り替えを説明する文脈）はオプションとして残す [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T009]
+- [IN-14] plan-only コミット機構の残留デッドコードをコード・テスト・古いドキュメントごと根本から削除する。対象: `libs/usecase/src/git_workflow.rs`（`validate_planning_only_commit_paths` 関数、`verify_explicit_track_branch` 内の planning-only `if` ブロック、`ExplicitTrackBranch::schema_version` フィールド、`TRANSIENT_AUTOMATION_FILES` 内の `tmp/track-commit/track-dir.txt` エントリ）、`apps/cli/src/commands/git.rs`（`track-dir.txt` 自動検出ブロック、`require_explicit_track_selector_on_non_track_branch`、`load_optional_track_dir`、`validate_planning_only_commit_paths` の呼び出しと import — トラック外ブランチのコミットを拒否する fail-closed 挙動は維持する）、`libs/infrastructure/src/git_cli/mod.rs`（`illegal_v3_branchless_track`、`invalid_v3_non_null_branch`、`REQUIRED_V3_METADATA_FIELDS`、`read_metadata` 内の v3 ガードブロック、`BranchMetadata::schema_version` フィールドおよび `default_schema_version` 関数、`TrackBranchRecord::schema_version` フィールド）、`.claude/commands/track/commit.md` および `track/workflow.md` 内の planning-only レーンに関する古いドキュメント記述。これは ADR `2026-05-26-1123-remove-plan-only-activate-lane.md` D1 のレーン削除をコード側で完結させるものであり、v5 スキーマ（ブランチ必須）では到達不能になっているデッドコードの除去である [adr: knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md#D1] [tasks: T011]
 
 ### Out of Scope
 - [OS-01] ブランチ移動系コマンド（`track branch create` / `track branch switch`）への既定解決の適用: これらは「現在いないトラック」を対象に動くコマンドであり、現在ブランチからの導出は意味をなさないか誤りになるため、track-id は明示必須のままとする [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D3]
@@ -68,6 +69,7 @@ signals: { blue: 50, yellow: 0, red: 0 }
 - [ ] [AC-12] `cargo make track-local-review` と `cargo make track-commit-message` のシグナル再生成ステップが対称である: 両者ともに `sotp track type-signals` → `sotp track catalogue-spec-signals` → `sotp track views sync` の同じコマンド列を実行する。review が承認した時点のシグナル状態と commit ゲートが観測するシグナル状態が一致し、`*-types.md` シグナル列のハッシュずれによる `check-approved` ブロックが構造的に発生しない [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D4] [tasks: T008, T007]
 - [ ] [AC-13] `cargo make track-local-review` の bare chain 中、いずれかのコマンドが失敗した場合に後続コマンドが実行されず、chain 全体がエラーで終了する [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D4] [tasks: T008, T007]
 - [ ] [AC-14] `.claude/commands/track/*.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、および `Makefile.toml` のタスク説明において、D1 により自己解決が可能になったコマンドに対する明示的な `--track-id` 指定の例示・記述が除去されている。別トラックを対象にする場面など、明示指定が意味を持つ文脈にはオプション表記として残っている [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D1] [tasks: T009, T007]
+- [ ] [AC-15] git の現在ブランチ取得 (`git rev-parse --abbrev-ref HEAD` を `std::process::Command::new("git")` 経由で直接呼ぶ) がワークスペース内で `libs/infrastructure/src/git_cli/mod.rs` の `SystemGitRepo` ポート実装 1 箇所のみに存在する。具体的に: (a) `libs/infrastructure/src/track/render.rs`（`sync_rendered_views` 内）が `GitRepository::current_branch()` 経由でブランチを読んでおり、直接シェルアウトを含まない。(b) `apps/cli/src/commands/make.rs`（`current_branch_track_id_strict` または相当するヘルパー内）が `GitRepository::current_branch()` 経由でブランチを読んでおり、直接シェルアウトを含まない。IN-06 のポート統一が infrastructure 層および cli 層まで完全に適用されていることを確認できる [adr: knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D2] [tasks: T010]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/hexagonal-architecture.md#Layer Dependencies
@@ -80,5 +82,5 @@ signals: { blue: 50, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 50  🟡 0  🔴 0
+🔵 52  🟡 0  🔴 0
 

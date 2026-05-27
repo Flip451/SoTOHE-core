@@ -177,6 +177,16 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-14",
+        "text": "plan-only コミット機構の残留デッドコードをコード・テスト・古いドキュメントごと根本から削除する。対象: `libs/usecase/src/git_workflow.rs`（`validate_planning_only_commit_paths` 関数、`verify_explicit_track_branch` 内の planning-only `if` ブロック、`ExplicitTrackBranch::schema_version` フィールド、`TRANSIENT_AUTOMATION_FILES` 内の `tmp/track-commit/track-dir.txt` エントリ）、`apps/cli/src/commands/git.rs`（`track-dir.txt` 自動検出ブロック、`require_explicit_track_selector_on_non_track_branch`、`load_optional_track_dir`、`validate_planning_only_commit_paths` の呼び出しと import — トラック外ブランチのコミットを拒否する fail-closed 挙動は維持する）、`libs/infrastructure/src/git_cli/mod.rs`（`illegal_v3_branchless_track`、`invalid_v3_non_null_branch`、`REQUIRED_V3_METADATA_FIELDS`、`read_metadata` 内の v3 ガードブロック、`BranchMetadata::schema_version` フィールドおよび `default_schema_version` 関数、`TrackBranchRecord::schema_version` フィールド）、`.claude/commands/track/commit.md` および `track/workflow.md` 内の planning-only レーンに関する古いドキュメント記述。これは ADR `2026-05-26-1123-remove-plan-only-activate-lane.md` D1 のレーン削除をコード側で完結させるものであり、v5 スキーマ（ブランチ必須）では到達不能になっているデッドコードの除去である",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -550,6 +560,16 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-15",
+      "text": "git の現在ブランチ取得 (`git rev-parse --abbrev-ref HEAD` を `std::process::Command::new(\"git\")` 経由で直接呼ぶ) がワークスペース内で `libs/infrastructure/src/git_cli/mod.rs` の `SystemGitRepo` ポート実装 1 箇所のみに存在する。具体的に: (a) `libs/infrastructure/src/track/render.rs`（`sync_rendered_views` 内）が `GitRepository::current_branch()` 経由でブランチを読んでおり、直接シェルアウトを含まない。(b) `apps/cli/src/commands/make.rs`（`current_branch_track_id_strict` または相当するヘルパー内）が `GitRepository::current_branch()` 経由でブランチを読んでおり、直接シェルアウトを含まない。IN-06 のポート統一が infrastructure 層および cli 層まで完全に適用されていることを確認できる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -579,7 +599,7 @@
     }
   ],
   "signals": {
-    "blue": 50,
+    "blue": 52,
     "yellow": 0,
     "red": 0
   }
