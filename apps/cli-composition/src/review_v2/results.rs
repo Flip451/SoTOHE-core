@@ -143,10 +143,11 @@ pub fn render_review_results_str(
         scope_universe.clone()
     };
 
-    // Load rounds per scope (only when limit > 0).
-    let rounds_per_scope: HashMap<ScopeName, Vec<ScopeRound>> = if limit.is_none() {
-        HashMap::new()
-    } else {
+    // Always load all rounds per scope so that state_line_suffix() can display
+    // the latest round_type@timestamp verdict even in the summary-only path
+    // (--limit 0, i.e. limit == None).  The `limit` parameter only controls how
+    // many rounds are *expanded* in the findings block, not whether we load them.
+    let rounds_per_scope: HashMap<ScopeName, Vec<ScopeRound>> = {
         let mut map = HashMap::new();
         for scope in &displayed_scopes {
             let rounds = comp

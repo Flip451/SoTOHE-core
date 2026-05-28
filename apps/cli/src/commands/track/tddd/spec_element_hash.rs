@@ -1,14 +1,11 @@
-//! `sotp track spec-element-hash` — emit canonical SHA-256 hashes for
-//! spec.json elements so type-designer can author `spec_refs[].hash`
-//! values for catalogue entries (Cat-Spec Blue promotion).
+//! `sotp track spec-element-hash` — emit canonical SHA-256 hashes for spec.json elements.
 //!
-//! Thin CLI wrapper: validates the track id, delegates all I/O (including
-//! the `symlink_metadata` guard on `items_dir`) to
-//! `infrastructure::track::spec_element_hash::compute_spec_element_hashes`,
-//! then maps the result to stdout output plus an exit code.
+//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 
 use std::path::PathBuf;
 use std::process::ExitCode;
+
+use cli_composition::CliApp;
 
 use crate::CliError;
 
@@ -20,45 +17,19 @@ use crate::CliError;
 ///
 /// # Errors
 ///
-/// Returns `CliError` when the spec.json is absent, fails to parse, or the
-/// requested anchor is not present.
+/// Returns `CliError` when the underlying `CliApp` composition fails.
 pub fn execute_spec_element_hash(
     items_dir: PathBuf,
     track_id: String,
     anchor: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Validate the track_id without importing domain::TrackId (CN-01 / AC-03).
-    crate::commands::track::validate_track_id_str(&track_id)
-        .map_err(|e| CliError::Message(format!("invalid track ID: {e}")))?;
-
-    // Delegate all I/O (symlink guard on items_dir, spec.json load, hash computation)
-    // to the infrastructure layer. CLI is wiring + output formatting only.
-    let hashes = infrastructure::track::spec_element_hash::compute_spec_element_hashes(
-        items_dir,
-        &track_id,
-        anchor.as_deref(),
-    )
-    .map_err(|e| CliError::Message(e.0))?;
-
-    match anchor {
-        Some(anchor_id) => {
-            // compute_spec_element_hashes already validated the anchor; the map has exactly
-            // one entry when an anchor is requested and succeeded.
-            if let Some(hash) = hashes.get(&anchor_id) {
-                println!("{hash}");
-                Ok(ExitCode::SUCCESS)
-            } else {
-                // Should not be reached (infrastructure returns Err on missing anchor).
-                Err(CliError::Message(format!("anchor '{anchor_id}' not found in spec.json")))
-            }
-        }
-        None => {
-            let json = serde_json::to_string_pretty(&hashes)
-                .map_err(|e| CliError::Message(format!("JSON encode error: {e}")))?;
-            println!("{json}");
-            Ok(ExitCode::SUCCESS)
-        }
+    let outcome = CliApp::new()
+        .track_spec_element_hash(items_dir, Some(track_id), anchor)
+        .map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
     }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 #[cfg(test)]
@@ -180,7 +151,7 @@ mod tests {
         assert!(result.is_err());
         let msg = result.unwrap_err().to_string();
         assert!(
-            msg.contains("invalid track ID"),
+            msg.to_ascii_lowercase().contains("invalid track id"),
             "error should mention path-traversal rejection: {msg}"
         );
     }

@@ -1,42 +1,19 @@
 //! `sotp track baseline-capture` — capture TypeGraph snapshot as baseline.
 //!
-//! Generates `<layer>-types-baseline.json` from the current TypeGraph.
-//! Idempotent by default: if the baseline file already exists it is kept as-is.
-//! Re-capturing the baseline after implementation has started would overwrite
-//! the pre-implementation snapshot with the current state, collapsing the
-//! signal semantics (new `add` entries become `AddButAlreadyInBaseline` noise).
-//! Use `--force` only when explicitly migrating from an older baseline format.
-//!
-//! `--source-workspace` lets you capture from a different Cargo workspace (e.g.
-//! a git worktree at `main`) while writing baseline files into the current track dir.
+//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 
 use std::path::PathBuf;
 use std::process::ExitCode;
-use std::sync::Arc;
 
-use infrastructure::FsSymlinkGuard;
-use infrastructure::tddd::rustdoc_baseline_capture_adapter::RustdocBaselineCaptureAdapter;
-use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
-use usecase::baseline_capture::{
-    BaselineCaptureInteractor, BaselineCaptureRequest, BaselineCaptureService,
-};
+use cli_composition::CliApp;
 
 use crate::CliError;
 
 /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
 ///
-/// Thin CLI adapter: constructs the concrete infrastructure adapters, wires up
-/// `BaselineCaptureInteractor`, and delegates all orchestration to the usecase layer.
-///
-/// The track items directory is derived from `workspace_root` as
-/// `<workspace_root>/track/items` inside the interactor.
-/// Symlink guards are applied inside the interactor via the injected
-/// [`domain::SymlinkGuardPort`] (`FsSymlinkGuard`).
-///
 /// # Errors
 ///
-/// Returns `CliError` when the track ID is invalid, rustdoc export fails,
-/// or the file write fails.
+/// Returns `CliError` when the underlying `CliApp` composition fails.
 pub fn execute_baseline_capture(
     track_id: String,
     workspace_root: PathBuf,
@@ -44,21 +21,17 @@ pub fn execute_baseline_capture(
     layer: Option<String>,
     force: bool,
 ) -> Result<ExitCode, CliError> {
-    let symlink_guard = Arc::new(FsSymlinkGuard::new());
-    let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
-    let capture = Arc::new(RustdocBaselineCaptureAdapter::new());
-
-    let interactor = BaselineCaptureInteractor::new(symlink_guard, layer_bindings, capture);
-
-    interactor
-        .run(BaselineCaptureRequest { track_id, workspace_root, source_workspace, layer, force })
-        .map_err(|e| CliError::Message(e.to_string()))?;
-
-    Ok(ExitCode::SUCCESS)
+    let outcome = CliApp::new()
+        .track_baseline_capture(Some(track_id), workspace_root, source_workspace, layer, force)
+        .map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
+    }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use rustdoc_types::FORMAT_VERSION;
 
@@ -132,6 +105,47 @@ mod tests {
         );
     }
 
+    /// Initialize a minimal git repository at `root` on branch `track/<track_id>`.
+    ///
+    /// `resolve_track_id_for_write` requires git discovery to succeed (fail-closed
+    /// branch guard). This helper creates an isolated repo so unit tests that
+    /// exercise WRITE paths work without depending on the CI/dev checkout branch.
+    fn init_git_repo_on_track_branch(root: &std::path::Path, track_id: &str) {
+        let branch_name = format!("track/{track_id}");
+
+        let status = std::process::Command::new("git")
+            .args(["init", "-q"])
+            .current_dir(root)
+            .status()
+            .expect("git init failed");
+        assert!(status.success(), "git init must succeed");
+
+        for (key, value) in
+            [("user.email", "test@example.com"), ("user.name", "Test"), ("commit.gpgsign", "false")]
+        {
+            let status = std::process::Command::new("git")
+                .args(["config", key, value])
+                .current_dir(root)
+                .status()
+                .expect("git config failed");
+            assert!(status.success(), "git config {key} must succeed");
+        }
+
+        let status = std::process::Command::new("git")
+            .args(["commit", "--allow-empty", "-q", "-m", "init", "--no-gpg-sign"])
+            .current_dir(root)
+            .status()
+            .expect("git commit failed");
+        assert!(status.success(), "initial git commit must succeed");
+
+        let status = std::process::Command::new("git")
+            .args(["branch", "-m", &branch_name])
+            .current_dir(root)
+            .status()
+            .expect("git branch -m failed");
+        assert!(status.success(), "git branch -m must succeed");
+    }
+
     #[test]
     fn test_baseline_capture_skips_when_baseline_exists() {
         let dir = tempfile::tempdir().unwrap();
@@ -151,6 +165,10 @@ mod tests {
         // Idempotency now validates `format_version`, so an empty `{}` would be rejected.
         std::fs::write(track_dir.join("domain-types-baseline.json"), minimal_rustdoc_json())
             .unwrap();
+
+        // resolve_track_id_for_write requires a git repository (fail-closed branch guard).
+        // Bootstrap an isolated repo on the matching track branch.
+        init_git_repo_on_track_branch(dir.path(), "test-track");
 
         let result =
             execute_baseline_capture("test-track".to_owned(), dir.path().into(), None, None, false);
@@ -181,6 +199,10 @@ mod tests {
 
         std::fs::write(track_dir.join("usecase-types-baseline.json"), minimal_rustdoc_json())
             .unwrap();
+
+        // resolve_track_id_for_write requires a git repository (fail-closed branch guard).
+        // Bootstrap an isolated repo on the matching track branch.
+        init_git_repo_on_track_branch(dir.path(), "test-track");
 
         let result = execute_baseline_capture(
             "test-track".to_owned(),

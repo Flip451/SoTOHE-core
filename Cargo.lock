@@ -206,8 +206,10 @@ dependencies = [
 name = "cli_composition"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "domain",
  "infrastructure",
+ "serde",
  "serde_json",
  "tempfile",
  "usecase",

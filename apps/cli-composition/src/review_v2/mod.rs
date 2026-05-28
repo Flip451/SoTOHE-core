@@ -2,6 +2,7 @@
 
 pub mod approved;
 pub mod briefing;
+pub mod commit_hash;
 mod inputs;
 pub mod null_reviewer;
 pub mod results;
@@ -17,6 +18,7 @@ pub use inputs::{
 // of the cli_composition crate (e.g. apps/cli shim, future callers).
 pub use approved::{build_check_approved_service, check_approved_str};
 pub use briefing::{append_scope_briefing_reference_str, get_briefing_for_scope_str};
+pub use commit_hash::persist_commit_hash_for_track;
 pub use null_reviewer::NullReviewer;
 pub use results::{build_run_review_service, render_review_results_str};
 pub use run::{run_claude_review_str, run_codex_review_str};
@@ -51,7 +53,7 @@ impl CliApp {
     /// Returns `Err` when arg validation, composition build, or the review cycle
     /// fails.
     pub fn review_run_codex(&self, input: ReviewRunCodexInput) -> Result<CommandOutcome, String> {
-        let track_id = resolve_track_id_or_branch(input.track_id, &input.items_dir)?;
+        let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
 
         validate_track_id_str(&track_id).map_err(|e| format!("invalid --track-id: {e}"))?;
         validate_review_group_name_str(&input.group)
@@ -98,7 +100,7 @@ impl CliApp {
     /// Returns `Err` when arg validation, composition build, or the review cycle
     /// fails.
     pub fn review_run_claude(&self, input: ReviewRunClaudeInput) -> Result<CommandOutcome, String> {
-        let track_id = resolve_track_id_or_branch(input.track_id, &input.items_dir)?;
+        let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
 
         validate_track_id_str(&track_id).map_err(|e| format!("invalid --track-id: {e}"))?;
         validate_review_group_name_str(&input.group)
@@ -459,7 +461,7 @@ impl CliApp {
         items_dir: PathBuf,
     ) -> Result<CommandOutcome, String> {
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
-        let head_sha = infrastructure::review_v2::persist_commit_hash_for_track(&track_id)?;
+        let head_sha = persist_commit_hash_for_track(&track_id)?;
         eprintln!("[review] Recorded .commit_hash: {head_sha}");
         Ok(CommandOutcome::success(None))
     }
@@ -499,7 +501,7 @@ fn resolve_track_id_or_branch_write(
 ) -> Result<String, String> {
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
-    let branch = SystemGitRepo::discover()
+    let branch = SystemGitRepo::discover_from(items_dir)
         .and_then(|r| r.output(&["rev-parse", "--abbrev-ref", "HEAD"]))
         .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
         .map_err(|e| format!("failed to detect current branch: {e}"))?;
@@ -522,7 +524,6 @@ fn resolve_track_id_or_branch_write(
         return Ok(explicit);
     }
 
-    let _ = items_dir; // accepted for API consistency
     Ok(resolved_from_branch)
 }
 
@@ -533,8 +534,7 @@ fn resolve_track_id_or_branch_write(
 fn resolve_track_id_from_branch(items_dir: &std::path::Path) -> Result<String, String> {
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
-    let _ = items_dir; // accepted for API consistency
-    let output = SystemGitRepo::discover()
+    let output = SystemGitRepo::discover_from(items_dir)
         .and_then(|r| r.output(&["rev-parse", "--abbrev-ref", "HEAD"]))
         .map_err(|e| format!("failed to detect current branch: {e}"))?;
 

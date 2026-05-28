@@ -6,32 +6,15 @@ use thiserror::Error;
 
 /// Unified error type for CLI commands.
 ///
-/// Each variant wraps an error from a specific layer or represents
-/// a CLI-specific failure. The `Display` impl (via thiserror) produces
-/// user-facing messages suitable for `eprintln!`.
+/// All composition logic (infrastructure/usecase errors) is handled inside
+/// `cli_composition::CliApp` and converted to `String` before reaching this
+/// layer. Only `Message` and `Io` are needed in production; the other variants
+/// are preserved (via `#[from]`) in test builds only for test-helper ergonomics.
+///
+/// The `Display` impl (via thiserror) produces user-facing messages suitable
+/// for `eprintln!`.
 #[derive(Debug, Error)]
 pub enum CliError {
-    #[error("{0}")]
-    Git(#[from] infrastructure::git_cli::GitError),
-
-    #[error("{0}")]
-    Gh(#[from] infrastructure::gh_cli::GhError),
-
-    #[error("{0}")]
-    TrackResolution(#[from] usecase::track_resolution::TrackResolutionError),
-
-    #[error("{0}")]
-    GitWorkflow(#[from] usecase::git_workflow::GitWorkflowError),
-
-    #[error("{0}")]
-    PrWorkflow(#[from] usecase::pr_workflow::PrWorkflowError),
-
-    #[error("{0}")]
-    ReviewWorkflow(#[from] usecase::review_workflow::ReviewWorkflowError),
-
-    #[error("{0}")]
-    PrReview(#[from] usecase::pr_review::PrReviewError),
-
     /// Generic message for errors that don't fit a specific variant.
     #[error("{0}")]
     Message(String),

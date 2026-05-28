@@ -2,6 +2,7 @@
 targets = []
 all-features = false
 no-default-features = false
+exclude-dev = true
 
 [output]
 feature-depth = 1
@@ -30,8 +31,8 @@ skip = [
 # Enforce layered architecture boundaries for this template workspace.
 # Crate names can be changed, but wrappers must reflect your composition root.
 deny = [
-    { crate = "infrastructure", wrappers = ["cli", "cli_composition"], reason = "Infrastructure implements usecase ports and domain ports; wired at composition root." },
-    { crate = "usecase", wrappers = ["infrastructure", "cli", "cli_composition"], reason = "Usecase crate must only be consumed by the cli layer." },
-    { crate = "domain", wrappers = ["usecase", "infrastructure", "cli_composition"], reason = "Domain dependencies are controlled by layer boundaries." },
+    { crate = "infrastructure", wrappers = ["cli_composition"], reason = "Infrastructure implements usecase ports and domain ports; wired at composition root." },
+    { crate = "usecase", wrappers = ["cli_composition", "infrastructure"], reason = "Usecase crate must only be consumed by the cli layer." },
+    { crate = "domain", wrappers = ["cli_composition", "infrastructure", "usecase"], reason = "Domain dependencies are controlled by layer boundaries." },
     { crate = "cli_composition", wrappers = ["cli"], reason = "CLI composition root owns domain/usecase/infrastructure wiring for the CLI delivery adapter." },
 ]

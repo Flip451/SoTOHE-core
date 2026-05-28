@@ -1,261 +1,41 @@
 //! `sotp track type-signals` — evaluate type signals via rustdoc schema export.
 //!
-//! Reads `<layer>-types.json` from the track directory, exports the target crate's
-//! public API via rustdoc JSON, evaluates signals for each declared type, and writes
-//! the updated document back to `<layer>-types.json`.
-//!
-//! `resolve_layers` remains in this module as a shared helper for sibling CLI commands.
-//! `execute_type_signals_lenient_with_bindings` stays here to allow
-//! `commands/make.rs` to share a single architecture-rules.json parse (TOCTOU
-//! prevention).
+//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitCode;
-use std::sync::Arc;
 
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
-use infrastructure::tddd::type_signals_evaluator::{
-    EvaluateSignalsError, execute_type_signals_for_layer,
-};
-use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
-use infrastructure::verify::tddd_layers::{
-    LoadTdddLayersError, TdddLayerBinding, load_tddd_layers,
-};
-use usecase::type_signals::{TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService};
+use cli_composition::CliApp;
 
 use crate::CliError;
 
-/// Resolves the set of TDDD-enabled layers for this invocation.
-///
-/// - Reads `architecture-rules.json` from `workspace_root`.
-/// - When `layer_filter` is `None`, returns every `tddd.enabled` layer in
-///   `layers[]` order.
-/// - When `layer_filter` is `Some(id)`, returns only the matching enabled
-///   binding. An unknown or disabled layer id is fail-closed.
-/// - When `architecture-rules.json` is absent, returns an error (fail-closed).
-pub(crate) fn resolve_layers(
-    workspace_root: &Path,
-    layer_filter: Option<&str>,
-) -> Result<Vec<TdddLayerBinding>, CliError> {
-    let rules_path = workspace_root.join("architecture-rules.json");
-    // Delegate symlink handling to the shared infrastructure helper (fail-closed).
-    // CLI stays a thin composition layer; it only maps the infra error variants
-    // into `CliError` and applies the CLI-level layer filter.
-    let bindings = load_tddd_layers(&rules_path, workspace_root).map_err(|e| match e {
-        LoadTdddLayersError::Io { path, source } => {
-            CliError::Message(format!("{}: {source}", path.display()))
-        }
-        LoadTdddLayersError::Parse(err) => {
-            CliError::Message(format!("{}: {err}", rules_path.display()))
-        }
-    })?;
-
-    if let Some(filter) = layer_filter {
-        let Some(binding) = bindings.iter().find(|b| b.layer_id() == filter) else {
-            return Err(CliError::Message(format!(
-                "layer '{filter}' is not tddd.enabled in architecture-rules.json"
-            )));
-        };
-        Ok(vec![binding.clone()])
-    } else {
-        Ok(bindings)
-    }
-}
-
-/// Map `EvaluateSignalsError` from infrastructure to `CliError`.
-fn map_eval_err(e: EvaluateSignalsError) -> CliError {
-    CliError::Message(e.to_string())
-}
-
 /// Evaluate type signals via rustdoc schema export and write back to `<layer>-types.json`.
 ///
-/// Thin CLI adapter: constructs the concrete infrastructure adapters, wires up
-/// `TypeSignalsInteractor` with `lenient: false`, and delegates all orchestration
-/// to the usecase layer.
-///
-/// The track items directory is always derived as `<workspace_root>/track/items`
-/// inside the interactor, so callers only need to supply `workspace_root`.
-///
-/// Steps (inside the interactor):
-/// 1. Validate the track ID format.
-/// 2. Guard the active track by branch match (reject when the current branch
-///    does not equal `track/<id>`).
-/// 3. Resolve the set of TDDD-enabled layers to process.
-/// 4. For each layer binding, evaluate signals and write back to `<layer>-types.json`.
+/// Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 ///
 /// # Errors
 ///
-/// Returns `CliError` when the track ID is invalid, the file cannot be read or
-/// decoded, rustdoc export fails (e.g., nightly not installed), or the write fails.
+/// Returns `CliError` when the underlying `CliApp` composition fails.
 pub fn execute_type_signals(
     track_id: String,
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Derive items_dir from workspace_root so the caller does not need to supply
-    // both and so the interactor's items_dir == workspace_root/track/items check
-    // is always satisfied regardless of how the caller invoked the command.
-    let items_dir = workspace_root.join("track").join("items");
-
-    // Resolve the current git branch (CN-07 active-track guard requires it),
-    // rooted at workspace_root so `--workspace-root` is always honoured.
-    let branch = SystemGitRepo::discover_from(&workspace_root)
-        .map_err(|e| CliError::Message(format!("cannot discover git repo: {e}")))?
-        .current_branch()
-        .map_err(|e| CliError::Message(format!("cannot read current branch: {e}")))?
-        .ok_or_else(|| {
-            CliError::Message(
-                "cannot read current branch: git rev-parse --abbrev-ref HEAD returned non-zero"
-                    .to_owned(),
-            )
-        })?;
-
-    let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
-    let executor = Arc::new(TypeSignalsExecutorAdapter::new());
-
-    let interactor = TypeSignalsInteractor::new(layer_bindings, executor);
-
-    interactor
-        .run(TypeSignalsRequest {
-            items_dir,
-            track_id,
-            branch,
-            workspace_root,
-            layer,
-            lenient: false,
-        })
-        .map_err(|e| CliError::Message(e.to_string()))?;
-
-    Ok(ExitCode::SUCCESS)
-}
-
-/// Pre-commit-flavored variant of [`execute_type_signals`] that treats a
-/// missing per-layer catalogue file as "layer not yet initialized for this
-/// track" and skips it silently, matching the CI
-/// (`spec_states::evaluate_layer_catalogue`) and merge-gate semantics. This
-/// resolves the asymmetry where the user-invoked `sotp track type-signals`
-/// hard-fails on a missing catalogue (correct UX — the user explicitly asked
-/// to evaluate), but the automated pre-commit hook must behave like the
-/// verification gates (skip inactive layers, pass).
-///
-/// The active-track branch guard is enforced by the dispatch layer
-/// (`resolve_track_id_from_root_for_write`) before this function is called.
-/// Only `architecture-rules.json` fail-closed via `resolve_layers` and
-/// empty-bindings fail-closed are checked here.
-///
-/// # Errors
-///
-/// Returns `CliError` on the same paths as `execute_type_signals` EXCEPT the
-/// per-layer catalogue NotFound, which is silently skipped here.
-#[allow(dead_code)]
-pub fn execute_type_signals_lenient(
-    items_dir: PathBuf,
-    track_id: String,
-    workspace_root: PathBuf,
-    layer: Option<String>,
-) -> Result<ExitCode, CliError> {
-    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
-    execute_type_signals_lenient_with_bindings(items_dir, track_id, workspace_root, &bindings)
-}
-
-/// Same semantics as [`execute_type_signals_lenient`] but accepts a
-/// caller-supplied `bindings` snapshot so the caller can run its own
-/// validation + classification against exactly the same binding set that
-/// was processed here. Closes the TOCTOU window where
-/// `architecture-rules.json` could be edited between a caller's pre-flight
-/// parse and the internal `resolve_layers` read.
-///
-/// The pre-commit wiring in `dispatch_track_commit_message` uses this
-/// variant to share one parsed binding snapshot across pre-flight
-/// validation, recompute, and the post-recompute signal classification
-/// loop. The active-track branch guard is enforced in the dispatch layer
-/// before this function is called; no duplicate check is performed here.
-///
-/// # Errors
-///
-/// Same as [`execute_type_signals_lenient`].
-pub fn execute_type_signals_lenient_with_bindings(
-    items_dir: PathBuf,
-    track_id: String,
-    workspace_root: PathBuf,
-    bindings: &[TdddLayerBinding],
-) -> Result<ExitCode, CliError> {
-    // The active-track branch guard (CN-07: branch must match `track/<track_id>`)
-    // is enforced by the dispatch layer via `resolve_track_id_from_root_for_write`
-    // before this function is called. No inline guard is performed here to avoid
-    // duplicating the guard semantics outside the centralized dispatch path.
-
-    if bindings.is_empty() {
-        return Err(CliError::Message(
-            "no tddd.enabled layers found in architecture-rules.json; nothing to evaluate"
-                .to_owned(),
-        ));
+    let outcome = CliApp::new()
+        .track_type_signals(Some(track_id), workspace_root, layer)
+        .map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
     }
-
-    let track_dir = items_dir.join(&track_id);
-    for binding in bindings {
-        // Skip layers with multi-target `schema_export.targets`:
-        // `execute_type_signals_for_layer` hard-fails on that configuration
-        // (multi-target rustdoc merge is not implemented yet). The CI /
-        // merge-gate paths read the persisted `<layer>-type-signals.json`
-        // directly and do not re-export schema, so they detect stale
-        // signals via `declaration_hash` comparison independently. Pre-commit
-        // must NOT block the commit on that unsupported configuration —
-        // that would create a hard regression for multi-target tracks
-        // (PR #106 multi-target P1 finding).
-        //
-        // This skip is narrow by design: it only bypasses recompute for
-        // configurations the strict evaluator cannot handle. It does NOT
-        // short-circuit on "signal file already fresh" — code or baseline
-        // changes without editing the declaration file would otherwise
-        // let real regressions slip past pre-commit (PR #106 recompute-on-
-        // hash-match P1 finding).
-        if binding.targets().len() > 1 {
-            continue;
-        }
-
-        let catalogue_path = track_dir.join(binding.catalogue_file());
-        // Use `symlink_metadata` + explicit NotFound match so only a truly
-        // absent declaration file is treated as "layer inactive". Symlinks,
-        // directories, permission errors, and other `std::fs` failures
-        // propagate as errors — matching the CI
-        // (`evaluate_layer_catalogue`) fail-closed posture and preventing
-        // the "pre-commit passes, verification fails later" divergence.
-        match std::fs::symlink_metadata(&catalogue_path) {
-            Ok(meta) if meta.file_type().is_file() => {
-                execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)
-                    .map_err(map_eval_err)?;
-            }
-            Ok(_) => {
-                // Regular-file check failed: symlink, directory, block
-                // device, etc. Delegate to the strict evaluator so the
-                // caller sees the same error as the CI / merge-gate path
-                // (`reject_symlinks_below` / non-regular-file rejection).
-                execute_type_signals_for_layer(&items_dir, &track_id, &workspace_root, binding)
-                    .map_err(map_eval_err)?;
-            }
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                // Declaration file is genuinely absent — layer not
-                // TDDD-active for this track. Skip silently (symmetric with
-                // `spec_states::evaluate_layer_catalogue` NotFound branch).
-            }
-            Err(e) => {
-                return Err(CliError::Message(format!(
-                    "pre-commit: cannot stat {}: {e}",
-                    catalogue_path.display()
-                )));
-            }
-        }
-    }
-
-    Ok(ExitCode::SUCCESS)
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
     use std::path::PathBuf;
+
+    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
 
     use super::*;
 

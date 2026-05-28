@@ -54,6 +54,6 @@
 | infrastructure::review_v2::cli_composition::validate_review_group_name_str | free_function | delete | fn() -> String | 🔵 | 🔵 |
 | infrastructure::review_v2::cli_composition::validate_scope_for_track_str | free_function | delete | fn() -> String | 🔵 | 🔵 |
 | infrastructure::review_v2::cli_composition::validate_track_id_str | free_function | delete | fn() -> String | 🔵 | 🔵 |
-| infrastructure::review_v2::persist_commit_hash_for_track | free_function | delete | fn(track_id: &str) -> Result<String, String> | 🟡 | 🔵 |
+| infrastructure::review_v2::persist_commit_hash_for_track | free_function | delete | fn(track_id: &str) -> Result<String, String> | 🔵 | 🔵 |
 | infrastructure::review_v2::scope_config_loader::load_v2_scope_config | free_function | reference | fn(track_id: domain::TrackId, items_dir: &std::path::Path) -> Result<domain::review_v2::ReviewScopeConfig, ScopeConfigLoadError> | 🔵 | 🔵 |
 

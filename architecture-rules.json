@@ -102,8 +102,6 @@
       "crate": "cli",
       "path": "apps/cli",
       "may_depend_on": [
-        "infrastructure",
-        "usecase",
         "cli_composition"
       ],
       "deny_reason": "",

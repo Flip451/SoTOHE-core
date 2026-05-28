@@ -3,10 +3,16 @@
 //! Contains the implementation of `track branch create` and `track branch switch`,
 //! along with shared git helpers used by both operations.
 
+use std::process::ExitCode;
+
+use cli_composition::CliApp;
+
 use crate::CliError;
 
-use super::*;
-use infrastructure::git_cli::GitRepository;
+use super::{
+    BranchAction, BranchArgs, resolve_project_root, validate_track_branch_str,
+    validate_track_id_str,
+};
 
 pub(super) fn execute_branch(action: BranchAction) -> Result<ExitCode, CliError> {
     match action {
@@ -36,14 +42,12 @@ fn execute_branch_create(args: BranchArgs) -> Result<ExitCode, CliError> {
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
-    let repo = SystemGitRepo::discover()
-        .map_err(|err| CliError::Message(format!("failed to discover git repository: {err}")))?;
-
-    branch_create_execute(&repo, &branch_name)
-        .map_err(|err| CliError::Message(format!("branch create failed: {err}")))?;
-
-    println!("[OK] Created and switched to branch: {branch_name}");
-    Ok(ExitCode::SUCCESS)
+    let app = CliApp::new();
+    let outcome = app.track_branch_create(items_dir, track_id).map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
+    }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 /// Switches to an existing `track/<track-id>` branch.
@@ -66,148 +70,12 @@ fn execute_branch_switch(args: BranchArgs) -> Result<ExitCode, CliError> {
         .map_err(|err| CliError::Message(format!("invalid track branch: {err}")))?;
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
-    let repo = SystemGitRepo::discover()
-        .map_err(|err| CliError::Message(format!("failed to discover git repository: {err}")))?;
-
-    // Verify the branch exists before attempting to switch.
-    match preflight_branch_operation(&repo, &branch_name, false) {
-        Ok(false) => {
-            return Err(CliError::Message(format!("branch '{branch_name}' does not exist")));
-        }
-        Ok(true) => {}
-        Err(err) => {
-            return Err(CliError::Message(format!("activation preflight failed: {err}")));
-        }
+    let app = CliApp::new();
+    let outcome = app.track_branch_switch(items_dir, track_id).map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
     }
-
-    match repo.status(&["switch", &branch_name]) {
-        Ok(0) => {}
-        Ok(_) => {
-            return Err(CliError::Message(format!("git switch {branch_name} failed")));
-        }
-        Err(err) => {
-            return Err(CliError::Message(format!(
-                "failed to run git switch {branch_name}: {err}"
-            )));
-        }
-    }
-
-    println!("[OK] Switched to branch: {branch_name}");
-    Ok(ExitCode::SUCCESS)
-}
-
-/// Returns the git command list for a branch-create invocation.
-///
-/// The create path intentionally emits only `git switch -c track/<id> main`; it must never
-/// stage or commit metadata so that `main` stays untouched while the new track branch is being
-/// bootstrapped. Metadata persistence belongs to the subsequent activation step that runs on
-/// the newly created track branch.
-pub(super) fn branch_create_git_commands(branch_name: &str) -> Vec<Vec<String>> {
-    vec![vec!["switch".to_owned(), "-c".to_owned(), branch_name.to_owned(), "main".to_owned()]]
-}
-
-/// Executes the branch-create git commands against `repo` after validating preconditions.
-///
-/// Preconditions:
-/// - current branch must be `main` (branch create must fork from main)
-/// - target branch `branch_name` must not yet exist
-///
-/// The function guarantees it never runs `git add` / `git commit` — only the commands produced
-/// by [`branch_create_git_commands`] are issued.
-pub(super) fn branch_create_execute(
-    repo: &impl GitRepository,
-    branch_name: &str,
-) -> Result<(), String> {
-    let current = repo.current_branch().map_err(|err| err.to_string())?;
-    if current.as_deref() != Some("main") {
-        return Err(format!(
-            "branch create must start from 'main'; current branch is {}",
-            current.as_deref().unwrap_or("<detached>")
-        ));
-    }
-
-    if branch_exists(repo, branch_name)? {
-        return Err(format!("branch '{branch_name}' already exists"));
-    }
-
-    for command in branch_create_git_commands(branch_name) {
-        let args: Vec<&str> = command.iter().map(String::as_str).collect();
-        match repo.status(&args) {
-            Ok(0) => {}
-            Ok(_) => return Err(format!("git {} failed", args.join(" "))),
-            Err(err) => return Err(format!("failed to run git {}: {err}", args.join(" "))),
-        }
-    }
-    Ok(())
-}
-
-pub(super) fn branch_exists(repo: &impl GitRepository, branch_name: &str) -> Result<bool, String> {
-    let output = repo
-        .output(&["rev-parse", "--verify", "--quiet", branch_name])
-        .map_err(|e| e.to_string())?;
-    Ok(output.status.success())
-}
-
-pub(super) fn rev_parse_oid(
-    repo: &impl GitRepository,
-    rev: &str,
-) -> Result<Option<String>, String> {
-    let spec = format!("{rev}^{{commit}}");
-    let output = repo
-        .output(&["rev-parse", "--verify", "--quiet", spec.as_str()])
-        .map_err(|e| e.to_string())?;
-    if !output.status.success() {
-        return Ok(None);
-    }
-    Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()))
-}
-
-fn reject_stale_or_divergent_branch(
-    repo: &impl GitRepository,
-    branch_name: &str,
-    exists: bool,
-) -> Result<(), String> {
-    if !exists {
-        return Ok(());
-    }
-
-    if repo.current_branch().map_err(|e| e.to_string())?.as_deref() == Some(branch_name) {
-        return Ok(());
-    }
-
-    let current_head = rev_parse_oid(repo, "HEAD")?
-        .ok_or_else(|| "cannot resolve current HEAD for activation preflight".to_owned())?;
-    let branch_head = rev_parse_oid(repo, branch_name)?
-        .ok_or_else(|| format!("cannot resolve existing branch '{branch_name}'"))?;
-
-    if current_head != branch_head {
-        return Err(format!(
-            "branch '{branch_name}' exists but does not point at the current HEAD; refuse to activate onto a stale/divergent branch"
-        ));
-    }
-
-    Ok(())
-}
-
-/// Checks whether the target branch exists and optionally validates alignment.
-///
-/// When `require_alignment` is `true`, an existing branch that does not point at the current
-/// HEAD (and is not the currently checked-out branch) is rejected as stale/divergent.
-///
-/// Returns `Ok(true)` if the branch exists, `Ok(false)` if it does not.
-///
-/// # Errors
-/// Returns an error string when the alignment check fails or the git invocation fails.
-pub(super) fn preflight_branch_operation(
-    repo: &impl GitRepository,
-    branch_name: &str,
-    require_alignment: bool,
-) -> Result<bool, String> {
-    let exists = branch_exists(repo, branch_name)?;
-    if require_alignment {
-        reject_stale_or_divergent_branch(repo, branch_name, exists)?;
-    }
-    Ok(exists)
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 #[cfg(test)]
@@ -222,8 +90,118 @@ mod tests {
     use infrastructure::git_cli::{GitError, GitRepository};
 
     use super::super::resolve_project_root;
-    use super::{branch_create_execute, branch_create_git_commands, preflight_branch_operation};
     use std::path::Path;
+
+    // ---------------------------------------------------------------------------
+    // Git helper functions — test-only (only called from this test module)
+    // ---------------------------------------------------------------------------
+
+    /// Returns the git command list for a branch-create invocation.
+    ///
+    /// The create path intentionally emits only `git switch -c track/<id> main`; it must never
+    /// stage or commit metadata so that `main` stays untouched while the new track branch is being
+    /// bootstrapped.
+    pub(super) fn branch_create_git_commands(branch_name: &str) -> Vec<Vec<String>> {
+        vec![vec!["switch".to_owned(), "-c".to_owned(), branch_name.to_owned(), "main".to_owned()]]
+    }
+
+    pub(super) fn branch_exists(
+        repo: &impl GitRepository,
+        branch_name: &str,
+    ) -> Result<bool, String> {
+        let output = repo
+            .output(&["rev-parse", "--verify", "--quiet", branch_name])
+            .map_err(|e| e.to_string())?;
+        Ok(output.status.success())
+    }
+
+    pub(super) fn rev_parse_oid(
+        repo: &impl GitRepository,
+        rev: &str,
+    ) -> Result<Option<String>, String> {
+        let spec = format!("{rev}^{{commit}}");
+        let output = repo
+            .output(&["rev-parse", "--verify", "--quiet", spec.as_str()])
+            .map_err(|e| e.to_string())?;
+        if !output.status.success() {
+            return Ok(None);
+        }
+        Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_owned()))
+    }
+
+    fn reject_stale_or_divergent_branch(
+        repo: &impl GitRepository,
+        branch_name: &str,
+        exists: bool,
+    ) -> Result<(), String> {
+        if !exists {
+            return Ok(());
+        }
+
+        if repo.current_branch().map_err(|e| e.to_string())?.as_deref() == Some(branch_name) {
+            return Ok(());
+        }
+
+        let current_head = rev_parse_oid(repo, "HEAD")?
+            .ok_or_else(|| "cannot resolve current HEAD for activation preflight".to_owned())?;
+        let branch_head = rev_parse_oid(repo, branch_name)?
+            .ok_or_else(|| format!("cannot resolve existing branch '{branch_name}'"))?;
+
+        if current_head != branch_head {
+            return Err(format!(
+                "branch '{branch_name}' exists but does not point at the current HEAD; refuse to activate onto a stale/divergent branch"
+            ));
+        }
+
+        Ok(())
+    }
+
+    pub(super) fn preflight_branch_operation(
+        repo: &impl GitRepository,
+        branch_name: &str,
+        require_alignment: bool,
+    ) -> Result<bool, String> {
+        let exists = branch_exists(repo, branch_name)?;
+        if require_alignment {
+            reject_stale_or_divergent_branch(repo, branch_name, exists)?;
+        }
+        Ok(exists)
+    }
+
+    /// Executes the branch-create git commands against `repo` after validating preconditions.
+    ///
+    /// Preconditions:
+    /// - current branch must be `main` (branch create must fork from main)
+    /// - target branch `branch_name` must not yet exist
+    ///
+    /// The function guarantees it never runs `git add` / `git commit` — only the commands produced
+    /// by [`branch_create_git_commands`] are issued.
+    pub(super) fn branch_create_execute(
+        repo: &impl GitRepository,
+        branch_name: &str,
+    ) -> Result<(), String> {
+        let current = repo.current_branch().map_err(|err| err.to_string())?;
+        if current.as_deref() != Some("main") {
+            return Err(format!(
+                "branch create must start from 'main'; current branch is {}",
+                current.as_deref().unwrap_or("<detached>")
+            ));
+        }
+
+        if branch_exists(repo, branch_name)? {
+            return Err(format!("branch '{branch_name}' already exists"));
+        }
+
+        for command in branch_create_git_commands(branch_name) {
+            let args: Vec<&str> = command.iter().map(String::as_str).collect();
+            match repo.status(&args) {
+                Ok(0) => {}
+                Ok(_) => return Err(format!("git {} failed", args.join(" "))),
+                Err(err) => return Err(format!("failed to run git {}: {err}", args.join(" "))),
+            }
+        }
+        Ok(())
+    }
 
     struct StubRepo {
         current_branch: Option<String>,

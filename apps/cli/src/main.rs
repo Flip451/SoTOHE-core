@@ -3,6 +3,7 @@
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
+use cli_composition::CliApp;
 
 mod commands;
 mod error;
@@ -90,10 +91,12 @@ fn main() -> ExitCode {
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
         Some(CliCommand::Make(args)) => commands::make::execute(args),
-        Some(CliCommand::Demo) | None => match infrastructure::demo::run_example_demo() {
-            Ok(msg) => {
-                println!("{msg}");
-                ExitCode::SUCCESS
+        Some(CliCommand::Demo) | None => match CliApp::new().demo() {
+            Ok(outcome) => {
+                if let Some(msg) = outcome.stdout {
+                    println!("{msg}");
+                }
+                ExitCode::from(outcome.exit_code)
             }
             Err(err) => {
                 eprintln!("{err}");
@@ -106,13 +109,16 @@ fn main() -> ExitCode {
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use cli_composition::CliApp;
+
     #[test]
     fn example_cli_flow_saves_track_successfully() {
-        // Delegates to usecase::demo::run_example_demo which creates an in-memory
+        // Delegates to infrastructure::demo::run_example_demo which creates an in-memory
         // track, persists it, derives status "planned", and returns the display string.
-        let result = infrastructure::demo::run_example_demo();
+        let result = CliApp::new().demo();
         assert!(result.is_ok(), "demo failed: {:?}", result.err());
-        let msg = result.unwrap();
+        let outcome = result.unwrap();
+        let msg = outcome.stdout.unwrap_or_default();
         assert!(msg.contains("planned"), "expected 'planned' in output: {msg}");
     }
 }
