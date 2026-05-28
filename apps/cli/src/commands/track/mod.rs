@@ -75,51 +75,103 @@ pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
     }
 }
 
-/// Resolves a track ID from an explicit value or from the current git branch.
+/// Discriminator for READ vs WRITE resolution semantics (CN-02 / CN-03 / D7).
 ///
-/// Thin wrapper around [`ActiveTrackResolveInteractor::resolve_for_read`].
-/// When `explicit_id` is `Some`, returns it directly (CN-02: explicit value
-/// takes priority, no branch validation — git discovery is skipped). When
-/// `None`, self-resolves from the current git branch via `SystemGitRepo` (D2).
-/// Fail-closed on non-track branches: returns an error with a hint to provide
-/// an explicit track-id (CN-01, AC-01, AC-02, AC-19).
+/// - `Read`: `explicit_id` short-circuits git discovery (CN-02 / AC-19).
+/// - `Write`: git branch is always read and compared against `explicit_id` (D7 / AC-18).
+#[derive(Copy, Clone)]
+enum ResolveMode {
+    Read,
+    Write,
+}
+
+/// Core resolution pipeline shared by all four public helpers.
+///
+/// All public wrappers (`resolve_track_id` / `resolve_track_id_from_root` /
+/// `resolve_track_id_for_write` / `resolve_track_id_from_root_for_write`) derive
+/// their `anchor` path (a git-discoverable directory) and delegate here.
+///
+/// READ mode (CN-02 / AC-19):
+/// - `explicit_id` is `Some` → returned as-is; git discovery is skipped.
+/// - `explicit_id` is `None` → branch derived from the repo at `anchor`.
+///
+/// WRITE mode (D7 / AC-18 / CN-03):
+/// - git branch is always read from the repo at `anchor`.
+/// - `explicit_id` is `Some` → branch-derived id must match; mismatch is fail-closed.
+/// - `explicit_id` is `None` → branch-derived id is returned directly.
 ///
 /// # Errors
 ///
-/// Returns a human-readable error string when the track-id cannot be resolved.
-pub(crate) fn resolve_track_id(explicit_id: Option<String>) -> Result<String, String> {
-    // Short-circuit for explicit id: skip git discovery entirely (CN-02).
+/// Returns a human-readable error string on git discovery failure or resolution failure.
+fn resolve_track_id_inner(
+    explicit_id: Option<String>,
+    anchor: &std::path::Path,
+    mode: ResolveMode,
+) -> Result<String, String> {
+    // READ short-circuit: explicit id overrides branch derivation (CN-02 / AC-19).
+    // WRITE: skip the short-circuit — the branch must always be read for comparison.
+    if matches!(mode, ResolveMode::Read) {
+        if let Some(id) = explicit_id {
+            return Ok(id);
+        }
+    }
+    let repo = SystemGitRepo::discover_from(anchor)
+        .map_err(|e| format!("cannot discover git repository from {}: {e}", anchor.display()))?;
+    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
+    match mode {
+        ResolveMode::Read => interactor.resolve_for_read(None).map_err(format_resolve_error),
+        ResolveMode::Write => {
+            interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
+        }
+    }
+}
+
+/// Resolves a track ID for a READ operation, anchored to the repository that
+/// owns `items_dir` (derived via [`resolve_project_root`]).
+///
+/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Read`.
+/// When `explicit_id` is `Some`, git discovery is skipped entirely (CN-02 / AC-19);
+/// `items_dir` is not validated in this case (the caller is responsible for
+/// ensuring a safe path before any filesystem probing).
+/// When `explicit_id` is `None`, `items_dir` is validated via [`resolve_project_root`]
+/// and git is discovered from the owning repo.
+/// Fail-closed on non-track branches (CN-01, AC-01, AC-02).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when `explicit_id` is `None` and
+/// `items_dir` is not in the `<root>/track/items` form, or when the branch
+/// cannot be resolved.
+pub(crate) fn resolve_track_id(
+    explicit_id: Option<String>,
+    items_dir: &std::path::Path,
+) -> Result<String, String> {
+    // Short-circuit for explicit id: skip items_dir validation and git discovery
+    // entirely (CN-02 / AC-19). The inner helper would also short-circuit, but
+    // calling resolve_project_root before it would reject non-canonical items_dir
+    // paths even when git discovery is not needed.
     if let Some(id) = explicit_id {
         return Ok(id);
     }
-    let repo =
-        SystemGitRepo::discover().map_err(|e| format!("cannot discover git repository: {e}"))?;
-    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-    interactor.resolve_for_read(None).map_err(format_resolve_error)
+    let project_root = resolve_project_root(items_dir)?;
+    resolve_track_id_inner(None, &project_root, ResolveMode::Read)
 }
 
-/// Resolves a track ID using git discovery rooted at a workspace path.
+/// Resolves a track ID for a READ operation, anchored to `workspace_root`.
 ///
-/// Thin wrapper around [`ActiveTrackResolveInteractor::resolve_for_read`]
-/// anchored to `workspace_root`. This is for commands whose target tree is
-/// selected by `--workspace-root`. The omitted track-id path must read the
-/// branch from that same workspace rather than from the process current
-/// directory.
+/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Read`.
+/// For commands that use `--workspace-root` instead of `--items-dir`.
+/// When `explicit_id` is `Some`, git discovery is skipped entirely (CN-02 / AC-19).
 ///
-/// When `explicit_id` is `Some`, git discovery is skipped entirely (CN-02).
+/// # Errors
+///
+/// Returns a human-readable error string when `workspace_root` is not inside a
+/// git repository, or when the branch cannot be resolved.
 pub(crate) fn resolve_track_id_from_root(
     explicit_id: Option<String>,
     workspace_root: &Path,
 ) -> Result<String, String> {
-    // Short-circuit for explicit id: skip git discovery entirely (CN-02).
-    if let Some(id) = explicit_id {
-        return Ok(id);
-    }
-    let repo = SystemGitRepo::discover_from(workspace_root).map_err(|e| {
-        format!("cannot discover git repository from {}: {e}", workspace_root.display())
-    })?;
-    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-    interactor.resolve_for_read(None).map_err(format_resolve_error)
+    resolve_track_id_inner(explicit_id, workspace_root, ResolveMode::Read)
 }
 
 #[cfg(test)]
@@ -134,45 +186,46 @@ fn resolve_track_id_with_branch_reader(
     interactor.resolve_for_read(explicit_id).map_err(format_resolve_error)
 }
 
-/// Resolves a track ID for a WRITE operation from an explicit value or the
-/// current git branch, with fail-closed validation when an explicit id is given.
+/// Resolves a track ID for a WRITE operation, anchored to the repository that
+/// owns `items_dir` (derived via [`resolve_project_root`]).
 ///
-/// Thin wrapper around [`ActiveTrackResolveInteractor::resolve_for_write`]
-/// (WRITE semantics, D7, AC-18, CN-02, CN-03):
-/// - When `explicit_id` is `None`: self-resolves from the git branch rooted at
-///   the repository that owns `items_dir`. Fail-closed on non-track branches.
-/// - When `explicit_id` is `Some(id)`: reads the current branch via
-///   `ActiveTrackResolveInteractor` from the repo owning `items_dir`, and
-///   compares the branch-derived id with the explicit id. Returns the explicit
-///   id only when they match; otherwise returns a fail-closed error explaining
-///   the mismatch.
-///
-/// Git discovery is anchored to the repository that owns `items_dir` (derived
-/// via `resolve_project_root`) rather than the process CWD. This ensures the
-/// WRITE guard validates the correct repo even when `--items-dir` points to an
-/// absolute path in a different working directory.
-///
-/// This prevents accidentally writing to a different track than the one the
-/// developer is working on (AC-18). READ operations keep the existing
-/// `resolve_track_id` override semantics (AC-19).
+/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Write`.
+/// The git branch is always read; `explicit_id` (if `Some`) must match the
+/// branch-derived id (D7, AC-18, CN-02, CN-03). Fail-closed on mismatch or
+/// on non-track branches.
 ///
 /// # Errors
 ///
 /// Returns a human-readable error string when:
 /// - `items_dir` is not in the `<root>/track/items` form.
-/// - `explicit_id` is `Some` and the current branch is not a track branch.
-/// - `explicit_id` is `Some` and the branch-derived id does not equal it.
-/// - `explicit_id` is `None` and the current branch is not a track branch.
+/// - `explicit_id` is `Some` and the branch-derived id does not match.
+/// - The current branch is not a track branch.
 pub(crate) fn resolve_track_id_for_write(
     explicit_id: Option<String>,
     items_dir: &std::path::Path,
 ) -> Result<String, String> {
     let project_root = resolve_project_root(items_dir)?;
-    let repo = SystemGitRepo::discover_from(&project_root).map_err(|e| {
-        format!("cannot discover git repository from {}: {e}", project_root.display())
-    })?;
-    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-    interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
+    resolve_track_id_inner(explicit_id, &project_root, ResolveMode::Write)
+}
+
+/// Resolves a track ID for a WRITE operation, anchored to `workspace_root`.
+///
+/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Write`.
+/// For commands that use `--workspace-root` instead of `--items-dir` (AC-18).
+/// The git branch is always read from `workspace_root`; `explicit_id` (if `Some`)
+/// must match the branch-derived id (D7, CN-03).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when:
+/// - `workspace_root` is not inside a git repository.
+/// - `explicit_id` is `Some` and the branch-derived id does not match.
+/// - The current branch is not a track branch.
+pub(crate) fn resolve_track_id_from_root_for_write(
+    explicit_id: Option<String>,
+    workspace_root: &Path,
+) -> Result<String, String> {
+    resolve_track_id_inner(explicit_id, workspace_root, ResolveMode::Write)
 }
 
 /// Formats an [`ActiveTrackResolveError`] into a user-facing CLI error string
@@ -221,42 +274,6 @@ fn format_write_error(e: &ActiveTrackResolveError) -> String {
             )
         }
     }
-}
-
-/// Resolves a track ID for a WRITE operation from an explicit value or the
-/// current git branch, anchored to a workspace root path.
-///
-/// Thin wrapper around [`ActiveTrackResolveInteractor::resolve_for_write`]
-/// (WRITE semantics, D7, AC-18, CN-02, CN-03) for commands that use
-/// `--workspace-root` instead of `--items-dir`:
-/// - When `explicit_id` is `None`: self-resolves from the git branch of the
-///   repository discovered from `workspace_root`. Fail-closed on non-track branches.
-/// - When `explicit_id` is `Some(id)`: reads the current branch via
-///   `ActiveTrackResolveInteractor` from the repo discovered at `workspace_root`,
-///   and compares the branch-derived id with the explicit id. Returns the explicit
-///   id only when they match; otherwise returns a fail-closed error explaining
-///   the mismatch.
-///
-/// This prevents accidentally writing to a different track than the one the
-/// developer is working on (AC-18). This is the workspace-root counterpart of
-/// [`resolve_track_id_for_write`], which is anchored to `items_dir`.
-///
-/// # Errors
-///
-/// Returns a human-readable error string when:
-/// - `workspace_root` is not inside a git repository.
-/// - `explicit_id` is `Some` and the current branch is not a track branch.
-/// - `explicit_id` is `Some` and the branch-derived id does not equal it.
-/// - `explicit_id` is `None` and the current branch is not a track branch.
-pub(crate) fn resolve_track_id_from_root_for_write(
-    explicit_id: Option<String>,
-    workspace_root: &Path,
-) -> Result<String, String> {
-    let repo = SystemGitRepo::discover_from(workspace_root).map_err(|e| {
-        format!("cannot discover git repository from {}: {e}", workspace_root.display())
-    })?;
-    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-    interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
 }
 
 pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
@@ -771,10 +788,10 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 .map_err(CliError::Message)
                 .and_then(|tid| state_ops::execute_clear_override(items_dir, tid))
         }
-        TrackCommand::NextTask { items_dir, track_id } => resolve_track_id(track_id)
+        TrackCommand::NextTask { items_dir, track_id } => resolve_track_id(track_id, &items_dir)
             .map_err(CliError::Message)
             .and_then(|tid| state_ops::execute_next_task(items_dir, tid)),
-        TrackCommand::TaskCounts { items_dir, track_id } => resolve_track_id(track_id)
+        TrackCommand::TaskCounts { items_dir, track_id } => resolve_track_id(track_id, &items_dir)
             .map_err(CliError::Message)
             .and_then(|tid| state_ops::execute_task_counts(items_dir, tid)),
         TrackCommand::Signals { items_dir, track_id } => {
@@ -823,7 +840,7 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             })
         }
         TrackCommand::SpecElementHash { items_dir, track_id, anchor } => {
-            resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
+            resolve_track_id(track_id, &items_dir).map_err(CliError::Message).and_then(|tid| {
                 tddd::spec_element_hash::execute_spec_element_hash(items_dir, tid, anchor)
             })
         }
@@ -913,11 +930,65 @@ mod tests {
 
     // --- resolve_track_id ---
 
-    /// AC-03 / CN-02: explicit track-id is returned as-is, regardless of branch.
+    /// AC-03 / CN-02: explicit track-id is returned as-is, regardless of branch or items_dir.
     #[test]
     fn test_resolve_track_id_with_explicit_value_returns_it_directly() {
-        let result = resolve_track_id(Some("my-feature-2026".to_owned()));
+        // items_dir only matters when explicit_id is None (git discovery is needed).
+        // With an explicit id, it is short-circuited — any valid-structured path works.
+        let dummy_items_dir = std::path::Path::new("track/items");
+        let result = resolve_track_id(Some("my-feature-2026".to_owned()), dummy_items_dir);
         assert_eq!(result.unwrap(), "my-feature-2026");
+    }
+
+    /// items_dir anchor: invalid structure returns resolve_project_root error.
+    ///
+    /// When items_dir is not in the `<root>/track/items` form, resolve_track_id
+    /// returns the error from resolve_project_root without attempting git discovery.
+    /// This validates that the items_dir anchor flows through resolve_track_id_inner.
+    #[test]
+    fn test_resolve_track_id_none_with_invalid_items_dir_structure_returns_error() {
+        let bad_items_dir = std::path::Path::new("not/a/track/items/structure");
+        let result = resolve_track_id(None, bad_items_dir);
+        assert!(result.is_err(), "expected Err for malformed items_dir, got: {result:?}");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("track/items"),
+            "error should mention the expected items_dir form, got: {err_msg}"
+        );
+    }
+
+    /// items_dir anchor: git discovery is anchored to items_dir, not CWD.
+    ///
+    /// This is the regression test for the bug fixed in PR #142: `resolve_track_id`
+    /// previously discovered git from CWD even when the caller supplied a different
+    /// `--items-dir`. The fix routes git discovery through `resolve_project_root(items_dir)`
+    /// → `SystemGitRepo::discover_from(project_root)`.
+    ///
+    /// Proof: create a temp directory (not a git repo) with the required `track/items`
+    /// sub-structure. Pass its `track/items` as `items_dir`. The error must reference
+    /// the temp directory path, confirming that git discovery ran against the target
+    /// tree rather than the process CWD (which IS a git repo and would have succeeded).
+    #[test]
+    fn test_resolve_track_id_none_anchors_discovery_to_items_dir_not_cwd() {
+        let tmp = tempfile::tempdir().unwrap();
+        let items_dir = tmp.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let result = resolve_track_id(None, &items_dir);
+
+        // The error must come from git discovery failing at the temp dir, not CWD.
+        // If CWD were used, the call would succeed (the process runs inside a git repo).
+        assert!(
+            result.is_err(),
+            "expected Err because temp dir is not a git repo, got: {result:?}"
+        );
+        let err_msg = result.unwrap_err();
+        let expected_root = tmp.path().to_string_lossy();
+        assert!(
+            err_msg.contains(expected_root.as_ref()),
+            "error must reference the target tree root '{}' (not CWD), got: {err_msg}",
+            expected_root,
+        );
     }
 
     /// CN-02: explicit track-id priority is preserved even when on a track branch.

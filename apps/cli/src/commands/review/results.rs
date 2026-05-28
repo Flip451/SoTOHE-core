@@ -22,7 +22,8 @@ pub(super) fn execute_results(args: &ResultsArgs) -> ExitCode {
 }
 
 fn run_results(args: &ResultsArgs) -> Result<String, String> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    let track_id =
+        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
     // Map ResultsLimit to Option<u32>:
     //   Zero        → None (state summary only)

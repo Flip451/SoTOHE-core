@@ -44,7 +44,8 @@ pub(super) fn execute_files(args: &FilesArgs) -> ExitCode {
 }
 
 fn run_files(args: &FilesArgs) -> Result<String, String> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    let track_id =
+        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
     // AC-08: validate scope name before resolving diff base.
     compose_v2::validate_scope_for_track_str(&track_id, &args.items_dir, &args.scope)?;

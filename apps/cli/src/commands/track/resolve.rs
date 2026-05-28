@@ -6,26 +6,16 @@ use usecase::track_phase::TrackPhaseService as _;
 pub(super) fn execute_resolve(args: ResolveArgs) -> Result<ExitCode, CliError> {
     let ResolveArgs { items_dir, track_id } = args;
 
-    // Validate items_dir structure (must be <root>/track/items).
+    // Validate items_dir structure (must be <root>/track/items) unconditionally,
+    // even when track_id is explicitly provided (resolve_track_id only calls
+    // resolve_project_root when explicit_id is None).
     resolve_project_root(&items_dir).map_err(CliError::Message)?;
 
-    // Auto-detect is only safe when items_dir is the default (track/items
-    // relative to CWD), because the shared resolver uses SystemGitRepo::discover
-    // from CWD.  When a custom --items-dir is supplied, require explicit id.
-    let is_default_items_dir = items_dir == std::path::Path::new("track/items");
-
-    let effective_track_id = match track_id {
-        Some(id) => id,
-        None if !is_default_items_dir => {
-            return Err(CliError::Message(
-                "resolve failed: custom --items-dir requires an explicit track-id argument"
-                    .to_owned(),
-            ));
-        }
-        // Delegate to the shared interactor path (IN-09: removes bespoke auto-detect).
-        None => super::resolve_track_id(None)
-            .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?,
-    };
+    // Delegate to resolve_track_id which anchors git discovery to the repository
+    // owning items_dir (via resolve_project_root). Explicit id short-circuits git
+    // discovery (CN-02 / AC-19).
+    let effective_track_id = super::resolve_track_id(track_id, &items_dir)
+        .map_err(|err| CliError::Message(format!("resolve failed: {err}")))?;
 
     // Validate the track ID before any filesystem probing.
     // `items_dir.join(track_id)` would otherwise let a caller traverse outside

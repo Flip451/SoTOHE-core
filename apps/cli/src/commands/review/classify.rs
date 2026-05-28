@@ -46,7 +46,8 @@ pub(super) fn execute_classify(args: &ClassifyArgs) -> ExitCode {
 }
 
 fn run_classify(args: &ClassifyArgs) -> Result<String, String> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    let track_id =
+        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
     // Pre-validate all paths and collect every error before delegating to the
     // interactor. `classify_by_strings` short-circuits on the first invalid

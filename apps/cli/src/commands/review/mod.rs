@@ -234,7 +234,8 @@ pub(super) fn validate_auto_record_args_raw(
 pub(super) fn validate_auto_record_args(
     args: &CodexLocalArgs,
 ) -> Result<ValidatedAutoRecordArgs, String> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    let track_id =
+        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
     validate_auto_record_args_raw(&track_id, &args.group, args.round_type, args.items_dir.clone())
 }
 
@@ -248,7 +249,8 @@ pub(super) fn validate_auto_record_args(
 pub(super) fn validate_claude_auto_record_args(
     args: &ClaudeLocalArgs,
 ) -> Result<ValidatedAutoRecordArgs, String> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    let track_id =
+        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
     validate_auto_record_args_raw(&track_id, &args.group, args.round_type, args.items_dir.clone())
 }
 
@@ -432,7 +434,8 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 }
 
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<ReviewApprovalOutput, String> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    let track_id =
+        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
     infrastructure::review_v2::check_approved_str(&track_id, &args.items_dir)
         .map_err(|e| format!("{e}"))
 }
