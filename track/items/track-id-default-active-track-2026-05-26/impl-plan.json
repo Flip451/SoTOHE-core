@@ -82,8 +82,8 @@
     {
       "id": "T014",
       "description": "make.rs wrapper passthrough: remove positional track-id consumption from the five cargo make task wrappers and update all existing call sites. (1) In apps/cli/src/commands/make.rs, rewrite dispatch_track_add_task, dispatch_track_transition, dispatch_track_next_task, dispatch_track_task_counts, and dispatch_track_set_override so that they no longer consume a positional track-id. Four of the five (add_task, transition, next_task, task_counts) inject --items-dir track/items and forward all remaining args verbatim. dispatch_track_set_override is the exception: it additionally reads the first non-flag positional word as the status (blocked / cancelled / clear) to route to either track set-override or track clear-override (the single Makefile entry covers two underlying commands), and it does NOT consume a positional track-id. dispatch_track_transition currently extracts track_dir from the first positional arg and derives --items-dir and --track-id by splitting it; change it to inject --items-dir track/items and pass --track-id only when explicitly present in the forwarded args (i.e. passthrough). After this change, cargo make track-add-task -- \"write docs\" resolves the active track from the current branch (D1 self-resolve), and cargo make track-add-task -- --track-id <id> \"write docs\" uses the explicit id. (2) Update existing call sites that still pass a positional track-id or track_dir to the five wrappers: .claude/commands/track/implement.md, .claude/commands/track/full-cycle.md, knowledge/conventions/task-completion-flow.md (cargo make track-transition <track_dir> <task_id> <status> invocation pattern), and apps/cli/src/commands/make_tests.rs (positional wrapper tests). Change each to the --track-id flag form or to the track-id-omitted form as appropriate. No new types. Covers IN-15, AC-17.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done",
+      "commit_hash": "a9890a39b08c3e1f0d2a128805fd6544bc8cc391"
     }
   ],
   "plan": {

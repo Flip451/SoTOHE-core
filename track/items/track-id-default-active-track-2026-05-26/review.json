@@ -390,223 +390,6 @@
         }
       ]
     },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This adds a new public `BranchReaderPort` implementation on `SystemGitRepo`, but there are no tests in `git_cli/mod.rs` covering the happy path or the error mapping for this adapter. That leaves the new public API unverified and makes regressions in the delegation/mapping easy to miss.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 235,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:74f62715d75176547bca2ff4bd84d8131bbf2e930e49a974d5d34b83c83c0f15",
-          "at": "2026-05-27T05:14:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This patch is no longer limited to the single impl block requested in CN-05: it appends unit tests under `mod tests`, so the change surface extends beyond the allowed block.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 743,
-              "category": "architecture"
-            },
-            {
-              "message": "The new `BranchReaderPort` adapter has no test for the only error branch (`GitError` -> `BranchReadError::ReadFailed`). The added tests cover the success path and the `Ok(None)` path only, so an error-mapping regression would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 748,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dfdea60bafe4d19709647aeedb23f86b066ab755183a46d6e7d034ac9d33165c",
-          "at": "2026-05-27T05:19:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This patch exceeds the briefing's CN-05 boundary: it adds a new `#[cfg(test)]` test block after the adapter impl, even though T002 was supposed to stay within a single `impl BranchReaderPort for SystemGitRepo` block in `libs/infrastructure/src/git_cli/` only.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 743,
-              "category": "scope"
-            }
-          ],
-          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
-          "at": "2026-05-27T05:25:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`branch_reader_port_returns_none_for_empty_repo_with_no_commits` is built on the wrong Git assumption: `git init` creates an unborn branch with a known current branch name, so this path is not a reliable `None` case and is likely to fail in CI. Use a scenario where `current_branch` באמת cannot resolve a branch name instead.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/git_cli/mod.rs",
-              "line": 766,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
-          "at": "2026-05-27T05:29:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
-          "at": "2026-05-27T05:32:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
-          "at": "2026-05-27T05:36:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new error path tells users to \"provide an explicit track-id\", but `verify catalogue-spec-signals` has no track-id argument. On a non-track branch this remediation is impossible within this command, so the failure message contradicts the CLI surface.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-              "line": 399,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:694fed682e06f9e80604ae933d4d859dab31d3ecb1e8fe961a7e9f19fa70a532",
-          "at": "2026-05-27T08:51:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
-          "at": "2026-05-27T08:56:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On non-track branches this error still includes the shared resolver text `provide an explicit track-id` via `{e}`, but `verify catalogue-spec-signals` exposes no `--track` or `--track-id` argument. The remediation is impossible for this command, so the failure message contradicts the CLI surface; suppress or map that nested resolver detail here and keep the actionable hint to switch to a `track/<id>` branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-              "line": 399,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
-          "at": "2026-05-27T09:00:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a99d2131400483ab69730db29bc3eda51b88c72408470baedcbc410ae098728",
-          "at": "2026-05-27T09:03:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
-          "at": "2026-05-27T11:46:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
-          "at": "2026-05-27T11:48:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
-          "at": "2026-05-27T12:42:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
-          "at": "2026-05-27T12:44:49Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
-          "at": "2026-05-27T08:50:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
-          "at": "2026-05-27T08:51:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
-          "at": "2026-05-27T09:34:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
-          "at": "2026-05-27T09:38:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
-          "at": "2026-05-27T13:02:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
-          "at": "2026-05-27T13:03:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
-          "at": "2026-05-27T16:14:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
-          "at": "2026-05-27T16:16:14Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -786,6 +569,163 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This adds a new public `BranchReaderPort` implementation on `SystemGitRepo`, but there are no tests in `git_cli/mod.rs` covering the happy path or the error mapping for this adapter. That leaves the new public API unverified and makes regressions in the delegation/mapping easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 235,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:74f62715d75176547bca2ff4bd84d8131bbf2e930e49a974d5d34b83c83c0f15",
+          "at": "2026-05-27T05:14:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This patch is no longer limited to the single impl block requested in CN-05: it appends unit tests under `mod tests`, so the change surface extends beyond the allowed block.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 743,
+              "category": "architecture"
+            },
+            {
+              "message": "The new `BranchReaderPort` adapter has no test for the only error branch (`GitError` -> `BranchReadError::ReadFailed`). The added tests cover the success path and the `Ok(None)` path only, so an error-mapping regression would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 748,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dfdea60bafe4d19709647aeedb23f86b066ab755183a46d6e7d034ac9d33165c",
+          "at": "2026-05-27T05:19:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This patch exceeds the briefing's CN-05 boundary: it adds a new `#[cfg(test)]` test block after the adapter impl, even though T002 was supposed to stay within a single `impl BranchReaderPort for SystemGitRepo` block in `libs/infrastructure/src/git_cli/` only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 743,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
+          "at": "2026-05-27T05:25:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`branch_reader_port_returns_none_for_empty_repo_with_no_commits` is built on the wrong Git assumption: `git init` creates an unborn branch with a known current branch name, so this path is not a reliable `None` case and is likely to fail in CI. Use a scenario where `current_branch` באמת cannot resolve a branch name instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
+              "line": 766,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
+          "at": "2026-05-27T05:29:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
+          "at": "2026-05-27T05:32:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
+          "at": "2026-05-27T05:36:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new error path tells users to \"provide an explicit track-id\", but `verify catalogue-spec-signals` has no track-id argument. On a non-track branch this remediation is impossible within this command, so the failure message contradicts the CLI surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 399,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:694fed682e06f9e80604ae933d4d859dab31d3ecb1e8fe961a7e9f19fa70a532",
+          "at": "2026-05-27T08:51:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
+          "at": "2026-05-27T08:56:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On non-track branches this error still includes the shared resolver text `provide an explicit track-id` via `{e}`, but `verify catalogue-spec-signals` exposes no `--track` or `--track-id` argument. The remediation is impossible for this command, so the failure message contradicts the CLI surface; suppress or map that nested resolver detail here and keep the actionable hint to switch to a `track/<id>` branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 399,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
+          "at": "2026-05-27T09:00:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a99d2131400483ab69730db29bc3eda51b88c72408470baedcbc410ae098728",
+          "at": "2026-05-27T09:03:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
+          "at": "2026-05-27T11:46:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
+          "at": "2026-05-27T11:48:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
+          "at": "2026-05-27T12:42:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
+          "at": "2026-05-27T12:44:49Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -859,6 +799,66 @@
           "findings": [],
           "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
           "at": "2026-05-27T12:50:27Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
+          "at": "2026-05-27T08:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
+          "at": "2026-05-27T08:51:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:38:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
+          "at": "2026-05-27T13:02:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
+          "at": "2026-05-27T13:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
+          "at": "2026-05-27T16:14:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
+          "at": "2026-05-27T16:16:14Z"
         }
       ]
     },
@@ -1396,6 +1396,20 @@
           "findings": [],
           "hash": "rvw1:sha256:88a5215f285b6730d09473f769fff436ddcd44e016f24d8718a4a32b24d40844",
           "at": "2026-05-28T00:13:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d509c3fa10ac0f49e89fdbcc3bcf8465cc51be80beeada4d1ca6886a9b80d307",
+          "at": "2026-05-28T00:36:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d509c3fa10ac0f49e89fdbcc3bcf8465cc51be80beeada4d1ca6886a9b80d307",
+          "at": "2026-05-28T00:39:51Z"
         }
       ]
     }
