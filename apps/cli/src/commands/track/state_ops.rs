@@ -26,15 +26,8 @@ impl BranchReaderPort for LazyBranchReader {
     }
 }
 
-fn build_branch_reader(
-    project_root: &std::path::Path,
-    skip_branch_check: bool,
-) -> Option<Arc<dyn BranchReaderPort>> {
-    if skip_branch_check {
-        None
-    } else {
-        Some(Arc::new(LazyBranchReader::new(project_root.to_path_buf())))
-    }
+fn build_branch_reader(project_root: &std::path::Path) -> Option<Arc<dyn BranchReaderPort>> {
+    Some(Arc::new(LazyBranchReader::new(project_root.to_path_buf())))
 }
 
 pub(super) fn execute_add_task(
@@ -43,7 +36,6 @@ pub(super) fn execute_add_task(
     description: String,
     section: Option<String>,
     after: Option<String>,
-    skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
     // Validate track_id as a safe slug before any filesystem probe.
     validate_track_id_str(&track_id).map_err(CliError::Message)?;
@@ -52,7 +44,7 @@ pub(super) fn execute_add_task(
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let branch_reader = build_branch_reader(&project_root, skip_branch_check);
+    let branch_reader = build_branch_reader(&project_root);
     let service =
         usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
 
@@ -75,7 +67,6 @@ pub(super) fn execute_add_task(
         description: description.clone(),
         section,
         after_task_id,
-        skip_branch_check,
     };
     let output = service
         .add_task(cmd)
@@ -96,7 +87,6 @@ pub(super) fn execute_set_override(
     track_id: String,
     status: String,
     reason: String,
-    skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
     // Validate track_id as a safe slug before any filesystem probe.
     validate_track_id_str(&track_id).map_err(CliError::Message)?;
@@ -105,7 +95,7 @@ pub(super) fn execute_set_override(
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let branch_reader = build_branch_reader(&project_root, skip_branch_check);
+    let branch_reader = build_branch_reader(&project_root);
     let service =
         usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
 
@@ -114,7 +104,6 @@ pub(super) fn execute_set_override(
         track_id: track_id.clone(),
         status: status.clone(),
         reason,
-        skip_branch_check,
     };
     let output = service
         .set_override(cmd)
@@ -129,7 +118,6 @@ pub(super) fn execute_set_override(
 pub(super) fn execute_clear_override(
     items_dir: PathBuf,
     track_id: String,
-    skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
     // Validate track_id as a safe slug before any filesystem probe.
     validate_track_id_str(&track_id).map_err(CliError::Message)?;
@@ -138,15 +126,11 @@ pub(super) fn execute_clear_override(
     let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
 
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let branch_reader = build_branch_reader(&project_root, skip_branch_check);
+    let branch_reader = build_branch_reader(&project_root);
     let service =
         usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
 
-    let cmd = usecase::task_ops::ClearOverrideCommand {
-        items_dir,
-        track_id: track_id.clone(),
-        skip_branch_check,
-    };
+    let cmd = usecase::task_ops::ClearOverrideCommand { items_dir, track_id: track_id.clone() };
     let output = service
         .clear_override(cmd)
         .map_err(|err| CliError::Message(format!("clear-override failed: {err}")))?;
@@ -261,6 +245,51 @@ mod tests {
 }}"#
         );
         fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
+    }
+
+    /// Write a minimal valid v5 branchless metadata.json (`branch: null`).
+    ///
+    /// Branchless tracks skip the in-usecase branch guard unconditionally
+    /// (`enforce_branch_guard` returns `Ok(())` when `track.branch()` is `None`),
+    /// so these fixtures let CLI-layer tests exercise the full mutation logic
+    /// without requiring a real git repository in the temp directory.
+    fn write_metadata_v5_branchless(track_dir: &std::path::Path, track_id: &str) {
+        let metadata = format!(
+            r#"{{
+  "schema_version": 5,
+  "id": "{track_id}",
+  "branch": null,
+  "title": "Test Track",
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z"
+}}"#
+        );
+        fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
+    }
+
+    /// Create a minimal branchless track setup. Returns (project_root, items_dir, track_dir).
+    ///
+    /// The branch guard in the usecase layer is skipped for branchless tracks,
+    /// so these fixtures let unit tests verify mutation logic without a git repo.
+    fn setup_test_track_branchless(
+        tmp: &std::path::Path,
+        track_id: &str,
+    ) -> (PathBuf, PathBuf, PathBuf) {
+        let track_dir = tmp.join("track").join("items").join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        write_metadata_v5_branchless(&track_dir, track_id);
+        let items_dir = tmp.join("track").join("items");
+        (tmp.to_path_buf(), items_dir, track_dir)
+    }
+
+    /// Create a branchless track with both metadata.json and impl-plan.json.
+    fn setup_test_track_branchless_with_impl_plan(
+        tmp: &std::path::Path,
+        track_id: &str,
+    ) -> (PathBuf, PathBuf, PathBuf) {
+        let (root, items_dir, track_dir) = setup_test_track_branchless(tmp, track_id);
+        write_impl_plan(&track_dir);
+        (root, items_dir, track_dir)
     }
 
     /// Write a minimal valid impl-plan.json with a single task T001.
@@ -407,14 +436,9 @@ mod tests {
         let items_dir = tmp.path().join("track").join("items");
         fs::create_dir_all(&items_dir).unwrap();
 
-        let result = execute_add_task(
-            items_dir,
-            "INVALID".to_string(),
-            "task desc".to_string(),
-            None,
-            None,
-            true,
-        );
+        // Invalid track ID is rejected before branch guard is reached.
+        let result =
+            execute_add_task(items_dir, "INVALID".to_string(), "task desc".to_string(), None, None);
         assert!(result.is_err());
     }
 
@@ -423,21 +447,26 @@ mod tests {
         let tmp = tempfile::tempdir().unwrap();
         let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
 
+        // Invalid status is rejected by the usecase layer (before the branch guard
+        // fires on the real git repo, which is absent in this temp directory).
         let result = execute_set_override(
             items_dir,
             "test-track".to_string(),
             "invalid_status".to_string(),
             "reason".to_string(),
-            true,
         );
         assert!(result.is_err());
     }
 
     #[test]
     fn test_execute_add_task_happy_path() {
+        // Uses a branchless track fixture (`branch: null`) so that the in-usecase
+        // branch guard is a no-op (skipped when track.branch() is None). This
+        // allows the test to verify the full CLI→domain mutation path without
+        // requiring a real git repository.
         let tmp = tempfile::tempdir().unwrap();
         let (_root, items_dir, _track_dir) =
-            setup_test_track_with_impl_plan(tmp.path(), "test-track");
+            setup_test_track_branchless_with_impl_plan(tmp.path(), "test-track");
 
         let result = execute_add_task(
             items_dir.clone(),
@@ -445,16 +474,17 @@ mod tests {
             "New task".to_string(),
             None,
             None,
-            true, // skip branch check for test
         );
-        assert!(result.is_ok(), "add-task must succeed: {result:?}");
+        assert!(result.is_ok(), "add-task with branchless track must succeed: {result:?}");
     }
 
     #[test]
     fn test_execute_add_task_without_impl_plan_fails() {
         // Without impl-plan.json, add-task should fail (can't add to missing plan).
+        // Uses branchless fixture so the domain layer (not the branch guard) returns
+        // the error: impl-plan.json absent → TrackNotFound or ImplPlanNotFound.
         let tmp = tempfile::tempdir().unwrap();
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
+        let (_root, items_dir, _track_dir) = setup_test_track_branchless(tmp.path(), "test-track");
 
         let result = execute_add_task(
             items_dir.clone(),
@@ -462,47 +492,59 @@ mod tests {
             "New task".to_string(),
             None,
             None,
-            true,
         );
         assert!(result.is_err(), "add-task without impl-plan.json must fail");
     }
 
     #[test]
     fn test_execute_set_override_happy_path() {
+        // Uses a branchless track fixture so the in-usecase branch guard is
+        // skipped. The test verifies the full CLI→domain mutation path and that
+        // the override is actually persisted in metadata.json.
         let tmp = tempfile::tempdir().unwrap();
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
+        let (_root, items_dir, track_dir) = setup_test_track_branchless(tmp.path(), "test-track");
 
         let result = execute_set_override(
             items_dir.clone(),
             "test-track".to_string(),
             "blocked".to_string(),
             "blocker reason".to_string(),
-            true,
         );
-        assert!(result.is_ok());
+        assert!(result.is_ok(), "set-override with branchless track must succeed: {result:?}");
 
-        let metadata_path = items_dir.join("test-track").join("metadata.json");
-        let content = fs::read_to_string(metadata_path).unwrap();
-        assert!(content.contains("blocked"));
+        // Verify the override was persisted to metadata.json.
+        let content = fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(
+            content.contains("blocked"),
+            "metadata.json must contain the override status after set-override:\n{content}"
+        );
     }
 
     #[test]
     fn test_execute_clear_override_happy_path() {
+        // Uses a branchless track fixture so the in-usecase branch guard is
+        // skipped. First sets an override, then clears it. Verifies both the
+        // mutation path and that the override is removed from metadata.json.
         let tmp = tempfile::tempdir().unwrap();
-        let (_root, items_dir, _track_dir) = setup_test_track(tmp.path(), "test-track");
+        let (_root, items_dir, track_dir) = setup_test_track_branchless(tmp.path(), "test-track");
 
-        // First set an override
+        // Set up an existing override first so clear-override has something to remove.
         execute_set_override(
             items_dir.clone(),
             "test-track".to_string(),
             "blocked".to_string(),
-            "reason".to_string(),
-            true,
+            "initial blocker".to_string(),
         )
-        .unwrap();
+        .expect("set-override must succeed before clear-override test");
 
-        // Then clear it
-        let result = execute_clear_override(items_dir, "test-track".to_string(), true);
-        assert!(result.is_ok());
+        let result = execute_clear_override(items_dir, "test-track".to_string());
+        assert!(result.is_ok(), "clear-override with branchless track must succeed: {result:?}");
+
+        // Verify the override was cleared from metadata.json.
+        let content = fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(
+            !content.contains("\"blocked\""),
+            "metadata.json must not contain override status after clear-override:\n{content}"
+        );
     }
 }

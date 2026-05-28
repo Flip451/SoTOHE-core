@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "73463f81984bc9219de7b6cc7d7d6af956842c35794283364dc009b8c89808f4",
+  "catalogue_declaration_hash": "32ba868c45bedf1b5d29bec93ed9c617a594f3eb7b030592e6926a1e02c66c25",
   "signals": [
     {
       "type_name": "ActiveTrackResolveError",
@@ -11,7 +11,15 @@
       "signal": "blue"
     },
     {
+      "type_name": "AddTaskCommand",
+      "signal": "blue"
+    },
+    {
       "type_name": "BranchReadError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ClearOverrideCommand",
       "signal": "blue"
     },
     {
@@ -19,7 +27,15 @@
       "signal": "blue"
     },
     {
+      "type_name": "SetOverrideCommand",
+      "signal": "blue"
+    },
+    {
       "type_name": "TaskOperationInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskTransitionCommand",
       "signal": "blue"
     },
     {

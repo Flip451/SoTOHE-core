@@ -269,20 +269,13 @@ fn test_build_set_override_args_missing_status_returns_error() {
 
 #[test]
 fn test_build_set_override_args_boolean_flag_before_status() {
-    // Boolean flag --skip-branch-check does not consume the next token as its value.
-    // cargo make track-set-override -- --skip-branch-check blocked
-    // Expected argv: track set-override --items-dir track/items blocked --skip-branch-check
-    let raw = vec!["--skip-branch-check blocked".to_owned()];
+    // An unknown boolean flag (e.g. --verbose) must not consume the next token as its value.
+    // cargo make track-set-override -- --verbose blocked
+    // Expected argv: track set-override --items-dir track/items blocked --verbose
+    let raw = vec!["--verbose blocked".to_owned()];
     let args = build_set_override_args(&raw).unwrap();
     assert_eq!(
         args,
-        vec![
-            "track",
-            "set-override",
-            "--items-dir",
-            "track/items",
-            "blocked",
-            "--skip-branch-check"
-        ]
+        vec!["track", "set-override", "--items-dir", "track/items", "blocked", "--verbose"]
     );
 }

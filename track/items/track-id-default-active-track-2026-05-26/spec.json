@@ -38,7 +38,7 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "位置引数 `track_id: String`（必須）として定義されている track 系サブコマンド（`transition` / `signals` / `type-signals` / `type-graph` / `baseline-graph` / `contract-map` / `catalogue-spec-signals` / `catalogue-impl-signals` / `spec-element-hash` / `baseline-capture` / `add-task` / `set-override` / `clear-override` / `next-task` / `task-counts` など）の引数を、省略可能な `--track-id` フラグ（`Option<String>`）へ変更する。位置引数ではなくフラグに統一する理由: (a) IN-02 が対象とするコマンド群（`lint` / `review *` など）はすでに `--track-id` フラグ形式であり、両グループを同じフラグ名に揃えることで CLI 全体の一貫性を保つ; (b) `transition <track_id> <task_id> <status>` のような複数位置引数を取るコマンドでは、省略可能な引数を最初の位置に置くと clap が後続の位置引数と曖昧になるため、フラグが適切; (c) 明示的な track-id 指定は「別トラックへのクロス操作」という稀なケースであり、そのような上書き用途にはフラグが自然で読みやすい",
+        "text": "位置引数 `track_id: String`（必須）として定義されている track 系サブコマンド（`transition` / `signals` / `type-signals` / `type-graph` / `baseline-graph` / `contract-map` / `catalogue-spec-signals` / `catalogue-impl-signals` / `spec-element-hash` / `baseline-capture` / `add-task` / `set-override` / `clear-override` / `next-task` / `task-counts` など）の引数を、省略可能な `--track-id` フラグ（`Option<String>`）へ変更する。位置引数ではなくフラグに統一する理由: (a) IN-02 が対象とするコマンド群（`lint` / `review *` など）はすでに `--track-id` フラグ形式であり、両グループを同じフラグ名に揃えることで CLI 全体の一貫性を保つ; (b) `transition <track_id> <task_id> <status>` のような複数位置引数を取るコマンドでは、省略可能な引数を最初の位置に置くと clap が後続の位置引数と曖昧になるため、フラグが適切; (c) 明示的な track-id 指定は「別トラックへのクロス操作」という稀なケースであり、そのような上書き用途にはフラグが自然で読みやすい。explicit `--track-id` が渡された場合の意味論は操作の種類（WRITE / READ）によって分岐する（D7）: WRITE 操作（`signals` / `type-signals` / `catalogue-spec-signals` / `baseline-graph` / `contract-map` / `baseline-capture` / `transition` / `add-task` / `set-override` / `clear-override` / `views sync` / `review local`）では explicit id を現在ブランチから導出した id と照合し、一致しなければ fail-closed で停止する。READ 操作（`catalogue-impl-signals` / `spec-element-hash` / `next-task` / `task-counts` / `lint` / `resolve` / `review results` / `review check-approved`）では explicit id は他トラックを対象にするための override として機能し、任意のブランチから指定トラックのアーティファクトを参照できる",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
@@ -47,6 +47,10 @@
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
             "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D7"
           }
         ]
       },
@@ -106,11 +110,15 @@
       },
       {
         "id": "IN-07",
-        "text": "active-track-write-guard（`2026-05-26-0518-active-track-write-guard.md`）が usecase interactor へのクロージャ注入で行うブランチ読み取りを、本 ADR の単一解決経路（ポート経由）に統合する。バリデーション（明示 id の照合）と既定値解決（省略時の導出）が同じ解決を共有し、git 読み取りは `GitRepository` ポート 1 本に集約する",
+        "text": "active-track-write-guard（`2026-05-26-0518-active-track-write-guard.md`）が usecase interactor へのクロージャ注入で行うブランチ読み取りを、本 ADR の単一解決経路（ポート経由）に統合する。バリデーション（明示 id の照合）と既定値解決（省略時の導出）が同じ解決を共有し、git 読み取りは `GitRepository` ポート 1 本に集約する。さらに D7 の分類に基づき、既存の write-guard が `baseline_graph.rs` / `contract_map.rs` のみで実装していた「explicit id がブランチと一致しなければ拒否」パターンを、全 WRITE 操作（`signals` / `type-signals` / `catalogue-spec-signals` / `baseline-graph` / `contract-map` / `baseline-capture` / `transition` / `add-task` / `set-override` / `clear-override` / `views sync` / `review local`）へ一般化する",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
             "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D7"
           },
           {
             "file": "knowledge/adr/2026-05-26-0518-active-track-write-guard.md",
@@ -140,7 +148,7 @@
       },
       {
         "id": "IN-10",
-        "text": "省略時解決のテストを追加する: `track/<id>` ブランチ上で省略した場合に正しい track-id が解決されるケース、`main` ブランチなどトラックブランチ以外で省略した場合に明示エラーで停止するケース、明示 track-id を渡した場合にそれが優先されるケース",
+        "text": "省略時解決のテストを追加する: `track/<id>` ブランチ上で省略した場合に正しい track-id が解決されるケース、`main` ブランチなどトラックブランチ以外で省略した場合に明示エラーで停止するケース、READ 操作において明示 track-id を渡した場合にそれが override として機能するケース、WRITE 操作において明示 track-id が現在ブランチと不一致の場合に fail-closed で停止するケース（D7 / CN-02）",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
@@ -307,21 +315,25 @@
     },
     {
       "id": "CN-02",
-      "text": "明示 track-id は常に優先される: 引数で track-id を渡した場合はそれを使う。ブランチに紐づかない文脈や別トラックを明示的に対象にしたい場合のために、明示経路は維持する",
+      "text": "明示 track-id の意味論は操作の種類（WRITE / READ）によって異なる。READ 操作では明示 track-id が他トラックを対象にするための override として機能し、任意のブランチから指定トラックを参照できる。WRITE 操作では明示 track-id を現在ブランチから導出した id と照合し、一致しない場合は fail-closed で停止する。D1 の「明示指定は上書きとして残す」という方針は D7 により WRITE 操作については撤回され、READ 操作のみに適用される",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
           "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
         }
       ]
     },
     {
       "id": "CN-03",
-      "text": "省略時に導出した id は定義上現在ブランチと一致するため、`2026-05-26-0518-active-track-write-guard.md` のブランチ紐付きバリデーションを自動的に満たす。明示 id がブランチと一致しない書き込み系コマンドは write-guard が拒否し、その escape hatch（`--skip-branch-check`）は従来どおり機能する",
+      "text": "省略時に導出した id は定義上現在ブランチと一致するため、`2026-05-26-0518-active-track-write-guard.md` のブランチ紐付きバリデーションを自動的に満たす。全 WRITE 操作（`signals` / `type-signals` / `catalogue-spec-signals` / `baseline-graph` / `contract-map` / `baseline-capture` / `transition` / `add-task` / `set-override` / `clear-override` / `views sync` / `review local`）において、明示 id がブランチと一致しない場合は fail-closed で停止する。escape hatch（`--skip-branch-check` 相当のフラグ）は設けない。誤操作で別トラックに誤った書き込みが確定するリスクを防ぐため、WRITE 操作に対する branch 照合の回避経路は提供しない",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
-          "anchor": "D1"
+          "anchor": "D7"
         },
         {
           "file": "knowledge/adr/2026-05-26-0518-active-track-write-guard.md",
@@ -461,7 +473,7 @@
     },
     {
       "id": "AC-03",
-      "text": "明示 track-id を渡した場合は、現在ブランチに関わらずその id が使われる。例: `main` ブランチ上で `sotp track signals --track-id my-track` を実行した場合に `my-track` を対象とする。`--track-id` フラグ形式は IN-01〜IN-03 のすべての対象コマンド群で共通である（IN-03 の `verify catalogue-spec-refs` も含め `--track-id` 名に統一する）",
+      "text": "明示 track-id の意味論は操作の種類（WRITE / READ）によって異なる（D7 / CN-02）。READ 操作では明示 track-id が現在ブランチに関わらず override として機能する。例: `main` ブランチ上で `sotp track next-task --track-id my-track` を実行した場合に `my-track` のアーティファクトを参照して正常終了する。WRITE 操作では明示 track-id が現在ブランチから導出した id と照合され、一致しない場合は fail-closed で停止する（AC-18）。`--track-id` フラグ形式は IN-01〜IN-03 のすべての対象コマンド群で共通である（IN-03 の `verify catalogue-spec-refs` も含め `--track-id` 名に統一する）",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
@@ -470,6 +482,10 @@
         {
           "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
           "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
         }
       ]
     },
@@ -620,6 +636,36 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-18",
+      "text": "WRITE 操作（`signals` / `type-signals` / `catalogue-spec-signals` / `baseline-graph` / `contract-map` / `baseline-capture` / `transition` / `add-task` / `set-override` / `clear-override` / `views sync` / `review local`）において、explicit `--track-id` が現在ブランチから導出した id と一致しない場合、コマンドが fail-closed で停止し、ブランチ不一致を示す明示エラーが表示される。例: `main` ブランチ上で `sotp track signals --track-id X` を実行した場合にエラーで停止する（`main` は `track/<id>` 形式でないため導出 id が存在せず fail-closed）。例: `track/A` ブランチ上で `sotp track signals --track-id B` を実行した場合にエラーで停止する（導出 id が `A` で明示 id が `B` と不一致）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-19",
+      "text": "READ 操作（`catalogue-impl-signals` / `spec-element-hash` / `next-task` / `task-counts` / `lint` / `resolve` / `review results` / `review check-approved`）において、explicit `--track-id` は他トラックを参照する override として機能する。例: `main` ブランチ上で `sotp track next-task --track-id X` を実行した場合、ブランチ不一致エラーなしに X のアーティファクトを参照して正常終了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-20",
+      "text": "`--skip-branch-check` フラグ（または相当する escape hatch）が、対象コマンド（`transition` / `add-task` / `set-override` / `clear-override` およびその他の WRITE 操作）のいずれからも除去されている。コードベース内に `skip_branch_check` / `skip-branch-check` という名前の CLI 引数定義が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -649,7 +695,7 @@
     }
   ],
   "signals": {
-    "blue": 55,
+    "blue": 58,
     "yellow": 0,
     "red": 0
   }

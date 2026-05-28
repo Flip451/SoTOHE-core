@@ -24,15 +24,8 @@ impl BranchReaderPort for LazyBranchReader {
     }
 }
 
-fn build_branch_reader(
-    project_root: &std::path::Path,
-    skip_branch_check: bool,
-) -> Option<Arc<dyn BranchReaderPort>> {
-    if skip_branch_check {
-        None
-    } else {
-        Some(Arc::new(LazyBranchReader::new(project_root.to_path_buf())))
-    }
+fn build_branch_reader(project_root: &std::path::Path) -> Option<Arc<dyn BranchReaderPort>> {
+    Some(Arc::new(LazyBranchReader::new(project_root.to_path_buf())))
 }
 
 pub(super) fn execute_transition(
@@ -41,7 +34,6 @@ pub(super) fn execute_transition(
     task_id: String,
     target_status: String,
     commit_hash: Option<String>,
-    skip_branch_check: bool,
 ) -> Result<ExitCode, CliError> {
     // Validate track_id as a safe slug before any filesystem probe.
     validate_track_id_str(&track_id).map_err(CliError::Message)?;
@@ -52,7 +44,7 @@ pub(super) fn execute_transition(
 
     // Build store and BranchReaderPort for TaskOperationInteractor.
     let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let branch_reader = build_branch_reader(&project_root, skip_branch_check);
+    let branch_reader = build_branch_reader(&project_root);
     let service =
         usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
 
@@ -62,7 +54,6 @@ pub(super) fn execute_transition(
         task_id: task_id.clone(),
         target_status: target_status.clone(),
         commit_hash,
-        skip_branch_check,
     };
     let output = service
         .transition_task(cmd)

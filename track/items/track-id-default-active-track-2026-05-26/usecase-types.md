@@ -35,6 +35,15 @@
 | ExplicitTrackBranch | dto | modify | — | 🔵 | 🔵 |
 | TrackBranchClaim | dto | modify | — | 🔵 | 🔵 |
 
+## Commands
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| AddTaskCommand | command | modify | — | 🔵 | 🔵 |
+| ClearOverrideCommand | command | modify | — | 🔵 | 🔵 |
+| SetOverrideCommand | command | modify | — | 🔵 | 🔵 |
+| TaskTransitionCommand | command | modify | — | 🔵 | 🔵 |
+
 ## Free Functions
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |

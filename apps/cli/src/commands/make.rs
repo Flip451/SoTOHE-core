@@ -366,9 +366,10 @@ fn dispatch_track_add_task(raw_args: &[String]) -> Result<ExitCode, CliError> {
 /// - other     → `["track", "set-override",   "--items-dir", "track/items", status, <rest>]`
 ///
 /// Only **value-taking** flags (`--track-id`, `--reason`) consume the next token as their
-/// value. Boolean flags (`--skip-branch-check`) do not consume the next token. The status
-/// word is removed by **index** (not by value), so a flag value that happens to equal the
-/// status string is never silently dropped.
+/// value. All other flags (those starting with `-` but not in VALUE_FLAGS) are treated as
+/// boolean flags and do not consume the next token. The status word is removed by **index**
+/// (not by value), so a flag value that happens to equal the status string is never silently
+/// dropped.
 ///
 /// # Errors
 ///
@@ -380,7 +381,7 @@ pub fn build_set_override_args(raw_args: &[String]) -> Result<Vec<String>, CliEr
     // Only these flags take a value argument; boolean flags do not consume the next token.
     const VALUE_FLAGS: &[&str] = &["--track-id", "--reason"];
     // Walk the filtered tokens. Skip known value-taking flags and their values.
-    // Boolean flags (e.g. --skip-branch-check) are skipped without consuming the next token.
+    // Any flag starting with '-' but not in VALUE_FLAGS is treated as boolean.
     let mut status_idx: Option<usize> = None;
     let mut skip_next = false;
     for (i, word) in filtered.iter().enumerate() {
@@ -396,7 +397,7 @@ pub fn build_set_override_args(raw_args: &[String]) -> Result<Vec<String>, CliEr
             status_idx = Some(i);
             break;
         }
-        // Boolean flags (starts with '-' but not in VALUE_FLAGS) are skipped without consuming next.
+        // Any flag starting with '-' but not in VALUE_FLAGS is a boolean flag; skip without consuming next.
     }
     let status_idx = status_idx.ok_or_else(|| CliError::Message(usage.to_owned()))?;
     let status = filtered.get(status_idx).ok_or_else(|| CliError::Message(usage.to_owned()))?;

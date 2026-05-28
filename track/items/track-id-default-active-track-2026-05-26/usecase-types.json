@@ -152,6 +152,138 @@
       ],
       "informal_grounds": []
     },
+    "TaskTransitionCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "String" },
+            { "name": "task_id",       "ty": "String" },
+            { "name": "target_status", "ty": "String" },
+            { "name": "commit_hash",   "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "CQRS command object for the task transition use case. Modified (D7 / AC-20): skip_branch_check field removed — WRITE operations now perform branch-id matching unconditionally (no escape hatch). track_id and target_status are raw strings (opaque identifiers, no domain concept requiring value-object treatment at this boundary).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-20",
+          "hash": "0f4de84ab5e8e6709e6ff551970efb3b783fdad6e6f9e2ea8f6e95d540ba130b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AddTaskCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "String" },
+            { "name": "description",   "ty": "String" },
+            { "name": "section",       "ty": "Option<String>" },
+            { "name": "after_task_id", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "CQRS command object for the add-task use case. Modified (D7 / AC-20): skip_branch_check field removed — WRITE operations now perform branch-id matching unconditionally (no escape hatch). description is free-text (no domain concept constraint), section/after_task_id are opaque optional identifiers.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-20",
+          "hash": "0f4de84ab5e8e6709e6ff551970efb3b783fdad6e6f9e2ea8f6e95d540ba130b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SetOverrideCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" },
+            { "name": "status",    "ty": "String" },
+            { "name": "reason",    "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "CQRS command object for the set-override use case. Modified (D7 / AC-20): skip_branch_check field removed — WRITE operations now perform branch-id matching unconditionally (no escape hatch). status is a finite-set token ('blocked'/'cancelled') validated at runtime inside the interactor; reason is free-text.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-20",
+          "hash": "0f4de84ab5e8e6709e6ff551970efb3b783fdad6e6f9e2ea8f6e95d540ba130b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ClearOverrideCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "CQRS command object for the clear-override use case. Modified (D7 / AC-20): skip_branch_check field removed — WRITE operations now perform branch-id matching unconditionally (no escape hatch).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-20",
+          "hash": "0f4de84ab5e8e6709e6ff551970efb3b783fdad6e6f9e2ea8f6e95d540ba130b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
     "TaskOperationInteractor": {
       "action": "modify",
       "role": "Interactor",
@@ -165,17 +297,17 @@
       },
       "methods": [],
       "module_path": "task_ops",
-      "docs": "Concrete struct implementing TaskOperationService. Modified (IN-07): the injected BranchReaderFn closure is replaced with Arc<dyn BranchReaderPort> so the branch guard uses the single port-based resolution path rather than a direct git rev-parse shelling out. Generic over S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync. Private fields stripped.",
+      "docs": "Concrete struct implementing TaskOperationService. Modified (IN-07): the injected BranchReaderFn closure is replaced with Arc<dyn BranchReaderPort> so the branch guard uses the single port-based resolution path rather than a direct git rev-parse shelling out. Modified (D7 / IN-07): branch guard is now always applied for WRITE operations when a branch_reader is injected — skip_branch_check logic in enforce_branch_guard is removed. Generic over S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync. Private fields stripped.",
       "spec_refs": [
         {
           "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
           "anchor": "IN-07",
-          "hash": "e2b97055f70c4cadb84e300d7a2e5092bd2ed5a7774d10115a4dafd7c3e48028"
+          "hash": "e234d55e7f99dd17dbad5d9229b40d3bda78af9a8873dfec4dfd137a3ff12d82"
         },
         {
           "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
-          "anchor": "CN-05",
-          "hash": "a581263dc2c9107054bb85943d60cd823f0773fb3457d0b6c941c8c0a435571e"
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
         }
       ],
       "informal_grounds": []

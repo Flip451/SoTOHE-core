@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-28T00:41:03Z",
-  "declaration_hash": "73463f81984bc9219de7b6cc7d7d6af956842c35794283364dc009b8c89808f4",
+  "generated_at": "2026-05-28T04:35:34Z",
+  "declaration_hash": "32ba868c45bedf1b5d29bec93ed9c617a594f3eb7b030592e6926a1e02c66c25",
   "signals": [
     {
       "type_name": "ActiveTrackResolveError",
@@ -32,6 +32,12 @@
       "found_type": true
     },
     {
+      "type_name": "AddTaskCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "BranchReadError",
       "kind_tag": "error_type",
       "signal": "blue",
@@ -49,6 +55,12 @@
       "found_type": true
     },
     {
+      "type_name": "ClearOverrideCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "ExplicitTrackBranch",
       "kind_tag": "dto",
       "signal": "blue",
@@ -61,6 +73,12 @@
       ]
     },
     {
+      "type_name": "SetOverrideCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "TaskOperationInteractor",
       "kind_tag": "interactor",
       "signal": "blue",
@@ -68,6 +86,12 @@
       "found_items": [
         "TaskOperationService"
       ]
+    },
+    {
+      "type_name": "TaskTransitionCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TrackBranchClaim",

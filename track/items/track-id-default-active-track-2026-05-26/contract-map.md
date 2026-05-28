@@ -41,10 +41,26 @@ subgraph usecase["usecase"]
   end
   subgraph usecase_usecase_module_task_ops["usecase::task_ops"]
     direction TB
+  subgraph T30_usecase_usecase_AddTaskCommand["task_ops::AddTaskCommand"]
+    direction TB
+    T30_usecase_usecase_AddTaskCommand__self[AddTaskCommand]
+  end
+  subgraph T36_usecase_usecase_ClearOverrideCommand["task_ops::ClearOverrideCommand"]
+    direction TB
+    T36_usecase_usecase_ClearOverrideCommand__self[ClearOverrideCommand]
+  end
+  subgraph T34_usecase_usecase_SetOverrideCommand["task_ops::SetOverrideCommand"]
+    direction TB
+    T34_usecase_usecase_SetOverrideCommand__self[SetOverrideCommand]
+  end
   subgraph T39_usecase_usecase_TaskOperationInteractor["task_ops::TaskOperationInteractor"]
     direction TB
     T39_usecase_usecase_TaskOperationInteractor__self[TaskOperationInteractor]
     T39_usecase_usecase_TaskOperationInteractor_new([new])
+  end
+  subgraph T37_usecase_usecase_TaskTransitionCommand["task_ops::TaskTransitionCommand"]
+    direction TB
+    T37_usecase_usecase_TaskTransitionCommand__self[TaskTransitionCommand]
   end
   subgraph R36_usecase_usecase_TaskOperationService["task_ops::TaskOperationService"]
     direction TB
@@ -112,6 +128,10 @@ subgraph infrastructure["infrastructure"]
   end
 end
 T39_usecase_usecase_TaskOperationInteractor_new --> T39_usecase_usecase_TaskOperationInteractor__self
+R36_usecase_usecase_TaskOperationService_transition_task --o T37_usecase_usecase_TaskTransitionCommand__self
+R36_usecase_usecase_TaskOperationService_add_task --o T30_usecase_usecase_AddTaskCommand__self
+R36_usecase_usecase_TaskOperationService_set_override --o T34_usecase_usecase_SetOverrideCommand__self
+R36_usecase_usecase_TaskOperationService_clear_override --o T36_usecase_usecase_ClearOverrideCommand__self
 T39_usecase_usecase_ActiveTrackResolveError_BranchRead --o T31_usecase_usecase_BranchReadError__self
 T39_usecase_usecase_ActiveTrackResolveError_Resolution --o T36_usecase_usecase_TrackResolutionError__self
 T44_usecase_usecase_ActiveTrackResolveInteractor_new --> T44_usecase_usecase_ActiveTrackResolveInteractor__self
@@ -123,8 +143,12 @@ T39_usecase_usecase_TaskOperationInteractor__self -.impl.-> R36_usecase_usecase_
 T43_infrastructure_infrastructure_SystemGitRepo__self -.impl.-> R32_usecase_usecase_BranchReaderPort__self
 class T35_usecase_usecase_ExplicitTrackBranch__self dto
 class T32_usecase_usecase_TrackBranchClaim__self dto
+class T30_usecase_usecase_AddTaskCommand__self command
+class T36_usecase_usecase_ClearOverrideCommand__self command
+class T34_usecase_usecase_SetOverrideCommand__self command
 class T39_usecase_usecase_TaskOperationInteractor_new method_node
 class T39_usecase_usecase_TaskOperationInteractor__self interactor
+class T37_usecase_usecase_TaskTransitionCommand__self command
 class R36_usecase_usecase_TaskOperationService_transition_task method_node
 class R36_usecase_usecase_TaskOperationService_add_task method_node
 class R36_usecase_usecase_TaskOperationService_set_override method_node

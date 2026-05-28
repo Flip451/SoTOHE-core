@@ -73,3 +73,4 @@ full-cycle が task を done マークするタイミングを commit 後（impl
 - `knowledge/adr/` — ADR 索引
 - `knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md` — catalogue active-track guard の起源。本 ADR はその frozen ブロック判定を branch ベースに置き換える。
 - `knowledge/conventions/workflow-ceremony-minimization.md` — 状態フィールド依存の最小化原則。
+- `knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#D7` — explicit `--track-id` の read/write 分岐を決定。WRITE 操作では本 ADR のブランチ照合バリデーションを全コマンドへ一般化し、escape hatch を撤廃する。READ 操作には従来どおり override を許可する。

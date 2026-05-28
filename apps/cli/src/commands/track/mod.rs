@@ -134,6 +134,73 @@ fn resolve_track_id_with_branch_reader(
     }
 }
 
+/// Resolves a track ID for a WRITE operation from an explicit value or the
+/// current git branch, with fail-closed validation when an explicit id is given.
+///
+/// WRITE semantics (D7, AC-18, CN-02, CN-03):
+/// - When `explicit_id` is `None`: self-resolves from the git branch rooted at
+///   the repository that owns `items_dir`. Fail-closed on non-track branches.
+/// - When `explicit_id` is `Some(id)`: reads the current branch via
+///   `ActiveTrackResolveInteractor` from the repo owning `items_dir`, and
+///   compares the branch-derived id with the explicit id. Returns the explicit
+///   id only when they match; otherwise returns a fail-closed error explaining
+///   the mismatch.
+///
+/// Git discovery is anchored to the repository that owns `items_dir` (derived
+/// via `resolve_project_root`) rather than the process CWD. This ensures the
+/// WRITE guard validates the correct repo even when `--items-dir` points to an
+/// absolute path in a different working directory.
+///
+/// This prevents accidentally writing to a different track than the one the
+/// developer is working on (AC-18). READ operations keep the existing
+/// `resolve_track_id` override semantics (AC-19).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when:
+/// - `items_dir` is not in the `<root>/track/items` form.
+/// - `explicit_id` is `Some` and the current branch is not a track branch.
+/// - `explicit_id` is `Some` and the branch-derived id does not equal it.
+/// - `explicit_id` is `None` and the current branch is not a track branch.
+pub(crate) fn resolve_track_id_for_write(
+    explicit_id: Option<String>,
+    items_dir: &std::path::Path,
+) -> Result<String, String> {
+    let project_root = resolve_project_root(items_dir)?;
+    let repo = SystemGitRepo::discover_from(&project_root).map_err(|e| {
+        format!("cannot discover git repository from {}: {e}", project_root.display())
+    })?;
+    let branch_reader: Arc<dyn BranchReaderPort> = Arc::new(repo);
+
+    let Some(id) = explicit_id else {
+        // No explicit id: self-resolve from current branch (same as READ, but
+        // using the repo anchored to the items_dir project root).
+        return resolve_track_id_with_branch_reader(None, branch_reader);
+    };
+
+    // Explicit id supplied: compare against the branch-derived id.
+    let interactor = ActiveTrackResolveInteractor::new(branch_reader);
+
+    let branch_id = interactor.resolve_active_track().map_err(|e| {
+        format!(
+            "WRITE operation requires the current branch to be the target track branch, \
+             but branch resolution failed: {e}\n\
+             Hint: switch to the track branch (track/{id}) before passing --track-id."
+        )
+    })?;
+
+    if branch_id != id {
+        return Err(format!(
+            "WRITE operation rejected: explicit --track-id '{id}' does not match the \
+             current branch-derived track id '{branch_id}'.\n\
+             Hint: switch to branch 'track/{id}' first, or omit --track-id to operate \
+             on the current branch's track."
+        ));
+    }
+
+    Ok(id)
+}
+
 pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
     let items_name = items_dir.file_name().and_then(|name| name.to_str());
     let track_dir = items_dir.parent();
@@ -183,10 +250,6 @@ pub enum TrackCommand {
         /// Commit hash (required when target_status is "done", optional).
         #[arg(long)]
         commit_hash: Option<String>,
-
-        /// Skip branch validation (escape hatch for CI/testing).
-        #[arg(long, default_value_t = false)]
-        skip_branch_check: bool,
     },
 
     /// Create or switch to a track branch.
@@ -225,10 +288,6 @@ pub enum TrackCommand {
         /// Insert after this task ID within the section. If omitted or not found, appends to end.
         #[arg(long)]
         after: Option<String>,
-
-        /// Skip branch validation (escape hatch for CI/testing).
-        #[arg(long, default_value_t = false)]
-        skip_branch_check: bool,
     },
 
     /// Set a status override on a track (blocked/cancelled).
@@ -248,10 +307,6 @@ pub enum TrackCommand {
         /// Reason for the override.
         #[arg(long, default_value = "")]
         reason: String,
-
-        /// Skip branch validation.
-        #[arg(long, default_value_t = false)]
-        skip_branch_check: bool,
     },
 
     /// Clear a status override on a track.
@@ -264,10 +319,6 @@ pub enum TrackCommand {
         /// When omitted, resolved from the current git branch (`track/<id>`).
         #[arg(long)]
         track_id: Option<String>,
-
-        /// Skip branch validation.
-        #[arg(long, default_value_t = false)]
-        skip_branch_check: bool,
     },
 
     /// Show the next open task for a track (JSON output).
@@ -631,52 +682,36 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
     use crate::CliError;
 
     let result: Result<ExitCode, CliError> = match cmd {
-        TrackCommand::Transition {
-            items_dir,
-            track_id,
-            task_id,
-            target_status,
-            commit_hash,
-            skip_branch_check,
-        } => resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
-            transition::execute_transition(
-                items_dir,
-                tid,
-                task_id,
-                target_status,
-                commit_hash,
-                skip_branch_check,
+        TrackCommand::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
+            resolve_track_id_for_write(track_id, &items_dir).map_err(CliError::Message).and_then(
+                |tid| {
+                    transition::execute_transition(
+                        items_dir,
+                        tid,
+                        task_id,
+                        target_status,
+                        commit_hash,
+                    )
+                },
             )
-        }),
+        }
         TrackCommand::Branch { action } => branch_ops::execute_branch(action),
         TrackCommand::Resolve(args) => resolve::execute_resolve(args),
         TrackCommand::Views { action } => views::execute_views(action),
-        TrackCommand::AddTask {
-            items_dir,
-            track_id,
-            description,
-            section,
-            after,
-            skip_branch_check,
-        } => resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
-            state_ops::execute_add_task(
-                items_dir,
-                tid,
-                description,
-                section,
-                after,
-                skip_branch_check,
+        TrackCommand::AddTask { items_dir, track_id, description, section, after } => {
+            resolve_track_id_for_write(track_id, &items_dir).map_err(CliError::Message).and_then(
+                |tid| state_ops::execute_add_task(items_dir, tid, description, section, after),
             )
-        }),
-        TrackCommand::SetOverride { items_dir, track_id, status, reason, skip_branch_check } => {
-            resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
-                state_ops::execute_set_override(items_dir, tid, status, reason, skip_branch_check)
-            })
         }
-        TrackCommand::ClearOverride { items_dir, track_id, skip_branch_check } => {
-            resolve_track_id(track_id).map_err(CliError::Message).and_then(|tid| {
-                state_ops::execute_clear_override(items_dir, tid, skip_branch_check)
-            })
+        TrackCommand::SetOverride { items_dir, track_id, status, reason } => {
+            resolve_track_id_for_write(track_id, &items_dir)
+                .map_err(CliError::Message)
+                .and_then(|tid| state_ops::execute_set_override(items_dir, tid, status, reason))
+        }
+        TrackCommand::ClearOverride { items_dir, track_id } => {
+            resolve_track_id_for_write(track_id, &items_dir)
+                .map_err(CliError::Message)
+                .and_then(|tid| state_ops::execute_clear_override(items_dir, tid))
         }
         TrackCommand::NextTask { items_dir, track_id } => resolve_track_id(track_id)
             .map_err(CliError::Message)
@@ -870,5 +905,98 @@ mod tests {
             err_msg.contains("detached HEAD") && err_msg.contains("provide an explicit track-id"),
             "error must mention detached HEAD and explicit track-id hint, got: {err_msg}"
         );
+    }
+
+    // ── resolve_track_id_for_write ────────────────────────────────────────────
+
+    /// Helper for resolve_track_id_for_write that injects a stub branch reader
+    /// instead of discovering a real git repo, enabling unit testing without a
+    /// git repository.
+    fn resolve_track_id_for_write_with_reader(
+        explicit_id: Option<String>,
+        branch_reader: Arc<dyn BranchReaderPort>,
+    ) -> Result<String, String> {
+        let Some(id) = explicit_id else {
+            // No explicit id: delegate to resolve_track_id_with_branch_reader (same
+            // as resolve_track_id but with a stub reader).
+            return resolve_track_id_with_branch_reader(None, branch_reader);
+        };
+
+        let interactor = ActiveTrackResolveInteractor::new(branch_reader);
+        let branch_id = interactor.resolve_active_track().map_err(|e| {
+            format!(
+                "WRITE operation requires the current branch to be the target track branch, \
+                 but branch resolution failed: {e}\n\
+                 Hint: switch to the track branch (track/{id}) before passing --track-id."
+            )
+        })?;
+
+        if branch_id != id {
+            return Err(format!(
+                "WRITE operation rejected: explicit --track-id '{id}' does not match the \
+                 current branch-derived track id '{branch_id}'.\n\
+                 Hint: switch to branch 'track/{id}' first, or omit --track-id to operate \
+                 on the current branch's track."
+            ));
+        }
+
+        Ok(id)
+    }
+
+    /// AC-18 / D7: explicit id matches the branch-derived id → returns the id.
+    #[test]
+    fn test_resolve_track_id_for_write_matching_explicit_and_branch_returns_id() {
+        let result = resolve_track_id_for_write_with_reader(
+            Some("my-track-2026".to_owned()),
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert_eq!(result.unwrap(), "my-track-2026");
+    }
+
+    /// AC-18 / D7: explicit id does not match the branch-derived id → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_for_write_mismatched_explicit_and_branch_returns_error() {
+        let result = resolve_track_id_for_write_with_reader(
+            Some("other-track-2026".to_owned()),
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert!(result.is_err(), "expected Err on id mismatch");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("WRITE operation rejected") && err_msg.contains("other-track-2026"),
+            "error must explain the mismatch, got: {err_msg}"
+        );
+    }
+
+    /// AC-18 / D7: non-track branch with explicit id → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_for_write_non_track_branch_with_explicit_id_returns_error() {
+        let result = resolve_track_id_for_write_with_reader(
+            Some("my-track-2026".to_owned()),
+            branch_reader(Some("main")),
+        );
+        assert!(result.is_err(), "expected Err on non-track branch");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("WRITE operation") || err_msg.contains("branch"),
+            "error must reference the branch issue, got: {err_msg}"
+        );
+    }
+
+    /// AC-18 / D7: None explicit id on track branch → self-resolves to branch id.
+    #[test]
+    fn test_resolve_track_id_for_write_none_on_track_branch_self_resolves() {
+        let result = resolve_track_id_for_write_with_reader(
+            None,
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert_eq!(result.unwrap(), "my-track-2026");
+    }
+
+    /// AC-18 / D7: None explicit id on non-track branch → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_for_write_none_on_non_track_branch_returns_error() {
+        let result = resolve_track_id_for_write_with_reader(None, branch_reader(Some("main")));
+        assert!(result.is_err(), "expected Err on non-track branch with no explicit id");
     }
 }
