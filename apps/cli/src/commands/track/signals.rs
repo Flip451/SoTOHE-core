@@ -174,4 +174,112 @@ mod tests {
         let result = execute_signals(items_dir.clone(), track_id.clone());
         assert!(result.is_ok(), "execute_signals should succeed: {result:?}");
     }
+
+    // Restored from baseline 883cb682 (apps/cli/src/commands/track/signals.rs).
+    // These spec.json signal-evaluation tests were dropped during the
+    // cli-composition migration. The behavior they pin is unchanged (signal
+    // counts written into spec.json, spec.md regeneration, spec.json-over-spec.md
+    // precedence, malformed-JSON returns error), so the coverage is restored here.
+    #[test]
+    fn test_execute_signals_via_spec_json_writes_signals_into_spec_json() {
+        let dir = tempfile::tempdir().unwrap();
+        // Schema v2: two in-scope requirements — one Blue (adr_ref), one Yellow (informal)
+        let spec_json = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Feature X",
+  "scope": {
+    "in_scope": [
+      {"id": "IN-01", "text": "Req A", "adr_refs": [{"file": "adr/x.md", "anchor": "D1"}]},
+      {"id": "IN-02", "text": "Req B", "informal_grounds": [{"kind": "discussion", "summary": "agreed"}]}
+    ],
+    "out_of_scope": []
+  }
+}"#;
+        let (items_dir, track_id) = setup_track_with_spec_json(dir.path(), spec_json);
+
+        let result = execute_signals(items_dir.clone(), track_id.clone());
+        assert!(result.is_ok(), "execute_signals via spec.json must succeed");
+
+        // spec.json must contain signals field
+        let updated_json =
+            std::fs::read_to_string(items_dir.join(&track_id).join("spec.json")).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&updated_json).unwrap();
+        let signals = &parsed["signals"];
+        assert_eq!(signals["blue"], 1, "adr_ref should be blue");
+        assert_eq!(signals["yellow"], 1, "informal should be yellow");
+        assert_eq!(signals["red"], 0);
+    }
+
+    #[test]
+    fn test_execute_signals_via_spec_json_also_generates_spec_md() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec_json = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Feature Y",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+        let (items_dir, track_id) = setup_track_with_spec_json(dir.path(), spec_json);
+
+        execute_signals(items_dir.clone(), track_id.clone()).unwrap();
+
+        let spec_md_path = items_dir.join(&track_id).join("spec.md");
+        assert!(spec_md_path.exists(), "spec.md must be generated after spec.json signal update");
+
+        let spec_md = std::fs::read_to_string(&spec_md_path).unwrap();
+        assert!(spec_md.contains("<!-- Generated from spec.json"));
+        assert!(spec_md.contains("Feature Y"));
+    }
+
+    #[test]
+    fn test_execute_signals_prefers_spec_json_over_spec_md_when_both_exist() {
+        let dir = tempfile::tempdir().unwrap();
+        let spec_json = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Feature Z",
+  "scope": { "in_scope": [], "out_of_scope": [] }
+}"#;
+        let (items_dir, track_id) = setup_track_with_spec_json(dir.path(), spec_json);
+
+        // Also write a legacy spec.md with frontmatter
+        std::fs::write(
+            items_dir.join(&track_id).join("spec.md"),
+            "---\nstatus: draft\nversion: \"1.0\"\n---\n## Scope\n- item [source: PRD §1]\n",
+        )
+        .unwrap();
+
+        execute_signals(items_dir.clone(), track_id.clone()).unwrap();
+
+        // metadata.json must NOT have spec_signals (spec.json path was taken)
+        let metadata_content =
+            std::fs::read_to_string(items_dir.join(&track_id).join("metadata.json")).unwrap();
+        let meta: serde_json::Value = serde_json::from_str(&metadata_content).unwrap();
+        assert!(
+            meta.get("spec_signals").is_none(),
+            "spec_signals must NOT be written to metadata.json when spec.json is present"
+        );
+
+        // spec.json must have signals
+        let updated_json =
+            std::fs::read_to_string(items_dir.join(&track_id).join("spec.json")).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&updated_json).unwrap();
+        assert!(parsed.get("signals").is_some(), "signals must be written into spec.json");
+    }
+
+    #[test]
+    fn test_execute_signals_via_spec_json_with_malformed_json_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        let track_id = "test-track";
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        std::fs::write(track_dir.join("spec.json"), "{not valid}").unwrap();
+        write_metadata(&track_dir, track_id);
+
+        let result = execute_signals(items_dir, track_id.to_owned());
+        assert!(result.is_err(), "malformed spec.json must return an error");
+    }
 }

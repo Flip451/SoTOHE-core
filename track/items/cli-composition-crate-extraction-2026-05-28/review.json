@@ -1,70 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
-          "at": "2026-05-28T10:37:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
-          "at": "2026-05-28T10:38:25Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:27:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:29:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
-          "at": "2026-05-28T11:35:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
-          "at": "2026-05-28T11:38:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
-          "at": "2026-05-28T15:02:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
-          "at": "2026-05-28T15:13:20Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -127,401 +63,231 @@
         }
       ]
     },
-    "cli_composition": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
-          "at": "2026-05-28T11:04:06Z"
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:26:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:32:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:32:37Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
-          "at": "2026-05-28T11:09:38Z"
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:33:05Z"
         },
         {
           "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
+          "at": "2026-05-28T11:39:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
+          "at": "2026-05-28T11:42:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
+          "at": "2026-05-28T12:24:58Z"
+        },
+        {
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The extracted `review_v2` surface is still largely untested. `run.rs` only covers the Claude path, and there are no direct happy-path/error-path tests for the Codex builder/run entry points or the new public helpers in `approved.rs`, `results.rs`, `scope.rs`, and `shared.rs`. That leaves the new composition boundary unverified and violates the repo requirement that public APIs have both success and failure coverage.",
+              "message": "`review local` used to call `resolve_track_id_for_write(args.track_id, &args.items_dir)` before dispatch, which anchored the write guard to the repository owning `--items-dir`. This now passes the raw optional track id into `CliApp::review_run_local`; that facade resolves/checks the branch from the process cwd and ignores `items_dir`, so running from another repo while pointing `--items-dir` at this track can record a review without verifying the target repo is on the matching `track/<id>` branch. Preserve the scoped write-resolution here and pass the resolved id to the facade, or make the facade resolve from `items_dir`.",
               "severity": "P1",
-              "file": null,
-              "line": null,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
-          "at": "2026-05-28T11:42:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
-          "at": "2026-05-28T11:47:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The moved `review_v2` modules still import the external `domain` crate as `domain::...`, but `cli_composition` already declares a root `mod domain` command module. That local module shadows the extern prelude, so paths like `use domain::review_v2::...` resolve to `cli_composition::domain`, which has no `review_v2`/`TrackId`, and the crate will not compile. Qualify the external crate as `::domain::...` or alias it across these new modules.",
-              "severity": "P0",
-              "file": "apps/cli-composition/src/review_v2/shared.rs",
-              "line": 5,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
-          "at": "2026-05-28T11:51:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
-          "at": "2026-05-28T11:55:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5812586eddf8d3f81ecd6750f805fc724a23779a47ca4aac45ef307559a4cdb4",
-          "at": "2026-05-28T12:29:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The review-v2 track-resolution helpers ignore their `items_dir` anchor and call `SystemGitRepo::discover()` from the process CWD. As a result, `review_results`, `review_check_approved`, and the review-run paths can resolve or write against the wrong repository whenever the caller supplies an explicit `items_dir` that is not the current directory.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/mod.rs",
-              "line": 535,
-              "category": "correctness"
+              "file": "apps/cli/src/commands/review/local.rs",
+              "line": 80,
+              "category": "write_guard_regression"
             },
             {
-              "message": "`verify_catalogue_spec_signals()` does its non-track-branch skip check with the CWD-based `resolve_ci_verify_track_id()` instead of the `workspace_root`-aware helper defined just above. If the command is invoked from a different directory than `--workspace-root`, the skip/fail decision is made against the wrong repo even though the actual verification runs against `workspace_root`.",
+              "message": "`review classify` no longer pre-resolves the track id with `crate::commands::track::resolve_track_id(..., &args.items_dir)`. When `--track-id` is omitted, the new facade path resolves the branch from cwd instead of the repository owning `--items-dir`, so classification can use a track id from one repo while reading scope config from another `items_dir`. That can silently return the wrong scope mapping. Resolve the track id as before and pass `Some(track_id)` into `CliApp::review_classify`, or move the same `items_dir`-anchored resolution into the facade.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/verify.rs",
-              "line": 444,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3ac82382c99e79812959276b9524e1eaf873ff474a6deff2dcb5298a5954a12b",
-          "at": "2026-05-28T15:08:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`make_track_review_results` discards the incoming `raw_args` and constructs `ReviewResultsInput` with hardcoded defaults (`scope: None`, `all: false`, `limit: 0`, `round_type: \"all\"`, `no_hint: false`). That means every `cargo make track-review-results -- ...` filter the dispatcher forwards is silently ignored, so the wrapper cannot actually expose the review-results options it is supposed to relay.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 284,
-              "category": "functional_regression"
+              "file": "apps/cli/src/commands/review/classify.rs",
+              "line": 47,
+              "category": "track_resolution_regression"
             },
             {
-              "message": "The positional parsing in the make-task wrappers is lossy: `make_track_transition`, `make_track_add_task`, and `make_track_set_override` all compute positionals with `filter(|w| !w.starts_with('-'))`, so flag values are treated as positional arguments. For example, `--track-id my-track T001 done` can make `task_id` become `my-track`, and `--track-id`/`--reason` can corrupt the status/description. These wrappers need flag-aware parsing, not a raw non-`-` filter.",
+              "message": "`review files` has the same `--items-dir` anchoring regression as `review classify`: the call now forwards `args.track_id.clone()` directly, so an omitted track id is resolved from cwd by the facade while file enumeration still uses `args.items_dir`. This can enumerate files for a different track than the one owning the requested `items_dir`, which breaks review scope selection. Pre-resolve with `resolve_track_id(..., &args.items_dir)` and pass the resolved id to the facade, or fix the facade resolver to honor `items_dir`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 336,
-              "category": "argument_parsing"
+              "file": "apps/cli/src/commands/review/files.rs",
+              "line": 48,
+              "category": "track_resolution_regression"
             }
           ],
-          "hash": "rvw1:sha256:e5d120c48b8511c4cb4200d56a36867fbfa5b25fc1d3042d299e08cfb5119d31",
-          "at": "2026-05-28T15:31:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`make_track_review_results` discards the caller's `--scope`, `--round-type`, `--limit`, and `--no-hint` arguments and hardcodes `scope: None`, `limit: 0`, and `round_type: \"all\"`. That means `cargo make track-review-results -- --track-id ... --scope ... --round-type ... --limit 1` cannot produce the scoped findings block required by the review protocol, so this wrapper reports the wrong review-results data.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 291,
-              "category": "workflow correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e5d120c48b8511c4cb4200d56a36867fbfa5b25fc1d3042d299e08cfb5119d31",
-          "at": "2026-05-28T19:37:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`--limit` is parsed with `parse::<u32>().ok().unwrap_or(0)`, so `cargo make track-review-results -- --limit all` or any malformed limit silently degrades to summary-only output instead of preserving the requested history or returning an error. That is a user-visible behavior regression in the wrapper.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 294,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:a31b6af04f51814fb57fa829a299c64cf4c34bd6730a2d4ca86fa7a3f3cdcacb",
-          "at": "2026-05-28T19:47:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9e98894a98e27b7a019f2fdbc1210644aae790105c75403a7914d05ec17148b3",
-          "at": "2026-05-28T19:55:28Z"
+          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
+          "at": "2026-05-28T12:28:46Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The make-wrapper positional parsing only filters out tokens starting with `-`, so values belonging to flags remain in the positional list. For example, `--track-id my-track T001 done` makes `task_id = \"my-track\"` and `target_status = \"T001\"` instead of `T001`/`done`; the same pattern below also breaks add-task and set-override when `--track-id`, `--section`, or `--reason` are supplied. These wrappers need to skip value-taking flags and their following values before selecting positional arguments, otherwise write commands can target the wrong task/status or reject valid invocations.",
+              "message": "`run_execute_local` resolves the track ID with `resolve_track_id_for_write` anchored to `args.items_dir`, but then delegates to `CliApp::review_run_local`, whose current implementation performs its own write branch check using cwd-based git discovery. That means a valid `sotp review local --items-dir <repo>/track/items` invocation can pass the intended items-dir anchored guard here and then fail against an unrelated current working repository before the review runs. The previous implementation did not re-enter a second cwd-based guard after resolving the track, so this regresses the documented items-dir anchoring for the local reviewer path.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/make.rs",
-              "line": 353,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:9e98894a98e27b7a019f2fdbc1210644aae790105c75403a7914d05ec17148b3",
-          "at": "2026-05-28T20:01:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`make_track_pr_review` drops the `--resume` flag: it only extracts a track id from `raw_args` and always calls `pr_review_cycle(..., false)`. As a result, `cargo make track-pr-review -- --resume` starts a new review cycle instead of resuming the persisted trigger state, causing duplicate review comments and making timeout recovery unusable through the make wrapper.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/make.rs",
-              "line": 232,
-              "category": "behavior_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:db8da47c027639ece9e9f781119f375df850534886ffb2a8db5fbbc7ce8d6fd0",
-          "at": "2026-05-28T20:08:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "WRITE track operations can bypass the branch guard when an explicit --track-id is supplied outside a discoverable git repository. resolve_track_id_for_write is documented to fail closed by comparing the explicit id to the current track/<id> branch, but this fallback returns the id on git discovery failure, letting callers proceed without any branch proof and risking cross-track or wrong-worktree mutation.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/mod.rs",
-              "line": 122,
-              "category": "branch-guard"
-            },
-            {
-              "message": "The in-process track-review-results wrapper rejects the documented --limit all form. The underlying review results CLI supports --limit 0|N|all and uses u32::MAX for all, but this parser only accepts u32, so cargo make track-review-results -- --limit all fails before rendering full history.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/make.rs",
-              "line": 295,
+              "file": "apps/cli/src/commands/review/local.rs",
+              "line": 92,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:4c6125096383caf74d96439194a59f3461fff840565962a1ccd98a2a39d7f1ea",
-          "at": "2026-05-28T20:14:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The write-guard was only applied to `review_run_local`; `review_run_codex` and `review_run_claude` still resolve `track_id` through `resolve_track_id_or_branch`, so `review codex-local` / `review claude-local` can still write `review.json` for an arbitrary track from the wrong branch. That reintroduces the cross-track write/corruption risk D7 is supposed to block.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
-              "line": 56,
-              "category": "correctness"
-            },
-            {
-              "message": "`extract_positionals` treats every token that starts with `-` as a flag and drops it, so legitimate free-form positional text beginning with `-` is silently mangled or discarded. That breaks `make_track_add_task` descriptions and `make_track_set_override` reasons whenever the user input starts with a dash.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 549,
-              "category": "input-parsing"
-            }
-          ],
-          "hash": "rvw1:sha256:e31c9f6650913bc775ec8b79e55526e052049339c07c76c96ecb08ec01c5cc59",
-          "at": "2026-05-28T20:43:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The summary-only path (`--limit 0`, which `review_results` maps to `None`) never loads `read_all_rounds`, so `state_line_suffix()` always sees an empty slice and the default results output drops the latest `round_type@timestamp verdict` suffix required by the review-results contract.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/results.rs",
-              "line": 146,
-              "category": "bug"
-            },
-            {
-              "message": "The ad hoc parser treats malformed or missing values for `--scope`/`--round-type`/`--limit` as if the flag were absent. For example, `--round-type` at the end of the arg list becomes `any`, and `--limit` becomes `0`, so bad invocations silently broaden the result set or suppress history instead of failing fast.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/make.rs",
-              "line": 289,
-              "category": "bug"
-            }
-          ],
-          "hash": "rvw1:sha256:ee7f0eabe417eb7ef9d4704d58d917e0490048ade42061047830a7bda54e856b",
-          "at": "2026-05-28T20:52:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new positional parser still drops the token after any known flag even when that flag's value is missing. A malformed `cargo make` invocation like `--section` or `--track-id` without a value can therefore be reinterpreted as a different task/description instead of failing fast, which is the kind of silent misparse this hardening pass was meant to eliminate.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 592,
-              "category": "correctness"
-            },
-            {
-              "message": "This module is 736 lines long, over the repository's 700-line cap. The new parser helpers and tests push it past the architectural limit, so it should be split before merge.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 736,
-              "category": "architecture"
-            },
-            {
-              "message": "This module is 737 lines long, over the repository's 700-line cap. The new resolution façade and tests push it past the architectural limit, so it should be split before merge.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
-              "line": 737,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:3c861d830d5afbb9b2f5b5e2708c6098a63cbdb5ceeb264949426ddbad768062",
-          "at": "2026-05-28T21:05:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: The new argument-parsing helpers still treat the next token as a value even when it is another flag. Malformed invocations such as `--commit-hash --track-id ...`, `--section --after ...`, or `--scope --limit 1` will be misparsed instead of failing closed, so `track_transition`, `track_add_task`, `track_set_override`, and `track_review_results` can act on the wrong task or silently drop required inputs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 523,
-              "category": "argument_parsing"
-            },
-            {
-              "message": "P1: The production portion of this module now runs to 703 lines before the test module starts, which exceeds the repo's 700-line maximum for a production file. That violates the scope checklist and makes the module harder to review and maintain.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
-              "line": 704,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:3c861d830d5afbb9b2f5b5e2708c6098a63cbdb5ceeb264949426ddbad768062",
-          "at": "2026-05-28T21:05:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:61ae3cc02aca65b37abea20c2d82ff82a60c347a40bf97a749d307b0ebdca8fe",
-          "at": "2026-05-28T21:18:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`extract_flag_value` still conflates an absent flag with a present flag that is missing its value. That means malformed invocations like `--track-id --section foo T001 done` are silently treated as if `--track-id` was omitted, so the write wrappers can fall back to branch-derived track resolution or defaults instead of failing closed and may act on the wrong track.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/make.rs",
-              "line": 528,
-              "category": "argument_parsing"
-            }
-          ],
-          "hash": "rvw1:sha256:00bf0de2869e3d14b9530e6b08f738383af1628e67a33c14366dfca91b503668",
-          "at": "2026-05-28T21:27:32Z"
+          "hash": "rvw1:sha256:fcba894f0bfab5db33cbbde0a08d3d9a6be9cab4f2d1f8ad3a26b33a2db97ea1",
+          "at": "2026-05-28T12:34:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5ca6845f08cb3b8fed025ecbc3aec27d1d45dc7be7ecfcd51e26209532a65e5c",
-          "at": "2026-05-28T21:36:09Z"
+          "hash": "rvw1:sha256:7913dfceb39d7a014618a6078eab86bda2fcc1fc80aee34b5822a4f88013d35b",
+          "at": "2026-05-28T12:40:07Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5ca6845f08cb3b8fed025ecbc3aec27d1d45dc7be7ecfcd51e26209532a65e5c",
-          "at": "2026-05-28T21:36:09Z"
+          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
+          "at": "2026-05-28T15:08:52Z"
         },
         {
-          "type": "fast",
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The timeout-recovery path now accepts any Codex review on the same commit SHA, even if it was submitted before the current `trigger_timestamp`. That lets a review from a previous cycle on an unchanged branch be resurrected as the result of the current cycle after a timeout, which defeats the freshness check that the main polling loop still enforces.",
+              "message": "`track/mod.rs` is still 1,095 lines after this change, with production code continuing past line 700 before the test module starts at line 757. The briefing explicitly requires production files to stay at or below 700 lines, so this scope does not meet the stated module-size gate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/pr/poll.rs",
-              "line": 353,
-              "category": "logic"
-            }
-          ],
-          "hash": "rvw1:sha256:c2caa8f3f9b3d768ea0a3a79d0726810a1cd45eee9c8ae4b815c6bd3694fabbc",
-          "at": "2026-05-28T21:58:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 701,
+              "category": "module-size"
+            },
             {
-              "message": "The recovery filter swallows malformed or missing `submitted_at` values with `unwrap_or(false)`, so JSON/schema issues are turned into a normal timeout instead of an error. That can hide a valid matching review and makes the recovery path inconsistent with the main polling loop, which propagates parse failures.",
+              "message": "`verify.rs` is still 1,627 lines after this change, exceeding the briefing's <=700-line limit for production files. Even though much of the tail is test-only, the scoped production module remains over the stated file-size gate and should be split or moved into test-only files/modules.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/pr/poll.rs",
-              "line": 376,
-              "category": "error-handling"
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 701,
+              "category": "module-size"
             }
           ],
-          "hash": "rvw1:sha256:090705ccbb60b50932fc75f3876884b80eaed080bd01194c2ed194a19637ada2",
-          "at": "2026-05-28T22:01:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:299fc59eedaf0f83fdac7b8b17859ffdd425c4d7fb6bcde0926a48a74fe078c5",
-          "at": "2026-05-28T22:03:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ba1a3ad9fb13ae074c4cbbc7b8b7e1358aadfc3bc3f4fa7324cbfa81ed47468d",
-          "at": "2026-05-28T22:12:55Z"
+          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
+          "at": "2026-05-28T15:15:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ba1a3ad9fb13ae074c4cbbc7b8b7e1358aadfc3bc3f4fa7324cbfa81ed47468d",
-          "at": "2026-05-28T22:15:28Z"
+          "hash": "rvw1:sha256:98edf3f8bed21926954786485aec7f58679826d6984fd9f6d95032fde0a67564",
+          "at": "2026-05-28T19:43:38Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c9018e3b41c17d667852a23c26d5dfda3e2358dc714e72e75c276233b32ffbe1",
-          "at": "2026-05-28T22:38:25Z"
+          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
+          "at": "2026-05-28T21:04:27Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c9018e3b41c17d667852a23c26d5dfda3e2358dc714e72e75c276233b32ffbe1",
-          "at": "2026-05-28T22:41:01Z"
+          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
+          "at": "2026-05-28T21:09:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e6466af0399f98655696aa730e80564f0b384ca584e207a00e6734e05c1dee8",
+          "at": "2026-05-28T22:39:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e6466af0399f98655696aa730e80564f0b384ca584e207a00e6734e05c1dee8",
+          "at": "2026-05-28T22:43:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21aa8cc91d7ee2e0c90c1b26f9c6dc099a3fc71bb5e023eae99e3c14436b59c0",
+          "at": "2026-05-28T23:47:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21aa8cc91d7ee2e0c90c1b26f9c6dc099a3fc71bb5e023eae99e3c14436b59c0",
+          "at": "2026-05-28T23:50:29Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:27:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:29:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:35:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:02:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:13:20Z"
         }
       ]
     },
@@ -935,171 +701,433 @@
         }
       ]
     },
-    "cli": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
-          "at": "2026-05-28T10:26:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
-          "at": "2026-05-28T10:32:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
-          "at": "2026-05-28T10:32:37Z"
+          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
+          "at": "2026-05-28T11:04:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
-          "at": "2026-05-28T10:33:05Z"
+          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
+          "at": "2026-05-28T11:09:38Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
-          "at": "2026-05-28T11:39:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
-          "at": "2026-05-28T11:42:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
-          "at": "2026-05-28T12:24:58Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`review local` used to call `resolve_track_id_for_write(args.track_id, &args.items_dir)` before dispatch, which anchored the write guard to the repository owning `--items-dir`. This now passes the raw optional track id into `CliApp::review_run_local`; that facade resolves/checks the branch from the process cwd and ignores `items_dir`, so running from another repo while pointing `--items-dir` at this track can record a review without verifying the target repo is on the matching `track/<id>` branch. Preserve the scoped write-resolution here and pass the resolved id to the facade, or make the facade resolve from `items_dir`.",
+              "message": "The extracted `review_v2` surface is still largely untested. `run.rs` only covers the Claude path, and there are no direct happy-path/error-path tests for the Codex builder/run entry points or the new public helpers in `approved.rs`, `results.rs`, `scope.rs`, and `shared.rs`. That leaves the new composition boundary unverified and violates the repo requirement that public APIs have both success and failure coverage.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/review/local.rs",
-              "line": 80,
-              "category": "write_guard_regression"
-            },
-            {
-              "message": "`review classify` no longer pre-resolves the track id with `crate::commands::track::resolve_track_id(..., &args.items_dir)`. When `--track-id` is omitted, the new facade path resolves the branch from cwd instead of the repository owning `--items-dir`, so classification can use a track id from one repo while reading scope config from another `items_dir`. That can silently return the wrong scope mapping. Resolve the track id as before and pass `Some(track_id)` into `CliApp::review_classify`, or move the same `items_dir`-anchored resolution into the facade.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/classify.rs",
-              "line": 47,
-              "category": "track_resolution_regression"
-            },
-            {
-              "message": "`review files` has the same `--items-dir` anchoring regression as `review classify`: the call now forwards `args.track_id.clone()` directly, so an omitted track id is resolved from cwd by the facade while file enumeration still uses `args.items_dir`. This can enumerate files for a different track than the one owning the requested `items_dir`, which breaks review scope selection. Pre-resolve with `resolve_track_id(..., &args.items_dir)` and pass the resolved id to the facade, or fix the facade resolver to honor `items_dir`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/files.rs",
-              "line": 48,
-              "category": "track_resolution_regression"
+              "file": null,
+              "line": null,
+              "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
-          "at": "2026-05-28T12:28:46Z"
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:42:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:47:49Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`run_execute_local` resolves the track ID with `resolve_track_id_for_write` anchored to `args.items_dir`, but then delegates to `CliApp::review_run_local`, whose current implementation performs its own write branch check using cwd-based git discovery. That means a valid `sotp review local --items-dir <repo>/track/items` invocation can pass the intended items-dir anchored guard here and then fail against an unrelated current working repository before the review runs. The previous implementation did not re-enter a second cwd-based guard after resolving the track, so this regresses the documented items-dir anchoring for the local reviewer path.",
+              "message": "The moved `review_v2` modules still import the external `domain` crate as `domain::...`, but `cli_composition` already declares a root `mod domain` command module. That local module shadows the extern prelude, so paths like `use domain::review_v2::...` resolve to `cli_composition::domain`, which has no `review_v2`/`TrackId`, and the crate will not compile. Qualify the external crate as `::domain::...` or alias it across these new modules.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/review_v2/shared.rs",
+              "line": 5,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:51:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:55:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5812586eddf8d3f81ecd6750f805fc724a23779a47ca4aac45ef307559a4cdb4",
+          "at": "2026-05-28T12:29:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The review-v2 track-resolution helpers ignore their `items_dir` anchor and call `SystemGitRepo::discover()` from the process CWD. As a result, `review_results`, `review_check_approved`, and the review-run paths can resolve or write against the wrong repository whenever the caller supplies an explicit `items_dir` that is not the current directory.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/review/local.rs",
-              "line": 92,
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 535,
+              "category": "correctness"
+            },
+            {
+              "message": "`verify_catalogue_spec_signals()` does its non-track-branch skip check with the CWD-based `resolve_ci_verify_track_id()` instead of the `workspace_root`-aware helper defined just above. If the command is invoked from a different directory than `--workspace-root`, the skip/fail decision is made against the wrong repo even though the actual verification runs against `workspace_root`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/verify.rs",
+              "line": 444,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:fcba894f0bfab5db33cbbde0a08d3d9a6be9cab4f2d1f8ad3a26b33a2db97ea1",
-          "at": "2026-05-28T12:34:23Z"
+          "hash": "rvw1:sha256:3ac82382c99e79812959276b9524e1eaf873ff474a6deff2dcb5298a5954a12b",
+          "at": "2026-05-28T15:08:48Z"
         },
         {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7913dfceb39d7a014618a6078eab86bda2fcc1fc80aee34b5822a4f88013d35b",
-          "at": "2026-05-28T12:40:07Z"
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_review_results` discards the incoming `raw_args` and constructs `ReviewResultsInput` with hardcoded defaults (`scope: None`, `all: false`, `limit: 0`, `round_type: \"all\"`, `no_hint: false`). That means every `cargo make track-review-results -- ...` filter the dispatcher forwards is silently ignored, so the wrapper cannot actually expose the review-results options it is supposed to relay.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 284,
+              "category": "functional_regression"
+            },
+            {
+              "message": "The positional parsing in the make-task wrappers is lossy: `make_track_transition`, `make_track_add_task`, and `make_track_set_override` all compute positionals with `filter(|w| !w.starts_with('-'))`, so flag values are treated as positional arguments. For example, `--track-id my-track T001 done` can make `task_id` become `my-track`, and `--track-id`/`--reason` can corrupt the status/description. These wrappers need flag-aware parsing, not a raw non-`-` filter.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 336,
+              "category": "argument_parsing"
+            }
+          ],
+          "hash": "rvw1:sha256:e5d120c48b8511c4cb4200d56a36867fbfa5b25fc1d3042d299e08cfb5119d31",
+          "at": "2026-05-28T15:31:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_review_results` discards the caller's `--scope`, `--round-type`, `--limit`, and `--no-hint` arguments and hardcodes `scope: None`, `limit: 0`, and `round_type: \"all\"`. That means `cargo make track-review-results -- --track-id ... --scope ... --round-type ... --limit 1` cannot produce the scoped findings block required by the review protocol, so this wrapper reports the wrong review-results data.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 291,
+              "category": "workflow correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e5d120c48b8511c4cb4200d56a36867fbfa5b25fc1d3042d299e08cfb5119d31",
+          "at": "2026-05-28T19:37:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--limit` is parsed with `parse::<u32>().ok().unwrap_or(0)`, so `cargo make track-review-results -- --limit all` or any malformed limit silently degrades to summary-only output instead of preserving the requested history or returning an error. That is a user-visible behavior regression in the wrapper.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 294,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a31b6af04f51814fb57fa829a299c64cf4c34bd6730a2d4ca86fa7a3f3cdcacb",
+          "at": "2026-05-28T19:47:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
-          "at": "2026-05-28T15:08:52Z"
+          "hash": "rvw1:sha256:9e98894a98e27b7a019f2fdbc1210644aae790105c75403a7914d05ec17148b3",
+          "at": "2026-05-28T19:55:28Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`track/mod.rs` is still 1,095 lines after this change, with production code continuing past line 700 before the test module starts at line 757. The briefing explicitly requires production files to stay at or below 700 lines, so this scope does not meet the stated module-size gate.",
+              "message": "The make-wrapper positional parsing only filters out tokens starting with `-`, so values belonging to flags remain in the positional list. For example, `--track-id my-track T001 done` makes `task_id = \"my-track\"` and `target_status = \"T001\"` instead of `T001`/`done`; the same pattern below also breaks add-task and set-override when `--track-id`, `--section`, or `--reason` are supplied. These wrappers need to skip value-taking flags and their following values before selecting positional arguments, otherwise write commands can target the wrong task/status or reject valid invocations.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 701,
-              "category": "module-size"
-            },
-            {
-              "message": "`verify.rs` is still 1,627 lines after this change, exceeding the briefing's <=700-line limit for production files. Even though much of the tail is test-only, the scoped production module remains over the stated file-size gate and should be split or moved into test-only files/modules.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/verify.rs",
-              "line": 701,
-              "category": "module-size"
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 353,
+              "category": "bug"
             }
           ],
-          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
-          "at": "2026-05-28T15:15:48Z"
+          "hash": "rvw1:sha256:9e98894a98e27b7a019f2fdbc1210644aae790105c75403a7914d05ec17148b3",
+          "at": "2026-05-28T20:01:55Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98edf3f8bed21926954786485aec7f58679826d6984fd9f6d95032fde0a67564",
-          "at": "2026-05-28T19:43:38Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_pr_review` drops the `--resume` flag: it only extracts a track id from `raw_args` and always calls `pr_review_cycle(..., false)`. As a result, `cargo make track-pr-review -- --resume` starts a new review cycle instead of resuming the persisted trigger state, causing duplicate review comments and making timeout recovery unusable through the make wrapper.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 232,
+              "category": "behavior_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:db8da47c027639ece9e9f781119f375df850534886ffb2a8db5fbbc7ce8d6fd0",
+          "at": "2026-05-28T20:08:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "WRITE track operations can bypass the branch guard when an explicit --track-id is supplied outside a discoverable git repository. resolve_track_id_for_write is documented to fail closed by comparing the explicit id to the current track/<id> branch, but this fallback returns the id on git discovery failure, letting callers proceed without any branch proof and risking cross-track or wrong-worktree mutation.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/mod.rs",
+              "line": 122,
+              "category": "branch-guard"
+            },
+            {
+              "message": "The in-process track-review-results wrapper rejects the documented --limit all form. The underlying review results CLI supports --limit 0|N|all and uses u32::MAX for all, but this parser only accepts u32, so cargo make track-review-results -- --limit all fails before rendering full history.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 295,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4c6125096383caf74d96439194a59f3461fff840565962a1ccd98a2a39d7f1ea",
+          "at": "2026-05-28T20:14:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The write-guard was only applied to `review_run_local`; `review_run_codex` and `review_run_claude` still resolve `track_id` through `resolve_track_id_or_branch`, so `review codex-local` / `review claude-local` can still write `review.json` for an arbitrary track from the wrong branch. That reintroduces the cross-track write/corruption risk D7 is supposed to block.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 56,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_positionals` treats every token that starts with `-` as a flag and drops it, so legitimate free-form positional text beginning with `-` is silently mangled or discarded. That breaks `make_track_add_task` descriptions and `make_track_set_override` reasons whenever the user input starts with a dash.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 549,
+              "category": "input-parsing"
+            }
+          ],
+          "hash": "rvw1:sha256:e31c9f6650913bc775ec8b79e55526e052049339c07c76c96ecb08ec01c5cc59",
+          "at": "2026-05-28T20:43:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The summary-only path (`--limit 0`, which `review_results` maps to `None`) never loads `read_all_rounds`, so `state_line_suffix()` always sees an empty slice and the default results output drops the latest `round_type@timestamp verdict` suffix required by the review-results contract.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/results.rs",
+              "line": 146,
+              "category": "bug"
+            },
+            {
+              "message": "The ad hoc parser treats malformed or missing values for `--scope`/`--round-type`/`--limit` as if the flag were absent. For example, `--round-type` at the end of the arg list becomes `any`, and `--limit` becomes `0`, so bad invocations silently broaden the result set or suppress history instead of failing fast.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 289,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:ee7f0eabe417eb7ef9d4704d58d917e0490048ade42061047830a7bda54e856b",
+          "at": "2026-05-28T20:52:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new positional parser still drops the token after any known flag even when that flag's value is missing. A malformed `cargo make` invocation like `--section` or `--track-id` without a value can therefore be reinterpreted as a different task/description instead of failing fast, which is the kind of silent misparse this hardening pass was meant to eliminate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 592,
+              "category": "correctness"
+            },
+            {
+              "message": "This module is 736 lines long, over the repository's 700-line cap. The new parser helpers and tests push it past the architectural limit, so it should be split before merge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 736,
+              "category": "architecture"
+            },
+            {
+              "message": "This module is 737 lines long, over the repository's 700-line cap. The new resolution façade and tests push it past the architectural limit, so it should be split before merge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "line": 737,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3c861d830d5afbb9b2f5b5e2708c6098a63cbdb5ceeb264949426ddbad768062",
+          "at": "2026-05-28T21:05:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new argument-parsing helpers still treat the next token as a value even when it is another flag. Malformed invocations such as `--commit-hash --track-id ...`, `--section --after ...`, or `--scope --limit 1` will be misparsed instead of failing closed, so `track_transition`, `track_add_task`, `track_set_override`, and `track_review_results` can act on the wrong task or silently drop required inputs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 523,
+              "category": "argument_parsing"
+            },
+            {
+              "message": "P1: The production portion of this module now runs to 703 lines before the test module starts, which exceeds the repo's 700-line maximum for a production file. That violates the scope checklist and makes the module harder to review and maintain.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "line": 704,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3c861d830d5afbb9b2f5b5e2708c6098a63cbdb5ceeb264949426ddbad768062",
+          "at": "2026-05-28T21:05:53Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
-          "at": "2026-05-28T21:04:27Z"
+          "hash": "rvw1:sha256:61ae3cc02aca65b37abea20c2d82ff82a60c347a40bf97a749d307b0ebdca8fe",
+          "at": "2026-05-28T21:18:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_flag_value` still conflates an absent flag with a present flag that is missing its value. That means malformed invocations like `--track-id --section foo T001 done` are silently treated as if `--track-id` was omitted, so the write wrappers can fall back to branch-derived track resolution or defaults instead of failing closed and may act on the wrong track.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 528,
+              "category": "argument_parsing"
+            }
+          ],
+          "hash": "rvw1:sha256:00bf0de2869e3d14b9530e6b08f738383af1628e67a33c14366dfca91b503668",
+          "at": "2026-05-28T21:27:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
-          "at": "2026-05-28T21:09:49Z"
+          "hash": "rvw1:sha256:5ca6845f08cb3b8fed025ecbc3aec27d1d45dc7be7ecfcd51e26209532a65e5c",
+          "at": "2026-05-28T21:36:09Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4e6466af0399f98655696aa730e80564f0b384ca584e207a00e6734e05c1dee8",
-          "at": "2026-05-28T22:39:44Z"
+          "hash": "rvw1:sha256:5ca6845f08cb3b8fed025ecbc3aec27d1d45dc7be7ecfcd51e26209532a65e5c",
+          "at": "2026-05-28T21:36:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The timeout-recovery path now accepts any Codex review on the same commit SHA, even if it was submitted before the current `trigger_timestamp`. That lets a review from a previous cycle on an unchanged branch be resurrected as the result of the current cycle after a timeout, which defeats the freshness check that the main polling loop still enforces.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/pr/poll.rs",
+              "line": 353,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c2caa8f3f9b3d768ea0a3a79d0726810a1cd45eee9c8ae4b815c6bd3694fabbc",
+          "at": "2026-05-28T21:58:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery filter swallows malformed or missing `submitted_at` values with `unwrap_or(false)`, so JSON/schema issues are turned into a normal timeout instead of an error. That can hide a valid matching review and makes the recovery path inconsistent with the main polling loop, which propagates parse failures.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr/poll.rs",
+              "line": 376,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:090705ccbb60b50932fc75f3876884b80eaed080bd01194c2ed194a19637ada2",
+          "at": "2026-05-28T22:01:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:299fc59eedaf0f83fdac7b8b17859ffdd425c4d7fb6bcde0926a48a74fe078c5",
+          "at": "2026-05-28T22:03:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba1a3ad9fb13ae074c4cbbc7b8b7e1358aadfc3bc3f4fa7324cbfa81ed47468d",
+          "at": "2026-05-28T22:12:55Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4e6466af0399f98655696aa730e80564f0b384ca584e207a00e6734e05c1dee8",
-          "at": "2026-05-28T22:43:07Z"
+          "hash": "rvw1:sha256:ba1a3ad9fb13ae074c4cbbc7b8b7e1358aadfc3bc3f4fa7324cbfa81ed47468d",
+          "at": "2026-05-28T22:15:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9018e3b41c17d667852a23c26d5dfda3e2358dc714e72e75c276233b32ffbe1",
+          "at": "2026-05-28T22:38:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9018e3b41c17d667852a23c26d5dfda3e2358dc714e72e75c276233b32ffbe1",
+          "at": "2026-05-28T22:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168bf4ec3fba35f3e020c97f2dc1846503ff18b7d035ec0cbae4642a8f97274d",
+          "at": "2026-05-28T23:47:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168bf4ec3fba35f3e020c97f2dc1846503ff18b7d035ec0cbae4642a8f97274d",
+          "at": "2026-05-28T23:50:18Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
+          "at": "2026-05-28T10:37:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
+          "at": "2026-05-28T10:38:25Z"
         }
       ]
     }

@@ -510,3 +510,48 @@ fn parse_layer_filter_ids(raw: &str) -> Result<Vec<usecase::LayerId>, String> {
     }
     Ok(layers)
 }
+
+// Restored from baseline 883cb682 (apps/cli/src/commands/track/tddd/contract_map.rs).
+// These `parse_layer_filter_ids` tests were dropped during the cli-composition
+// migration. The parser behavior (CSV split, trim, skip empty, CN-12 LayerId
+// validation) is unchanged, so the coverage is restored here.
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic, clippy::indexing_slicing, clippy::expect_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_layer_filter_ids_single_value_succeeds() {
+        let layers = parse_layer_filter_ids("domain").unwrap();
+        assert_eq!(layers.len(), 1);
+        assert_eq!(layers[0].as_ref(), "domain");
+    }
+
+    #[test]
+    fn test_parse_layer_filter_ids_multiple_values_preserves_order() {
+        let layers = parse_layer_filter_ids("infrastructure,usecase,domain").unwrap();
+        assert_eq!(layers.len(), 3);
+        assert_eq!(layers[0].as_ref(), "infrastructure");
+        assert_eq!(layers[1].as_ref(), "usecase");
+        assert_eq!(layers[2].as_ref(), "domain");
+    }
+
+    #[test]
+    fn test_parse_layer_filter_ids_trims_whitespace_and_skips_empty() {
+        let layers = parse_layer_filter_ids(" domain ,, usecase , ").unwrap();
+        assert_eq!(layers.len(), 2);
+        assert_eq!(layers[0].as_ref(), "domain");
+        assert_eq!(layers[1].as_ref(), "usecase");
+    }
+
+    #[test]
+    fn test_parse_layer_filter_ids_invalid_value_returns_error() {
+        // A value with an internal space is rejected by LayerId::try_new (CN-12).
+        let result = parse_layer_filter_ids("domain core");
+        assert!(result.is_err(), "layer id with space must be rejected");
+
+        // A value starting with a digit is rejected by LayerId::try_new (CN-12).
+        let result = parse_layer_filter_ids("1layer");
+        assert!(result.is_err(), "layer id starting with digit must be rejected");
+    }
+}

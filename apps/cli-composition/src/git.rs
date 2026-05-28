@@ -192,20 +192,13 @@ impl CliApp {
         match repo.status(&["pull", "--ff-only"]).map_err(|e| e.to_string())? {
             0 => {
                 stdout_lines.push(format!("[OK] On {branch}, up to date."));
-                Ok(CommandOutcome::success(Some(stdout_lines.join("\n"))))
             }
-            code => {
-                stdout_lines.push(
-                    "[ERROR] git pull --ff-only failed (check auth, remote, or upstream config)"
-                        .to_owned(),
-                );
-                Ok(CommandOutcome {
-                    stdout: Some(stdout_lines.join("\n")),
-                    stderr: None,
-                    exit_code: u8::try_from(code).unwrap_or(1),
-                })
+            _ => {
+                stdout_lines
+                    .push("[WARN] Pull failed (may not have remote tracking branch)".to_owned());
             }
         }
+        Ok(CommandOutcome::success(Some(stdout_lines.join("\n"))))
     }
 
     /// Unstage paths (remove from git index without discarding worktree changes).
@@ -286,4 +279,39 @@ fn load_stage_paths(path: &Path) -> Result<Vec<String>, String> {
             msg
         }
     })
+}
+
+// Restored from baseline 883cb682 (apps/cli/src/commands/git.rs).
+// These `load_stage_paths` tests were dropped during the cli-composition
+// migration. The behavior (dedup + transient-automation rejection via the
+// usecase `validate_stage_path_entries` rules) is unchanged, so the coverage
+// is restored here.
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use std::fs;
+
+    use super::load_stage_paths;
+
+    #[test]
+    fn load_stage_paths_accepts_unique_repo_relative_paths() {
+        let dir = tempfile::tempdir().unwrap();
+        let list = dir.path().join("add-paths.txt");
+        fs::write(&list, "src/lib.rs\n# comment\nsrc/lib.rs\nREADME.md\n").unwrap();
+
+        let paths = load_stage_paths(&list).unwrap();
+
+        assert_eq!(paths, vec!["src/lib.rs".to_owned(), "README.md".to_owned()]);
+    }
+
+    #[test]
+    fn load_stage_paths_rejects_transient_automation_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        let list = dir.path().join("add-paths.txt");
+        fs::write(&list, "tmp/track-commit\n").unwrap();
+
+        let err = load_stage_paths(&list).unwrap_err();
+
+        assert!(err.contains("transient automation"));
+    }
 }

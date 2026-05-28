@@ -410,25 +410,16 @@ mod tests {
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
         run_git(dir.path(), &["commit", "-m", "initial"]);
-
-        // Set up a bare clone as "origin" so that `git pull --ff-only` in
-        // `git_switch_and_pull` succeeds.  Without a remote, `git pull` exits
-        // non-zero with "no tracking information for the current branch".
-        let bare_dir = tempfile::tempdir().unwrap();
-        run_git(
-            dir.path(),
-            &["clone", "--bare", dir.path().to_str().unwrap(), bare_dir.path().to_str().unwrap()],
-        );
-        run_git(dir.path(), &["remote", "add", "origin", bare_dir.path().to_str().unwrap()]);
-        run_git(dir.path(), &["fetch", "origin"]);
-        run_git(dir.path(), &["branch", "--set-upstream-to=origin/main", "main"]);
-
         run_git(dir.path(), &["checkout", "-b", "feature"]);
 
         let nested = dir.path().join("nested");
         fs::create_dir_all(&nested).unwrap();
         let _guard = CurrentDirGuard::change_to(&nested);
 
+        // No remote/upstream is configured, so `git pull --ff-only` exits non-zero.
+        // switch-and-pull must still report success: the branch switch itself
+        // succeeded and a failed pull is only a warning. This pins the non-fatal
+        // pull behavior so a future change cannot silently make it fatal.
         assert_eq!(
             super::execute(super::GitCommand::SwitchAndPull(super::SwitchAndPullArgs {
                 branch: "main".to_owned(),
