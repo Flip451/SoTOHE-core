@@ -1,240 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
-          "at": "2026-05-28T10:37:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
-          "at": "2026-05-28T10:38:25Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
-          "at": "2026-05-28T10:26:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
-          "at": "2026-05-28T10:32:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
-          "at": "2026-05-28T10:32:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
-          "at": "2026-05-28T10:33:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
-          "at": "2026-05-28T11:39:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
-          "at": "2026-05-28T11:42:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
-          "at": "2026-05-28T12:24:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`review local` used to call `resolve_track_id_for_write(args.track_id, &args.items_dir)` before dispatch, which anchored the write guard to the repository owning `--items-dir`. This now passes the raw optional track id into `CliApp::review_run_local`; that facade resolves/checks the branch from the process cwd and ignores `items_dir`, so running from another repo while pointing `--items-dir` at this track can record a review without verifying the target repo is on the matching `track/<id>` branch. Preserve the scoped write-resolution here and pass the resolved id to the facade, or make the facade resolve from `items_dir`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/local.rs",
-              "line": 80,
-              "category": "write_guard_regression"
-            },
-            {
-              "message": "`review classify` no longer pre-resolves the track id with `crate::commands::track::resolve_track_id(..., &args.items_dir)`. When `--track-id` is omitted, the new facade path resolves the branch from cwd instead of the repository owning `--items-dir`, so classification can use a track id from one repo while reading scope config from another `items_dir`. That can silently return the wrong scope mapping. Resolve the track id as before and pass `Some(track_id)` into `CliApp::review_classify`, or move the same `items_dir`-anchored resolution into the facade.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/classify.rs",
-              "line": 47,
-              "category": "track_resolution_regression"
-            },
-            {
-              "message": "`review files` has the same `--items-dir` anchoring regression as `review classify`: the call now forwards `args.track_id.clone()` directly, so an omitted track id is resolved from cwd by the facade while file enumeration still uses `args.items_dir`. This can enumerate files for a different track than the one owning the requested `items_dir`, which breaks review scope selection. Pre-resolve with `resolve_track_id(..., &args.items_dir)` and pass the resolved id to the facade, or fix the facade resolver to honor `items_dir`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/files.rs",
-              "line": 48,
-              "category": "track_resolution_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
-          "at": "2026-05-28T12:28:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_execute_local` resolves the track ID with `resolve_track_id_for_write` anchored to `args.items_dir`, but then delegates to `CliApp::review_run_local`, whose current implementation performs its own write branch check using cwd-based git discovery. That means a valid `sotp review local --items-dir <repo>/track/items` invocation can pass the intended items-dir anchored guard here and then fail against an unrelated current working repository before the review runs. The previous implementation did not re-enter a second cwd-based guard after resolving the track, so this regresses the documented items-dir anchoring for the local reviewer path.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/review/local.rs",
-              "line": 92,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:fcba894f0bfab5db33cbbde0a08d3d9a6be9cab4f2d1f8ad3a26b33a2db97ea1",
-          "at": "2026-05-28T12:34:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7913dfceb39d7a014618a6078eab86bda2fcc1fc80aee34b5822a4f88013d35b",
-          "at": "2026-05-28T12:40:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
-          "at": "2026-05-28T15:08:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track/mod.rs` is still 1,095 lines after this change, with production code continuing past line 700 before the test module starts at line 757. The briefing explicitly requires production files to stay at or below 700 lines, so this scope does not meet the stated module-size gate.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 701,
-              "category": "module-size"
-            },
-            {
-              "message": "`verify.rs` is still 1,627 lines after this change, exceeding the briefing's <=700-line limit for production files. Even though much of the tail is test-only, the scoped production module remains over the stated file-size gate and should be split or moved into test-only files/modules.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/verify.rs",
-              "line": 701,
-              "category": "module-size"
-            }
-          ],
-          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
-          "at": "2026-05-28T15:15:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98edf3f8bed21926954786485aec7f58679826d6984fd9f6d95032fde0a67564",
-          "at": "2026-05-28T19:43:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
-          "at": "2026-05-28T21:04:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
-          "at": "2026-05-28T21:09:49Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
-          "at": "2026-05-28T11:36:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The infrastructure side still defines and publicly re-exports `NullReviewer`, even though the briefing says the infra `null_reviewer` module should be deleted after moving it to the `cli_composition` crate. This leaves an old composition-only adapter in the infra public API, contrary to the extraction boundary; remove the `pub use` and inline module from `mod.rs`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/mod.rs",
-              "line": 16,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
-          "at": "2026-05-28T11:39:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3eacf10c6b53d18269f3733f23ec01771c942995509b66c848d1039ff412bc04",
-          "at": "2026-05-28T11:43:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`mod.rs` still publicly re-exports `ScopeConfigLoadError`, but the scope requires this module to expose only the adapter types plus `load_v2_scope_config`. That leaves an extra public API surface outside AC-07.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/mod.rs",
-              "line": 17,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:a32d3408ab8113f2ebb3842f92935612c4277196883ab3ebe1244f70b88805a2",
-          "at": "2026-05-28T15:03:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
-          "at": "2026-05-28T15:11:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
-          "at": "2026-05-28T15:12:58Z"
-        }
-      ]
-    },
     "cli_composition": {
       "rounds": [
         {
@@ -568,49 +334,65 @@
         }
       ]
     },
-    "other": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:27:17Z"
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:36:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure side still defines and publicly re-exports `NullReviewer`, even though the briefing says the infra `null_reviewer` module should be deleted after moving it to the `cli_composition` crate. This leaves an old composition-only adapter in the infra public API, contrary to the extraction boundary; remove the `pub use` and inline module from `mod.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 16,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:39:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:29:10Z"
+          "hash": "rvw1:sha256:3eacf10c6b53d18269f3733f23ec01771c942995509b66c848d1039ff412bc04",
+          "at": "2026-05-28T11:43:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mod.rs` still publicly re-exports `ScopeConfigLoadError`, but the scope requires this module to expose only the adapter types plus `load_v2_scope_config`. That leaves an extra public API surface outside AC-07.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 17,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a32d3408ab8113f2ebb3842f92935612c4277196883ab3ebe1244f70b88805a2",
+          "at": "2026-05-28T15:03:20Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
-          "at": "2026-05-28T11:35:57Z"
+          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
+          "at": "2026-05-28T15:11:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
-          "at": "2026-05-28T11:38:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
-          "at": "2026-05-28T15:02:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
-          "at": "2026-05-28T15:13:20Z"
+          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
+          "at": "2026-05-28T15:12:58Z"
         }
       ]
     },
@@ -1007,6 +789,238 @@
           "findings": [],
           "hash": "rvw1:sha256:524bf06ebe34513e6a88fb9b641e33263681c7741f943cc0a86d3e9403a4afe8",
           "at": "2026-05-28T15:11:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11e94412c3e7ce308df2bf9bbffba1dcf2c08ec7342696f58d5e1f5a4d42c3e3",
+          "at": "2026-05-28T21:39:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11e94412c3e7ce308df2bf9bbffba1dcf2c08ec7342696f58d5e1f5a4d42c3e3",
+          "at": "2026-05-28T21:41:05Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:26:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:32:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:32:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:33:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
+          "at": "2026-05-28T11:39:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
+          "at": "2026-05-28T11:42:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
+          "at": "2026-05-28T12:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review local` used to call `resolve_track_id_for_write(args.track_id, &args.items_dir)` before dispatch, which anchored the write guard to the repository owning `--items-dir`. This now passes the raw optional track id into `CliApp::review_run_local`; that facade resolves/checks the branch from the process cwd and ignores `items_dir`, so running from another repo while pointing `--items-dir` at this track can record a review without verifying the target repo is on the matching `track/<id>` branch. Preserve the scoped write-resolution here and pass the resolved id to the facade, or make the facade resolve from `items_dir`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/local.rs",
+              "line": 80,
+              "category": "write_guard_regression"
+            },
+            {
+              "message": "`review classify` no longer pre-resolves the track id with `crate::commands::track::resolve_track_id(..., &args.items_dir)`. When `--track-id` is omitted, the new facade path resolves the branch from cwd instead of the repository owning `--items-dir`, so classification can use a track id from one repo while reading scope config from another `items_dir`. That can silently return the wrong scope mapping. Resolve the track id as before and pass `Some(track_id)` into `CliApp::review_classify`, or move the same `items_dir`-anchored resolution into the facade.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/classify.rs",
+              "line": 47,
+              "category": "track_resolution_regression"
+            },
+            {
+              "message": "`review files` has the same `--items-dir` anchoring regression as `review classify`: the call now forwards `args.track_id.clone()` directly, so an omitted track id is resolved from cwd by the facade while file enumeration still uses `args.items_dir`. This can enumerate files for a different track than the one owning the requested `items_dir`, which breaks review scope selection. Pre-resolve with `resolve_track_id(..., &args.items_dir)` and pass the resolved id to the facade, or fix the facade resolver to honor `items_dir`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/files.rs",
+              "line": 48,
+              "category": "track_resolution_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
+          "at": "2026-05-28T12:28:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_execute_local` resolves the track ID with `resolve_track_id_for_write` anchored to `args.items_dir`, but then delegates to `CliApp::review_run_local`, whose current implementation performs its own write branch check using cwd-based git discovery. That means a valid `sotp review local --items-dir <repo>/track/items` invocation can pass the intended items-dir anchored guard here and then fail against an unrelated current working repository before the review runs. The previous implementation did not re-enter a second cwd-based guard after resolving the track, so this regresses the documented items-dir anchoring for the local reviewer path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/local.rs",
+              "line": 92,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fcba894f0bfab5db33cbbde0a08d3d9a6be9cab4f2d1f8ad3a26b33a2db97ea1",
+          "at": "2026-05-28T12:34:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7913dfceb39d7a014618a6078eab86bda2fcc1fc80aee34b5822a4f88013d35b",
+          "at": "2026-05-28T12:40:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
+          "at": "2026-05-28T15:08:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/mod.rs` is still 1,095 lines after this change, with production code continuing past line 700 before the test module starts at line 757. The briefing explicitly requires production files to stay at or below 700 lines, so this scope does not meet the stated module-size gate.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 701,
+              "category": "module-size"
+            },
+            {
+              "message": "`verify.rs` is still 1,627 lines after this change, exceeding the briefing's <=700-line limit for production files. Even though much of the tail is test-only, the scoped production module remains over the stated file-size gate and should be split or moved into test-only files/modules.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 701,
+              "category": "module-size"
+            }
+          ],
+          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
+          "at": "2026-05-28T15:15:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98edf3f8bed21926954786485aec7f58679826d6984fd9f6d95032fde0a67564",
+          "at": "2026-05-28T19:43:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
+          "at": "2026-05-28T21:04:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
+          "at": "2026-05-28T21:09:49Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
+          "at": "2026-05-28T10:37:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
+          "at": "2026-05-28T10:38:25Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:27:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:29:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:35:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:02:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:13:20Z"
         }
       ]
     }
