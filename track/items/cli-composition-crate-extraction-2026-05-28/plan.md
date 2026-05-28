@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # composition root を専用 crate (apps/cli-composition) に切り出す
 
-## Tasks (0/6 resolved)
+## Tasks (1/6 resolved)
 
 ### S1 — crate scaffold: workspace registration + architecture-rules.json エントリ追加
 
@@ -10,7 +10,7 @@
 > deny.toml を中間更新: infrastructure / usecase / domain の wrappers に "cli_composition" を追加して cargo make deny が新 crate の依存を受け入れるようにする (中間状態)。apps/cli/Cargo.toml は変更しない — cli 側の enforcement flip は T006 で一括実施 (IN-07, CN-01)。
 > この時点で cargo make ci が緑を維持することを確認する (CN-05)。
 
-- [~] **T001**: Crate scaffold: create apps/cli-composition directory with Cargo.toml (declaring domain / usecase / infrastructure dependencies), add "apps/cli-composition" to the workspace root Cargo.toml members list, and add the cli_composition layer entry to architecture-rules.json (may_depend_on: ["domain","infrastructure","usecase"], tddd.enabled: false). Also create apps/cli-composition/src/lib.rs as an empty or minimal stub so the crate compiles. Also update deny.toml to add cli_composition as an allowed dependent for the infrastructure, usecase, and domain bans (intermediate state: add "cli_composition" to wrappers for infrastructure, usecase, and domain alongside the existing allowed wrappers). This intermediate deny.toml update is required so that cargo make deny accepts the new cli_composition crate's dependencies on those layers — without this update deny.toml would reject cli_composition → infrastructure / usecase / domain. apps/cli/Cargo.toml is NOT changed in this task; the enforcement flip (removing cli from wrappers, removing infrastructure/usecase from apps/cli) is deferred to T006. After this task cargo make ci must pass (the new crate compiles, architecture-rules-verify-sync sees the new member, verify-arch-docs sees no drift, cargo make deny accepts cli_composition deps). Covers IN-01, IN-02, AC-01, AC-02.
+- [x] **T001**: Crate scaffold: create apps/cli-composition directory with Cargo.toml (declaring domain / usecase / infrastructure dependencies), add "apps/cli-composition" to the workspace root Cargo.toml members list, and add the cli_composition layer entry to architecture-rules.json (may_depend_on: ["domain","infrastructure","usecase"], tddd.enabled: false). Also create apps/cli-composition/src/lib.rs as an empty or minimal stub so the crate compiles. Also update deny.toml to add cli_composition as an allowed dependent for the infrastructure, usecase, and domain bans (intermediate state: add "cli_composition" to wrappers for infrastructure, usecase, and domain alongside the existing allowed wrappers). This intermediate deny.toml update is required so that cargo make deny accepts the new cli_composition crate's dependencies on those layers — without this update deny.toml would reject cli_composition → infrastructure / usecase / domain. apps/cli/Cargo.toml is NOT changed in this task; the enforcement flip (removing cli from wrappers, removing infrastructure/usecase from apps/cli) is deferred to T006. After this task cargo make ci must pass (the new crate compiles, architecture-rules-verify-sync sees the new member, verify-arch-docs sees no drift, cargo make deny accepts cli_composition deps). Covers IN-01, IN-02, AC-01, AC-02. (`abfb589974750458d238bdce1f8da3277452f553`)
 
 ### S2 — CliApp facade + CommandOutcome の公開 API 骨格（全コマンドファミリーのスタブ）
 
