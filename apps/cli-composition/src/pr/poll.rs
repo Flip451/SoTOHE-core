@@ -350,9 +350,14 @@ where
         sleep(Duration::from_secs(interval));
     }
 
-    // Timeout recovery: only consider reviews submitted after `trigger_dt` so
-    // that a stale review from a prior cycle on the same commit is never
-    // resurrected as the result of the current cycle.
+    // Timeout recovery: consider any Codex bot review on the exact same commit SHA.
+    // `review_commit == expected_commit` is itself the stale guard — a review on a
+    // different SHA cannot be resurrected as the current cycle's result. Restoring
+    // the pre-T005 cli behavior (the original `apps/cli/src/commands/pr.rs` did not
+    // carry an additional `submitted_after_trigger` predicate here). Per PR #143
+    // Codex Cloud reviewer: the extra timestamp filter rejects valid same-SHA
+    // reviews from prior cycles even though `commit_id == expected_commit` proves
+    // they cover the exact HEAD being reviewed.
     if let Some(expected_commit) = head_commit {
         let recovery_nwo = client.repo_nwo().map_err(|e| e.to_string())?;
         let recovery_reviews_json =
@@ -369,17 +374,9 @@ where
                     .unwrap_or("");
                 let state = r.get("state").and_then(|s| s.as_str()).unwrap_or("");
                 let review_commit = r.get("commit_id").and_then(|s| s.as_str()).unwrap_or("");
-                // Only accept reviews submitted at or after the trigger timestamp
-                // to avoid resurrecting a stale review from a prior cycle.
-                let submitted_raw = r.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
-                let submitted_after_trigger = submitted_raw
-                    .replace('Z', "+00:00")
-                    .parse::<chrono::DateTime<chrono::FixedOffset>>()
-                    .is_ok_and(|dt| dt >= trigger_dt);
                 is_codex_bot(author)
                     && matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED")
                     && review_commit == expected_commit
-                    && submitted_after_trigger
             })
             .collect();
         if let Some(recovered) = find_latest_bot_review_in(&recovery_refs) {
@@ -643,4 +640,218 @@ pub(super) fn trigger_new_review(
     })?;
 
     Ok(Some((pr_number, trigger_timestamp, head_hash)))
+}
+
+// ---------------------------------------------------------------------------
+// Unit tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use std::cell::RefCell;
+    use std::path::Path;
+    use std::time::Duration;
+
+    use infrastructure::gh_cli::{GhClient, GhError, PrCheckRecord};
+
+    use super::{PollReviewResult, poll_review_for_cycle};
+
+    // ------------------------------------------------------------------
+    // Minimal fake GhClient for poll tests
+    // ------------------------------------------------------------------
+
+    struct FakePollClient {
+        /// Responses returned by `list_reviews` on successive calls.
+        /// The first entry is used in the main loop, the second in recovery.
+        reviews_responses: RefCell<Vec<String>>,
+        issue_comments: String,
+        reactions: String,
+    }
+
+    impl FakePollClient {
+        fn new(reviews_responses: Vec<String>) -> Self {
+            Self {
+                reviews_responses: RefCell::new(reviews_responses),
+                issue_comments: "[]".to_owned(),
+                reactions: "[]".to_owned(),
+            }
+        }
+    }
+
+    impl GhClient for FakePollClient {
+        fn pr_checks(&self, _pr: &str) -> Result<Vec<PrCheckRecord>, GhError> {
+            Ok(vec![])
+        }
+
+        fn pr_url(&self, pr: &str) -> String {
+            format!("PR #{pr}")
+        }
+
+        fn merge_pr(&self, _pr: &str, _method: &str) -> Result<(), GhError> {
+            Ok(())
+        }
+
+        fn find_open_pr(&self, _head: &str, _base: &str) -> Result<Option<String>, GhError> {
+            Ok(None)
+        }
+
+        fn create_pr(
+            &self,
+            _head: &str,
+            _base: &str,
+            _title: &str,
+            _body_file: &Path,
+        ) -> Result<String, GhError> {
+            Ok("1".to_owned())
+        }
+
+        fn list_reviews(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+            let mut responses = self.reviews_responses.borrow_mut();
+            if responses.is_empty() { Ok("[]".to_owned()) } else { Ok(responses.remove(0)) }
+        }
+
+        fn list_issue_comments(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+            Ok(self.issue_comments.clone())
+        }
+
+        fn list_reactions(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+            Ok(self.reactions.clone())
+        }
+
+        fn repo_nwo(&self) -> Result<String, GhError> {
+            Ok("owner/repo".to_owned())
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------
+
+    /// Build a single-element JSON array representing one Codex review.
+    fn make_reviews_json(
+        commit_id: &str,
+        state: &str,
+        submitted_at: &str,
+        bot_login: &str,
+    ) -> String {
+        format!(
+            r#"[{{"id":1,"user":{{"login":"{bot_login}"}},"state":"{state}","commit_id":"{commit_id}","submitted_at":"{submitted_at}","body":""}}]"#
+        )
+    }
+
+    // ------------------------------------------------------------------
+    // Tests
+    // ------------------------------------------------------------------
+
+    /// Recovery path accepts any same-SHA Codex bot review regardless of
+    /// submission timestamp. `commit_id == expected_commit` is itself the
+    /// stale guard (a different-SHA review cannot represent the current
+    /// HEAD). This matches the pre-T005 cli behavior (`apps/cli/src/commands/
+    /// pr.rs` carried no `submitted_after_trigger` predicate here).
+    #[test]
+    fn test_poll_review_for_cycle_with_timeout_and_pre_trigger_same_sha_review_returns_review() {
+        let trigger_timestamp = "2024-01-01T01:00:00Z";
+        let review_submitted_at = "2024-01-01T00:30:00Z"; // 30 min before trigger
+        let head_commit = "abc123";
+
+        // timeout=0 means the deadline is already past before the loop body runs,
+        // so the main loop never calls list_reviews.  The only call is from the
+        // recovery path.  The same-SHA review must be accepted.
+        let reviews_json =
+            make_reviews_json(head_commit, "CHANGES_REQUESTED", review_submitted_at, "codex[bot]");
+        let client = FakePollClient::new(vec![
+            reviews_json, // recovery fetch (loop body is skipped entirely when timeout=0)
+        ]);
+
+        let no_sleep = |_: Duration| {};
+
+        let result = poll_review_for_cycle(
+            "1",
+            trigger_timestamp,
+            1, // interval
+            0, // timeout=0 → deadline already expired before the loop body runs
+            &client,
+            &no_sleep,
+            Some(head_commit),
+        )
+        .unwrap();
+
+        assert!(
+            matches!(result, PollReviewResult::ReviewFound(_)),
+            "expected ReviewFound — same-SHA review must be accepted in recovery (commit-id is the stale guard)"
+        );
+    }
+
+    /// Recovery path returns a same-SHA review submitted *after* the trigger
+    /// timestamp, e.g. when the review completed but the main polling loop timed
+    /// out due to API delays or lost trigger state.
+    #[test]
+    fn test_poll_review_for_cycle_with_timeout_and_post_trigger_same_sha_review_returns_review() {
+        let trigger_timestamp = "2024-01-01T00:00:00Z";
+        let review_submitted_at = "2024-01-01T00:30:00Z"; // 30 min after trigger
+        let head_commit = "abc123";
+
+        let reviews_json =
+            make_reviews_json(head_commit, "CHANGES_REQUESTED", review_submitted_at, "codex[bot]");
+        let client = FakePollClient::new(vec![
+            reviews_json, // recovery fetch (loop body is skipped entirely when timeout=0)
+        ]);
+
+        let no_sleep = |_: Duration| {};
+
+        let result = poll_review_for_cycle(
+            "1",
+            trigger_timestamp,
+            1,
+            0,
+            &client,
+            &no_sleep,
+            Some(head_commit),
+        )
+        .unwrap();
+
+        assert!(
+            matches!(result, PollReviewResult::ReviewFound(_)),
+            "expected ReviewFound — post-trigger same-SHA review must be accepted in recovery"
+        );
+    }
+
+    /// Recovery path returns `Timeout` when no review with the expected commit
+    /// SHA exists, regardless of timestamps.
+    #[test]
+    fn test_poll_review_for_cycle_with_timeout_and_no_matching_sha_returns_timeout() {
+        let trigger_timestamp = "2024-01-01T00:00:00Z";
+        let head_commit = "abc123";
+        let different_commit = "deadbeef";
+
+        let reviews_json = make_reviews_json(
+            different_commit,
+            "CHANGES_REQUESTED",
+            "2024-01-01T00:30:00Z",
+            "codex[bot]",
+        );
+        // The loop body is skipped with timeout=0; only recovery fetch runs.
+        let client = FakePollClient::new(vec![
+            reviews_json, // recovery fetch — different SHA, must not be picked up
+        ]);
+
+        let no_sleep = |_: Duration| {};
+
+        let result = poll_review_for_cycle(
+            "1",
+            trigger_timestamp,
+            1,
+            0,
+            &client,
+            &no_sleep,
+            Some(head_commit),
+        )
+        .unwrap();
+
+        assert!(
+            matches!(result, PollReviewResult::Timeout),
+            "expected Timeout when no same-SHA review exists"
+        );
+    }
 }
