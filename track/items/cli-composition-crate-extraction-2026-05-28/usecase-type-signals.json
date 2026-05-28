@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-28T10:14:13Z",
+  "declaration_hash": "0ed1282597318a75acbf982251a3e0ef8dfc26383eafb3ea1cb36d2bda4e6328",
+  "signals": [
+    {
+      "type_name": "DiffGetter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewHasher",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "Reviewer",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "ReviewReader": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read_latest_finals",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<std::collections::HashMap<ScopeName, (Verdict, ReviewHash)>, ReviewReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_all_rounds",
+          "receiver": "&self",
+          "params": [{ "name": "scope", "ty": "&ScopeName" }],
+          "returns": "Result<Vec<ScopeRound>, ReviewReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2",
+      "docs": "Carried for R7 edge visibility: FsReviewStore implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewWriter": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "write_verdict",
+          "receiver": "&self",
+          "params": [
+            { "name": "scope", "ty": "&ScopeName" },
+            { "name": "verdict", "ty": "&Verdict" },
+            { "name": "hash", "ty": "&ReviewHash" }
+          ],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "write_fast_verdict",
+          "receiver": "&self",
+          "params": [
+            { "name": "scope", "ty": "&ScopeName" },
+            { "name": "verdict", "ty": "&FastVerdict" },
+            { "name": "hash", "ty": "&ReviewHash" }
+          ],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "init",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "reset",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), ReviewWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2",
+      "docs": "Carried for R7 edge visibility: FsReviewStore implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewExistsPort": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "review_json_exists",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<bool, ReviewReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2",
+      "docs": "Carried for R7 edge visibility: FsReviewStore implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CommitHashReader": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<CommitHash>, CommitHashError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2",
+      "docs": "Carried for R7 edge visibility: FsCommitHashStore implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "CommitHashWriter": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [{ "name": "hash", "ty": "&CommitHash" }],
+          "returns": "Result<(), CommitHashError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "clear",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<(), CommitHashError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2",
+      "docs": "Carried for R7 edge visibility: FsCommitHashStore implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

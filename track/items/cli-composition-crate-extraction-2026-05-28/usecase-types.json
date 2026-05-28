@@ -1,0 +1,84 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "DiffGetter": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "list_diff_files",
+          "receiver": "&self",
+          "params": [{ "name": "base", "ty": "&domain::CommitHash" }],
+          "returns": "Result<Vec<domain::review_v2::FilePath>, DiffGetError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "review_v2::ports",
+      "docs": "Carried for R7 edge visibility: NullDiffGetter and GitDiffGetter implement this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "Reviewer": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "review",
+          "receiver": "&self",
+          "params": [{ "name": "target", "ty": "&domain::review_v2::ReviewTarget" }],
+          "returns": "Result<(domain::review_v2::Verdict, domain::review_v2::LogInfo), ReviewerError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fast_review",
+          "receiver": "&self",
+          "params": [{ "name": "target", "ty": "&domain::review_v2::ReviewTarget" }],
+          "returns": "Result<(domain::review_v2::FastVerdict, domain::review_v2::LogInfo), ReviewerError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "review_v2::ports",
+      "docs": "Carried for R7 edge visibility: CodexReviewer, ClaudeReviewer, and NullReviewer implement this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ReviewHasher": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "calc",
+          "receiver": "&self",
+          "params": [{ "name": "target", "ty": "&domain::review_v2::ReviewTarget" }],
+          "returns": "Result<domain::review_v2::ReviewHash, ReviewHasherError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "review_v2::ports",
+      "docs": "Carried for R7 edge visibility: SystemReviewHasher implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

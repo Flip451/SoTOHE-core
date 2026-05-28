@@ -161,6 +161,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Review System V1 完全撤去 — metadata.json review + V1 review.json codec + escalation + index_tree_hash_normalizing](2026-04-12-1800-reviewstate-v1-decommission.md) | Accepted | 2026-04-12 |
 | [review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設](2026-04-18-1354-review-scope-prompt-injection.md) | Proposed | 2026-04-18 |
 | [CLI→domain 直接参照禁止と usecase 経由への一本化](2026-04-30-0848-cli-via-usecase-only.md) | — | 2026-04-30 |
+| [composition root を専用 crate (apps/cli-composition) に切り出す](2026-05-27-0110-composition-root-dedicated-crate.md) | Proposed | 2026-05-27 |
 
 ### オーケストレーション・エージェント管理
 

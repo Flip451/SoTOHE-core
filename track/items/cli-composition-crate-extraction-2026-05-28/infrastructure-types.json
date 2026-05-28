@@ -1,0 +1,785 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "NullDiffGetter": {
+      "action": "delete",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "review_v2::cli_composition",
+      "docs": "Stub DiffGetter for pure-logic use cases. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewV2Composition": {
+      "action": "delete",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::cli_composition",
+      "docs": "Composition struct for status/check-approved operations. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewV2CompositionWithCodex": {
+      "action": "delete",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::cli_composition",
+      "docs": "Composition struct for Codex review. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewV2CompositionWithClaude": {
+      "action": "delete",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::cli_composition",
+      "docs": "Composition struct for Claude review. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CodexReviewOutcome": {
+      "action": "delete",
+      "role": "Dto",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Skipped",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "scope_label", "ty": "String" }]
+            }
+          },
+          {
+            "name": "FinalCompleted",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "verdict_json", "ty": "String" },
+                { "name": "exit_code", "ty": "u8" }
+              ]
+            }
+          },
+          {
+            "name": "FastCompleted",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "verdict_json", "ty": "String" },
+                { "name": "exit_code", "ty": "u8" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::cli_composition",
+      "docs": "Return value of run_codex_review_str indicating review outcome. Moved to apps/cli-composition in this track (IN-05 / D4). Fields verdict_json/scope_label are opaque CLI output strings (no domain concept); exit_code is a raw process exit code — all correctly primitive.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "NullReviewer": {
+      "action": "delete",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "review_v2",
+      "docs": "Null Reviewer stub used in composition. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CodexReviewer": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::codex_reviewer",
+      "docs": "Codex-backed Reviewer adapter. Remains in infrastructure after D4 (IN-06).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ClaudeReviewer": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::claude_reviewer",
+      "docs": "Claude-backed Reviewer adapter. Remains in infrastructure after D4 (IN-06).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "GitDiffGetter": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "review_v2::diff_getter",
+      "docs": "Git-backed DiffGetter adapter. Remains in infrastructure after D4 (IN-06).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SystemReviewHasher": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "review_v2::hasher",
+      "docs": "System SHA-256 ReviewHasher adapter. Remains in infrastructure after D4 (IN-06).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FsReviewStore": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::persistence::review_store",
+      "docs": "Filesystem-based review.json adapter. Remains in infrastructure after D4 (IN-06).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FsCommitHashStore": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "review_v2::persistence::commit_hash_store",
+      "docs": "Filesystem-based .commit_hash adapter. Remains in infrastructure after D4 (IN-06).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "ScopeConfigLoadError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "source", "ty": "std::io::Error" }
+              ]
+            }
+          },
+          {
+            "name": "Parse",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "source", "ty": "serde_json::Error" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidField",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "detail", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Config",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["domain::review_v2::ScopeConfigError"]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::scope_config_loader",
+      "docs": "Error type for review-scope.json loading. Remains in infrastructure after D4 (IN-06).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::review_v2::cli_composition::append_scope_briefing_reference_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Appends a briefing reference line for a scope. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_check_approved_service": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds check-approved service composition. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_review_v2": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds v2 review composition with NullReviewer. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_review_v2_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting variant of build_review_v2. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds v2 review composition with ClaudeReviewer. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_review_v2_with_claude_reviewer_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting variant of build_review_v2_with_claude_reviewer. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_review_v2_with_reviewer": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds v2 review composition with CodexReviewer. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_review_v2_with_reviewer_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting variant of build_review_v2_with_reviewer. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_run_review_service": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds run-review service composition. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_scope_query_interactor_no_diff_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds ScopeQueryInteractor with NullDiffGetter. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::build_scope_query_interactor_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds ScopeQueryInteractor with GitDiffGetter. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::check_approved_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting entry point for check-approved. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::get_briefing_for_scope_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting entry point for scope briefing retrieval. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::load_scope_config_only": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Loads scope config without initializing stores. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::load_scope_config_only_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting variant of load_scope_config_only. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::render_review_results_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Renders review results as a string. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::resolve_diff_base_and_getter": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Resolves diff base commit hash and DiffGetter. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::run_claude_review_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting entry point for Claude review cycle. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::run_codex_review_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "String-accepting entry point for Codex review cycle. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::validate_review_group_name_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Validates a review group name string. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::validate_scope_for_track_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Validates a scope name against track config. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::cli_composition::validate_track_id_str": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Validates a track ID string. Moved to apps/cli-composition in this track (IN-05 / D4).",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::scope_config_loader::load_v2_scope_config": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_id", "ty": "domain::TrackId" },
+        { "name": "items_dir", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<domain::review_v2::ReviewScopeConfig, ScopeConfigLoadError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Loads review-scope.json into ReviewScopeConfig. Remains in infrastructure after D4 (IN-06).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "infrastructure::review_v2::persist_commit_hash_for_track": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track_id", "ty": "&str" }
+      ],
+      "returns": "Result<String, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Composition-layer helper that encapsulates domain type construction for the CLI layer. Moved to apps/cli-composition/src/review_v2/ in T005 (IN-05, IN-06); deleted from infrastructure.",
+      "spec_refs": [
+        {
+          "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+          "anchor": "IN-05",
+          "hash": "3490f58a002b57e4af6097ac1d7fb3456a3f9f012b0cd82be3bb4a24d9abc3ea"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "delete",
+      "trait_ref": "usecase::review_v2::ports::DiffGetter",
+      "for_type": "NullDiffGetter"
+    },
+    {
+      "action": "delete",
+      "trait_ref": "usecase::review_v2::ports::Reviewer",
+      "for_type": "NullReviewer"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::review_v2::ports::Reviewer",
+      "for_type": "CodexReviewer"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::review_v2::ports::Reviewer",
+      "for_type": "ClaudeReviewer"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::review_v2::ports::DiffGetter",
+      "for_type": "GitDiffGetter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::review_v2::ports::ReviewHasher",
+      "for_type": "SystemReviewHasher"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "domain::review_v2::ReviewReader",
+      "for_type": "FsReviewStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "domain::review_v2::ReviewWriter",
+      "for_type": "FsReviewStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "domain::review_v2::ReviewExistsPort",
+      "for_type": "FsReviewStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "domain::review_v2::CommitHashReader",
+      "for_type": "FsCommitHashStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "domain::review_v2::CommitHashWriter",
+      "for_type": "FsCommitHashStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ScopeConfigLoadError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ScopeConfigLoadError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "ScopeConfigLoadError"
+    }
+  ]
+}

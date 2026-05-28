@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "488afb82e56a16a64c8f4beba0bba4b8cced158a3eda62e2f7b08ab4c385622c",
+  "signals": [
+    {
+      "type_name": "CommitHashReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CommitHashWriter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewExistsPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewWriter",
+      "signal": "blue"
+    }
+  ]
+}
