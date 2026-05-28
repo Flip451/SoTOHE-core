@@ -48,7 +48,7 @@ type SpawnClaudeResult =
     Result<(Child, thread::JoinHandle<String>, thread::JoinHandle<String>), String>;
 
 /// Environment variable for overriding the `claude` binary path in tests.
-#[cfg(test)]
+#[cfg(any(test, feature = "test-helpers"))]
 pub(crate) const CLAUDE_BIN_ENV: &str = "SOTP_CLAUDE_BIN";
 
 /// Claude-backed reviewer implementation for the `Reviewer` usecase port.
@@ -82,7 +82,7 @@ pub struct ClaudeReviewer {
     /// Scope label injected into the prompt (e.g., `"cli"`, `"infrastructure"`).
     scope_label: String,
     /// Test-only: override the Claude binary path (avoids unsafe env var mutation).
-    #[cfg(test)]
+    #[cfg(any(test, feature = "test-helpers"))]
     bin_override: Option<OsString>,
 }
 
@@ -103,7 +103,7 @@ impl ClaudeReviewer {
             timeout,
             base_prompt: base_prompt.into(),
             scope_label: "scope".to_owned(),
-            #[cfg(test)]
+            #[cfg(any(test, feature = "test-helpers"))]
             bin_override: None,
         }
     }
@@ -115,8 +115,12 @@ impl ClaudeReviewer {
     }
 
     /// Test-only: set a custom binary path instead of the default `claude`.
-    #[cfg(test)]
-    pub(crate) fn with_bin(mut self, bin: impl Into<OsString>) -> Self {
+    ///
+    /// Available in test builds and when the `test-helpers` feature is enabled.
+    /// Used by integration tests in dependent crates (e.g. `cli_composition`) that
+    /// need a fake Claude binary.
+    #[cfg(any(test, feature = "test-helpers"))]
+    pub fn with_bin(mut self, bin: impl Into<OsString>) -> Self {
         self.bin_override = Some(bin.into());
         self
     }
@@ -155,9 +159,9 @@ impl ClaudeReviewer {
     ) -> Result<ReviewOutcomeRaw, ReviewerError> {
         let prompt = self.build_full_prompt(target, scope_label);
 
-        #[cfg(test)]
+        #[cfg(any(test, feature = "test-helpers"))]
         let bin = self.bin_override.clone().unwrap_or_else(claude_bin);
-        #[cfg(not(test))]
+        #[cfg(not(any(test, feature = "test-helpers")))]
         let bin = claude_bin();
 
         let (child, stderr_collector, stdout_collector) =
@@ -271,7 +275,7 @@ fn convert_findings_to_domain(
 // ---------------------------------------------------------------------------
 
 fn claude_bin() -> OsString {
-    #[cfg(test)]
+    #[cfg(any(test, feature = "test-helpers"))]
     if let Some(value) = std::env::var_os(CLAUDE_BIN_ENV).filter(|v| !v.is_empty()) {
         return value;
     }

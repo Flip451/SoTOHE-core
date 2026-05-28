@@ -33,4 +33,5 @@ deny = [
     { crate = "infrastructure", wrappers = ["cli", "cli_composition"], reason = "Infrastructure implements usecase ports and domain ports; wired at composition root." },
     { crate = "usecase", wrappers = ["infrastructure", "cli", "cli_composition"], reason = "Usecase crate must only be consumed by the cli layer." },
     { crate = "domain", wrappers = ["usecase", "infrastructure", "cli_composition"], reason = "Domain dependencies are controlled by layer boundaries." },
+    { crate = "cli_composition", wrappers = ["cli"], reason = "CLI composition root owns domain/usecase/infrastructure wiring for the CLI delivery adapter." },
 ]

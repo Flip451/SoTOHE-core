@@ -5,6 +5,11 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[features]
+# Exposes internal test-helpers (e.g. ClaudeReviewer::with_bin) as public API.
+# Enable only in dev-dependencies of dependent crates that need these helpers.
+test-helpers = []
+
 [lints]
 workspace = true
 

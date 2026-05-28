@@ -189,6 +189,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "clap",
+ "cli_composition",
  "infrastructure",
  "libc",
  "rstest",
@@ -207,6 +208,8 @@ version = "0.1.0"
 dependencies = [
  "domain",
  "infrastructure",
+ "serde_json",
+ "tempfile",
  "usecase",
 ]
 

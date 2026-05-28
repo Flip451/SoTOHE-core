@@ -192,11 +192,11 @@ pub(super) fn validate_auto_record_args_raw(
     round_type: CodexRoundTypeArg,
     items_dir: PathBuf,
 ) -> Result<ValidatedAutoRecordArgs, String> {
-    // Validate track ID format via infrastructure helper (no domain import needed).
-    infrastructure::review_v2::validate_track_id_str(track_id)
+    // Validate track ID format via cli_composition helper (no domain import needed).
+    cli_composition::review_v2::validate_track_id_str(track_id)
         .map_err(|e| format!("invalid --track-id: {e}"))?;
-    // Validate group name format via infrastructure helper.
-    infrastructure::review_v2::validate_review_group_name_str(group)
+    // Validate group name format via cli_composition helper.
+    cli_composition::review_v2::validate_review_group_name_str(group)
         .map_err(|e| format!("invalid --group: {e}"))?;
 
     let round_type_str = match round_type {
@@ -436,6 +436,6 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
 fn run_check_approved(args: &CheckApprovedArgs) -> Result<ReviewApprovalOutput, String> {
     let track_id =
         crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
-    infrastructure::review_v2::check_approved_str(&track_id, &args.items_dir)
+    cli_composition::review_v2::check_approved_str(&track_id, &args.items_dir)
         .map_err(|e| format!("{e}"))
 }

@@ -20,6 +20,7 @@ tempfile = "3.27.0"
 [dependencies]
 chrono = { version = "0.4.44", features = ["serde"] }
 clap = { version = "4.5.60", features = ["derive", "env"] }
+cli_composition = { path = "../../apps/cli-composition" }
 infrastructure = { path = "../../libs/infrastructure" }
 libc = "0.2"
 serde = { version = "1", features = ["derive"] }

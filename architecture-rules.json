@@ -103,7 +103,8 @@
       "path": "apps/cli",
       "may_depend_on": [
         "infrastructure",
-        "usecase"
+        "usecase",
+        "cli_composition"
       ],
       "deny_reason": "",
       "tddd": {

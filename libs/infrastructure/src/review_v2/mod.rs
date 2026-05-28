@@ -3,7 +3,6 @@
 //! Implements usecase and domain port traits using git CLI and filesystem I/O.
 
 pub mod claude_reviewer;
-pub mod cli_composition;
 pub mod codex_reviewer;
 pub mod diff_getter;
 pub mod hasher;
@@ -11,49 +10,11 @@ pub mod persistence;
 pub mod scope_config_loader;
 
 pub use claude_reviewer::ClaudeReviewer;
-pub use cli_composition::{
-    CodexReviewOutcome, NullDiffGetter, ReviewV2Composition, ReviewV2CompositionWithClaude,
-    ReviewV2CompositionWithCodex, append_scope_briefing_reference_str,
-    build_check_approved_service, build_review_v2, build_review_v2_str,
-    build_review_v2_with_claude_reviewer, build_review_v2_with_claude_reviewer_str,
-    build_review_v2_with_reviewer, build_review_v2_with_reviewer_str, build_run_review_service,
-    build_scope_query_interactor_no_diff_str, build_scope_query_interactor_str, check_approved_str,
-    get_briefing_for_scope_str, load_scope_config_only, load_scope_config_only_str,
-    render_review_results_str, resolve_diff_base_and_getter, run_claude_review_str,
-    run_codex_review_str, validate_review_group_name_str, validate_scope_for_track_str,
-    validate_track_id_str,
-};
 pub use codex_reviewer::CodexReviewer;
 pub use diff_getter::GitDiffGetter;
 pub use hasher::SystemReviewHasher;
-pub use null_reviewer::NullReviewer;
 pub use persistence::{FsCommitHashStore, FsReviewStore};
 pub use scope_config_loader::{ScopeConfigLoadError, load_v2_scope_config};
-
-mod null_reviewer {
-    use domain::review_v2::{FastVerdict, LogInfo, ReviewTarget, Verdict};
-    use usecase::review_v2::{ReviewerError, ports::Reviewer};
-
-    /// Null reviewer — used when the composition only needs status/check-approved
-    /// (no actual review invocation). The Reviewer trait is required by ReviewCycle
-    /// but these operations only call `get_review_states()`.
-    pub struct NullReviewer;
-
-    impl Reviewer for NullReviewer {
-        fn review(&self, _target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
-            Err(ReviewerError::Unexpected("NullReviewer: review() must not be called".to_owned()))
-        }
-
-        fn fast_review(
-            &self,
-            _target: &ReviewTarget,
-        ) -> Result<(FastVerdict, LogInfo), ReviewerError> {
-            Err(ReviewerError::Unexpected(
-                "NullReviewer: fast_review() must not be called".to_owned(),
-            ))
-        }
-    }
-}
 
 /// Persists the current HEAD SHA to `.commit_hash` for the given track (v2 incremental diff base).
 ///

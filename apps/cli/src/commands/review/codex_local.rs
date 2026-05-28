@@ -7,7 +7,8 @@ use std::io::{self, Write};
 use std::process::ExitCode;
 use std::time::Duration;
 
-use infrastructure::review_v2::{CodexReviewOutcome, CodexReviewer};
+use cli_composition::review_v2::CodexReviewOutcome;
+use infrastructure::review_v2::CodexReviewer;
 
 use super::{CodexLocalArgs, validate_auto_record_args};
 
@@ -28,7 +29,7 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
     // Step 2: Check whether the scope has a configured briefing file.
     // Log a warning if the path is unsafe (prompt injection guard) but do not
     // fail — `append_scope_briefing_reference_str` skips injection on unsafe paths.
-    let maybe_briefing = infrastructure::review_v2::get_briefing_for_scope_str(
+    let maybe_briefing = cli_composition::review_v2::get_briefing_for_scope_str(
         &validated.group_name,
         &validated.track_id,
         &validated.items_dir,
@@ -45,7 +46,7 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
 
     // Step 3: Build base prompt and append the scope-specific severity policy reference.
     let mut base_prompt = build_base_prompt(args)?;
-    infrastructure::review_v2::append_scope_briefing_reference_str(
+    cli_composition::review_v2::append_scope_briefing_reference_str(
         &mut base_prompt,
         &validated.group_name,
         &validated.track_id,
@@ -58,8 +59,8 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
     let reviewer = CodexReviewer::new(&args.model, timeout, base_prompt)
         .with_scope_label(&validated.group_name);
 
-    // Step 5: Run the review cycle via infrastructure (handles all domain types internally).
-    let outcome = infrastructure::review_v2::run_codex_review_str(
+    // Step 5: Run the review cycle via cli_composition (handles all domain types internally).
+    let outcome = cli_composition::review_v2::run_codex_review_str(
         &validated.track_id,
         &validated.items_dir,
         &validated.group_name,
@@ -124,7 +125,7 @@ pub(super) fn append_scope_briefing_reference(
     track_id: &str,
     items_dir: &std::path::Path,
 ) -> Result<(), String> {
-    infrastructure::review_v2::append_scope_briefing_reference_str(
+    cli_composition::review_v2::append_scope_briefing_reference_str(
         prompt,
         scope_name,
         track_id,

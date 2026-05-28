@@ -9,9 +9,10 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use clap::{ArgGroup, Args};
+use cli_composition::review_v2::CodexReviewOutcome;
 use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
 use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-use infrastructure::review_v2::{ClaudeReviewer, CodexReviewOutcome, CodexReviewer};
+use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
 
 use super::CodexRoundTypeArg;
 
@@ -134,13 +135,13 @@ fn dispatch_codex(args: &LocalArgs, model: &str) -> Result<u8, String> {
         CodexRoundTypeArg::Final => "final",
     };
 
-    infrastructure::review_v2::validate_track_id_str(track_id)
+    cli_composition::review_v2::validate_track_id_str(track_id)
         .map_err(|e| format!("invalid --track-id: {e}"))?;
-    infrastructure::review_v2::validate_review_group_name_str(group)
+    cli_composition::review_v2::validate_review_group_name_str(group)
         .map_err(|e| format!("invalid --group: {e}"))?;
 
     let maybe_briefing =
-        infrastructure::review_v2::get_briefing_for_scope_str(group, track_id, &args.items_dir)?;
+        cli_composition::review_v2::get_briefing_for_scope_str(group, track_id, &args.items_dir)?;
     if let Some(path) = &maybe_briefing {
         if !is_safe_briefing_path(path) {
             eprintln!(
@@ -151,7 +152,7 @@ fn dispatch_codex(args: &LocalArgs, model: &str) -> Result<u8, String> {
     }
 
     let mut base_prompt = build_base_prompt_from_args(&args.briefing_file, &args.prompt)?;
-    infrastructure::review_v2::append_scope_briefing_reference_str(
+    cli_composition::review_v2::append_scope_briefing_reference_str(
         &mut base_prompt,
         group,
         track_id,
@@ -162,7 +163,7 @@ fn dispatch_codex(args: &LocalArgs, model: &str) -> Result<u8, String> {
     let timeout = Duration::from_secs(args.timeout_seconds);
     let reviewer = CodexReviewer::new(model, timeout, base_prompt).with_scope_label(group);
 
-    let outcome = infrastructure::review_v2::run_codex_review_str(
+    let outcome = cli_composition::review_v2::run_codex_review_str(
         track_id,
         &args.items_dir,
         group,
@@ -185,13 +186,13 @@ fn dispatch_claude(args: &LocalArgs, model: &str) -> Result<u8, String> {
         CodexRoundTypeArg::Final => "final",
     };
 
-    infrastructure::review_v2::validate_track_id_str(track_id)
+    cli_composition::review_v2::validate_track_id_str(track_id)
         .map_err(|e| format!("invalid --track-id: {e}"))?;
-    infrastructure::review_v2::validate_review_group_name_str(group)
+    cli_composition::review_v2::validate_review_group_name_str(group)
         .map_err(|e| format!("invalid --group: {e}"))?;
 
     let maybe_briefing =
-        infrastructure::review_v2::get_briefing_for_scope_str(group, track_id, &args.items_dir)?;
+        cli_composition::review_v2::get_briefing_for_scope_str(group, track_id, &args.items_dir)?;
     if let Some(path) = &maybe_briefing {
         if !is_safe_briefing_path(path) {
             eprintln!(
@@ -202,7 +203,7 @@ fn dispatch_claude(args: &LocalArgs, model: &str) -> Result<u8, String> {
     }
 
     let mut base_prompt = build_base_prompt_from_args(&args.briefing_file, &args.prompt)?;
-    infrastructure::review_v2::append_scope_briefing_reference_str(
+    cli_composition::review_v2::append_scope_briefing_reference_str(
         &mut base_prompt,
         group,
         track_id,
@@ -213,7 +214,7 @@ fn dispatch_claude(args: &LocalArgs, model: &str) -> Result<u8, String> {
     let timeout = Duration::from_secs(args.timeout_seconds);
     let reviewer = ClaudeReviewer::new(model, timeout, base_prompt).with_scope_label(group);
 
-    let outcome = infrastructure::review_v2::run_claude_review_str(
+    let outcome = cli_composition::review_v2::run_claude_review_str(
         track_id,
         &args.items_dir,
         group,

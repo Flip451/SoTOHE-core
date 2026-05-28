@@ -42,7 +42,7 @@ fn run_results(args: &ResultsArgs) -> Result<String, String> {
         RoundTypeFilter::Any => "any",
     };
 
-    infrastructure::review_v2::render_review_results_str(
+    cli_composition::review_v2::render_review_results_str(
         &track_id,
         &args.items_dir,
         args.scope.as_deref(),

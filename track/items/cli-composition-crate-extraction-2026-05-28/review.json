@@ -338,6 +338,99 @@
           "findings": [],
           "hash": "rvw1:sha256:040f3ba158ada53a45debdd1768a33cb3c519ff941038e112d202d25cc2a6c21",
           "at": "2026-05-28T11:02:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69c58fe084d766f964f92b3c6270b70459c96f88512b7667ee97cdec44dfe722",
+          "at": "2026-05-28T11:37:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69c58fe084d766f964f92b3c6270b70459c96f88512b7667ee97cdec44dfe722",
+          "at": "2026-05-28T11:39:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee578c297bf2ed4462b726bb7a28493d7ccee024cfef6c32961d7eb6da8071c",
+          "at": "2026-05-28T11:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee578c297bf2ed4462b726bb7a28493d7ccee024cfef6c32961d7eb6da8071c",
+          "at": "2026-05-28T12:01:21Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:36:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure side still defines and publicly re-exports `NullReviewer`, even though the briefing says the infra `null_reviewer` module should be deleted after moving it to the `cli_composition` crate. This leaves an old composition-only adapter in the infra public API, contrary to the extraction boundary; remove the `pub use` and inline module from `mod.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 16,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:39:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3eacf10c6b53d18269f3733f23ec01771c942995509b66c848d1039ff412bc04",
+          "at": "2026-05-28T11:43:08Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:27:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:29:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:35:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:38:22Z"
         }
       ]
     },
@@ -356,24 +449,6 @@
           "findings": [],
           "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
           "at": "2026-05-28T10:38:25Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
-          "at": "2026-05-28T11:04:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
-          "at": "2026-05-28T11:09:38Z"
         }
       ]
     },
@@ -406,24 +481,82 @@
           "findings": [],
           "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
           "at": "2026-05-28T10:33:05Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:27:17Z"
+          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
+          "at": "2026-05-28T11:39:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:29:10Z"
+          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
+          "at": "2026-05-28T11:42:50Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
+          "at": "2026-05-28T11:04:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
+          "at": "2026-05-28T11:09:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The extracted `review_v2` surface is still largely untested. `run.rs` only covers the Claude path, and there are no direct happy-path/error-path tests for the Codex builder/run entry points or the new public helpers in `approved.rs`, `results.rs`, `scope.rs`, and `shared.rs`. That leaves the new composition boundary unverified and violates the repo requirement that public APIs have both success and failure coverage.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:42:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:47:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The moved `review_v2` modules still import the external `domain` crate as `domain::...`, but `cli_composition` already declares a root `mod domain` command module. That local module shadows the extern prelude, so paths like `use domain::review_v2::...` resolve to `cli_composition::domain`, which has no `review_v2`/`TrackId`, and the crate will not compile. Qualify the external crate as `::domain::...` or alias it across these new modules.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/review_v2/shared.rs",
+              "line": 5,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:51:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:55:30Z"
         }
       ]
     }

@@ -15,7 +15,7 @@ mod guard;
 mod hook;
 mod make;
 mod pr;
-mod review_v2;
+pub mod review_v2;
 mod track;
 mod verify;
 
