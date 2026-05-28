@@ -70,12 +70,22 @@
           {
             "name": "Resolution",
             "payload": { "kind": "tuple", "fields": ["TrackResolutionError"] }
+          },
+          {
+            "name": "BranchMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "explicit_id", "ty": "String" },
+                { "name": "branch_id",   "ty": "String" }
+              ]
+            }
           }
         ]
       },
       "methods": [],
       "module_path": "track_resolution",
-      "docs": "Error type for ActiveTrackResolveService. Aggregates branch-read failures (BranchReadError) and resolution failures (TrackResolutionError) from resolve_track_id_from_branch. BranchRead and Resolution carry free-text / nested error types — no domain concept requiring value-object treatment.",
+      "docs": "Error type for ActiveTrackResolveService. Aggregates branch-read failures (BranchReadError), resolution failures (TrackResolutionError), and WRITE-guard mismatch errors (BranchMismatch). BranchRead and Resolution carry free-text / nested error types — no domain concept requiring value-object treatment. BranchMismatch.explicit_id and branch_id are opaque slugs (track-id strings), not validated domain types at this boundary (the validation has already been done by resolve_track_id_from_branch before the comparison).",
       "spec_refs": [
         {
           "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
@@ -84,8 +94,13 @@
         },
         {
           "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
-          "anchor": "CN-01",
-          "hash": "9b196a063e45fa31d7a49e624a2fc2d896468f16274d7ab74dcff091e1f61e05"
+          "anchor": "CN-02",
+          "hash": "c5dce4e721184a895c2f73ed7b8b97078616974f35509d43a9510979fcaf6787"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
         }
       ],
       "informal_grounds": []
@@ -103,7 +118,7 @@
       },
       "methods": [],
       "module_path": "track_resolution",
-      "docs": "Concrete struct implementing ActiveTrackResolveService. Holds a BranchReaderPort injection for testability (git I/O stays in infrastructure; usecase is pure). Delegates to resolve_track_id_from_branch for the branch → track-id parse rule (IN-05).",
+      "docs": "Concrete struct implementing ActiveTrackResolveService. Holds a BranchReaderPort injection for testability (git I/O stays in infrastructure; usecase is pure). Delegates to resolve_track_id_from_branch for the branch → track-id parse rule (IN-05). Implements resolve_for_read and resolve_for_write in addition to resolve_active_track (IN-07 / D7 / CN-02 / CN-03).",
       "spec_refs": [
         {
           "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
@@ -119,6 +134,11 @@
           "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
           "anchor": "CN-04",
           "hash": "662518e89a4cb32fbc7f2a4594de659816fa682acb9673bfe6e5ead246cd3c83"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-07",
+          "hash": "e234d55e7f99dd17dbad5d9229b40d3bda78af9a8873dfec4dfd137a3ff12d82"
         }
       ],
       "informal_grounds": []
@@ -348,11 +368,35 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": []
+        },
+        {
+          "name": "resolve_for_read",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<String, ActiveTrackResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_for_write",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<String, ActiveTrackResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
         }
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "track_resolution",
-      "docs": "Application service trait for resolving the active track id from the current git branch. The single shared resolution path (IN-04, D2). CLI drives this as the composition root; tests inject a stub BranchReaderPort. Returns the track-id string (opaque slug, caller converts to TrackId if needed).",
+      "docs": "Application service trait for resolving the active track id from the current git branch. The single shared resolution path (IN-04, D2). CLI drives this as the composition root; tests inject a stub BranchReaderPort. Three methods: resolve_active_track (self-resolve only, no explicit id override), resolve_for_read (READ semantics: explicit id overrides branch, no branch guard), resolve_for_write (WRITE semantics: explicit id must match branch-derived id; fail-closed on mismatch or non-track branch). D7 / CN-02 / CN-03 / AC-18 / AC-19.",
       "spec_refs": [
         {
           "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
@@ -363,6 +407,31 @@
           "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
           "anchor": "GO-02",
           "hash": "49e23ae026a7a505e46d1bb1d36d1cb968abfbef32afaa06707db48d2bc50175"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-02",
+          "hash": "c5dce4e721184a895c2f73ed7b8b97078616974f35509d43a9510979fcaf6787"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-18",
+          "hash": "8583223464c8384f28ed83d6070826ebb56807962a644f2d61ae076fefabee9a"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-19",
+          "hash": "add227877fdacfe1791175558308988eb375c5994d553b4eb9c11af4a1a2e8bb"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-07",
+          "hash": "e234d55e7f99dd17dbad5d9229b40d3bda78af9a8873dfec4dfd137a3ff12d82"
         }
       ],
       "informal_grounds": []

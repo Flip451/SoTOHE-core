@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-28T04:41:48Z",
-  "declaration_hash": "32ba868c45bedf1b5d29bec93ed9c617a594f3eb7b030592e6926a1e02c66c25",
+  "generated_at": "2026-05-28T05:36:02Z",
+  "declaration_hash": "329bf8f9d3e641cc7f4ac87efd029017f85b193bd69e778d7eab4c8b69b8cf92",
   "signals": [
     {
       "type_name": "ActiveTrackResolveError",

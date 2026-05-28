@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "32ba868c45bedf1b5d29bec93ed9c617a594f3eb7b030592e6926a1e02c66c25",
+  "catalogue_declaration_hash": "329bf8f9d3e641cc7f4ac87efd029017f85b193bd69e778d7eab4c8b69b8cf92",
   "signals": [
     {
       "type_name": "ActiveTrackResolveError",
