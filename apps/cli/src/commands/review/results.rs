@@ -25,31 +25,33 @@ fn run_results(args: &ResultsArgs) -> Result<String, String> {
     let track_id =
         crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
-    // Map ResultsLimit to Option<u32>:
-    //   Zero        → None (state summary only)
-    //   Count(n)    → Some(n)
-    //   All         → Some(u32::MAX)
+    // Map ResultsLimit to u32 (CliApp convention: 0 = state summary only,
+    // u32::MAX = all rounds, n = up to n rounds).
     let limit = match args.limit {
-        ResultsLimit::Zero => None,
-        ResultsLimit::Count(n) => Some(n),
-        ResultsLimit::All => Some(u32::MAX),
+        ResultsLimit::Zero => 0u32,
+        ResultsLimit::Count(n) => n,
+        ResultsLimit::All => u32::MAX,
     };
 
-    // Map RoundTypeFilter to a string recognised by render_review_results_str.
+    // Map RoundTypeFilter to a string recognised by review_results.
     let round_type = match args.round_type {
-        RoundTypeFilter::Fast => "fast",
-        RoundTypeFilter::Final => "final",
-        RoundTypeFilter::Any => "any",
+        RoundTypeFilter::Fast => "fast".to_owned(),
+        RoundTypeFilter::Final => "final".to_owned(),
+        RoundTypeFilter::Any => "any".to_owned(),
     };
 
-    cli_composition::review_v2::render_review_results_str(
-        &track_id,
-        &args.items_dir,
-        args.scope.as_deref(),
+    let input = cli_composition::ReviewResultsInput {
+        track_id: Some(track_id),
+        items_dir: args.items_dir.clone(),
+        scope: args.scope.clone(),
+        all: args.all,
         limit,
         round_type,
-        args.no_hint,
-    )
+        no_hint: args.no_hint,
+    };
+
+    let outcome = cli_composition::CliApp::new().review_results(input)?;
+    outcome.stdout.ok_or_else(|| "review results returned no output".to_owned())
 }
 
 #[cfg(test)]

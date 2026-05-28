@@ -11,10 +11,6 @@ use std::process::ExitCode;
 
 use clap::Args;
 
-use usecase::review_v2::{ScopeClassificationOutput, ScopeQueryService};
-
-use super::compose_v2;
-
 /// CLI arguments for `sotp review classify`.
 #[derive(Debug, Args)]
 pub struct ClassifyArgs {
@@ -46,62 +42,23 @@ pub(super) fn execute_classify(args: &ClassifyArgs) -> ExitCode {
 }
 
 fn run_classify(args: &ClassifyArgs) -> Result<String, String> {
+    // READ resolution: anchors git discovery to the repo owning args.items_dir so that
+    // track ID resolution uses the same repository as the scope config (AC-19 / CN-02).
     let track_id =
         crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
-    // Pre-validate all paths and collect every error before delegating to the
-    // interactor. `classify_by_strings` short-circuits on the first invalid
-    // path; collecting errors here restores the multi-error reporting that the
-    // old `validate_paths` loop provided (CN-03 / AC-05).
-    validate_all_paths(&args.paths)?;
-
-    let interactor =
-        compose_v2::build_scope_query_interactor_no_diff_str(&track_id, &args.items_dir)?;
-
-    let classifications = interactor
-        .classify_by_strings(args.paths.clone())
-        .map_err(|e| format!("classify failed: {e}"))?;
-
-    Ok(render_classifications(&classifications))
+    let outcome = cli_composition::CliApp::new().review_classify(
+        args.paths.clone(),
+        Some(track_id),
+        args.items_dir.clone(),
+    )?;
+    outcome.stdout.ok_or_else(|| "review classify returned no output".to_owned())
 }
 
-/// Validate every path and return a joined error if any fail.
-///
-/// Rules mirror `domain::FilePath::new` exactly:
-/// - empty string → rejected
-/// - starts with `/` (Unix absolute), `\\` (Windows UNC), or has Windows
-///   drive prefix (`C:\` / `C:/`) → rejected as absolute
-/// - contains `..` component (using `/` or `\` as separators) → traversal → rejected
-///
-/// # Errors
-///
-/// Returns a newline-joined string of all validation errors when any path fails.
-fn validate_all_paths(paths: &[String]) -> Result<(), String> {
-    let mut errors: Vec<String> = Vec::new();
-    for raw in paths {
-        if raw.is_empty() {
-            errors.push("invalid path: empty string".to_owned());
-        } else if raw.starts_with('/')
-            || raw.starts_with('\\')
-            || raw.get(1..3).is_some_and(|p| p == ":\\" || p == ":/")
-        {
-            errors.push(format!(
-                "invalid path '{raw}': absolute paths are not allowed (use repo-relative)"
-            ));
-        } else {
-            // Check for `..` traversal components using both Unix and Windows separators
-            // — matches FilePath::Traversal rejection exactly.
-            let has_traversal = raw.split(&['/', '\\'][..]).any(|seg| seg == "..");
-            if has_traversal {
-                errors.push(format!(
-                    "invalid path '{raw}': '..' traversal components are not allowed"
-                ));
-            }
-        }
-    }
-    if errors.is_empty() { Ok(()) } else { Err(errors.join("\n")) }
-}
+#[cfg(test)]
+use usecase::review_v2::ScopeClassificationOutput;
 
+#[cfg(test)]
 fn render_classifications(classifications: &[ScopeClassificationOutput]) -> String {
     use std::fmt::Write as _;
     let mut out = String::new();

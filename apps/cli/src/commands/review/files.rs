@@ -9,9 +9,8 @@ use std::process::ExitCode;
 
 use clap::Args;
 
-use usecase::review_v2::{ScopeQueryError, ScopeQueryService};
-
-use super::compose_v2;
+#[cfg(test)]
+use usecase::review_v2::ScopeQueryError;
 
 /// CLI arguments for `sotp review files`.
 #[derive(Debug, Args)]
@@ -44,17 +43,20 @@ pub(super) fn execute_files(args: &FilesArgs) -> ExitCode {
 }
 
 fn run_files(args: &FilesArgs) -> Result<String, String> {
+    // READ resolution: anchors git discovery to the repo owning args.items_dir so that
+    // track ID resolution uses the same repository as the scope config (AC-19 / CN-02).
     let track_id =
         crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
-    // AC-08: validate scope name before resolving diff base.
-    compose_v2::validate_scope_for_track_str(&track_id, &args.items_dir, &args.scope)?;
-
-    let interactor = compose_v2::build_scope_query_interactor_str(&track_id, &args.items_dir)?;
-    let files = interactor.files_by_string(args.scope.clone()).map_err(format_files_error)?;
-    Ok(render_files(&files))
+    let outcome = cli_composition::CliApp::new().review_files(
+        args.scope.clone(),
+        Some(track_id),
+        args.items_dir.clone(),
+    )?;
+    outcome.stdout.ok_or_else(|| "review files returned no output".to_owned())
 }
 
+#[cfg(test)]
 fn format_files_error(err: ScopeQueryError) -> String {
     match err {
         ScopeQueryError::DiffGet(inner) => format!("diff getter failed: {inner}"),
@@ -70,6 +72,7 @@ fn format_files_error(err: ScopeQueryError) -> String {
     }
 }
 
+#[cfg(test)]
 fn render_files(files: &[String]) -> String {
     use std::fmt::Write as _;
     let mut out = String::new();
