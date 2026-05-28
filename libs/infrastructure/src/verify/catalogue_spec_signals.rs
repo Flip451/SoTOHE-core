@@ -7,7 +7,7 @@
 use std::path::PathBuf;
 
 use domain::ConfidenceSignal;
-use domain::verify::{Severity, VerifyFinding, VerifyOutcome};
+use domain::verify::{VerifyFinding, VerifyOutcome};
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::catalogue_spec_signals_codec;
@@ -365,18 +365,21 @@ pub fn execute_catalogue_spec_signals(
 
 /// Execute `verify catalogue-spec-signals` after git-based branch resolution.
 ///
-/// Resolves the active track branch, then delegates to `execute_catalogue_spec_signals`.
-/// Follows the fail-closed pattern: git errors → error finding; non-track branches → Info/SKIP.
-///
-/// Returns a tuple `(label, outcome)` for use with `print_outcome`.
-#[allow(clippy::too_many_lines)]
+/// Resolves the active track via the shared `ActiveTrackResolveInteractor`
+/// (IN-08 / IN-09: consolidates individual auto-detect implementations onto the
+/// shared interactor path). Fail-closed on non-track branches: git errors and
+/// non-`track/<id>` branches both produce an error finding and exit 1 (CN-01).
+/// This removes the previous `[SKIP]` Info behaviour that masked CI failures on
+/// unexpected branches.
 pub fn execute_catalogue_spec_signals_check(
     items_dir: PathBuf,
     workspace_root: PathBuf,
     strict: bool,
 ) -> VerifyOutcome {
+    use std::sync::Arc;
+
     use crate::git_cli::{GitRepository, resolve_repo_path};
-    use usecase::track_resolution::{TrackResolutionError, resolve_track_id_from_branch};
+    use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService};
 
     let repo = match crate::git_cli::SystemGitRepo::discover() {
         Ok(r) => r,
@@ -386,36 +389,25 @@ pub fn execute_catalogue_spec_signals_check(
             ))]);
         }
     };
-    let branch = match repo.current_branch() {
-        Ok(Some(b)) => b,
-        Ok(None) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(
-                "[ERROR] git rev-parse --abbrev-ref HEAD failed (non-zero exit)".to_owned(),
-            )]);
-        }
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "[ERROR] cannot read current branch: {e}"
-            ))]);
-        }
-    };
-    let track_id = match resolve_track_id_from_branch(Some(branch.as_str())) {
+
+    let repo_root = repo.root().to_path_buf();
+    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
+    let track_id = match interactor.resolve_active_track() {
         Ok(id) => id,
-        Err(TrackResolutionError::InvalidTrackId(slug, e)) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "[ERROR] invalid track id '{slug}' from branch '{branch}': {e}"
-            ))]);
-        }
-        Err(_) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::new(
-                Severity::Info,
-                format!("[SKIP] not on a track branch (branch: {branch})"),
+        Err(_e) => {
+            // Suppress the nested resolver detail (which may reference
+            // "provide an explicit track-id" — an option this command does not
+            // expose). The actionable fix is always to switch branches.
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(
+                "[ERROR] cannot resolve active track: not on a track/<id> branch.\n\
+                 Hint: run this command on a track/<id> branch."
+                    .to_owned(),
             )]);
         }
     };
 
-    let resolved_items_dir = resolve_repo_path(repo.root(), &items_dir);
-    let resolved_workspace_root = resolve_repo_path(repo.root(), &workspace_root);
+    let resolved_items_dir = resolve_repo_path(&repo_root, &items_dir);
+    let resolved_workspace_root = resolve_repo_path(&repo_root, &workspace_root);
 
     execute_catalogue_spec_signals(resolved_items_dir, track_id, resolved_workspace_root, strict)
 }

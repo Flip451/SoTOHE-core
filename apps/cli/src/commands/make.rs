@@ -9,14 +9,8 @@ use std::process::ExitCode;
 
 use clap::{Args, ValueEnum};
 use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-use infrastructure::tddd::type_signals_codec;
-use infrastructure::track::symlink_guard;
-use infrastructure::verify::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::{
-    ensure_branch_matches_track, execute_type_signals_lenient_with_bindings,
-};
 
 /// Arguments for `sotp make <task> [args...]`.
 #[derive(Args)]
@@ -326,81 +320,116 @@ fn dispatch_track_pr_status(raw_args: &[String]) -> Result<ExitCode, CliError> {
 }
 
 fn dispatch_track_next_task(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let track_id = raw_args_to_single(raw_args).map_err(|_| {
-        CliError::Message("error: usage: sotp make track-next-task <track-id>".to_owned())
-    })?;
-    run_sotp(&["track", "next-task", "--items-dir", "track/items", &track_id])
+    // Passthrough: inject --items-dir and forward all remaining args verbatim.
+    // If the caller passes --track-id <id>, it flows through; otherwise the
+    // underlying command self-resolves from the current branch (D1, D6).
+    let args =
+        build_forwarded_args(&["track", "next-task", "--items-dir", "track/items"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
 }
 
 fn dispatch_track_task_counts(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let track_id = raw_args_to_single(raw_args).map_err(|_| {
-        CliError::Message("error: usage: sotp make track-task-counts <track-id>".to_owned())
-    })?;
-    run_sotp(&["track", "task-counts", "--items-dir", "track/items", &track_id])
+    // Passthrough: inject --items-dir and forward all remaining args verbatim.
+    // If the caller passes --track-id <id>, it flows through; otherwise the
+    // underlying command self-resolves from the current branch (D1, D6).
+    let args =
+        build_forwarded_args(&["track", "task-counts", "--items-dir", "track/items"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
 }
 
 fn dispatch_track_transition(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let words = raw_args_to_words(raw_args);
-    let usage = "error: usage: sotp make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]";
-    let track_dir = words.first().ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let task_id = words.get(1).ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let target_status = words.get(2).ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    // Extract items-dir (parent) and track-id (basename) from track_dir
-    let path = std::path::Path::new(track_dir.as_str());
-    let items_dir = path.parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_default();
-    let track_id_str =
-        path.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
-    if items_dir.is_empty() || track_id_str.is_empty() {
-        return Err(CliError::Message(
-            "error: track_dir must be in the form <items_dir>/<track_id>".to_owned(),
-        ));
-    }
-    let mut args: Vec<&str> = vec![
-        "track",
-        "transition",
-        "--items-dir",
-        &items_dir,
-        &track_id_str,
-        task_id,
-        target_status,
-    ];
-    // Forward remaining args (e.g., --commit-hash <hash>)
-    for w in words.get(3..).unwrap_or_default() {
-        args.push(w);
-    }
-    run_sotp(&args)
+    // Passthrough: inject --items-dir and forward all remaining args verbatim.
+    // Callers pass task_id, status, and optional --commit-hash / --track-id as flags.
+    // --track-id is forwarded if present; omitting it triggers self-resolve (D1, D6).
+    let args =
+        build_forwarded_args(&["track", "transition", "--items-dir", "track/items"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
 }
 
 fn dispatch_track_add_task(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    // Passthrough: inject --items-dir and forward all remaining args verbatim.
+    // If the caller passes --track-id <id>, it flows through; otherwise the
+    // underlying command self-resolves from the current branch (D1, D6).
+    let args = build_forwarded_args(&["track", "add-task", "--items-dir", "track/items"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
+}
+
+/// Build the sotp argv for `track-set-override` / `track-clear-override`.
+///
+/// Finds the first positional (non-flag, non-flag-value) word in `raw_args` as
+/// the status, then routes:
+/// - `"clear"` → `["track", "clear-override", "--items-dir", "track/items", <rest>]`
+/// - other     → `["track", "set-override",   "--items-dir", "track/items", status, <rest>]`
+///
+/// Only **value-taking** flags (`--track-id`, `--reason`) consume the next token as their
+/// value. All other flags (those starting with `-` but not in VALUE_FLAGS) are treated as
+/// boolean flags and do not consume the next token. The status word is removed by **index**
+/// (not by value), so a flag value that happens to equal the status string is never silently
+/// dropped.
+///
+/// # Errors
+///
+/// Returns `Err` if no positional word is found (missing status argument).
+pub fn build_set_override_args(raw_args: &[String]) -> Result<Vec<String>, CliError> {
     let words = raw_args_to_words(raw_args);
-    let usage = "error: usage: sotp make track-add-task <track-id> <description> [--section <id>] [--after <task-id>]";
-    let track_id = words.first().ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let desc = words.get(1).ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let mut args: Vec<&str> =
-        vec!["track", "add-task", "--items-dir", "track/items", track_id, desc];
-    for w in words.get(2..).unwrap_or_default() {
-        args.push(w);
+    let filtered: Vec<&str> = words.iter().map(|s| s.as_str()).skip_while(|s| *s == "--").collect();
+    let usage = "error: usage: sotp make track-set-override <blocked|cancelled|clear> [--track-id <id>] [--reason <text>]";
+    // Only these flags take a value argument; boolean flags do not consume the next token.
+    const VALUE_FLAGS: &[&str] = &["--track-id", "--reason"];
+    // Walk the filtered tokens. Skip known value-taking flags and their values.
+    // Any flag starting with '-' but not in VALUE_FLAGS is treated as boolean.
+    let mut status_idx: Option<usize> = None;
+    let mut skip_next = false;
+    for (i, word) in filtered.iter().enumerate() {
+        if skip_next {
+            skip_next = false;
+            continue;
+        }
+        if VALUE_FLAGS.contains(word) {
+            // This flag takes exactly one value argument.
+            skip_next = true;
+        } else if !word.starts_with('-') {
+            // First non-flag, non-flag-value token is the status.
+            status_idx = Some(i);
+            break;
+        }
+        // Any flag starting with '-' but not in VALUE_FLAGS is a boolean flag; skip without consuming next.
     }
-    run_sotp(&args)
+    let status_idx = status_idx.ok_or_else(|| CliError::Message(usage.to_owned()))?;
+    let status = filtered.get(status_idx).ok_or_else(|| CliError::Message(usage.to_owned()))?;
+    // Remaining args: all words except the status word at status_idx, removed by index.
+    let rest: Vec<&str> =
+        filtered.iter().enumerate().filter(|(i, _)| *i != status_idx).map(|(_, s)| *s).collect();
+    if *status == "clear" {
+        let mut args: Vec<String> = vec![
+            "track".to_owned(),
+            "clear-override".to_owned(),
+            "--items-dir".to_owned(),
+            "track/items".to_owned(),
+        ];
+        args.extend(rest.iter().map(|s| (*s).to_owned()));
+        Ok(args)
+    } else {
+        let mut args: Vec<String> = vec![
+            "track".to_owned(),
+            "set-override".to_owned(),
+            "--items-dir".to_owned(),
+            "track/items".to_owned(),
+            (*status).to_owned(),
+        ];
+        args.extend(rest.iter().map(|s| (*s).to_owned()));
+        Ok(args)
+    }
 }
 
 fn dispatch_track_set_override(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let words = raw_args_to_words(raw_args);
-    let usage = "error: usage: sotp make track-set-override <track-id> <blocked|cancelled|clear> [--reason <text>]";
-    let track_id = words.first().ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let status = words.get(1).ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let extra: Vec<&str> = words.get(2..).unwrap_or_default().iter().map(|s| s.as_str()).collect();
-    if status == "clear" {
-        let mut args: Vec<&str> =
-            vec!["track", "clear-override", "--items-dir", "track/items", track_id];
-        args.extend_from_slice(&extra);
-        run_sotp(&args)
-    } else {
-        let mut args: Vec<&str> =
-            vec!["track", "set-override", "--items-dir", "track/items", track_id, status];
-        args.extend_from_slice(&extra);
-        run_sotp(&args)
-    }
+    let args = build_set_override_args(raw_args)?;
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
 }
 
 fn dispatch_track_local_plan(raw_args: &[String]) -> Result<ExitCode, CliError> {
@@ -468,248 +497,21 @@ fn dispatch_note(raw_args: &[String]) -> Result<ExitCode, CliError> {
     run_command("git", &["notes", "add", "-f", "-m", &note_text, "HEAD"])
 }
 
-#[allow(clippy::too_many_lines)]
 fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
     std::fs::create_dir_all("tmp")
         .map_err(|e| CliError::Message(format!("mkdir tmp failed: {e}")))?;
 
-    // ADR 2026-04-18-1400 §D2: pre-commit auto-recomputation of TDDD type
-    // signals runs BEFORE CI so the stale-detection pass in CI
-    // (`verify-spec-states-current-local`) always sees a fresh evaluation
-    // result. Red signals block the commit here (§D3) with an actionable
-    // message, and the commit-message.txt scratch file is preserved.
-    let track_id = current_branch_track_id_required_for_track_commit_message()?;
-    {
-        eprintln!(
-            "[track-commit-message] Pre-commit: recomputing type signals for '{track_id}'..."
-        );
-        // `run_pre_commit_type_signals` returns bindings for the current track.
-        // The branch-based guard inside ensures only the current-branch track can proceed.
-        let (signals_result, type_signal_bindings) = run_pre_commit_type_signals(&track_id)?;
-        if signals_result != ExitCode::SUCCESS {
-            return Ok(signals_result);
-        }
-
-        // ADR 2026-04-23-0344 §D3.4 (SoT Chain ② pre-commit integration):
-        //   (existing 1) Stage 2 type-signals recompute → (new 2) verify
-        //   catalogue-spec-refs --skip-stale → (new 3) refresh catalogue-spec
-        //   signals → (existing 4+) ci / review guard / commit.
-        // The binary gate (step 2) blocks the commit on ERROR; the refresh
-        // (step 3) runs only when step 2 passes so a stale signals file is
-        // regenerated before CI and the review guard read it.
-        {
-            // Workspace root discovery: `run_sotp` inherits the caller's CWD,
-            // so pass the absolute git-discovered root explicitly so the pre-commit
-            // steps behave identically to `run_pre_commit_type_signals`, which
-            // already uses `SystemGitRepo::discover()` internally.
-            // Keep paths as `PathBuf` throughout to avoid lossy UTF-8 conversion.
-            // Only convert to `&str` at the last moment for subprocess calls
-            // that require a string slice.
-            let workspace_root_path = SystemGitRepo::discover()
-                .map_err(|e| {
-                    CliError::Message(format!(
-                        "[track-commit-message] BLOCKED: unable to discover git repository \
-                             root for catalogue-spec steps: {e}"
-                    ))
-                })?
-                .root()
-                .to_path_buf();
-            let items_dir_path = workspace_root_path.join("track").join("items");
-
-            eprintln!(
-                "[track-commit-message] Pre-commit: verifying catalogue-spec refs \
-                 for '{track_id}' (--skip-stale)..."
-            );
-            // Use OsStr-based subprocess arguments throughout so that workspace
-            // paths containing non-UTF-8 bytes (valid on Unix) are passed verbatim
-            // to the child process instead of going through a lossy UTF-8 conversion.
-            // `run_sotp(&[&str])` cannot carry non-UTF-8 paths; use
-            // `std::process::Command` directly for these path arguments.
-            let refs_status = std::process::Command::new("bin/sotp")
-                .arg("verify")
-                .arg("catalogue-spec-refs")
-                .arg("--track")
-                .arg(&track_id)
-                .arg("--items-dir")
-                .arg(&items_dir_path)
-                .arg("--workspace-root")
-                .arg(&workspace_root_path)
-                .arg("--skip-stale")
-                .status()
-                .map_err(|e| {
-                    CliError::Message(format!(
-                        "[track-commit-message] BLOCKED: failed to launch verify \
-                         catalogue-spec-refs: {e}"
-                    ))
-                })?;
-            let refs_result =
-                ExitCode::from(u8::try_from(refs_status.code().unwrap_or(1)).unwrap_or(1));
-            if refs_result != ExitCode::SUCCESS {
-                eprintln!(
-                    "[track-commit-message] BLOCKED: catalogue-spec-refs binary gate \
-                     detected integrity violations. Fix the reported findings before \
-                     retrying."
-                );
-                return Ok(refs_result);
-            }
-
-            // Refresh catalogue-spec signals per layer, lenient: skip layers
-            // without a catalogue file. Mirrors the lenient semantics of
-            // `run_pre_commit_type_signals` (which skips layers whose
-            // declaration file is absent) so the pre-commit hook is not
-            // stricter than CI / the type-signals step that just ran.
-            //
-            // Per-layer invocations use `--layer <id>` (positional `track_id`,
-            // not `--track-id` — the CLI accepts `track_id` positionally).
-            // Using `type_signal_bindings` from `run_pre_commit_type_signals`
-            // avoids a second `architecture-rules.json` read in this process.
-            // OsStr arguments carry paths verbatim (no lossy UTF-8 conversion).
-            //
-            // Staging of the refreshed `*-catalogue-spec-signals.json` file
-            // is done inline per layer so the refresh + stage are atomic: a
-            // layer whose subprocess succeeds but whose output cannot be staged
-            // is caught immediately rather than at the end of all layers.
-            // `track catalogue-spec-signals` writes to the working tree only;
-            // without `git add` the refreshed signals stay out of the index
-            // and the commit records stale content.
-            let track_dir = items_dir_path.join(&track_id);
-            for binding in &type_signal_bindings {
-                let catalogue_path = track_dir.join(binding.catalogue_file());
-                // Lenient skip: if no catalogue file exists for this layer, TDDD is
-                // not active and there is nothing to refresh. Use `reject_symlinks_below`
-                // rather than `is_file()` so that a symlink or other non-regular-file
-                // path is rejected fail-closed instead of being treated as "absent"
-                // — matching the type-signals step's symlink guard semantics.
-                // Anchor at `items_dir_path` (not `track_dir`) so a symlinked
-                // `track_dir` itself is also detected.
-                match symlink_guard::reject_symlinks_below(&catalogue_path, &items_dir_path) {
-                    Ok(true) => {} // regular file exists — proceed
-                    Ok(false) => {
-                        // Absent (not a symlink): TDDD not active for this layer.
-                        continue;
-                    }
-                    Err(e) => {
-                        // Symlink or other I/O error — fail-closed.
-                        return Err(CliError::Message(format!(
-                            "[track-commit-message] BLOCKED: catalogue path {} rejected: {e}",
-                            catalogue_path.display()
-                        )));
-                    }
-                }
-                eprintln!(
-                    "[track-commit-message] Pre-commit: refreshing catalogue-spec \
-                     signals for '{track_id}' layer '{}'...",
-                    binding.layer_id()
-                );
-                let refresh_status = std::process::Command::new("bin/sotp")
-                    .arg("track")
-                    .arg("catalogue-spec-signals")
-                    .arg("--items-dir")
-                    .arg(&items_dir_path)
-                    .arg(&track_id)
-                    .arg("--workspace-root")
-                    .arg(&workspace_root_path)
-                    .arg("--layer")
-                    .arg(binding.layer_id())
-                    .status()
-                    .map_err(|e| {
-                        CliError::Message(format!(
-                            "[track-commit-message] BLOCKED: failed to launch track \
-                             catalogue-spec-signals: {e}"
-                        ))
-                    })?;
-                let refresh_result =
-                    ExitCode::from(u8::try_from(refresh_status.code().unwrap_or(1)).unwrap_or(1));
-                if refresh_result != ExitCode::SUCCESS {
-                    eprintln!(
-                        "[track-commit-message] BLOCKED: catalogue-spec-signals \
-                         refresh failed for layer '{}'.",
-                        binding.layer_id()
-                    );
-                    return Ok(refresh_result);
-                }
-                let signals_file = format!("{}-catalogue-spec-signals.json", binding.layer_id());
-                let signals_path = track_dir.join(&signals_file);
-                if signals_path.is_file() {
-                    let stage_status = std::process::Command::new("git")
-                        .arg("add")
-                        .arg("--")
-                        .arg(&signals_path)
-                        .status()
-                        .map_err(|e| {
-                            CliError::Message(format!(
-                                "pre-commit: git add catalogue-spec-signals \
-                                 failed: {e}"
-                            ))
-                        })?;
-                    if !stage_status.success() {
-                        return Err(CliError::Message(format!(
-                            "pre-commit: git add {} returned non-zero",
-                            signals_path.display()
-                        )));
-                    }
-                }
-            }
-
-            // Step 3.5: sync rendered views (`<layer>-types.md`, `plan.md`, etc.)
-            //
-            // The signal compute steps (step 1 / step 3) intentionally do NOT touch
-            // `.md` views. Rendering is centralised here so both type-signals and
-            // catalogue-spec-signals are finalised before any view consumes them —
-            // this eliminates the former step-1 → step-3 reverse dependency that
-            // deadlocked commits when `<layer>-catalogue-spec-signals.json` went
-            // stale. See ADR `2026-04-23-0344-catalogue-spec-signal-activation.md`
-            // §D2.5 (view content) and §D3.4 (pre-commit ordering).
-            eprintln!(
-                "[track-commit-message] Pre-commit: syncing rendered views for '{track_id}'..."
-            );
-            let rendered_paths = infrastructure::track::render::sync_rendered_views(
-                &workspace_root_path,
-                Some(&track_id),
-            )
-            .map_err(|e| {
-                CliError::Message(format!(
-                    "[track-commit-message] BLOCKED: sync_rendered_views failed for \
-                             '{track_id}': {e}"
-                ))
-            })?;
-            for path in &rendered_paths {
-                // Skip git-ignored rendered views (e.g., `track/registry.md` is
-                // intentionally in `.gitignore` and must not be staged). `git
-                // check-ignore --quiet --no-index` exits 0 when the path is
-                // git-ignored, non-zero when it is not ignored (or git is
-                // unavailable). Spawn failures are treated as "not ignored" so a
-                // missing git binary falls through to the normal `git add` error.
-                let is_ignored = std::process::Command::new("git")
-                    .args(["check-ignore", "--quiet", "--no-index", "--"])
-                    .arg(path)
-                    .status()
-                    .map(|s| s.success())
-                    .unwrap_or(false);
-                if is_ignored {
-                    eprintln!(
-                        "[track-commit-message] Skipping git-ignored rendered view: {}",
-                        path.display()
-                    );
-                    continue;
-                }
-                let stage_status =
-                    std::process::Command::new("git").arg("add").arg(path).status().map_err(
-                        |e| {
-                            CliError::Message(format!(
-                                "pre-commit: git add {} failed to launch: {e}",
-                                path.display()
-                            ))
-                        },
-                    )?;
-                if !stage_status.success() {
-                    return Err(CliError::Message(format!(
-                        "pre-commit: git add {} returned non-zero",
-                        path.display()
-                    )));
-                }
-            }
-        }
+    // D4 (bare-chain): regen (type-signals → catalogue-spec-signals → views sync) is
+    // handled by the `track-active-gate` Makefile dependency that ran before this
+    // command. Stage the regen outputs and any other modified tracked files so they
+    // are included in the subsequent commit (CN-12: this staging step replaces the
+    // per-step inline git-add from the pre-D4 implementation; the strict ci +
+    // check-approved gates that follow are unchanged).
+    eprintln!("[track-commit-message] Pre-commit: staging working tree...");
+    let add_result = run_sotp(&["git", "add-all"])?;
+    if add_result != ExitCode::SUCCESS {
+        eprintln!("[track-commit-message] BLOCKED: git add-all failed");
+        return Ok(add_result);
     }
 
     eprintln!("[track-commit-message] Running CI...");
@@ -742,22 +544,31 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
 
     // Review guard: check review.status == approved with current code hash.
     // Resolve track ID from current branch (track/<id>).
-    if let Some(track_id) = current_branch_track_id_strict()? {
-        eprintln!("[track-commit-message] Checking review approval for track '{track_id}'...");
-        let guard_result = run_sotp(&[
-            "review",
-            "check-approved",
-            "--items-dir",
-            "track/items",
-            "--track-id",
-            &track_id,
-        ])?;
-        if guard_result != ExitCode::SUCCESS {
-            eprintln!("[track-commit-message] BLOCKED: review guard rejected commit");
-            return Ok(guard_result);
-        }
-        eprintln!("[track-commit-message] Review approved");
+    // CN-12 / D1 fail-closed: if the current branch is not a track branch (main,
+    // detached HEAD, or any non-track/<id> branch), block the commit with an
+    // explicit error. Silently skipping the check-approved gate is forbidden.
+    let track_id = current_branch_track_id_strict()?.ok_or_else(|| {
+        CliError::Message(
+            "[track-commit-message] BLOCKED: not on a track/<id> branch; \
+             check-approved guard requires a track branch. \
+             Switch to your track branch."
+                .to_owned(),
+        )
+    })?;
+    eprintln!("[track-commit-message] Checking review approval for track '{track_id}'...");
+    let guard_result = run_sotp(&[
+        "review",
+        "check-approved",
+        "--items-dir",
+        "track/items",
+        "--track-id",
+        &track_id,
+    ])?;
+    if guard_result != ExitCode::SUCCESS {
+        eprintln!("[track-commit-message] BLOCKED: review guard rejected commit");
+        return Ok(guard_result);
     }
+    eprintln!("[track-commit-message] Review approved");
 
     let commit_result =
         run_sotp(&["git", "commit-from-file", "tmp/track-commit/commit-message.txt", "--cleanup"])?;
@@ -787,321 +598,6 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
     Ok(ExitCode::SUCCESS)
 }
 
-/// Runs the ADR 2026-04-18-1400 §D2 pre-commit type-signal recomputation
-/// step.
-///
-/// Steps per ADR §D2 / §D3 / §D7:
-/// 1. Branch-based guard: only proceed when the current git branch matches
-///    `track/<track_id>` (CN-01 / CN-04). Fail-closed on branch mismatch or
-///    missing/non-track branch (reject, do not silently skip).
-/// 2. Fail-closed on missing `architecture-rules.json` (the new pre-commit
-///    path explicitly does NOT inherit the legacy synthetic-domain fallback
-///    that `sotp track type-signals` uses — see §D2 last paragraph).
-/// 3. Delegate the recomputation itself to `execute_type_signals`, which
-///    writes `<layer>-type-signals.json` and re-encodes declaration files
-///    via the declaration codec (which omits the `signals` field). Symlink guards
-///    (§D7) are applied inside `execute_type_signals` on both write paths.
-/// 4. After recomputation, read each generated signal file and classify the
-///    result: Red → BLOCKED (exit 1, commit-message.txt preserved), Yellow
-///    → warning on stderr + proceed, Blue → silent pass.
-///
-/// The Red / Yellow classification mirrors the spec.md Behavior Truth Table
-/// for the pre-commit column. Full-route CI verification still runs after
-/// this step (§D2 ordering: recompute → CI → review guard → commit).
-///
-/// Returns the exit code together with a layer bindings snapshot for the
-/// current track. The caller reuses this snapshot for subsequent pre-commit
-/// steps (catalogue-spec signals), eliminating a second read and closing the
-/// TOCTOU window.
-#[allow(clippy::too_many_lines)]
-fn run_pre_commit_type_signals(
-    track_id: &str,
-) -> Result<(ExitCode, Vec<TdddLayerBinding>), CliError> {
-    // Resolve the workspace root from the git discovery result, not from the
-    // current working directory. Running `/track:commit` (which invokes
-    // `bin/sotp make track-commit-message`) from a nested subdirectory must
-    // still locate `architecture-rules.json` and `track/items/` at the repo
-    // root. `PathBuf::from(".")` would introduce CWD-dependent behavior that
-    // silently fail-closes commits launched from subdirectories.
-    let workspace_root = SystemGitRepo::discover()
-        .map_err(|e| {
-            CliError::Message(format!(
-                "[track-commit-message] BLOCKED: unable to discover git repository root: {e}"
-            ))
-        })?
-        .root()
-        .to_path_buf();
-
-    // Branch-based guard (CN-01 / CN-04): only proceed when the current git branch
-    // matches `track/<track_id>`. Fail-closed on branch mismatch or non-track branch.
-    // This replaces the former status-based frozen guard (done|archived bypass).
-    {
-        let branch = SystemGitRepo::discover()
-            .map_err(|e| {
-                CliError::Message(format!(
-                    "[track-commit-message] BLOCKED: unable to discover git repository \
-                     root for branch guard: {e}"
-                ))
-            })?
-            .current_branch()
-            .map_err(|e| {
-                CliError::Message(format!(
-                    "[track-commit-message] BLOCKED: cannot read current branch \
-                     for guard: {e}"
-                ))
-            })?
-            .ok_or_else(|| {
-                CliError::Message(
-                    "[track-commit-message] BLOCKED: cannot read current branch for guard: \
-                     git rev-parse --abbrev-ref HEAD returned non-zero"
-                        .to_owned(),
-                )
-            })?;
-        ensure_branch_matches_track(&branch, track_id).map_err(|e| {
-            CliError::Message(format!(
-                "[track-commit-message] BLOCKED: branch guard rejected '{track_id}': {e}"
-            ))
-        })?;
-    }
-
-    // ADR §D2 fail-closed: architecture-rules.json must be present and
-    // readable. Unlike the legacy `sotp track type-signals` CLI, the
-    // pre-commit path does NOT fall back to a synthetic domain binding.
-    let rules_path = workspace_root.join("architecture-rules.json");
-
-    // Pre-flight snapshot: read + parse `architecture-rules.json` exactly
-    // once. The same parsed binding set drives recompute (via
-    // `execute_type_signals_lenient_with_bindings`) AND the post-recompute
-    // classification loop below, eliminating the TOCTOU window where
-    // `architecture-rules.json` could be edited between separate reads and
-    // allow stale signals through pre-commit (PR #106 TOCTOU P1 finding).
-    let bindings_snapshot = match symlink_guard::reject_symlinks_below(&rules_path, &workspace_root)
-    {
-        Ok(true) => {
-            let content = std::fs::read_to_string(&rules_path).map_err(|e| {
-                CliError::Message(format!(
-                    "[track-commit-message] BLOCKED: cannot read {}: {e}",
-                    rules_path.display()
-                ))
-            })?;
-            parse_tddd_layers(&content).map_err(|e| {
-                CliError::Message(format!(
-                    "[track-commit-message] BLOCKED: architecture-rules.json parse error: {e}"
-                ))
-            })?
-        }
-        Ok(false) => {
-            eprintln!(
-                "[track-commit-message] BLOCKED: architecture-rules.json not found. \
-                 Pre-commit type-signal recomputation cannot enumerate TDDD layers."
-            );
-            return Ok((ExitCode::from(1), Vec::new()));
-        }
-        Err(e) => {
-            eprintln!(
-                "[track-commit-message] BLOCKED: architecture-rules.json symlink rejected: {e}"
-            );
-            return Ok((ExitCode::from(1), Vec::new()));
-        }
-    };
-
-    let items_dir = workspace_root.join("track").join("items");
-
-    // Delegate to the lenient variant so pre-commit matches CI semantics:
-    // a layer without a declaration file is treated as "TDDD not active for
-    // this layer" and skipped silently, rather than hard-failing the commit.
-    // This keeps pre-commit from being stricter than CI / merge gate (ADR
-    // §D2 / §D5 symmetry). Pass the pre-flight `bindings_snapshot` so the
-    // recompute runs against exactly the same binding set the classification
-    // loop below will use — no TOCTOU gap.
-    let exec_result = execute_type_signals_lenient_with_bindings(
-        items_dir.clone(),
-        track_id.to_owned(),
-        workspace_root.clone(),
-        &bindings_snapshot,
-    )?;
-    if exec_result != ExitCode::SUCCESS {
-        eprintln!("[track-commit-message] BLOCKED: type-signals recomputation returned non-zero");
-        return Ok((exec_result, Vec::new()));
-    }
-
-    // Classify against the same `bindings_snapshot` the recompute saw.
-    // Re-reading `architecture-rules.json` here would re-open the TOCTOU
-    // window called out by the PR #106 review; keep a single source of
-    // truth for the entire pre-commit critical section.
-    let bindings_post = &bindings_snapshot;
-
-    let track_dir = items_dir.join(track_id);
-
-    // Stage the regenerated files so they are included in the subsequent
-    // `git commit-from-file`. `execute_type_signals` writes the declaration
-    // file, rendered Markdown, and signal file for each layer that has a
-    // catalogue. Without this step the regenerated working-tree files would
-    // be left out of the commit (the index still reflects pre-recomputation
-    // content), causing CI to validate a different tree than what gets recorded.
-    // Use `bindings_post` (post-recompute re-read) so we stage exactly the files
-    // that execute_type_signals processed.
-    for binding in bindings_post {
-        let catalogue_path = track_dir.join(binding.catalogue_file());
-        if !catalogue_path.is_file() {
-            continue; // no catalogue → nothing was written → nothing to stage
-        }
-        // Mirror the lenient executor's multi-target skip: for layers with
-        // multiple `schema_export.targets`, `execute_type_signals_lenient`
-        // did NOT regenerate catalogue / rendered / signal files, so
-        // `git add` here would stage pre-existing working-tree content
-        // (including any unrelated unstaged edits) rather than recomputed
-        // outputs. Skip staging entirely for those layers — CI / merge-gate
-        // still detect staleness via `declaration_hash` comparison on the
-        // already-committed signal file.
-        if binding.targets().len() > 1 {
-            continue;
-        }
-        // Stage all three files written by execute_type_signals for this layer.
-        for rel_path in &[
-            track_dir.join(binding.catalogue_file()),
-            track_dir.join(binding.rendered_file()),
-            track_dir.join(binding.signal_file()),
-        ] {
-            if rel_path.is_file() {
-                let status = std::process::Command::new("git")
-                    .args(["add", "--", &rel_path.display().to_string()])
-                    .status()
-                    .map_err(|e| CliError::Message(format!("pre-commit: git add failed: {e}")))?;
-                if !status.success() {
-                    return Err(CliError::Message(format!(
-                        "pre-commit: git add {} returned non-zero",
-                        rel_path.display()
-                    )));
-                }
-            }
-        }
-    }
-    let mut red_names: Vec<String> = Vec::new();
-    let mut yellow_names: Vec<String> = Vec::new();
-    for binding in bindings_post {
-        // Skip layers whose declaration file is absent on this track —
-        // matches the CI / merge-gate semantics (`evaluate_layer_catalogue`
-        // treats a missing catalogue as "TDDD not active for this layer"
-        // and returns `VerifyOutcome::pass()`). Reading an orphan signal
-        // file (declaration deleted but signals left behind) would block
-        // commits on stale Red signals that the downstream gates silently
-        // skip, producing a pre-commit vs CI divergence.
-        let catalogue_path = track_dir.join(binding.catalogue_file());
-        if !catalogue_path.is_file() {
-            continue;
-        }
-
-        // Skip multi-target layers here so this post-recompute missing-file
-        // gate stays consistent with `execute_type_signals_lenient`, which
-        // intentionally bypasses the strict evaluator for layers whose
-        // `schema_export.targets` has more than one entry. Without this
-        // exemption the "catalogue present but signal file absent" BLOCKED
-        // branch below would fire on every pre-commit for multi-target
-        // tracks even though the lenient executor chose not to write signals
-        // for them. CI / merge-gate detect staleness independently via
-        // `declaration_hash` comparison on the persisted signal file.
-        if binding.targets().len() > 1 {
-            continue;
-        }
-
-        let signal_path = track_dir.join(binding.signal_file());
-        if !signal_path.is_file() {
-            // Catalogue exists but signal file is absent after a successful
-            // recompute — something went wrong (e.g. execute_type_signals
-            // used fewer bindings than we expect). Treat this as BLOCKED to
-            // avoid silently skipping a layer that could contain Red signals.
-            eprintln!(
-                "[track-commit-message] BLOCKED: {} has a catalogue ({}) but no signal file \
-                 ({}) after recomputation. This may indicate a TOCTOU race on \
-                 architecture-rules.json.",
-                binding.layer_id(),
-                binding.catalogue_file(),
-                binding.signal_file(),
-            );
-            return Ok((ExitCode::from(1), Vec::new()));
-        }
-        // ADR §D7 read-path symlink guard: reject symlinks on the signal file
-        // before reading so that a symlink-swap after recomputation cannot
-        // cause the gate to evaluate attacker-chosen content.
-        match symlink_guard::reject_symlinks_below(&signal_path, &track_dir) {
-            Ok(true) => {}
-            Ok(false) => {
-                // File vanished between the is_file() check and this guard.
-                // The catalogue presence was already verified above, so this
-                // is a missing-after-recompute race — BLOCKED.
-                eprintln!(
-                    "[track-commit-message] BLOCKED: {} disappeared between existence check \
-                     and read.",
-                    signal_path.display()
-                );
-                return Ok((ExitCode::from(1), Vec::new()));
-            }
-            Err(e) => {
-                return Err(CliError::Message(format!(
-                    "pre-commit: symlink rejected on {}: {e}",
-                    signal_path.display()
-                )));
-            }
-        }
-        let content = std::fs::read_to_string(&signal_path).map_err(|e| {
-            CliError::Message(format!(
-                "pre-commit: cannot read {} after recompute: {e}",
-                signal_path.display()
-            ))
-        })?;
-        let doc = type_signals_codec::decode(&content).map_err(|e| {
-            CliError::Message(format!("pre-commit: decode error on {}: {e}", signal_path.display()))
-        })?;
-        for signal in doc.signals() {
-            // CN-01 / AC-03: use `signal_as_str()` to avoid importing
-            // `domain::ConfidenceSignal` in the CLI layer.
-            match signal.signal_as_str() {
-                "red" => {
-                    red_names.push(format!(
-                        "{}: {} ({})",
-                        binding.layer_id(),
-                        signal.type_name(),
-                        signal.kind_tag()
-                    ));
-                }
-                "yellow" => {
-                    yellow_names.push(format!(
-                        "{}: {} ({})",
-                        binding.layer_id(),
-                        signal.type_name(),
-                        signal.kind_tag()
-                    ));
-                }
-                _ => {}
-            }
-        }
-    }
-
-    if !red_names.is_empty() {
-        eprintln!("[track-commit-message] BLOCKED: type-signals Red detected");
-        for name in &red_names {
-            eprintln!("  Red: {name}");
-        }
-        eprintln!(
-            "[track-commit-message] Fix: run /track:design to update type declarations, \
-             then re-run /track:commit"
-        );
-        eprintln!("[track-commit-message] commit-message.txt is preserved for your next attempt.");
-        return Ok((ExitCode::from(1), Vec::new()));
-    }
-
-    if !yellow_names.is_empty() {
-        eprintln!("[track-commit-message] WARN: Yellow type-signals detected (commit proceeds):");
-        for name in &yellow_names {
-            eprintln!("  Yellow: {name}");
-        }
-    }
-
-    eprintln!("[track-commit-message] Pre-commit type signals: OK");
-    Ok((ExitCode::SUCCESS, bindings_snapshot))
-}
-
 fn dispatch_set_commit_hash(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let track_id = raw_args_to_single(raw_args)
         .map_err(|_| CliError::Message("usage: track-set-commit-hash <track-id>".to_owned()))?;
@@ -1128,73 +624,25 @@ fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
     Ok(())
 }
 
-/// Resolves the track ID for `track-commit-message` pre-commit guards.
-///
-/// Unlike [`current_branch_track_id_strict`], this helper is fail-closed:
-/// `track-commit-message` may only proceed from `track/<id>`. Non-track
-/// branches, detached HEAD, and branch read failures are rejected before CI
-/// or commit execution.
-fn current_branch_track_id_required_for_track_commit_message() -> Result<String, CliError> {
-    let branch = SystemGitRepo::discover()
-        .map_err(|e| {
-            CliError::Message(format!(
-                "[track-commit-message] BLOCKED: unable to discover git repository \
-                 root for branch guard: {e}"
-            ))
-        })?
-        .current_branch()
-        .map_err(|e| {
-            CliError::Message(format!(
-                "[track-commit-message] BLOCKED: cannot read current branch for guard: {e}"
-            ))
-        })?
-        .ok_or_else(|| {
-            CliError::Message(
-                "[track-commit-message] BLOCKED: cannot read current branch for guard: \
-                 git rev-parse --abbrev-ref HEAD returned non-zero"
-                    .to_owned(),
-            )
-        })?;
-
-    let track_id =
-        usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)).map_err(|e| {
-            CliError::Message(format!(
-                "[track-commit-message] BLOCKED: current branch is not an active track \
-                 branch for commit guard: {e}"
-            ))
-        })?;
-    ensure_branch_matches_track(&branch, &track_id).map_err(|e| {
-        CliError::Message(format!(
-            "[track-commit-message] BLOCKED: branch guard rejected '{track_id}': {e}"
-        ))
-    })?;
-    Ok(track_id)
-}
-
 /// Resolves the track ID from the current git branch (strict mode).
 ///
 /// Returns `Ok(Some(id))` only when the branch matches `track/<id>` and the
-/// id passes [`TrackId`] validation. Plan-phase branches (`plan/<id>`)
-/// intentionally resolve to `Ok(None)` because the make-task callers
-/// (review check-approved, post-commit hash persistence) only apply once a
-/// track has progressed past the planning phase. Non-track branches (e.g.
-/// `main`) and git failures also resolve to `Ok(None)`.
+/// id passes [`TrackId`] validation. Non-track branches (e.g. `main`) and
+/// git failures resolve to `Ok(None)`.
 ///
 /// Returns `Err` when the branch matches `track/<id>` but the `<id>` fails
 /// validation: in that case the callers must not silently skip the review
 /// guard (fail-closed).
 ///
-/// Internally delegates parsing to
+/// Reads the current branch via the [`GitRepository`] port (IN-06 / AC-15),
+/// then delegates parsing to
 /// [`usecase::track_resolution::resolve_track_id_from_branch`] so the
 /// branch-name semantics stay consistent with the rest of the workflow.
 fn current_branch_track_id_strict() -> Result<Option<String>, CliError> {
-    let output =
-        std::process::Command::new("git").args(["rev-parse", "--abbrev-ref", "HEAD"]).output().ok();
-    let Some(output) = output else { return Ok(None) };
-    if !output.status.success() {
-        return Ok(None);
-    }
-    let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+    let branch = match SystemGitRepo::discover().and_then(|r| r.current_branch()) {
+        Ok(Some(b)) => b,
+        Ok(None) | Err(_) => return Ok(None),
+    };
     match usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)) {
         Ok(id) => Ok(Some(id)),
         Err(usecase::track_resolution::TrackResolutionError::InvalidTrackId(slug, _)) => {

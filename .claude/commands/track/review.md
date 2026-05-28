@@ -7,12 +7,12 @@ Canonical command for review in the track workflow.
 Implements the review → fix → review cycle: do not commit until every required scope
 reaches `final` round `zero_findings` (or the `NotStarted` bypass applies — see Step 6).
 
-Arguments: none. The current branch (`track/<id>` or `plan/<id>`) determines the review target.
+Arguments: none. The current `track/<id>` branch determines the review target.
 
 ## Step 0: Gather context
 
-- Extract the track id from the current git branch (`track/<id>` or `plan/<id>`).
-  If the branch matches neither pattern, stop and instruct the user to switch first.
+- Extract the track id from the current git branch (`track/<id>`).
+  If the branch does not match this pattern, stop and instruct the user to switch first.
 - Read the current track's `spec.md`, `plan.md`, `metadata.json`, and every convention listed
   in `## Related Conventions (Required Reading)` — check both `spec.md` and `plan.md` (legacy
   tracks may carry this section in `plan.md` instead of `spec.md`).
@@ -25,7 +25,7 @@ The reviewer invocation resolves its own provider/model. `cargo make track-local
 `sotp review local`, which reads `capabilities.reviewer` from `.harness/config/agent-profiles.json`
 and resolves the reviewer provider/model internally (including the `fast_provider` / `fast_model`
 fallback for `--round-type fast`). The skill never reads or passes the reviewer provider/model —
-Step 4 / Step 5 pass only `--round-type` / `--group` / `--track-id` / `--briefing-file`.
+Step 4 / Step 5 pass only `--round-type` / `--group` / `--briefing-file` (the reviewer self-resolves the track-id from the current `track/<id>` branch).
 
 Read `capabilities.review-fix-lead` to resolve the fixer-loop dispatch (used by the Step 4 / Step 5 dispatch):
 - `capabilities.review-fix-lead.provider` — `claude` (default) launches the `review-fix-lead` subagent; `codex` launches the Codex fixer wrapper instead.
@@ -41,7 +41,7 @@ applies only to that fixer branch; the reviewer invocation (`sotp review local`)
 ## Step 2: Determine required scopes
 
 ```
-cargo make track-review-results -- --track-id {track-id}
+cargo make track-review-results
 ```
 
 State legend: `[+] approved` (skip) / `[-] required (...)` (run) / `[.] not required (empty)` (skip).
@@ -97,7 +97,7 @@ Agent prompt minimum content (`provider: claude` path):
 
 - Track id, scope name, briefing path
 - `round_type: fast`, `model: {review-fix-lead.model}` (resolved from `capabilities.review-fix-lead.model`)
-- Reviewer invocation: `cargo make track-local-review -- --round-type fast --group {scope} --track-id {track-id} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md`
+- Reviewer invocation: `cargo make track-local-review -- --round-type fast --group {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md`
 - Scope file list (files the agent is allowed to **modify** — this is the agent's modification
   boundary, distinct from the reviewer's scope which the CLI injects automatically): apply
   the CLI classifier logic to the changed file list — exclude `review_operational` and
@@ -140,7 +140,7 @@ scope do not affect another scope's hash.
 ## Step 6: Final validation
 
 1. `cargo make ci` (full CI, not just `ci-rust`) — fix and re-run on failure (does not reset the loop).
-2. `cargo make track-check-approved -- --track-id {track-id}` — exit 0 confirms readiness.
+2. `cargo make track-check-approved` — exit 0 confirms readiness.
    Non-zero exit means review is not complete (e.g., stale hash, auto-record failure); diagnose
    and resolve before declaring readiness.
 

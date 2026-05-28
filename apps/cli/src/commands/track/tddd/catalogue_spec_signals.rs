@@ -14,25 +14,24 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
 use usecase::TrackId;
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::{ensure_branch_matches_track, resolve_layers};
+use crate::commands::track::tddd::signals::resolve_layers;
 
 /// Per-layer refresh entry point.
 ///
-/// Same guards as `execute_type_signals`: track id validation, branch-based
-/// guard (reject writes for tracks not matching the current branch),
-/// `architecture-rules.json` fail-closed via `resolve_layers`.
+/// Track id validation and format check are performed here; the branch-based
+/// WRITE guard (AC-18 / D7) is enforced at the CLI dispatch layer via
+/// `resolve_track_id_from_root_for_write` in `mod.rs` before this function is
+/// called. Architecture-rules.json resolution is fail-closed via `resolve_layers`.
 ///
 /// # Errors
 ///
-/// Returns `CliError` when the track id is invalid, the current branch does
-/// not match `track/<track_id>`, the layer filter is unknown, any per-layer
-/// `<layer>-types.json` is missing or fails to decode, or the atomic write
-/// fails.
+/// Returns `CliError` when the track id is invalid, the layer filter is unknown,
+/// any per-layer `<layer>-types.json` is missing or fails to decode, or the atomic
+/// write fails.
 pub fn execute_catalogue_spec_signals(
     items_dir: PathBuf,
     track_id: String,
@@ -45,20 +44,9 @@ pub fn execute_catalogue_spec_signals(
     TrackId::try_new(&track_id)
         .map_err(|e| CliError::Message(format!("invalid track ID '{track_id}': {e}")))?;
 
-    // Branch-based guard (CN-07 / CN-04): only allow writes for the track whose
-    // branch matches the current git branch. Reads the branch from the workspace_root
-    // so `--workspace-root` overrides are honoured.
-    let branch = SystemGitRepo::discover_from(&workspace_root)
-        .map_err(|e| CliError::Message(format!("cannot discover git repo for branch check: {e}")))?
-        .current_branch()
-        .map_err(|e| CliError::Message(format!("cannot read current branch for guard: {e}")))?
-        .ok_or_else(|| {
-            CliError::Message(
-                "cannot read current branch for guard: git rev-parse --abbrev-ref HEAD returned non-zero"
-                    .to_owned(),
-            )
-        })?;
-    ensure_branch_matches_track(&branch, &track_id)?;
+    // Branch guard is enforced at the CLI dispatch layer (mod.rs) via
+    // `resolve_track_id_from_root_for_write` (D7 / AC-18 / CN-02 / CN-03).
+    // Inline duplication removed per T016.
 
     // Security: verify the items_dir root itself is not a symlink before using it as the
     // trusted anchor for `reject_symlinks_below`. That helper only checks components
@@ -327,31 +315,10 @@ mod tests {
         );
     }
 
-    /// Branch-based guard: catalogue-spec-signals must be rejected when the current branch
-    /// does not match the requested track_id. Uses the real workspace root so
-    /// SystemGitRepo::discover_from succeeds. The supplied track_id is guaranteed to
-    /// never match the real branch.
-    #[test]
-    fn refresh_rejects_mismatched_branch() {
-        let ws_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(|p| p.parent())
-            .expect("workspace root from CARGO_MANIFEST_DIR")
-            .to_path_buf();
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        fs::create_dir_all(&items_dir).unwrap();
-
-        // A track_id that never matches any real branch.
-        let track_id = "this-id-will-never-match-the-real-branch";
-        let result = execute_catalogue_spec_signals(items_dir, track_id.to_owned(), ws_root, None);
-        assert!(result.is_err(), "mismatched branch must be rejected");
-        let err_msg = result.unwrap_err().to_string();
-        assert!(
-            err_msg.contains("does not match") || err_msg.contains("not an active track branch"),
-            "error must be branch guard rejection, got: {err_msg}"
-        );
-    }
+    // Note: branch mismatch rejection for catalogue-spec-signals is now enforced at the CLI
+    // dispatch layer (mod.rs `resolve_track_id_from_root_for_write`) rather than inline in
+    // this function (T016 — inline guard removed, duplication eliminated). Branch mismatch
+    // coverage is provided by the `resolve_track_id_from_root_for_write` unit tests in mod.rs.
 
     /// Branch-based guard: catalogue-spec-signals on a `done` track must be allowed
     /// when the current branch is the matching track branch. The frozen/done status

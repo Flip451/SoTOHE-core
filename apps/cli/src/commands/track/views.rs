@@ -1,7 +1,11 @@
+use std::sync::Arc;
+
+use infrastructure::git_cli::SystemGitRepo;
+use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
+
 use crate::CliError;
 
 use super::*;
-use usecase::track_resolution::resolve_track_id_from_branch;
 
 pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
     match action {
@@ -14,14 +18,30 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
         }
         ViewAction::Sync { project_root, track_id } => {
             // If `--track-id` was not given, try to detect the active track from
-            // the current git branch (`track/<id>` or `plan/<id>`). This makes
+            // the current git branch (`track/<id>`). This makes
             // `cargo make track-sync-views` "do the right thing" inside an
             // active track checkout without requiring the caller to repeat the
             // track id. When the current branch is not a track/plan branch
-            // (e.g., on `main`), fall back to the registry-only mode.
+            // (e.g., on `main`), or when git is unavailable, fall back to
+            // registry-only mode (CN-01 documented exception: no-track mode
+            // is preserved for track views sync because registry.md is
+            // track-independent).
+            //
+            // When an explicit --track-id is given, the WRITE guard validates
+            // that it matches the current git branch (AC-18, D7): a mismatch
+            // is fail-closed. This prevents accidentally syncing views for a
+            // different track than the one the developer is working on.
             let resolved_track_id = match track_id {
-                Some(id) => Some(id),
-                None => detect_track_id_from_branch(&project_root),
+                Some(id) => {
+                    // WRITE guard: verify explicit id matches the current branch (D7 / AC-18).
+                    // resolve_track_id_from_root_for_write validates the id format and performs
+                    // the branch-id comparison fail-closed. On success the id is returned as-is.
+                    let validated_id =
+                        super::resolve_track_id_from_root_for_write(Some(id), &project_root)
+                            .map_err(CliError::Message)?;
+                    Some(validated_id)
+                }
+                None => detect_active_track_from_branch(&project_root),
             };
             let changed = render::sync_rendered_views(&project_root, resolved_track_id.as_deref())
                 .map_err(|err| CliError::Message(format!("sync-views failed: {err}")))?;
@@ -40,26 +60,20 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
     }
 }
 
-/// Detect the active track id from the current git branch.
+/// Detect the active track id from the current git branch via the shared
+/// `ActiveTrackResolveInteractor` (IN-09: consolidates individual auto-detect
+/// implementations onto the shared interactor path).
 ///
 /// Only `track/<id>` branches are resolved; any other branch (e.g. `main`,
 /// detached HEAD) or git failure resolves to `None` so the caller can fall
 /// back to registry-only mode without surfacing an error.
 ///
-/// Uses `project_root` as the working directory for the underlying git
-/// command so that auto-detection is consistent with `--project-root`
-/// invocations and does not depend on the process CWD.
-fn detect_track_id_from_branch(project_root: &std::path::Path) -> Option<String> {
-    let output = std::process::Command::new("git")
-        .args(["rev-parse", "--abbrev-ref", "HEAD"])
-        .current_dir(project_root)
-        .output()
-        .ok()?;
-    if !output.status.success() {
-        return None;
-    }
-    let branch = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    resolve_track_id_from_branch(Some(&branch)).ok()
+/// Uses `project_root` for git discovery so that auto-detection is consistent
+/// with `--project-root` invocations and does not depend on the process CWD.
+fn detect_active_track_from_branch(project_root: &std::path::Path) -> Option<String> {
+    let repo = SystemGitRepo::discover_from(project_root).ok()?;
+    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
+    interactor.resolve_active_track().ok()
 }
 
 #[cfg(test)]
@@ -71,7 +85,7 @@ mod tests {
     /// Initialise a temporary git repository with a single commit on `main`
     /// and then check out `branch_name` (which may use a slash-separated
     /// namespace such as `track/foo` or `plan/bar`). Returns the path to
-    /// the repo root so callers can hand it to `detect_track_id_from_branch`.
+    /// the repo root so callers can hand it to `detect_active_track_from_branch`.
     fn init_repo_on_branch(tmp: &tempfile::TempDir, branch_name: &str) -> std::path::PathBuf {
         let root = tmp.path().to_path_buf();
         // Initialise a repo with `main` as the default branch so the branch
@@ -128,32 +142,90 @@ mod tests {
     }
 
     #[test]
-    fn detect_track_id_from_branch_resolves_track_branch() {
+    fn detect_active_track_from_branch_resolves_track_branch() {
         let tmp = tempfile::tempdir().unwrap();
         let root = init_repo_on_branch(&tmp, "track/my-feature-2026-04-10");
-        assert_eq!(detect_track_id_from_branch(&root), Some("my-feature-2026-04-10".to_owned()));
+        assert_eq!(
+            detect_active_track_from_branch(&root),
+            Some("my-feature-2026-04-10".to_owned())
+        );
     }
 
     #[test]
-    fn detect_track_id_from_branch_returns_none_on_main() {
+    fn detect_active_track_from_branch_returns_none_on_main() {
         let tmp = tempfile::tempdir().unwrap();
         let root = init_repo_on_branch(&tmp, "main");
-        assert_eq!(detect_track_id_from_branch(&root), None);
+        assert_eq!(detect_active_track_from_branch(&root), None);
     }
 
     #[test]
-    fn detect_track_id_from_branch_returns_none_on_feature_branch() {
+    fn detect_active_track_from_branch_returns_none_on_feature_branch() {
         let tmp = tempfile::tempdir().unwrap();
         let root = init_repo_on_branch(&tmp, "feature/unrelated");
-        assert_eq!(detect_track_id_from_branch(&root), None);
+        assert_eq!(detect_active_track_from_branch(&root), None);
     }
 
     #[test]
-    fn detect_track_id_from_branch_returns_none_outside_git_repo() {
+    fn detect_active_track_from_branch_returns_none_outside_git_repo() {
         // `tempdir()` produces an empty directory — no `.git` anywhere up
-        // the tree inside the tmpfs-backed path, so git rev-parse fails
+        // the tree inside the tmpfs-backed path, so git discover fails
         // and auto-detection must silently return None.
         let tmp = tempfile::tempdir().unwrap();
-        assert_eq!(detect_track_id_from_branch(tmp.path()), None);
+        assert_eq!(detect_active_track_from_branch(tmp.path()), None);
+    }
+
+    // ── WRITE guard integration tests (AC-18 / D7 / T016) ───────────────────
+
+    /// AC-18 / D7: explicit --track-id that mismatches the current branch must be
+    /// rejected by the WRITE guard before sync_rendered_views is attempted.
+    ///
+    /// Uses a synthetic git repo on `track/real-track` so branch discovery succeeds.
+    /// Supplying `other-track` as the explicit id triggers the mismatch error.
+    #[test]
+    fn sync_write_guard_rejects_explicit_id_mismatching_branch() {
+        let tmp = tempfile::tempdir().unwrap();
+        // Set up a real git repo on track/real-track so branch discovery finds it.
+        let root = init_repo_on_branch(&tmp, "track/real-track");
+
+        let result = execute_views(ViewAction::Sync {
+            project_root: root.clone(),
+            track_id: Some("other-track".to_owned()),
+        });
+
+        assert!(result.is_err(), "WRITE guard must reject mismatched explicit track-id");
+        let err_msg = format!("{:?}", result.unwrap_err());
+        assert!(
+            err_msg.contains("WRITE operation rejected") || err_msg.contains("other-track"),
+            "error must explain the mismatch, got: {err_msg}"
+        );
+    }
+
+    /// AC-18 / D7: explicit --track-id that matches the current branch passes the
+    /// WRITE guard (the sync itself may fail due to missing registry files, but the
+    /// guard itself must not reject the call).
+    #[test]
+    fn sync_write_guard_allows_explicit_id_matching_branch() {
+        let tmp = tempfile::tempdir().unwrap();
+        // Set up a real git repo on track/my-track so branch discovery finds it.
+        let root = init_repo_on_branch(&tmp, "track/my-track");
+
+        // Note: sync_rendered_views will fail because `track/items` etc. are absent
+        // in the synthetic repo. The WRITE guard itself must pass (not return
+        // "WRITE operation rejected"). We only check the guard layer — any downstream
+        // filesystem error is acceptable.
+        let result = execute_views(ViewAction::Sync {
+            project_root: root.clone(),
+            track_id: Some("my-track".to_owned()),
+        });
+
+        // Acceptable outcomes: Ok (unlikely — registry missing) or Err from render,
+        // but must NOT be a WRITE guard rejection.
+        if let Err(ref e) = result {
+            let msg = format!("{e:?}");
+            assert!(
+                !msg.contains("WRITE operation rejected"),
+                "WRITE guard must pass for matching track-id, got: {msg}"
+            );
+        }
     }
 }

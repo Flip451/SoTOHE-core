@@ -489,36 +489,9 @@ script = ['cargo run --quiet -p cli -- verify latest-track']
 
 [tasks.verify-plan-artifact-refs-local]
 private = true
-description = "[internal] Verify plan artifact refs + task-coverage integrity (branch-bound track resolution)"
-script_runner = "@shell"
-script = ['''
-BRANCH=$(git branch --show-current 2>/dev/null || true)
-case "$BRANCH" in
-  track/*)
-    TRACK_ID="${BRANCH#track/}"
-    TRACK_DIR="track/items/$TRACK_ID"
-    if [ -d "$TRACK_DIR" ]; then
-      cargo run --quiet -p cli -- verify plan-artifact-refs --track-dir "$TRACK_DIR"
-    else
-      echo "[FAIL] Track dir not found: $TRACK_DIR (branch maps to missing track)"
-      exit 1
-    fi
-    ;;
-  plan/*)
-    TRACK_ID="${BRANCH#plan/}"
-    TRACK_DIR="track/items/$TRACK_ID"
-    if [ -d "$TRACK_DIR" ]; then
-      cargo run --quiet -p cli -- verify plan-artifact-refs --track-dir "$TRACK_DIR"
-    else
-      echo "[FAIL] Track dir not found: $TRACK_DIR (branch maps to missing track)"
-      exit 1
-    fi
-    ;;
-  *)
-    echo "[SKIP] Not on a track or plan branch (branch: ${BRANCH:-detached})"
-    ;;
-esac
-''']
+description = "[internal] Verify plan artifact refs + task-coverage integrity (active-track auto-resolved from branch)"
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "verify", "plan-artifact-refs"]
 
 [tasks.verify-adr-signals-local]
 private = true
@@ -528,74 +501,21 @@ args = ["run", "--quiet", "-p", "cli", "--", "verify", "adr-signals"]
 
 [tasks.verify-spec-states-current-local]
 private = true
-description = "[internal] Verify current track's spec.json signals in CI interim mode. Yellow surfaces as Finding::warning; only red blocks. Strict enforcement happens at sotp pr wait-and-merge."
-script_runner = "@shell"
-script = ['''
-BRANCH=$(git branch --show-current 2>/dev/null || true)
-case "$BRANCH" in
-  track/*)
-    TRACK_ID="${BRANCH#track/}"
-    SPEC_PATH="track/items/$TRACK_ID/spec.md"
-    if [ -f "$SPEC_PATH" ]; then
-      cargo run --quiet -p cli -- verify spec-states "$SPEC_PATH"
-    else
-      echo "[SKIP] $SPEC_PATH not found"
-    fi
-    ;;
-  plan/*|main)
-    echo "[SKIP] $BRANCH is not a track branch"
-    ;;
-  *)
-    echo "[SKIP] not on a track branch (branch: ${BRANCH:-detached})"
-    ;;
-esac
-''']
+description = "[internal] Verify current track's spec.json signals in CI interim mode. Yellow surfaces as Finding::warning; only red blocks. Active track auto-resolved from branch (CN-01, IN-08). Strict enforcement happens at sotp pr wait-and-merge."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "verify", "spec-states"]
 
 [tasks.verify-catalogue-spec-refs-local]
 private = true
-description = "[internal] Verify catalogue-spec ref integrity (SoT Chain ② binary gate: dangling / drift / stale) per ADR 2026-04-23-0344 §D1.5"
-script_runner = "@shell"
-script = ['''
-BRANCH=$(git branch --show-current 2>/dev/null || true)
-case "$BRANCH" in
-  track/*)
-    TRACK_ID="${BRANCH#track/}"
-    TRACK_DIR="track/items/$TRACK_ID"
-    if [ -d "$TRACK_DIR" ]; then
-      cargo run --quiet -p cli -- verify catalogue-spec-refs --track "$TRACK_ID"
-    else
-      echo "[FAIL] Track dir not found: $TRACK_DIR (branch maps to missing track)"
-      exit 1
-    fi
-    ;;
-  *)
-    echo "[SKIP] not on a track branch (branch: ${BRANCH:-detached})"
-    ;;
-esac
-''']
+description = "[internal] Verify catalogue-spec ref integrity (SoT Chain ② binary gate: dangling / drift / stale) per ADR 2026-04-23-0344 §D1.5. Active track auto-resolved from branch (IN-03, IN-08)."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-refs"]
 
 [tasks.check-catalogue-spec-signals-local]
 private = true
-description = "[internal] Check catalogue-spec signal gate (strict=false interim mode): Red blocks, Yellow warns"
-script_runner = "@shell"
-script = ['''
-BRANCH=$(git branch --show-current 2>/dev/null || true)
-case "$BRANCH" in
-  track/*)
-    TRACK_ID="${BRANCH#track/}"
-    TRACK_DIR="track/items/$TRACK_ID"
-    if [ -d "$TRACK_DIR" ]; then
-      cargo run --quiet -p cli -- verify catalogue-spec-signals
-    else
-      echo "[FAIL] Track dir not found: $TRACK_DIR (branch maps to missing track)"
-      exit 1
-    fi
-    ;;
-  *)
-    echo "[SKIP] not on a track branch (branch: ${BRANCH:-detached})"
-    ;;
-esac
-''']
+description = "[internal] Check catalogue-spec signal gate (strict=false interim mode): Red blocks, Yellow warns. Active track auto-resolved from branch (IN-08)."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "verify", "catalogue-spec-signals"]
 
 [tasks.ci-rust-local]
 private = true
@@ -834,12 +754,12 @@ command = "bin/sotp"
 args = ["make", "track-resolve", "${@}"]
 
 [tasks.track-pr-push]
-description = "[wrapper] Push current track/plan branch to origin (plan/ branches require track-id arg)"
+description = "[wrapper] Push current track branch to origin"
 command = "bin/sotp"
 args = ["make", "track-pr-push", "${@}"]
 
 [tasks.track-pr-ensure]
-description = "[wrapper] Create or reuse a PR for the current track/plan branch (plan/ branches require track-id arg)"
+description = "[wrapper] Create or reuse a PR for the current track branch"
 command = "bin/sotp"
 args = ["make", "track-pr-ensure", "${@}"]
 
@@ -868,10 +788,17 @@ description = "[wrapper] Run the local Codex planner through the repo-owned Rust
 script_runner = "@shell"
 script = ['bin/sotp make track-local-plan "$@"']
 
-[tasks.track-local-review]
-description = "[wrapper] Run the local Codex reviewer through the repo-owned Rust wrapper. Runs `bin/sotp make track-sync-views` first so review scope hashes are computed against the up-to-date rendered views (plan.md / contract-map.md / <layer>-types.md). Without this, a reviewer approving at hash H followed by a later `track-sync-views` flap would desync the approval from the on-disk state and force a re-review at commit time."
+[tasks.track-active-gate]
+private = true
+description = "[gate] Regen sequence: type-signals → catalogue-spec-signals → views sync. Both track-local-review and track-commit-message depend on this shared task (D4 symmetry, CN-11 DRY). Each sotp command self-resolves the active track from the current branch (D1). Fail-closed: non-zero exit aborts the chain (CN-09)."
 script_runner = "@shell"
-script = ['bin/sotp make track-sync-views && bin/sotp make track-local-review "$@"']
+script = ['bin/sotp track type-signals && bin/sotp track catalogue-spec-signals && bin/sotp track views sync']
+
+[tasks.track-local-review]
+description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the local Codex reviewer. The shared regen gate (track-active-gate) ensures the reviewer observes the same signal state that the commit gate will re-check, eliminating hash-mismatch check-approved blocks (AC-12)."
+dependencies = ["track-active-gate"]
+script_runner = "@shell"
+script = ['bin/sotp make track-local-review "$@"']
 
 [tasks.track-local-review-fix-codex]
 description = "[wrapper] Launch a Codex review-fix-lead fixer via `codex exec --sandbox workspace-write`. Performs pre-launch smoke-tests (sandbox assertion + version check) and credential isolation (strips GITHUB_TOKEN, SSH credentials). Parses Codex output for `completed`/`blocked_cross_scope`/`failed` and prints the result. Usage: cargo make track-local-review-fix-codex -- --scope <scope> --briefing-file <path> --track-id <id> --round-type <fast|final> --reviewer-model <model> [--model <model>] --scope-files <file1,file2,...>"
@@ -1195,7 +1122,8 @@ command = "bin/sotp"
 args = ["make", "commit", "${@}"]
 
 [tasks.track-commit-message]
-description = "[wrapper] Run CI (output to tmp/ci-output.log) then commit using tmp/track-commit/commit-message.txt"
+description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the strict commit gate: stage working tree, full cargo make ci, check-approved (review not approved → BLOCK), commit from tmp/track-commit/commit-message.txt. The regen sequence is shared with track-local-review via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved) are NOT weakened by the bare-chain refactor (CN-12)."
+dependencies = ["track-active-gate"]
 command = "bin/sotp"
 args = ["make", "track-commit-message"]
 

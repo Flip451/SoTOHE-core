@@ -1,6 +1,7 @@
 ---
 name: spec-designer
 model: opus
+effort: max
 tools:
   - Read
   - Grep

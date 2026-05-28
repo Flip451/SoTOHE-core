@@ -1,0 +1,702 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "track を対象とする `sotp` サブコマンドの track-id 引数を必須から省略可能へ変更し、省略時は現在の git ブランチ（`track/<id>`）からアクティブトラックの id を自動的に解決して既定値とする。これにより、pre-commit フックや pre-review コマンドなど「現在ブランチ = 当該トラックブランチ」が自明な文脈で、呼び出し側が track-id を用意する必要をなくす",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "省略時解決を単一の共有経路（usecase 操作）に集約し、git ブランチ読み取りをすべて infrastructure の `GitRepository` ポート経由に統一する。これにより、各コマンドの個別実装・直接シェルアウト・Makefile シェルボイラープレートを除去し、解決規則を Rust 側（`usecase::track_resolution`）に一本化する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "既定解決の適用範囲を「現在のトラックを操作するコマンド」に限定し、ブランチ移動系コマンド（`branch create` / `branch switch`）は明示 track-id 必須のままとする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "位置引数 `track_id: String`（必須）として定義されている track 系サブコマンド（`transition` / `signals` / `type-signals` / `type-graph` / `baseline-graph` / `contract-map` / `catalogue-spec-signals` / `catalogue-impl-signals` / `spec-element-hash` / `baseline-capture` / `add-task` / `set-override` / `clear-override` / `next-task` / `task-counts` など）の引数を、省略可能な `--track-id` フラグ（`Option<String>`）へ変更する。位置引数ではなくフラグに統一する理由: (a) IN-02 が対象とするコマンド群（`lint` / `review *` など）はすでに `--track-id` フラグ形式であり、両グループを同じフラグ名に揃えることで CLI 全体の一貫性を保つ; (b) `transition <track_id> <task_id> <status>` のような複数位置引数を取るコマンドでは、省略可能な引数を最初の位置に置くと clap が後続の位置引数と曖昧になるため、フラグが適切; (c) 明示的な track-id 指定は「別トラックへのクロス操作」という稀なケースであり、そのような上書き用途にはフラグが自然で読みやすい。explicit `--track-id` が渡された場合の意味論は操作の種類（WRITE / READ）によって分岐する（D7）: WRITE 操作（`signals` / `type-signals` / `catalogue-spec-signals` / `baseline-graph` / `contract-map` / `baseline-capture` / `transition` / `add-task` / `set-override` / `clear-override` / `views sync` / `review local`）では explicit id を現在ブランチから導出した id と照合し、一致しなければ fail-closed で停止する。READ 操作（`catalogue-impl-signals` / `spec-element-hash` / `next-task` / `task-counts` / `lint` / `resolve` / `review results` / `review check-approved`）では explicit id は他トラックを対象にするための override として機能し、任意のブランチから指定トラックのアーティファクトを参照できる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "フラグ `--track-id: String`（必須）として定義されている track 系サブコマンド（`lint` / `review codex-local` / `review claude-local` / `review check-approved` / `review results` など）の引数を `Option<String>` へ変更する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "フラグ `--track: String`（必須）として定義されている `verify catalogue-spec-refs` の引数を、`--track-id: Option<String>` へ変更する。フラグ名を `--track` から `--track-id` へ改名する（D5 の全コマンド統一決定による）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "「現在ブランチからアクティブトラックを解決する」操作を usecase 層の操作として公開する。usecase はブランチ読み取りをポート（branch reader port）として受け取り、cli は composition root として `SystemGitRepo` アダプタを wiring して渡す。これにより解決ロジックが git 実体なしで単体テスト可能になる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "既存の `usecase::track_resolution::resolve_track_id_from_branch` を省略時解決の中核ロジックとして再利用する。解決処理を新規実装せず重複させない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "git ブランチ読み取りを infrastructure の `GitRepository` ポート経由に統一する。`track views sync`・`make` ヘルパー・write-guard 注入リーダーに残る `git rev-parse` の直接シェルアウトを取り除き、ポート経由の読み取りに置き換える",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "active-track-write-guard（`2026-05-26-0518-active-track-write-guard.md`）が usecase interactor へのクロージャ注入で行うブランチ読み取りを、本 ADR の単一解決経路（ポート経由）に統合する。バリデーション（明示 id の照合）と既定値解決（省略時の導出）が同じ解決を共有し、git 読み取りは `GitRepository` ポート 1 本に集約する。さらに D7 の分類に基づき、既存の write-guard が `baseline_graph.rs` / `contract_map.rs` のみで実装していた「explicit id がブランチと一致しなければ拒否」パターンを、全 WRITE 操作（`signals` / `type-signals` / `catalogue-spec-signals` / `baseline-graph` / `contract-map` / `baseline-capture` / `transition` / `add-task` / `set-override` / `clear-override` / `views sync` / `review local`）へ一般化する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D7"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-0518-active-track-write-guard.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`Makefile.toml` の `*-local` タスク（`verify-plan-artifact-refs-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-spec-states-current-local` ほか）に散在する shell でのブランチ解析ボイラープレート（`BRANCH=$(git ...); TRACK_ID=\"${BRANCH#track/}\"; TRACK_DIR=\"track/items/$TRACK_ID\"` / `SPEC_PATH=\"track/items/$TRACK_ID/spec.md\"` 相当）を除去する。track-id や pre-resolved spec path を渡さずに `cargo run -p cli -- verify catalogue-spec-refs` / `cargo run -p cli -- verify spec-states` のように呼べるようにする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "既に省略時自動解決に対応している `track resolve`（位置引数 `Option<String>`）・`track views sync`（`--track-id: Option<String>`）・`verify plan-artifact-refs`（`--track-dir: Option<PathBuf>`）の個別実装を、本 ADR の単一共有経路に統合し、重複を除去する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "省略時解決のテストを追加する: `track/<id>` ブランチ上で省略した場合に正しい track-id が解決されるケース、`main` ブランチなどトラックブランチ以外で省略した場合に明示エラーで停止するケース、READ 操作において明示 track-id を渡した場合にそれが override として機能するケース、WRITE 操作において明示 track-id が現在ブランチと不一致の場合に fail-closed で停止するケース（D7 / CN-02）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "`cargo make track-local-review` ラッパーを bare chain として実装する: `sotp track type-signals → sotp track catalogue-spec-signals → sotp track views sync → sotp review local` の順に各コマンドを呼び出し、ラッパー自身は track-id を保持しない。`BRANCH=$(git ...); TRACK_ID=\"${BRANCH#track/}\"` のような shell でのブランチ解析をラッパー・Makefile 側に一切置かない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-12",
+        "text": "`cargo make track-commit-message` の pre-commit ゲートを `cargo make track-local-review` と同じ bare chain 形式にする: `sotp track type-signals → sotp track catalogue-spec-signals → sotp track views sync` を chain した後にコミット処理を続け、review と commit の両ゲートで同じ手順（同じコマンド列）が使われるようにする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-13",
+        "text": "運用ドキュメント（`.claude/commands/track/*.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、`Makefile.toml` のタスク説明）から、コマンドが現在ブランチから自己解決するようになったことで不要になった明示的な `--track-id` 指定の記述を除去する。別トラックを明示的に対象にする意味を持つ箇所（例: 別トラックへの切り替えを説明する文脈）はオプションとして残す",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-14",
+        "text": "plan-only コミット機構の残留デッドコードをコード・テスト・古いドキュメントごと根本から削除する。対象: `libs/usecase/src/git_workflow.rs`（`validate_planning_only_commit_paths` 関数、`verify_explicit_track_branch` 内の planning-only `if` ブロック、`ExplicitTrackBranch::schema_version` フィールド、`TRANSIENT_AUTOMATION_FILES` 内の `tmp/track-commit/track-dir.txt` エントリ）、`apps/cli/src/commands/git.rs`（`track-dir.txt` 自動検出ブロック、`require_explicit_track_selector_on_non_track_branch`、`load_optional_track_dir`、`validate_planning_only_commit_paths` の呼び出しと import — トラック外ブランチのコミットを拒否する fail-closed 挙動は維持する）、`libs/infrastructure/src/git_cli/mod.rs`（`illegal_v3_branchless_track`、`invalid_v3_non_null_branch`、`REQUIRED_V3_METADATA_FIELDS`、`read_metadata` 内の v3 ガードブロック、`BranchMetadata::schema_version` フィールドおよび `default_schema_version` 関数、`TrackBranchRecord::schema_version` フィールド）、`.claude/commands/track/commit.md` および `track/workflow.md` 内の planning-only レーンに関する古いドキュメント記述。これは ADR `2026-05-26-1123-remove-plan-only-activate-lane.md` D1 のレーン削除をコード側で完結させるものであり、v5 スキーマ（ブランチ必須）では到達不能になっているデッドコードの除去である",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-15",
+        "text": "`apps/cli/src/commands/make.rs` の `cargo make` task wrapper 群（`dispatch_track_add_task` / `dispatch_track_transition` / `dispatch_track_next_task` / `dispatch_track_task_counts` / `dispatch_track_set_override`）が、位置引数の先頭要素を track_id として強制消費する実装を廃止する。各 wrapper が最低限行う注入は `--items-dir track/items` のみとし、残りの引数はすべて underlying `sotp` コマンドへそのまま渡す。ただし `dispatch_track_set_override` は例外として、最初の非フラグ位置引数をステータス語（`blocked` / `cancelled` / `clear`）として読み取り `track set-override` / `track clear-override` へのルーティングを行う（これは track-id の消費ではなく、Makefile 単一エントリポイントから 2 つの underlying コマンドへ振り分けるための内部ルーティングである）。これにより D1 の省略時自己解決（`track/<id>` ブランチ → active track）と D5 の `--track-id` フラグが wrapper 経由でも働くようになる（IN-01 は CLI コマンド定義層での `--track-id` フラグ統一を対象とし、本項はその上の make wrapper 起動層を対象とする）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "ブランチ移動系コマンド（`track branch create` / `track branch switch`）への既定解決の適用: これらは「現在いないトラック」を対象に動くコマンドであり、現在ブランチからの導出は意味をなさないか誤りになるため、track-id は明示必須のままとする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "CI 環境での detached HEAD やブランチ外バッチ処理への一般的な対応: 非トラックブランチで fail-closed 以外の挙動（サイレントスキップや警告止まり）を設計する一般的な仕組みは本 track のスコープ外とする（ADR Reassess When に記載）。ただし、ci-local が呼ぶ 4 つのトラック検証チェック（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）が非トラックブランチ上でスキップする挙動（CN-01 の例外として文書化）は本 track のスコープ内で対処する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "複数トラックを同時に操作するユースケースへの対応: 「現在ブランチ = 単一トラック」という前提が崩れる複数トラック並行操作への対応は本 track のスコープ外とする（ADR Reassess When に記載）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "rejected alternative B（shell 側にブランチ解決を置き続ける）の実装: Makefile タスクに shell ボイラープレートを追加・維持するアプローチは採用しない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "rejected alternative C（環境変数 `SOTP_TRACK_ID` 等で track-id を引き回す）の実装: 環境変数ベースの設定管理は採用しない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "rejected alternative D（各コマンドへの個別 auto-detect 実装追加）の踏襲: 既存の `resolve.rs` / `views.rs` 方式のように個別関数を都度追加するアプローチは採用しない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "cli ヘルパーによる糊付け案（D2 内 rejected alternative）の採用: 解決を usecase 操作にせず cli 層の共有ヘルパー関数に集約するアプローチは原則採用しない。型設計フェーズで write-guard 側の既存抽象との整合確認後に最終判断する余地は ADR が残しているが、usecase 操作として公開する案が優先",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-08",
+        "text": "rejected alternative B（shell 側でブランチ解決しコマンドに渡す）をラッパーに採用すること: `cargo make track-local-review` や `cargo make track-commit-message` のラッパー内で `git rev-parse` + プレフィックス除去を行い、解決済み track-id をコマンドへ渡す形は採用しない（D4 の bare chain 方針と矛盾し、解決規則の二重化を再導入する）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D4"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "track-id を省略しかつ現在ブランチがトラックブランチ（`track/<id>`）でない場合（`main` / detached HEAD など）は fail-closed とする: サイレントスキップや警告に留めず明示エラーで停止し、明示 track-id の指定を促す。ただし、トラック文脈を必須としないコマンド固有の no-track モードは文書化された例外として許容する。文書化された例外の一覧: (1) `track views sync` — 明示 `--track-id` がなく active track も解決できない場合に registry-only モードを維持できる; (2) ci-local の CI 検証チェック 4 種（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）— 検証するトラックが存在しない非トラックブランチ（`main` 等）ではスキップ（`[SKIP]` exit 0）する。操作コマンド（`transition` / `signals` 等）はこの例外の対象外であり、引き続き fail-closed のままとする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "明示 track-id の意味論は操作の種類（WRITE / READ）によって異なる。READ 操作では明示 track-id が他トラックを対象にするための override として機能し、任意のブランチから指定トラックを参照できる。WRITE 操作では明示 track-id を現在ブランチから導出した id と照合し、一致しない場合は fail-closed で停止する。D1 の「明示指定は上書きとして残す」という方針は D7 により WRITE 操作については撤回され、READ 操作のみに適用される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "省略時に導出した id は定義上現在ブランチと一致するため、`2026-05-26-0518-active-track-write-guard.md` のブランチ紐付きバリデーションを自動的に満たす。全 WRITE 操作（`signals` / `type-signals` / `catalogue-spec-signals` / `baseline-graph` / `contract-map` / `baseline-capture` / `transition` / `add-task` / `set-override` / `clear-override` / `views sync` / `review local`）において、明示 id がブランチと一致しない場合は fail-closed で停止する。escape hatch（`--skip-branch-check` 相当のフラグ）は設けない。誤操作で別トラックに誤った書き込みが確定するリスクを防ぐため、WRITE 操作に対する branch 照合の回避経路は提供しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-0518-active-track-write-guard.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "「現在ブランチからアクティブトラックを解決する」操作は usecase 層の操作として公開する。配置は hexagonal architecture と `2026-04-30-0848-cli-via-usecase-only.md` の cli-via-usecase 方針に従い、cli は composition root として wiring を行う薄い層に留まる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "git の現在ブランチ読み取りはすべて infrastructure の `GitRepository` ポート（`current_branch()`）経由に統一する。usecase 操作内で git を直接呼び出さない（usecase 層の純粋性を維持する）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "解決規則は Rust 側（`usecase::track_resolution`）に一本化する。shell 文字列処理（`${BRANCH#track/}` 相当）を Rust 引数処理へ置き換えるという `sotp` 導入方針（`knowledge/conventions/shell-parsing.md`）に従い、shell 側に解決規則を重複させない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/shell-parsing.md",
+          "anchor": "Single Parser Rule"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "既定解決はブランチ移動系コマンド（`branch create` / `branch switch`）に適用しない。これらは track-id を明示必須のままとする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "解決対象のブランチプレフィックスは `track/<id>` のみ。`plan/<id>` ブランチと lenient 解決関数は `2026-05-26-1123-remove-plan-only-activate-lane.md` の決定によりすでに削除されているため、strict / lenient の方針分岐を新たに設計しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1123-remove-plan-only-activate-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-09",
+      "text": "bare chain の各ステップは fail-closed で連結する: chain の途中ステップが失敗した場合は後続ステップを実行しない。部分的に更新された状態でレビューやコミットを進め、後でハッシュずれが発覚する事態を防ぐ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-10",
+      "text": "ラッパー（`cargo make track-local-review` / `cargo make track-commit-message`）は track-id に関する知識を持たない。各 `sotp` サブコマンドが D1 の省略時解決を自分で行うため、ラッパーは track-id を shell で解析・保持・渡しをしない。各コマンドにオーケストレーション責務を追加することも行わない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-11",
+      "text": "regen ゲート列（`sotp track type-signals` → `sotp track catalogue-spec-signals` → `sotp track views sync`）は単一の共有 `cargo make` タスクに一元定義し、`track-local-review` と `track-commit-message` の両ラッパーはその共有タスクを依存として呼び出す。同じ列を両ラッパーに重複定義しない。片方だけ変更されて pre-review と pre-commit が非対称になる回帰を構造的に防ぐ",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-12",
+      "text": "`cargo make track-commit-message` の bare chain 化は、regen 系コマンドの呼び出し形（shell 解決から裸の自己解決コマンドへの変更）のみを変える。commit ゲートが持つ厳格な検査 — フル `cargo make ci`、および `check-approved`（レビュー未承認なら fail-closed で BLOCK）— は一切削除・弱体化しない。D4 は pre-review に regen ゲートを追加するものであり、commit ゲートを緩めるものではない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`track/<id>` ブランチ上で track-id を省略した場合、`sotp track signals`（および IN-01〜IN-03 の対象コマンド群）が正常に動作し、現在ブランチの `<id>` が既定値として使われる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`main` ブランチまたは detached HEAD の状態で track-targeted コマンドの track-id を省略した場合、明示的なエラー（`TrackResolutionError::NotTrackBranch` または `DetachedHead` 相当）でコマンドが停止し、明示 track-id の指定を促すメッセージが表示される。CN-01 で文書化した no-track モード例外（例: `track views sync` の registry-only モード）はこの fail-closed 対象から除外する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "明示 track-id の意味論は操作の種類（WRITE / READ）によって異なる（D7 / CN-02）。READ 操作では明示 track-id が現在ブランチに関わらず override として機能する。例: `main` ブランチ上で `sotp track next-task --track-id my-track` を実行した場合に `my-track` のアーティファクトを参照して正常終了する。WRITE 操作では明示 track-id が現在ブランチから導出した id と照合され、一致しない場合は fail-closed で停止する（AC-18）。`--track-id` フラグ形式は IN-01〜IN-03 のすべての対象コマンド群で共通である（IN-03 の `verify catalogue-spec-refs` も含め `--track-id` 名に統一する）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "`cargo run -p cli -- verify catalogue-spec-refs` を track-id 引数なしで `track/<id>` ブランチ上から呼べる。従来 Makefile タスクで必要だった `TRACK_ID=${BRANCH#track/}` 相当の shell ボイラープレートなしで動作する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "省略時解決の git ブランチ読み取りは `GitRepository::current_branch()` 経由で行われる。`git rev-parse --abbrev-ref HEAD` の直接シェルアウトが usecase 操作内に残っていない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "active-track-write-guard のブランチ読み取り（usecase interactor へのクロージャ注入）が `GitRepository` ポート経由に置き換えられており、write-guard の動作（現在ブランチに紐づかないトラックへの書き込みを拒否する）にリグレッションがない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-0518-active-track-write-guard.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`track branch create` と `track branch switch` は track-id を必須引数のままとする。引数なしで呼び出した場合、省略時解決ではなく clap のエラー（引数不足）として報告される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "省略時解決のユニットテストが存在する: (a) `track/<id>` ブランチで省略した場合に正しい id を返す、(b) `main` ブランチで省略した場合に `NotTrackBranch` エラーを返す、(c) detached HEAD の場合に `DetachedHead` エラーを返す",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`cargo make ci`（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "Makefile の `*-local` タスクから `BRANCH=$(git ...); TRACK_ID=\"${BRANCH#track/}\"` 相当の shell ボイラープレートが除去されている。`plan/*` の dead な case アームが残っていない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`cargo make track-local-review` の実装において、ラッパー自身が track-id を shell で解析・保持する処理が存在しない。`BRANCH=$(git ...); TRACK_ID=\"${BRANCH#track/}\"` のような式が含まれていない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "`cargo make track-local-review` と `cargo make track-commit-message` のシグナル再生成ステップが対称である: 両者ともに `sotp track type-signals` → `sotp track catalogue-spec-signals` → `sotp track views sync` の同じコマンド列を実行する。review が承認した時点のシグナル状態と commit ゲートが観測するシグナル状態が一致し、`*-types.md` シグナル列のハッシュずれによる `check-approved` ブロックが構造的に発生しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "`cargo make track-local-review` の bare chain 中、いずれかのコマンドが失敗した場合に後続コマンドが実行されず、chain 全体がエラーで終了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "`.claude/commands/track/*.md`、`track/workflow.md`、`DEVELOPER_AI_WORKFLOW.md`、および `Makefile.toml` のタスク説明において、D1 により自己解決が可能になったコマンドに対する明示的な `--track-id` 指定の例示・記述が除去されている。別トラックを対象にする場面など、明示指定が意味を持つ文脈にはオプション表記として残っている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-15",
+      "text": "git の現在ブランチ取得 (`git rev-parse --abbrev-ref HEAD` を `std::process::Command::new(\"git\")` 経由で直接呼ぶ) がワークスペース内で `libs/infrastructure/src/git_cli/mod.rs` の `SystemGitRepo` ポート実装 1 箇所のみに存在する。具体的に: (a) `libs/infrastructure/src/track/render.rs`（`sync_rendered_views` 内）が `GitRepository::current_branch()` 経由でブランチを読んでおり、直接シェルアウトを含まない。(b) `apps/cli/src/commands/make.rs`（`current_branch_track_id_strict` または相当するヘルパー内）が `GitRepository::current_branch()` 経由でブランチを読んでおり、直接シェルアウトを含まない。IN-06 のポート統一が infrastructure 層および cli 層まで完全に適用されていることを確認できる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-16",
+      "text": "`cargo make ci` が `main`（非トラックブランチ）上で pass する。ci-local が呼ぶ 4 つのトラック検証チェック（`verify-spec-states-current-local` / `verify-catalogue-spec-refs-local` / `check-catalogue-spec-signals-local` / `verify-plan-artifact-refs-local`）は、解決すべきアクティブトラックが存在しない非トラックブランチ上でスキップ（`[SKIP]` exit 0）し、CI 全体をブロックしない。本 track のマージ後にデフォルトブランチ CI が壊れないことを確認できる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-17",
+      "text": "`track/<id>` ブランチ上で `cargo make track-add-task -- \"<desc>\"` のように track-id を省略した呼び出しが、track-id を要求せずアクティブトラックへ自己解決して動作する。track-id を明示する場合は `cargo make track-add-task -- --track-id <id> \"<desc>\"` のようにフラグ形式で渡せる。IN-15 の対象 5 wrapper（`dispatch_track_add_task` / `dispatch_track_transition` / `dispatch_track_next_task` / `dispatch_track_task_counts` / `dispatch_track_set_override`）のいずれも、positional track_id を先頭引数として消費しない。`apps/cli/src/commands/make_tests.rs` が wrapper 経由の新形式（`--track-id` フラグまたは省略）を反映していること（CN-10 の方針を wrapper 層で観測可能な形で確認する）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-18",
+      "text": "WRITE 操作（`signals` / `type-signals` / `catalogue-spec-signals` / `baseline-graph` / `contract-map` / `baseline-capture` / `transition` / `add-task` / `set-override` / `clear-override` / `views sync` / `review local`）において、explicit `--track-id` が現在ブランチから導出した id と一致しない場合、コマンドが fail-closed で停止し、ブランチ不一致を示す明示エラーが表示される。例: `main` ブランチ上で `sotp track signals --track-id X` を実行した場合にエラーで停止する（`main` は `track/<id>` 形式でないため導出 id が存在せず fail-closed）。例: `track/A` ブランチ上で `sotp track signals --track-id B` を実行した場合にエラーで停止する（導出 id が `A` で明示 id が `B` と不一致）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-19",
+      "text": "READ 操作（`catalogue-impl-signals` / `spec-element-hash` / `next-task` / `task-counts` / `lint` / `resolve` / `review results` / `review check-approved`）において、explicit `--track-id` は他トラックを参照する override として機能する。例: `main` ブランチ上で `sotp track next-task --track-id X` を実行した場合、ブランチ不一致エラーなしに X のアーティファクトを参照して正常終了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-20",
+      "text": "`--skip-branch-check` フラグ（または相当する escape hatch）が、対象コマンド（`transition` / `add-task` / `set-override` / `clear-override` およびその他の WRITE 操作）のいずれからも除去されている。コードベース内に `skip_branch_check` / `skip-branch-check` という名前の CLI 引数定義が存在しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/shell-parsing.md",
+      "anchor": "Single Parser Rule"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/source-attribution.md",
+      "anchor": "Source Tag Types"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 58,
+    "yellow": 0,
+    "red": 0
+  }
+}

@@ -1,0 +1,728 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "ExplicitTrackBranch": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "display_path",    "ty": "String" },
+            { "name": "expected_branch", "ty": "Option<String>" },
+            { "name": "status",          "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Data carrier for a branch specification read from metadata.json. Used by verify_explicit_track_branch. schema_version field removed (T011: planning-only removal). Declared as Dto because it crosses the infrastructure→usecase boundary as a plain data record without serde derives (usecase △ with this justification).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-14",
+          "hash": "a4e2c43d1be3d32eb8d2f20a16812448e8b60c38478303d3e857cd79bdeb301d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TrackBranchClaim": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_name", "ty": "String" },
+            { "name": "branch",     "ty": "Option<String>" },
+            { "name": "status",     "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "git_workflow",
+      "docs": "Data carrier representing one track's branch claim from metadata.json. Used by verify_auto_detected_branch. schema_version field removed (T011: planning-only removal). Declared as Dto for same reason as ExplicitTrackBranch.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-14",
+          "hash": "a4e2c43d1be3d32eb8d2f20a16812448e8b60c38478303d3e857cd79bdeb301d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ActiveTrackResolveError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BranchRead",
+            "payload": { "kind": "tuple", "fields": ["BranchReadError"] }
+          },
+          {
+            "name": "Resolution",
+            "payload": { "kind": "tuple", "fields": ["TrackResolutionError"] }
+          },
+          {
+            "name": "BranchMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "explicit_id", "ty": "String" },
+                { "name": "branch_id",   "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "docs": "Error type for ActiveTrackResolveService. Aggregates branch-read failures (BranchReadError), resolution failures (TrackResolutionError), and WRITE-guard mismatch errors (BranchMismatch). BranchRead and Resolution carry free-text / nested error types — no domain concept requiring value-object treatment. BranchMismatch.explicit_id and branch_id are opaque slugs (track-id strings), not validated domain types at this boundary (the validation has already been done by resolve_track_id_from_branch before the comparison).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-04",
+          "hash": "eb8042717bbd606446fa5071354bd434cd08f5403c2f855315f378895e76364b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-02",
+          "hash": "c5dce4e721184a895c2f73ed7b8b97078616974f35509d43a9510979fcaf6787"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ActiveTrackResolveInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "docs": "Concrete struct implementing ActiveTrackResolveService. Holds a BranchReaderPort injection for testability (git I/O stays in infrastructure; usecase is pure). Delegates to resolve_track_id_from_branch for the branch → track-id parse rule (IN-05). Implements resolve_for_read and resolve_for_write in addition to resolve_active_track (IN-07 / D7 / CN-02 / CN-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-04",
+          "hash": "eb8042717bbd606446fa5071354bd434cd08f5403c2f855315f378895e76364b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-05",
+          "hash": "c31856add47cb3c0c54e2b5b6108bab0b4514faa364a1200deeb71a2f4489391"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-04",
+          "hash": "662518e89a4cb32fbc7f2a4594de659816fa682acb9673bfe6e5ead246cd3c83"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-07",
+          "hash": "e234d55e7f99dd17dbad5d9229b40d3bda78af9a8873dfec4dfd137a3ff12d82"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BranchReadError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadFailed",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "docs": "Error type for BranchReaderPort::current_branch. ReadFailed carries a free-text diagnostic string — opaque infrastructure failure message, no domain concept requiring value-object treatment.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-04",
+          "hash": "eb8042717bbd606446fa5071354bd434cd08f5403c2f855315f378895e76364b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-05",
+          "hash": "a581263dc2c9107054bb85943d60cd823f0773fb3457d0b6c941c8c0a435571e"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TaskTransitionCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "String" },
+            { "name": "task_id",       "ty": "String" },
+            { "name": "target_status", "ty": "String" },
+            { "name": "commit_hash",   "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "CQRS command object for the task transition use case. Modified (D7 / AC-20): skip_branch_check field removed — WRITE operations now perform branch-id matching unconditionally (no escape hatch). track_id and target_status are raw strings (opaque identifiers, no domain concept requiring value-object treatment at this boundary).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-20",
+          "hash": "0f4de84ab5e8e6709e6ff551970efb3b783fdad6e6f9e2ea8f6e95d540ba130b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AddTaskCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir",     "ty": "std::path::PathBuf" },
+            { "name": "track_id",      "ty": "String" },
+            { "name": "description",   "ty": "String" },
+            { "name": "section",       "ty": "Option<String>" },
+            { "name": "after_task_id", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "CQRS command object for the add-task use case. Modified (D7 / AC-20): skip_branch_check field removed — WRITE operations now perform branch-id matching unconditionally (no escape hatch). description is free-text (no domain concept constraint), section/after_task_id are opaque optional identifiers.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-20",
+          "hash": "0f4de84ab5e8e6709e6ff551970efb3b783fdad6e6f9e2ea8f6e95d540ba130b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SetOverrideCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" },
+            { "name": "status",    "ty": "String" },
+            { "name": "reason",    "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "CQRS command object for the set-override use case. Modified (D7 / AC-20): skip_branch_check field removed — WRITE operations now perform branch-id matching unconditionally (no escape hatch). status is a finite-set token ('blocked'/'cancelled') validated at runtime inside the interactor; reason is free-text.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-20",
+          "hash": "0f4de84ab5e8e6709e6ff551970efb3b783fdad6e6f9e2ea8f6e95d540ba130b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ClearOverrideCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id",  "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "CQRS command object for the clear-override use case. Modified (D7 / AC-20): skip_branch_check field removed — WRITE operations now perform branch-id matching unconditionally (no escape hatch).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-20",
+          "hash": "0f4de84ab5e8e6709e6ff551970efb3b783fdad6e6f9e2ea8f6e95d540ba130b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TaskOperationInteractor": {
+      "action": "modify",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "docs": "Concrete struct implementing TaskOperationService. Modified (IN-07): the injected BranchReaderFn closure is replaced with Arc<dyn BranchReaderPort> so the branch guard uses the single port-based resolution path rather than a direct git rev-parse shelling out. Modified (D7 / IN-07): branch guard is now always applied for WRITE operations when a branch_reader is injected — skip_branch_check logic in enforce_branch_guard is removed. Generic over S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync. Private fields stripped.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-07",
+          "hash": "e234d55e7f99dd17dbad5d9229b40d3bda78af9a8873dfec4dfd137a3ff12d82"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TrackResolutionError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "DetachedHead",           "payload": { "kind": "unit" } },
+          { "name": "NotTrackBranch",          "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "NoBranch",               "payload": { "kind": "unit" } },
+          { "name": "InvalidTrackId",          "payload": { "kind": "tuple", "fields": ["String", "domain::ValidationError"] } },
+          { "name": "UnsupportedTargetStatus", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "TrackNotFound",           "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "ReadError",               "payload": { "kind": "tuple", "fields": ["domain::TrackReadError"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "docs": "Errors returned by track resolution functions. Carried for contract-map edge visibility (ActiveTrackResolveError references this type). No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "ActiveTrackResolveService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "resolve_active_track",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<String, ActiveTrackResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_for_read",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<String, ActiveTrackResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_for_write",
+          "receiver": "&self",
+          "params": [
+            { "name": "explicit_id", "ty": "Option<String>" }
+          ],
+          "returns": "Result<String, ActiveTrackResolveError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "track_resolution",
+      "docs": "Application service trait for resolving the active track id from the current git branch. The single shared resolution path (IN-04, D2). CLI drives this as the composition root; tests inject a stub BranchReaderPort. Three methods: resolve_active_track (self-resolve only, no explicit id override), resolve_for_read (READ semantics: explicit id overrides branch, no branch guard), resolve_for_write (WRITE semantics: explicit id must match branch-derived id; fail-closed on mismatch or non-track branch). D7 / CN-02 / CN-03 / AC-18 / AC-19.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-04",
+          "hash": "eb8042717bbd606446fa5071354bd434cd08f5403c2f855315f378895e76364b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "GO-02",
+          "hash": "49e23ae026a7a505e46d1bb1d36d1cb968abfbef32afaa06707db48d2bc50175"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-02",
+          "hash": "c5dce4e721184a895c2f73ed7b8b97078616974f35509d43a9510979fcaf6787"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-03",
+          "hash": "4bd3c109b6c07e6847f546fdf281c30889e819588e882c50e884c0eae5edd907"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-18",
+          "hash": "8583223464c8384f28ed83d6070826ebb56807962a644f2d61ae076fefabee9a"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "AC-19",
+          "hash": "add227877fdacfe1791175558308988eb375c5994d553b4eb9c11af4a1a2e8bb"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-07",
+          "hash": "e234d55e7f99dd17dbad5d9229b40d3bda78af9a8873dfec4dfd137a3ff12d82"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BranchReaderPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "current_branch",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<String>, BranchReadError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "track_resolution",
+      "docs": "Secondary port for reading the current git branch name. Returns Some(\"HEAD\") for detached HEAD when the underlying GitRepository reports that sentinel, Some(branch_name) for named branches, and None only when no branch name can be determined. Infrastructure's SystemGitRepo implements this port. Declared in usecase (CN-04: usecase must not depend on infra; port inverts dependency). The current_branch return value is a raw Option<String> — the branch name is an opaque VCS string, not a validated domain concept at this boundary; callers (resolve_track_id_from_branch) apply the track/ validation on top, including mapping Some(\"HEAD\") to DetachedHead.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-04",
+          "hash": "eb8042717bbd606446fa5071354bd434cd08f5403c2f855315f378895e76364b"
+        },
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "CN-05",
+          "hash": "a581263dc2c9107054bb85943d60cd823f0773fb3457d0b6c941c8c0a435571e"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TaskOperationService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "transition_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "TaskTransitionCommand" }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "add_task",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "AddTaskCommand" }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "set_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "SetOverrideCommand" }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "clear_override",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "ClearOverrideCommand" }
+          ],
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "task_ops",
+      "docs": "Application service trait for track task mutation operations. Carried for contract-map edge visibility (TaskOperationInteractor implements this). No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "usecase::git_workflow::validate_planning_only_commit_paths": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [],
+      "returns": "Result<(), String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted in T011 (planning-only removal). Baseline had this function; T011 removed it entirely.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-id-default-active-track-2026-05-26/spec.json",
+          "anchor": "IN-14",
+          "hash": "a4e2c43d1be3d32eb8d2f20a16812448e8b60c38478303d3e857cd79bdeb301d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::track_resolution::resolve_track_id_from_branch": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "branch", "ty": "Option<&str>" }
+      ],
+      "returns": "Result<String, TrackResolutionError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Existing branch -> track-id parse rule. Reused as the core resolution logic by ActiveTrackResolveInteractor (IN-05). No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "ActiveTrackResolveInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "branch_reader", "ty": "std::sync::Arc<dyn BranchReaderPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "impl_generics": [
+        {
+          "name": "S",
+          "bounds": [
+            "domain::TrackReader",
+            "domain::TrackWriter",
+            "domain::ImplPlanReader",
+            "domain::ImplPlanWriter",
+            "Send",
+            "Sync"
+          ]
+        }
+      ],
+      "impl_where_predicates": [],
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "store", "ty": "Arc<S>" },
+            { "name": "branch_reader", "ty": "Option<Arc<dyn BranchReaderPort>>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ExplicitTrackBranch"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ExplicitTrackBranch"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ExplicitTrackBranch"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ExplicitTrackBranch"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TrackBranchClaim"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TrackBranchClaim"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TrackBranchClaim"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TrackBranchClaim"
+    },
+    {
+      "action": "add",
+      "trait_ref": "ActiveTrackResolveService",
+      "for_type": "ActiveTrackResolveInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ActiveTrackResolveError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ActiveTrackResolveError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ActiveTrackResolveError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<BranchReadError>",
+      "for_type": "ActiveTrackResolveError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<TrackResolutionError>",
+      "for_type": "ActiveTrackResolveError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BranchReadError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "BranchReadError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "BranchReadError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "TaskOperationService",
+      "for_type": "TaskOperationInteractor"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TrackResolutionError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TrackResolutionError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "TrackResolutionError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<domain::TrackReadError>",
+      "for_type": "TrackResolutionError"
+    }
+  ]
+}

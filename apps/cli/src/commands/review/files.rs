@@ -17,8 +17,9 @@ use super::compose_v2;
 #[derive(Debug, Args)]
 pub struct FilesArgs {
     /// Track ID (used to expand `<track-id>` placeholders in scope patterns).
+    /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    pub(super) track_id: String,
+    pub(super) track_id: Option<String>,
 
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
@@ -43,10 +44,13 @@ pub(super) fn execute_files(args: &FilesArgs) -> ExitCode {
 }
 
 fn run_files(args: &FilesArgs) -> Result<String, String> {
-    // AC-08: validate scope name before resolving diff base.
-    compose_v2::validate_scope_for_track_str(&args.track_id, &args.items_dir, &args.scope)?;
+    let track_id =
+        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
 
-    let interactor = compose_v2::build_scope_query_interactor_str(&args.track_id, &args.items_dir)?;
+    // AC-08: validate scope name before resolving diff base.
+    compose_v2::validate_scope_for_track_str(&track_id, &args.items_dir, &args.scope)?;
+
+    let interactor = compose_v2::build_scope_query_interactor_str(&track_id, &args.items_dir)?;
     let files = interactor.files_by_string(args.scope.clone()).map_err(format_files_error)?;
     Ok(render_files(&files))
 }

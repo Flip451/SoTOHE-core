@@ -17,6 +17,8 @@ use domain::{
     derive_track_status,
 };
 
+use crate::track_resolution::{BranchReadError, BranchReaderPort};
+
 // ── DTOs ──────────────────────────────────────────────────────────────────────
 
 /// DTO returned by track task operations (transition, add-task, set-override,
@@ -128,7 +130,6 @@ pub struct TaskTransitionCommand {
     pub task_id: String,
     pub target_status: String,
     pub commit_hash: Option<String>,
-    pub skip_branch_check: bool,
 }
 
 /// CQRS command object for the add-task use case.
@@ -138,7 +139,6 @@ pub struct AddTaskCommand {
     pub description: String,
     pub section: Option<String>,
     pub after_task_id: Option<String>,
-    pub skip_branch_check: bool,
 }
 
 /// CQRS command object for the set-override use case.
@@ -147,14 +147,12 @@ pub struct SetOverrideCommand {
     pub track_id: String,
     pub status: String,
     pub reason: String,
-    pub skip_branch_check: bool,
 }
 
 /// CQRS command object for the clear-override use case.
 pub struct ClearOverrideCommand {
     pub items_dir: PathBuf,
     pub track_id: String,
-    pub skip_branch_check: bool,
 }
 
 // ── TaskOperationService ──────────────────────────────────────────────────────
@@ -208,15 +206,9 @@ pub trait TaskOperationService: Send + Sync {
     ) -> Result<TaskOperationOutput, TaskOperationError>;
 }
 
-// ── Branch guard port ────────────────────────────────────────────────────────
-
-/// Port type for reading the current git branch name.
-///
-/// The function receives the `items_dir` path and returns the current branch
-/// name as a `String`, or `"HEAD"` for detached HEAD state, or an `Err` if
-/// the branch cannot be determined.
-pub(crate) type BranchReaderFn =
-    Arc<dyn Fn(&std::path::Path) -> Result<String, String> + Send + Sync>;
+// ── Branch guard port type alias (removed) ───────────────────────────────────
+// BranchReaderFn closure type replaced by BranchReaderPort from track_resolution
+// (T003: IN-07, CN-05).
 
 // ── TaskOperationInteractor ───────────────────────────────────────────────────
 
@@ -232,55 +224,61 @@ pub(crate) type BranchReaderFn =
 /// usecase→CLI boundary; CLI commands only see the `dyn TaskOperationService`
 /// trait object (CN-01 satisfied).
 ///
-/// Branch guard enforcement is active whenever `cmd.skip_branch_check = false`.
-/// The injected `branch_reader` closure (supplied at construction time) reads
-/// the current branch without importing an infrastructure type; branch detection
-/// stays outside the usecase layer (hexagonal boundary preserved).
+/// Branch guard enforcement is always active when a `branch_reader` port is
+/// injected (supplied at construction time). Passing `None` for `branch_reader`
+/// disables the guard entirely (e.g. in test environments without a git
+/// repository). The injected port reads the current branch via the
+/// [`BranchReaderPort`] secondary port; branch detection stays outside the
+/// usecase layer (hexagonal boundary preserved, IN-07, CN-05).
 pub struct TaskOperationInteractor<S>
 where
     S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync,
 {
     store: Arc<S>,
-    branch_reader: Option<BranchReaderFn>,
+    branch_reader: Option<Arc<dyn BranchReaderPort>>,
 }
 
 impl<S> TaskOperationInteractor<S>
 where
     S: TrackReader + TrackWriter + ImplPlanReader + ImplPlanWriter + Send + Sync,
 {
-    /// Creates a new interactor with an injected branch reader closure.
+    /// Creates a new interactor with an optional injected [`BranchReaderPort`] port.
     ///
-    /// The `branch_reader` closure supplies the current git branch name without
+    /// The `branch_reader` port supplies the current git branch name without
     /// introducing an infrastructure dependency into the usecase layer.  When
-    /// `cmd.skip_branch_check` is `false`, the interactor calls
-    /// `branch_reader(&cmd.items_dir)` and compares the result with the track's
+    /// `branch_reader` is `Some`, the interactor calls
+    /// `branch_reader.current_branch()` and compares the result with the track's
     /// expected branch, returning [`TaskOperationError::BranchGuardFailed`] or
     /// [`TaskOperationError::BranchlessGuardFailed`] on mismatch.
     ///
-    /// The CLI composition root supplies the real `git rev-parse` reader;
-    /// tests supply a stub closure.
+    /// Pass `None` to disable the branch guard entirely (e.g. in test
+    /// environments without a git repository); the guard is a no-op in that case.
+    ///
+    /// The CLI composition root supplies `Arc<SystemGitRepo>` (wrapped in `Some`)
+    /// as the real adapter; tests pass `None` (or a stub) to control guard
+    /// behaviour.
     ///
     /// # Errors
     ///
-    /// The branch reader closure itself should return `Err(String)` when the
+    /// The branch reader port should return `Err(BranchReadError)` when the
     /// branch cannot be determined; the error is surfaced as
     /// [`TaskOperationError::BranchGuardFailed`].
     #[must_use]
-    pub fn new<F>(store: Arc<S>, branch_reader: F) -> Self
-    where
-        F: Fn(&std::path::Path) -> Result<String, String> + Send + Sync + 'static,
-    {
-        Self { store, branch_reader: Some(Arc::new(branch_reader)) }
+    pub fn new(store: Arc<S>, branch_reader: Option<Arc<dyn BranchReaderPort>>) -> Self {
+        Self { store, branch_reader }
     }
 
-    /// Test-only constructor with an injected `BranchReaderFn` arc.
+    /// Test-only constructor with an injected `Option<Arc<dyn BranchReaderPort>>`.
     ///
     /// Intra-crate test helpers use this to share a pre-built `Arc` branch reader;
     /// external callers should use [`Self::new`] instead.
     #[cfg(test)]
     #[must_use]
-    pub(crate) fn with_branch_reader(store: Arc<S>, branch_reader: BranchReaderFn) -> Self {
-        Self { store, branch_reader: Some(branch_reader) }
+    pub(crate) fn with_branch_reader(
+        store: Arc<S>,
+        branch_reader: Option<Arc<dyn BranchReaderPort>>,
+    ) -> Self {
+        Self { store, branch_reader }
     }
 }
 
@@ -288,17 +286,17 @@ where
 
 /// Enforces the branch guard for track mutation operations.
 ///
-/// When `skip_branch_check` is `false` and a `branch_reader` is provided:
+/// When a `branch_reader` port is provided:
 /// - Branchless tracks (`branch = None` in metadata) pass the guard unconditionally.
-/// - Tracks with a branch require the current git branch (returned by `branch_reader`)
-///   to match the expected branch; detached HEAD state is rejected.
+/// - Tracks with a branch require the current git branch (returned by
+///   [`BranchReaderPort::current_branch`]) to match the expected branch;
+///   detached HEAD state is rejected.
 /// - When the current branch does not match, returns
 ///   [`TaskOperationError::BranchGuardFailed`].
-/// - When the HEAD is detached (reader returns `"HEAD"`), returns
+/// - When the HEAD is detached (reader returns `Some("HEAD")`), returns
 ///   [`TaskOperationError::BranchlessGuardFailed`].
 ///
-/// When `skip_branch_check` is `true` or no `branch_reader` is provided, the
-/// guard is a no-op.
+/// When no `branch_reader` is provided, the guard is a no-op.
 ///
 /// # Errors
 ///
@@ -307,14 +305,9 @@ where
 fn enforce_branch_guard<R: TrackReader>(
     store: &R,
     track_id: &TrackId,
-    items_dir: &std::path::Path,
-    skip_branch_check: bool,
-    branch_reader: Option<&BranchReaderFn>,
+    _items_dir: &std::path::Path,
+    branch_reader: Option<&Arc<dyn BranchReaderPort>>,
 ) -> Result<(), TaskOperationError> {
-    if skip_branch_check {
-        return Ok(());
-    }
-
     let Some(reader) = branch_reader else {
         return Ok(()); // no reader injected — skip guard
     };
@@ -331,8 +324,19 @@ fn enforce_branch_guard<R: TrackReader>(
     };
 
     // Delegate branch reading to the injected port.
-    let actual_branch = reader(items_dir)
-        .map_err(|e| TaskOperationError::BranchGuardFailed(format!("branch read failed: {e}")))?;
+    let actual_branch_opt =
+        reader.current_branch().map_err(|BranchReadError::ReadFailed(msg)| {
+            TaskOperationError::BranchGuardFailed(format!("branch read failed: {msg}"))
+        })?;
+
+    let actual_branch = match actual_branch_opt {
+        Some(b) => b,
+        None => {
+            return Err(TaskOperationError::BranchGuardFailed(
+                "branch read returned no branch name".to_owned(),
+            ));
+        }
+    };
 
     // Detached HEAD → ambiguous branch state.
     if actual_branch == "HEAD" {
@@ -371,13 +375,7 @@ where
             .map_err(|e| TaskOperationError::InvalidCommitHash(e.to_string()))?;
 
         // Enforce branch guard before mutating state.
-        enforce_branch_guard(
-            &*self.store,
-            &track_id,
-            &cmd.items_dir,
-            cmd.skip_branch_check,
-            self.branch_reader.as_ref(),
-        )?;
+        enforce_branch_guard(&*self.store, &track_id, &cmd.items_dir, self.branch_reader.as_ref())?;
 
         let uc = crate::TransitionTaskUseCase::new(Arc::clone(&self.store));
         let track = uc
@@ -409,13 +407,7 @@ where
             .map_err(|e| TaskOperationError::InvalidTaskId(e.to_string()))?;
 
         // Enforce branch guard before mutating state.
-        enforce_branch_guard(
-            &*self.store,
-            &track_id,
-            &cmd.items_dir,
-            cmd.skip_branch_check,
-            self.branch_reader.as_ref(),
-        )?;
+        enforce_branch_guard(&*self.store, &track_id, &cmd.items_dir, self.branch_reader.as_ref())?;
 
         let uc = crate::AddTaskUseCase::new(Arc::clone(&self.store));
         let (track, new_id) = uc
@@ -455,13 +447,7 @@ where
         };
 
         // Enforce branch guard before mutating state.
-        enforce_branch_guard(
-            &*self.store,
-            &track_id,
-            &cmd.items_dir,
-            cmd.skip_branch_check,
-            self.branch_reader.as_ref(),
-        )?;
+        enforce_branch_guard(&*self.store, &track_id, &cmd.items_dir, self.branch_reader.as_ref())?;
 
         let uc = crate::SetOverrideUseCase::new(Arc::clone(&self.store));
         let track =
@@ -488,13 +474,7 @@ where
             .map_err(|e| TaskOperationError::InvalidTrackId(e.to_string()))?;
 
         // Enforce branch guard before mutating state.
-        enforce_branch_guard(
-            &*self.store,
-            &track_id,
-            &cmd.items_dir,
-            cmd.skip_branch_check,
-            self.branch_reader.as_ref(),
-        )?;
+        enforce_branch_guard(&*self.store, &track_id, &cmd.items_dir, self.branch_reader.as_ref())?;
 
         let uc = crate::SetOverrideUseCase::new(Arc::clone(&self.store));
         let track = uc.execute(&track_id, None).map_err(TaskOperationError::from)?;
@@ -659,7 +639,35 @@ mod tests {
         TrackWriteError, TrackWriter,
     };
 
+    use crate::track_resolution::{BranchReadError, BranchReaderPort};
+
     use super::*;
+
+    /// Stub BranchReaderPort that returns a fixed branch or error.
+    struct StubBranchReader {
+        value: Result<Option<String>, String>,
+    }
+
+    impl StubBranchReader {
+        /// Returns `Some(Arc<StubBranchReader>)` that yields the given branch name.
+        fn ok(branch: impl Into<String>) -> Option<Arc<dyn BranchReaderPort>> {
+            Some(Arc::new(Self { value: Ok(Some(branch.into())) }))
+        }
+
+        /// Returns `Some(Arc<StubBranchReader>)` that yields a `ReadFailed` error.
+        fn err(msg: impl Into<String>) -> Option<Arc<dyn BranchReaderPort>> {
+            Some(Arc::new(Self { value: Err(msg.into()) }))
+        }
+    }
+
+    impl BranchReaderPort for StubBranchReader {
+        fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
+            match &self.value {
+                Ok(v) => Ok(v.clone()),
+                Err(msg) => Err(BranchReadError::ReadFailed(msg.clone())),
+            }
+        }
+    }
 
     #[derive(Default)]
     struct StubStore {
@@ -814,16 +822,16 @@ mod tests {
         store.impl_plans.lock().unwrap().insert(track.id().clone(), plan);
 
         // Inject a stub that returns the expected branch — guard passes.
-        let interactor = TaskOperationInteractor::new(Arc::clone(&store), |_| {
-            Ok("track/my-track-2026".to_owned())
-        });
+        let interactor = TaskOperationInteractor::new(
+            Arc::clone(&store),
+            StubBranchReader::ok("track/my-track-2026"),
+        );
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
             task_id: "T001".to_owned(),
             target_status: "in_progress".to_owned(),
             commit_hash: None,
-            skip_branch_check: false,
         };
         let out = interactor.transition_task(cmd).unwrap();
         assert_eq!(out.track_id, "my-track-2026");
@@ -833,8 +841,7 @@ mod tests {
 
     #[test]
     fn task_operation_branch_guard_enforced_via_injected_reader() {
-        // Verify that new() wires the injected branch reader so that
-        // skip_branch_check = false enforces the reader's result.
+        // Verify that new() wires the injected branch reader and enforces the guard.
         use domain::TrackBranch;
         let store = Arc::new(StubStore::default());
         let track = TrackMetadata::with_branch(
@@ -849,14 +856,13 @@ mod tests {
 
         // Inject a reader that returns a mismatched branch.
         let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), |_| Ok("main".to_owned()));
+            TaskOperationInteractor::new(Arc::clone(&store), StubBranchReader::ok("main"));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
             task_id: "T001".to_owned(),
             target_status: "in_progress".to_owned(),
             commit_hash: None,
-            skip_branch_check: false,
         };
         let err = interactor.transition_task(cmd).unwrap_err();
         assert!(
@@ -882,14 +888,13 @@ mod tests {
         // No impl-plan: branch guard fires before the domain call.
 
         let interactor =
-            TaskOperationInteractor::new(Arc::clone(&store), |_| Ok("HEAD".to_owned()));
+            TaskOperationInteractor::new(Arc::clone(&store), StubBranchReader::ok("HEAD"));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
             task_id: "T001".to_owned(),
             target_status: "in_progress".to_owned(),
             commit_hash: None,
-            skip_branch_check: false,
         };
         let err = interactor.transition_task(cmd).unwrap_err();
         assert!(
@@ -902,22 +907,23 @@ mod tests {
     fn task_operation_error_invalid_track_id_returns_error() {
         let store = Arc::new(StubStore::default());
         // Branch reader is never called: track_id validation fires first.
-        let interactor = TaskOperationInteractor::new(Arc::clone(&store), |_| Ok("any".to_owned()));
+        let interactor =
+            TaskOperationInteractor::new(Arc::clone(&store), StubBranchReader::ok("any"));
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: String::new(),
             task_id: "T001".to_owned(),
             target_status: "in_progress".to_owned(),
             commit_hash: None,
-            skip_branch_check: false,
         };
         let err = interactor.transition_task(cmd).unwrap_err();
         assert!(matches!(err, TaskOperationError::InvalidTrackId(_)));
     }
 
     #[test]
-    fn task_operation_transition_with_skip_branch_check_true_bypasses_guard() {
-        // A track with a branch, but skip_branch_check = true bypasses the guard.
+    fn task_operation_transition_with_none_branch_reader_bypasses_guard() {
+        // When branch_reader is None, the guard is a no-op (replaces the old
+        // skip_branch_check = true test).
         use domain::TrackBranch;
         let store = Arc::new(StubStore::default());
         let track = TrackMetadata::with_branch(
@@ -931,19 +937,14 @@ mod tests {
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
         store.impl_plans.lock().unwrap().insert(track.id().clone(), plan);
 
-        // Inject a branch reader that would return a wrong branch — but since
-        // skip_branch_check = true, it must never be called.
-        let branch_reader: BranchReaderFn =
-            Arc::new(|_| Err("branch reader must not be called".to_owned()));
-        let interactor =
-            TaskOperationInteractor::with_branch_reader(Arc::clone(&store), branch_reader);
+        // No branch reader — guard is a no-op regardless of the track's branch.
+        let interactor = TaskOperationInteractor::new(Arc::clone(&store), None);
         let cmd = TaskTransitionCommand {
             items_dir: PathBuf::new(),
             track_id: "my-track-2026".to_owned(),
             task_id: "T001".to_owned(),
             target_status: "in_progress".to_owned(),
             commit_hash: None,
-            skip_branch_check: true, // bypass branch guard
         };
         let out = interactor.transition_task(cmd).unwrap();
         assert_eq!(out.track_id, "my-track-2026");
@@ -960,8 +961,8 @@ mod tests {
 
         // Inject a branch reader that would fail — it must not be called for
         // branchless tracks.
-        let branch_reader: BranchReaderFn =
-            Arc::new(|_| Err("branch reader must not be called for branchless tracks".to_owned()));
+        let branch_reader =
+            StubBranchReader::err("branch reader must not be called for branchless tracks");
         let interactor =
             TaskOperationInteractor::with_branch_reader(Arc::clone(&store), branch_reader);
         let cmd = TaskTransitionCommand {
@@ -970,7 +971,6 @@ mod tests {
             task_id: "T001".to_owned(),
             target_status: "in_progress".to_owned(),
             commit_hash: None,
-            skip_branch_check: false, // guard enabled, but no-op for branchless
         };
         let out = interactor.transition_task(cmd).unwrap();
         assert_eq!(out.track_id, "my-track-2026");
@@ -992,7 +992,7 @@ mod tests {
         // Note: no impl-plan needed since branch guard fires before domain calls.
 
         // Inject a reader that returns "main" — mismatches "track/my-track-2026".
-        let branch_reader: BranchReaderFn = Arc::new(|_| Ok("main".to_owned()));
+        let branch_reader = StubBranchReader::ok("main");
         let interactor =
             TaskOperationInteractor::with_branch_reader(Arc::clone(&store), branch_reader);
         let cmd = TaskTransitionCommand {
@@ -1001,7 +1001,6 @@ mod tests {
             task_id: "T001".to_owned(),
             target_status: "in_progress".to_owned(),
             commit_hash: None,
-            skip_branch_check: false,
         };
         let err = interactor.transition_task(cmd).unwrap_err();
         assert!(
@@ -1024,7 +1023,7 @@ mod tests {
         .unwrap();
         store.tracks.lock().unwrap().insert(track.id().clone(), track.clone());
 
-        let branch_reader: BranchReaderFn = Arc::new(|_| Ok("HEAD".to_owned()));
+        let branch_reader = StubBranchReader::ok("HEAD");
         let interactor =
             TaskOperationInteractor::with_branch_reader(Arc::clone(&store), branch_reader);
         let cmd = TaskTransitionCommand {
@@ -1033,7 +1032,6 @@ mod tests {
             task_id: "T001".to_owned(),
             target_status: "in_progress".to_owned(),
             commit_hash: None,
-            skip_branch_check: false,
         };
         let err = interactor.transition_task(cmd).unwrap_err();
         assert!(

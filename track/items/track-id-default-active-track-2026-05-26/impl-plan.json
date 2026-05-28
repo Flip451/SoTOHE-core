@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "usecase: add BranchReaderPort, BranchReadError, ActiveTrackResolveError, ActiveTrackResolveService, ActiveTrackResolveInteractor to libs/usecase/src/track_resolution.rs. BranchReaderPort is the secondary port (current_branch() -> Result<Option<String>, BranchReadError>), passing through Some(\"HEAD\") for detached HEAD and using None only when no branch name can be determined. ActiveTrackResolveInteractor holds Arc<dyn BranchReaderPort> and delegates to the existing resolve_track_id_from_branch for the parse rule (IN-04, IN-05). Implement standard trait impls for both error types (Debug, Display, Error, From). Add unit tests for the new types: (a) track/<id> branch resolves correctly, (b) main branch returns NotTrackBranch, (c) detached HEAD (Some(\"HEAD\") from current_branch) returns DetachedHead, and (d) None from current_branch returns NoBranch. These tests use a stub BranchReaderPort — no git I/O (IN-10, AC-08). Keep changes within libs/usecase/src/track_resolution.rs (CN-04, CN-05).",
+      "status": "done",
+      "commit_hash": "dffe739b287035812229683cdf30d588c6bbe996"
+    },
+    {
+      "id": "T002",
+      "description": "infrastructure: add BranchReaderPort impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs. SystemGitRepo::current_branch() already exists on GitRepository; wire it as the BranchReaderPort impl by delegating to that method and mapping the error type to BranchReadError::ReadFailed (IN-04, IN-06, CN-05). Ensure the trait impl is exported from the infrastructure crate public API. Keep changes within libs/infrastructure/src/git_cli/ (one impl block). This task is a prerequisite for T003 (CLI wiring) and T004 (write-guard integration).",
+      "status": "done",
+      "commit_hash": "e66ec101dd214706e7a7fd477fecc52607e8cf44"
+    },
+    {
+      "id": "T003",
+      "description": "usecase: replace the BranchReaderFn closure injection in TaskOperationInteractor with Arc<dyn BranchReaderPort>. TaskOperationInteractor::new currently accepts a closure `move |_items_dir| { Command::new(\"git\").args([\"rev-parse\",\"--abbrev-ref\",\"HEAD\"]) ... }` for the branch guard (IN-07, CN-05). Replace this with Arc<dyn BranchReaderPort> as the second constructor parameter. Update the internal branch-reading call to invoke BranchReaderPort::current_branch() instead. Update all call sites in apps/cli/src/commands/track/ (transition.rs, state_ops.rs) to pass Arc::new(SystemGitRepo::discover_from(...)) as the BranchReaderPort. This removes the last direct git rev-parse shelling-out from usecase-facing command handlers. Keep changes within libs/usecase/src/task_ops.rs plus the CLI call sites that wire the interactor (IN-07, CN-05).",
+      "status": "done",
+      "commit_hash": "9e8b31aba10e2a5501e043c4f83db11f033d0626"
+    },
+    {
+      "id": "T004",
+      "description": "CLI batch 1: make track-id optional for positional-arg commands and wire ActiveTrackResolveInteractor. Affected commands in apps/cli/src/commands/track/mod.rs and submodules: TrackCommand::Transition, AddTask, SetOverride, ClearOverride, NextTask, TaskCounts, Signals, TypeSignals, TypeGraph, BaselineGraph, ContractMap, CatalogueSpecSignals, CatalogueImplSignals, SpecElementHash, and BaselineCapture. Change `track_id: String` to `track_id: Option<String>` for each. In the command handler, resolve None via ActiveTrackResolveInteractor (wired at composition root with Arc<SystemGitRepo::discover()>). When Some, use the explicit value directly (CN-02). Add command/helper tests that prove explicit track-id priority is preserved when a value is supplied, alongside the active-branch default tests from T001 (IN-10, AC-03). Also remove the now-redundant individual auto-detect implementation in resolve.rs (ResolveArgs already uses Option<String>) by replacing its bespoke auto-detect with the shared interactor path (IN-09). Fail-closed on non-track branch: error message must prompt the user to provide an explicit track-id (CN-01, AC-01, AC-02, AC-03). Keep under 500 lines total diff; split submodule changes per file if needed for reviewability.",
+      "status": "done",
+      "commit_hash": "a73a371a7d62f689b8eec2e31b84d93f893ed74b"
+    },
+    {
+      "id": "T005",
+      "description": "CLI batch 2: make track-id optional for the remaining flag-based commands. Affected: (a) flag --track-id commands in apps/cli/src/commands/track/mod.rs and apps/cli/src/commands/review/: Lint (track_id field in the clap struct), review CodexLocal / ClaudeLocal / Local / CheckApproved / Results / Classify / Files (track_id / --track-id fields). Change to Option<String> and add ActiveTrackResolveInteractor wiring at each composition root. (b) flag --track command in apps/cli/src/commands/verify.rs: CatalogueSpecRefsArgs.track field. Change to Option<String>; resolve None via ActiveTrackResolveInteractor. (c) Remove the individual auto-detect implementations in views.rs (ViewAction::Sync --track-id is already Option<String> with bespoke impl) and in verify.rs PlanArtifactRefsArgs (already Option<PathBuf> with bespoke impl), replacing them with the shared interactor path (IN-09). Fail-closed on non-track branch for track-targeted commands and verify plan-artifact-refs (CN-01, AC-01, AC-04); preserve track views sync's registry-only mode when no explicit --track-id is provided and no active track is resolvable, because that path has no track target to fail closed against. Keep under 500 lines per commit; this task may be split across two commits if the diff exceeds that threshold.",
+      "status": "done",
+      "commit_hash": "de4bd9586bf444767cf4aa08d1a368c05c1cae13"
+    },
+    {
+      "id": "T006",
+      "description": "Makefile + verify CLI cleanup: remove shell boilerplate from *-local tasks. Remove the BRANCH=$(git ...); TRACK_ID=\"${BRANCH#track/}\" pattern, TRACK_DIR / SPEC_PATH construction, and the now-dead plan/* case arms from: verify-plan-artifact-refs-local, verify-catalogue-spec-refs-local, check-catalogue-spec-signals-local, verify-spec-states-current-local. Replace each shell branch-resolve block with a direct `cargo run --quiet -p cli -- <subcommand>` call that passes no pre-resolved track argument/path. For verify-plan-artifact-refs-local, omit --track-dir and rely on the shared active-track resolver path from IN-09; for verify-catalogue-spec-refs-local, omit --track and rely on the optional --track flow from IN-03; for check-catalogue-spec-signals-local, rely on its current-branch lookup after consolidating that lookup onto the shared ActiveTrackResolveInteractor path. For verify-spec-states-current-local, first change `verify spec-states` so its spec path argument is optional; when omitted, resolve the active track via ActiveTrackResolveInteractor and verify `track/items/<id>/spec.md`. On non-track branches, do not preserve skip behavior: let the CLI return a clear fail-closed error and propagate the non-zero exit code (CN-01). Verify this by testing a non-track branch dry-run on main and confirming failure rather than [SKIP]. This satisfies IN-08, AC-04, AC-10 (IN-08, AC-04, AC-10).",
+      "status": "done",
+      "commit_hash": "f49581015834f22933838a25516b1cf1b975115c"
+    },
+    {
+      "id": "T007",
+      "description": "Final integration and CI gate. Run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) and fix any compilation, lint, or test failures introduced by T001-T006, T008, and T009. Verify acceptance criteria: (a) sotp track signals with no track-id on track/<id> branch uses the branch id (AC-01); (b) on main branch without explicit id, the command exits with a clear NotTrackBranch error (AC-02); (c) explicit track-id overrides branch resolution (AC-03); (d) cargo run -p cli -- verify catalogue-spec-refs works without --track on track/<id> branch (AC-04); (e) git rev-parse shelling-out removed from the usecase / CLI path (AC-05, AC-06); (f) track branch create / switch still require explicit track-id — clap reports missing arg (AC-07); (g) unit tests for ActiveTrackResolveInteractor pass (AC-08); (h) cargo make ci passes (AC-09); (i) Makefile plan/* dead case arms are gone (AC-10); (j) track-local-review wrapper holds no BRANCH=$(git ...) shell parsing (AC-11); (k) track-local-review and track-commit-message run the same regen sequence via the shared track-active-gate task, and check-approved hash-mismatch is structurally eliminated (AC-12); (l) failing chain step stops the chain (AC-13); (m) explicit --track-id examples removed from docs/workflow where command self-resolves; explicit form retained as noted option where meaningful (AC-14). No source code changes beyond fixes — this task is gate-only except for trivial fixups (AC-09).",
+      "status": "done",
+      "commit_hash": "fdf55559f1ba6f2a9096fce73784b70c52e8d6ee"
+    },
+    {
+      "id": "T008",
+      "description": "Makefile gate symmetry (D4): define a single shared cargo make task (e.g., track-active-gate) that encodes the regen sequence — sotp track type-signals → sotp track catalogue-spec-signals → sotp track views sync — exactly once. Rewrite cargo make track-local-review to call track-active-gate as a dependency then invoke sotp review local; rewrite the cargo make track-commit-message pre-commit regen step to call track-active-gate as a dependency before the commit action. Both wrappers must chain with fail-closed semantics (CN-09): non-zero exit from any step aborts the chain (AC-13). Neither wrapper may contain its own copy of the regen sequence or any BRANCH= / TRACK_ID= shell variables — duplication of the chain between the two wrappers is structurally prohibited by routing both through the shared task (CN-10, CN-11). The bare-chain refactor changes only the regen invocation form; the cargo make track-commit-message commit gate retains its full strict checks: complete cargo make ci and check-approved (review not approved → fail-closed BLOCK). These strict checks are NOT removed or weakened (CN-12). This task depends on T004 and T005 (which make the chained sotp commands accept optional track-id so each command self-resolves via the current branch). Satisfies IN-11, IN-12, CN-09, CN-10, CN-11, CN-12, AC-11, AC-12, AC-13.",
+      "status": "done",
+      "commit_hash": "3b997a2f080a51c12859d08d1b2b684f23596e04"
+    },
+    {
+      "id": "T009",
+      "description": "Operational-docs cleanup: remove explicit --track-id from documentation where commands now self-resolve. Edit the following files to drop examples, step descriptions, and command invocations that pass an explicit --track-id (or equivalent positional track_id) to commands that now self-resolve from the current branch: .claude/commands/track/*.md (all affected command docs), track/workflow.md, DEVELOPER_AI_WORKFLOW.md, and Makefile.toml task description comments. Where a documented invocation has meaning only because it targets a different track (e.g., explicitly operating on a non-current track), retain the explicit form as a noted option rather than removing it. The goal is to align the docs with the D1 contract: the standard/happy-path examples show commands without --track-id, and only the cross-track or disambiguation use-cases retain the explicit form. This task depends on T004 and T005 (the underlying commands must already self-resolve before the docs can truthfully omit the flag). Satisfies IN-13, AC-14.",
+      "status": "done",
+      "commit_hash": "fdf55559f1ba6f2a9096fce73784b70c52e8d6ee"
+    },
+    {
+      "id": "T010",
+      "description": "infrastructure + CLI: port-route the two remaining raw git shellouts in render.rs and make.rs through SystemGitRepo (IN-06 completion + AC-15). GAP-1: libs/infrastructure/src/track/render.rs — the sync_rendered_views branch guard that calls std::process::Command::new(\"git\").args([\"rev-parse\",\"--abbrev-ref\",\"HEAD\"]) must be replaced with SystemGitRepo::discover_from(root)?.current_branch() via the GitRepository port established in T002. GAP-2: apps/cli/src/commands/make.rs — the current_branch_track_id_strict helper (called at ~line 522 and ~line 553) that issues the same raw shellout must be replaced with SystemGitRepo::discover()?.current_branch(); the stale doc comment referencing the removed plan/<id> branch format must also be updated. Both sites already delegate branch-name parsing to usecase::track_resolution::resolve_track_id_from_branch; only the git READ must move to the port. After this task there must be zero occurrences of std::process::Command::new(\"git\") with rev-parse --abbrev-ref HEAD outside libs/infrastructure/src/git_cli/mod.rs in the workspace. T010 must be sequenced before T011 or verified to touch non-overlapping regions of make.rs. Covers IN-06 (completion) + AC-15.",
+      "status": "done",
+      "commit_hash": "0f17f3cc05ab063ee0fa33af395290faee01b003"
+    },
+    {
+      "id": "T011",
+      "description": "usecase + CLI + infrastructure + docs: root-and-branch removal of planning-only commit machinery (IN-14). The implementer must verify each item against real code before deleting (cross-reference tmp/planning-only-removal-footprint.md). (1) libs/usecase/src/git_workflow.rs: delete validate_planning_only_commit_paths; delete the v3 branchless planning-only if-block inside verify_explicit_track_branch; delete ExplicitTrackBranch.schema_version field; remove the tmp/track-commit/track-dir.txt entry from TRANSIENT_AUTOMATION_FILES; delete related tests. (2) apps/cli/src/commands/git.rs: delete load_optional_track_dir; remove the track-dir.txt auto-detection block and the validate_planning_only_commit_paths call+import from require_explicit_track_selector_on_non_track_branch — the fail-closed reject behavior for non-track-branch commits must be retained; rewrite any regression test that relied on track-dir.txt auto-detection to pass --track-dir directly instead. Also update the commit-gate error message in apps/cli/src/commands/make.rs that references the removed selector (the message may touch the same file as T010 but at a different location; the implementer must confirm non-overlapping diff regions or sequence after T010). (3) libs/infrastructure/src/git_cli/mod.rs: delete illegal_v3_branchless_track, invalid_v3_non_null_branch, REQUIRED_V3_METADATA_FIELDS; delete the v3 guard blocks inside read_metadata; delete the schema_version fields on BranchMetadata and TrackBranchRecord and the default_schema_version helper; update test fixtures that use v3 format to use v5 format. All construction sites for BranchMetadata / TrackBranchRecord must be updated in the same commit because field removal is a compile-breaking change. (4) docs: remove planning-only lane wording from .claude/commands/track/commit.md; remove /track:plan-only and /track:activate references from track/workflow.md that were not removed by T007 (if any). Run cargo make ci as the final gate. Covers IN-14.",
+      "status": "done",
+      "commit_hash": "9e9f8b27f6a1005b602872452feafb0cd4af841c"
+    },
+    {
+      "id": "T012",
+      "description": "CLI: fix the main-CI regression for AC-16 — make the four ci-local CI verify checks (verify spec-states / verify catalogue-spec-refs / verify catalogue-spec-signals / verify plan-artifact-refs) skip (exit 0, print a [SKIP] message) on a non-track branch (no active track resolvable), so cargo make ci passes on main. Implement as a CLI control-flow change in apps/cli/src/commands/verify.rs per the Phase-2 design: when active-track resolution returns the not-a-track-branch error family (NotTrackBranch / DetachedHead / NoBranch), emit [SKIP] and return ExitCode::SUCCESS; real failures (BranchRead / InvalidTrackId / etc.) stay fail-closed. verify catalogue-spec-signals currently resolves the track inside infrastructure — add a CLI-dispatch conditional using ActiveTrackResolveInteractor (same pattern as the other three verify subcommands) to skip on no-track before delegating to the infrastructure path. Operation commands (transition, signals, etc.) and direct invocations with an explicit-but-invalid track keep fail-closed (D1 / CN-01). No new types; this is pure CLI control-flow. Add unit tests for the skip path: stub BranchReaderPort returning a non-track branch name or None to verify all four subcommands emit [SKIP] and exit 0. Do NOT reintroduce shell branch-parsing in the Makefile (AC-11). Covers AC-16, within CN-01's documented exception.",
+      "status": "done",
+      "commit_hash": "5b786cb3801a8cd72630c3bf61ad3a4c794d5d29"
+    },
+    {
+      "id": "T013",
+      "description": "CLI: make the optional track-id a uniform --track-id flag across all IN-01 commands and rename verify catalogue-spec-refs's --track to --track-id (D5). The four write commands (transition / add-task / set-override / clear-override) in apps/cli/src/commands/track/mod.rs already use #[arg(long)] track_id: Option<String> from T004 — leave those unchanged. Change the remaining eleven read/query commands that T004 left as optional positional args: signals / type-signals / type-graph / baseline-graph / contract-map / catalogue-spec-signals / catalogue-impl-signals / spec-element-hash / baseline-capture / next-task / task-counts. For each, change the clap annotation from a bare positional field to #[arg(long)] track_id: Option<String>, so they accept --track-id instead of a positional argument. In apps/cli/src/commands/verify.rs, rename CatalogueSpecRefsArgs.track (--track flag) to track_id (#[arg(long = \"track-id\")]) to match the unified flag name (IN-03, D5). Update any affected unit tests that passed an explicit track-id as a positional argument in test invocations; regen/self-resolving invocations that pass no track-id are unaffected. Update any cargo make wrappers or call sites in the codebase that supplied an explicit track-id positionally to these commands (if any). Leave --track-dir (a path arg in git commit-from-file / verify plan-artifact-refs) unchanged. No new types. Covers D5, IN-01 (flag-form dimension), AC-03 (flag name unification), IN-03.",
+      "status": "done",
+      "commit_hash": "d76584ab6520df37c408c2d5fb105748887e5a2b"
+    },
+    {
+      "id": "T014",
+      "description": "make.rs wrapper passthrough: remove positional track-id consumption from the five cargo make task wrappers and update all existing call sites. (1) In apps/cli/src/commands/make.rs, rewrite dispatch_track_add_task, dispatch_track_transition, dispatch_track_next_task, dispatch_track_task_counts, and dispatch_track_set_override so that they no longer consume a positional track-id. Four of the five (add_task, transition, next_task, task_counts) inject --items-dir track/items and forward all remaining args verbatim. dispatch_track_set_override is the exception: it additionally reads the first non-flag positional word as the status (blocked / cancelled / clear) to route to either track set-override or track clear-override (the single Makefile entry covers two underlying commands), and it does NOT consume a positional track-id. dispatch_track_transition currently extracts track_dir from the first positional arg and derives --items-dir and --track-id by splitting it; change it to inject --items-dir track/items and pass --track-id only when explicitly present in the forwarded args (i.e. passthrough). After this change, cargo make track-add-task -- \"write docs\" resolves the active track from the current branch (D1 self-resolve), and cargo make track-add-task -- --track-id <id> \"write docs\" uses the explicit id. (2) Update existing call sites that still pass a positional track-id or track_dir to the five wrappers: .claude/commands/track/implement.md, .claude/commands/track/full-cycle.md, knowledge/conventions/task-completion-flow.md (cargo make track-transition <track_dir> <task_id> <status> invocation pattern), and apps/cli/src/commands/make_tests.rs (positional wrapper tests). Change each to the --track-id flag form or to the track-id-omitted form as appropriate. No new types. Covers IN-15, AC-17.",
+      "status": "done",
+      "commit_hash": "a9890a39b08c3e1f0d2a128805fd6544bc8cc391"
+    },
+    {
+      "id": "T015",
+      "description": "usecase + CLI: remove skip_branch_check escape hatch and enforce WRITE/READ split for explicit --track-id (D7 / AC-18 / AC-19 / AC-20). (1) Remove skip_branch_check from usecase command structs: delete the skip_branch_check: bool field from TaskTransitionCommand, AddTaskCommand, SetOverrideCommand, and ClearOverrideCommand in libs/usecase/src/task_ops.rs. Remove the skip_branch_check parameter from enforce_branch_guard and all its call sites inside TaskOperationInteractor; the guard is now always enforced when a branch_reader is injected (the None branch_reader path used in tests without git still skips the guard). Update the doc comments on enforce_branch_guard and TaskOperationInteractor::new accordingly. (2) Remove --skip-branch-check CLI flags: delete the skip_branch_check: bool field (with #[arg(long, default_value_t = false)] annotation) from TrackCommand::Transition, TrackCommand::AddTask, TrackCommand::SetOverride, and TrackCommand::ClearOverride in apps/cli/src/commands/track/mod.rs. Remove the skip_branch_check argument from the execute_* function signatures in transition.rs and state_ops.rs; remove build_branch_reader's skip_branch_check parameter and the if skip_branch_check { None } branch — it now always returns Some(Arc::new(LazyBranchReader::new(...))). Remove skip_branch_check from all command struct construction sites (cmd = TaskTransitionCommand { ..., skip_branch_check } etc.) in those files. (3) Add resolve_track_id_for_write function to apps/cli/src/commands/track/mod.rs: when explicit_id is Some, read the current branch via ActiveTrackResolveInteractor and compare it with the given id; if the branch cannot resolve to a track id (non-track branch) or the resolved id does not equal explicit_id, return a fail-closed error explaining the mismatch; when explicit_id is None, delegate to the existing resolve_track_id (self-resolve from branch). Wire this new function in the Transition / AddTask / SetOverride / ClearOverride dispatch arms of the execute() match in mod.rs, replacing the current resolve_track_id call. The existing resolve_track_id (override semantics) stays in place for READ operations. (4) Update unit tests in mod.rs: add tests for resolve_track_id_for_write covering (a) explicit id matches branch — returns the id; (b) explicit id does not match branch — returns Err; (c) non-track branch with explicit id — returns Err; (d) None explicit id on track branch — delegates to resolve_track_id (existing tests cover this). Update transition.rs and state_ops.rs tests that previously set skip_branch_check: true to instead pass branch_reader: None (TaskOperationInteractor::new(store, None) bypasses the guard). Confirm no skip_branch_check / skip-branch-check identifier remains in apps/cli/src/commands/track/ and libs/usecase/src/task_ops.rs after this task. Covers AC-18, AC-19, AC-20, CN-02, CN-03, IN-01 (D7 dimension), IN-07 (D7 generalization to all four write commands). Target diff < 500 lines. Run cargo make ci as the gate.",
+      "status": "done",
+      "commit_hash": "90d7423fbee2f557a0259cda79af672806e425d1"
+    },
+    {
+      "id": "T016",
+      "description": "CLI: generalize WRITE branch guard to the remaining WRITE operations outside task_ops (signals / type-signals / catalogue-spec-signals / baseline-graph / contract-map / baseline-capture / views sync / review local) — D7 generalization completion (IN-07, AC-18). Note: resolve_track_id_from_root_for_write was already introduced by T017 (with #[allow(dead_code)]) and its unit tests covering 4+1 scenarios are also present; this task only applies it at the call sites and removes the #[allow(dead_code)] annotation. For each WRITE command listed below, replace the current resolve_track_id (or resolve_track_id_from_root) call with resolve_track_id_for_write when an explicit --track-id is supplied, so that a mismatching explicit id causes fail-closed error. (a) Signals: in the execute() match arm for TrackCommand::Signals, replace resolve_track_id with resolve_track_id_for_write. (b) TypeSignals: in TrackCommand::TypeSignals, replace resolve_track_id_from_root with the already-existing resolve_track_id_from_root_for_write (introduced by T017; discovers git from workspace_root). (c) CatalogueSpecSignals: same pattern as TypeSignals using workspace_root discovery. (d) BaselineGraph: same, using workspace_root. (e) ContractMap: same, using workspace_root. (f) BaselineCapture: same, using workspace_root. (g) Views Sync: in the execute() match arm for TrackCommand::Views { action: ViewAction::Sync { track_id, ... } }, apply WRITE guard when track_id is Some. (h) Review Local (apps/cli/src/commands/review/): in the execute handler for review local (sotp review local), apply WRITE guard for the explicit --track-id path. Remove the #[allow(dead_code)] annotation from resolve_track_id_from_root_for_write in mod.rs once all call sites use it. Do not change READ operations (catalogue-impl-signals / spec-element-hash / next-task / task-counts / lint / resolve / review results / review check-approved) — those keep the existing resolve_track_id override semantics (AC-19). Confirm that after this task all WRITE operations listed in IN-07 and D7 perform branch-id matching on explicit --track-id, and that READ operations still allow cross-track override. Run cargo make ci as the gate. Covers IN-07 (D7 generalization completion), AC-18 (WRITE fail-closed on mismatch, all WRITE operations), CN-02, CN-03.",
+      "status": "done",
+      "commit_hash": "4230605030cdf4105ada1bc87e0fc6b3c0ce6092"
+    },
+    {
+      "id": "T017",
+      "description": "usecase + CLI: move WRITE/READ resolution logic from cli helpers into ActiveTrackResolveInteractor (D2 / CN-04 cli-via-usecase completion). T015 introduced resolve_track_id_for_write in apps/cli/src/commands/track/mod.rs, keeping the WRITE branch-mismatch check in the cli layer. This task also introduces resolve_track_id_from_root_for_write (same WRITE-guard logic but discovers git from workspace_root) as part of the refactor, and then relocates all WRITE/READ resolution logic into usecase so that both cli helpers become thin composition-root wrappers as required by CN-04 and ADR 2026-04-30-0848-cli-via-usecase-only.md. Behavior is unchanged — this is a pure refactor along the hexagonal boundary. (1) libs/usecase/src/track_resolution.rs: add BranchMismatch { explicit_id: String, branch_id: String } variant to ActiveTrackResolveError (already declared in usecase-types.json but not yet implemented). Implement resolve_for_read(explicit_id: Option<String>) -> Result<String, ActiveTrackResolveError> on ActiveTrackResolveInteractor: when Some, return the id directly; when None, invoke current_branch via BranchReaderPort and resolve with resolve_track_id_from_branch. Implement resolve_for_write(explicit_id: Option<String>) -> Result<String, ActiveTrackResolveError> on ActiveTrackResolveInteractor: when Some, resolve the branch id via BranchReaderPort + resolve_track_id_from_branch and compare with explicit_id — return BranchMismatch if not equal; when None, delegate to resolve_for_read(None) (same self-resolve path). Add unit tests for both methods using a stub BranchReaderPort covering: (a) resolve_for_read with Some returns id unchanged; (b) resolve_for_read with None on track branch returns branch-derived id; (c) resolve_for_write with Some matching branch id returns id; (d) resolve_for_write with Some mismatching branch id returns BranchMismatch Err; (e) resolve_for_write with Some on non-track branch returns Err; (f) resolve_for_write with None delegates to self-resolve. (2) apps/cli/src/commands/track/mod.rs: refactor resolve_track_id_for_write to become a thin wrapper: construct SystemGitRepo::discover_from + ActiveTrackResolveInteractor, call interactor.resolve_for_write(explicit_id), and map ActiveTrackResolveError to the CLI-facing String error; remove the inline WRITE-guard comparison logic that currently lives in this function. Refactor resolve_track_id_from_root_for_write (introduced by this task as a peer of resolve_track_id_for_write) similarly: construct SystemGitRepo::discover_from(workspace_root) + ActiveTrackResolveInteractor, call interactor.resolve_for_write(explicit_id), and map ActiveTrackResolveError to the CLI-facing String error; remove the inline WRITE-guard comparison logic from this function. Refactor resolve_track_id similarly to call interactor.resolve_for_read(explicit_id) instead of the inline branch-resolve path, keeping the existing override semantics for READ operations intact. After this task, neither resolve_track_id_for_write nor resolve_track_id_from_root_for_write contains inline branch-mismatch comparison logic — both delegate exclusively to ActiveTrackResolveInteractor. Existing CLI-level unit tests for resolve_track_id_for_write and resolve_track_id_from_root_for_write that use stub inputs may be simplified to wrapper-level smoke tests or kept as-is — do not delete coverage. No behavior change for callers of either function. Run cargo make ci as the gate. Covers IN-07 (usecase encapsulation of WRITE/READ split), CN-02, CN-03, CN-04, AC-18, AC-19.",
+      "status": "done",
+      "commit_hash": "ab6aced0ef3891b97a04a34f18931f1ac5e0f5dc"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "usecase: port + interactor for active-track resolution",
+        "description": [
+          "Introduce the BranchReaderPort secondary port and all associated types (BranchReadError, ActiveTrackResolveError, ActiveTrackResolveService, ActiveTrackResolveInteractor) in libs/usecase/src/track_resolution.rs.",
+          "Re-use the existing resolve_track_id_from_branch for the parse rule so no new resolution logic is introduced (IN-04, IN-05, CN-04, CN-05).",
+          "Include unit tests using a stub BranchReaderPort to verify the resolution cases (track branch, non-track branch, detached HEAD via Some(\"HEAD\"), and no branch via None) without git I/O (IN-10, AC-08)."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "infrastructure: SystemGitRepo implements BranchReaderPort",
+        "description": [
+          "Add the BranchReaderPort trait impl for SystemGitRepo in libs/infrastructure/src/git_cli/mod.rs by delegating to the existing GitRepository::current_branch() method and mapping the error to BranchReadError::ReadFailed.",
+          "This completes the port inversion: the usecase layer declares the port; the infrastructure layer provides the adapter (IN-04, IN-06, CN-05)."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "usecase: replace write-guard closure injection with BranchReaderPort",
+        "description": [
+          "TaskOperationInteractor currently injects a raw closure that shells out to git rev-parse --abbrev-ref HEAD for branch validation (active-track-write-guard pattern).",
+          "Replace the closure parameter with Arc<dyn BranchReaderPort> and update the CLI call sites (transition.rs, state_ops.rs) to pass SystemGitRepo (IN-07, CN-05).",
+          "This consolidates validation and default resolution onto the same port-based path as T001-T002, eliminating the remaining direct git shelling-out from usecase-facing handlers."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "CLI: make track-id optional — positional-arg commands",
+        "description": [
+          "Change track_id from String to Option<String> for all positional-arg track commands: Transition, AddTask, SetOverride, ClearOverride, NextTask, TaskCounts, Signals, TypeSignals, TypeGraph, BaselineGraph, ContractMap, CatalogueSpecSignals, CatalogueImplSignals, SpecElementHash, and BaselineCapture.",
+          "Wire ActiveTrackResolveInteractor at the composition root; fail-closed on non-track branch with a user-facing error (IN-01, CN-01, CN-02, AC-01, AC-02, AC-03).",
+          "Consolidate the existing bespoke auto-detect in resolve.rs onto the shared interactor path (IN-09).",
+          "Add command/helper coverage for explicit track-id priority when a value is supplied (IN-10, AC-03)."
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "CLI: make track-id optional — flag-arg commands and verify subcommands",
+        "description": [
+          "Change --track-id and --track flags to Option<String> for all remaining affected commands: Lint, review CodexLocal / ClaudeLocal / Local / CheckApproved / Results / Classify / Files, and verify CatalogueSpecRefs (IN-02, IN-03, CN-01, CN-02).",
+          "Consolidate the bespoke auto-detect implementations in views.rs and verify PlanArtifactRefs onto the shared interactor path (IN-09, AC-04), while preserving track views sync's registry-only fallback when no active track is present."
+        ],
+        "task_ids": [
+          "T005"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "Makefile: strip shell boilerplate from *-local verify tasks",
+        "description": [
+          "Remove BRANCH=$(git ...); TRACK_ID=${BRANCH#track/}, SPEC_PATH construction, and dead plan/* case arms from verify-plan-artifact-refs-local, verify-catalogue-spec-refs-local, check-catalogue-spec-signals-local, verify-spec-states-current-local.",
+          "Add the missing no-argument active-track path for verify spec-states, then replace the wrappers with bare cargo run calls that let the CLI resolve the track from the branch (IN-08, AC-04, AC-10)."
+        ],
+        "task_ids": [
+          "T006"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "Makefile: shared track-active-gate task + bare chain wrappers (D4 gate symmetry, DRY regen sequence)",
+        "description": [
+          "Introduce a single shared cargo make task (track-active-gate) that defines the regen sequence exactly once: sotp track type-signals → sotp track catalogue-spec-signals → sotp track views sync (CN-11).",
+          "Rewrite cargo make track-local-review to call track-active-gate as a dependency then invoke sotp review local; rewrite the track-commit-message pre-commit regen step to call track-active-gate as a dependency before the commit action (IN-11, IN-12).",
+          "Both wrappers must chain fail-closed (CN-09); neither may contain its own copy of the regen sequence or any BRANCH= / TRACK_ID= shell variables (CN-10).",
+          "The bare-chain refactor of track-commit-message changes only the regen invocation form; the full cargo make ci check and check-approved (fail-closed BLOCK) are preserved without weakening (CN-12).",
+          "Depends on T004 and T005 (sotp commands must self-resolve track-id before the wrappers can omit it). Satisfies IN-11, IN-12, CN-09, CN-10, CN-11, CN-12, AC-11, AC-12, AC-13."
+        ],
+        "task_ids": [
+          "T008"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "Operational-docs cleanup: drop explicit --track-id from docs where command self-resolves",
+        "description": [
+          "Edit .claude/commands/track/*.md, track/workflow.md, DEVELOPER_AI_WORKFLOW.md, and Makefile.toml task descriptions to remove examples that pass an explicit --track-id to commands that now self-resolve from the current branch (IN-13).",
+          "Retain explicit form as a noted option only where it has distinct meaning (targeting a different track or disambiguation context).",
+          "Depends on T004 and T005; satisfies IN-13, AC-14."
+        ],
+        "task_ids": [
+          "T009"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "Integration gate: cargo make ci pass",
+        "description": [
+          "Compile, lint, test, and run the full verify-* suite against the changes from T001-T009.",
+          "Fix any issues and confirm all acceptance criteria (AC-01 through AC-14) are satisfied (AC-09)."
+        ],
+        "task_ids": [
+          "T007"
+        ]
+      },
+      {
+        "id": "S10",
+        "title": "Port-route remaining raw git shellouts + remove dead planning-only commit machinery",
+        "description": [
+          "T010: Route the two remaining raw git shellouts in render.rs (sync_rendered_views branch guard) and make.rs (current_branch_track_id_strict) through the SystemGitRepo port, completing IN-06 and satisfying AC-15. After T010, zero occurrences of direct git rev-parse --abbrev-ref HEAD shelling-out remain outside libs/infrastructure/src/git_cli/mod.rs.",
+          "T011: Root-and-branch removal of planning-only commit machinery from git_workflow.rs, git.rs, git_cli/mod.rs, make.rs, and stale doc files, completing ADR 2026-05-26-1123 lane removal at the code level (IN-14).",
+          "T010 and T011 both touch apps/cli/src/commands/make.rs at different locations; implementation must be sequenced (T010 first) or verified to use non-overlapping diff regions in a single commit. Do not parallelize."
+        ],
+        "task_ids": [
+          "T010",
+          "T011"
+        ]
+      },
+      {
+        "id": "S11",
+        "title": "CLI: non-track branch skip for CI verify checks (AC-16 fix)",
+        "description": [
+          "Add CLI control-flow in apps/cli/src/commands/verify.rs so that the four ci-local CI verify subcommands (verify spec-states / verify catalogue-spec-refs / verify catalogue-spec-signals / verify plan-artifact-refs) skip with [SKIP] and exit 0 when no active track is resolvable (NotTrackBranch / DetachedHead / NoBranch).",
+          "verify catalogue-spec-signals currently resolves the track inside infrastructure; wire ActiveTrackResolveInteractor at the CLI dispatch layer so the non-track skip is uniform across all four subcommands.",
+          "Real failures (BranchRead / InvalidTrackId / etc.) and operation commands (transition, signals, etc.) stay fail-closed — the skip applies only to the four CI-gate verify commands on non-track branches (CN-01 documented exception).",
+          "No new types. Add unit tests for the skip path using a stub BranchReaderPort (AC-16)."
+        ],
+        "task_ids": [
+          "T012"
+        ]
+      },
+      {
+        "id": "S12",
+        "title": "CLI: uniform --track-id flag for all IN-01 commands + rename --track to --track-id (D5)",
+        "description": [
+          "Change the eleven read/query commands in apps/cli/src/commands/track/mod.rs (signals / type-signals / type-graph / baseline-graph / contract-map / catalogue-spec-signals / catalogue-impl-signals / spec-element-hash / baseline-capture / next-task / task-counts) from optional positional args (left as-is by T004) to #[arg(long)] track_id: Option<String>, so they accept --track-id instead of a positional value (IN-01 flag-form dimension, D5).",
+          "The four write commands (transition / add-task / set-override / clear-override) already carry #[arg(long)] from T004 — leave those unchanged.",
+          "Rename CatalogueSpecRefsArgs.track (--track) to track_id (#[arg(long = \"track-id\")]) in apps/cli/src/commands/verify.rs to complete the flag-name unification required by IN-03 and D5.",
+          "Update unit tests that passed a track-id as a positional argument, and any cargo make wrappers or call sites that supplied an explicit positional track-id. Leave --track-dir unchanged. No new types (AC-03 flag-name dimension, D5)."
+        ],
+        "task_ids": [
+          "T013"
+        ]
+      },
+      {
+        "id": "S13",
+        "title": "make.rs wrapper passthrough: remove positional track-id consumption + update call sites",
+        "description": [
+          "Rewrite the five cargo make task wrappers (dispatch_track_add_task / dispatch_track_transition / dispatch_track_next_task / dispatch_track_task_counts / dispatch_track_set_override) in apps/cli/src/commands/make.rs to stop consuming a positional track-id. Four of the five (dispatch_track_add_task / dispatch_track_transition / dispatch_track_next_task / dispatch_track_task_counts) inject --items-dir track/items and forward all remaining args verbatim to the underlying sotp command. dispatch_track_set_override is the exception: it additionally reads the first non-flag positional word as the status (blocked / cancelled / clear) to route to either track set-override or track clear-override; this routing is necessary because the single Makefile entry track-set-override covers two distinct underlying sotp commands.",
+          "dispatch_track_transition currently extracts track_dir from the first positional arg and derives both --items-dir and --track-id from it; change it to inject --items-dir track/items and passthrough --track-id when the caller provides it explicitly.",
+          "Update all existing call sites that currently pass a positional track-id or track_dir to these wrappers: .claude/commands/track/implement.md, .claude/commands/track/full-cycle.md, knowledge/conventions/task-completion-flow.md, and apps/cli/src/commands/make_tests.rs (IN-15, AC-17, D6)."
+        ],
+        "task_ids": [
+          "T014"
+        ]
+      },
+      {
+        "id": "S14",
+        "title": "D7: skip_branch_check 除去 + WRITE/READ split の適用（task_ops 4 コマンド）",
+        "description": [
+          "usecase command struct (TaskTransitionCommand / AddTaskCommand / SetOverrideCommand / ClearOverrideCommand) から skip_branch_check フィールドを除去し、enforce_branch_guard を常時 enforce に変更する (AC-20, CN-03)。",
+          "CLI の --skip-branch-check フラグを Transition / AddTask / SetOverride / ClearOverride から除去し、build_branch_reader から skip_branch_check 条件分岐を取り除く (AC-20)。",
+          "resolve_track_id_for_write を mod.rs に追加: explicit id が渡された場合は現在ブランチから導出した id と照合し、不一致なら fail-closed エラーを返す。4 つの WRITE 操作のディスパッチアームをこの新関数で置き換える (AC-18, CN-02)。",
+          "READ 操作 (next-task / task-counts / catalogue-impl-signals / spec-element-hash / lint / resolve / review results / review check-approved) は既存の resolve_track_id を維持し、explicit id が override として機能する (AC-19)。",
+          "ユニットテストを追加: resolve_track_id_for_write で (a) explicit id がブランチと一致 → Ok、(b) 不一致 → Err、(c) 非トラックブランチ + explicit id → Err、(d) None → self-resolve へ委譲。cargo make ci pass を gate とする。"
+        ],
+        "task_ids": [
+          "T015"
+        ]
+      },
+      {
+        "id": "S15",
+        "title": "D7: 残りの WRITE 操作への branch guard 一般化（signals / type-signals / catalogue-spec-signals / baseline-graph / contract-map / baseline-capture / views sync / review local）",
+        "description": [
+          "T015 で導入した resolve_track_id_for_write と、T017 で導入済みの resolve_track_id_from_root_for_write を、IN-07 / D7 で列挙された残りの WRITE 操作すべてのディスパッチアームに適用する (AC-18, IN-07, CN-02, CN-03)。",
+          "対象: Signals / TypeSignals / CatalogueSpecSignals / BaselineGraph / ContractMap / BaselineCapture / Views Sync / Review Local。各コマンドで explicit --track-id が渡されたとき、現在ブランチから導出した id と照合し不一致なら fail-closed エラーを返す。",
+          "READ 操作 (CatalogueImplSignals / SpecElementHash など; TypeGraph は D7 で「設計対象外」の削除済みスタブのため対象外) は引き続き resolve_track_id または resolve_track_id_from_root を使い override 動作を維持する (AC-19)。",
+          "resolve_track_id_from_root_for_write は T017 で mod.rs に追加済み (#[allow(dead_code)] 付き): resolve_track_id_for_write と同ロジックだが SystemGitRepo::discover_from(workspace_root) でブランチを読む。本タスク (T016) では各 call site にこの既存ヘルパーを適用し、#[allow(dead_code)] 属性を削除する。",
+          "resolve_track_id_from_root_for_write のユニットテスト (4+1 シナリオ) は T017 で mod.rs に追加済み。本タスク (T016) では各 call site にこの既存ヘルパーを適用し、#[allow(dead_code)] 属性を削除するのみ。cargo make ci pass を gate とする。"
+        ],
+        "task_ids": [
+          "T016"
+        ]
+      },
+      {
+        "id": "S16",
+        "title": "usecase への WRITE/READ 解決ロジック移動（cli-via-usecase 完結）",
+        "description": [
+          "T015 が cli 層に残した WRITE branch-mismatch 比較ロジックと READ self-resolve ロジックを ActiveTrackResolveInteractor.resolve_for_write / resolve_for_read として usecase 層に移動する。cli 側の resolve_track_id_for_write / resolve_track_id_from_root_for_write (本タスク T017 で導入) / resolve_track_id の 3 関数は usecase interactor への薄い wrapper に変わる (CN-04, ADR 2026-04-30-0848-cli-via-usecase-only.md)。",
+          "ActiveTrackResolveError に BranchMismatch { explicit_id, branch_id } variant を実装し (usecase-types.json 宣言済み)、resolve_for_write の不一致時にこの variant を返す (CN-02, CN-03)。",
+          "usecase 側に stub BranchReaderPort を使ったユニットテストを追加: resolve_for_read と resolve_for_write の 6 シナリオ (Some 一致 / 不一致 / 非トラックブランチ / None 自己解決など) を git I/O なしで検証する (IN-10)。",
+          "behavior は不変。cli 側既存テストは wrapper 越しの smoke test として維持または簡略化可能。cargo make ci pass を gate とする。"
+        ],
+        "task_ids": [
+          "T017"
+        ]
+      }
+    ]
+  }
+}

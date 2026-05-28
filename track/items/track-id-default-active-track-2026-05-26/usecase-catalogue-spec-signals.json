@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "329bf8f9d3e641cc7f4ac87efd029017f85b193bd69e778d7eab4c8b69b8cf92",
+  "signals": [
+    {
+      "type_name": "ActiveTrackResolveError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ActiveTrackResolveInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "AddTaskCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BranchReadError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ClearOverrideCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ExplicitTrackBranch",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SetOverrideCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskTransitionCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackBranchClaim",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TrackResolutionError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ActiveTrackResolveService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BranchReaderPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TaskOperationService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::git_workflow::validate_planning_only_commit_paths",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::track_resolution::resolve_track_id_from_branch",
+      "signal": "blue"
+    }
+  ]
+}

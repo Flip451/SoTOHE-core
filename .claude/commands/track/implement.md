@@ -17,7 +17,7 @@ Execution:
 - For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer `## Canonical Blocks` in `plan.md` and `knowledge/DESIGN.md` over surrounding prose.
 - **ADR pre-check**: If `spec.md` or `plan.md` references an ADR (`knowledge/adr/*.md`), read the ADR and verify that the target task's description is consistent with the ADR's design (layer placement, error types, behavioral contracts). If discrepancies are found, fix the plan (`metadata.json` + `track-sync-views`) before writing code. ADR is the SSoT for design decisions — do not override ADR layer placement or omit ADR-specified types.
 - Identify the target task(s) from the approved plan. If `$ARGUMENTS` is provided, map it to the relevant plan scope.
-- Use `cargo make track-transition <track_dir> <task_id> in_progress` to mark selected tasks as `in_progress` in `metadata.json` and auto-render `plan.md` + `registry.md`. Do NOT edit `plan.md` directly — it is a read-only view rendered from metadata.json (SSoT).
+- Use `cargo make track-transition -- <task_id> in_progress` to mark selected tasks as `in_progress` in `metadata.json` and auto-render `plan.md` + `registry.md`. The active track is resolved from the current branch; pass `--track-id <id>` explicitly only when targeting a different track. Do NOT edit `plan.md` directly — it is a read-only view rendered from metadata.json (SSoT).
 - Before using `cargo make *-exec` commands or Agent Teams fast loops, confirm `cargo make tools-up` has already started `tools-daemon`. If not, either start it first or fall back to `run --rm` tasks.
 - Run Agent Teams based parallel implementation for the current approved plan.
 - If `$ARGUMENTS` is provided, treat it as implementation scope.
@@ -28,7 +28,7 @@ Execution:
   - (a) the task produced machine-non-verifiable observations (e.g., wall-time measurements, UX confirmation, dogfooding results) that the implementer judges worth recording, or
   - (b) `spec.json`'s `acceptance_criteria` explicitly mandates recording to `observations.md`.
   The file is free-form markdown with no scaffold / required fields / required sections — record the observation target, procedure, value, and date at the author's discretion. Otherwise, skip this step (file absence = no observations).
-- Use `cargo make track-transition <track_dir> <task_id> done` to mark completed tasks as `done` (auto-renders `plan.md` + `registry.md`). After `/track:commit` creates the actual commit, run `cargo make track-transition <track_dir> <task_id> done --commit-hash <hash>` to record the commit hash. If work remains blocked, keep tasks in `in_progress` and report why.
+- Use `cargo make track-transition -- <task_id> done` to mark completed tasks as `done` (auto-renders `plan.md` + `registry.md`). After `/track:commit` creates the actual commit, run `cargo make track-transition -- <task_id> done --commit-hash <hash>` to record the commit hash. The active track is resolved from the current branch; pass `--track-id <id>` explicitly only when targeting a different track. If work remains blocked, keep tasks in `in_progress` and report why.
 
 Behavior:
 - This command is the canonical replacement for legacy team-implement style flow.

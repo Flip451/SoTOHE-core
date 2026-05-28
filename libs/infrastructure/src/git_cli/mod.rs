@@ -4,6 +4,7 @@ use std::process::{Command, Output};
 
 use serde::Deserialize;
 use thiserror::Error;
+use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
 pub(crate) mod show;
 
@@ -231,6 +232,26 @@ impl domain::WorktreeReader for SystemGitRepo {
     }
 }
 
+impl BranchReaderPort for SystemGitRepo {
+    /// Returns the current git branch name by delegating to [`GitRepository::current_branch`].
+    ///
+    /// Passes `Some("HEAD")` through for detached HEAD (as reported by
+    /// `git rev-parse --abbrev-ref HEAD`). Returns `None` when the underlying
+    /// git command exits non-zero and no branch can be determined (e.g. empty
+    /// repository with no commits). Returns an error only when git cannot be
+    /// spawned or an I/O failure prevents the command from running.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`BranchReadError::ReadFailed`] if the underlying git operation
+    /// cannot complete (I/O error, git not found, etc.).
+    fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
+        // Delegate to GitRepository::current_branch() which already handles the
+        // rev-parse --abbrev-ref HEAD invocation.  Map GitError to BranchReadError.
+        GitRepository::current_branch(self).map_err(|e| BranchReadError::ReadFailed(e.to_string()))
+    }
+}
+
 pub fn resolve_repo_path(root: &Path, path: &Path) -> PathBuf {
     if path.is_absolute() { path.to_path_buf() } else { root.join(path) }
 }
@@ -241,32 +262,13 @@ pub struct TrackBranchRecord {
     pub track_name: String,
     pub branch: Option<String>,
     pub status: Option<String>,
-    pub schema_version: u32,
 }
 
 #[derive(Debug, Deserialize)]
 struct BranchMetadata {
-    #[serde(default = "default_schema_version")]
-    schema_version: u32,
     branch: Option<String>,
     status: Option<String>,
 }
-
-const fn default_schema_version() -> u32 {
-    2
-}
-
-const REQUIRED_V3_METADATA_FIELDS: &[&str] = &[
-    "schema_version",
-    "branch",
-    "id",
-    "title",
-    "status",
-    "created_at",
-    "updated_at",
-    "tasks",
-    "plan",
-];
 
 pub fn load_explicit_track_branch(
     root: &Path,
@@ -312,7 +314,6 @@ pub fn load_explicit_track_branch_from_items_dir(
             .to_owned(),
         branch: metadata.branch,
         status: metadata.status,
-        schema_version: metadata.schema_version,
     })
 }
 
@@ -344,7 +345,6 @@ pub fn collect_track_branch_claims(root: &Path) -> Result<Vec<TrackBranchRecord>
                     .to_owned(),
                 branch: metadata.branch,
                 status: metadata.status,
-                schema_version: metadata.schema_version,
             });
         }
     }
@@ -369,87 +369,8 @@ fn read_metadata(path: &Path) -> Result<BranchMetadata, String> {
     let content = fs::read_to_string(path).map_err(|err| {
         format!("Cannot read or parse metadata.json in {}: {err}", path.display())
     })?;
-    let raw: serde_json::Value = serde_json::from_str(&content).map_err(|err| {
-        format!("Cannot read or parse metadata.json in {}: {err}", path.display())
-    })?;
-    if raw.get("schema_version").and_then(serde_json::Value::as_u64) == Some(3) {
-        let Some(object) = raw.as_object() else {
-            return Err(format!(
-                "Cannot read or parse metadata.json in {}: metadata.json must be a JSON object",
-                path.display()
-            ));
-        };
-        if let Some(missing) =
-            REQUIRED_V3_METADATA_FIELDS.iter().find(|field| !object.contains_key(**field))
-        {
-            return Err(format!(
-                "Cannot read or parse metadata.json in {}: Missing required field '{}'",
-                path.display(),
-                missing
-            ));
-        }
-    }
-    let metadata: BranchMetadata = serde_json::from_value(raw.clone()).map_err(|err| {
-        format!("Cannot read or parse metadata.json in {}: {err}", path.display())
-    })?;
-    if invalid_v3_non_null_branch(&raw) {
-        return Err(format!(
-            "Cannot read or parse metadata.json in {}: Invalid v3 branch value; expected 'track/<id>' or null",
-            path.display()
-        ));
-    }
-    if illegal_v3_branchless_track(&raw, &metadata) {
-        return Err(format!(
-            "Cannot read or parse metadata.json in {}: Illegal branchless v3 metadata; materialize a track branch before committing implementation tasks",
-            path.display()
-        ));
-    }
-    Ok(metadata)
-}
-
-fn illegal_v3_branchless_track(raw: &serde_json::Value, metadata: &BranchMetadata) -> bool {
-    if metadata.schema_version != 3 || metadata.branch.is_some() {
-        return false;
-    }
-
-    if raw.get("status_override").is_some_and(|value| !value.is_null()) {
-        return true;
-    }
-
-    match metadata.status.as_deref() {
-        Some("planned") => match raw.get("tasks") {
-            None => false,
-            Some(serde_json::Value::Array(tasks)) => !tasks.iter().all(|task| {
-                task.as_object()
-                    .and_then(|object| object.get("status"))
-                    .and_then(serde_json::Value::as_str)
-                    == Some("todo")
-            }),
-            Some(_) => true,
-        },
-        _ => true,
-    }
-}
-
-fn invalid_v3_non_null_branch(raw: &serde_json::Value) -> bool {
-    if raw.get("schema_version").and_then(serde_json::Value::as_u64) != Some(3) {
-        return false;
-    }
-
-    let Some(branch) = raw.get("branch") else {
-        return false;
-    };
-    if branch.is_null() {
-        return false;
-    }
-
-    match branch.as_str() {
-        Some(value) => {
-            let trimmed = value.trim();
-            trimmed.is_empty() || !trimmed.starts_with("track/")
-        }
-        None => true,
-    }
+    serde_json::from_str(&content)
+        .map_err(|err| format!("Cannot read or parse metadata.json in {}: {err}", path.display()))
 }
 
 #[cfg(test)]
@@ -460,7 +381,7 @@ mod tests {
     use std::process::Command;
     use std::sync::{Mutex, OnceLock};
 
-    use rstest::rstest;
+    use usecase::track_resolution::{BranchReadError, BranchReaderPort};
 
     use super::{
         GitRepository, SystemGitRepo, collect_track_branch_claims, load_explicit_track_branch,
@@ -557,11 +478,8 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let track_dir = dir.path().join("track/items/example");
         fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":null,"title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        )
-        .unwrap();
+        fs::write(track_dir.join("metadata.json"), r#"{"branch":null,"status":"planned"}"#)
+            .unwrap();
 
         let record = load_explicit_track_branch(dir.path(), &track_dir).unwrap();
 
@@ -576,7 +494,7 @@ mod tests {
         fs::create_dir_all(&track_dir).unwrap();
         fs::write(
             track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":"track/example","title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
+            r#"{"branch":"track/example","status":"in_progress"}"#,
         )
         .unwrap();
 
@@ -584,94 +502,6 @@ mod tests {
             load_explicit_track_branch_from_items_dir(dir.path(), &items_dir, &track_dir).unwrap();
 
         assert_eq!(record.display_path, "custom/track/items/example");
-    }
-
-    #[rstest]
-    #[case::missing_branch(
-        r#"{"schema_version":3,"status":"planned"}"#,
-        "Missing required field 'branch'"
-    )]
-    #[case::missing_title(
-        r#"{"schema_version":3,"id":"example","status":"planned","branch":null,"created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        "Missing required field 'title'"
-    )]
-    fn load_explicit_track_branch_rejects_v3_track_missing_required_field(
-        #[case] metadata_json: &str,
-        #[case] expected_error: &str,
-    ) {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(track_dir.join("metadata.json"), metadata_json).unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains(expected_error));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_rejects_illegal_branchless_v3_track() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":null,"title":"Example","status":"in_progress","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        )
-        .unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains("Illegal branchless v3 metadata"));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_rejects_branchless_v3_track_with_status_override() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":null,"title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]},"status_override":{"status":"blocked","reason":"waiting"}}"#,
-        )
-        .unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains("Illegal branchless v3 metadata"));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_allows_branchless_v3_track_with_null_status_override() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":null,"title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]},"status_override":null}"#,
-        )
-        .unwrap();
-
-        let metadata = load_explicit_track_branch(dir.path(), &track_dir).unwrap();
-
-        assert_eq!(metadata.branch, None);
-        assert_eq!(metadata.status.as_deref(), Some("planned"));
-    }
-
-    #[test]
-    fn load_explicit_track_branch_rejects_invalid_non_track_v3_branch() {
-        let dir = tempfile::tempdir().unwrap();
-        let track_dir = dir.path().join("track/items/example");
-        fs::create_dir_all(&track_dir).unwrap();
-        fs::write(
-            track_dir.join("metadata.json"),
-            r#"{"schema_version":3,"id":"example","branch":"feature/foo","title":"Example","status":"planned","created_at":"2026-03-14T00:00:00Z","updated_at":"2026-03-14T00:00:00Z","tasks":[],"plan":{"summary":[],"sections":[]}}"#,
-        )
-        .unwrap();
-
-        let err = load_explicit_track_branch(dir.path(), &track_dir).unwrap_err();
-
-        assert!(err.contains("Invalid v3 branch value"));
     }
 
     #[test]
@@ -715,5 +545,52 @@ mod tests {
         let claims = collect_track_branch_claims(dir.path()).unwrap();
         assert_eq!(claims.len(), 1);
         assert_eq!(claims[0].track_name, "valid");
+    }
+
+    // ── BranchReaderPort tests ────────────────────────────────────────────────
+
+    /// Happy path: `BranchReaderPort::current_branch` returns `Some(branch_name)` for
+    /// a named branch.  Creates a temporary repo, makes an initial commit, creates a
+    /// named branch and checks out to it, then verifies the adapter reports that name.
+    #[test]
+    fn branch_reader_port_returns_branch_name_on_named_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init"]);
+        // Set local identity so `git commit` succeeds in CI environments without
+        // a global git config.
+        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
+        run_git(dir.path(), &["config", "user.name", "Test"]);
+        // Need at least one commit so that rev-parse --abbrev-ref HEAD succeeds.
+        run_git(dir.path(), &["commit", "--allow-empty", "-m", "init"]);
+        run_git(dir.path(), &["checkout", "-b", "track/test-branch"]);
+
+        let repo = SystemGitRepo::discover_from(dir.path()).unwrap();
+        let branch = BranchReaderPort::current_branch(&repo).unwrap();
+
+        assert_eq!(branch, Some("track/test-branch".to_owned()));
+    }
+
+    /// Error mapping: `BranchReaderPort::current_branch` maps `GitError` to
+    /// `BranchReadError::ReadFailed` when the git command cannot be run (I/O failure).
+    ///
+    /// After the repo root directory is removed, `git rev-parse --abbrev-ref HEAD`
+    /// fails to spawn (or immediately errors), causing `GitRepository::current_branch` to
+    /// return `Err(GitError::Spawn { .. })`.  The adapter must map that to
+    /// `Err(BranchReadError::ReadFailed(...))`.
+    #[test]
+    fn branch_reader_port_maps_git_spawn_error_to_branch_read_error() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init"]);
+        let repo = SystemGitRepo::discover_from(dir.path()).unwrap();
+        // Drop the temp dir, making the root path invalid so that subsequent
+        // git spawns fail with an I/O error.
+        drop(dir);
+
+        let result = BranchReaderPort::current_branch(&repo);
+
+        assert!(
+            matches!(result, Err(BranchReadError::ReadFailed(_))),
+            "expected BranchReadError::ReadFailed, got: {result:?}"
+        );
     }
 }

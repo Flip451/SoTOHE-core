@@ -1,6 +1,7 @@
 ---
 name: impl-planner
 model: opus
+effort: max
 tools:
   - Read
   - Grep

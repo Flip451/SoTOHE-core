@@ -1,13 +1,17 @@
 //! CLI subcommand for track operations using FsTrackStore.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Arc;
 
 use clap::{Args, Subcommand};
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+use infrastructure::git_cli::SystemGitRepo;
 use infrastructure::track::fs_store::FsTrackStore;
 use infrastructure::track::render;
+use usecase::track_resolution::{
+    ActiveTrackResolveError, ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
+    TrackResolutionError,
+};
 
 mod branch_ops;
 mod resolve;
@@ -71,6 +75,207 @@ pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
     }
 }
 
+/// Discriminator for READ vs WRITE resolution semantics (CN-02 / CN-03 / D7).
+///
+/// - `Read`: `explicit_id` short-circuits git discovery (CN-02 / AC-19).
+/// - `Write`: git branch is always read and compared against `explicit_id` (D7 / AC-18).
+#[derive(Copy, Clone)]
+enum ResolveMode {
+    Read,
+    Write,
+}
+
+/// Core resolution pipeline shared by all four public helpers.
+///
+/// All public wrappers (`resolve_track_id` / `resolve_track_id_from_root` /
+/// `resolve_track_id_for_write` / `resolve_track_id_from_root_for_write`) derive
+/// their `anchor` path (a git-discoverable directory) and delegate here.
+///
+/// READ mode (CN-02 / AC-19):
+/// - `explicit_id` is `Some` → returned as-is; git discovery is skipped.
+/// - `explicit_id` is `None` → branch derived from the repo at `anchor`.
+///
+/// WRITE mode (D7 / AC-18 / CN-03):
+/// - git branch is always read from the repo at `anchor`.
+/// - `explicit_id` is `Some` → branch-derived id must match; mismatch is fail-closed.
+/// - `explicit_id` is `None` → branch-derived id is returned directly.
+///
+/// # Errors
+///
+/// Returns a human-readable error string on git discovery failure or resolution failure.
+fn resolve_track_id_inner(
+    explicit_id: Option<String>,
+    anchor: &std::path::Path,
+    mode: ResolveMode,
+) -> Result<String, String> {
+    // READ short-circuit: explicit id overrides branch derivation (CN-02 / AC-19).
+    // WRITE: skip the short-circuit — the branch must always be read for comparison.
+    if matches!(mode, ResolveMode::Read) {
+        if let Some(id) = explicit_id {
+            return Ok(id);
+        }
+    }
+    let repo = SystemGitRepo::discover_from(anchor)
+        .map_err(|e| format!("cannot discover git repository from {}: {e}", anchor.display()))?;
+    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
+    match mode {
+        ResolveMode::Read => interactor.resolve_for_read(None).map_err(format_resolve_error),
+        ResolveMode::Write => {
+            interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
+        }
+    }
+}
+
+/// Resolves a track ID for a READ operation, anchored to the repository that
+/// owns `items_dir` (derived via [`resolve_project_root`]).
+///
+/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Read`.
+/// When `explicit_id` is `Some`, git discovery is skipped entirely (CN-02 / AC-19);
+/// `items_dir` is not validated in this case (the caller is responsible for
+/// ensuring a safe path before any filesystem probing).
+/// When `explicit_id` is `None`, `items_dir` is validated via [`resolve_project_root`]
+/// and git is discovered from the owning repo.
+/// Fail-closed on non-track branches (CN-01, AC-01, AC-02).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when `explicit_id` is `None` and
+/// `items_dir` is not in the `<root>/track/items` form, or when the branch
+/// cannot be resolved.
+pub(crate) fn resolve_track_id(
+    explicit_id: Option<String>,
+    items_dir: &std::path::Path,
+) -> Result<String, String> {
+    // Short-circuit for explicit id: skip items_dir validation and git discovery
+    // entirely (CN-02 / AC-19). The inner helper would also short-circuit, but
+    // calling resolve_project_root before it would reject non-canonical items_dir
+    // paths even when git discovery is not needed.
+    if let Some(id) = explicit_id {
+        return Ok(id);
+    }
+    let project_root = resolve_project_root(items_dir)?;
+    resolve_track_id_inner(None, &project_root, ResolveMode::Read)
+}
+
+/// Resolves a track ID for a READ operation, anchored to `workspace_root`.
+///
+/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Read`.
+/// For commands that use `--workspace-root` instead of `--items-dir`.
+/// When `explicit_id` is `Some`, git discovery is skipped entirely (CN-02 / AC-19).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when `workspace_root` is not inside a
+/// git repository, or when the branch cannot be resolved.
+pub(crate) fn resolve_track_id_from_root(
+    explicit_id: Option<String>,
+    workspace_root: &Path,
+) -> Result<String, String> {
+    resolve_track_id_inner(explicit_id, workspace_root, ResolveMode::Read)
+}
+
+#[cfg(test)]
+fn resolve_track_id_with_branch_reader(
+    explicit_id: Option<String>,
+    branch_reader: Arc<dyn usecase::track_resolution::BranchReaderPort>,
+) -> Result<String, String> {
+    // Delegate the full READ semantics (including the Some short-circuit) to the
+    // interactor — no git discovery is needed in tests since the stub reader is
+    // injected directly.
+    let interactor = ActiveTrackResolveInteractor::new(branch_reader);
+    interactor.resolve_for_read(explicit_id).map_err(format_resolve_error)
+}
+
+/// Resolves a track ID for a WRITE operation, anchored to the repository that
+/// owns `items_dir` (derived via [`resolve_project_root`]).
+///
+/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Write`.
+/// The git branch is always read; `explicit_id` (if `Some`) must match the
+/// branch-derived id (D7, AC-18, CN-02, CN-03). Fail-closed on mismatch or
+/// on non-track branches.
+///
+/// # Errors
+///
+/// Returns a human-readable error string when:
+/// - `items_dir` is not in the `<root>/track/items` form.
+/// - `explicit_id` is `Some` and the branch-derived id does not match.
+/// - The current branch is not a track branch.
+pub(crate) fn resolve_track_id_for_write(
+    explicit_id: Option<String>,
+    items_dir: &std::path::Path,
+) -> Result<String, String> {
+    let project_root = resolve_project_root(items_dir)?;
+    resolve_track_id_inner(explicit_id, &project_root, ResolveMode::Write)
+}
+
+/// Resolves a track ID for a WRITE operation, anchored to `workspace_root`.
+///
+/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Write`.
+/// For commands that use `--workspace-root` instead of `--items-dir` (AC-18).
+/// The git branch is always read from `workspace_root`; `explicit_id` (if `Some`)
+/// must match the branch-derived id (D7, CN-03).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when:
+/// - `workspace_root` is not inside a git repository.
+/// - `explicit_id` is `Some` and the branch-derived id does not match.
+/// - The current branch is not a track branch.
+pub(crate) fn resolve_track_id_from_root_for_write(
+    explicit_id: Option<String>,
+    workspace_root: &Path,
+) -> Result<String, String> {
+    resolve_track_id_inner(explicit_id, workspace_root, ResolveMode::Write)
+}
+
+/// Formats an [`ActiveTrackResolveError`] into a user-facing CLI error string
+/// with a hint for READ operations (non-WRITE path, AC-19).
+fn format_resolve_error(e: ActiveTrackResolveError) -> String {
+    match &e {
+        ActiveTrackResolveError::Resolution(TrackResolutionError::DetachedHead) => {
+            format!(
+                "{e}\nHint: provide an explicit track-id argument, or switch to a track branch (track/<id>) first."
+            )
+        }
+        ActiveTrackResolveError::BranchRead(_) | ActiveTrackResolveError::Resolution(_) => {
+            format!(
+                "{e}\nHint: provide an explicit track-id argument, or switch to a track branch (track/<id>) first."
+            )
+        }
+        ActiveTrackResolveError::BranchMismatch { explicit_id, branch_id } => {
+            format!(
+                "WRITE operation rejected: explicit --track-id '{explicit_id}' does not match \
+                 the current branch-derived track id '{branch_id}'.\n\
+                 Hint: switch to branch 'track/{explicit_id}' first, or omit --track-id to \
+                 operate on the current branch's track."
+            )
+        }
+    }
+}
+
+/// Formats an [`ActiveTrackResolveError`] into a user-facing CLI error string
+/// for WRITE operations, preserving the existing hint messages (AC-18, D7).
+fn format_write_error(e: &ActiveTrackResolveError) -> String {
+    match e {
+        ActiveTrackResolveError::BranchMismatch { explicit_id, branch_id } => {
+            format!(
+                "WRITE operation rejected: explicit --track-id '{explicit_id}' does not match \
+                 the current branch-derived track id '{branch_id}'.\n\
+                 Hint: switch to branch 'track/{explicit_id}' first, or omit --track-id to \
+                 operate on the current branch's track."
+            )
+        }
+        ActiveTrackResolveError::Resolution(_) | ActiveTrackResolveError::BranchRead(_) => {
+            // For WRITE, a branch resolution failure means we cannot validate the explicit id.
+            format!(
+                "WRITE operation requires the current branch to be the target track branch, \
+                 but branch resolution failed: {e}\n\
+                 Hint: switch to a track branch (track/<id>) before passing --track-id."
+            )
+        }
+    }
+}
+
 pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
     let items_name = items_dir.file_name().and_then(|name| name.to_str());
     let track_dir = items_dir.parent();
@@ -107,7 +312,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Task ID (e.g., T1, T2).
         task_id: String,
@@ -118,10 +325,6 @@ pub enum TrackCommand {
         /// Commit hash (required when target_status is "done", optional).
         #[arg(long)]
         commit_hash: Option<String>,
-
-        /// Skip branch validation (escape hatch for CI/testing).
-        #[arg(long, default_value_t = false)]
-        skip_branch_check: bool,
     },
 
     /// Create or switch to a track branch.
@@ -146,7 +349,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Task description.
         description: String,
@@ -158,10 +363,6 @@ pub enum TrackCommand {
         /// Insert after this task ID within the section. If omitted or not found, appends to end.
         #[arg(long)]
         after: Option<String>,
-
-        /// Skip branch validation (escape hatch for CI/testing).
-        #[arg(long, default_value_t = false)]
-        skip_branch_check: bool,
     },
 
     /// Set a status override on a track (blocked/cancelled).
@@ -171,7 +372,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Override status: blocked or cancelled.
         status: String,
@@ -179,10 +382,6 @@ pub enum TrackCommand {
         /// Reason for the override.
         #[arg(long, default_value = "")]
         reason: String,
-
-        /// Skip branch validation.
-        #[arg(long, default_value_t = false)]
-        skip_branch_check: bool,
     },
 
     /// Clear a status override on a track.
@@ -192,11 +391,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
-
-        /// Skip branch validation.
-        #[arg(long, default_value_t = false)]
-        skip_branch_check: bool,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
     },
 
     /// Show the next open task for a track (JSON output).
@@ -206,7 +403,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
     },
 
     /// Show task status counts for a track (JSON output).
@@ -216,7 +415,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
     },
 
     /// Evaluate spec.md source tags and store results in metadata.json spec_signals.
@@ -226,13 +427,17 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
     },
 
     /// Evaluate domain type signals via rustdoc schema export and store results in domain-types.json.
     TypeSignals {
         /// Track ID (directory name under `workspace_root/track/items`).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
         ///
@@ -260,7 +465,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `Cargo.toml`). Defaults to current directory.
         #[arg(long, default_value = ".")]
@@ -298,7 +505,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
@@ -325,7 +534,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
@@ -352,7 +563,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
@@ -379,7 +592,9 @@ pub enum TrackCommand {
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Optional single-anchor lookup. When omitted, every element is emitted.
         #[arg(long)]
@@ -401,7 +616,9 @@ pub enum TrackCommand {
         ///
         /// The track items directory is always derived as
         /// `<workspace_root>/track/items` inside the interactor.
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Workspace root directory used for architecture-rules.json resolution
         /// and the default rustdoc source. Defaults to current directory.
@@ -436,8 +653,9 @@ pub enum TrackCommand {
     /// Exits with code 1 when any violations are found, 0 when none.
     Lint {
         /// Track ID (directory name under `track/items`).
+        /// When omitted, resolved from the current git branch (`track/<id>`).
         #[arg(long)]
-        track_id: String,
+        track_id: Option<String>,
 
         /// Layer ID to lint (e.g. `domain`, `usecase`, `infrastructure`).
         #[arg(long)]
@@ -464,7 +682,9 @@ pub enum TrackCommand {
     /// (ADR 2026-05-11-2330 §D3).
     CatalogueImplSignals {
         /// Track ID (directory name under `track/items`).
-        track_id: String,
+        /// When omitted, resolved from the current git branch (`track/<id>`).
+        #[arg(long)]
+        track_id: Option<String>,
 
         /// Workspace root directory (must contain `architecture-rules.json`).
         /// Defaults to current directory.
@@ -537,56 +757,52 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
     use crate::CliError;
 
     let result: Result<ExitCode, CliError> = match cmd {
-        TrackCommand::Transition {
-            items_dir,
-            track_id,
-            task_id,
-            target_status,
-            commit_hash,
-            skip_branch_check,
-        } => transition::execute_transition(
-            items_dir,
-            track_id,
-            task_id,
-            target_status,
-            commit_hash,
-            skip_branch_check,
-        ),
+        TrackCommand::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
+            resolve_track_id_for_write(track_id, &items_dir).map_err(CliError::Message).and_then(
+                |tid| {
+                    transition::execute_transition(
+                        items_dir,
+                        tid,
+                        task_id,
+                        target_status,
+                        commit_hash,
+                    )
+                },
+            )
+        }
         TrackCommand::Branch { action } => branch_ops::execute_branch(action),
         TrackCommand::Resolve(args) => resolve::execute_resolve(args),
         TrackCommand::Views { action } => views::execute_views(action),
-        TrackCommand::AddTask {
-            items_dir,
-            track_id,
-            description,
-            section,
-            after,
-            skip_branch_check,
-        } => state_ops::execute_add_task(
-            items_dir,
-            track_id,
-            description,
-            section,
-            after,
-            skip_branch_check,
-        ),
-        TrackCommand::SetOverride { items_dir, track_id, status, reason, skip_branch_check } => {
-            state_ops::execute_set_override(items_dir, track_id, status, reason, skip_branch_check)
+        TrackCommand::AddTask { items_dir, track_id, description, section, after } => {
+            resolve_track_id_for_write(track_id, &items_dir).map_err(CliError::Message).and_then(
+                |tid| state_ops::execute_add_task(items_dir, tid, description, section, after),
+            )
         }
-        TrackCommand::ClearOverride { items_dir, track_id, skip_branch_check } => {
-            state_ops::execute_clear_override(items_dir, track_id, skip_branch_check)
+        TrackCommand::SetOverride { items_dir, track_id, status, reason } => {
+            resolve_track_id_for_write(track_id, &items_dir)
+                .map_err(CliError::Message)
+                .and_then(|tid| state_ops::execute_set_override(items_dir, tid, status, reason))
         }
-        TrackCommand::NextTask { items_dir, track_id } => {
-            state_ops::execute_next_task(items_dir, track_id)
+        TrackCommand::ClearOverride { items_dir, track_id } => {
+            resolve_track_id_for_write(track_id, &items_dir)
+                .map_err(CliError::Message)
+                .and_then(|tid| state_ops::execute_clear_override(items_dir, tid))
         }
-        TrackCommand::TaskCounts { items_dir, track_id } => {
-            state_ops::execute_task_counts(items_dir, track_id)
-        }
+        TrackCommand::NextTask { items_dir, track_id } => resolve_track_id(track_id, &items_dir)
+            .map_err(CliError::Message)
+            .and_then(|tid| state_ops::execute_next_task(items_dir, tid)),
+        TrackCommand::TaskCounts { items_dir, track_id } => resolve_track_id(track_id, &items_dir)
+            .map_err(CliError::Message)
+            .and_then(|tid| state_ops::execute_task_counts(items_dir, tid)),
         TrackCommand::Signals { items_dir, track_id } => {
-            signals::execute_signals(items_dir, track_id)
+            resolve_track_id_for_write(track_id, &items_dir)
+                .map_err(CliError::Message)
+                .and_then(|tid| signals::execute_signals(items_dir, tid))
         }
         TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
-            tddd::signals::execute_type_signals(track_id, workspace_root, layer)
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
+            resolved.and_then(|tid| tddd::signals::execute_type_signals(tid, workspace_root, layer))
         }
         TrackCommand::TypeGraph {
             items_dir,
@@ -595,27 +811,38 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             layer,
             cluster_depth,
             edges,
-        } => tddd::graph::execute_type_graph(
-            items_dir,
-            track_id,
-            workspace_root,
-            layer,
-            cluster_depth,
-            edges,
-        ),
+        } => {
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::graph::execute_type_graph(
+                    items_dir,
+                    tid,
+                    workspace_root,
+                    layer,
+                    cluster_depth,
+                    edges,
+                )
+            })
+        }
         TrackCommand::BaselineGraph { items_dir, track_id, workspace_root, layers } => {
-            tddd::baseline_graph::execute_baseline_graph(
-                items_dir,
-                track_id,
-                workspace_root,
-                layers,
-            )
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::baseline_graph::execute_baseline_graph(items_dir, tid, workspace_root, layers)
+            })
         }
         TrackCommand::ContractMap { items_dir, track_id, workspace_root, layers } => {
-            tddd::contract_map::execute_contract_map(items_dir, track_id, workspace_root, layers)
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::contract_map::execute_contract_map(items_dir, tid, workspace_root, layers)
+            })
         }
         TrackCommand::SpecElementHash { items_dir, track_id, anchor } => {
-            tddd::spec_element_hash::execute_spec_element_hash(items_dir, track_id, anchor)
+            resolve_track_id(track_id, &items_dir).map_err(CliError::Message).and_then(|tid| {
+                tddd::spec_element_hash::execute_spec_element_hash(items_dir, tid, anchor)
+            })
         }
         TrackCommand::BaselineCapture {
             track_id,
@@ -623,30 +850,46 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             source_workspace,
             layer,
             force,
-        } => tddd::baseline::execute_baseline_capture(
-            track_id,
-            workspace_root,
-            source_workspace,
-            layer,
-            force,
-        ),
+        } => {
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::baseline::execute_baseline_capture(
+                    tid,
+                    workspace_root,
+                    source_workspace,
+                    layer,
+                    force,
+                )
+            })
+        }
         TrackCommand::CatalogueSpecSignals { items_dir, track_id, workspace_root, layer } => {
-            tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
-                items_dir,
-                track_id,
-                workspace_root,
-                layer,
-            )
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
+                    items_dir,
+                    tid,
+                    workspace_root,
+                    layer,
+                )
+            })
         }
         TrackCommand::Lint { track_id, layer_id, workspace_root } => {
-            tddd::lint::execute_lint(workspace_root, track_id, layer_id)
+            resolve_track_id_from_root(track_id, &workspace_root)
+                .map_err(CliError::Message)
+                .and_then(|tid| tddd::lint::execute_lint(workspace_root, tid, layer_id))
         }
         TrackCommand::CatalogueImplSignals { track_id, workspace_root, layer } => {
-            tddd::catalogue_impl_signals::execute_catalogue_impl_signals(
-                track_id,
-                workspace_root,
-                layer,
-            )
+            let resolved =
+                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            resolved.and_then(|tid| {
+                tddd::catalogue_impl_signals::execute_catalogue_impl_signals(
+                    tid,
+                    workspace_root,
+                    layer,
+                )
+            })
         }
     };
     match result {
@@ -655,5 +898,290 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             eprintln!("{err}");
             err.exit_code()
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use usecase::track_resolution::{BranchReadError, BranchReaderPort};
+
+    #[derive(Debug)]
+    struct StubBranchReader {
+        branch: Option<String>,
+    }
+
+    impl StubBranchReader {
+        fn new(branch: Option<&str>) -> Self {
+            Self { branch: branch.map(str::to_owned) }
+        }
+    }
+
+    impl BranchReaderPort for StubBranchReader {
+        fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
+            Ok(self.branch.clone())
+        }
+    }
+
+    fn branch_reader(branch: Option<&str>) -> Arc<dyn BranchReaderPort> {
+        Arc::new(StubBranchReader::new(branch))
+    }
+
+    // --- resolve_track_id ---
+
+    /// AC-03 / CN-02: explicit track-id is returned as-is, regardless of branch or items_dir.
+    #[test]
+    fn test_resolve_track_id_with_explicit_value_returns_it_directly() {
+        // items_dir only matters when explicit_id is None (git discovery is needed).
+        // With an explicit id, it is short-circuited — any valid-structured path works.
+        let dummy_items_dir = std::path::Path::new("track/items");
+        let result = resolve_track_id(Some("my-feature-2026".to_owned()), dummy_items_dir);
+        assert_eq!(result.unwrap(), "my-feature-2026");
+    }
+
+    /// items_dir anchor: invalid structure returns resolve_project_root error.
+    ///
+    /// When items_dir is not in the `<root>/track/items` form, resolve_track_id
+    /// returns the error from resolve_project_root without attempting git discovery.
+    /// This validates that the items_dir anchor flows through resolve_track_id_inner.
+    #[test]
+    fn test_resolve_track_id_none_with_invalid_items_dir_structure_returns_error() {
+        let bad_items_dir = std::path::Path::new("not/a/track/items/structure");
+        let result = resolve_track_id(None, bad_items_dir);
+        assert!(result.is_err(), "expected Err for malformed items_dir, got: {result:?}");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("track/items"),
+            "error should mention the expected items_dir form, got: {err_msg}"
+        );
+    }
+
+    /// items_dir anchor: git discovery is anchored to items_dir, not CWD.
+    ///
+    /// This is the regression test for the bug fixed in PR #142: `resolve_track_id`
+    /// previously discovered git from CWD even when the caller supplied a different
+    /// `--items-dir`. The fix routes git discovery through `resolve_project_root(items_dir)`
+    /// → `SystemGitRepo::discover_from(project_root)`.
+    ///
+    /// Proof: create a temp directory (not a git repo) with the required `track/items`
+    /// sub-structure. Pass its `track/items` as `items_dir`. The error must reference
+    /// the temp directory path, confirming that git discovery ran against the target
+    /// tree rather than the process CWD (which IS a git repo and would have succeeded).
+    #[test]
+    fn test_resolve_track_id_none_anchors_discovery_to_items_dir_not_cwd() {
+        let tmp = tempfile::tempdir().unwrap();
+        let items_dir = tmp.path().join("track").join("items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let result = resolve_track_id(None, &items_dir);
+
+        // The error must come from git discovery failing at the temp dir, not CWD.
+        // If CWD were used, the call would succeed (the process runs inside a git repo).
+        assert!(
+            result.is_err(),
+            "expected Err because temp dir is not a git repo, got: {result:?}"
+        );
+        let err_msg = result.unwrap_err();
+        let expected_root = tmp.path().to_string_lossy();
+        assert!(
+            err_msg.contains(expected_root.as_ref()),
+            "error must reference the target tree root '{}' (not CWD), got: {err_msg}",
+            expected_root,
+        );
+    }
+
+    /// CN-02: explicit track-id priority is preserved even when on a track branch.
+    #[test]
+    fn test_resolve_track_id_explicit_value_takes_priority_over_branch() {
+        let result = resolve_track_id_with_branch_reader(
+            Some("explicit-id".to_owned()),
+            branch_reader(Some("track/branch-id")),
+        );
+        assert_eq!(result.unwrap(), "explicit-id");
+    }
+
+    /// AC-01 / CN-01: when track_id is None and on a track branch, the branch
+    /// suffix is returned.
+    #[test]
+    fn test_resolve_track_id_none_on_track_branch_returns_branch_id() {
+        let result = resolve_track_id_with_branch_reader(
+            None,
+            branch_reader(Some("track/active-track-2026")),
+        );
+        assert!(result.is_ok(), "expected Ok on track branch, got: {result:?}");
+        assert_eq!(result.unwrap(), "active-track-2026");
+    }
+
+    /// AC-02 / CN-01: when track_id is None and on a non-track branch (e.g. main),
+    /// an error is returned with a hint to provide an explicit track-id.
+    #[test]
+    fn test_resolve_track_id_none_on_non_track_branch_returns_error_with_hint() {
+        let result = resolve_track_id_with_branch_reader(None, branch_reader(Some("main")));
+        assert!(result.is_err(), "expected Err on non-track branch");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("Hint:") || err_msg.contains("provide an explicit track-id"),
+            "error must prompt user to provide explicit track-id, got: {err_msg}"
+        );
+    }
+
+    /// AC-02 / CN-01: detached HEAD is also fail-closed with the explicit-id hint.
+    #[test]
+    fn test_resolve_track_id_none_on_detached_head_returns_error_with_hint() {
+        let result = resolve_track_id_with_branch_reader(None, branch_reader(Some("HEAD")));
+        assert!(result.is_err(), "expected Err on detached HEAD");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("detached HEAD") && err_msg.contains("provide an explicit track-id"),
+            "error must mention detached HEAD and explicit track-id hint, got: {err_msg}"
+        );
+    }
+
+    // ── resolve_track_id_for_write ────────────────────────────────────────────
+
+    /// Helper for resolve_track_id_for_write that injects a stub branch reader
+    /// instead of discovering a real git repo, enabling unit testing without a
+    /// git repository.
+    ///
+    /// Now delegates to [`ActiveTrackResolveInteractor::resolve_for_write`] and
+    /// maps the error via [`format_write_error`] — mirroring the production wrapper.
+    fn resolve_track_id_for_write_with_reader(
+        explicit_id: Option<String>,
+        branch_reader: Arc<dyn BranchReaderPort>,
+    ) -> Result<String, String> {
+        let interactor = ActiveTrackResolveInteractor::new(branch_reader);
+        interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
+    }
+
+    /// AC-18 / D7: explicit id matches the branch-derived id → returns the id.
+    #[test]
+    fn test_resolve_track_id_for_write_matching_explicit_and_branch_returns_id() {
+        let result = resolve_track_id_for_write_with_reader(
+            Some("my-track-2026".to_owned()),
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert_eq!(result.unwrap(), "my-track-2026");
+    }
+
+    /// AC-18 / D7: explicit id does not match the branch-derived id → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_for_write_mismatched_explicit_and_branch_returns_error() {
+        let result = resolve_track_id_for_write_with_reader(
+            Some("other-track-2026".to_owned()),
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert!(result.is_err(), "expected Err on id mismatch");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("WRITE operation rejected") && err_msg.contains("other-track-2026"),
+            "error must explain the mismatch, got: {err_msg}"
+        );
+    }
+
+    /// AC-18 / D7: non-track branch with explicit id → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_for_write_non_track_branch_with_explicit_id_returns_error() {
+        let result = resolve_track_id_for_write_with_reader(
+            Some("my-track-2026".to_owned()),
+            branch_reader(Some("main")),
+        );
+        assert!(result.is_err(), "expected Err on non-track branch");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("WRITE operation") || err_msg.contains("branch"),
+            "error must reference the branch issue, got: {err_msg}"
+        );
+    }
+
+    /// AC-18 / D7: None explicit id on track branch → self-resolves to branch id.
+    #[test]
+    fn test_resolve_track_id_for_write_none_on_track_branch_self_resolves() {
+        let result = resolve_track_id_for_write_with_reader(
+            None,
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert_eq!(result.unwrap(), "my-track-2026");
+    }
+
+    /// AC-18 / D7: None explicit id on non-track branch → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_for_write_none_on_non_track_branch_returns_error() {
+        let result = resolve_track_id_for_write_with_reader(None, branch_reader(Some("main")));
+        assert!(result.is_err(), "expected Err on non-track branch with no explicit id");
+    }
+
+    // ── resolve_track_id_from_root_for_write ─────────────────────────────────
+
+    /// Helper for resolve_track_id_from_root_for_write that injects a stub branch
+    /// reader instead of discovering a real git repo, enabling unit testing without
+    /// a git repository.
+    ///
+    /// Delegates to [`ActiveTrackResolveInteractor::resolve_for_write`] and maps
+    /// the error via [`format_write_error`] — mirroring the production wrapper.
+    fn resolve_track_id_from_root_for_write_with_reader(
+        explicit_id: Option<String>,
+        branch_reader: Arc<dyn BranchReaderPort>,
+    ) -> Result<String, String> {
+        let interactor = ActiveTrackResolveInteractor::new(branch_reader);
+        interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
+    }
+
+    /// AC-18 / D7: explicit id matches the branch-derived id → returns the id.
+    #[test]
+    fn test_resolve_track_id_from_root_for_write_matching_explicit_and_branch_returns_id() {
+        let result = resolve_track_id_from_root_for_write_with_reader(
+            Some("my-track-2026".to_owned()),
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert_eq!(result.unwrap(), "my-track-2026");
+    }
+
+    /// AC-18 / D7: explicit id does not match the branch-derived id → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_from_root_for_write_mismatched_explicit_and_branch_returns_error() {
+        let result = resolve_track_id_from_root_for_write_with_reader(
+            Some("other-track-2026".to_owned()),
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert!(result.is_err(), "expected Err on id mismatch");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("WRITE operation rejected") && err_msg.contains("other-track-2026"),
+            "error must explain the mismatch, got: {err_msg}"
+        );
+    }
+
+    /// AC-18 / D7: non-track branch with explicit id → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_from_root_for_write_non_track_branch_with_explicit_id_returns_error() {
+        let result = resolve_track_id_from_root_for_write_with_reader(
+            Some("my-track-2026".to_owned()),
+            branch_reader(Some("main")),
+        );
+        assert!(result.is_err(), "expected Err on non-track branch");
+        let err_msg = result.unwrap_err();
+        assert!(
+            err_msg.contains("WRITE operation") || err_msg.contains("branch"),
+            "error must reference the branch issue, got: {err_msg}"
+        );
+    }
+
+    /// AC-18 / D7: None explicit id on track branch → self-resolves to branch id.
+    #[test]
+    fn test_resolve_track_id_from_root_for_write_none_on_track_branch_self_resolves() {
+        let result = resolve_track_id_from_root_for_write_with_reader(
+            None,
+            branch_reader(Some("track/my-track-2026")),
+        );
+        assert_eq!(result.unwrap(), "my-track-2026");
+    }
+
+    /// AC-18 / D7: None explicit id on non-track branch → fail-closed error.
+    #[test]
+    fn test_resolve_track_id_from_root_for_write_none_on_non_track_branch_returns_error() {
+        let result =
+            resolve_track_id_from_root_for_write_with_reader(None, branch_reader(Some("main")));
+        assert!(result.is_err(), "expected Err on non-track branch with no explicit id");
     }
 }

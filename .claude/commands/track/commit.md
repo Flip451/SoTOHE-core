@@ -7,7 +7,7 @@ Canonical command for final commit in the track workflow.
 Arguments:
 
 - Use `$ARGUMENTS` as the commit message.
-- On a non-track branch, guarded commit execution is only supported via an explicit planning-only selector: `<track-id> -- <commit message>`. Materialized tracks must be committed from their `track/<id>` branch.
+- Guarded commit execution requires being on a `track/<id>` branch; commits from non-track branches are rejected (fail-closed).
 - If empty, do not commit immediately. Inspect the current track (branch-bound if on a `track/<id>` branch, otherwise latest by timestamp), current diff, and recent task context, then propose 2-3 concrete commit message candidates and ask the user to choose one or edit one.
 
 Execution:
@@ -16,9 +16,7 @@ Execution:
 
 If `$ARGUMENTS` is empty:
 
-1. Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, fall back to the latest active track by `updated_at`.
-   - On a non-track branch, do not auto-detect a branchless planning-only track.
-   - For actual commit execution from a non-track branch, require an explicit track-id selector and use it only for the planning-only lane.
+1. Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise (read-only message proposal only), fall back to the latest active track by `updated_at`.
 2. Inspect the current track under `track/items/` when present.
 3. Read available context from `spec.md` and `plan.md`, current changed files, and `observations.md` if it exists (optional source — absent is normal).
 4. Propose 2-3 commit message candidates that follow the repository's current style and reflect the actual change scope.
@@ -32,25 +30,13 @@ Before committing:
 
 1. Run `git diff --cached --stat` and verify the staged scope matches the intended commit.
 2. If the staged diff is empty or includes unrelated changes, stop and fix staging before continuing. If `review.json` shows as modified-but-unstaged in `git status`, the caller staged before the final review round — re-stage now before proceeding.
-3. Resolve the current track in this order:
-   - current `track/<id>` branch
-   - explicit planning-only `<track-id>` selector on a non-track branch
-   - otherwise latest materialized active track (non-archived, non-done, `branch != null`) for read-only context only
-   - do not execute a guarded commit from a non-track branch without the explicit planning-only selector
+3. Resolve the current track from the current `track/<id>` branch. A guarded commit from a non-track branch is rejected (fail-closed) — switch to the track branch first.
 4. `track/registry.md` is a generated view (gitignored, not version-controlled). Do NOT attempt to stage or commit it. If the current track's `plan.md` or `spec.md` views appear stale, run `cargo make track-sync-views` to regenerate them. Note: this command syncs views for ALL tracks, so when staging for commit, only include the current track's files — do not stage other tracks' regenerated views. This is purely about commit scope; staging does not affect review hash computation (hashes are worktree-based).
-5. If the selected track is branchless planning-only (`status=planned`, `branch=null`), enforce the planning-only allowlist before committing:
-   - `track/items/<id>/`
-   - `track/tech-stack.md`
-   - `knowledge/DESIGN.md`
-   If staged changes exceed that allowlist, stop and report the issue.
-   Note: `track/registry.md` is gitignored and never committed — it is excluded from this allowlist.
 
 ## Step 2: Guarded commit
 
 Write the chosen commit message to `tmp/track-commit/commit-message.txt`.
-If this is a planning-only commit from a non-track branch, also write `track/items/<track-id>` to
-`tmp/track-commit/track-dir.txt` so the guarded commit path uses explicit track context.
-If you are on a non-track branch without that selector, stop instead of running the wrapper.
+If you are on a non-track branch, stop instead of running the wrapper (guarded commits require a `track/<id>` branch).
 Then run:
 
 ```bash
