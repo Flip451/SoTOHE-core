@@ -441,7 +441,15 @@ impl CliApp {
         workspace_root: PathBuf,
         strict: bool,
     ) -> Result<CommandOutcome, String> {
-        match resolve_ci_verify_track_id_from_root(&workspace_root)? {
+        // AC-16: check for non-track branch at the composition layer before delegating
+        // to infrastructure (which has its own track resolution).
+        //
+        // Uses resolve_ci_verify_track_id() (CWD-anchored) to match the behaviour of
+        // execute_catalogue_spec_signals_check(), which also discovers the git repo from
+        // the process CWD via SystemGitRepo::discover().
+        // Using the workspace_root-anchored variant here while the check resolves from
+        // CWD would create a mismatch when --workspace-root differs from CWD.
+        match resolve_ci_verify_track_id()? {
             None => {
                 Ok(render_skip("verify catalogue-spec signals", "not on a track branch; skipping"))
             }

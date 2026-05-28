@@ -35,21 +35,30 @@ pub fn execute_type_signals(
 mod tests {
     use std::path::PathBuf;
 
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
-
     use super::*;
 
-    /// Returns the current git branch's track-id suffix (the part after `track/`)
-    /// if the working directory is on a `track/<id>` branch, or `None` otherwise
-    /// (e.g. detached HEAD, `main`, non-track branches).
+    /// Initialize a minimal git repository at `root` on branch `track/<track_id>`.
     ///
-    /// Tests that require the branch guard to *pass* use this helper to derive
-    /// the track_id at runtime, making them independent of which specific branch
-    /// name is checked out when the test suite is run.
-    fn current_track_id_suffix() -> Option<String> {
-        let repo = SystemGitRepo::discover().ok()?;
-        let branch = repo.current_branch().ok()??;
-        branch.strip_prefix("track/").map(|s| s.to_owned())
+    /// `resolve_track_id_for_write` requires git discovery to succeed (fail-closed
+    /// branch guard). This helper creates an isolated repo so tests that exercise
+    /// WRITE paths work without depending on the CI/dev checkout branch or git
+    /// state (detached HEAD, main, etc.).
+    fn init_git_repo_on_track_branch(root: &std::path::Path, track_id: &str) {
+        let branch_name = format!("track/{track_id}");
+        let run_git = |args: &[&str]| {
+            let status = std::process::Command::new("git")
+                .args(args)
+                .current_dir(root)
+                .status()
+                .expect("git command failed to spawn");
+            assert!(status.success(), "git {} exited with status {status}", args.join(" "));
+        };
+        run_git(&["init", "-q"]);
+        run_git(&["config", "user.email", "test@example.com"]);
+        run_git(&["config", "user.name", "Test"]);
+        run_git(&["config", "commit.gpgsign", "false"]);
+        run_git(&["commit", "--allow-empty", "-q", "-m", "init", "--no-gpg-sign"]);
+        run_git(&["branch", "-m", &branch_name]);
     }
 
     /// Minimal valid `metadata.json` (schema v5) with a branch set (activated track).
@@ -150,30 +159,31 @@ mod tests {
         // usecase interactor and that an unknown layer is rejected by the interactor's
         // layer-resolution step.
         //
-        // Reads the current branch at runtime so that the track_id used to pass CN-07
-        // is not hard-coded: the test is skipped when the checkout is not on a
-        // `track/<id>` branch (detached HEAD, `main`, CI branches), preventing
-        // environment-dependent failures.
-        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(|p| p.parent())
-            .expect("workspace root from CARGO_MANIFEST_DIR")
-            .to_path_buf();
+        // Uses an isolated tempdir git repo (branch: track/test-track) so the test
+        // always runs in CI regardless of the ambient git state (detached HEAD, main,
+        // etc.). CN-07 passes because the explicit track_id matches the isolated
+        // repo's branch, then the interactor rejects the unknown layer name.
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
 
-        // Derive the track_id from the ambient branch at test runtime.
-        let Some(track_id) = current_track_id_suffix() else {
-            // Not on a track/ branch — skip this test.
-            return;
-        };
+        // Minimal track fixtures: metadata + impl-plan satisfy the activated-track guard.
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        // architecture-rules.json with only a `domain` layer — `__nonexistent_layer__` is absent.
+        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
 
         let result = execute_type_signals(
-            // Runtime-derived track_id — CN-07 passes because branch matches.
-            track_id,
-            workspace_root,
-            // A layer name that is never in architecture-rules.json.
+            "test-track".to_owned(),
+            dir.path().to_path_buf(),
+            // A layer name that is never in the minimal architecture-rules.json.
             Some("__nonexistent_layer__".to_owned()),
         );
-        // CN-07 passes; the interactor rejects the unknown layer name.
+        // CN-07 passes (branch matches); the interactor rejects the unknown layer name.
         let err = result.expect_err("unknown layer must be rejected by the interactor");
         let msg = format!("{err}");
         assert!(
@@ -224,37 +234,47 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_rejects_non_matching_track_id() {
-        // CN-07: the current git branch is `track/<some-id>`. Invoking
+        // CN-07: the workspace git branch is `track/known-track`. Invoking
         // type-signals for a different `track_id` must be rejected by the
-        // branch/track-id mismatch guard (regardless of track status).
+        // branch/track-id mismatch guard regardless of the ambient CI git state.
         //
-        // Use the real workspace root (derived from CARGO_MANIFEST_DIR) so the
-        // workspace-alignment guard passes; the CN-07 guard then fires because
-        // the supplied track_id does not match the current branch suffix.
-        // The error message must contain CN-07 text to pin the branch-forwarding
-        // wiring from the CLI into the interactor.
-        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(|p| p.parent())
-            .expect("workspace root from CARGO_MANIFEST_DIR")
-            .to_path_buf();
+        // Uses an isolated tempdir git repo (branch: track/known-track) so the
+        // test is independent of the CI runner's detached HEAD or the developer's
+        // current branch. `SystemGitRepo::discover_from(&workspace_root)` finds the
+        // tempdir's own repo, not the real checkout.
+        let dir = tempfile::tempdir().unwrap();
+        // Bootstrap an isolated repo on a known track branch.
+        init_git_repo_on_track_branch(dir.path(), "known-track");
 
-        // A track_id that will never match the current branch suffix.
+        // Minimal track fixtures so layer-bindings and track-lookup do not fail
+        // before the CN-07 branch guard fires.
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("known-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            minimal_active_metadata_json("known-track"),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        // A track_id that will never match the isolated repo's branch suffix.
         let result = execute_type_signals(
-            "this-id-will-never-match-the-real-branch".to_owned(),
-            workspace_root,
+            "this-id-will-never-match".to_owned(),
+            dir.path().to_path_buf(),
             None,
         );
 
-        // SystemGitRepo::discover() finds the actual git branch (workspace CWD).
-        // The current branch does not match the supplied track_id, so the usecase
-        // CN-07 guard must fire with BranchTrackMismatch ("does not match track_id")
-        // or NonActiveTrack ("not an active track branch" on main/detached HEAD).
+        // The tempdir git repo is on track/known-track. The supplied track_id
+        // ("this-id-will-never-match") does not match, so the CN-07 guard must
+        // fire with BranchMismatch ("does not match").
         let err = result.expect_err("mismatched track_id must be rejected by CN-07");
         let msg = format!("{err}");
         assert!(
-            msg.contains("does not match") || msg.contains("not an active track branch"),
-            "error must be CN-07 branch guard rejection (BranchTrackMismatch or NonActiveTrack), got: {msg}"
+            msg.contains("does not match"),
+            "error must be CN-07 BranchMismatch rejection (contains 'does not match'), got: {msg}"
         );
     }
 
@@ -297,35 +317,45 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_branch_guard_passes_for_current_track() {
-        // Verify the branch-forwarding wiring: when track_id matches the current git
-        // branch suffix, the CN-07 guard passes and execution reaches the layer-resolution
-        // or evaluation step.
+        // Verify the branch-forwarding wiring: when track_id matches the git
+        // branch of the workspace, the CN-07 guard passes and execution reaches
+        // the layer-resolution or evaluation step.
         //
-        // Reads the current branch at runtime to derive the track_id, so this test is
-        // independent of which specific branch name is checked out (not hard-coded to a
-        // particular track). Skipped on non-track/ branches (detached HEAD, main, CI).
+        // Uses an isolated tempdir git repo (branch: track/test-track) so the
+        // test always runs in CI regardless of the ambient git state (detached
+        // HEAD, main, etc.). The tempdir's branch matches the explicit track_id,
+        // so CN-07 passes.
         //
-        // After CN-07 passes, the interactor loads layer bindings from the real
-        // architecture-rules.json and then attempts to evaluate signals.  The
-        // evaluator stub (T008) returns an error at that stage, so the function
-        // returns Err — but the error must come from the evaluation step (containing
-        // "evaluation failed" or "evaluator") not from the branch guard. This
-        // confirms: (a) the branch was forwarded from the CLI to the interactor,
-        // (b) the guard passed for a matching branch, and (c) execution reached the
-        // layer-evaluation step.
-        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(|p| p.parent())
-            .expect("workspace root from CARGO_MANIFEST_DIR")
-            .to_path_buf();
+        // After CN-07 passes, the interactor loads layer bindings from the
+        // minimal architecture-rules.json written to the tempdir and attempts to
+        // evaluate signals.  The evaluator stub (T008) returns an error at that
+        // stage, so the function returns Err — but the error must NOT come from
+        // the branch guard or git-discovery.  This confirms:
+        // (a) the branch was forwarded from the CLI to the interactor,
+        // (b) the guard passed for a matching branch, and
+        // (c) execution reached the layer-evaluation step.
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
 
-        // Derive the track_id from the ambient branch at test runtime.
-        let Some(track_id) = current_track_id_suffix() else {
-            // Not on a track/ branch (detached HEAD, main, CI) — skip.
-            return;
-        };
+        // Minimal track fixtures: metadata + impl-plan + architecture-rules.json +
+        // domain-types.json (so catalogue load succeeds and the evaluator stub fires).
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+        // Provide a minimal domain-types.json so catalogue load succeeds and execution
+        // reaches the evaluator stub (T008) rather than failing at catalogue-load.
+        std::fs::write(
+            track_dir.join("domain-types.json"),
+            r#"{"schema_version":2,"type_definitions":[]}"#,
+        )
+        .unwrap();
 
-        let result = execute_type_signals(track_id, workspace_root, None);
+        let result = execute_type_signals("test-track".to_owned(), dir.path().to_path_buf(), None);
 
         // Verify the branch guard passed: the function must NOT return a CN-07 rejection or
         // a git-discovery failure.  The function may succeed (evaluation reached and passed)
@@ -342,7 +372,11 @@ mod tests {
                 );
                 assert!(
                     !msg.contains("cannot discover git repo"),
-                    "error must NOT be a git-discovery failure — CWD must point to the real workspace, got: {msg}"
+                    "error must NOT be a git-discovery failure — workspace_root must point to the isolated repo, got: {msg}"
+                );
+                assert!(
+                    !msg.contains("detached HEAD"),
+                    "error must NOT be a detached HEAD failure — isolated repo is on a named branch, got: {msg}"
                 );
                 // The error must originate from the evaluation stage (after CN-07 + layer resolution).
                 assert!(
