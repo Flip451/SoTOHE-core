@@ -123,7 +123,10 @@ fn run_execute_local(args: &LocalArgs) -> Result<u8, String> {
 }
 
 fn dispatch_codex(args: &LocalArgs, model: &str) -> Result<u8, String> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    // WRITE guard: verify explicit --track-id matches the current branch (D7 / AC-18).
+    // When None, self-resolves from the current branch (fail-closed on non-track branches).
+    let track_id =
+        crate::commands::track::resolve_track_id_for_write(args.track_id.clone(), &args.items_dir)?;
     let track_id = &track_id;
     let group = args.group.trim();
     let round_type_str = match args.round_type {
@@ -171,7 +174,10 @@ fn dispatch_codex(args: &LocalArgs, model: &str) -> Result<u8, String> {
 }
 
 fn dispatch_claude(args: &LocalArgs, model: &str) -> Result<u8, String> {
-    let track_id = crate::commands::track::resolve_track_id(args.track_id.clone())?;
+    // WRITE guard: verify explicit --track-id matches the current branch (D7 / AC-18).
+    // When None, self-resolves from the current branch (fail-closed on non-track branches).
+    let track_id =
+        crate::commands::track::resolve_track_id_for_write(args.track_id.clone(), &args.items_dir)?;
     let track_id = &track_id;
     let group = args.group.trim();
     let round_type_str = match args.round_type {

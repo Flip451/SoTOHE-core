@@ -1,163 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This adds a new public `BranchReaderPort` implementation on `SystemGitRepo`, but there are no tests in `git_cli/mod.rs` covering the happy path or the error mapping for this adapter. That leaves the new public API unverified and makes regressions in the delegation/mapping easy to miss.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 235,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:74f62715d75176547bca2ff4bd84d8131bbf2e930e49a974d5d34b83c83c0f15",
-          "at": "2026-05-27T05:14:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This patch is no longer limited to the single impl block requested in CN-05: it appends unit tests under `mod tests`, so the change surface extends beyond the allowed block.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 743,
-              "category": "architecture"
-            },
-            {
-              "message": "The new `BranchReaderPort` adapter has no test for the only error branch (`GitError` -> `BranchReadError::ReadFailed`). The added tests cover the success path and the `Ok(None)` path only, so an error-mapping regression would not be caught.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 748,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:dfdea60bafe4d19709647aeedb23f86b066ab755183a46d6e7d034ac9d33165c",
-          "at": "2026-05-27T05:19:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This patch exceeds the briefing's CN-05 boundary: it adds a new `#[cfg(test)]` test block after the adapter impl, even though T002 was supposed to stay within a single `impl BranchReaderPort for SystemGitRepo` block in `libs/infrastructure/src/git_cli/` only.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
-              "line": 743,
-              "category": "scope"
-            }
-          ],
-          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
-          "at": "2026-05-27T05:25:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`branch_reader_port_returns_none_for_empty_repo_with_no_commits` is built on the wrong Git assumption: `git init` creates an unborn branch with a known current branch name, so this path is not a reliable `None` case and is likely to fail in CI. Use a scenario where `current_branch` באמת cannot resolve a branch name instead.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/git_cli/mod.rs",
-              "line": 766,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
-          "at": "2026-05-27T05:29:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
-          "at": "2026-05-27T05:32:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
-          "at": "2026-05-27T05:36:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new error path tells users to \"provide an explicit track-id\", but `verify catalogue-spec-signals` has no track-id argument. On a non-track branch this remediation is impossible within this command, so the failure message contradicts the CLI surface.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-              "line": 399,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:694fed682e06f9e80604ae933d4d859dab31d3ecb1e8fe961a7e9f19fa70a532",
-          "at": "2026-05-27T08:51:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
-          "at": "2026-05-27T08:56:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On non-track branches this error still includes the shared resolver text `provide an explicit track-id` via `{e}`, but `verify catalogue-spec-signals` exposes no `--track` or `--track-id` argument. The remediation is impossible for this command, so the failure message contradicts the CLI surface; suppress or map that nested resolver detail here and keep the actionable hint to switch to a `track/<id>` branch.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
-              "line": 399,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
-          "at": "2026-05-27T09:00:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a99d2131400483ab69730db29bc3eda51b88c72408470baedcbc410ae098728",
-          "at": "2026-05-27T09:03:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
-          "at": "2026-05-27T11:46:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
-          "at": "2026-05-27T11:48:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
-          "at": "2026-05-27T12:42:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
-          "at": "2026-05-27T12:44:49Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -973,63 +816,107 @@
         }
       ]
     },
-    "other": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
-          "at": "2026-05-27T08:50:29Z"
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:35:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
-          "at": "2026-05-27T08:51:48Z"
+          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
+          "at": "2026-05-27T04:38:08Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
-          "at": "2026-05-27T09:34:54Z"
+          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
+          "at": "2026-05-27T06:43:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
-          "at": "2026-05-27T09:38:33Z"
+          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
+          "at": "2026-05-27T06:51:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `tmp/track-commit/track-dir.txt` from `TRANSIENT_AUTOMATION_FILES` does not change behavior while `TRANSIENT_AUTOMATION_DIRS` still contains `tmp`. `validate_stage_path_entries` still rejects every `tmp/**` path, so the track-dir file remains transient/excluded and the intended cleanup is not actually realized.",
+              "severity": "P1",
+              "file": "libs/usecase/src/git_workflow.rs",
+              "line": 15,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
+          "at": "2026-05-27T12:42:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Removing `tmp/track-commit/track-dir.txt` from `TRANSIENT_AUTOMATION_FILES` is ineffective while `TRANSIENT_AUTOMATION_DIRS` still contains `tmp`. `validate_stage_path_entries` still rejects every `tmp/**` path, so the track-dir file remains blocked and the intended cleanup never takes effect.",
+              "severity": "P1",
+              "file": "libs/usecase/src/git_workflow.rs",
+              "line": 15,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
+          "at": "2026-05-27T12:44:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
-          "at": "2026-05-27T13:02:42Z"
+          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
+          "at": "2026-05-27T12:47:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
-          "at": "2026-05-27T13:03:58Z"
+          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
+          "at": "2026-05-27T12:50:27Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
-          "at": "2026-05-27T16:14:56Z"
+          "hash": "rvw1:sha256:c22c56f7c96ef13ceb5bfa0d5cd6d9145756615675b8125ebbf8d7fe623ed190",
+          "at": "2026-05-28T03:30:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
-          "at": "2026-05-27T16:16:14Z"
+          "hash": "rvw1:sha256:c22c56f7c96ef13ceb5bfa0d5cd6d9145756615675b8125ebbf8d7fe623ed190",
+          "at": "2026-05-28T03:32:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d7452fd0eb1a4237012ffbba7f91bce3a539be5a6dd03c8504108dc0a168515",
+          "at": "2026-05-28T05:28:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d7452fd0eb1a4237012ffbba7f91bce3a539be5a6dd03c8504108dc0a168515",
+          "at": "2026-05-28T05:30:22Z"
         }
       ]
     },
@@ -1616,110 +1503,35 @@
           "findings": [],
           "hash": "rvw1:sha256:76f6dd73aba287942dfb70bb922c9f9242d71c8a120fdefa14b19141270eaf3f",
           "at": "2026-05-28T05:35:06Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
-          "at": "2026-05-27T04:35:36Z"
+          "hash": "rvw1:sha256:c354680c7859dc034b4b7ed2da981b62d6b82a5e33576f6f8363da49ab0cf6d0",
+          "at": "2026-05-28T06:07:35Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:932d942686870e0db3550570d377f82db6ea94fdbc143e0caf937f0c51b50cdc",
-          "at": "2026-05-27T04:38:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
-          "at": "2026-05-27T06:43:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac818ee5d92ee17a2df3de169bef10c5e130bb8d6625ffb2099ba1790ce48646",
-          "at": "2026-05-27T06:51:16Z"
-        },
-        {
-          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Removing `tmp/track-commit/track-dir.txt` from `TRANSIENT_AUTOMATION_FILES` does not change behavior while `TRANSIENT_AUTOMATION_DIRS` still contains `tmp`. `validate_stage_path_entries` still rejects every `tmp/**` path, so the track-dir file remains transient/excluded and the intended cleanup is not actually realized.",
+              "message": "The T016 checklist says inline branch guards must be fully removed from `signals.rs` and centralized in the dispatch-layer WRITE guard, but `execute_type_signals_lenient_with_bindings()` still discovers the git repo, reads the current branch, strips `track/`, and compares it to `track_id` itself. This leaves a production WRITE path with duplicate branch-guard semantics outside `resolve_track_id_from_root_for_write`, so the migration is incomplete and this path can diverge from the shared guard behavior.",
               "severity": "P1",
-              "file": "libs/usecase/src/git_workflow.rs",
-              "line": 15,
-              "category": "correctness"
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 185,
+              "category": "architecture"
             }
           ],
-          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
-          "at": "2026-05-27T12:42:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Removing `tmp/track-commit/track-dir.txt` from `TRANSIENT_AUTOMATION_FILES` is ineffective while `TRANSIENT_AUTOMATION_DIRS` still contains `tmp`. `validate_stage_path_entries` still rejects every `tmp/**` path, so the track-dir file remains blocked and the intended cleanup never takes effect.",
-              "severity": "P1",
-              "file": "libs/usecase/src/git_workflow.rs",
-              "line": 15,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
-          "at": "2026-05-27T12:44:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
-          "at": "2026-05-27T12:47:14Z"
+          "hash": "rvw1:sha256:c354680c7859dc034b4b7ed2da981b62d6b82a5e33576f6f8363da49ab0cf6d0",
+          "at": "2026-05-28T06:14:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9b4aca87193906f7505acda2f78714992232d8de6941169af593759dd646d9c7",
-          "at": "2026-05-27T12:50:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c22c56f7c96ef13ceb5bfa0d5cd6d9145756615675b8125ebbf8d7fe623ed190",
-          "at": "2026-05-28T03:30:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c22c56f7c96ef13ceb5bfa0d5cd6d9145756615675b8125ebbf8d7fe623ed190",
-          "at": "2026-05-28T03:32:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d7452fd0eb1a4237012ffbba7f91bce3a539be5a6dd03c8504108dc0a168515",
-          "at": "2026-05-28T05:28:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d7452fd0eb1a4237012ffbba7f91bce3a539be5a6dd03c8504108dc0a168515",
-          "at": "2026-05-28T05:30:22Z"
+          "hash": "rvw1:sha256:3df4c5a75c1752e843d986f88e659c3d672c08f469e3787c487c10d9b880ecd1",
+          "at": "2026-05-28T06:20:16Z"
         }
       ]
     },
@@ -1899,6 +1711,237 @@
           "findings": [],
           "hash": "rvw1:sha256:bd19d1a66956e4f66cbfe4414319d260826f6f675cf0fd57f03c800268cf3eac",
           "at": "2026-05-28T00:01:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d143c3dccdb8e6e0d634f4c04736ae4e0631b136b0f5f931262243cd91257e94",
+          "at": "2026-05-28T06:12:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d143c3dccdb8e6e0d634f4c04736ae4e0631b136b0f5f931262243cd91257e94",
+          "at": "2026-05-28T06:13:59Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This adds a new public `BranchReaderPort` implementation on `SystemGitRepo`, but there are no tests in `git_cli/mod.rs` covering the happy path or the error mapping for this adapter. That leaves the new public API unverified and makes regressions in the delegation/mapping easy to miss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 235,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:74f62715d75176547bca2ff4bd84d8131bbf2e930e49a974d5d34b83c83c0f15",
+          "at": "2026-05-27T05:14:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This patch is no longer limited to the single impl block requested in CN-05: it appends unit tests under `mod tests`, so the change surface extends beyond the allowed block.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 743,
+              "category": "architecture"
+            },
+            {
+              "message": "The new `BranchReaderPort` adapter has no test for the only error branch (`GitError` -> `BranchReadError::ReadFailed`). The added tests cover the success path and the `Ok(None)` path only, so an error-mapping regression would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 748,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:dfdea60bafe4d19709647aeedb23f86b066ab755183a46d6e7d034ac9d33165c",
+          "at": "2026-05-27T05:19:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This patch exceeds the briefing's CN-05 boundary: it adds a new `#[cfg(test)]` test block after the adapter impl, even though T002 was supposed to stay within a single `impl BranchReaderPort for SystemGitRepo` block in `libs/infrastructure/src/git_cli/` only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "line": 743,
+              "category": "scope"
+            }
+          ],
+          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
+          "at": "2026-05-27T05:25:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`branch_reader_port_returns_none_for_empty_repo_with_no_commits` is built on the wrong Git assumption: `git init` creates an unborn branch with a known current branch name, so this path is not a reliable `None` case and is likely to fail in CI. Use a scenario where `current_branch` באמת cannot resolve a branch name instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
+              "line": 766,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0e10f0a214877cea464afa1aabc1720ff6bf3dfa7214546b37cc6ef7e18317d4",
+          "at": "2026-05-27T05:29:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
+          "at": "2026-05-27T05:32:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6141b9d741805662be81687501e9debb8a4e037ff5f05c11e10d4bb8f3c93ed",
+          "at": "2026-05-27T05:36:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new error path tells users to \"provide an explicit track-id\", but `verify catalogue-spec-signals` has no track-id argument. On a non-track branch this remediation is impossible within this command, so the failure message contradicts the CLI surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 399,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:694fed682e06f9e80604ae933d4d859dab31d3ecb1e8fe961a7e9f19fa70a532",
+          "at": "2026-05-27T08:51:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
+          "at": "2026-05-27T08:56:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On non-track branches this error still includes the shared resolver text `provide an explicit track-id` via `{e}`, but `verify catalogue-spec-signals` exposes no `--track` or `--track-id` argument. The remediation is impossible for this command, so the failure message contradicts the CLI surface; suppress or map that nested resolver detail here and keep the actionable hint to switch to a `track/<id>` branch.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "line": 399,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:21916e64304caa0bd881aead68eefd435be76253bb55714b64ac06580ec788bf",
+          "at": "2026-05-27T09:00:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a99d2131400483ab69730db29bc3eda51b88c72408470baedcbc410ae098728",
+          "at": "2026-05-27T09:03:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
+          "at": "2026-05-27T11:46:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6f10b4270a64dada0d8abd21060b520384d3c0ed62fa9eee5e8d788238ebeb62",
+          "at": "2026-05-27T11:48:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
+          "at": "2026-05-27T12:42:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1099ac4b156539590a3cce2d77976f87e6e538b0d63312cfceddf48488895b0",
+          "at": "2026-05-27T12:44:49Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
+          "at": "2026-05-27T08:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5932e843410fb30c2612e4aff67b7b6477faafd91777dbe72db41f14a8ede339",
+          "at": "2026-05-27T08:51:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7403e99d9a1b1a835dd60fb53c7219daa5adea7d0874c20748fefc4b04847c94",
+          "at": "2026-05-27T09:38:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
+          "at": "2026-05-27T13:02:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93a8e9b33079db8f45316513b777dc6847ceea4cfe3ae6fd0a6fa5268fa2781b",
+          "at": "2026-05-27T13:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
+          "at": "2026-05-27T16:14:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:910142e43eb595ef28a1d336b394e2f3dcb7d1a4b39dfcac37562c75cb6f42c1",
+          "at": "2026-05-27T16:16:14Z"
         }
       ]
     }

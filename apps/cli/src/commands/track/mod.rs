@@ -248,9 +248,6 @@ fn format_write_error(e: &ActiveTrackResolveError) -> String {
 /// - `explicit_id` is `Some` and the current branch is not a track branch.
 /// - `explicit_id` is `Some` and the branch-derived id does not equal it.
 /// - `explicit_id` is `None` and the current branch is not a track branch.
-// Call sites are added by T016 (generalizing the WRITE branch guard to the remaining
-// WRITE operations). The attribute is removed when T016 wires the call sites.
-#[allow(dead_code)]
 pub(crate) fn resolve_track_id_from_root_for_write(
     explicit_id: Option<String>,
     workspace_root: &Path,
@@ -780,12 +777,14 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
         TrackCommand::TaskCounts { items_dir, track_id } => resolve_track_id(track_id)
             .map_err(CliError::Message)
             .and_then(|tid| state_ops::execute_task_counts(items_dir, tid)),
-        TrackCommand::Signals { items_dir, track_id } => resolve_track_id(track_id)
-            .map_err(CliError::Message)
-            .and_then(|tid| signals::execute_signals(items_dir, tid)),
+        TrackCommand::Signals { items_dir, track_id } => {
+            resolve_track_id_for_write(track_id, &items_dir)
+                .map_err(CliError::Message)
+                .and_then(|tid| signals::execute_signals(items_dir, tid))
+        }
         TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
-            let resolved =
-                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
             resolved.and_then(|tid| tddd::signals::execute_type_signals(tid, workspace_root, layer))
         }
         TrackCommand::TypeGraph {
@@ -810,15 +809,15 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             })
         }
         TrackCommand::BaselineGraph { items_dir, track_id, workspace_root, layers } => {
-            let resolved =
-                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
             resolved.and_then(|tid| {
                 tddd::baseline_graph::execute_baseline_graph(items_dir, tid, workspace_root, layers)
             })
         }
         TrackCommand::ContractMap { items_dir, track_id, workspace_root, layers } => {
-            let resolved =
-                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
             resolved.and_then(|tid| {
                 tddd::contract_map::execute_contract_map(items_dir, tid, workspace_root, layers)
             })
@@ -835,8 +834,8 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             layer,
             force,
         } => {
-            let resolved =
-                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
             resolved.and_then(|tid| {
                 tddd::baseline::execute_baseline_capture(
                     tid,
@@ -848,8 +847,8 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
             })
         }
         TrackCommand::CatalogueSpecSignals { items_dir, track_id, workspace_root, layer } => {
-            let resolved =
-                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
+            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
+                .map_err(CliError::Message);
             resolved.and_then(|tid| {
                 tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
                     items_dir,

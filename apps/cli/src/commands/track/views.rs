@@ -27,12 +27,19 @@ pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
             // is preserved for track views sync because registry.md is
             // track-independent).
             //
-            // Explicit ids are validated before use to prevent path-traversal
-            // via malformed inputs (e.g. `../../tmp`) reaching sync_rendered_views.
+            // When an explicit --track-id is given, the WRITE guard validates
+            // that it matches the current git branch (AC-18, D7): a mismatch
+            // is fail-closed. This prevents accidentally syncing views for a
+            // different track than the one the developer is working on.
             let resolved_track_id = match track_id {
                 Some(id) => {
-                    super::validate_track_id_str(&id).map_err(CliError::Message)?;
-                    Some(id)
+                    // WRITE guard: verify explicit id matches the current branch (D7 / AC-18).
+                    // resolve_track_id_from_root_for_write validates the id format and performs
+                    // the branch-id comparison fail-closed. On success the id is returned as-is.
+                    let validated_id =
+                        super::resolve_track_id_from_root_for_write(Some(id), &project_root)
+                            .map_err(CliError::Message)?;
+                    Some(validated_id)
                 }
                 None => detect_active_track_from_branch(&project_root),
             };
@@ -165,5 +172,60 @@ mod tests {
         // and auto-detection must silently return None.
         let tmp = tempfile::tempdir().unwrap();
         assert_eq!(detect_active_track_from_branch(tmp.path()), None);
+    }
+
+    // ── WRITE guard integration tests (AC-18 / D7 / T016) ───────────────────
+
+    /// AC-18 / D7: explicit --track-id that mismatches the current branch must be
+    /// rejected by the WRITE guard before sync_rendered_views is attempted.
+    ///
+    /// Uses a synthetic git repo on `track/real-track` so branch discovery succeeds.
+    /// Supplying `other-track` as the explicit id triggers the mismatch error.
+    #[test]
+    fn sync_write_guard_rejects_explicit_id_mismatching_branch() {
+        let tmp = tempfile::tempdir().unwrap();
+        // Set up a real git repo on track/real-track so branch discovery finds it.
+        let root = init_repo_on_branch(&tmp, "track/real-track");
+
+        let result = execute_views(ViewAction::Sync {
+            project_root: root.clone(),
+            track_id: Some("other-track".to_owned()),
+        });
+
+        assert!(result.is_err(), "WRITE guard must reject mismatched explicit track-id");
+        let err_msg = format!("{:?}", result.unwrap_err());
+        assert!(
+            err_msg.contains("WRITE operation rejected") || err_msg.contains("other-track"),
+            "error must explain the mismatch, got: {err_msg}"
+        );
+    }
+
+    /// AC-18 / D7: explicit --track-id that matches the current branch passes the
+    /// WRITE guard (the sync itself may fail due to missing registry files, but the
+    /// guard itself must not reject the call).
+    #[test]
+    fn sync_write_guard_allows_explicit_id_matching_branch() {
+        let tmp = tempfile::tempdir().unwrap();
+        // Set up a real git repo on track/my-track so branch discovery finds it.
+        let root = init_repo_on_branch(&tmp, "track/my-track");
+
+        // Note: sync_rendered_views will fail because `track/items` etc. are absent
+        // in the synthetic repo. The WRITE guard itself must pass (not return
+        // "WRITE operation rejected"). We only check the guard layer — any downstream
+        // filesystem error is acceptable.
+        let result = execute_views(ViewAction::Sync {
+            project_root: root.clone(),
+            track_id: Some("my-track".to_owned()),
+        });
+
+        // Acceptable outcomes: Ok (unlikely — registry missing) or Err from render,
+        // but must NOT be a WRITE guard rejection.
+        if let Err(ref e) = result {
+            let msg = format!("{e:?}");
+            assert!(
+                !msg.contains("WRITE operation rejected"),
+                "WRITE guard must pass for matching track-id, got: {msg}"
+            );
+        }
     }
 }
