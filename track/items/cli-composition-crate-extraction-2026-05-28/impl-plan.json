@@ -10,7 +10,7 @@
     {
       "id": "T002",
       "description": "CliApp facade skeleton: implement CliApp struct and CommandOutcome type in apps/cli-composition/src/lib.rs. CommandOutcome carries stdout: Option<String>, stderr: Option<String>, exit_code: u8 — all primitive. CliApp is a unit struct with pub fn new() -> Self. Add stub method signatures for ALL command families (review_v2: review_run_codex, review_run_claude, review_run_local, review_check_approved, review_results, review_classify, review_files, review_validate_scope, review_get_briefing, review_persist_commit_hash; guard: guard_check; hook: hook_dispatch; domain: domain_export_schema; git: git commands; track: track commands including tddd subcommands; verify: verify commands; pr/pr_tests: pr commands; make non-review: any remaining make subcommands not covered by review_persist_commit_hash) — each returns Result<CommandOutcome, String> and returns Err(String::from(\"not implemented\")) as a temporary placeholder (not unimplemented!() — library code must not panic per the No Panics convention). The public method signatures must use only String / &str / PathBuf / primitive / CommandOutcome / composition-defined input DTO parameters — no usecase / domain / infrastructure types on the public face (CN-02). The stub must compile so cargo make ci passes. The actual composition logic is wired in T003-T005; this task only establishes the public API contract for ALL command families so that T006 can remove all infrastructure/usecase deps from apps/cli. Covers IN-03, CN-02.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T003",
