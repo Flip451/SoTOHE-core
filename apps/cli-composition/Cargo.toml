@@ -1,0 +1,14 @@
+[package]
+name = "cli_composition"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+domain = { path = "../../libs/domain" }
+infrastructure = { path = "../../libs/infrastructure" }
+usecase = { path = "../../libs/usecase" }
