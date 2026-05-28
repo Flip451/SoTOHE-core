@@ -19,6 +19,10 @@ decisions:
   - id: D5
     user_decision_ref: "chat_segment:optional-track-id-uniform-flag:2026-05-27"
     status: proposed
+  - id: D6
+    user_decision_ref: "chat_segment:make-wrapper-uniform-flag-passthrough:2026-05-28"
+    review_finding_ref: "pr:142:codex-review:make-wrapper-track-id-self-resolve"
+    status: proposed
 ---
 # track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする
 
@@ -106,6 +110,27 @@ D1 で「明示指定は上書きとして残す」と決定したが、その *
   - 明示 track-id 上書きは「現在ブランチ外のトラックを対象にしたい」まれなケースであり、フラグの若干の冗長さは許容できる。省略時の自動解決が大多数の用途を担うため、フラグの記述量が問題になる頻度は低い。
 - **フラグ名を `--track-id` に統一する**: すべての track 対象コマンドでフラグ名を `--track-id` に揃える。現状で `--track` という別名を持つ `verify catalogue-spec-refs` は、`--track-id` に改名する。この統一により、コマンドをまたいでフラグ名を使い分ける必要がなくなる。
 - **`--track-dir` は対象外**: `git commit-from-file` / `verify plan-artifact-refs` の `--track-dir` は track-id スラグではなくファイルシステムパスを受け取る引数であり、別の概念である。この名前統一の対象に含めない。
+
+D5 の uniform `--track-id` フラグを `cargo make` task wrapper 起動層まで延長する方針は D6 で決定する。
+
+### D6: `cargo make` task wrapper は positional track-id を課さず、`--track-id` を素通しする
+
+D5 は `sotp` CLI コマンド定義層（`apps/cli/src/commands/track/` の各サブコマンド）での `--track-id` フラグ統一を決定した。しかし `apps/cli/src/commands/make.rs` の `dispatch_track_*` 関数群（`dispatch_track_add_task` / `dispatch_track_transition` / `dispatch_track_next_task` / `dispatch_track_task_counts` / `dispatch_track_set_override`）は、位置引数の先頭要素を強制的に `track_id` として消費する実装になっている。このため `cargo make track-add-task -- "write docs"` のように track-id なしで呼ぶと `"write docs"` が track_id として誤消費され、D1 の省略時自己解決が wrapper 経由では働かない。
+
+PR #142 の @codex レビューで上記の問題が "Allow make wrappers to use the active track default" として指摘された。
+
+この問題を解決するため、以下のように決定する。
+
+- **wrapper は positional track-id を課さない**: 対象 wrapper（`track-add-task` / `track-transition` / `track-next-task` / `track-task-counts` / `track-set-override`）は先頭位置引数を track_id として読み取ることをやめる。各 wrapper が最低限行うのは `--items-dir track/items` の注入であり、それ以外の引数はすべて underlying `sotp` コマンドへ素通しする。ただし `dispatch_track_set_override` は例外として、最初の非フラグ位置引数をステータス語（`blocked` / `cancelled` / `clear`）として読み取り、`track set-override` と `track clear-override` のいずれを呼ぶかをルーティングする（この読み取りは track-id の消費ではなく、Makefile の単一エントリポイント `track-set-override` を 2 つの underlying コマンドに振り分けるための内部ルーティングである）。
+- **`--track-id` を明示するか省略する**: track-id を使いたい呼び出し側は `cargo make track-add-task -- --track-id <id> "write docs"` のようにフラグとして渡す。省略した場合は D1 の自己解決（現在ブランチ → active track）が働く。これにより `track/<id>` ブランチ上では `cargo make track-add-task -- "write docs"` が期待どおり動く。
+- **対象 wrapper の列挙**:
+  - `dispatch_track_add_task` — `track add-task`
+  - `dispatch_track_transition` — `track transition`
+  - `dispatch_track_next_task` — `track next-task`
+  - `dispatch_track_task_counts` — `track task-counts`
+  - `dispatch_track_set_override` — `track set-override` / `track clear-override`
+- **wrapper は track-id 知識を持たない**: D4 で定めた「ラッパーは track-id に関する知識を持たなくてよい」という原則（bare chain wrapper の方針）を task wrapper へも適用する。
+- **interface 変更を伴う**: 既存の positional 呼び出し（`.claude/commands/track/implement.md` / `full-cycle.md` / `knowledge/conventions/task-completion-flow.md` / `apps/cli/src/commands/make_tests.rs` における `cargo make track-transition <track_dir> ...` など）は、`--track-id <id>` フラグ形式または track-id 省略形式へ更新が必要になる。
 
 ## Rejected Alternatives
 

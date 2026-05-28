@@ -320,89 +320,115 @@ fn dispatch_track_pr_status(raw_args: &[String]) -> Result<ExitCode, CliError> {
 }
 
 fn dispatch_track_next_task(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let track_id = raw_args_to_single(raw_args).map_err(|_| {
-        CliError::Message("error: usage: sotp make track-next-task <track-id>".to_owned())
-    })?;
-    run_sotp(&["track", "next-task", "--items-dir", "track/items", "--track-id", &track_id])
+    // Passthrough: inject --items-dir and forward all remaining args verbatim.
+    // If the caller passes --track-id <id>, it flows through; otherwise the
+    // underlying command self-resolves from the current branch (D1, D6).
+    let args =
+        build_forwarded_args(&["track", "next-task", "--items-dir", "track/items"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
 }
 
 fn dispatch_track_task_counts(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let track_id = raw_args_to_single(raw_args).map_err(|_| {
-        CliError::Message("error: usage: sotp make track-task-counts <track-id>".to_owned())
-    })?;
-    run_sotp(&["track", "task-counts", "--items-dir", "track/items", "--track-id", &track_id])
+    // Passthrough: inject --items-dir and forward all remaining args verbatim.
+    // If the caller passes --track-id <id>, it flows through; otherwise the
+    // underlying command self-resolves from the current branch (D1, D6).
+    let args =
+        build_forwarded_args(&["track", "task-counts", "--items-dir", "track/items"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
 }
 
 fn dispatch_track_transition(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let words = raw_args_to_words(raw_args);
-    let usage = "error: usage: sotp make track-transition <track_dir> <task_id> <status> [--commit-hash <hash>]";
-    let track_dir = words.first().ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let task_id = words.get(1).ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let target_status = words.get(2).ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    // Extract items-dir (parent) and track-id (basename) from track_dir
-    let path = std::path::Path::new(track_dir.as_str());
-    let items_dir = path.parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_default();
-    let track_id_str =
-        path.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
-    if items_dir.is_empty() || track_id_str.is_empty() {
-        return Err(CliError::Message(
-            "error: track_dir must be in the form <items_dir>/<track_id>".to_owned(),
-        ));
-    }
-    let mut args: Vec<&str> = vec![
-        "track",
-        "transition",
-        "--items-dir",
-        &items_dir,
-        "--track-id",
-        &track_id_str,
-        task_id,
-        target_status,
-    ];
-    // Forward remaining args (e.g., --commit-hash <hash>)
-    for w in words.get(3..).unwrap_or_default() {
-        args.push(w);
-    }
-    run_sotp(&args)
+    // Passthrough: inject --items-dir and forward all remaining args verbatim.
+    // Callers pass task_id, status, and optional --commit-hash / --track-id as flags.
+    // --track-id is forwarded if present; omitting it triggers self-resolve (D1, D6).
+    let args =
+        build_forwarded_args(&["track", "transition", "--items-dir", "track/items"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
 }
 
 fn dispatch_track_add_task(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    // Passthrough: inject --items-dir and forward all remaining args verbatim.
+    // If the caller passes --track-id <id>, it flows through; otherwise the
+    // underlying command self-resolves from the current branch (D1, D6).
+    let args = build_forwarded_args(&["track", "add-task", "--items-dir", "track/items"], raw_args);
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
+}
+
+/// Build the sotp argv for `track-set-override` / `track-clear-override`.
+///
+/// Finds the first positional (non-flag, non-flag-value) word in `raw_args` as
+/// the status, then routes:
+/// - `"clear"` → `["track", "clear-override", "--items-dir", "track/items", <rest>]`
+/// - other     → `["track", "set-override",   "--items-dir", "track/items", status, <rest>]`
+///
+/// Only **value-taking** flags (`--track-id`, `--reason`) consume the next token as their
+/// value. Boolean flags (`--skip-branch-check`) do not consume the next token. The status
+/// word is removed by **index** (not by value), so a flag value that happens to equal the
+/// status string is never silently dropped.
+///
+/// # Errors
+///
+/// Returns `Err` if no positional word is found (missing status argument).
+pub fn build_set_override_args(raw_args: &[String]) -> Result<Vec<String>, CliError> {
     let words = raw_args_to_words(raw_args);
-    let usage = "error: usage: sotp make track-add-task <track-id> <description> [--section <id>] [--after <task-id>]";
-    let track_id = words.first().ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let desc = words.get(1).ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let mut args: Vec<&str> =
-        vec!["track", "add-task", "--items-dir", "track/items", "--track-id", track_id, desc];
-    for w in words.get(2..).unwrap_or_default() {
-        args.push(w);
+    let filtered: Vec<&str> = words.iter().map(|s| s.as_str()).skip_while(|s| *s == "--").collect();
+    let usage = "error: usage: sotp make track-set-override <blocked|cancelled|clear> [--track-id <id>] [--reason <text>]";
+    // Only these flags take a value argument; boolean flags do not consume the next token.
+    const VALUE_FLAGS: &[&str] = &["--track-id", "--reason"];
+    // Walk the filtered tokens. Skip known value-taking flags and their values.
+    // Boolean flags (e.g. --skip-branch-check) are skipped without consuming the next token.
+    let mut status_idx: Option<usize> = None;
+    let mut skip_next = false;
+    for (i, word) in filtered.iter().enumerate() {
+        if skip_next {
+            skip_next = false;
+            continue;
+        }
+        if VALUE_FLAGS.contains(word) {
+            // This flag takes exactly one value argument.
+            skip_next = true;
+        } else if !word.starts_with('-') {
+            // First non-flag, non-flag-value token is the status.
+            status_idx = Some(i);
+            break;
+        }
+        // Boolean flags (starts with '-' but not in VALUE_FLAGS) are skipped without consuming next.
     }
-    run_sotp(&args)
+    let status_idx = status_idx.ok_or_else(|| CliError::Message(usage.to_owned()))?;
+    let status = filtered.get(status_idx).ok_or_else(|| CliError::Message(usage.to_owned()))?;
+    // Remaining args: all words except the status word at status_idx, removed by index.
+    let rest: Vec<&str> =
+        filtered.iter().enumerate().filter(|(i, _)| *i != status_idx).map(|(_, s)| *s).collect();
+    if *status == "clear" {
+        let mut args: Vec<String> = vec![
+            "track".to_owned(),
+            "clear-override".to_owned(),
+            "--items-dir".to_owned(),
+            "track/items".to_owned(),
+        ];
+        args.extend(rest.iter().map(|s| (*s).to_owned()));
+        Ok(args)
+    } else {
+        let mut args: Vec<String> = vec![
+            "track".to_owned(),
+            "set-override".to_owned(),
+            "--items-dir".to_owned(),
+            "track/items".to_owned(),
+            (*status).to_owned(),
+        ];
+        args.extend(rest.iter().map(|s| (*s).to_owned()));
+        Ok(args)
+    }
 }
 
 fn dispatch_track_set_override(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let words = raw_args_to_words(raw_args);
-    let usage = "error: usage: sotp make track-set-override <track-id> <blocked|cancelled|clear> [--reason <text>]";
-    let track_id = words.first().ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let status = words.get(1).ok_or_else(|| CliError::Message(usage.to_owned()))?;
-    let extra: Vec<&str> = words.get(2..).unwrap_or_default().iter().map(|s| s.as_str()).collect();
-    if status == "clear" {
-        let mut args: Vec<&str> =
-            vec!["track", "clear-override", "--items-dir", "track/items", "--track-id", track_id];
-        args.extend_from_slice(&extra);
-        run_sotp(&args)
-    } else {
-        let mut args: Vec<&str> = vec![
-            "track",
-            "set-override",
-            "--items-dir",
-            "track/items",
-            "--track-id",
-            track_id,
-            status,
-        ];
-        args.extend_from_slice(&extra);
-        run_sotp(&args)
-    }
+    let args = build_set_override_args(raw_args)?;
+    let refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
+    run_sotp(&refs)
 }
 
 fn dispatch_track_local_plan(raw_args: &[String]) -> Result<ExitCode, CliError> {

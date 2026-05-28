@@ -195,6 +195,20 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-15",
+        "text": "`apps/cli/src/commands/make.rs` の `cargo make` task wrapper 群（`dispatch_track_add_task` / `dispatch_track_transition` / `dispatch_track_next_task` / `dispatch_track_task_counts` / `dispatch_track_set_override`）が、位置引数の先頭要素を track_id として強制消費する実装を廃止する。各 wrapper が最低限行う注入は `--items-dir track/items` のみとし、残りの引数はすべて underlying `sotp` コマンドへそのまま渡す。ただし `dispatch_track_set_override` は例外として、最初の非フラグ位置引数をステータス語（`blocked` / `cancelled` / `clear`）として読み取り `track set-override` / `track clear-override` へのルーティングを行う（これは track-id の消費ではなく、Makefile 単一エントリポイントから 2 つの underlying コマンドへ振り分けるための内部ルーティングである）。これにより D1 の省略時自己解決（`track/<id>` ブランチ → active track）と D5 の `--track-id` フラグが wrapper 経由でも働くようになる（IN-01 は CLI コマンド定義層での `--track-id` フラグ統一を対象とし、本項はその上の make wrapper 起動層を対象とする）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -592,6 +606,20 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-17",
+      "text": "`track/<id>` ブランチ上で `cargo make track-add-task -- \"<desc>\"` のように track-id を省略した呼び出しが、track-id を要求せずアクティブトラックへ自己解決して動作する。track-id を明示する場合は `cargo make track-add-task -- --track-id <id> \"<desc>\"` のようにフラグ形式で渡せる。IN-15 の対象 5 wrapper（`dispatch_track_add_task` / `dispatch_track_transition` / `dispatch_track_next_task` / `dispatch_track_task_counts` / `dispatch_track_set_override`）のいずれも、positional track_id を先頭引数として消費しない。`apps/cli/src/commands/make_tests.rs` が wrapper 経由の新形式（`--track-id` フラグまたは省略）を反映していること（CN-10 の方針を wrapper 層で観測可能な形で確認する）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -621,7 +649,7 @@
     }
   ],
   "signals": {
-    "blue": 53,
+    "blue": 55,
     "yellow": 0,
     "red": 0
   }

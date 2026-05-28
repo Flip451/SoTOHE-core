@@ -78,6 +78,12 @@
       "description": "CLI: make the optional track-id a uniform --track-id flag across all IN-01 commands and rename verify catalogue-spec-refs's --track to --track-id (D5). The four write commands (transition / add-task / set-override / clear-override) in apps/cli/src/commands/track/mod.rs already use #[arg(long)] track_id: Option<String> from T004 — leave those unchanged. Change the remaining eleven read/query commands that T004 left as optional positional args: signals / type-signals / type-graph / baseline-graph / contract-map / catalogue-spec-signals / catalogue-impl-signals / spec-element-hash / baseline-capture / next-task / task-counts. For each, change the clap annotation from a bare positional field to #[arg(long)] track_id: Option<String>, so they accept --track-id instead of a positional argument. In apps/cli/src/commands/verify.rs, rename CatalogueSpecRefsArgs.track (--track flag) to track_id (#[arg(long = \"track-id\")]) to match the unified flag name (IN-03, D5). Update any affected unit tests that passed an explicit track-id as a positional argument in test invocations; regen/self-resolving invocations that pass no track-id are unaffected. Update any cargo make wrappers or call sites in the codebase that supplied an explicit track-id positionally to these commands (if any). Leave --track-dir (a path arg in git commit-from-file / verify plan-artifact-refs) unchanged. No new types. Covers D5, IN-01 (flag-form dimension), AC-03 (flag name unification), IN-03.",
       "status": "done",
       "commit_hash": "d76584ab6520df37c408c2d5fb105748887e5a2b"
+    },
+    {
+      "id": "T014",
+      "description": "make.rs wrapper passthrough: remove positional track-id consumption from the five cargo make task wrappers and update all existing call sites. (1) In apps/cli/src/commands/make.rs, rewrite dispatch_track_add_task, dispatch_track_transition, dispatch_track_next_task, dispatch_track_task_counts, and dispatch_track_set_override so that they no longer consume a positional track-id. Four of the five (add_task, transition, next_task, task_counts) inject --items-dir track/items and forward all remaining args verbatim. dispatch_track_set_override is the exception: it additionally reads the first non-flag positional word as the status (blocked / cancelled / clear) to route to either track set-override or track clear-override (the single Makefile entry covers two underlying commands), and it does NOT consume a positional track-id. dispatch_track_transition currently extracts track_dir from the first positional arg and derives --items-dir and --track-id by splitting it; change it to inject --items-dir track/items and pass --track-id only when explicitly present in the forwarded args (i.e. passthrough). After this change, cargo make track-add-task -- \"write docs\" resolves the active track from the current branch (D1 self-resolve), and cargo make track-add-task -- --track-id <id> \"write docs\" uses the explicit id. (2) Update existing call sites that still pass a positional track-id or track_dir to the five wrappers: .claude/commands/track/implement.md, .claude/commands/track/full-cycle.md, knowledge/conventions/task-completion-flow.md (cargo make track-transition <track_dir> <task_id> <status> invocation pattern), and apps/cli/src/commands/make_tests.rs (positional wrapper tests). Change each to the --track-id flag form or to the track-id-omitted form as appropriate. No new types. Covers IN-15, AC-17.",
+      "status": "todo",
+      "commit_hash": null
     }
   ],
   "plan": {
@@ -227,6 +233,18 @@
         ],
         "task_ids": [
           "T013"
+        ]
+      },
+      {
+        "id": "S13",
+        "title": "make.rs wrapper passthrough: remove positional track-id consumption + update call sites",
+        "description": [
+          "Rewrite the five cargo make task wrappers (dispatch_track_add_task / dispatch_track_transition / dispatch_track_next_task / dispatch_track_task_counts / dispatch_track_set_override) in apps/cli/src/commands/make.rs to stop consuming a positional track-id. Four of the five (dispatch_track_add_task / dispatch_track_transition / dispatch_track_next_task / dispatch_track_task_counts) inject --items-dir track/items and forward all remaining args verbatim to the underlying sotp command. dispatch_track_set_override is the exception: it additionally reads the first non-flag positional word as the status (blocked / cancelled / clear) to route to either track set-override or track clear-override; this routing is necessary because the single Makefile entry track-set-override covers two distinct underlying sotp commands.",
+          "dispatch_track_transition currently extracts track_dir from the first positional arg and derives both --items-dir and --track-id from it; change it to inject --items-dir track/items and passthrough --track-id when the caller provides it explicitly.",
+          "Update all existing call sites that currently pass a positional track-id or track_dir to these wrappers: .claude/commands/track/implement.md, .claude/commands/track/full-cycle.md, knowledge/conventions/task-completion-flow.md, and apps/cli/src/commands/make_tests.rs (IN-15, AC-17, D6)."
+        ],
+        "task_ids": [
+          "T014"
         ]
       }
     ]
