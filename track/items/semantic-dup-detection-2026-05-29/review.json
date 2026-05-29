@@ -265,6 +265,68 @@
           "findings": [],
           "hash": "rvw1:sha256:92e70d5448584915d9d61b5ca243883e52476744655e77eb2706a2589becbe0c",
           "at": "2026-05-29T15:09:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fca4cbceb112abf32a60ac36f8b518421da9043c08704c8b411552b9ee670b7e",
+          "at": "2026-05-29T15:24:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The task-state-only briefing says there should be no catalogue/signal drift, but this generated domain type view now changes `SimilarFragment` to a fully signalled state, with `SemanticDupError` similarly changed on line 17. That is outside the requested T001 status bookkeeping change and should be reverted or moved to the implementation/signals scope.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/domain-types.md",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fca4cbceb112abf32a60ac36f8b518421da9043c08704c8b411552b9ee670b7e",
+          "at": "2026-05-29T15:26:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fca4cbceb112abf32a60ac36f8b518421da9043c08704c8b411552b9ee670b7e",
+          "at": "2026-05-29T15:37:46Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 160,
+              "category": "domain invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:25:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
+          "at": "2026-05-29T15:27:41Z"
         }
       ]
     }

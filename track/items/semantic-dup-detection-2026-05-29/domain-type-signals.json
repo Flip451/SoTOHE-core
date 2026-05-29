@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-29T15:11:00Z",
+  "generated_at": "2026-05-29T15:38:37Z",
   "declaration_hash": "4093e55311c528d823f247b056c2dd62b1ed59e336664a9952492c79420cb918",
   "signals": [
     {
       "type_name": "CodeFragment",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -16,9 +16,9 @@
     {
       "type_name": "SemanticDupError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -27,9 +27,9 @@
     {
       "type_name": "SimilarFragment",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -38,8 +38,8 @@
       "type_name": "SimilarityScore",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
         "core::marker::Copy"
@@ -49,8 +49,8 @@
       "type_name": "SimilarityThreshold",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
         "core::marker::Copy"
@@ -60,8 +60,8 @@
       "type_name": "TopK",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug",
         "core::marker::Copy"

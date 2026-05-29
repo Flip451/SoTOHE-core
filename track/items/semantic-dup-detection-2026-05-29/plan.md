@@ -9,7 +9,7 @@
 > No external crate dependencies are introduced here; this task compiles independently and is the prerequisite for every layer above it.
 > All constructors enforce invariants (non-empty content, score/threshold in [0,1], k>=1) so illegal states are unrepresentable per .claude/rules/04-coding-principles.md.
 
-- [ ] **T001**: Add the domain module `libs/domain/src/semantic_dup.rs`: implement `CodeFragment` (non-empty content guard, Debug+Clone), `SimilarityScore` (range [0,1] guard, Debug+Clone+Copy), `TopK` (>=1 guard, Debug+Clone+Copy), `SimilarityThreshold` (range [0,1] guard, Debug+Clone+Copy), `SimilarFragment` (Debug+Clone), and `SemanticDupError` (Debug+Display+Error) as specified in domain-types.json. Wire the new module into `libs/domain/src/lib.rs`. No external crate dependencies added in this task.
+- [~] **T001**: Add the domain module `libs/domain/src/semantic_dup.rs`: implement `CodeFragment` (non-empty content guard, Debug+Clone), `SimilarityScore` (range [0,1] guard, Debug+Clone+Copy), `TopK` (>=1 guard, Debug+Clone+Copy), `SimilarityThreshold` (range [0,1] guard, Debug+Clone+Copy), `SimilarFragment` (Debug+Clone), and `SemanticDupError` (Debug+Display+Error) as specified in domain-types.json. Wire the new module into `libs/domain/src/lib.rs`. No external crate dependencies added in this task.
 
 ### S2 — Usecase ports, errors, and interactors
 

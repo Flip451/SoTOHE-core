@@ -15,6 +15,7 @@ pub mod plan_ref;
 mod repository;
 pub mod review_v2;
 pub mod schema;
+pub mod semantic_dup;
 mod signal;
 pub mod skill_compliance;
 pub mod spec;
@@ -48,6 +49,9 @@ pub use plan_ref::{
 };
 pub use repository::{ImplPlanReader, ImplPlanWriter, TrackReader, TrackWriter, WorktreeReader};
 pub use review_v2::RoundType;
+pub use semantic_dup::{
+    CodeFragment, SemanticDupError, SimilarFragment, SimilarityScore, SimilarityThreshold, TopK,
+};
 // T008: TypeGraph, TypeNode, TraitNode, TraitImplEntry, FunctionNode removed.
 pub use signal::{
     ConfidenceSignal, SignalBasis, SignalCounts, classify_source_tag, evaluate_source_tag,
