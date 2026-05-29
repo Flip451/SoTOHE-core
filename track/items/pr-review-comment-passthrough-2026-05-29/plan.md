@@ -36,4 +36,4 @@
 > Removes P0/P1 severity language and pass/fail-finding framing from Step 3 and Behavior sections.
 > This is a doc-only task and can be done independently of S1-S3, but is placed last so the text reflects the finished implementation.
 
-- [x] **T006**: Update .claude/commands/track/pr-review.md: remove P0/P1 severity framing and pass/fail-finding language from Step 3 and the Behavior section; rewrite to passthrough model where ReviewFound means comments are surfaced for agent judgment (not auto-graded), and only zero-findings detection produces a machine PASS. Align with AC-11.
+- [x] **T006**: Update .claude/commands/track/pr-review.md: remove P0/P1 severity framing and pass/fail-finding language from Step 3 and the Behavior section; rewrite to passthrough model where ReviewFound means comments are surfaced for agent judgment (not auto-graded), and only zero-findings detection produces a machine PASS. Align with AC-11. (`0beba4ffb59a62d2b3506150bf516277fc44b851`)
