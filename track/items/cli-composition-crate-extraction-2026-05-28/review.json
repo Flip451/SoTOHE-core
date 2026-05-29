@@ -1,6 +1,68 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:36:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure side still defines and publicly re-exports `NullReviewer`, even though the briefing says the infra `null_reviewer` module should be deleted after moving it to the `cli_composition` crate. This leaves an old composition-only adapter in the infra public API, contrary to the extraction boundary; remove the `pub use` and inline module from `mod.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 16,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:39:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3eacf10c6b53d18269f3733f23ec01771c942995509b66c848d1039ff412bc04",
+          "at": "2026-05-28T11:43:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mod.rs` still publicly re-exports `ScopeConfigLoadError`, but the scope requires this module to expose only the adapter types plus `load_v2_scope_config`. That leaves an extra public API surface outside AC-07.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 17,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a32d3408ab8113f2ebb3842f92935612c4277196883ab3ebe1244f70b88805a2",
+          "at": "2026-05-28T15:03:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
+          "at": "2026-05-28T15:11:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
+          "at": "2026-05-28T15:12:58Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -201,65 +263,459 @@
         }
       ]
     },
-    "infrastructure": {
+    "plan-artifacts": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
-          "at": "2026-05-28T11:36:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The infrastructure side still defines and publicly re-exports `NullReviewer`, even though the briefing says the infra `null_reviewer` module should be deleted after moving it to the `cli_composition` crate. This leaves an old composition-only adapter in the infra public API, contrary to the extraction boundary; remove the `pub use` and inline module from `mod.rs`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/mod.rs",
-              "line": 16,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
-          "at": "2026-05-28T11:39:18Z"
+          "hash": "rvw1:sha256:3b3bd0ce5c7aa95b17bb24f2715e11c36566825a760a4f968712aa10e4ed6d48",
+          "at": "2026-05-28T07:58:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3eacf10c6b53d18269f3733f23ec01771c942995509b66c848d1039ff412bc04",
-          "at": "2026-05-28T11:43:08Z"
+          "hash": "rvw1:sha256:3b3bd0ce5c7aa95b17bb24f2715e11c36566825a760a4f968712aa10e4ed6d48",
+          "at": "2026-05-28T08:01:17Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`mod.rs` still publicly re-exports `ScopeConfigLoadError`, but the scope requires this module to expose only the adapter types plus `load_v2_scope_config`. That leaves an extra public API surface outside AC-07.",
+              "message": "T003 adds a `libs/infrastructure -> cli_composition` shim dependency while T001/IN-02 already makes `apps/cli-composition` depend on `infrastructure`. That creates a Cargo dependency cycle, so the intermediate shimmed state cannot compile and the migration cannot be built as written.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/mod.rs",
-              "line": 17,
-              "category": "architecture"
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 72,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T002 instructs the new public `CliApp` methods in `apps/cli-composition/src/lib.rs` to use `unimplemented!()` placeholders. That leaves panic-based code in a library crate and violates the repo's no-panics-in-library-code rule even if it is intended as temporary scaffolding.",
+              "severity": "P0",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 12,
+              "category": "panic"
             }
           ],
-          "hash": "rvw1:sha256:a32d3408ab8113f2ebb3842f92935612c4277196883ab3ebe1244f70b88805a2",
-          "at": "2026-05-28T15:03:20Z"
+          "hash": "rvw1:sha256:a1e40e12172dafa6bd4d7211945facb0d6696ce7cd32cbf43088b4d9f3a70172",
+          "at": "2026-05-28T08:53:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 asks `libs/infrastructure` to add a `cli_composition` dependency for the re-export shim while D1/D6 require `apps/cli-composition` to keep a direct `infrastructure` dependency. That creates a Cargo package dependency cycle (`infrastructure` -> `cli_composition` -> `infrastructure`), so the staged migration cannot compile as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 18,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T006 step 3 says remaining `apps/cli/src` imports may be rerouted through `cli_composition` public API or `domain`, but D3/CN-01 reduce `apps/cli` to a single `cli_composition` dependency. There is no allowed final path that uses `domain` directly from `apps/cli`, so this instruction conflicts with the stated end state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 104,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a1e40e12172dafa6bd4d7211945facb0d6696ce7cd32cbf43088b4d9f3a70172",
+          "at": "2026-05-28T08:58:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T006` keeps `persist_commit_hash_for_track` in `libs/infrastructure/src/review_v2/mod.rs`, but `spec.json` AC-07 and the S6 summary both require that module to expose only adapter types. As written, the final acceptance target and the final task disagree on the end state, so the track cannot be completed without revising one side.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb92f81172e8b5b6f9403f29f457b8f26088a6a7bae44ab7fccfab57716bde1a",
+          "at": "2026-05-28T09:07:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 asks for the final enforcement flip after removing `apps/cli`'s `infrastructure`/`usecase` deps and re-routing every remaining direct import through `cli_composition`, but the earlier tasks only define `CliApp` methods for the review_v2 family. The current `apps/cli/src` tree still contains other production imports (`track`, `verify`, `git`, `domain`, `pr`, etc.) and no task creates a façade surface for them, so the last step cannot be completed from this plan.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 36,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-07 says `libs/infrastructure/src/review_v2/mod.rs` will expose only adapter types after the move, but T006 explicitly preserves `persist_commit_hash_for_track` as a live free function in that module. Those two requirements disagree on the intended post-migration public surface.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+              "line": 321,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb92f81172e8b5b6f9403f29f457b8f26088a6a7bae44ab7fccfab57716bde1a",
+          "at": "2026-05-28T09:10:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` moves `persist_commit_hash_for_track` out of `libs/infrastructure/src/review_v2/mod.rs` into `apps/cli-composition`, but `T006` still requires `libs/infrastructure/src/review_v2/mod.rs` to contain that same free function, and `spec.json` AC-07 says the module should contain only adapter types. The final state cannot satisfy all three; choose one location for the helper and update the conflicting task/spec entry accordingly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 29,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d51598109ea90203032b590f3a91d3a473286a583ca54948dddd25e89a6f5694",
+          "at": "2026-05-28T09:17:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` reclassifies `persist_commit_hash_for_track` as a composition-layer helper and moves it into `apps/cli-composition`, but the symbol catalogue says `infrastructure::review_v2::persist_commit_hash_for_track` is a persistence helper that \"Remains in infrastructure after D4 (IN-06)\". The task is pointed at the wrong layer and the stated rationale does not match the documented symbol.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            },
+            {
+              "message": "S3 says IN-06 is already complete after T003 because `libs/infrastructure/src/review_v2/mod.rs` then only re-exports adapter types, but S5/T005 still needs to move `persist_commit_hash_for_track` out of that same module. The plan's ordering is self-contradictory: either the module is already final at T003 or it still has outstanding work in T005.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:95dc1d382f76b8e10787a10c2fc08faef24b3eef3ba80373fb9926dcecc8ca22",
+          "at": "2026-05-28T09:24:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 states that IN-06 is completed once `libs/infrastructure/src/review_v2/cli_composition.rs` is removed, but the same description also says IN-06 is only partially complete until T006. That conflicts with T005, which still needs to move `persist_commit_hash_for_track` before `libs/infrastructure/src/review_v2/mod.rs` can be adapter-only, so the step ordering is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:95dc1d382f76b8e10787a10c2fc08faef24b3eef3ba80373fb9926dcecc8ca22",
+          "at": "2026-05-28T09:26:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
-          "at": "2026-05-28T15:11:25Z"
+          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
+          "at": "2026-05-28T09:31:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
+          "at": "2026-05-28T09:35:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 requires all new `CliApp` public API stubs in `apps/cli-composition/src/lib.rs` to call `unimplemented!()`, and T003 leaves those placeholders until T004. That would introduce explicit panic paths in non-test library code for intermediate commits that are also required to keep CI green, violating the repository's no-panics rule. Use fallible placeholder implementations such as `Err(...)` or defer exposing callable stubs until they can return real results.",
+              "severity": "P0",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T001 creates `apps/cli-composition` with `domain`/`usecase`/`infrastructure` dependencies and requires `cargo make ci` to pass, but the same task explicitly defers `deny.toml` changes until T006. Since D6/IN-08 say `deny.toml` must be updated to make `cli_composition` the allowed wrapper for infrastructure/usecase, the T001 intermediate state cannot satisfy the stated deny/sync checks while keeping CI green. The task order needs a CI-valid temporary policy step or a different sequencing of the crate dependency/enforcement changes.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
+              "line": 13,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The infrastructure catalogue marks `infrastructure::review_v2::persist_commit_hash_for_track` as `reference` and says it remains in infrastructure after D4, but T005 and AC-07 require moving it into `apps/cli-composition` so `libs/infrastructure/src/review_v2/mod.rs` exposes only adapters. This contradiction can let Phase 2 treat the function as retained while Phase 3 removes it, so the catalogue action should align with the implementation plan.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/infrastructure-types.json",
+              "line": 691,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
+          "at": "2026-05-28T09:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 instructs implementers to add public `CliApp` methods in the new `apps/cli-composition` library crate with bodies that call `unimplemented!()`, and T003 explicitly keeps those placeholders until T004 while still requiring `cargo make ci` to stay green. That conflicts with this track's required `No Panics in Library Code` convention, which forbids `todo!()` / `unimplemented!()` outside tests. The plan should use fallible stubs that return `Err(...)` or avoid introducing callable placeholders in non-test library code.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
+          "at": "2026-05-28T09:43:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 creates `apps/cli-composition` with `domain` / `usecase` / `infrastructure` dependencies, explicitly defers `deny.toml` changes to T006, and still requires `cargo make ci` to pass. Since the ADR says `cargo make deny` enforces the hand-maintained wrapper policy and `cli_composition` must be added as a wrapper for `infrastructure` / `usecase`, this intermediate step is infeasible unless the `deny.toml` wrapper update moves earlier or the CI requirement is changed.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
+              "line": 13,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T003 adds `cli_composition` as an `apps/cli` dependency while requiring `cargo make ci` to stay green, but the plan does not update `apps/cli`'s `may_depend_on` until T006, where it changes directly to `[\"cli_composition\"]`. D5 describes the needed intermediate state as `cli_composition + infrastructure + usecase`; without adding that earlier, layer verification rejects the T003-T005 state, so the staged migration cannot keep CI green.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
+              "line": 29,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:9594a5a47739e6feef3d2750ddf648c3f2f8c42c0e706fe9bea283a995f364f9",
+          "at": "2026-05-28T09:47:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005/T006 require moving `persist_commit_hash_for_track` out of `libs/infrastructure/src/review_v2/mod.rs` so the final module exposes only the listed adapter types, but the infrastructure catalogue still marks `infrastructure::review_v2::persist_commit_hash_for_track` as a `reference` item whose docs say it remains in infrastructure after IN-06. These artifacts give conflicting implementation instructions about whether the helper is kept or moved.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/infrastructure-types.json",
+              "line": 691,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6bf940f8135e0aa3165eb02005e8b7f0bd907eb90bb1932827108551a93bd292",
+          "at": "2026-05-28T09:54:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 says `apps/cli/Cargo.toml` should declare only `cli_composition` under `[dependencies]`, and T006 repeats that instruction. That is not executable as written: the ADR still keeps `apps/cli` as the clap parsing + emit binary, so it must retain external CLI/runtime dependencies such as `clap`, `serde`, etc. The acceptance criterion should narrow this to internal workspace/layer dependencies, removing only `usecase` and `infrastructure` while adding `cli_composition`.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+              "line": 292,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d98541dff2c462cfd991a91d1fe0e8c9ee57735e8206a0095fe0996e6ea55899",
+          "at": "2026-05-28T09:59:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04 says the plan must not introduce a migration-period allow list, but the implementation plan requires exactly that: T001 adds `cli_composition` as an allowed dependent in `deny.toml`, T003 adds an intermediate `cli.may_depend_on = [\"infrastructure\", \"usecase\", \"cli_composition\"]` and a `cli_composition` wrapper for `cli`, and T006 later removes those intermediate allowances. As written, an implementer cannot satisfy CN-04 while following the required task sequence to keep CI green; either CN-04 should explicitly allow these intermediate policy updates or the tasks need a different migration strategy.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.md",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:85dfe8683dff706f3171ed8103525047ec9fe68d4bbe52df846da0c7b560bdb8",
+          "at": "2026-05-28T10:04:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-10/AC-11 describe the final verification as confirming that `cli` direct dependencies on `infrastructure`/`usecase` are not rejected / not treated as layer errors. That contradicts AC-04/AC-05/AC-09 and ADR D6, which make `cli_composition` the only final `apps/cli` layer dependency and update `deny.toml`/`architecture-rules.json` so direct `cli -> infrastructure/usecase` dependencies are forbidden. As written, an implementer could satisfy these acceptance criteria by leaving or allowing the exact dependency edge this track is meant to remove.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+              "line": 352,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2c40006fd4f6f3de851e1a845dac3a54d8766260b0fd29610dc1ec1211307a5f",
+          "at": "2026-05-28T10:07:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
-          "at": "2026-05-28T15:12:58Z"
+          "hash": "rvw1:sha256:6fa12b0207ef7ef2bc2d2a6c483408bbc0c7f1700a73808845d9311ec2cd58f2",
+          "at": "2026-05-28T10:11:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca0299aad779b21036ca191b1cad0679bc6c19ca0167d9b336c3ee597397656e",
+          "at": "2026-05-28T10:25:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca0299aad779b21036ca191b1cad0679bc6c19ca0167d9b336c3ee597397656e",
+          "at": "2026-05-28T10:27:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d13304188e564b631be18f48ddba3114da97d1cd4340c012f8191d239336a165",
+          "at": "2026-05-28T10:37:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d13304188e564b631be18f48ddba3114da97d1cd4340c012f8191d239336a165",
+          "at": "2026-05-28T10:39:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:040f3ba158ada53a45debdd1768a33cb3c519ff941038e112d202d25cc2a6c21",
+          "at": "2026-05-28T11:01:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:040f3ba158ada53a45debdd1768a33cb3c519ff941038e112d202d25cc2a6c21",
+          "at": "2026-05-28T11:02:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69c58fe084d766f964f92b3c6270b70459c96f88512b7667ee97cdec44dfe722",
+          "at": "2026-05-28T11:37:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69c58fe084d766f964f92b3c6270b70459c96f88512b7667ee97cdec44dfe722",
+          "at": "2026-05-28T11:39:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee578c297bf2ed4462b726bb7a28493d7ccee024cfef6c32961d7eb6da8071c",
+          "at": "2026-05-28T11:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee578c297bf2ed4462b726bb7a28493d7ccee024cfef6c32961d7eb6da8071c",
+          "at": "2026-05-28T12:01:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74ac6838919d4d5ae502c5bffc6cf31a4fbe86cfe885b1cdd5fd4984ceda021",
+          "at": "2026-05-28T12:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74ac6838919d4d5ae502c5bffc6cf31a4fbe86cfe885b1cdd5fd4984ceda021",
+          "at": "2026-05-28T12:21:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:524bf06ebe34513e6a88fb9b641e33263681c7741f943cc0a86d3e9403a4afe8",
+          "at": "2026-05-28T15:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:524bf06ebe34513e6a88fb9b641e33263681c7741f943cc0a86d3e9403a4afe8",
+          "at": "2026-05-28T15:11:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11e94412c3e7ce308df2bf9bbffba1dcf2c08ec7342696f58d5e1f5a4d42c3e3",
+          "at": "2026-05-28T21:39:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11e94412c3e7ce308df2bf9bbffba1dcf2c08ec7342696f58d5e1f5a4d42c3e3",
+          "at": "2026-05-28T21:41:05Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:27:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:29:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:35:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:02:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:13:20Z"
         }
       ]
     },
@@ -701,462 +1157,233 @@
           "findings": [],
           "hash": "rvw1:sha256:f4c3bd745a58a25c3b6a491a4941997ed28186a319e87e77bb1cb08136295a93",
           "at": "2026-05-29T00:25:09Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:27:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:29:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
-          "at": "2026-05-28T11:35:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
-          "at": "2026-05-28T11:38:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
-          "at": "2026-05-28T15:02:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
-          "at": "2026-05-28T15:13:20Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3b3bd0ce5c7aa95b17bb24f2715e11c36566825a760a4f968712aa10e4ed6d48",
-          "at": "2026-05-28T07:58:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3b3bd0ce5c7aa95b17bb24f2715e11c36566825a760a4f968712aa10e4ed6d48",
-          "at": "2026-05-28T08:01:17Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T003 adds a `libs/infrastructure -> cli_composition` shim dependency while T001/IN-02 already makes `apps/cli-composition` depend on `infrastructure`. That creates a Cargo dependency cycle, so the intermediate shimmed state cannot compile and the migration cannot be built as written.",
+              "message": "The new hand-rolled parsing only recognizes `--flag <value>` tokens. Valid clap-style `--base=...`, `--interval=...`, `--timeout=...`, and `--method=...` inputs are treated as absent, so explicit overrides are silently dropped and the code falls back to `main`/15/600/merge.",
               "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 72,
-              "category": "infeasibility"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 620,
+              "category": "correctness"
             },
             {
-              "message": "T002 instructs the new public `CliApp` methods in `apps/cli-composition/src/lib.rs` to use `unimplemented!()` placeholders. That leaves panic-based code in a library crate and violates the repo's no-panics-in-library-code rule even if it is intended as temporary scaffolding.",
+              "message": "`parse_pr_merge_args` no longer enforces the `merge|squash|rebase` method set. An invalid `--method` value is forwarded to `gh pr merge` instead of being rejected up front like the clap-based CLI does.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 655,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa1645f26799558cc3f362e8cf52ed6716d7e53e728583c3226afb42e476f6ef",
+          "at": "2026-05-29T00:40:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` is not clap-equivalent: it treats `--base` as optional data and falls back to `main` when the flag is malformed, and it only inspects the first token for the track id. As a result, invocations like `cargo make track-pr-ensure --base develop my-track` or `--base` with no value will act on the wrong branch instead of failing the way the baseline CLI does.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 620,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_merge_args` no longer matches the baseline clap parser: it only treats the first token as the PR number, so valid orderings that put flags first (for example `cargo make track-pr-merge --timeout 60 123`) lose the PR entirely, and it accepts any `--method` string instead of rejecting values outside `merge|squash|rebase` up front.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 641,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa1645f26799558cc3f362e8cf52ed6716d7e53e728583c3226afb42e476f6ef",
+          "at": "2026-05-29T00:42:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` reads the token after `--base` unconditionally, so malformed input like `cargo make track-pr-ensure --base --track-id abc` treats `--track-id` as the base branch instead of failing like the clap-based path. That can silently route PR creation to the wrong base branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 620,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_merge_args` ignores every flag except `--interval`, `--timeout`, and `--method`. The old wrapper forwarded the full arg list to `sotp pr wait-and-merge`, where clap would reject unknown arguments; here an invocation like `cargo make track-pr-merge --bogus 1 123` is silently accepted and the stray positional token can be mistaken for the PR number.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 660,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e842ad4ec85774ed361e4a72375848f000b063be360d67532e21a8616e59af6",
+          "at": "2026-05-29T00:46:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` still swallows malformed input instead of failing like the baseline clap parser: `--base` with no value (or followed by another flag) falls back to `\"main\"`, and unknown flags/extra positionals are ignored rather than rejected. That means typos can be misinterpreted as a valid `track_id`/default base instead of surfacing an error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 633,
+              "category": "missing_error_handling"
+            },
+            {
+              "message": "`parse_pr_merge_args` does not enforce the single required `pr` positional. It records the first non-flag token and silently ignores any additional positionals, and when no positional is provided it forwards `\"\"` to `pr_wait_and_merge` instead of rejecting the invocation. Baseline `WaitAndMergeArgs` would fail fast in both cases.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 681,
+              "category": "missing_error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:d00f58be64bd08bb52a47395d53423adcd8aedd867b528d80612831933b0cf84",
+          "at": "2026-05-29T00:51:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_pr` still runs `make_track_pr_push(raw_args.clone())` before the new parser, and that push path still uses `words.first()` as the track id. As a result, flag-first invocations such as `cargo make track-pr -- --base develop my-track` will push a branch named `--base` before the ensure step runs, so the combined wrapper still drops the restored flag ordering.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 216,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_ensure_args` treats `--track-id` as a value-taking flag but never assigns its value to `track_id`; it only skips over the token. That means `make_track_pr_ensure -- --track-id foo` silently falls back to branch-derived resolution instead of honoring the user-supplied track id, which can create or reuse the wrong PR.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 653,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:185bd99dc0b2167cd95c486f05fac0b5c390b23a6ccb22635f0515b0e2068bc3",
+          "at": "2026-05-29T00:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` and `parse_pr_merge_args` do not actually mirror clap here: they only accept `--flag VALUE` tokens, so valid invocations like `--base=develop`, `--interval=5`, `--timeout=60`, and `--method=squash` are treated as unknown flags. They also stop at the first positional and silently ignore any later positional tokens, whereas the clap-backed commands would reject extra arguments. That reintroduces argument-handling regressions for the wrappers this refactor is supposed to preserve.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 640,
+              "category": "correctness"
+            },
+            {
+              "message": "`make_track_pr_push` now treats every `-`-prefixed token as a flag and blindly skips the following token if it does not start with `-`. That means an unknown or boolean flag can consume the real track id, so `cargo make track-pr-push --resume my-track` (or any typoed flag before the track id) will silently drop `my-track` and call `pr_push(None)`, pushing the current branch instead of erroring like the baseline dispatcher would.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 203,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:64a4d90cbf170774e780536894751ca4513ae16925a3732ff44723b088967bb6",
+          "at": "2026-05-29T00:59:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` and `parse_pr_merge_args` accept the first positional token and silently discard any later positional tokens. That means invocations such as `cargo make track-pr-merge 42 99` or `cargo make track-pr-ensure foo bar` proceed instead of failing, which diverges from the clap-backed CLI behavior and can act on the wrong PR/track. Reject surplus positional arguments instead of ignoring them.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 699,
+              "category": "correctness"
+            },
+            {
+              "message": "`expand_eq_flags` rewrites `--flag=value` into separate tokens, but the parsers then reject any value token starting with `-`. As a result, valid clap forms like `--base=-feature` or `--track-id=-foo` are no longer accepted, because the equals syntax loses the distinction between a literal string value and a new flag. Preserve the `=` form or special-case dash-leading values.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 623,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7502d733f53485d980b8abaf1de033b42c3d6dd9670282e6f16e4be33a47fcf9",
+          "at": "2026-05-29T01:04:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` does not enforce a single source of truth for the track ID. If callers mix a positional track_id with `--track-id` (for example `foo --track-id bar` or `--track-id bar extra`), the helper silently overrides or discards one of the values instead of rejecting the malformed invocation. That can push/ensure the wrong branch without surfacing an error, which is a regression in argument validation.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 646,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:63fda0b4240851b93536aed2d7d5bf55610b32a9593114f7602a797fed317038",
+          "at": "2026-05-29T01:09:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` overwrites repeated options instead of surfacing the clap-style `ArgumentConflict`. `--base` and `--track-id` are both `ArgAction::Set`-style options in the baseline CLI, so invocations like `cargo make track-pr-ensure --base main --base develop` or `--track-id foo --track-id bar` should fail closed, not silently pick the last value and target the wrong base/track.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 646,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_merge_args` has the same duplicate-option bug for `--interval`, `--timeout`, and `--method`: later occurrences silently override earlier ones, but clap’s default `Set` action would reject repeated options. That means malformed calls like `cargo make track-pr-merge 123 --timeout 60 --timeout 5` can merge with the wrong settings instead of failing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 749,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aeb009f021f127784c290c3c931d313af68e23e8ceba721da5dfee88eaf66e24",
+          "at": "2026-05-29T01:14:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e9aaf9135fe43002d33504187f1418c536ac985efdcc2717864991581966b9e",
+          "at": "2026-05-29T01:21:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d496444f874f15e9c6c0ead8409d58a9c667b80d464b357e9723be490792e95",
+          "at": "2026-05-29T02:35:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_pr_ensure` still treats the first token as a positional track id even when it is an option. A valid flag-only invocation such as `cargo make track-pr-ensure -- --base release` is rewritten to `bin/sotp pr ensure-pr --track-id --base release`, so clap rejects it instead of honoring `--base` while deriving the track from the branch. This means the `--base` forwarding regression remains for the current-branch path.",
               "severity": "P0",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 12,
-              "category": "panic"
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 209,
+              "category": "logic"
             }
           ],
-          "hash": "rvw1:sha256:a1e40e12172dafa6bd4d7211945facb0d6696ce7cd32cbf43088b4d9f3a70172",
-          "at": "2026-05-28T08:53:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 asks `libs/infrastructure` to add a `cli_composition` dependency for the re-export shim while D1/D6 require `apps/cli-composition` to keep a direct `infrastructure` dependency. That creates a Cargo package dependency cycle (`infrastructure` -> `cli_composition` -> `infrastructure`), so the staged migration cannot compile as written.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 18,
-              "category": "infeasibility"
-            },
-            {
-              "message": "T006 step 3 says remaining `apps/cli/src` imports may be rerouted through `cli_composition` public API or `domain`, but D3/CN-01 reduce `apps/cli` to a single `cli_composition` dependency. There is no allowed final path that uses `domain` directly from `apps/cli`, so this instruction conflicts with the stated end state.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 104,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a1e40e12172dafa6bd4d7211945facb0d6696ce7cd32cbf43088b4d9f3a70172",
-          "at": "2026-05-28T08:58:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T006` keeps `persist_commit_hash_for_track` in `libs/infrastructure/src/review_v2/mod.rs`, but `spec.json` AC-07 and the S6 summary both require that module to expose only adapter types. As written, the final acceptance target and the final task disagree on the end state, so the track cannot be completed without revising one side.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 36,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:bb92f81172e8b5b6f9403f29f457b8f26088a6a7bae44ab7fccfab57716bde1a",
-          "at": "2026-05-28T09:07:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T006 asks for the final enforcement flip after removing `apps/cli`'s `infrastructure`/`usecase` deps and re-routing every remaining direct import through `cli_composition`, but the earlier tasks only define `CliApp` methods for the review_v2 family. The current `apps/cli/src` tree still contains other production imports (`track`, `verify`, `git`, `domain`, `pr`, etc.) and no task creates a façade surface for them, so the last step cannot be completed from this plan.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 36,
-              "category": "infeasibility"
-            },
-            {
-              "message": "AC-07 says `libs/infrastructure/src/review_v2/mod.rs` will expose only adapter types after the move, but T006 explicitly preserves `persist_commit_hash_for_track` as a live free function in that module. Those two requirements disagree on the intended post-migration public surface.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
-              "line": 321,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:bb92f81172e8b5b6f9403f29f457b8f26088a6a7bae44ab7fccfab57716bde1a",
-          "at": "2026-05-28T09:10:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T005` moves `persist_commit_hash_for_track` out of `libs/infrastructure/src/review_v2/mod.rs` into `apps/cli-composition`, but `T006` still requires `libs/infrastructure/src/review_v2/mod.rs` to contain that same free function, and `spec.json` AC-07 says the module should contain only adapter types. The final state cannot satisfy all three; choose one location for the helper and update the conflicting task/spec entry accordingly.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 29,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:d51598109ea90203032b590f3a91d3a473286a583ca54948dddd25e89a6f5694",
-          "at": "2026-05-28T09:17:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`T005` reclassifies `persist_commit_hash_for_track` as a composition-layer helper and moves it into `apps/cli-composition`, but the symbol catalogue says `infrastructure::review_v2::persist_commit_hash_for_track` is a persistence helper that \"Remains in infrastructure after D4 (IN-06)\". The task is pointed at the wrong layer and the stated rationale does not match the documented symbol.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 30,
-              "category": "contradiction"
-            },
-            {
-              "message": "S3 says IN-06 is already complete after T003 because `libs/infrastructure/src/review_v2/mod.rs` then only re-exports adapter types, but S5/T005 still needs to move `persist_commit_hash_for_track` out of that same module. The plan's ordering is self-contradictory: either the module is already final at T003 or it still has outstanding work in T005.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
-              "line": 30,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:95dc1d382f76b8e10787a10c2fc08faef24b3eef3ba80373fb9926dcecc8ca22",
-          "at": "2026-05-28T09:24:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 states that IN-06 is completed once `libs/infrastructure/src/review_v2/cli_composition.rs` is removed, but the same description also says IN-06 is only partially complete until T006. That conflicts with T005, which still needs to move `persist_commit_hash_for_track` before `libs/infrastructure/src/review_v2/mod.rs` can be adapter-only, so the step ordering is internally inconsistent.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 18,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:95dc1d382f76b8e10787a10c2fc08faef24b3eef3ba80373fb9926dcecc8ca22",
-          "at": "2026-05-28T09:26:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
-          "at": "2026-05-28T09:31:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
-          "at": "2026-05-28T09:35:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T002 requires all new `CliApp` public API stubs in `apps/cli-composition/src/lib.rs` to call `unimplemented!()`, and T003 leaves those placeholders until T004. That would introduce explicit panic paths in non-test library code for intermediate commits that are also required to keep CI green, violating the repository's no-panics rule. Use fallible placeholder implementations such as `Err(...)` or defer exposing callable stubs until they can return real results.",
-              "severity": "P0",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 12,
-              "category": "infeasibility"
-            },
-            {
-              "message": "T001 creates `apps/cli-composition` with `domain`/`usecase`/`infrastructure` dependencies and requires `cargo make ci` to pass, but the same task explicitly defers `deny.toml` changes until T006. Since D6/IN-08 say `deny.toml` must be updated to make `cli_composition` the allowed wrapper for infrastructure/usecase, the T001 intermediate state cannot satisfy the stated deny/sync checks while keeping CI green. The task order needs a CI-valid temporary policy step or a different sequencing of the crate dependency/enforcement changes.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
-              "line": 13,
-              "category": "infeasibility"
-            },
-            {
-              "message": "The infrastructure catalogue marks `infrastructure::review_v2::persist_commit_hash_for_track` as `reference` and says it remains in infrastructure after D4, but T005 and AC-07 require moving it into `apps/cli-composition` so `libs/infrastructure/src/review_v2/mod.rs` exposes only adapters. This contradiction can let Phase 2 treat the function as retained while Phase 3 removes it, so the catalogue action should align with the implementation plan.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/infrastructure-types.json",
-              "line": 691,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
-          "at": "2026-05-28T09:40:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T002 instructs implementers to add public `CliApp` methods in the new `apps/cli-composition` library crate with bodies that call `unimplemented!()`, and T003 explicitly keeps those placeholders until T004 while still requiring `cargo make ci` to stay green. That conflicts with this track's required `No Panics in Library Code` convention, which forbids `todo!()` / `unimplemented!()` outside tests. The plan should use fallible stubs that return `Err(...)` or avoid introducing callable placeholders in non-test library code.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
-              "line": 12,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
-          "at": "2026-05-28T09:43:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 creates `apps/cli-composition` with `domain` / `usecase` / `infrastructure` dependencies, explicitly defers `deny.toml` changes to T006, and still requires `cargo make ci` to pass. Since the ADR says `cargo make deny` enforces the hand-maintained wrapper policy and `cli_composition` must be added as a wrapper for `infrastructure` / `usecase`, this intermediate step is infeasible unless the `deny.toml` wrapper update moves earlier or the CI requirement is changed.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
-              "line": 13,
-              "category": "infeasibility"
-            },
-            {
-              "message": "T003 adds `cli_composition` as an `apps/cli` dependency while requiring `cargo make ci` to stay green, but the plan does not update `apps/cli`'s `may_depend_on` until T006, where it changes directly to `[\"cli_composition\"]`. D5 describes the needed intermediate state as `cli_composition + infrastructure + usecase`; without adding that earlier, layer verification rejects the T003-T005 state, so the staged migration cannot keep CI green.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
-              "line": 29,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:9594a5a47739e6feef3d2750ddf648c3f2f8c42c0e706fe9bea283a995f364f9",
-          "at": "2026-05-28T09:47:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005/T006 require moving `persist_commit_hash_for_track` out of `libs/infrastructure/src/review_v2/mod.rs` so the final module exposes only the listed adapter types, but the infrastructure catalogue still marks `infrastructure::review_v2::persist_commit_hash_for_track` as a `reference` item whose docs say it remains in infrastructure after IN-06. These artifacts give conflicting implementation instructions about whether the helper is kept or moved.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/infrastructure-types.json",
-              "line": 691,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:6bf940f8135e0aa3165eb02005e8b7f0bd907eb90bb1932827108551a93bd292",
-          "at": "2026-05-28T09:54:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-04 says `apps/cli/Cargo.toml` should declare only `cli_composition` under `[dependencies]`, and T006 repeats that instruction. That is not executable as written: the ADR still keeps `apps/cli` as the clap parsing + emit binary, so it must retain external CLI/runtime dependencies such as `clap`, `serde`, etc. The acceptance criterion should narrow this to internal workspace/layer dependencies, removing only `usecase` and `infrastructure` while adding `cli_composition`.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
-              "line": 292,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:d98541dff2c462cfd991a91d1fe0e8c9ee57735e8206a0095fe0996e6ea55899",
-          "at": "2026-05-28T09:59:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-04 says the plan must not introduce a migration-period allow list, but the implementation plan requires exactly that: T001 adds `cli_composition` as an allowed dependent in `deny.toml`, T003 adds an intermediate `cli.may_depend_on = [\"infrastructure\", \"usecase\", \"cli_composition\"]` and a `cli_composition` wrapper for `cli`, and T006 later removes those intermediate allowances. As written, an implementer cannot satisfy CN-04 while following the required task sequence to keep CI green; either CN-04 should explicitly allow these intermediate policy updates or the tasks need a different migration strategy.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.md",
-              "line": 41,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:85dfe8683dff706f3171ed8103525047ec9fe68d4bbe52df846da0c7b560bdb8",
-          "at": "2026-05-28T10:04:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-10/AC-11 describe the final verification as confirming that `cli` direct dependencies on `infrastructure`/`usecase` are not rejected / not treated as layer errors. That contradicts AC-04/AC-05/AC-09 and ADR D6, which make `cli_composition` the only final `apps/cli` layer dependency and update `deny.toml`/`architecture-rules.json` so direct `cli -> infrastructure/usecase` dependencies are forbidden. As written, an implementer could satisfy these acceptance criteria by leaving or allowing the exact dependency edge this track is meant to remove.",
-              "severity": "P1",
-              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
-              "line": 352,
-              "category": "contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2c40006fd4f6f3de851e1a845dac3a54d8766260b0fd29610dc1ec1211307a5f",
-          "at": "2026-05-28T10:07:09Z"
+          "hash": "rvw1:sha256:6d496444f874f15e9c6c0ead8409d58a9c667b80d464b357e9723be490792e95",
+          "at": "2026-05-29T02:38:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6fa12b0207ef7ef2bc2d2a6c483408bbc0c7f1700a73808845d9311ec2cd58f2",
-          "at": "2026-05-28T10:11:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca0299aad779b21036ca191b1cad0679bc6c19ca0167d9b336c3ee597397656e",
-          "at": "2026-05-28T10:25:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca0299aad779b21036ca191b1cad0679bc6c19ca0167d9b336c3ee597397656e",
-          "at": "2026-05-28T10:27:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d13304188e564b631be18f48ddba3114da97d1cd4340c012f8191d239336a165",
-          "at": "2026-05-28T10:37:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d13304188e564b631be18f48ddba3114da97d1cd4340c012f8191d239336a165",
-          "at": "2026-05-28T10:39:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:040f3ba158ada53a45debdd1768a33cb3c519ff941038e112d202d25cc2a6c21",
-          "at": "2026-05-28T11:01:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:040f3ba158ada53a45debdd1768a33cb3c519ff941038e112d202d25cc2a6c21",
-          "at": "2026-05-28T11:02:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69c58fe084d766f964f92b3c6270b70459c96f88512b7667ee97cdec44dfe722",
-          "at": "2026-05-28T11:37:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69c58fe084d766f964f92b3c6270b70459c96f88512b7667ee97cdec44dfe722",
-          "at": "2026-05-28T11:39:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ee578c297bf2ed4462b726bb7a28493d7ccee024cfef6c32961d7eb6da8071c",
-          "at": "2026-05-28T11:59:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ee578c297bf2ed4462b726bb7a28493d7ccee024cfef6c32961d7eb6da8071c",
-          "at": "2026-05-28T12:01:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c74ac6838919d4d5ae502c5bffc6cf31a4fbe86cfe885b1cdd5fd4984ceda021",
-          "at": "2026-05-28T12:19:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c74ac6838919d4d5ae502c5bffc6cf31a4fbe86cfe885b1cdd5fd4984ceda021",
-          "at": "2026-05-28T12:21:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:524bf06ebe34513e6a88fb9b641e33263681c7741f943cc0a86d3e9403a4afe8",
-          "at": "2026-05-28T15:03:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:524bf06ebe34513e6a88fb9b641e33263681c7741f943cc0a86d3e9403a4afe8",
-          "at": "2026-05-28T15:11:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:11e94412c3e7ce308df2bf9bbffba1dcf2c08ec7342696f58d5e1f5a4d42c3e3",
-          "at": "2026-05-28T21:39:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:11e94412c3e7ce308df2bf9bbffba1dcf2c08ec7342696f58d5e1f5a4d42c3e3",
-          "at": "2026-05-28T21:41:05Z"
+          "hash": "rvw1:sha256:60a0853f6ea6adb81ed232500e8ea41420301cc97e23c06f272afa40a16a3c20",
+          "at": "2026-05-29T02:42:06Z"
         }
       ]
     }

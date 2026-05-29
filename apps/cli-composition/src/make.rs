@@ -202,11 +202,26 @@ impl CliApp {
     /// Create or reuse a PR for the current branch.
     ///
     /// # Errors
-    /// Returns `Err` when PR creation fails.
+    /// Returns `Err` when the `sotp pr ensure-pr` invocation fails.
     pub fn make_track_pr_ensure(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
-        let track_id = words.first().cloned();
-        self.pr_ensure(track_id, "main".to_owned())
+        let mut args: Vec<&str> = vec!["pr", "ensure-pr"];
+        // Only treat the first word as a positional track-id when it is not a
+        // flag (does not start with "--").  Flag-only invocations such as
+        // `-- --base release` must flow through unchanged so clap can parse them.
+        let start = if words.first().is_some_and(|w| !w.starts_with("--")) {
+            if let Some(track_id) = words.first() {
+                args.extend_from_slice(&["--track-id", track_id]);
+            }
+            1
+        } else {
+            0
+        };
+        // Forward remaining args so clap rejects unexpected ones.
+        for w in words.get(start..).unwrap_or_default() {
+            args.push(w);
+        }
+        run_sotp(&args)
     }
 
     /// Push + ensure PR in one step.
@@ -214,6 +229,7 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when push or PR creation fails.
     pub fn make_track_pr(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
+        // push + ensure-pr in one step
         let push_result = self.make_track_pr_push(raw_args.clone())?;
         if push_result.exit_code != 0 {
             return Ok(push_result);
@@ -236,12 +252,14 @@ impl CliApp {
     /// Wait for PR checks then merge.
     ///
     /// # Errors
-    /// Returns `Err` when the wait or merge fails.
+    /// Returns `Err` when the `sotp pr wait-and-merge` invocation fails.
     pub fn make_track_pr_merge(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
-        let pr = words.first().cloned().unwrap_or_default();
-        let method = require_flag_value(&words, "--method")?.unwrap_or_else(|| "merge".to_owned());
-        self.pr_wait_and_merge(pr, 30, 3600, method)
+        let mut args: Vec<&str> = vec!["pr", "wait-and-merge"];
+        for w in &words {
+            args.push(w);
+        }
+        run_sotp(&args)
     }
 
     /// Show PR check status.
