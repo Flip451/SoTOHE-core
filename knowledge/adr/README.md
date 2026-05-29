@@ -184,3 +184,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [`sotp review results` で review.json 直読みを置き換える](2026-04-28-1905-review-results-command.md) | — | 2026-04-28 |
 | [scope 分類ロジックの CLI 公開 (classify / files)](2026-04-29-1547-review-scope-lookup-commands.md) | — | 2026-04-29 |
+| [PR レビュー結果を解釈せず最新ラウンドのコメントを agent に渡す](2026-05-29-0526-pr-review-comment-passthrough.md) | — | 2026-05-29 |

@@ -1,0 +1,290 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "PrReviewFinding": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "path", "ty": "String" },
+            { "name": "line", "ty": "Option<u32>" },
+            { "name": "end_line", "ty": "Option<u32>" },
+            { "name": "body", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pr_review",
+      "docs": "A passthrough inline review comment from the latest Codex review round. Carries file path, line range, and sanitized body text. severity and rule_id fields are removed per D1 (no Rust-side interpretation). String fields are raw GitHub API values: path is an opaque filesystem path, body is free text — both are truly opaque values with no underlying invariant to enforce.",
+      "spec_refs": [
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-02",
+          "hash": "83daf92999d562006b68a4aa404c6e56b39c17c8e68ae133740d882e6a04d686"
+        },
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "d8b6babe5ea099d60d70ea48f48fb8f2f2011d0852c3e7d38032ed9c9b760ea4"
+        },
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "AC-02",
+          "hash": "87f0027bb9759a73173a159d3eead50cd46675f4e00f038b1a5abcb0f5f3a7f6"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PrReviewResult": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "review_id", "ty": "u64" },
+            { "name": "state", "ty": "String" },
+            { "name": "body", "ty": "String" },
+            { "name": "findings", "ty": "Vec<PrReviewFinding>" },
+            { "name": "inline_comment_count", "ty": "u32" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "pr_review",
+      "docs": "Parsed passthrough result from a Codex Cloud PR review. Carries the sanitized review body and inline comments for agent consumption. actionable_count and passed fields are removed per D1/AC-02 — pass/fail judgment is delegated to the agent. state: String is a raw GitHub API field ('APPROVED'/'CHANGES_REQUESTED'/'COMMENTED'); it is surfaced as-is without interpretation (truly opaque external API value).",
+      "spec_refs": [
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-02",
+          "hash": "83daf92999d562006b68a4aa404c6e56b39c17c8e68ae133740d882e6a04d686"
+        },
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "e067033836754fd37ff2b859faca97c65a418e69d207590a2d58d4b7655f7f0b"
+        },
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "d8b6babe5ea099d60d70ea48f48fb8f2f2011d0852c3e7d38032ed9c9b760ea4"
+        },
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "AC-02",
+          "hash": "87f0027bb9759a73173a159d3eead50cd46675f4e00f038b1a5abcb0f5f3a7f6"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PrReviewError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UnsupportedProvider",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "provider", "ty": "String" },
+                { "name": "allowed", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pr_review",
+      "docs": "Carried for contract-map edge exposure; not modified in this track.",
+      "spec_refs": [
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "OS-06",
+          "hash": "3f026586d0a2b206ffda8cc941c24a8f47f2c38b02c6af3b0d3111bc83a32e43"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "usecase::pr_review::sanitize_text": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "text", "ty": "&str" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Remove absolute paths, secrets, localhost references, and RFC 1918 IPs from text. Not modified in this track.",
+      "spec_refs": [
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-07",
+          "hash": "499d108c977f1343fd30a54490e62775ccfda4e626ac24bd7018dfde858232c8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::pr_review::parse_paginated_json": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "text", "ty": "&str" }
+      ],
+      "returns": "Result<Vec<serde_json::Value>, serde_json::Error>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Parse potentially paginated gh api --paginate JSON output into a flat list. Not modified in this track.",
+      "spec_refs": [
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-07",
+          "hash": "499d108c977f1343fd30a54490e62775ccfda4e626ac24bd7018dfde858232c8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::pr_review::validate_reviewer_provider": {
+      "action": "reference",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "provider", "ty": "&str" }
+      ],
+      "returns": "Result<(), PrReviewError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Validates that the given reviewer provider supports structured output. Not modified in this track.",
+      "spec_refs": [
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "OS-06",
+          "hash": "3f026586d0a2b206ffda8cc941c24a8f47f2c38b02c6af3b0d3111bc83a32e43"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::pr_review::classify_severity": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "text", "ty": "&str" }
+      ],
+      "returns": "&'static str",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted per D1: Rust-side severity classification is interpretation logic being removed.",
+      "spec_refs": [
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-01",
+          "hash": "07a9aa3c2e8d7f7359a8c0f9dbd609ff4ae4235c2461672ef6d7dbf71062759f"
+        },
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "48e1a170203d5ffaee188cca66ada52559aa07f618faeb03ba5bc4ea03e0b7f8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "usecase::pr_review::parse_body_findings": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "body", "ty": "&str" }
+      ],
+      "returns": "Vec<PrReviewFinding>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted per D1: bullet-list finding extraction is interpretation logic being removed.",
+      "spec_refs": [
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "IN-01",
+          "hash": "07a9aa3c2e8d7f7359a8c0f9dbd609ff4ae4235c2461672ef6d7dbf71062759f"
+        },
+        {
+          "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "48e1a170203d5ffaee188cca66ada52559aa07f618faeb03ba5bc4ea03e0b7f8"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PrReviewFinding"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "PrReviewFinding"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "PrReviewFinding"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "PrReviewFinding"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PrReviewResult"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "PrReviewResult"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "PrReviewResult"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "PrReviewResult"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PrReviewError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "PrReviewError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "PrReviewError"
+    }
+  ]
+}

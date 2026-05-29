@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7ab4169fb8a51c12eefe401f3210031e05a318d6a9ef3ead4cff3fcb1128327",
+          "at": "2026-05-29T06:29:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7ab4169fb8a51c12eefe401f3210031e05a318d6a9ef3ead4cff3fcb1128327",
+          "at": "2026-05-29T06:32:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 says the ReviewFound output should be \"sanitize 済みコメントのみ\", but IN-04 and IN-05 require `review.body` plus inline comments to be emitted as part of the same payload. As written, the spec both includes and excludes the review body.",
+              "severity": "P1",
+              "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+              "line": 200,
+              "category": "contradiction"
+            },
+            {
+              "message": "OS-06 says `ポーリング・recovery ロジック` is not changed, but IN-03 and T003 explicitly change `poll_review_for_cycle` to select the latest review by `submitted_at`. The scope section and task plan disagree on whether polling behavior is being modified.",
+              "severity": "P1",
+              "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+              "line": 176,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:926197c7c605e754a870174ffaef4c52d8a0953755e414a1f9dd14915f2a8939",
+          "at": "2026-05-29T07:03:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff93374d3786b99c8c011fd7b57af51f1371cee89227f71608aa6a4954d1b3b5",
+          "at": "2026-05-29T07:08:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-02` says the current `PrReviewResult` interpretation fields include `findings` and that those interpretation fields should be removed, but the rest of the plan keeps `findings` as the inline-comment passthrough container: `PrReviewResult` still has `findings: Vec<PrReviewFinding>`, and T003 explicitly says to build `PrReviewResult.findings` from inline comments. This gives implementers conflicting contracts for whether the `findings` field should be deleted or retained/redefined.",
+              "severity": "P1",
+              "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ff93374d3786b99c8c011fd7b57af51f1371cee89227f71608aa6a4954d1b3b5",
+          "at": "2026-05-29T07:11:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:610ab738d8c3767e7becdd1849f97d42b56b904981fae55d74fad8ea7667e086",
+          "at": "2026-05-29T07:16:56Z"
+        }
+      ]
+    }
+  }
+}
