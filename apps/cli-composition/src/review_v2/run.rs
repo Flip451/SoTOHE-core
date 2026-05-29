@@ -25,7 +25,7 @@ use super::shared::{
 ///
 /// # Errors
 /// Returns a human-readable error string on failure at any step.
-pub fn run_codex_review_str(
+pub(crate) fn run_codex_review_str(
     track_id_str: &str,
     items_dir: &Path,
     group_str: &str,
@@ -155,7 +155,7 @@ pub fn run_codex_review_str(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure at any step.
-pub fn run_claude_review_str(
+pub(crate) fn run_claude_review_str(
     track_id_str: &str,
     items_dir: &Path,
     group_str: &str,

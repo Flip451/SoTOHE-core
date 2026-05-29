@@ -76,7 +76,7 @@ pub fn append_scope_briefing_reference_str(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn get_briefing_for_scope_str(
+pub(crate) fn get_briefing_for_scope_str(
     scope_name: &str,
     track_id_str: &str,
     items_dir: &Path,

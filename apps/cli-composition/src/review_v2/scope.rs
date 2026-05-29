@@ -13,7 +13,7 @@ use infrastructure::review_v2::load_v2_scope_config;
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn load_scope_config_only(
+pub(crate) fn load_scope_config_only(
     track_id: &TrackId,
     items_dir: &Path,
 ) -> Result<ReviewScopeConfig, String> {
@@ -53,23 +53,6 @@ pub fn load_scope_config_only(
         .map_err(|e| format!("load review-scope.json: {e}"))
 }
 
-/// String-accepting variant of `load_scope_config_only`.
-///
-/// Converts `track_id_str` to `TrackId` and delegates. Returns the scope config
-/// for use in the CLI composition root (via `append_scope_briefing_reference`).
-/// Returns `Err` if the track ID is invalid or the config cannot be loaded.
-///
-/// # Errors
-/// Returns a human-readable error string on failure.
-pub fn load_scope_config_only_str(
-    track_id_str: &str,
-    items_dir: &Path,
-) -> Result<ReviewScopeConfig, String> {
-    let track_id =
-        TrackId::try_new(track_id_str).map_err(|e| format!("invalid --track-id: {e}"))?;
-    load_scope_config_only(&track_id, items_dir)
-}
-
 /// Validates that `scope_name` is a configured scope for the given track,
 /// without resolving the diff base.
 ///
@@ -79,7 +62,7 @@ pub fn load_scope_config_only_str(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn validate_scope_for_track_str(
+pub(crate) fn validate_scope_for_track_str(
     track_id_str: &str,
     items_dir: &Path,
     scope_name: &str,

@@ -18,7 +18,7 @@ use super::null_reviewer::NullReviewer;
 
 /// Stub `DiffGetter` for pure-logic use cases (e.g. `classify`) that do not
 /// need diff listings. `list_diff_files` always returns an empty list.
-pub struct NullDiffGetter;
+pub(crate) struct NullDiffGetter;
 
 impl DiffGetter for NullDiffGetter {
     fn list_diff_files(&self, _base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError> {
@@ -52,7 +52,7 @@ pub struct ReviewV2Composition {
 /// `commit_hash_store` and `base` are retained for future commands that need
 /// to read or reset the diff base without going through the full composition.
 #[allow(dead_code)]
-pub struct ReviewV2CompositionWithCodex {
+pub(crate) struct ReviewV2CompositionWithCodex {
     pub(super) cycle: ReviewCycle<CodexReviewer, SystemReviewHasher, GitDiffGetter>,
     pub(super) review_store: FsReviewStore,
     pub(super) commit_hash_store: FsCommitHashStore,
@@ -68,7 +68,7 @@ pub struct ReviewV2CompositionWithCodex {
 /// `commit_hash_store` and `base` are retained for future commands that need
 /// to read or reset the diff base without going through the full composition.
 #[allow(dead_code)]
-pub struct ReviewV2CompositionWithClaude {
+pub(crate) struct ReviewV2CompositionWithClaude {
     pub(super) cycle: ReviewCycle<ClaudeReviewer, SystemReviewHasher, GitDiffGetter>,
     pub(super) review_store: FsReviewStore,
     pub(super) commit_hash_store: FsCommitHashStore,
@@ -184,7 +184,7 @@ pub(super) fn resolve_diff_base(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn build_review_v2_with_reviewer(
+pub(crate) fn build_review_v2_with_reviewer(
     track_id: &TrackId,
     items_dir: &Path,
     reviewer: CodexReviewer,
@@ -207,7 +207,7 @@ pub fn build_review_v2_with_reviewer(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn build_review_v2(
+pub(crate) fn build_review_v2(
     track_id: &TrackId,
     items_dir: &Path,
 ) -> Result<ReviewV2Composition, String> {
@@ -239,28 +239,11 @@ pub fn build_review_v2_str(
     build_review_v2(&track_id, items_dir)
 }
 
-/// String-accepting variant of `build_review_v2_with_reviewer`.
-///
-/// Converts `track_id_str` to `TrackId` and delegates. Callers that must not
-/// import `domain::TrackId` use this entry point (CN-01 / AC-03).
-///
-/// # Errors
-/// Returns a human-readable error string on failure.
-pub fn build_review_v2_with_reviewer_str(
-    track_id_str: &str,
-    items_dir: &Path,
-    reviewer: CodexReviewer,
-) -> Result<ReviewV2CompositionWithCodex, String> {
-    let track_id =
-        TrackId::try_new(track_id_str).map_err(|e| format!("invalid --track-id: {e}"))?;
-    build_review_v2_with_reviewer(&track_id, items_dir, reviewer)
-}
-
 /// Builds the v2 review composition with a real `ClaudeReviewer`.
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn build_review_v2_with_claude_reviewer(
+pub(crate) fn build_review_v2_with_claude_reviewer(
     track_id: &TrackId,
     items_dir: &Path,
     reviewer: ClaudeReviewer,
@@ -279,7 +262,8 @@ pub fn build_review_v2_with_claude_reviewer(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn build_review_v2_with_claude_reviewer_str(
+#[allow(dead_code)] // used in run.rs tests only
+pub(crate) fn build_review_v2_with_claude_reviewer_str(
     track_id_str: &str,
     items_dir: &Path,
     reviewer: ClaudeReviewer,
@@ -293,7 +277,7 @@ pub fn build_review_v2_with_claude_reviewer_str(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn resolve_diff_base_and_getter(
+pub(crate) fn resolve_diff_base_and_getter(
     track_id: &TrackId,
     items_dir: &Path,
 ) -> Result<(GitDiffGetter, CommitHash), String> {
@@ -309,7 +293,7 @@ pub fn resolve_diff_base_and_getter(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
-pub fn build_scope_query_interactor_str(
+pub(crate) fn build_scope_query_interactor_str(
     track_id_str: &str,
     items_dir: &Path,
 ) -> Result<ScopeQueryInteractor<GitDiffGetter>, String> {
@@ -335,7 +319,7 @@ pub fn build_scope_query_interactor_str(
 /// # Errors
 /// Returns a human-readable error string on failure (invalid track id,
 /// scope-config load failure, items_dir traversal guard).
-pub fn build_scope_query_interactor_no_diff_str(
+pub(crate) fn build_scope_query_interactor_no_diff_str(
     track_id_str: &str,
     items_dir: &Path,
 ) -> Result<ScopeQueryInteractor<NullDiffGetter>, String> {

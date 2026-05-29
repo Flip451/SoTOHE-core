@@ -1,84 +1,10 @@
-//! Review results rendering and run-review service factory.
+//! Review results rendering helper.
 
 use std::path::Path;
 
 use domain::TrackId;
 
-use infrastructure::review_v2::CodexReviewer;
-use usecase::review_v2::{
-    RunReviewCommand, RunReviewError, RunReviewInteractor, RunReviewOutput, RunReviewService,
-};
-
-use super::approved::count_findings_in_verdict_json;
-use super::run::run_codex_review_str;
-use super::shared::{CodexReviewOutcome, build_review_v2};
-
-/// Constructs an `Arc<dyn RunReviewService>` that the CLI can call without
-/// importing infrastructure or domain types.
-///
-/// Returns a `RunReviewInteractor` whose closure builds a `CodexReviewer` from
-/// the command fields and dispatches the review via [`run_codex_review_str`].
-///
-/// # Purpose
-///
-/// This factory gives the CLI a usecase-service-trait handle rather than a
-/// concrete `ReviewV2CompositionWithCodex` struct, satisfying the CN-01 / AC-03
-/// wiring requirement: the CLI composition root wires through
-/// `Arc<dyn RunReviewService>` rather than touching concrete infrastructure
-/// adapters directly.
-#[must_use]
-pub fn build_run_review_service() -> std::sync::Arc<dyn RunReviewService> {
-    use std::sync::Arc;
-    use std::time::Duration;
-
-    let run_fn = Arc::new(|cmd: RunReviewCommand| {
-        // Set `scope_label` so the reviewer prompt includes `Review scope: <group>`.
-        let reviewer = CodexReviewer::new(
-            cmd.model.clone(),
-            Duration::from_secs(cmd.timeout_seconds),
-            cmd.base_prompt.clone(),
-        )
-        .with_scope_label(cmd.group.clone());
-        run_codex_review_str(&cmd.track_id, &cmd.items_dir, &cmd.group, &cmd.round_type, reviewer)
-            .map_err(RunReviewError::CompositionFailed)
-            .map(|outcome| match outcome {
-                CodexReviewOutcome::Skipped { .. } => RunReviewOutput {
-                    verdict_kind: "skipped".to_owned(),
-                    skipped: true,
-                    finding_count: 0,
-                    summary: None,
-                },
-                CodexReviewOutcome::FinalCompleted { verdict_json, exit_code } => {
-                    let finding_count = count_findings_in_verdict_json(&verdict_json);
-                    RunReviewOutput {
-                        verdict_kind: if exit_code == 0 {
-                            "approved".to_owned()
-                        } else {
-                            "rejected".to_owned()
-                        },
-                        skipped: false,
-                        finding_count,
-                        summary: Some(verdict_json),
-                    }
-                }
-                CodexReviewOutcome::FastCompleted { verdict_json, exit_code } => {
-                    let finding_count = count_findings_in_verdict_json(&verdict_json);
-                    RunReviewOutput {
-                        verdict_kind: if exit_code == 0 {
-                            "approved".to_owned()
-                        } else {
-                            "rejected".to_owned()
-                        },
-                        skipped: false,
-                        finding_count,
-                        summary: Some(verdict_json),
-                    }
-                }
-            })
-    });
-
-    Arc::new(RunReviewInteractor::new(run_fn))
-}
+use super::shared::build_review_v2;
 
 /// Renders the `sotp review results` output as a string, given string-typed parameters.
 ///
@@ -95,7 +21,7 @@ pub fn build_run_review_service() -> std::sync::Arc<dyn RunReviewService> {
 ///
 /// # Errors
 /// Returns a human-readable error string on any I/O or domain failure.
-pub fn render_review_results_str(
+pub(crate) fn render_review_results_str(
     track_id_str: &str,
     items_dir: &Path,
     scope_filter: Option<&str>,
