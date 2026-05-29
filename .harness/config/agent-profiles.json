@@ -14,27 +14,27 @@
   "capabilities": {
     "orchestrator": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-8"
     },
     "spec-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-8"
     },
     "impl-planner": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-8"
     },
     "type-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-8"
     },
     "adr-editor": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-8"
     },
     "implementer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-8"
     },
     "reviewer": {
       "provider": "codex",
@@ -46,7 +46,7 @@
     },
     "review-fix-lead": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-8"
     },
     "pr-reviewer": {
       "provider": "codex"

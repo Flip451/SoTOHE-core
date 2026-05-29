@@ -1,8 +1,9 @@
 //! `make` command family — CliApp impl methods.
 //!
 //! Each method receives `raw_args: Vec<String>` forwarded from cargo-make and
-//! delegates in-process to the corresponding `CliApp::*` method or infrastructure
-//! layer.  No subprocess (`bin/sotp`) is spawned — `cli-composition` is a library.
+//! forwards them to the real `sotp` binary via `run_sotp`.  This matches the
+//! baseline `apps/cli/src/commands/make.rs` dispatch_* pattern exactly, so
+//! clap (via the subprocess) owns all argument parsing, validation and defaults.
 
 use std::path::PathBuf;
 
@@ -19,6 +20,10 @@ fn raw_args_to_single(raw_args: &[String]) -> Result<String, String> {
 }
 
 /// Split raw args into individual words.
+///
+/// When cargo-make passes `${@}` as a single string element, this function
+/// splits it on whitespace.  When called directly with multiple args (already
+/// properly split by the shell), they are returned as-is to preserve quoting.
 fn raw_args_to_words(raw_args: &[String]) -> Vec<String> {
     if raw_args.len() == 1 {
         raw_args
@@ -31,9 +36,85 @@ fn raw_args_to_words(raw_args: &[String]) -> Vec<String> {
 }
 
 /// Strip a leading `"--"` separator and return the remaining words.
+///
+/// Equivalent to the `skip_while(|s| *s == "--")` step inside `build_forwarded_args`
+/// in the baseline `apps/cli/src/commands/make.rs`.
 fn strip_leading_separator(raw_args: &[String]) -> Vec<String> {
     let words = raw_args_to_words(raw_args);
     words.into_iter().skip_while(|s| s == "--").collect()
+}
+
+/// Build the sotp argv for a forwarding dispatcher: `prefix` tokens followed by
+/// user args with any leading `"--"` separator stripped.
+///
+/// Mirrors `build_forwarded_args` in the baseline `apps/cli/src/commands/make.rs`.
+fn build_forwarded_args(prefix: &[&str], raw_args: &[String]) -> Vec<String> {
+    let filtered = strip_leading_separator(raw_args);
+    let mut args: Vec<String> = prefix.iter().map(|s| (*s).to_owned()).collect();
+    args.extend(filtered);
+    args
+}
+
+/// Build the sotp argv for `track-set-override` / `track-clear-override`.
+///
+/// Finds the first positional (non-flag, non-flag-value) word in `raw_args` as
+/// the status, then routes:
+/// - `"clear"` → `["track", "clear-override", "--items-dir", "track/items", <rest>]`
+/// - other     → `["track", "set-override",   "--items-dir", "track/items", status, <rest>]`
+///
+/// Only **value-taking** flags (`--track-id`, `--reason`) consume the next token as their
+/// value.  All other flags are treated as boolean flags.  The status word is removed by
+/// **index** (not by value), so a flag value that happens to equal the status string is
+/// never silently dropped.
+///
+/// # Errors
+///
+/// Returns `Err` if no positional word is found (missing status argument).
+fn build_set_override_args(raw_args: &[String]) -> Result<Vec<String>, String> {
+    let words = raw_args_to_words(raw_args);
+    let filtered: Vec<&str> = words.iter().map(|s| s.as_str()).skip_while(|s| *s == "--").collect();
+    let usage = "error: usage: sotp make track-set-override <blocked|cancelled|clear> [--track-id <id>] [--reason <text>]";
+    // Only these flags take a value argument; boolean flags do not consume the next token.
+    const VALUE_FLAGS: &[&str] = &["--track-id", "--reason"];
+    let mut status_idx: Option<usize> = None;
+    let mut skip_next = false;
+    for (i, word) in filtered.iter().enumerate() {
+        if skip_next {
+            skip_next = false;
+            continue;
+        }
+        if VALUE_FLAGS.contains(word) {
+            skip_next = true;
+        } else if !word.starts_with('-') {
+            status_idx = Some(i);
+            break;
+        }
+    }
+    let status_idx = status_idx.ok_or_else(|| usage.to_owned())?;
+    let status = filtered.get(status_idx).ok_or_else(|| usage.to_owned())?;
+    // Remaining args: all words except the status word at status_idx, removed by index.
+    let rest: Vec<&str> =
+        filtered.iter().enumerate().filter(|(i, _)| *i != status_idx).map(|(_, s)| *s).collect();
+    if *status == "clear" {
+        let mut args: Vec<String> = vec![
+            "track".to_owned(),
+            "clear-override".to_owned(),
+            "--items-dir".to_owned(),
+            "track/items".to_owned(),
+        ];
+        args.extend(rest.iter().map(|s| (*s).to_owned()));
+        Ok(args)
+    } else {
+        let mut args: Vec<String> = vec![
+            "track".to_owned(),
+            "set-override".to_owned(),
+            "--items-dir".to_owned(),
+            "track/items".to_owned(),
+            (*status).to_owned(),
+        ];
+        args.extend(rest.iter().map(|s| (*s).to_owned()));
+        Ok(args)
+    }
 }
 
 impl CliApp {
@@ -163,7 +244,7 @@ impl CliApp {
     ) -> Result<CommandOutcome, String> {
         let track_id = raw_args_to_single(&raw_args)
             .map_err(|_| "error: track-id argument required".to_owned())?;
-        self.track_branch_create(PathBuf::from("track/items"), track_id)
+        run_sotp(&["track", "branch", "create", "--items-dir", "track/items", &track_id])
     }
 
     /// Switch to an existing track branch.
@@ -176,7 +257,7 @@ impl CliApp {
     ) -> Result<CommandOutcome, String> {
         let track_id = raw_args_to_single(&raw_args)
             .map_err(|_| "error: track-id argument required".to_owned())?;
-        self.track_branch_switch(PathBuf::from("track/items"), track_id)
+        run_sotp(&["track", "branch", "switch", "--items-dir", "track/items", &track_id])
     }
 
     /// Resolve current track phase.
@@ -184,9 +265,9 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when track resolution fails.
     pub fn make_track_resolve(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let track_id = words.iter().find(|w| !w.starts_with('-')).cloned();
-        self.track_resolve(PathBuf::from("track/items"), track_id)
+        let args = build_forwarded_args(&["track", "resolve"], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Push current track/plan branch to origin.
@@ -195,8 +276,23 @@ impl CliApp {
     /// Returns `Err` when push fails.
     pub fn make_track_pr_push(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
-        let track_id = words.first().cloned();
-        self.pr_push(track_id)
+        let mut args: Vec<&str> = vec!["pr", "push"];
+        match words.first() {
+            Some(first) if !first.starts_with("--") => {
+                // Legacy positional track id: promote to --track-id.
+                args.extend_from_slice(&["--track-id", first]);
+                for w in words.get(1..).unwrap_or_default() {
+                    args.push(w);
+                }
+            }
+            _ => {
+                // Flag-first or empty: forward everything verbatim; clap resolves track-id.
+                for w in &words {
+                    args.push(w);
+                }
+            }
+        }
+        run_sotp(&args)
     }
 
     /// Create or reuse a PR for the current branch.
@@ -206,20 +302,20 @@ impl CliApp {
     pub fn make_track_pr_ensure(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
         let mut args: Vec<&str> = vec!["pr", "ensure-pr"];
-        // Only treat the first word as a positional track-id when it is not a
-        // flag (does not start with "--").  Flag-only invocations such as
-        // `-- --base release` must flow through unchanged so clap can parse them.
-        let start = if words.first().is_some_and(|w| !w.starts_with("--")) {
-            if let Some(track_id) = words.first() {
-                args.extend_from_slice(&["--track-id", track_id]);
+        match words.first() {
+            Some(first) if !first.starts_with("--") => {
+                // Legacy positional track id: promote to --track-id.
+                args.extend_from_slice(&["--track-id", first]);
+                for w in words.get(1..).unwrap_or_default() {
+                    args.push(w);
+                }
             }
-            1
-        } else {
-            0
-        };
-        // Forward remaining args so clap rejects unexpected ones.
-        for w in words.get(start..).unwrap_or_default() {
-            args.push(w);
+            _ => {
+                // Flag-first or empty: forward everything verbatim; clap resolves track-id.
+                for w in &words {
+                    args.push(w);
+                }
+            }
         }
         run_sotp(&args)
     }
@@ -242,11 +338,9 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when the review cycle fails.
     pub fn make_track_pr_review(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let track_id = require_flag_value(&words, "--track-id")?
-            .or_else(|| words.first().filter(|w| !w.starts_with('-')).cloned());
-        let resume = words.iter().any(|w| w == "--resume");
-        self.pr_review_cycle(track_id, resume)
+        let args = build_forwarded_args(&["pr", "review-cycle"], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Wait for PR checks then merge.
@@ -267,9 +361,9 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when status retrieval fails.
     pub fn make_track_pr_status(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let pr = words.first().cloned().unwrap_or_default();
-        self.pr_status(pr)
+        let args = build_forwarded_args(&["pr", "status"], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Run the local Codex planner.
@@ -304,29 +398,9 @@ impl CliApp {
         &self,
         raw_args: Vec<String>,
     ) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let items_dir = PathBuf::from("track/items");
-        let track_id = require_flag_value(&words, "--track-id")?;
-        let scope = require_flag_value(&words, "--scope")?;
-        let round_type = match require_flag_value(&words, "--round-type")? {
-            None => "any".to_owned(),
-            Some(v) => validate_round_type(v)?,
-        };
-        let limit = match require_flag_value(&words, "--limit")? {
-            None => 0u32,
-            Some(v) => parse_limit_arg(&v)?,
-        };
-        let all = words.iter().any(|w| w == "--all");
-        let no_hint = words.iter().any(|w| w == "--no-hint");
-        self.review_results(crate::ReviewResultsInput {
-            track_id,
-            items_dir,
-            scope,
-            all,
-            limit,
-            round_type,
-            no_hint,
-        })
+        let args = build_forwarded_args(&["review", "results"], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Check that the review state is approved and code hash is current.
@@ -337,10 +411,9 @@ impl CliApp {
         &self,
         raw_args: Vec<String>,
     ) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let items_dir = PathBuf::from("track/items");
-        let track_id = require_flag_value(&words, "--track-id")?;
-        self.review_check_approved(track_id, items_dir)
+        let args = build_forwarded_args(&["review", "check-approved"], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Switch to main branch and pull latest.
@@ -348,7 +421,7 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when switching or pulling fails.
     pub fn make_track_switch_main(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        self.git_switch_and_pull("main".to_owned())
+        run_sotp(&["git", "switch-and-pull", "main"])
     }
 
     /// Stage paths from tmp/track-commit/add-paths.txt.
@@ -356,7 +429,7 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when staging fails.
     pub fn make_track_add_paths(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        self.git_add_from_file(PathBuf::from("tmp/track-commit/add-paths.txt"), true)
+        run_sotp(&["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"])
     }
 
     /// Transition a task status.
@@ -364,15 +437,10 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when the transition fails.
     pub fn make_track_transition(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let items_dir = PathBuf::from("track/items");
-        let track_id = require_flag_value(&words, "--track-id")?;
-        let commit_hash = require_flag_value(&words, "--commit-hash")?;
-        // Positional args: task_id, target_status (flag values must be excluded)
-        let positional = extract_positionals(&words);
-        let task_id = positional.first().cloned().unwrap_or_default();
-        let target_status = positional.get(1).cloned().unwrap_or_default();
-        self.track_transition(items_dir, track_id, task_id, target_status, commit_hash)
+        let args =
+            build_forwarded_args(&["track", "transition", "--items-dir", "track/items"], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Add a new task to a track.
@@ -380,15 +448,10 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when the add-task operation fails.
     pub fn make_track_add_task(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let items_dir = PathBuf::from("track/items");
-        let track_id = require_flag_value(&words, "--track-id")?;
-        let section = require_flag_value(&words, "--section")?;
-        let after = require_flag_value(&words, "--after")?;
-        // First positional arg is the description (flag values must be excluded)
-        let positional = extract_positionals(&words);
-        let description = positional.first().cloned().unwrap_or_default();
-        self.track_add_task(items_dir, track_id, description, section, after)
+        let args =
+            build_forwarded_args(&["track", "add-task", "--items-dir", "track/items"], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Show the next open task (JSON).
@@ -396,10 +459,10 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when task retrieval fails.
     pub fn make_track_next_task(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let items_dir = PathBuf::from("track/items");
-        let track_id = require_flag_value(&words, "--track-id")?;
-        self.track_next_task(items_dir, track_id)
+        let args =
+            build_forwarded_args(&["track", "next-task", "--items-dir", "track/items"], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Show task status counts (JSON).
@@ -407,10 +470,12 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when counts retrieval fails.
     pub fn make_track_task_counts(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let items_dir = PathBuf::from("track/items");
-        let track_id = require_flag_value(&words, "--track-id")?;
-        self.track_task_counts(items_dir, track_id)
+        let args = build_forwarded_args(
+            &["track", "task-counts", "--items-dir", "track/items"],
+            &raw_args,
+        );
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Set or clear a status override.
@@ -418,18 +483,9 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when the override operation fails.
     pub fn make_track_set_override(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let items_dir = PathBuf::from("track/items");
-        let track_id = require_flag_value(&words, "--track-id")?;
-        let reason = require_flag_value(&words, "--reason")?.unwrap_or_default();
-        // First positional arg is the status value (flag values must be excluded)
-        let positional = extract_positionals(&words);
-        let status = positional.first().cloned().unwrap_or_default();
-        if status == "clear" {
-            self.track_clear_override(items_dir, track_id)
-        } else {
-            self.track_set_override(items_dir, track_id, status, reason)
-        }
+        let args = build_set_override_args(&raw_args)?;
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Render plan.md and registry.md from metadata.json.
@@ -437,9 +493,10 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when the sync-views operation fails.
     pub fn make_track_sync_views(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        let words = strip_leading_separator(&raw_args);
-        let track_id = require_flag_value(&words, "--track-id")?;
-        self.track_views_sync(PathBuf::from("."), track_id)
+        let args =
+            build_forwarded_args(&["track", "views", "sync", "--project-root", "."], &raw_args);
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        run_sotp(&refs)
     }
 
     /// Attach git note from tmp/track-commit/note.md.
@@ -447,7 +504,7 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when the note attachment fails.
     pub fn make_track_note(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        self.git_note_from_file(PathBuf::from("tmp/track-commit/note.md"), true)
+        run_sotp(&["git", "note-from-file", "tmp/track-commit/note.md", "--cleanup"])
     }
 
     /// Write current HEAD SHA to .commit_hash (set v2 diff base).
@@ -471,7 +528,7 @@ impl CliApp {
     /// # Errors
     /// Returns `Err` when staging fails.
     pub fn make_add_all(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {
-        self.git_add_all()
+        run_sotp(&["git", "add-all"])
     }
 
     /// Unstage paths (remove from index without discarding worktree changes).
@@ -483,8 +540,9 @@ impl CliApp {
             return Err("error: at least one path required".to_owned());
         }
         let words = raw_args_to_words(&raw_args);
-        let paths: Vec<PathBuf> = words.iter().map(PathBuf::from).collect();
-        self.git_unstage(paths)
+        let mut sotp_args: Vec<&str> = vec!["git", "unstage", "--"];
+        sotp_args.extend(words.iter().map(String::as_str));
+        run_sotp(&sotp_args)
     }
 
     /// Run a cargo make task via tools-daemon exec with WORKER_ID isolation.
@@ -538,95 +596,6 @@ fn run_sotp(args: &[&str]) -> Result<CommandOutcome, String> {
     run_command("bin/sotp", args)
 }
 
-/// Extract the value following a flag like `--flag-name` from a word list.
-///
-/// Extract the value following a required flag like `--flag-name` from a word
-/// list, failing if the flag is present but has no following value token.
-///
-/// Returns `Ok(None)` when the flag is absent, `Ok(Some(value))` when the flag
-/// is present and has a value, and `Err` when the flag is present but is the
-/// last token in the list or the next token is another flag (starts with `"--"`).
-fn require_flag_value(words: &[String], flag: &str) -> Result<Option<String>, String> {
-    let mut iter = words.iter();
-    while let Some(w) = iter.next() {
-        if w.as_str() == flag {
-            return match iter.next() {
-                Some(v) if !v.starts_with("--") => Ok(Some(v.clone())),
-                Some(next_flag) => {
-                    Err(format!("flag {flag} requires a value but got another flag: {next_flag}"))
-                }
-                None => Err(format!("flag {flag} requires a value but none was provided")),
-            };
-        }
-    }
-    Ok(None)
-}
-
-/// Validate the `--round-type` flag value.
-///
-/// Accepts `"fast"`, `"final"`, or `"any"` (case-sensitive).
-/// Returns `Err` for any other value.
-///
-/// # Errors
-///
-/// Returns an error string when `value` is not one of the accepted tokens.
-fn validate_round_type(value: String) -> Result<String, String> {
-    match value.as_str() {
-        "fast" | "final" | "any" => Ok(value),
-        _ => Err(format!("invalid --round-type value {value:?}: expected one of fast, final, any")),
-    }
-}
-
-/// Parse the `--limit` flag value.
-///
-/// Accepts `"all"` (case-insensitive) → `u32::MAX`, a non-negative integer, or
-/// returns `Err` for any other string.
-///
-/// # Errors
-///
-/// Returns an error string when `value` is neither `"all"` nor a valid `u32`.
-fn parse_limit_arg(value: &str) -> Result<u32, String> {
-    if value.eq_ignore_ascii_case("all") {
-        return Ok(u32::MAX);
-    }
-    value.parse::<u32>().map_err(|_| {
-        format!("invalid --limit value {value:?}: expected a non-negative integer or 'all'")
-    })
-}
-
-/// Collect positional arguments from a word list, skipping only the known
-/// flag tokens (`--track-id`, `--commit-hash`, `--section`, `--after`,
-/// `--reason`, `--round-type`) and their immediately following values.
-///
-/// Tokens that do not match a known flag — even if they start with `-` — are
-/// treated as positional arguments and returned.  This preserves free-form
-/// values like descriptions or reasons that start with a dash.
-///
-/// A known flag only consumes the next token as its value when that next token
-/// is not itself a known flag.  If the next token is another known flag, the
-/// current flag is treated as having no value (the next flag is left in the
-/// stream to be processed normally).  This prevents a malformed invocation
-/// such as `--section --track-id abc T001` from silently treating `--track-id`
-/// as the value of `--section`.
-fn extract_positionals(words: &[String]) -> Vec<String> {
-    const KNOWN_FLAGS: &[&str] =
-        &["--track-id", "--commit-hash", "--section", "--after", "--reason", "--round-type"];
-    let mut result = Vec::new();
-    let mut iter = words.iter().peekable();
-    while let Some(w) = iter.next() {
-        if KNOWN_FLAGS.contains(&w.as_str()) {
-            // Consume the next token as this flag's value only when it is not
-            // itself a known flag (which would indicate a missing value).
-            if iter.peek().is_some_and(|next| !KNOWN_FLAGS.contains(&next.as_str())) {
-                iter.next();
-            }
-        } else {
-            result.push(w.clone());
-        }
-    }
-    result
-}
-
 // ---------------------------------------------------------------------------
 // Unit tests
 // ---------------------------------------------------------------------------
@@ -634,154 +603,203 @@ fn extract_positionals(words: &[String]) -> Vec<String> {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use super::{extract_positionals, parse_limit_arg, require_flag_value, validate_round_type};
+    use super::{build_forwarded_args, build_set_override_args, strip_leading_separator};
 
-    /// `--limit all` (and case variants) must parse to `u32::MAX` — the sentinel
-    /// that the underlying `bin/sotp review results` CLI accepts for "no limit".
+    // --- build_forwarded_args tests ---
+
     #[test]
-    fn test_parse_limit_arg_with_all_returns_u32_max() {
-        assert_eq!(parse_limit_arg("all").unwrap(), u32::MAX);
+    fn test_build_forwarded_args_prepends_prefix() {
+        let raw = vec!["--track-id my-track --round-type fast".to_owned()];
+        let args = build_forwarded_args(&["review", "results"], &raw);
+        assert_eq!(args.first().map(String::as_str), Some("review"));
+        assert_eq!(args.get(1).map(String::as_str), Some("results"));
+        assert_eq!(args.get(2).map(String::as_str), Some("--track-id"));
     }
 
     #[test]
-    fn test_parse_limit_arg_with_all_uppercase_returns_u32_max() {
-        assert_eq!(parse_limit_arg("ALL").unwrap(), u32::MAX);
+    fn test_build_forwarded_args_strips_leading_double_dash() {
+        let raw = vec!["-- --track-id my-track".to_owned()];
+        let args = build_forwarded_args(&["review", "check-approved"], &raw);
+        assert_eq!(args, vec!["review", "check-approved", "--track-id", "my-track"]);
     }
 
-    /// A numeric string must parse to the corresponding `u32` value.
     #[test]
-    fn test_parse_limit_arg_with_numeric_returns_value() {
-        assert_eq!(parse_limit_arg("7").unwrap(), 7u32);
-        assert_eq!(parse_limit_arg("0").unwrap(), 0u32);
-        assert_eq!(parse_limit_arg("100").unwrap(), 100u32);
+    fn test_build_forwarded_args_empty_raw() {
+        let raw: Vec<String> = vec![];
+        let args = build_forwarded_args(&["review", "check-approved"], &raw);
+        assert_eq!(args, vec!["review", "check-approved"]);
     }
 
-    /// Any non-numeric, non-"all" string must return an error.
+    // --- pr_push / pr_ensure guard logic tests ---
+    //
+    // These tests exercise the non-flag-first guard: a first word that does not
+    // start with "--" is promoted to "--track-id <word> <rest>"; a flag-first or
+    // empty word list is forwarded verbatim.
+
     #[test]
-    fn test_parse_limit_arg_with_invalid_string_returns_error() {
-        assert!(parse_limit_arg("foo").is_err());
-        assert!(parse_limit_arg("-1").is_err());
-        assert!(parse_limit_arg("").is_err());
+    fn test_pr_push_guard_positional_first_word_promoted() {
+        // Legacy positional: "my-track" → "--track-id my-track"
+        let words = strip_leading_separator(&["my-track".to_owned()]);
+        let mut args: Vec<&str> = vec!["pr", "push"];
+        match words.first() {
+            Some(first) if !first.starts_with("--") => {
+                args.extend_from_slice(&["--track-id", first]);
+                for w in words.get(1..).unwrap_or_default() {
+                    args.push(w);
+                }
+            }
+            _ => {
+                for w in &words {
+                    args.push(w);
+                }
+            }
+        }
+        assert_eq!(args, vec!["pr", "push", "--track-id", "my-track"]);
     }
 
-    /// A known flag and its value must be skipped; other tokens are positional.
     #[test]
-    fn test_extract_positionals_skips_known_flags_and_their_values() {
-        let words: Vec<String> =
-            ["--track-id", "my-track", "T001", "done"].iter().map(|s| s.to_string()).collect();
-        let positional = extract_positionals(&words);
-        assert_eq!(positional, vec!["T001", "done"]);
+    fn test_pr_push_guard_flag_first_forwarded_verbatim() {
+        // Flag-first: "--base release" must not be promoted to "--track-id --base release".
+        let words = strip_leading_separator(&["--base release".to_owned()]);
+        let mut args: Vec<&str> = vec!["pr", "push"];
+        match words.first() {
+            Some(first) if !first.starts_with("--") => {
+                args.extend_from_slice(&["--track-id", first]);
+                for w in words.get(1..).unwrap_or_default() {
+                    args.push(w);
+                }
+            }
+            _ => {
+                for w in &words {
+                    args.push(w);
+                }
+            }
+        }
+        assert_eq!(args, vec!["pr", "push", "--base", "release"]);
     }
 
-    /// A free-form positional that starts with `-` must NOT be dropped.
     #[test]
-    fn test_extract_positionals_preserves_dash_prefixed_positionals() {
-        let words: Vec<String> =
-            ["--track-id", "my-track", "-important-note"].iter().map(|s| s.to_string()).collect();
-        let positional = extract_positionals(&words);
-        assert_eq!(positional, vec!["-important-note"]);
+    fn test_pr_push_guard_explicit_track_id_flag_forwarded_verbatim() {
+        // Explicit "--track-id foo" must not be doubled to
+        // "--track-id --track-id foo".
+        let words = strip_leading_separator(&["--track-id foo".to_owned()]);
+        let mut args: Vec<&str> = vec!["pr", "push"];
+        match words.first() {
+            Some(first) if !first.starts_with("--") => {
+                args.extend_from_slice(&["--track-id", first]);
+                for w in words.get(1..).unwrap_or_default() {
+                    args.push(w);
+                }
+            }
+            _ => {
+                for w in &words {
+                    args.push(w);
+                }
+            }
+        }
+        assert_eq!(args, vec!["pr", "push", "--track-id", "foo"]);
     }
 
-    /// Unknown flags (not in KNOWN_FLAGS) that start with `--` are returned as positional.
     #[test]
-    fn test_extract_positionals_treats_unknown_flags_as_positional() {
-        let words: Vec<String> =
-            ["--unknown-flag", "value", "positional"].iter().map(|s| s.to_string()).collect();
-        let positional = extract_positionals(&words);
-        assert_eq!(positional, vec!["--unknown-flag", "value", "positional"]);
+    fn test_pr_push_guard_empty_forwarded_verbatim() {
+        // Empty args: no "--track-id" injected.
+        let words: Vec<String> = vec![];
+        let mut args: Vec<&str> = vec!["pr", "push"];
+        match words.first() {
+            Some(first) if !first.starts_with("--") => {
+                args.extend_from_slice(&["--track-id", first]);
+                for w in words.get(1..).unwrap_or_default() {
+                    args.push(w);
+                }
+            }
+            _ => {
+                for w in &words {
+                    args.push(w);
+                }
+            }
+        }
+        assert_eq!(args, vec!["pr", "push"]);
     }
 
-    /// When a flag is absent, `require_flag_value` returns `Ok(None)`.
+    // --- build_set_override_args tests ---
+
     #[test]
-    fn test_require_flag_value_when_flag_absent_returns_ok_none() {
-        let words: Vec<String> = ["--other", "val"].iter().map(|s| s.to_string()).collect();
-        let result = require_flag_value(&words, "--scope").unwrap();
-        assert!(result.is_none());
+    fn test_build_set_override_args_blocked_no_flags() {
+        let raw = vec!["blocked".to_owned()];
+        let args = build_set_override_args(&raw).unwrap();
+        assert_eq!(args, vec!["track", "set-override", "--items-dir", "track/items", "blocked"]);
     }
 
-    /// When a flag is present with a following value, `require_flag_value` returns `Ok(Some(value))`.
     #[test]
-    fn test_require_flag_value_when_flag_present_with_value_returns_ok_some() {
-        let words: Vec<String> =
-            ["--scope", "cli_composition"].iter().map(|s| s.to_string()).collect();
-        let result = require_flag_value(&words, "--scope").unwrap();
-        assert_eq!(result, Some("cli_composition".to_owned()));
+    fn test_build_set_override_args_clear_routes_to_clear_override() {
+        let raw = vec!["clear".to_owned()];
+        let args = build_set_override_args(&raw).unwrap();
+        assert_eq!(args, vec!["track", "clear-override", "--items-dir", "track/items"]);
     }
 
-    /// When a flag is present but is the last token (no following value), `require_flag_value` returns `Err`.
     #[test]
-    fn test_require_flag_value_when_flag_is_last_token_returns_error() {
-        let words: Vec<String> = ["--round-type"].iter().map(|s| s.to_string()).collect();
-        let result = require_flag_value(&words, "--round-type");
-        assert!(result.is_err(), "flag at end of list must return Err, got: {result:?}");
-    }
-
-    /// When `--limit` is the last token, `require_flag_value` must fail, preventing
-    /// the silent `--limit 0` fallback that would suppress history.
-    #[test]
-    fn test_require_flag_value_prevents_silent_limit_fallback() {
-        let words: Vec<String> =
-            ["--track-id", "my-track", "--limit"].iter().map(|s| s.to_string()).collect();
-        let result = require_flag_value(&words, "--limit");
-        assert!(result.is_err(), "--limit without value must return Err, got: {result:?}");
-    }
-
-    /// When a flag is followed immediately by another flag, `require_flag_value` must
-    /// return `Err` rather than mis-parsing the next flag as the value.
-    #[test]
-    fn test_require_flag_value_when_next_token_is_flag_returns_error() {
-        let words: Vec<String> =
-            ["--scope", "--limit", "1"].iter().map(|s| s.to_string()).collect();
-        let result = require_flag_value(&words, "--scope");
-        assert!(
-            result.is_err(),
-            "--scope followed by another flag must return Err, got: {result:?}"
+    fn test_build_set_override_args_status_after_flags() {
+        // Flags before status: "--track-id my-track blocked" →
+        // status is "blocked"; --track-id and its value are in rest.
+        let raw = vec!["--track-id my-track blocked".to_owned()];
+        let args = build_set_override_args(&raw).unwrap();
+        assert_eq!(
+            args,
+            vec![
+                "track",
+                "set-override",
+                "--items-dir",
+                "track/items",
+                "blocked",
+                "--track-id",
+                "my-track"
+            ]
         );
     }
 
-    /// Valid `--round-type` values must pass through unchanged.
     #[test]
-    fn test_validate_round_type_with_valid_values_returns_ok() {
-        assert_eq!(validate_round_type("fast".to_owned()).unwrap(), "fast");
-        assert_eq!(validate_round_type("final".to_owned()).unwrap(), "final");
-        assert_eq!(validate_round_type("any".to_owned()).unwrap(), "any");
+    fn test_build_set_override_args_reason_with_same_word_as_status_not_dropped() {
+        // Status word removed by index (not by value): --reason blocked must survive.
+        let raw = vec!["blocked --reason blocked".to_owned()];
+        let args = build_set_override_args(&raw).unwrap();
+        assert_eq!(
+            args,
+            vec![
+                "track",
+                "set-override",
+                "--items-dir",
+                "track/items",
+                "blocked",
+                "--reason",
+                "blocked"
+            ]
+        );
     }
 
-    /// A known flag followed immediately by another known flag must NOT consume
-    /// the second flag as the value of the first.  This prevents a malformed
-    /// invocation (`--section --track-id abc T001`) from silently treating
-    /// `--track-id` as the value of `--section` and exposing `abc` and `T001`
-    /// as positionals while the track ID is lost.
     #[test]
-    fn test_extract_positionals_does_not_consume_adjacent_known_flag_as_value() {
-        // Malformed: --section has no value; --track-id is immediately after.
-        let words: Vec<String> =
-            ["--section", "--track-id", "abc", "T001"].iter().map(|s| s.to_string()).collect();
-        let positional = extract_positionals(&words);
-        // --section's value is missing; --track-id should NOT be eaten.
-        // --track-id then consumes "abc", leaving "T001" as the sole positional.
-        assert_eq!(positional, vec!["T001"]);
+    fn test_build_set_override_args_clear_with_track_id() {
+        let raw = vec!["clear --track-id my-track".to_owned()];
+        let args = build_set_override_args(&raw).unwrap();
+        assert_eq!(
+            args,
+            vec!["track", "clear-override", "--items-dir", "track/items", "--track-id", "my-track"]
+        );
     }
 
-    /// An unrecognized `--round-type` value must return `Err` (fail-fast),
-    /// not silently degrade to "any".
     #[test]
-    fn test_validate_round_type_with_unrecognized_value_returns_error() {
-        assert!(
-            validate_round_type("all".to_owned()).is_err(),
-            "\"all\" is not a valid round-type; expected Err"
-        );
-        assert!(
-            validate_round_type("foo".to_owned()).is_err(),
-            "\"foo\" is not a valid round-type; expected Err"
-        );
-        assert!(
-            validate_round_type("FAST".to_owned()).is_err(),
-            "case variants are not accepted; expected Err"
-        );
-        assert!(
-            validate_round_type(String::new()).is_err(),
-            "empty string is not a valid round-type; expected Err"
+    fn test_build_set_override_args_missing_status_returns_error() {
+        let raw = vec!["--track-id my-track".to_owned()];
+        assert!(build_set_override_args(&raw).is_err());
+    }
+
+    #[test]
+    fn test_build_set_override_args_boolean_flag_before_status() {
+        // Unknown boolean flag (--verbose) must not consume the next token as its value.
+        let raw = vec!["--verbose blocked".to_owned()];
+        let args = build_set_override_args(&raw).unwrap();
+        assert_eq!(
+            args,
+            vec!["track", "set-override", "--items-dir", "track/items", "blocked", "--verbose"]
         );
     }
 }
