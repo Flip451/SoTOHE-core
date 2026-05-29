@@ -425,95 +425,65 @@
         }
       ]
     },
-    "harness-policy": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
-          "at": "2026-05-28T10:37:07Z"
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:36:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure side still defines and publicly re-exports `NullReviewer`, even though the briefing says the infra `null_reviewer` module should be deleted after moving it to the `cli_composition` crate. This leaves an old composition-only adapter in the infra public API, contrary to the extraction boundary; remove the `pub use` and inline module from `mod.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 16,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:39:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
-          "at": "2026-05-28T10:38:25Z"
+          "hash": "rvw1:sha256:3eacf10c6b53d18269f3733f23ec01771c942995509b66c848d1039ff412bc04",
+          "at": "2026-05-28T11:43:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mod.rs` still publicly re-exports `ScopeConfigLoadError`, but the scope requires this module to expose only the adapter types plus `load_v2_scope_config`. That leaves an extra public API surface outside AC-07.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 17,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a32d3408ab8113f2ebb3842f92935612c4277196883ab3ebe1244f70b88805a2",
+          "at": "2026-05-28T15:03:20Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7e7660aba903f2e6dae7e963460df62ef583f8506dca79df4a6a3f594005df63",
-          "at": "2026-05-29T02:54:39Z"
+          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
+          "at": "2026-05-28T15:11:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7e7660aba903f2e6dae7e963460df62ef583f8506dca79df4a6a3f594005df63",
-          "at": "2026-05-29T02:56:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:193a618a9ca47842f7c2e23999189248a538eab0e75dc5451ddd493d1a852baa",
-          "at": "2026-05-29T03:49:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:193a618a9ca47842f7c2e23999189248a538eab0e75dc5451ddd493d1a852baa",
-          "at": "2026-05-29T03:50:29Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:27:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
-          "at": "2026-05-28T10:29:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
-          "at": "2026-05-28T11:35:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
-          "at": "2026-05-28T11:38:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
-          "at": "2026-05-28T15:02:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
-          "at": "2026-05-28T15:13:20Z"
+          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
+          "at": "2026-05-28T15:12:58Z"
         }
       ]
     },
@@ -1430,68 +1400,186 @@
           "findings": [],
           "hash": "rvw1:sha256:56743a4a9b7e6320e05eead5fa908161aeebf862af7994fdfc4d7d6c365cf606",
           "at": "2026-05-29T04:04:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_track_id_from_branch_uses_project_root_not_items_dir` does not reproduce the regression it claims to pin: it switches to the repo root, where `track/items` already exists, so the pre-fix `discover_from(items_dir)` path would still pass. The subdirectory invocation that actually failed is not covered, so this test will not catch a relapse.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 704,
+              "category": "testing"
+            },
+            {
+              "message": "`resolve_track_id_from_branch_returns_branch_error_on_non_track_branch` changes the process CWD to a tempdir and never restores it. When the tempdir is dropped, later tests inherit a deleted working directory, making the suite order-dependent and flaky.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 757,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:483355cad947d2c7cf978c5f270c90563e21d96c75ae31b73aa111e5654c3f84",
+          "at": "2026-05-29T04:22:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new regression test mutates the process CWD, but its `cwd_lock` is private to this module. Sibling `review_v2` test modules (`run.rs` and `commit_hash.rs`) use their own separate locks, so under parallel test execution the different `set_current_dir` call sites can still interleave and make CI flaky. The production fix is fine; the test needs a shared, crate-wide serialization mechanism or to avoid changing CWD.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 668,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e13674a42f2695d03060816b688c0d3b943f5a9c93eec655d7815ffee8ff2ba6",
+          "at": "2026-05-29T04:29:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression coverage here does not exercise the actual failure mode from the briefing. The new test uses an absolute `items_dir`, and the `resolve_project_root` unit test is independent, so both still pass if `resolve_track_id_from_branch`/`resolve_track_id_or_branch_write` keep calling `SystemGitRepo::discover_from(items_dir)`. The bug only reproduces when the process starts in a repo subdirectory with a relative `track/items` path, so add a test that runs from that context and invokes the helper with the relative path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 671,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:0c39a49f6038f7d3e52b8d66c298097ceeefb5e4849d57dad569d2042b08fae4",
+          "at": "2026-05-29T04:35:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new regression test mutates process CWD, but the mutex is only local to this module. Other `review_v2` test modules in this crate also call `set_current_dir()` with their own unrelated locks, so `cargo test` can still interleave process-wide cwd changes across modules and make this test suite flaky.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 671,
+              "category": "testing"
+            },
+            {
+              "message": "The added coverage only exercises the private read-path helper; none of the public entrypoints that actually use `resolve_track_id_or_branch_write` (`review_run_codex`, `review_run_claude`, `review_run_local`) are run from a subdirectory with a relative `track/items` path. That leaves the original branch-discovery regression untested on the public API path that matters.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 700,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d04de3328f966fc87c30d8792932ab7154b4a027f1a2674b387995e7a80e923e",
+          "at": "2026-05-29T04:40:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3d78fa9da87951c74ac9bc6854d7ae3af9463a30791d19fa5bde569a1b994f1",
+          "at": "2026-05-29T04:45:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3d78fa9da87951c74ac9bc6854d7ae3af9463a30791d19fa5bde569a1b994f1",
+          "at": "2026-05-29T04:48:23Z"
         }
       ]
     },
-    "infrastructure": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
-          "at": "2026-05-28T11:36:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The infrastructure side still defines and publicly re-exports `NullReviewer`, even though the briefing says the infra `null_reviewer` module should be deleted after moving it to the `cli_composition` crate. This leaves an old composition-only adapter in the infra public API, contrary to the extraction boundary; remove the `pub use` and inline module from `mod.rs`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/mod.rs",
-              "line": 16,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
-          "at": "2026-05-28T11:39:18Z"
+          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
+          "at": "2026-05-28T10:37:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3eacf10c6b53d18269f3733f23ec01771c942995509b66c848d1039ff412bc04",
-          "at": "2026-05-28T11:43:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`mod.rs` still publicly re-exports `ScopeConfigLoadError`, but the scope requires this module to expose only the adapter types plus `load_v2_scope_config`. That leaves an extra public API surface outside AC-07.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/mod.rs",
-              "line": 17,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:a32d3408ab8113f2ebb3842f92935612c4277196883ab3ebe1244f70b88805a2",
-          "at": "2026-05-28T15:03:20Z"
+          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
+          "at": "2026-05-28T10:38:25Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
-          "at": "2026-05-28T15:11:25Z"
+          "hash": "rvw1:sha256:7e7660aba903f2e6dae7e963460df62ef583f8506dca79df4a6a3f594005df63",
+          "at": "2026-05-29T02:54:39Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
-          "at": "2026-05-28T15:12:58Z"
+          "hash": "rvw1:sha256:7e7660aba903f2e6dae7e963460df62ef583f8506dca79df4a6a3f594005df63",
+          "at": "2026-05-29T02:56:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:193a618a9ca47842f7c2e23999189248a538eab0e75dc5451ddd493d1a852baa",
+          "at": "2026-05-29T03:49:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:193a618a9ca47842f7c2e23999189248a538eab0e75dc5451ddd493d1a852baa",
+          "at": "2026-05-29T03:50:29Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:27:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:29:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:35:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:02:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:13:20Z"
         }
       ]
     }

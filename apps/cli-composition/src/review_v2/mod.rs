@@ -487,6 +487,11 @@ fn resolve_track_id_or_branch(
 /// When `None`, resolves from the current branch. Fail-closed on non-track
 /// branches.
 ///
+/// Git discovery is anchored to the repository root derived from `items_dir`
+/// (stripping the trailing `track/items` segments), so that a relative
+/// `items_dir` like `"track/items"` discovers the correct repo root even when
+/// the process is invoked from a repo subdirectory.
+///
 /// # Errors
 /// Returns `Err` when the explicit track ID does not match the current branch,
 /// or when the current branch is not a track branch.
@@ -496,7 +501,8 @@ fn resolve_track_id_or_branch_write(
 ) -> Result<String, String> {
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
-    let branch = SystemGitRepo::discover_from(items_dir)
+    let project_root = crate::track::resolve_project_root(items_dir)?;
+    let branch = SystemGitRepo::discover_from(&project_root)
         .and_then(|r| r.output(&["rev-parse", "--abbrev-ref", "HEAD"]))
         .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
         .map_err(|e| format!("failed to detect current branch: {e}"))?;
@@ -524,12 +530,17 @@ fn resolve_track_id_or_branch_write(
 
 /// Resolves the current track ID from the active git branch (`track/<id>`).
 ///
+/// Git discovery is anchored to the repository root derived from `items_dir`
+/// (stripping the trailing `track/items` segments), matching the same anchor
+/// strategy used by the write-guard variant and the pre-migration resolver.
+///
 /// # Errors
 /// Returns `Err` when git discovery fails or the branch is not a track branch.
 fn resolve_track_id_from_branch(items_dir: &std::path::Path) -> Result<String, String> {
     use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
-    let output = SystemGitRepo::discover_from(items_dir)
+    let project_root = crate::track::resolve_project_root(items_dir)?;
+    let output = SystemGitRepo::discover_from(&project_root)
         .and_then(|r| r.output(&["rev-parse", "--abbrev-ref", "HEAD"]))
         .map_err(|e| format!("failed to detect current branch: {e}"))?;
 
@@ -640,4 +651,282 @@ fn validate_all_paths(paths: &[String]) -> Result<(), String> {
         }
     }
     if errors.is_empty() { Ok(()) } else { Err(errors.join("\n")) }
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use std::fs;
+    use std::path::PathBuf;
+    use std::process::Command;
+    use std::sync::{Mutex, OnceLock};
+
+    /// Serializes tests in this module that mutate the process CWD.
+    /// Note: nextest runs each test in its own process, so this lock guards
+    /// against races only when tests run in a shared process (e.g., `cargo test`).
+    fn cwd_lock() -> &'static Mutex<()> {
+        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+    }
+
+    /// RAII guard: restores the process CWD to `saved` when dropped, even on panic.
+    struct CwdGuard(PathBuf);
+    impl Drop for CwdGuard {
+        fn drop(&mut self) {
+            let _ = std::env::set_current_dir(&self.0);
+        }
+    }
+
+    fn run_git(root: &std::path::Path, args: &[&str]) {
+        let status = Command::new("git").args(args).current_dir(root).status().unwrap();
+        assert!(status.success(), "git command failed: git {}", args.join(" "));
+    }
+
+    /// Pin the regression: `resolve_track_id_from_branch` must anchor git discovery
+    /// to the project root (derived by stripping `track/items`), NOT to `items_dir`
+    /// directly.  This test invokes the function with the **relative** path
+    /// `"track/items"` from a **subdirectory** of the repo root to reproduce the
+    /// actual failure mode.
+    ///
+    /// Before the fix, `discover_from("track/items")` ran `git -C track/items …`
+    /// from the subdirectory CWD where `track/items` does not exist as a path,
+    /// causing git to fail.  After the fix, `resolve_project_root("track/items")`
+    /// returns `"."` and `discover_from(".")` succeeds from any directory inside
+    /// the repo.
+    #[test]
+    fn resolve_track_id_from_branch_relative_items_dir_works_from_subdirectory() {
+        let _lock = cwd_lock().lock().unwrap();
+
+        // Set up a real git repo with a track branch.
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init", "-b", "main"]);
+        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
+        run_git(dir.path(), &["config", "user.name", "Test"]);
+        fs::write(dir.path().join("README.md"), "init\n").unwrap();
+        run_git(dir.path(), &["add", "README.md"]);
+        run_git(dir.path(), &["commit", "-m", "init"]);
+        run_git(dir.path(), &["checkout", "-b", "track/test-track"]);
+
+        // Create `<repo>/track/items` so `resolve_project_root` finds a valid structure.
+        let items_dir = dir.path().join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+
+        // Create a subdirectory inside the repo.  From this path, the relative string
+        // "track/items" does NOT point to an existing directory, so the pre-fix code
+        // (`discover_from("track/items")`) would run `git -C track/items …` and fail.
+        let subdir = dir.path().join("src");
+        fs::create_dir_all(&subdir).unwrap();
+
+        // Restore CWD on drop, even if an assertion panics.
+        let _cwd_guard = CwdGuard(std::env::current_dir().unwrap());
+        std::env::set_current_dir(&subdir).unwrap();
+
+        // Pass the relative path — the function must succeed by anchoring to CWD (".").
+        let result = super::resolve_track_id_from_branch(std::path::Path::new("track/items"));
+
+        assert_eq!(result.unwrap(), "test-track");
+    }
+
+    /// Pin that `resolve_track_id_from_branch` returns an error for a relative
+    /// `items_dir` that does not follow the `*/track/items` structure.
+    #[test]
+    fn resolve_track_id_from_branch_rejects_non_canonical_items_dir() {
+        // A path like "wrong/path" does not end in "track/items", so
+        // resolve_project_root should return an error before any git I/O.
+        let result = super::resolve_track_id_from_branch(std::path::Path::new("wrong/path"));
+        assert!(result.is_err(), "expected error for non-canonical items_dir, got: {result:?}");
+        let msg = result.unwrap_err();
+        assert!(msg.contains("track/items"), "error should mention 'track/items', got: {msg}");
+    }
+
+    /// Pin the absolute path case: an absolute `items_dir` must also anchor
+    /// git discovery to the derived project root, not directly to `items_dir`.
+    #[test]
+    fn resolve_track_id_from_branch_works_with_absolute_items_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init", "-b", "main"]);
+        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
+        run_git(dir.path(), &["config", "user.name", "Test"]);
+        fs::write(dir.path().join("README.md"), "init\n").unwrap();
+        run_git(dir.path(), &["add", "README.md"]);
+        run_git(dir.path(), &["commit", "-m", "init"]);
+        run_git(dir.path(), &["checkout", "-b", "track/abs-track"]);
+
+        let items_dir = dir.path().join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+
+        // Pass the absolute path directly — no CWD dependency.
+        let result = super::resolve_track_id_from_branch(&items_dir);
+
+        assert_eq!(result.unwrap(), "abs-track");
+    }
+
+    /// Pin that the path passed to `resolve_track_id_from_branch` is used as
+    /// `items_dir`.  When the canonical path exists as an absolute dir but no
+    /// track branch is active, the function must fail with a branch error (not a
+    /// git-discovery error), confirming that git is discovered successfully.
+    ///
+    /// This test passes an absolute `items_dir` and never changes the process CWD,
+    /// so it does not hold `cwd_lock`.
+    #[test]
+    fn resolve_track_id_from_branch_returns_branch_error_on_non_track_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init", "-b", "main"]);
+        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
+        run_git(dir.path(), &["config", "user.name", "Test"]);
+        fs::write(dir.path().join("README.md"), "init\n").unwrap();
+        run_git(dir.path(), &["add", "README.md"]);
+        run_git(dir.path(), &["commit", "-m", "init"]);
+        // Stay on `main` (not a track branch).
+
+        let items_dir = dir.path().join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+
+        let result = super::resolve_track_id_from_branch(&items_dir);
+
+        assert!(result.is_err());
+        let msg = result.unwrap_err();
+        // The error must mention the branch name, not a git-discovery failure.
+        assert!(
+            msg.contains("not a track branch") || msg.contains("main"),
+            "expected branch error, got: {msg}"
+        );
+    }
+
+    #[test]
+    fn resolve_track_id_uses_provided_id_without_git_discovery() {
+        // When an explicit track ID is provided, no git I/O should occur.
+        // A non-existent items_dir is fine here because track_id shortcircuits.
+        let result = super::resolve_track_id_or_branch(
+            Some("explicit-id".to_owned()),
+            std::path::Path::new("track/items"),
+        );
+        assert_eq!(result.unwrap(), "explicit-id");
+    }
+
+    #[test]
+    fn validate_all_paths_accepts_clean_relative_paths() {
+        let result =
+            super::validate_all_paths(&["src/lib.rs".to_owned(), "apps/cli/mod.rs".to_owned()]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn validate_all_paths_rejects_absolute_paths() {
+        let result = super::validate_all_paths(&["/etc/passwd".to_owned()]);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("absolute paths"));
+    }
+
+    #[test]
+    fn validate_all_paths_rejects_traversal_components() {
+        let result = super::validate_all_paths(&["../../etc/passwd".to_owned()]);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("traversal"));
+    }
+
+    #[test]
+    fn resolve_track_id_from_branch_returns_project_root_error_for_nested_dir() {
+        // items_dir path "some/nested/dir" is not valid `*/track/items`
+        let result = super::resolve_track_id_from_branch(std::path::Path::new("some/nested/dir"));
+        assert!(result.is_err());
+        let msg = result.unwrap_err();
+        assert!(msg.contains("track/items"), "error should mention 'track/items', got: {msg}");
+    }
+
+    #[test]
+    fn is_safe_briefing_path_rejects_empty() {
+        assert!(!super::is_safe_briefing_path(""));
+    }
+
+    #[test]
+    fn is_safe_briefing_path_rejects_absolute_unix() {
+        assert!(!super::is_safe_briefing_path("/tmp/brief.md"));
+    }
+
+    #[test]
+    fn is_safe_briefing_path_rejects_traversal() {
+        assert!(!super::is_safe_briefing_path("../some/brief.md"));
+    }
+
+    #[test]
+    fn is_safe_briefing_path_accepts_relative_clean_path() {
+        assert!(super::is_safe_briefing_path("track/items/my-track/briefing.md"));
+    }
+
+    /// Confirm that `PathBuf` passed as `items_dir` is handled correctly for
+    /// both read-path (explicit short-circuit) and non-canonical (error) cases,
+    /// without requiring a live git repo.
+    #[test]
+    fn resolve_track_id_or_branch_explicit_id_bypasses_items_dir_validation() {
+        // Even a clearly non-canonical items_dir is ignored when track_id is explicit.
+        let result = super::resolve_track_id_or_branch(
+            Some("my-track".to_owned()),
+            std::path::Path::new("not/track/items"),
+        );
+        assert_eq!(result.unwrap(), "my-track");
+    }
+
+    #[test]
+    fn resolve_track_id_or_branch_none_id_validates_items_dir_structure() {
+        // When track_id is None, items_dir must follow the canonical `*/track/items` structure.
+        // Use a path that genuinely does NOT end in `track/items`.
+        let result =
+            super::resolve_track_id_or_branch(None, std::path::Path::new("wrong/path/here"));
+        assert!(result.is_err());
+        let msg = result.unwrap_err();
+        assert!(msg.contains("track/items"), "expected items-dir error, got: {msg}");
+    }
+
+    /// Pin the regression on the public API path (`review_run_codex`).
+    ///
+    /// `resolve_track_id_or_branch_write` is called as the first step of
+    /// `review_run_codex`.  It must anchor git discovery to the project root
+    /// (via `resolve_project_root`), not to `items_dir` directly.  When the
+    /// function succeeds in discovering the repo but finds a non-track branch,
+    /// it returns a **branch** error — not a filesystem error about `items_dir`.
+    ///
+    /// This test uses an absolute `items_dir` (no CWD mutation) to verify that
+    /// the public entrypoint path correctly reaches the branch-guard logic.
+    #[test]
+    fn review_run_codex_returns_branch_error_not_discovery_error_for_non_track_branch() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init", "-b", "main"]);
+        run_git(dir.path(), &["config", "user.email", "test@example.com"]);
+        run_git(dir.path(), &["config", "user.name", "Test"]);
+        fs::write(dir.path().join("README.md"), "init\n").unwrap();
+        run_git(dir.path(), &["add", "README.md"]);
+        run_git(dir.path(), &["commit", "-m", "init"]);
+        // Stay on `main` (not a track branch).
+
+        let items_dir = dir.path().join("track/items");
+        fs::create_dir_all(&items_dir).unwrap();
+
+        let app = crate::CliApp::new();
+        let input = crate::review_v2::ReviewRunCodexInput {
+            model: "test-model".to_owned(),
+            timeout_seconds: 10,
+            briefing_file: None,
+            prompt: Some("Review.".to_owned()),
+            track_id: None,
+            round_type: "fast".to_owned(),
+            group: "cli_composition".to_owned(),
+            items_dir,
+        };
+
+        let result = app.review_run_codex(input);
+
+        assert!(result.is_err(), "expected Err on non-track branch, got Ok");
+        let msg = result.unwrap_err();
+        // The error must be a branch error ("not a track branch", "main", or similar)
+        // rather than a git-discovery error ("failed to run git", "No such file", etc.).
+        assert!(
+            msg.contains("not a track branch") || msg.contains("main"),
+            "expected branch error, got: {msg}"
+        );
+    }
 }

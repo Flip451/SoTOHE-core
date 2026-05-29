@@ -45,7 +45,7 @@ pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
 }
 
 /// Resolves `<project-root>/track/items` → `<project-root>`.
-fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, String> {
+pub(crate) fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, String> {
     let items_name = items_dir.file_name().and_then(|n| n.to_str());
     let track_dir = items_dir.parent();
     let track_name = track_dir.and_then(Path::file_name).and_then(|n| n.to_str());
@@ -685,7 +685,38 @@ impl CliApp {
 mod tests {
     use std::path::Path;
 
-    use super::resolve_track_id_for_write;
+    use super::{resolve_project_root, resolve_track_id_for_write};
+
+    /// `resolve_project_root` strips the trailing `track/items` from a relative path.
+    ///
+    /// For `"track/items"` the parent of `track` is empty, so the function returns
+    /// `"."` (the current-working-directory anchor).  This is the key property used
+    /// by `resolve_track_id_from_branch` and `resolve_track_id_or_branch_write` in
+    /// `review_v2/mod.rs`: they call `resolve_project_root` first and then pass the
+    /// result to `SystemGitRepo::discover_from`, which means a relative items_dir
+    /// always discovers from `"."` (the CWD) rather than from `"track/items"` which
+    /// may not exist as a filesystem path when the process is inside a subdirectory.
+    #[test]
+    fn resolve_project_root_returns_dot_for_relative_items_dir() {
+        let root = resolve_project_root(Path::new("track/items")).unwrap();
+        assert_eq!(root, std::path::Path::new("."));
+    }
+
+    /// `resolve_project_root` returns the absolute parent when given an absolute path.
+    #[test]
+    fn resolve_project_root_strips_track_items_from_absolute_path() {
+        let root = resolve_project_root(Path::new("/some/project/track/items")).unwrap();
+        assert_eq!(root, std::path::Path::new("/some/project"));
+    }
+
+    /// `resolve_project_root` returns an error when the path does not end in `track/items`.
+    #[test]
+    fn resolve_project_root_rejects_non_canonical_path() {
+        let result = resolve_project_root(Path::new("wrong/path"));
+        assert!(result.is_err());
+        let msg = result.unwrap_err();
+        assert!(msg.contains("track/items"), "error should mention 'track/items': {msg}");
+    }
 
     /// When git discovery fails (anchor path does not exist → `current_dir` fails)
     /// AND an explicit track id is supplied, `resolve_track_id_for_write` must
