@@ -16,7 +16,7 @@ When reviewing pull requests, focus on the following areas:
 - **Make illegal states unrepresentable**: Use validated domain types (e.g., `Email(String)`) instead of raw primitives.
 - **Error handling**: All errors must propagate via `Result<T, E>` with the `?` operator. No silent error swallowing.
 - **Trait-based abstraction**: Infrastructure dependencies must be behind trait boundaries (hexagonal architecture).
-- **Module size**: Aim for 200-400 lines per module, 700 max.
+- **Module size**: Aim for 200-400 lines per module, 700 max. The size limit applies to **production code only**; test code (`#[cfg(test)] mod tests` blocks, `*_tests.rs` files, `tests/` integration tests) is **exempt** and must be excluded when measuring a module against the limit. Count only the non-test lines (the code above the `#[cfg(test)]` block).
 - **Unsafe code**: Must be minimal, commented with `// Safety:` justification, and reviewed.
 
 ### Testing
