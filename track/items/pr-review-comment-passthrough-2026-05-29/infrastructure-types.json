@@ -1,0 +1,10 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

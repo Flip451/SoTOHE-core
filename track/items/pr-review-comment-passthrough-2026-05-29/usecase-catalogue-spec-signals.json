@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "a60ecbf4dc21d3dc865f7f3179bd0f2713d4e72d7d569eb6840217fa8e9479f9",
+  "signals": [
+    {
+      "type_name": "PrReviewError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PrReviewFinding",
+      "signal": "blue"
+    },
+    {
+      "type_name": "PrReviewResult",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::pr_review::classify_severity",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::pr_review::parse_body_findings",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::pr_review::parse_paginated_json",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::pr_review::sanitize_text",
+      "signal": "blue"
+    },
+    {
+      "type_name": "usecase::pr_review::validate_reviewer_provider",
+      "signal": "blue"
+    }
+  ]
+}

@@ -364,11 +364,9 @@ impl CliApp {
             PollReviewResult::ReviewFound(review) => {
                 let parsed = parse_review(&pr_number, &review, &nwo, &client)?;
                 let summary = format_review_summary(&pr_number, &parsed);
-                if parsed.passed {
-                    Ok(CommandOutcome::success(Some(summary)))
-                } else {
-                    Ok(CommandOutcome { stdout: Some(summary), stderr: None, exit_code: 1 })
-                }
+                // ReviewFound always exits 0 (D1/AC-09): pass/fail judgment is
+                // delegated to the calling agent; Rust no longer gates on findings.
+                Ok(CommandOutcome::success(Some(summary)))
             }
         };
 

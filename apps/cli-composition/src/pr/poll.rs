@@ -23,6 +23,7 @@ pub(super) fn is_codex_bot(login: &str) -> bool {
 // Outcome of a poll-review cycle
 // ---------------------------------------------------------------------------
 
+#[derive(Debug)]
 pub(super) enum PollReviewResult {
     ReviewFound(serde_json::Value),
     ZeroFindings,
@@ -254,6 +255,10 @@ where
         let reviews_json = client.list_reviews(&repo_nwo, pr).map_err(|e| e.to_string())?;
         let reviews = usecase::pr_review::parse_paginated_json(&reviews_json)
             .map_err(|e| format!("failed to parse reviews JSON: {e}"))?;
+
+        // Collect all qualifying Codex bot reviews from this iteration (post-trigger,
+        // with a terminal state), then pick the latest one by submitted_at (AC-05 / CN-02).
+        let mut qualifying: Vec<&serde_json::Value> = Vec::new();
         for review in &reviews {
             let author = review
                 .get("user")
@@ -274,18 +279,15 @@ where
                 any_bot_activity = true;
                 let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("");
                 if matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED") {
-                    let review_id = review.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
-                    eprintln!("[OK] Found Codex review (id={review_id}, state={state})");
-                    let mut sanitized = review.clone();
-                    if let Some(obj) = sanitized.as_object_mut() {
-                        if let Some(serde_json::Value::String(body)) = obj.get("body") {
-                            let clean = usecase::pr_review::sanitize_text(body);
-                            obj.insert("body".to_owned(), serde_json::Value::String(clean));
-                        }
-                    }
-                    return Ok(PollReviewResult::ReviewFound(sanitized));
+                    qualifying.push(review);
                 }
             }
+        }
+        if let Some(latest) = find_latest_bot_review_in(&qualifying) {
+            let review_id = latest.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+            let state = latest.get("state").and_then(|s| s.as_str()).unwrap_or("");
+            eprintln!("[OK] Found Codex review (id={review_id}, state={state})");
+            return Ok(PollReviewResult::ReviewFound(latest));
         }
 
         if head_commit.is_some() {
@@ -451,7 +453,7 @@ pub(super) fn ensure_pr_for_cycle<C: infrastructure::gh_cli::GhClient>(
 }
 
 // ---------------------------------------------------------------------------
-// parse_review helper — uses usecase::pr_review::PrReviewResult directly
+// parse_review helper — passthrough: inline comments only, no interpretation
 // ---------------------------------------------------------------------------
 
 pub(super) fn parse_review<C: infrastructure::gh_cli::GhClient>(
@@ -463,6 +465,7 @@ pub(super) fn parse_review<C: infrastructure::gh_cli::GhClient>(
     let review_id = review.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
     let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("COMMENTED").to_owned();
     let raw_body = review.get("body").and_then(|s| s.as_str()).unwrap_or("");
+    // Sanitize body but retain it (D3: review.body is not discarded).
     let body = usecase::pr_review::sanitize_text(raw_body);
 
     let mut findings: Vec<usecase::pr_review::PrReviewFinding> = Vec::new();
@@ -489,25 +492,15 @@ pub(super) fn parse_review<C: infrastructure::gh_cli::GhClient>(
             .or_else(|| comment.get("original_line").and_then(|v| v.as_u64()));
         let line = start.or(end).map(|v| v as u32);
         let end_line = end.map(|v| v as u32);
-        let severity = usecase::pr_review::classify_severity(&comment_body);
+        // No severity classification (D1): inline comment is a passthrough container.
         findings.push(usecase::pr_review::PrReviewFinding {
-            severity: severity.to_owned(),
             path,
             line,
             end_line,
             body: comment_body,
-            rule_id: None,
         });
     }
-
-    if !body.is_empty() {
-        let body_findings = usecase::pr_review::parse_body_findings(&body);
-        findings.extend(body_findings);
-    }
-
-    let actionable =
-        findings.iter().filter(|f| f.severity == "P0" || f.severity == "P1").count() as u32;
-    let passed = state == "APPROVED" || (actionable == 0 && state != "CHANGES_REQUESTED");
+    // No body-findings extraction (D1): parse_body_findings is removed.
 
     Ok(usecase::pr_review::PrReviewResult {
         review_id,
@@ -515,8 +508,6 @@ pub(super) fn parse_review<C: infrastructure::gh_cli::GhClient>(
         body,
         findings,
         inline_comment_count: inline_count,
-        actionable_count: actionable,
-        passed,
     })
 }
 
@@ -524,30 +515,32 @@ pub(super) fn format_review_summary(
     pr: &str,
     result: &usecase::pr_review::PrReviewResult,
 ) -> String {
-    let status = if result.passed { "PASS" } else { "FAIL" };
     let mut lines = Vec::new();
     lines.push(String::new());
-    lines.push(format!("=== PR Review Result: {status} ==="));
+    lines.push("=== PR Review Result: ReviewFound ===".to_owned());
     lines.push(format!("PR: #{pr}"));
     lines.push(format!("Review ID: {}", result.review_id));
     lines.push(format!("State: {}", result.state));
     lines.push(format!("Inline comments: {}", result.inline_comment_count));
-    lines.push(format!("Total findings: {}", result.findings.len()));
-    lines.push(format!("Actionable (P0/P1): {}", result.actionable_count));
+
+    if !result.body.is_empty() {
+        lines.push(String::new());
+        lines.push("Review Body:".to_owned());
+        lines.push(result.body.clone());
+    }
 
     if !result.findings.is_empty() {
         lines.push(String::new());
-        lines.push("Findings:".to_owned());
+        lines.push("Inline Comments:".to_owned());
         for (i, f) in result.findings.iter().enumerate() {
             let location = if !f.path.is_empty() && f.line.is_some() {
                 format!("{}:{}", f.path, f.line.unwrap_or(0))
             } else if !f.path.is_empty() {
                 f.path.clone()
             } else {
-                "general".to_owned()
+                "(no location)".to_owned()
             };
-            let truncated_body: String = f.body.chars().take(120).collect();
-            lines.push(format!("  {}. [{}] {}: {}", i + 1, f.severity, location, truncated_body));
+            lines.push(format!("  {}. {}: {}", i + 1, location, f.body));
         }
     }
     lines.join("\n")
@@ -647,7 +640,7 @@ pub(super) fn trigger_new_review(
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use std::cell::RefCell;
     use std::path::Path;
@@ -852,6 +845,262 @@ mod tests {
         assert!(
             matches!(result, PollReviewResult::Timeout),
             "expected Timeout when no same-SHA review exists"
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // T005: passthrough behavior tests (AC-03 to AC-09)
+    // ------------------------------------------------------------------
+
+    /// A fake client that also supports list_review_comments and list_reactions/
+    /// list_issue_comments for parse_review-based tests.
+    struct FullFakePollClient {
+        reviews: String,
+        review_comments: String,
+        issue_comments: String,
+        reactions: String,
+    }
+
+    impl FullFakePollClient {
+        fn new(
+            reviews: &str,
+            review_comments: &str,
+            issue_comments: &str,
+            reactions: &str,
+        ) -> Self {
+            Self {
+                reviews: reviews.to_owned(),
+                review_comments: review_comments.to_owned(),
+                issue_comments: issue_comments.to_owned(),
+                reactions: reactions.to_owned(),
+            }
+        }
+    }
+
+    impl GhClient for FullFakePollClient {
+        fn pr_checks(&self, _pr: &str) -> Result<Vec<PrCheckRecord>, GhError> {
+            Ok(vec![])
+        }
+
+        fn pr_url(&self, pr: &str) -> String {
+            format!("PR #{pr}")
+        }
+
+        fn merge_pr(&self, _pr: &str, _method: &str) -> Result<(), GhError> {
+            Ok(())
+        }
+
+        fn find_open_pr(&self, _head: &str, _base: &str) -> Result<Option<String>, GhError> {
+            Ok(None)
+        }
+
+        fn create_pr(
+            &self,
+            _head: &str,
+            _base: &str,
+            _title: &str,
+            _body_file: &Path,
+        ) -> Result<String, GhError> {
+            Ok("1".to_owned())
+        }
+
+        fn list_reviews(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+            Ok(self.reviews.clone())
+        }
+
+        fn list_review_comments(
+            &self,
+            _repo_nwo: &str,
+            _pr: &str,
+            _review_id: &str,
+        ) -> Result<String, GhError> {
+            Ok(self.review_comments.clone())
+        }
+
+        fn list_issue_comments(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+            Ok(self.issue_comments.clone())
+        }
+
+        fn list_reactions(&self, _repo_nwo: &str, _pr: &str) -> Result<String, GhError> {
+            Ok(self.reactions.clone())
+        }
+
+        fn repo_nwo(&self) -> Result<String, GhError> {
+            Ok("owner/repo".to_owned())
+        }
+    }
+
+    /// AC-09: COMMENTED review state produces ReviewFound, not FAIL.
+    /// This test verifies that a COMMENTED review is surfaced as ReviewFound
+    /// (the broken behavior before this track was: COMMENTED could never PASS
+    /// because actionable_count was always > 0 from body phantom findings).
+    #[test]
+    fn test_poll_review_for_cycle_with_commented_review_returns_review_found_not_timeout() {
+        let client = FakePollClient::new(vec![
+            r#"[{"id":10,"user":{"login":"codex[bot]"},"state":"COMMENTED","commit_id":"abc","submitted_at":"2026-05-29T10:05:00Z","body":"Some comments here."}]"#
+                .to_owned(),
+        ]);
+        let result = poll_review_for_cycle(
+            "1",
+            "2026-05-29T10:00:00Z",
+            1,
+            60,
+            &client,
+            &|_| {},
+            Some("abc"),
+        )
+        .unwrap();
+        assert!(
+            matches!(result, PollReviewResult::ReviewFound(_)),
+            "COMMENTED review must produce ReviewFound (AC-09)"
+        );
+    }
+
+    /// AC-05: When multiple Codex reviews exist, only the one with the latest
+    /// submitted_at is returned.
+    #[test]
+    fn test_poll_review_for_cycle_with_multiple_rounds_returns_latest_submitted_at() {
+        // Two reviews: older round (id=1) and newer round (id=2).
+        let reviews_json = r#"[
+            {"id":1,"user":{"login":"codex[bot]"},"state":"COMMENTED","commit_id":"abc","submitted_at":"2026-05-29T09:00:00Z","body":"old round"},
+            {"id":2,"user":{"login":"codex[bot]"},"state":"CHANGES_REQUESTED","commit_id":"abc","submitted_at":"2026-05-29T10:05:00Z","body":"new round"}
+        ]"#;
+        let client = FakePollClient::new(vec![reviews_json.to_owned()]);
+        let result = poll_review_for_cycle(
+            "1",
+            "2026-05-29T08:00:00Z",
+            1,
+            60,
+            &client,
+            &|_| {},
+            Some("abc"),
+        )
+        .unwrap();
+        match result {
+            PollReviewResult::ReviewFound(v) => {
+                let id = v.get("id").and_then(|x| x.as_u64()).unwrap_or(0);
+                assert_eq!(id, 2, "must return latest review (id=2, AC-05)");
+            }
+            other => panic!("expected ReviewFound, got {other:?}"),
+        }
+    }
+
+    /// AC-03: ReviewFound output contains sanitized review.body.
+    #[test]
+    fn test_parse_review_with_review_body_includes_sanitized_body_in_result() {
+        let review = serde_json::json!({
+            "id": 42,
+            "state": "COMMENTED",
+            "body": "Please check /home/user/project/src/main.rs for the issue."
+        });
+        let client = FullFakePollClient::new("[]", "[]", "[]", "[]");
+        let result = super::parse_review("1", &review, "owner/repo", &client).unwrap();
+        assert!(
+            result.body.contains("[PATH]"),
+            "sanitize_text must be applied to review.body (AC-03, AC-08)"
+        );
+        assert!(
+            !result.body.contains("/home/user"),
+            "absolute path must be redacted in review.body"
+        );
+    }
+
+    /// AC-04: ReviewFound output contains inline comment path:line and sanitized body.
+    #[test]
+    fn test_parse_review_with_inline_comments_includes_path_and_line_in_findings() {
+        let review = serde_json::json!({"id": 99, "state": "COMMENTED", "body": ""});
+        let comments_json = r#"[{
+            "path": "src/main.rs",
+            "line": 42,
+            "start_line": null,
+            "body": "This variable should be renamed."
+        }]"#;
+        let client = FullFakePollClient::new("[]", comments_json, "[]", "[]");
+        let result = super::parse_review("1", &review, "owner/repo", &client).unwrap();
+        assert_eq!(result.findings.len(), 1, "should have one inline comment");
+        assert_eq!(result.findings[0].path, "src/main.rs");
+        assert_eq!(result.findings[0].line, Some(42));
+        assert!(
+            result.findings[0].body.contains("renamed"),
+            "finding body should contain sanitized comment text (AC-04)"
+        );
+    }
+
+    /// AC-08: sanitize_text is applied to inline comment bodies.
+    #[test]
+    fn test_parse_review_with_secret_in_inline_comment_body_redacts_it() {
+        let review = serde_json::json!({"id": 7, "state": "CHANGES_REQUESTED", "body": ""});
+        let comments_json = r#"[{
+            "path": "config.rs",
+            "line": 5,
+            "body": "Token sk-abcdefghijklmnopqrstuvwx should not be committed."
+        }]"#;
+        let client = FullFakePollClient::new("[]", comments_json, "[]", "[]");
+        let result = super::parse_review("1", &review, "owner/repo", &client).unwrap();
+        assert_eq!(result.findings.len(), 1);
+        assert!(
+            !result.findings[0].body.contains("sk-"),
+            "secret must be redacted in inline comment body (AC-08)"
+        );
+        assert!(
+            result.findings[0].body.contains("[REDACTED]"),
+            "expected [REDACTED] placeholder in inline comment body"
+        );
+    }
+
+    /// AC-06: Zero-findings via +1 reaction from Codex bot produces ZeroFindings.
+    #[test]
+    fn test_poll_review_for_cycle_with_post_trigger_thumbsup_reaction_returns_zero_findings() {
+        let reactions_json = r#"[{
+            "content": "+1",
+            "user": {"login": "openai-codex[bot]"},
+            "created_at": "2026-05-29T10:05:00Z"
+        }]"#;
+        let client = FullFakePollClient::new("[]", "[]", "[]", reactions_json);
+        let result = poll_review_for_cycle(
+            "1",
+            "2026-05-29T10:00:00Z",
+            1,
+            60,
+            &client,
+            &|_| {},
+            Some("abc"),
+        )
+        .unwrap();
+        assert!(
+            matches!(result, PollReviewResult::ZeroFindings),
+            "post-trigger +1 reaction from Codex bot must produce ZeroFindings (AC-06)"
+        );
+    }
+
+    /// AC-07: Zero-findings via "Didn't find any major issues" comment.
+    #[test]
+    fn test_poll_review_for_cycle_with_zero_findings_comment_returns_zero_findings() {
+        // Stale reaction (pre-trigger) + post-trigger comment with the magic phrase.
+        let reactions_json = r#"[{
+            "content": "+1",
+            "user": {"login": "openai-codex[bot]"},
+            "created_at": "2026-05-29T09:00:00Z"
+        }]"#;
+        let comments_json = r#"[{
+            "user": {"login": "openai-codex[bot]"},
+            "body": "Didn't find any major issues with the code.",
+            "created_at": "2026-05-29T10:05:00Z"
+        }]"#;
+        let client = FullFakePollClient::new("[]", "[]", comments_json, reactions_json);
+        let result = poll_review_for_cycle(
+            "1",
+            "2026-05-29T10:00:00Z",
+            1,
+            60,
+            &client,
+            &|_| {},
+            Some("abc"),
+        )
+        .unwrap();
+        assert!(
+            matches!(result, PollReviewResult::ZeroFindings),
+            "\"Didn't find any major issues\" comment must produce ZeroFindings (AC-07)"
         );
     }
 }

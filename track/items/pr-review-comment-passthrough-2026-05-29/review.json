@@ -1,0 +1,233 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7ab4169fb8a51c12eefe401f3210031e05a318d6a9ef3ead4cff3fcb1128327",
+          "at": "2026-05-29T06:29:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7ab4169fb8a51c12eefe401f3210031e05a318d6a9ef3ead4cff3fcb1128327",
+          "at": "2026-05-29T06:32:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 says the ReviewFound output should be \"sanitize 済みコメントのみ\", but IN-04 and IN-05 require `review.body` plus inline comments to be emitted as part of the same payload. As written, the spec both includes and excludes the review body.",
+              "severity": "P1",
+              "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+              "line": 200,
+              "category": "contradiction"
+            },
+            {
+              "message": "OS-06 says `ポーリング・recovery ロジック` is not changed, but IN-03 and T003 explicitly change `poll_review_for_cycle` to select the latest review by `submitted_at`. The scope section and task plan disagree on whether polling behavior is being modified.",
+              "severity": "P1",
+              "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+              "line": 176,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:926197c7c605e754a870174ffaef4c52d8a0953755e414a1f9dd14915f2a8939",
+          "at": "2026-05-29T07:03:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff93374d3786b99c8c011fd7b57af51f1371cee89227f71608aa6a4954d1b3b5",
+          "at": "2026-05-29T07:08:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-02` says the current `PrReviewResult` interpretation fields include `findings` and that those interpretation fields should be removed, but the rest of the plan keeps `findings` as the inline-comment passthrough container: `PrReviewResult` still has `findings: Vec<PrReviewFinding>`, and T003 explicitly says to build `PrReviewResult.findings` from inline comments. This gives implementers conflicting contracts for whether the `findings` field should be deleted or retained/redefined.",
+              "severity": "P1",
+              "file": "track/items/pr-review-comment-passthrough-2026-05-29/spec.json",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ff93374d3786b99c8c011fd7b57af51f1371cee89227f71608aa6a4954d1b3b5",
+          "at": "2026-05-29T07:11:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:610ab738d8c3767e7becdd1849f97d42b56b904981fae55d74fad8ea7667e086",
+          "at": "2026-05-29T07:16:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dffe4537a59482ccc8d3c29b5363a893bc4dd0a533da89a1687bfdb59b847b9",
+          "at": "2026-05-29T07:32:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dffe4537a59482ccc8d3c29b5363a893bc4dd0a533da89a1687bfdb59b847b9",
+          "at": "2026-05-29T07:34:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39d9dff36310c8db809c1ed81aa0da5ec04ac1b0c8ed32f020a038daf0f6af46",
+          "at": "2026-05-29T07:56:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39d9dff36310c8db809c1ed81aa0da5ec04ac1b0c8ed32f020a038daf0f6af46",
+          "at": "2026-05-29T07:57:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d9c6840f6b3cfa2af70f5c351bb445f83ced94bb2cb7b3efa47a59cf22455ac",
+          "at": "2026-05-29T08:06:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d9c6840f6b3cfa2af70f5c351bb445f83ced94bb2cb7b3efa47a59cf22455ac",
+          "at": "2026-05-29T08:08:16Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ea9fd1c715d54ee9e89127c185344354b200e41f09dfdefaffe358597dcb5b0",
+          "at": "2026-05-29T07:32:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ea9fd1c715d54ee9e89127c185344354b200e41f09dfdefaffe358597dcb5b0",
+          "at": "2026-05-29T07:35:14Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_review_summary` still truncates each inline comment body to 120 characters, so the new pass-through output can silently drop the tail of a review comment and prevent the agent from judging longer findings reliably.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr/poll.rs",
+              "line": 543,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4c362862aa253c8bbcf04c3c8a27b785066ddfcca9d015b6e367c2834c251681",
+          "at": "2026-05-29T07:34:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c362862aa253c8bbcf04c3c8a27b785066ddfcca9d015b6e367c2834c251681",
+          "at": "2026-05-29T07:37:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_review_summary` still truncates each inline comment body to 120 characters before emitting it. This breaks the new pass-through contract because longer Codex review comments can lose the details the calling agent is supposed to judge.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr/poll.rs",
+              "line": 543,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4c362862aa253c8bbcf04c3c8a27b785066ddfcca9d015b6e367c2834c251681",
+          "at": "2026-05-29T07:39:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba88c0bb88a5b606c03ff35eae165f891e7141756f0d3fd0aad5ca852d7eeceb",
+          "at": "2026-05-29T07:42:00Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bc6604a3bd1f1ed320be30793335eb13d3a0d687c1a27ebf53bee5fc98f082e",
+          "at": "2026-05-29T07:32:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bc6604a3bd1f1ed320be30793335eb13d3a0d687c1a27ebf53bee5fc98f082e",
+          "at": "2026-05-29T07:34:36Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20009625e9c1773b4c611605c86c2d4311fe5724e395005a439601447b6e0a65",
+          "at": "2026-05-29T07:57:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The reporting checklist still requires a review state and surfaced review body/inline comments for every `cargo make track-pr-review` result, but the new zero-findings path explicitly has only a bot signal and the implementation returns a PASS summary without a review state or comments. In the machine PASS case this makes the documented command require unavailable data, contradicting the new zero-findings behavior described just above.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr-review.md",
+              "line": 67,
+              "category": "harness_policy_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:20009625e9c1773b4c611605c86c2d4311fe5724e395005a439601447b6e0a65",
+          "at": "2026-05-29T07:59:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b66b0be45c1be93b67abd869eceb3a20eb66767a24ff5550bb27bd7a861a7a7c",
+          "at": "2026-05-29T08:02:45Z"
+        }
+      ]
+    }
+  }
+}

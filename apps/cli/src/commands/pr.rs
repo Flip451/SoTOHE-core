@@ -418,6 +418,10 @@ mod test_helpers {
             let reviews_json = client.list_reviews(&repo_nwo, pr).map_err(|e| e.to_string())?;
             let reviews = pr_review::parse_paginated_json(&reviews_json)
                 .map_err(|e| format!("failed to parse reviews JSON: {e}"))?;
+
+            // Collect all qualifying Codex bot reviews (post-trigger, terminal state),
+            // then pick the latest one by submitted_at (AC-05 / CN-02).
+            let mut qualifying: Vec<&serde_json::Value> = Vec::new();
             for review in &reviews {
                 let author = review
                     .get("user")
@@ -439,18 +443,30 @@ mod test_helpers {
                     any_bot_activity = true;
                     let state = review.get("state").and_then(|s| s.as_str()).unwrap_or("");
                     if matches!(state, "APPROVED" | "CHANGES_REQUESTED" | "COMMENTED") {
-                        let review_id = review.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
-                        eprintln!("[OK] Found Codex review (id={review_id}, state={state})");
-                        let mut sanitized = review.clone();
-                        if let Some(obj) = sanitized.as_object_mut() {
-                            if let Some(serde_json::Value::String(body)) = obj.get("body") {
-                                let clean = pr_review::sanitize_text(body);
-                                obj.insert("body".to_owned(), serde_json::Value::String(clean));
-                            }
-                        }
-                        return Ok(PollReviewResult::ReviewFound(sanitized));
+                        qualifying.push(review);
                     }
                 }
+            }
+            if let Some(best) = qualifying.iter().max_by(|a, b| {
+                let ts_a = a.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+                let ts_b = b.get("submitted_at").and_then(|s| s.as_str()).unwrap_or("");
+                ts_a.cmp(ts_b).then_with(|| {
+                    let id_a = a.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let id_b = b.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+                    id_a.cmp(&id_b)
+                })
+            }) {
+                let review_id = best.get("id").and_then(|v| v.as_u64()).unwrap_or(0);
+                let state = best.get("state").and_then(|s| s.as_str()).unwrap_or("");
+                eprintln!("[OK] Found Codex review (id={review_id}, state={state})");
+                let mut sanitized = (*best).clone();
+                if let Some(obj) = sanitized.as_object_mut() {
+                    if let Some(serde_json::Value::String(body)) = obj.get("body") {
+                        let clean = pr_review::sanitize_text(body);
+                        obj.insert("body".to_owned(), serde_json::Value::String(clean));
+                    }
+                }
+                return Ok(PollReviewResult::ReviewFound(sanitized));
             }
 
             if head_commit.is_some() {
