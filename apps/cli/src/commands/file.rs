@@ -1,10 +1,13 @@
 //! File utility subcommands.
+//!
+//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 
 use std::io::Read;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Subcommand;
+use cli_composition::CliApp;
 
 use crate::CliError;
 
@@ -23,7 +26,7 @@ pub enum FileCommand {
 
 pub fn execute(cmd: FileCommand) -> ExitCode {
     match cmd {
-        FileCommand::WriteAtomic { path } => match write_atomic(&path) {
+        FileCommand::WriteAtomic { path } => match write_atomic(path) {
             Ok(code) => code,
             Err(err) => {
                 eprintln!("{err}");
@@ -33,7 +36,7 @@ pub fn execute(cmd: FileCommand) -> ExitCode {
     }
 }
 
-fn write_atomic(path: &std::path::Path) -> Result<ExitCode, CliError> {
+fn write_atomic(path: PathBuf) -> Result<ExitCode, CliError> {
     let mut buf = Vec::new();
     std::io::stdin()
         .take(MAX_STDIN_BYTES as u64 + 1)
@@ -45,8 +48,6 @@ fn write_atomic(path: &std::path::Path) -> Result<ExitCode, CliError> {
         )));
     }
 
-    infrastructure::track::atomic_write::atomic_write_file(path, &buf)
-        .map_err(|e| CliError::Message(format!("atomic write failed: {e}")))?;
-
+    CliApp::new().file_write_atomic(path, &buf).map_err(CliError::Message)?;
     Ok(ExitCode::SUCCESS)
 }

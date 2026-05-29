@@ -8,7 +8,7 @@
 use std::process::ExitCode;
 
 use clap::{Args, ValueEnum};
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+use cli_composition::CliApp;
 
 use crate::CliError;
 
@@ -612,14 +612,14 @@ fn dispatch_set_commit_hash(raw_args: &[String]) -> Result<ExitCode, CliError> {
 
 /// Persists the current HEAD SHA to `.commit_hash` (v2 incremental diff base).
 ///
-/// Delegates to `infrastructure::review_v2::persist_commit_hash_for_track` so
+/// Delegates to `cli_composition::review_v2::persist_commit_hash_for_track` so
 /// that this function does not import `domain::CommitHash`, `domain::TrackId`,
 /// or `domain::review_v2::CommitHashWriter` directly (CN-01 / AC-03).
 ///
 /// # Errors
 /// Returns a human-readable error string on failure.
 fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
-    let head_sha = infrastructure::review_v2::persist_commit_hash_for_track(track_id)?;
+    let head_sha = cli_composition::review_v2::persist_commit_hash_for_track(track_id)?;
     eprintln!("[track-commit-message] Recorded .commit_hash: {head_sha}");
     Ok(())
 }
@@ -633,26 +633,8 @@ fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
 /// Returns `Err` when the branch matches `track/<id>` but the `<id>` fails
 /// validation: in that case the callers must not silently skip the review
 /// guard (fail-closed).
-///
-/// Reads the current branch via the [`GitRepository`] port (IN-06 / AC-15),
-/// then delegates parsing to
-/// [`usecase::track_resolution::resolve_track_id_from_branch`] so the
-/// branch-name semantics stay consistent with the rest of the workflow.
 fn current_branch_track_id_strict() -> Result<Option<String>, CliError> {
-    let branch = match SystemGitRepo::discover().and_then(|r| r.current_branch()) {
-        Ok(Some(b)) => b,
-        Ok(None) | Err(_) => return Ok(None),
-    };
-    match usecase::track_resolution::resolve_track_id_from_branch(Some(&branch)) {
-        Ok(id) => Ok(Some(id)),
-        Err(usecase::track_resolution::TrackResolutionError::InvalidTrackId(slug, _)) => {
-            Err(CliError::Message(format!(
-                "current branch 'track/{slug}' has an invalid track id; \
-                 rename the branch or switch to a valid track branch before committing"
-            )))
-        }
-        Err(_) => Ok(None),
-    }
+    CliApp::new().current_branch_track_id_strict().map_err(CliError::Message)
 }
 
 // --- Phase 4: Exec dispatcher ---

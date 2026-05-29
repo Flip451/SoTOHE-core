@@ -161,6 +161,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Review System V1 完全撤去 — metadata.json review + V1 review.json codec + escalation + index_tree_hash_normalizing](2026-04-12-1800-reviewstate-v1-decommission.md) | Accepted | 2026-04-12 |
 | [review-scope.json に scope 別 briefing 注入機構を追加する — plan-artifacts scope の新設](2026-04-18-1354-review-scope-prompt-injection.md) | Proposed | 2026-04-18 |
 | [CLI→domain 直接参照禁止と usecase 経由への一本化](2026-04-30-0848-cli-via-usecase-only.md) | — | 2026-04-30 |
+| [composition root を専用 crate (apps/cli-composition) に切り出す](2026-05-27-0110-composition-root-dedicated-crate.md) | Proposed | 2026-05-27 |
 
 ### オーケストレーション・エージェント管理
 
@@ -169,6 +170,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [agent-router フックを skill 遵守フックに置換](2026-04-08-1200-remove-agent-router-hook.md) | Accepted | 2026-04-08 |
 | [review-fix-lead の provider を選択可能にする (Claude デフォルト、Codex オプション)](2026-05-23-1848-review-fix-lead-codex-migration.md) | Proposed | 2026-05-23 |
 | [reviewer capability の provider を選択可能にする (Codex デフォルト、Claude オプション)](2026-05-23-2236-reviewer-provider-selectable-claude-option.md) | Proposed | 2026-05-23 |
+| [Claude モデル baseline を Opus 4.7 から 4.8 へ更新する](2026-05-28-2246-claude-opus-4-8-baseline-migration.md) | Proposed | 2026-05-28 |
 
 ### テスト・CI ツーリング
 

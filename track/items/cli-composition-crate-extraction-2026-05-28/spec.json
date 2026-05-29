@@ -1,0 +1,440 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "composition root を専用 crate (apps/cli-composition) に切り出す",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "composition root の責務を `apps/cli-composition`（crate 名 `cli_composition`）に集約し、`architecture-rules.json` に新層エントリを追加することで、cli → infrastructure 直接依存をコンパイル時に遮断できるアーキテクチャ境界を確立する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "`CliApp` facade と `CommandOutcome` 統一戻り値を公開 API とすることで、bin が parse + emit のみの極薄な entry point になり、DI 配線・ユースケース呼び出し・出力整形がすべて `cli_composition` 内に閉じる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "`libs/infrastructure/src/review_v2/cli_composition.rs` をはじめとする infrastructure 層に押し出された composition logic を正しい層（`apps/cli-composition`）へ移動し、infrastructure 層の adapter 型のみ公開する非対称を解消する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`apps/cli-composition` ディレクトリを新設し、`architecture-rules.json` に `cli_composition` 層エントリ（`may_depend_on: [\"domain\", \"infrastructure\", \"usecase\"]`、`tddd: { \"enabled\": false }`）を追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "`Cargo.toml`（workspace ルート）の `members` に `\"apps/cli-composition\"` を追加し、`apps/cli-composition/Cargo.toml` を新設して `domain` / `usecase` / `infrastructure` 依存を宣言する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "`CliApp` facade struct と `CommandOutcome` 統一戻り値型を `apps/cli-composition` の公開 API として実装する。facade の公開面には string / path / primitive / composition 自身が定義する DTO のみを出し、generic interactor は composition 内部に private に閉じる",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "`apps/cli` の `may_depend_on` を `[\"cli_composition\"]` に変更し、`apps/cli/Cargo.toml` から `usecase` と `infrastructure` の依存を削除して `cli_composition` を追加する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "`libs/infrastructure/src/review_v2/cli_composition.rs`（1507 行）を `apps/cli-composition/src/review_v2/` へ移動し、コンテキスト境界に従ってサブモジュールに分割する（各ファイル 700 行以内）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "移動後、`libs/infrastructure/src/review_v2/mod.rs` は adapter 型（`CodexReviewer`, `ClaudeReviewer`, `GitDiffGetter`, `SystemReviewHasher`, `FsReviewStore`, `FsCommitHashStore`, `load_v2_scope_config`）の公開のみ残し、composition function の re-export を停止する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "移行を re-export shim で CI 緑を維持しながらコマンドファミリー単位で段階コミットし、全コマンドの移動が完了した最終コミットで `architecture-rules.json` / `deny.toml` / `Cargo.toml` を一括更新して `cli.may_depend_on = [\"cli_composition\"]` を固定する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`deny.toml` を手書き更新し、`infrastructure` の `wrappers` を `[\"cli\"]` から `[\"cli_composition\"]` に変更し、新規 `cli_composition` の `wrappers=[\"cli\"]` を追加し、`usecase` の `wrappers` を更新する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D6"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "`apps/cli-composition` 内部のモジュール分割案・trait 設計・型の具体的な定義: これらは Phase 2（type-design）が扱う",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "`apps/cli` 内モジュール分割のみ（新 crate 作成なし、Rejected Alternative A）: deny.toml とコンパイル時強制は crate 粒度で機能するため、module 分割では cli → infra 依存を実際に遮断できない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "`libs/composition` への配置（Rejected Alternative B）: composition root は entry point ごとの最外殻であり再利用ライブラリではないため `libs/` ではなく `apps/` に置く",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "bin の usecase 依存の保持（DTO 取得目的、Rejected Alternative E）: `CommandOutcome` 統一戻り値で bin は usecase 型を一切必要としない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "全ファイルを一度に動かす single big-bang コミット（Rejected Alternative F）: 巨大 diff で review が困難になり、移行中に CI 緑を保てない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "web / gRPC など 2 つ目の entry point のための composition root 追加: 本 track は CLI 専用の `apps/cli-composition` に限定し、multi entry point 対応は将来 track とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "`architecture-rules.json` の自動生成による `deny.toml` 更新: D6 で「手書き更新」と明示されており、自動生成は本 track の対象外",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "OS-08",
+        "text": "`hexagonal-architecture.md` convention の「CLI as Composition Root」節の更新: ADR Consequences に「本 ADR の実装後にこの節を更新する」と記されているが、convention 更新は本 track の実装完了後の後続作業であり spec の acceptance_criteria に含めない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "`apps/cli` の `may_depend_on` 最終状態は `[\"cli_composition\"]` のみ。中間状態（`cli_composition` + `infrastructure` + `usecase` を含む移行途中の状態）は main にマージしない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "`apps/cli-composition` の公開面（`CliApp` facade のメソッド引数・戻り値）には string / path / primitive / composition 自身が定義する DTO のみを出す。`usecase` / `domain` / `infrastructure` の型を facade 公開面に漏らさない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "移動後のファイルはそれぞれ 700 行以内に収める。`libs/infrastructure/src/review_v2/cli_composition.rs`（1507 行）は移動時にサブモジュールに分割することで制限を満たす",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "enforcement は `architecture-rules.json`（SSoT）/ `deny.toml`（手書き）/ `Cargo.toml` の更新で成立させる。新規の lint 機構・追加 verify サブコマンド・Rust `#[allow(...)]` 属性や CI バイパスフラグのような ad-hoc な移行期 allow list は導入しない。D5 の段階コミット戦略に従い `architecture-rules.json` / `deny.toml` を段階的に更新して中間状態を通過することは許容される（最終的に D3/D6 が定める状態に収束させる）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "移行中は re-export shim を使い CI が常に緑の状態を維持する。コンパイルエラーや CI 失敗が発生する中間コミットは track ブランチ上にも残さない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D5"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`apps/cli-composition` ディレクトリが存在し、`architecture-rules.json` に `cli_composition` 層エントリ（`may_depend_on: [\"domain\", \"infrastructure\", \"usecase\"]`、`tddd.enabled: false`）が追加されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`apps/cli-composition/Cargo.toml` が存在し、workspace ルートの `Cargo.toml` の `members` に `\"apps/cli-composition\"` が含まれる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`apps/cli-composition/src/` に `CliApp` struct と `CommandOutcome` 型が公開 API として存在し、`CliApp` のメソッド引数・戻り値に `usecase` / `domain` / `infrastructure` の型が出現しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "`apps/cli/Cargo.toml` の `[dependencies]` にワークスペース内レイヤー依存として `usecase` と `infrastructure` が存在せず、`cli_composition` のみがワークスペースレイヤー依存として宣言されている（`clap` / `anyhow` 等の外部クレート依存は本 AC の対象外）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "`architecture-rules.json` の `apps/cli` 層エントリの `may_depend_on` が `[\"cli_composition\"]` のみである",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`apps/cli/src/` 配下のすべての Rust ファイルに `use infrastructure::` / `use usecase::` の直接 import が存在しない（bin は `cli_composition` の公開 API のみを使う）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`libs/infrastructure/src/review_v2/` に composition function が存在しない。`libs/infrastructure/src/review_v2/mod.rs` は adapter 型（`CodexReviewer`, `ClaudeReviewer`, `GitDiffGetter`, `SystemReviewHasher`, `FsReviewStore`, `FsCommitHashStore`, `load_v2_scope_config`）の公開のみを含む",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "`apps/cli-composition/src/` 配下のすべての Rust ファイルが 700 行以内である",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`deny.toml` が更新されており、`infrastructure` の `wrappers` に `cli` が含まれず `cli_composition` が含まれる。新規 `cli_composition` の `wrappers=[\"cli\"]` エントリが存在する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`cargo make deny` が pass する（`deny.toml` の最終状態で cli が infrastructure / usecase を直接依存しておらず、禁止違反がない状態を確認する）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`bin/sotp verify layers` が pass する（`architecture-rules.json` の最終状態で cli.may_depend_on = [\"cli_composition\"] のみとなっており、cli → cli_composition 依存のみが許可された状態を確認する）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "`architecture-rules-verify-sync`（`scripts/architecture_rules.py verify-sync`）が pass する（`architecture-rules.json` から期待値を計算し、手書き `deny.toml` と `Cargo.toml` workspace members との一致を検証）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "`cargo make ci` の全項目（fmt-check + clippy + nextest + deny + check-layers + verify-*）が pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "既存 CLI コマンドの外部 CLI 振る舞い（引数・出力フォーマット・exit code）が変化しない。既存の統合テストおよび acceptance test が pass する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-0110-composition-root-dedicated-crate.md",
+          "anchor": "D5"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "CLI as Composition Root"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Adapter Rules"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Trait-Based Abstraction (Hexagonal Architecture)"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": ".claude/rules/04-coding-principles.md",
+      "anchor": "Module Size"
+    },
+    {
+      "file": ".claude/rules/05-testing.md",
+      "anchor": "Test Structure"
+    }
+  ],
+  "signals": {
+    "blue": 38,
+    "yellow": 0,
+    "red": 0
+  }
+}

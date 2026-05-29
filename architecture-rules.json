@@ -102,10 +102,22 @@
       "crate": "cli",
       "path": "apps/cli",
       "may_depend_on": [
+        "cli_composition"
+      ],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": false
+      }
+    },
+    {
+      "crate": "cli_composition",
+      "path": "apps/cli-composition",
+      "may_depend_on": [
+        "domain",
         "infrastructure",
         "usecase"
       ],
-      "deny_reason": "",
+      "deny_reason": "CLI composition root owns domain/usecase/infrastructure wiring for the CLI delivery adapter.",
       "tddd": {
         "enabled": false
       }

@@ -8,6 +8,7 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use clap::{ArgGroup, Args, Subcommand};
+#[cfg(test)]
 use usecase::review_v2::{ReviewApprovalDecision, ReviewApprovalOutput};
 #[cfg(test)]
 use usecase::review_workflow::ReviewVerdict;
@@ -15,7 +16,6 @@ use usecase::review_workflow::ReviewVerdict;
 mod classify;
 mod claude_local;
 mod codex_local;
-mod compose_v2;
 mod files;
 mod local;
 mod results;
@@ -192,11 +192,11 @@ pub(super) fn validate_auto_record_args_raw(
     round_type: CodexRoundTypeArg,
     items_dir: PathBuf,
 ) -> Result<ValidatedAutoRecordArgs, String> {
-    // Validate track ID format via infrastructure helper (no domain import needed).
-    infrastructure::review_v2::validate_track_id_str(track_id)
+    // Validate track ID format via cli_composition helper (no domain import needed).
+    cli_composition::review_v2::validate_track_id_str(track_id)
         .map_err(|e| format!("invalid --track-id: {e}"))?;
-    // Validate group name format via infrastructure helper.
-    infrastructure::review_v2::validate_review_group_name_str(group)
+    // Validate group name format via cli_composition helper.
+    cli_composition::review_v2::validate_review_group_name_str(group)
         .map_err(|e| format!("invalid --group: {e}"))?;
 
     let round_type_str = match round_type {
@@ -393,6 +393,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
 /// - `Approved`            → `[OK] …`   + `ExitCode::SUCCESS`
 /// - `ApprovedWithBypass`  → `[WARN] …` + `ExitCode::SUCCESS`
 /// - `Blocked`             → `[BLOCKED] …` + `ExitCode::FAILURE`
+#[cfg(test)]
 pub(super) fn format_approval_verdict(output: ReviewApprovalOutput) -> (String, ExitCode) {
     match output.decision {
         ReviewApprovalDecision::Approved => {
@@ -420,22 +421,26 @@ pub(super) fn format_approval_verdict(output: ReviewApprovalOutput) -> (String, 
 }
 
 fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
-    match run_check_approved(args) {
-        Ok(output) => {
-            let (msg, code) = format_approval_verdict(output);
-            eprintln!("{msg}");
-            code
+    let track_id =
+        match crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir) {
+            Ok(id) => id,
+            Err(msg) => {
+                eprintln!("{msg}");
+                return ExitCode::FAILURE;
+            }
+        };
+    match cli_composition::CliApp::new()
+        .review_check_approved(Some(track_id), args.items_dir.clone())
+    {
+        Ok(outcome) => {
+            if let Some(msg) = &outcome.stderr {
+                eprintln!("{msg}");
+            }
+            ExitCode::from(outcome.exit_code)
         }
         Err(msg) => {
             eprintln!("{msg}");
             ExitCode::FAILURE
         }
     }
-}
-
-fn run_check_approved(args: &CheckApprovedArgs) -> Result<ReviewApprovalOutput, String> {
-    let track_id =
-        crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)?;
-    infrastructure::review_v2::check_approved_str(&track_id, &args.items_dir)
-        .map_err(|e| format!("{e}"))
 }

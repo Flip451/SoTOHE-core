@@ -1,0 +1,1587 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b3bd0ce5c7aa95b17bb24f2715e11c36566825a760a4f968712aa10e4ed6d48",
+          "at": "2026-05-28T07:58:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b3bd0ce5c7aa95b17bb24f2715e11c36566825a760a4f968712aa10e4ed6d48",
+          "at": "2026-05-28T08:01:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 adds a `libs/infrastructure -> cli_composition` shim dependency while T001/IN-02 already makes `apps/cli-composition` depend on `infrastructure`. That creates a Cargo dependency cycle, so the intermediate shimmed state cannot compile and the migration cannot be built as written.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 72,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T002 instructs the new public `CliApp` methods in `apps/cli-composition/src/lib.rs` to use `unimplemented!()` placeholders. That leaves panic-based code in a library crate and violates the repo's no-panics-in-library-code rule even if it is intended as temporary scaffolding.",
+              "severity": "P0",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 12,
+              "category": "panic"
+            }
+          ],
+          "hash": "rvw1:sha256:a1e40e12172dafa6bd4d7211945facb0d6696ce7cd32cbf43088b4d9f3a70172",
+          "at": "2026-05-28T08:53:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 asks `libs/infrastructure` to add a `cli_composition` dependency for the re-export shim while D1/D6 require `apps/cli-composition` to keep a direct `infrastructure` dependency. That creates a Cargo package dependency cycle (`infrastructure` -> `cli_composition` -> `infrastructure`), so the staged migration cannot compile as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 18,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T006 step 3 says remaining `apps/cli/src` imports may be rerouted through `cli_composition` public API or `domain`, but D3/CN-01 reduce `apps/cli` to a single `cli_composition` dependency. There is no allowed final path that uses `domain` directly from `apps/cli`, so this instruction conflicts with the stated end state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 104,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a1e40e12172dafa6bd4d7211945facb0d6696ce7cd32cbf43088b4d9f3a70172",
+          "at": "2026-05-28T08:58:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T006` keeps `persist_commit_hash_for_track` in `libs/infrastructure/src/review_v2/mod.rs`, but `spec.json` AC-07 and the S6 summary both require that module to expose only adapter types. As written, the final acceptance target and the final task disagree on the end state, so the track cannot be completed without revising one side.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb92f81172e8b5b6f9403f29f457b8f26088a6a7bae44ab7fccfab57716bde1a",
+          "at": "2026-05-28T09:07:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 asks for the final enforcement flip after removing `apps/cli`'s `infrastructure`/`usecase` deps and re-routing every remaining direct import through `cli_composition`, but the earlier tasks only define `CliApp` methods for the review_v2 family. The current `apps/cli/src` tree still contains other production imports (`track`, `verify`, `git`, `domain`, `pr`, etc.) and no task creates a façade surface for them, so the last step cannot be completed from this plan.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 36,
+              "category": "infeasibility"
+            },
+            {
+              "message": "AC-07 says `libs/infrastructure/src/review_v2/mod.rs` will expose only adapter types after the move, but T006 explicitly preserves `persist_commit_hash_for_track` as a live free function in that module. Those two requirements disagree on the intended post-migration public surface.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+              "line": 321,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bb92f81172e8b5b6f9403f29f457b8f26088a6a7bae44ab7fccfab57716bde1a",
+          "at": "2026-05-28T09:10:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` moves `persist_commit_hash_for_track` out of `libs/infrastructure/src/review_v2/mod.rs` into `apps/cli-composition`, but `T006` still requires `libs/infrastructure/src/review_v2/mod.rs` to contain that same free function, and `spec.json` AC-07 says the module should contain only adapter types. The final state cannot satisfy all three; choose one location for the helper and update the conflicting task/spec entry accordingly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 29,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d51598109ea90203032b590f3a91d3a473286a583ca54948dddd25e89a6f5694",
+          "at": "2026-05-28T09:17:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` reclassifies `persist_commit_hash_for_track` as a composition-layer helper and moves it into `apps/cli-composition`, but the symbol catalogue says `infrastructure::review_v2::persist_commit_hash_for_track` is a persistence helper that \"Remains in infrastructure after D4 (IN-06)\". The task is pointed at the wrong layer and the stated rationale does not match the documented symbol.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            },
+            {
+              "message": "S3 says IN-06 is already complete after T003 because `libs/infrastructure/src/review_v2/mod.rs` then only re-exports adapter types, but S5/T005 still needs to move `persist_commit_hash_for_track` out of that same module. The plan's ordering is self-contradictory: either the module is already final at T003 or it still has outstanding work in T005.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:95dc1d382f76b8e10787a10c2fc08faef24b3eef3ba80373fb9926dcecc8ca22",
+          "at": "2026-05-28T09:24:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 states that IN-06 is completed once `libs/infrastructure/src/review_v2/cli_composition.rs` is removed, but the same description also says IN-06 is only partially complete until T006. That conflicts with T005, which still needs to move `persist_commit_hash_for_track` before `libs/infrastructure/src/review_v2/mod.rs` can be adapter-only, so the step ordering is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:95dc1d382f76b8e10787a10c2fc08faef24b3eef3ba80373fb9926dcecc8ca22",
+          "at": "2026-05-28T09:26:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
+          "at": "2026-05-28T09:31:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
+          "at": "2026-05-28T09:35:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 requires all new `CliApp` public API stubs in `apps/cli-composition/src/lib.rs` to call `unimplemented!()`, and T003 leaves those placeholders until T004. That would introduce explicit panic paths in non-test library code for intermediate commits that are also required to keep CI green, violating the repository's no-panics rule. Use fallible placeholder implementations such as `Err(...)` or defer exposing callable stubs until they can return real results.",
+              "severity": "P0",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T001 creates `apps/cli-composition` with `domain`/`usecase`/`infrastructure` dependencies and requires `cargo make ci` to pass, but the same task explicitly defers `deny.toml` changes until T006. Since D6/IN-08 say `deny.toml` must be updated to make `cli_composition` the allowed wrapper for infrastructure/usecase, the T001 intermediate state cannot satisfy the stated deny/sync checks while keeping CI green. The task order needs a CI-valid temporary policy step or a different sequencing of the crate dependency/enforcement changes.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
+              "line": 13,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The infrastructure catalogue marks `infrastructure::review_v2::persist_commit_hash_for_track` as `reference` and says it remains in infrastructure after D4, but T005 and AC-07 require moving it into `apps/cli-composition` so `libs/infrastructure/src/review_v2/mod.rs` exposes only adapters. This contradiction can let Phase 2 treat the function as retained while Phase 3 removes it, so the catalogue action should align with the implementation plan.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/infrastructure-types.json",
+              "line": 691,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
+          "at": "2026-05-28T09:40:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 instructs implementers to add public `CliApp` methods in the new `apps/cli-composition` library crate with bodies that call `unimplemented!()`, and T003 explicitly keeps those placeholders until T004 while still requiring `cargo make ci` to stay green. That conflicts with this track's required `No Panics in Library Code` convention, which forbids `todo!()` / `unimplemented!()` outside tests. The plan should use fallible stubs that return `Err(...)` or avoid introducing callable placeholders in non-test library code.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:38f74f2179c2e2fa28b8449a109fbbe455d9ab9cfe737a7191adb427f790483b",
+          "at": "2026-05-28T09:43:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 creates `apps/cli-composition` with `domain` / `usecase` / `infrastructure` dependencies, explicitly defers `deny.toml` changes to T006, and still requires `cargo make ci` to pass. Since the ADR says `cargo make deny` enforces the hand-maintained wrapper policy and `cli_composition` must be added as a wrapper for `infrastructure` / `usecase`, this intermediate step is infeasible unless the `deny.toml` wrapper update moves earlier or the CI requirement is changed.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
+              "line": 13,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T003 adds `cli_composition` as an `apps/cli` dependency while requiring `cargo make ci` to stay green, but the plan does not update `apps/cli`'s `may_depend_on` until T006, where it changes directly to `[\"cli_composition\"]`. D5 describes the needed intermediate state as `cli_composition + infrastructure + usecase`; without adding that earlier, layer verification rejects the T003-T005 state, so the staged migration cannot keep CI green.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/plan.md",
+              "line": 29,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:9594a5a47739e6feef3d2750ddf648c3f2f8c42c0e706fe9bea283a995f364f9",
+          "at": "2026-05-28T09:47:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005/T006 require moving `persist_commit_hash_for_track` out of `libs/infrastructure/src/review_v2/mod.rs` so the final module exposes only the listed adapter types, but the infrastructure catalogue still marks `infrastructure::review_v2::persist_commit_hash_for_track` as a `reference` item whose docs say it remains in infrastructure after IN-06. These artifacts give conflicting implementation instructions about whether the helper is kept or moved.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/infrastructure-types.json",
+              "line": 691,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6bf940f8135e0aa3165eb02005e8b7f0bd907eb90bb1932827108551a93bd292",
+          "at": "2026-05-28T09:54:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 says `apps/cli/Cargo.toml` should declare only `cli_composition` under `[dependencies]`, and T006 repeats that instruction. That is not executable as written: the ADR still keeps `apps/cli` as the clap parsing + emit binary, so it must retain external CLI/runtime dependencies such as `clap`, `serde`, etc. The acceptance criterion should narrow this to internal workspace/layer dependencies, removing only `usecase` and `infrastructure` while adding `cli_composition`.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+              "line": 292,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d98541dff2c462cfd991a91d1fe0e8c9ee57735e8206a0095fe0996e6ea55899",
+          "at": "2026-05-28T09:59:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-04 says the plan must not introduce a migration-period allow list, but the implementation plan requires exactly that: T001 adds `cli_composition` as an allowed dependent in `deny.toml`, T003 adds an intermediate `cli.may_depend_on = [\"infrastructure\", \"usecase\", \"cli_composition\"]` and a `cli_composition` wrapper for `cli`, and T006 later removes those intermediate allowances. As written, an implementer cannot satisfy CN-04 while following the required task sequence to keep CI green; either CN-04 should explicitly allow these intermediate policy updates or the tasks need a different migration strategy.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.md",
+              "line": 41,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:85dfe8683dff706f3171ed8103525047ec9fe68d4bbe52df846da0c7b560bdb8",
+          "at": "2026-05-28T10:04:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-10/AC-11 describe the final verification as confirming that `cli` direct dependencies on `infrastructure`/`usecase` are not rejected / not treated as layer errors. That contradicts AC-04/AC-05/AC-09 and ADR D6, which make `cli_composition` the only final `apps/cli` layer dependency and update `deny.toml`/`architecture-rules.json` so direct `cli -> infrastructure/usecase` dependencies are forbidden. As written, an implementer could satisfy these acceptance criteria by leaving or allowing the exact dependency edge this track is meant to remove.",
+              "severity": "P1",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/spec.json",
+              "line": 352,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2c40006fd4f6f3de851e1a845dac3a54d8766260b0fd29610dc1ec1211307a5f",
+          "at": "2026-05-28T10:07:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fa12b0207ef7ef2bc2d2a6c483408bbc0c7f1700a73808845d9311ec2cd58f2",
+          "at": "2026-05-28T10:11:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca0299aad779b21036ca191b1cad0679bc6c19ca0167d9b336c3ee597397656e",
+          "at": "2026-05-28T10:25:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca0299aad779b21036ca191b1cad0679bc6c19ca0167d9b336c3ee597397656e",
+          "at": "2026-05-28T10:27:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d13304188e564b631be18f48ddba3114da97d1cd4340c012f8191d239336a165",
+          "at": "2026-05-28T10:37:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d13304188e564b631be18f48ddba3114da97d1cd4340c012f8191d239336a165",
+          "at": "2026-05-28T10:39:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:040f3ba158ada53a45debdd1768a33cb3c519ff941038e112d202d25cc2a6c21",
+          "at": "2026-05-28T11:01:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:040f3ba158ada53a45debdd1768a33cb3c519ff941038e112d202d25cc2a6c21",
+          "at": "2026-05-28T11:02:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69c58fe084d766f964f92b3c6270b70459c96f88512b7667ee97cdec44dfe722",
+          "at": "2026-05-28T11:37:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69c58fe084d766f964f92b3c6270b70459c96f88512b7667ee97cdec44dfe722",
+          "at": "2026-05-28T11:39:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee578c297bf2ed4462b726bb7a28493d7ccee024cfef6c32961d7eb6da8071c",
+          "at": "2026-05-28T11:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee578c297bf2ed4462b726bb7a28493d7ccee024cfef6c32961d7eb6da8071c",
+          "at": "2026-05-28T12:01:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74ac6838919d4d5ae502c5bffc6cf31a4fbe86cfe885b1cdd5fd4984ceda021",
+          "at": "2026-05-28T12:19:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74ac6838919d4d5ae502c5bffc6cf31a4fbe86cfe885b1cdd5fd4984ceda021",
+          "at": "2026-05-28T12:21:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:524bf06ebe34513e6a88fb9b641e33263681c7741f943cc0a86d3e9403a4afe8",
+          "at": "2026-05-28T15:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:524bf06ebe34513e6a88fb9b641e33263681c7741f943cc0a86d3e9403a4afe8",
+          "at": "2026-05-28T15:11:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11e94412c3e7ce308df2bf9bbffba1dcf2c08ec7342696f58d5e1f5a4d42c3e3",
+          "at": "2026-05-28T21:39:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11e94412c3e7ce308df2bf9bbffba1dcf2c08ec7342696f58d5e1f5a4d42c3e3",
+          "at": "2026-05-28T21:41:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd40675c4fb63c33aa025bc571d9a466dd99044bd82837ab62c41bdab4ec0c0d",
+          "at": "2026-05-29T03:51:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd40675c4fb63c33aa025bc571d9a466dd99044bd82837ab62c41bdab4ec0c0d",
+          "at": "2026-05-29T03:54:04Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:36:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure side still defines and publicly re-exports `NullReviewer`, even though the briefing says the infra `null_reviewer` module should be deleted after moving it to the `cli_composition` crate. This leaves an old composition-only adapter in the infra public API, contrary to the extraction boundary; remove the `pub use` and inline module from `mod.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 16,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:d12d8e9d1b5c40fe232ccfb7d5a603a68a6fddf40f8e4227c127fa5eff1c98a7",
+          "at": "2026-05-28T11:39:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3eacf10c6b53d18269f3733f23ec01771c942995509b66c848d1039ff412bc04",
+          "at": "2026-05-28T11:43:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mod.rs` still publicly re-exports `ScopeConfigLoadError`, but the scope requires this module to expose only the adapter types plus `load_v2_scope_config`. That leaves an extra public API surface outside AC-07.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
+              "line": 17,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a32d3408ab8113f2ebb3842f92935612c4277196883ab3ebe1244f70b88805a2",
+          "at": "2026-05-28T15:03:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
+          "at": "2026-05-28T15:11:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:872b61303c5fde8eed6717851de67784800bed5dd8577544ada98e632bb5c3a7",
+          "at": "2026-05-28T15:12:58Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:26:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:32:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:32:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81565d1c0da1e257d5110e4e265c6c41fb721896b462133e527518a3e7f83691",
+          "at": "2026-05-28T10:33:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
+          "at": "2026-05-28T11:39:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0256862e1e0e88920fc8a0e51648cfee74b102e7dbd876695a614e06335ff59b",
+          "at": "2026-05-28T11:42:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
+          "at": "2026-05-28T12:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review local` used to call `resolve_track_id_for_write(args.track_id, &args.items_dir)` before dispatch, which anchored the write guard to the repository owning `--items-dir`. This now passes the raw optional track id into `CliApp::review_run_local`; that facade resolves/checks the branch from the process cwd and ignores `items_dir`, so running from another repo while pointing `--items-dir` at this track can record a review without verifying the target repo is on the matching `track/<id>` branch. Preserve the scoped write-resolution here and pass the resolved id to the facade, or make the facade resolve from `items_dir`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/local.rs",
+              "line": 80,
+              "category": "write_guard_regression"
+            },
+            {
+              "message": "`review classify` no longer pre-resolves the track id with `crate::commands::track::resolve_track_id(..., &args.items_dir)`. When `--track-id` is omitted, the new facade path resolves the branch from cwd instead of the repository owning `--items-dir`, so classification can use a track id from one repo while reading scope config from another `items_dir`. That can silently return the wrong scope mapping. Resolve the track id as before and pass `Some(track_id)` into `CliApp::review_classify`, or move the same `items_dir`-anchored resolution into the facade.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/classify.rs",
+              "line": 47,
+              "category": "track_resolution_regression"
+            },
+            {
+              "message": "`review files` has the same `--items-dir` anchoring regression as `review classify`: the call now forwards `args.track_id.clone()` directly, so an omitted track id is resolved from cwd by the facade while file enumeration still uses `args.items_dir`. This can enumerate files for a different track than the one owning the requested `items_dir`, which breaks review scope selection. Pre-resolve with `resolve_track_id(..., &args.items_dir)` and pass the resolved id to the facade, or fix the facade resolver to honor `items_dir`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/files.rs",
+              "line": 48,
+              "category": "track_resolution_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:43237dbc9a0a836771b0261298252f67ffd1e60d08aa87cb1f69edc2e4defa23",
+          "at": "2026-05-28T12:28:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_execute_local` resolves the track ID with `resolve_track_id_for_write` anchored to `args.items_dir`, but then delegates to `CliApp::review_run_local`, whose current implementation performs its own write branch check using cwd-based git discovery. That means a valid `sotp review local --items-dir <repo>/track/items` invocation can pass the intended items-dir anchored guard here and then fail against an unrelated current working repository before the review runs. The previous implementation did not re-enter a second cwd-based guard after resolving the track, so this regresses the documented items-dir anchoring for the local reviewer path.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/review/local.rs",
+              "line": 92,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fcba894f0bfab5db33cbbde0a08d3d9a6be9cab4f2d1f8ad3a26b33a2db97ea1",
+          "at": "2026-05-28T12:34:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7913dfceb39d7a014618a6078eab86bda2fcc1fc80aee34b5822a4f88013d35b",
+          "at": "2026-05-28T12:40:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
+          "at": "2026-05-28T15:08:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track/mod.rs` is still 1,095 lines after this change, with production code continuing past line 700 before the test module starts at line 757. The briefing explicitly requires production files to stay at or below 700 lines, so this scope does not meet the stated module-size gate.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 701,
+              "category": "module-size"
+            },
+            {
+              "message": "`verify.rs` is still 1,627 lines after this change, exceeding the briefing's <=700-line limit for production files. Even though much of the tail is test-only, the scoped production module remains over the stated file-size gate and should be split or moved into test-only files/modules.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 701,
+              "category": "module-size"
+            }
+          ],
+          "hash": "rvw1:sha256:da6508cbb5a73b497d7946aeadbdd454f33d8df4855e9da0695070676c25b27c",
+          "at": "2026-05-28T15:15:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98edf3f8bed21926954786485aec7f58679826d6984fd9f6d95032fde0a67564",
+          "at": "2026-05-28T19:43:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
+          "at": "2026-05-28T21:04:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48c5dd52e7d69a23d3d50a20b12c4a7cd671d554c4b7d42fecffbae6354ac92e",
+          "at": "2026-05-28T21:09:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e6466af0399f98655696aa730e80564f0b384ca584e207a00e6734e05c1dee8",
+          "at": "2026-05-28T22:39:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e6466af0399f98655696aa730e80564f0b384ca584e207a00e6734e05c1dee8",
+          "at": "2026-05-28T22:43:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21aa8cc91d7ee2e0c90c1b26f9c6dc099a3fc71bb5e023eae99e3c14436b59c0",
+          "at": "2026-05-28T23:47:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21aa8cc91d7ee2e0c90c1b26f9c6dc099a3fc71bb5e023eae99e3c14436b59c0",
+          "at": "2026-05-28T23:50:29Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
+          "at": "2026-05-28T11:04:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99a8e82b3a1539c6854405e9644989e45b8016b3cece54499c6b66db2f82884",
+          "at": "2026-05-28T11:09:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The extracted `review_v2` surface is still largely untested. `run.rs` only covers the Claude path, and there are no direct happy-path/error-path tests for the Codex builder/run entry points or the new public helpers in `approved.rs`, `results.rs`, `scope.rs`, and `shared.rs`. That leaves the new composition boundary unverified and violates the repo requirement that public APIs have both success and failure coverage.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:42:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:47:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The moved `review_v2` modules still import the external `domain` crate as `domain::...`, but `cli_composition` already declares a root `mod domain` command module. That local module shadows the extern prelude, so paths like `use domain::review_v2::...` resolve to `cli_composition::domain`, which has no `review_v2`/`TrackId`, and the crate will not compile. Qualify the external crate as `::domain::...` or alias it across these new modules.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/review_v2/shared.rs",
+              "line": 5,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:51:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:912653e404de5a959c85ce51591584e83b15fc255e8325e4f12aa76f09787fad",
+          "at": "2026-05-28T11:55:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5812586eddf8d3f81ecd6750f805fc724a23779a47ca4aac45ef307559a4cdb4",
+          "at": "2026-05-28T12:29:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The review-v2 track-resolution helpers ignore their `items_dir` anchor and call `SystemGitRepo::discover()` from the process CWD. As a result, `review_results`, `review_check_approved`, and the review-run paths can resolve or write against the wrong repository whenever the caller supplies an explicit `items_dir` that is not the current directory.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 535,
+              "category": "correctness"
+            },
+            {
+              "message": "`verify_catalogue_spec_signals()` does its non-track-branch skip check with the CWD-based `resolve_ci_verify_track_id()` instead of the `workspace_root`-aware helper defined just above. If the command is invoked from a different directory than `--workspace-root`, the skip/fail decision is made against the wrong repo even though the actual verification runs against `workspace_root`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/verify.rs",
+              "line": 444,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3ac82382c99e79812959276b9524e1eaf873ff474a6deff2dcb5298a5954a12b",
+          "at": "2026-05-28T15:08:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_review_results` discards the incoming `raw_args` and constructs `ReviewResultsInput` with hardcoded defaults (`scope: None`, `all: false`, `limit: 0`, `round_type: \"all\"`, `no_hint: false`). That means every `cargo make track-review-results -- ...` filter the dispatcher forwards is silently ignored, so the wrapper cannot actually expose the review-results options it is supposed to relay.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 284,
+              "category": "functional_regression"
+            },
+            {
+              "message": "The positional parsing in the make-task wrappers is lossy: `make_track_transition`, `make_track_add_task`, and `make_track_set_override` all compute positionals with `filter(|w| !w.starts_with('-'))`, so flag values are treated as positional arguments. For example, `--track-id my-track T001 done` can make `task_id` become `my-track`, and `--track-id`/`--reason` can corrupt the status/description. These wrappers need flag-aware parsing, not a raw non-`-` filter.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 336,
+              "category": "argument_parsing"
+            }
+          ],
+          "hash": "rvw1:sha256:e5d120c48b8511c4cb4200d56a36867fbfa5b25fc1d3042d299e08cfb5119d31",
+          "at": "2026-05-28T15:31:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_review_results` discards the caller's `--scope`, `--round-type`, `--limit`, and `--no-hint` arguments and hardcodes `scope: None`, `limit: 0`, and `round_type: \"all\"`. That means `cargo make track-review-results -- --track-id ... --scope ... --round-type ... --limit 1` cannot produce the scoped findings block required by the review protocol, so this wrapper reports the wrong review-results data.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 291,
+              "category": "workflow correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e5d120c48b8511c4cb4200d56a36867fbfa5b25fc1d3042d299e08cfb5119d31",
+          "at": "2026-05-28T19:37:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--limit` is parsed with `parse::<u32>().ok().unwrap_or(0)`, so `cargo make track-review-results -- --limit all` or any malformed limit silently degrades to summary-only output instead of preserving the requested history or returning an error. That is a user-visible behavior regression in the wrapper.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 294,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a31b6af04f51814fb57fa829a299c64cf4c34bd6730a2d4ca86fa7a3f3cdcacb",
+          "at": "2026-05-28T19:47:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e98894a98e27b7a019f2fdbc1210644aae790105c75403a7914d05ec17148b3",
+          "at": "2026-05-28T19:55:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The make-wrapper positional parsing only filters out tokens starting with `-`, so values belonging to flags remain in the positional list. For example, `--track-id my-track T001 done` makes `task_id = \"my-track\"` and `target_status = \"T001\"` instead of `T001`/`done`; the same pattern below also breaks add-task and set-override when `--track-id`, `--section`, or `--reason` are supplied. These wrappers need to skip value-taking flags and their following values before selecting positional arguments, otherwise write commands can target the wrong task/status or reject valid invocations.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 353,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:9e98894a98e27b7a019f2fdbc1210644aae790105c75403a7914d05ec17148b3",
+          "at": "2026-05-28T20:01:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_pr_review` drops the `--resume` flag: it only extracts a track id from `raw_args` and always calls `pr_review_cycle(..., false)`. As a result, `cargo make track-pr-review -- --resume` starts a new review cycle instead of resuming the persisted trigger state, causing duplicate review comments and making timeout recovery unusable through the make wrapper.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 232,
+              "category": "behavior_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:db8da47c027639ece9e9f781119f375df850534886ffb2a8db5fbbc7ce8d6fd0",
+          "at": "2026-05-28T20:08:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "WRITE track operations can bypass the branch guard when an explicit --track-id is supplied outside a discoverable git repository. resolve_track_id_for_write is documented to fail closed by comparing the explicit id to the current track/<id> branch, but this fallback returns the id on git discovery failure, letting callers proceed without any branch proof and risking cross-track or wrong-worktree mutation.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/mod.rs",
+              "line": 122,
+              "category": "branch-guard"
+            },
+            {
+              "message": "The in-process track-review-results wrapper rejects the documented --limit all form. The underlying review results CLI supports --limit 0|N|all and uses u32::MAX for all, but this parser only accepts u32, so cargo make track-review-results -- --limit all fails before rendering full history.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 295,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4c6125096383caf74d96439194a59f3461fff840565962a1ccd98a2a39d7f1ea",
+          "at": "2026-05-28T20:14:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The write-guard was only applied to `review_run_local`; `review_run_codex` and `review_run_claude` still resolve `track_id` through `resolve_track_id_or_branch`, so `review codex-local` / `review claude-local` can still write `review.json` for an arbitrary track from the wrong branch. That reintroduces the cross-track write/corruption risk D7 is supposed to block.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 56,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_positionals` treats every token that starts with `-` as a flag and drops it, so legitimate free-form positional text beginning with `-` is silently mangled or discarded. That breaks `make_track_add_task` descriptions and `make_track_set_override` reasons whenever the user input starts with a dash.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 549,
+              "category": "input-parsing"
+            }
+          ],
+          "hash": "rvw1:sha256:e31c9f6650913bc775ec8b79e55526e052049339c07c76c96ecb08ec01c5cc59",
+          "at": "2026-05-28T20:43:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The summary-only path (`--limit 0`, which `review_results` maps to `None`) never loads `read_all_rounds`, so `state_line_suffix()` always sees an empty slice and the default results output drops the latest `round_type@timestamp verdict` suffix required by the review-results contract.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/results.rs",
+              "line": 146,
+              "category": "bug"
+            },
+            {
+              "message": "The ad hoc parser treats malformed or missing values for `--scope`/`--round-type`/`--limit` as if the flag were absent. For example, `--round-type` at the end of the arg list becomes `any`, and `--limit` becomes `0`, so bad invocations silently broaden the result set or suppress history instead of failing fast.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 289,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:ee7f0eabe417eb7ef9d4704d58d917e0490048ade42061047830a7bda54e856b",
+          "at": "2026-05-28T20:52:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new positional parser still drops the token after any known flag even when that flag's value is missing. A malformed `cargo make` invocation like `--section` or `--track-id` without a value can therefore be reinterpreted as a different task/description instead of failing fast, which is the kind of silent misparse this hardening pass was meant to eliminate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 592,
+              "category": "correctness"
+            },
+            {
+              "message": "This module is 736 lines long, over the repository's 700-line cap. The new parser helpers and tests push it past the architectural limit, so it should be split before merge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 736,
+              "category": "architecture"
+            },
+            {
+              "message": "This module is 737 lines long, over the repository's 700-line cap. The new resolution façade and tests push it past the architectural limit, so it should be split before merge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "line": 737,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3c861d830d5afbb9b2f5b5e2708c6098a63cbdb5ceeb264949426ddbad768062",
+          "at": "2026-05-28T21:05:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new argument-parsing helpers still treat the next token as a value even when it is another flag. Malformed invocations such as `--commit-hash --track-id ...`, `--section --after ...`, or `--scope --limit 1` will be misparsed instead of failing closed, so `track_transition`, `track_add_task`, `track_set_override`, and `track_review_results` can act on the wrong task or silently drop required inputs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 523,
+              "category": "argument_parsing"
+            },
+            {
+              "message": "P1: The production portion of this module now runs to 703 lines before the test module starts, which exceeds the repo's 700-line maximum for a production file. That violates the scope checklist and makes the module harder to review and maintain.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "line": 704,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3c861d830d5afbb9b2f5b5e2708c6098a63cbdb5ceeb264949426ddbad768062",
+          "at": "2026-05-28T21:05:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61ae3cc02aca65b37abea20c2d82ff82a60c347a40bf97a749d307b0ebdca8fe",
+          "at": "2026-05-28T21:18:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_flag_value` still conflates an absent flag with a present flag that is missing its value. That means malformed invocations like `--track-id --section foo T001 done` are silently treated as if `--track-id` was omitted, so the write wrappers can fall back to branch-derived track resolution or defaults instead of failing closed and may act on the wrong track.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 528,
+              "category": "argument_parsing"
+            }
+          ],
+          "hash": "rvw1:sha256:00bf0de2869e3d14b9530e6b08f738383af1628e67a33c14366dfca91b503668",
+          "at": "2026-05-28T21:27:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ca6845f08cb3b8fed025ecbc3aec27d1d45dc7be7ecfcd51e26209532a65e5c",
+          "at": "2026-05-28T21:36:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ca6845f08cb3b8fed025ecbc3aec27d1d45dc7be7ecfcd51e26209532a65e5c",
+          "at": "2026-05-28T21:36:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The timeout-recovery path now accepts any Codex review on the same commit SHA, even if it was submitted before the current `trigger_timestamp`. That lets a review from a previous cycle on an unchanged branch be resurrected as the result of the current cycle after a timeout, which defeats the freshness check that the main polling loop still enforces.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/pr/poll.rs",
+              "line": 353,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:c2caa8f3f9b3d768ea0a3a79d0726810a1cd45eee9c8ae4b815c6bd3694fabbc",
+          "at": "2026-05-28T21:58:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery filter swallows malformed or missing `submitted_at` values with `unwrap_or(false)`, so JSON/schema issues are turned into a normal timeout instead of an error. That can hide a valid matching review and makes the recovery path inconsistent with the main polling loop, which propagates parse failures.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr/poll.rs",
+              "line": 376,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:090705ccbb60b50932fc75f3876884b80eaed080bd01194c2ed194a19637ada2",
+          "at": "2026-05-28T22:01:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:299fc59eedaf0f83fdac7b8b17859ffdd425c4d7fb6bcde0926a48a74fe078c5",
+          "at": "2026-05-28T22:03:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba1a3ad9fb13ae074c4cbbc7b8b7e1358aadfc3bc3f4fa7324cbfa81ed47468d",
+          "at": "2026-05-28T22:12:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba1a3ad9fb13ae074c4cbbc7b8b7e1358aadfc3bc3f4fa7324cbfa81ed47468d",
+          "at": "2026-05-28T22:15:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9018e3b41c17d667852a23c26d5dfda3e2358dc714e72e75c276233b32ffbe1",
+          "at": "2026-05-28T22:38:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9018e3b41c17d667852a23c26d5dfda3e2358dc714e72e75c276233b32ffbe1",
+          "at": "2026-05-28T22:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168bf4ec3fba35f3e020c97f2dc1846503ff18b7d035ec0cbae4642a8f97274d",
+          "at": "2026-05-28T23:47:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168bf4ec3fba35f3e020c97f2dc1846503ff18b7d035ec0cbae4642a8f97274d",
+          "at": "2026-05-28T23:50:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_review_v2_str` is still re-exported publicly here, but its return type `ReviewV2Composition` now lives in `pub(crate) mod shared`. That makes the public signature reference a non-public type path, which rustc flags as a `private_interfaces`/`private_in_public` warning; because the workspace sets `warnings = \"deny\"`, this becomes a hard build failure. Keep the module public for this symbol, or stop exporting `build_review_v2_str` publicly.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 23,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:f4c3bd745a58a25c3b6a491a4941997ed28186a319e87e77bb1cb08136295a93",
+          "at": "2026-05-29T00:17:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c3bd745a58a25c3b6a491a4941997ed28186a319e87e77bb1cb08136295a93",
+          "at": "2026-05-29T00:21:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c3bd745a58a25c3b6a491a4941997ed28186a319e87e77bb1cb08136295a93",
+          "at": "2026-05-29T00:25:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new hand-rolled parsing only recognizes `--flag <value>` tokens. Valid clap-style `--base=...`, `--interval=...`, `--timeout=...`, and `--method=...` inputs are treated as absent, so explicit overrides are silently dropped and the code falls back to `main`/15/600/merge.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 620,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_merge_args` no longer enforces the `merge|squash|rebase` method set. An invalid `--method` value is forwarded to `gh pr merge` instead of being rejected up front like the clap-based CLI does.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 655,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa1645f26799558cc3f362e8cf52ed6716d7e53e728583c3226afb42e476f6ef",
+          "at": "2026-05-29T00:40:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` is not clap-equivalent: it treats `--base` as optional data and falls back to `main` when the flag is malformed, and it only inspects the first token for the track id. As a result, invocations like `cargo make track-pr-ensure --base develop my-track` or `--base` with no value will act on the wrong branch instead of failing the way the baseline CLI does.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 620,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_merge_args` no longer matches the baseline clap parser: it only treats the first token as the PR number, so valid orderings that put flags first (for example `cargo make track-pr-merge --timeout 60 123`) lose the PR entirely, and it accepts any `--method` string instead of rejecting values outside `merge|squash|rebase` up front.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 641,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aa1645f26799558cc3f362e8cf52ed6716d7e53e728583c3226afb42e476f6ef",
+          "at": "2026-05-29T00:42:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` reads the token after `--base` unconditionally, so malformed input like `cargo make track-pr-ensure --base --track-id abc` treats `--track-id` as the base branch instead of failing like the clap-based path. That can silently route PR creation to the wrong base branch.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 620,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_merge_args` ignores every flag except `--interval`, `--timeout`, and `--method`. The old wrapper forwarded the full arg list to `sotp pr wait-and-merge`, where clap would reject unknown arguments; here an invocation like `cargo make track-pr-merge --bogus 1 123` is silently accepted and the stray positional token can be mistaken for the PR number.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 660,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e842ad4ec85774ed361e4a72375848f000b063be360d67532e21a8616e59af6",
+          "at": "2026-05-29T00:46:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` still swallows malformed input instead of failing like the baseline clap parser: `--base` with no value (or followed by another flag) falls back to `\"main\"`, and unknown flags/extra positionals are ignored rather than rejected. That means typos can be misinterpreted as a valid `track_id`/default base instead of surfacing an error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 633,
+              "category": "missing_error_handling"
+            },
+            {
+              "message": "`parse_pr_merge_args` does not enforce the single required `pr` positional. It records the first non-flag token and silently ignores any additional positionals, and when no positional is provided it forwards `\"\"` to `pr_wait_and_merge` instead of rejecting the invocation. Baseline `WaitAndMergeArgs` would fail fast in both cases.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 681,
+              "category": "missing_error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:d00f58be64bd08bb52a47395d53423adcd8aedd867b528d80612831933b0cf84",
+          "at": "2026-05-29T00:51:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_pr` still runs `make_track_pr_push(raw_args.clone())` before the new parser, and that push path still uses `words.first()` as the track id. As a result, flag-first invocations such as `cargo make track-pr -- --base develop my-track` will push a branch named `--base` before the ensure step runs, so the combined wrapper still drops the restored flag ordering.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 216,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_ensure_args` treats `--track-id` as a value-taking flag but never assigns its value to `track_id`; it only skips over the token. That means `make_track_pr_ensure -- --track-id foo` silently falls back to branch-derived resolution instead of honoring the user-supplied track id, which can create or reuse the wrong PR.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 653,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:185bd99dc0b2167cd95c486f05fac0b5c390b23a6ccb22635f0515b0e2068bc3",
+          "at": "2026-05-29T00:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` and `parse_pr_merge_args` do not actually mirror clap here: they only accept `--flag VALUE` tokens, so valid invocations like `--base=develop`, `--interval=5`, `--timeout=60`, and `--method=squash` are treated as unknown flags. They also stop at the first positional and silently ignore any later positional tokens, whereas the clap-backed commands would reject extra arguments. That reintroduces argument-handling regressions for the wrappers this refactor is supposed to preserve.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 640,
+              "category": "correctness"
+            },
+            {
+              "message": "`make_track_pr_push` now treats every `-`-prefixed token as a flag and blindly skips the following token if it does not start with `-`. That means an unknown or boolean flag can consume the real track id, so `cargo make track-pr-push --resume my-track` (or any typoed flag before the track id) will silently drop `my-track` and call `pr_push(None)`, pushing the current branch instead of erroring like the baseline dispatcher would.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 203,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:64a4d90cbf170774e780536894751ca4513ae16925a3732ff44723b088967bb6",
+          "at": "2026-05-29T00:59:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` and `parse_pr_merge_args` accept the first positional token and silently discard any later positional tokens. That means invocations such as `cargo make track-pr-merge 42 99` or `cargo make track-pr-ensure foo bar` proceed instead of failing, which diverges from the clap-backed CLI behavior and can act on the wrong PR/track. Reject surplus positional arguments instead of ignoring them.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 699,
+              "category": "correctness"
+            },
+            {
+              "message": "`expand_eq_flags` rewrites `--flag=value` into separate tokens, but the parsers then reject any value token starting with `-`. As a result, valid clap forms like `--base=-feature` or `--track-id=-foo` are no longer accepted, because the equals syntax loses the distinction between a literal string value and a new flag. Preserve the `=` form or special-case dash-leading values.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 623,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7502d733f53485d980b8abaf1de033b42c3d6dd9670282e6f16e4be33a47fcf9",
+          "at": "2026-05-29T01:04:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` does not enforce a single source of truth for the track ID. If callers mix a positional track_id with `--track-id` (for example `foo --track-id bar` or `--track-id bar extra`), the helper silently overrides or discards one of the values instead of rejecting the malformed invocation. That can push/ensure the wrong branch without surfacing an error, which is a regression in argument validation.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 646,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:63fda0b4240851b93536aed2d7d5bf55610b32a9593114f7602a797fed317038",
+          "at": "2026-05-29T01:09:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_pr_ensure_args` overwrites repeated options instead of surfacing the clap-style `ArgumentConflict`. `--base` and `--track-id` are both `ArgAction::Set`-style options in the baseline CLI, so invocations like `cargo make track-pr-ensure --base main --base develop` or `--track-id foo --track-id bar` should fail closed, not silently pick the last value and target the wrong base/track.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 646,
+              "category": "correctness"
+            },
+            {
+              "message": "`parse_pr_merge_args` has the same duplicate-option bug for `--interval`, `--timeout`, and `--method`: later occurrences silently override earlier ones, but clap’s default `Set` action would reject repeated options. That means malformed calls like `cargo make track-pr-merge 123 --timeout 60 --timeout 5` can merge with the wrong settings instead of failing.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 749,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aeb009f021f127784c290c3c931d313af68e23e8ceba721da5dfee88eaf66e24",
+          "at": "2026-05-29T01:14:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e9aaf9135fe43002d33504187f1418c536ac985efdcc2717864991581966b9e",
+          "at": "2026-05-29T01:21:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d496444f874f15e9c6c0ead8409d58a9c667b80d464b357e9723be490792e95",
+          "at": "2026-05-29T02:35:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_pr_ensure` still treats the first token as a positional track id even when it is an option. A valid flag-only invocation such as `cargo make track-pr-ensure -- --base release` is rewritten to `bin/sotp pr ensure-pr --track-id --base release`, so clap rejects it instead of honoring `--base` while deriving the track from the branch. This means the `--base` forwarding regression remains for the current-branch path.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 209,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:6d496444f874f15e9c6c0ead8409d58a9c667b80d464b357e9723be490792e95",
+          "at": "2026-05-29T02:38:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60a0853f6ea6adb81ed232500e8ea41420301cc97e23c06f272afa40a16a3c20",
+          "at": "2026-05-29T02:42:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6fcaa5b1c790a45a2ccf49ee86c9a63eacca987d03935035fdf966b7d25e801",
+          "at": "2026-05-29T03:23:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_pr_ensure` still treats the first forwarded word as a positional track id before invoking clap. A flag-first call such as `cargo make track-pr-ensure -- --base release` is rewritten as `sotp pr ensure-pr --track-id --base release` instead of forwarding `--base release`, so users cannot set the PR base branch through this wrapper. This contradicts the stated restoration of raw `run_sotp` forwarding for the `--base` regression.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 297,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:c6fcaa5b1c790a45a2ccf49ee86c9a63eacca987d03935035fdf966b7d25e801",
+          "at": "2026-05-29T03:27:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`make_track_pr_ensure` still treats the first forwarded word as a positional track id before invoking clap. A flag-first call such as `cargo make track-pr-ensure -- --base release` is rewritten to `sotp pr ensure-pr --track-id --base release`, so the wrapper fails instead of forwarding `--base` to the real subcommand. The same pattern also breaks explicit `--track-id foo`; only synthesize `--track-id` for a non-flag legacy positional, otherwise forward the args verbatim.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 297,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c6fcaa5b1c790a45a2ccf49ee86c9a63eacca987d03935035fdf966b7d25e801",
+          "at": "2026-05-29T03:30:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This refactor removes the `#[cfg(test)]` coverage from `make.rs` and adds no replacement tests for the new forwarding helpers. The new `build_set_override_args` state machine and the `pr push`/`pr ensure` compatibility shim are now untested, so regressions in `--track-id`/`--reason` routing will only show up at runtime.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": null,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4fc84b7422310d157914ab3007a07c5d1122e4b6963b3f021358a72b6d553f1a",
+          "at": "2026-05-29T03:54:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56743a4a9b7e6320e05eead5fa908161aeebf862af7994fdfc4d7d6c365cf606",
+          "at": "2026-05-29T04:00:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56743a4a9b7e6320e05eead5fa908161aeebf862af7994fdfc4d7d6c365cf606",
+          "at": "2026-05-29T04:04:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_track_id_from_branch_uses_project_root_not_items_dir` does not reproduce the regression it claims to pin: it switches to the repo root, where `track/items` already exists, so the pre-fix `discover_from(items_dir)` path would still pass. The subdirectory invocation that actually failed is not covered, so this test will not catch a relapse.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 704,
+              "category": "testing"
+            },
+            {
+              "message": "`resolve_track_id_from_branch_returns_branch_error_on_non_track_branch` changes the process CWD to a tempdir and never restores it. When the tempdir is dropped, later tests inherit a deleted working directory, making the suite order-dependent and flaky.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 757,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:483355cad947d2c7cf978c5f270c90563e21d96c75ae31b73aa111e5654c3f84",
+          "at": "2026-05-29T04:22:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: The new regression test mutates the process CWD, but its `cwd_lock` is private to this module. Sibling `review_v2` test modules (`run.rs` and `commit_hash.rs`) use their own separate locks, so under parallel test execution the different `set_current_dir` call sites can still interleave and make CI flaky. The production fix is fine; the test needs a shared, crate-wide serialization mechanism or to avoid changing CWD.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 668,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e13674a42f2695d03060816b688c0d3b943f5a9c93eec655d7815ffee8ff2ba6",
+          "at": "2026-05-29T04:29:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression coverage here does not exercise the actual failure mode from the briefing. The new test uses an absolute `items_dir`, and the `resolve_project_root` unit test is independent, so both still pass if `resolve_track_id_from_branch`/`resolve_track_id_or_branch_write` keep calling `SystemGitRepo::discover_from(items_dir)`. The bug only reproduces when the process starts in a repo subdirectory with a relative `track/items` path, so add a test that runs from that context and invokes the helper with the relative path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 671,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:0c39a49f6038f7d3e52b8d66c298097ceeefb5e4849d57dad569d2042b08fae4",
+          "at": "2026-05-29T04:35:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new regression test mutates process CWD, but the mutex is only local to this module. Other `review_v2` test modules in this crate also call `set_current_dir()` with their own unrelated locks, so `cargo test` can still interleave process-wide cwd changes across modules and make this test suite flaky.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 671,
+              "category": "testing"
+            },
+            {
+              "message": "The added coverage only exercises the private read-path helper; none of the public entrypoints that actually use `resolve_track_id_or_branch_write` (`review_run_codex`, `review_run_claude`, `review_run_local`) are run from a subdirectory with a relative `track/items` path. That leaves the original branch-discovery regression untested on the public API path that matters.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 700,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d04de3328f966fc87c30d8792932ab7154b4a027f1a2674b387995e7a80e923e",
+          "at": "2026-05-29T04:40:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3d78fa9da87951c74ac9bc6854d7ae3af9463a30791d19fa5bde569a1b994f1",
+          "at": "2026-05-29T04:45:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3d78fa9da87951c74ac9bc6854d7ae3af9463a30791d19fa5bde569a1b994f1",
+          "at": "2026-05-29T04:48:23Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
+          "at": "2026-05-28T10:37:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c58a6e72a4b42d973b79ddd9476c9b50cd8ea4d80e7e24dc76c4a57e885694d",
+          "at": "2026-05-28T10:38:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e7660aba903f2e6dae7e963460df62ef583f8506dca79df4a6a3f594005df63",
+          "at": "2026-05-29T02:54:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e7660aba903f2e6dae7e963460df62ef583f8506dca79df4a6a3f594005df63",
+          "at": "2026-05-29T02:56:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:193a618a9ca47842f7c2e23999189248a538eab0e75dc5451ddd493d1a852baa",
+          "at": "2026-05-29T03:49:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:193a618a9ca47842f7c2e23999189248a538eab0e75dc5451ddd493d1a852baa",
+          "at": "2026-05-29T03:50:29Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:27:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a897bacae9a6c825cf22563462e63c7eebaa8a84999a23a0b09d2ee73b527b91",
+          "at": "2026-05-28T10:29:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:35:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62d0dd87af0d8d7954500116f206c494547a18d95580619c0bfa759232b0f912",
+          "at": "2026-05-28T11:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:02:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d00086aaced53759a6c9d07dd3f940b494b7280a233f52f88ca2fe6ccd67fe58",
+          "at": "2026-05-28T15:13:20Z"
+        }
+      ]
+    }
+  }
+}

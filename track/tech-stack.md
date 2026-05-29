@@ -26,7 +26,8 @@
 libs/domain          # 最下層（外部依存を最小化）
 libs/usecase         # domain を利用
 libs/infrastructure  # domain を利用（実装詳細）
-apps/cli             # CLI エントリーポイント + composition root（usecase/infrastructure/domain を束ねる）
+apps/cli             # CLI エントリーポイント（bin のみ。DI 配線は apps/cli-composition に委譲）
+apps/cli-composition # CLI composition root（domain / usecase / infrastructure を束ねる）
 ```
 
 ### 依存ルール（強制）

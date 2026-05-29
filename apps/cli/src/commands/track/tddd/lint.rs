@@ -1,79 +1,34 @@
-//! `sotp track lint` subcommand — runs catalogue lint rules against a layer
-//! catalogue.
+//! `sotp track lint` subcommand — runs catalogue lint rules against a layer catalogue.
 //!
-//! ADR `tddd-struct-kind-uniformization-and-catalogue-linter` §S3 / IN-05 /
-//! AC-05. Composition root: wires `FsCatalogueLoader` (existing) +
-//! `InMemoryCatalogueLinter` (T005) + `RunCatalogueLintInteractor` (T006) and
-//! runs a hardcoded demo rule set.
+//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use infrastructure::tddd::contract_map_adapter::FsCatalogueLoader;
-use infrastructure::tddd::in_memory_catalogue_linter::InMemoryCatalogueLinter;
-use usecase::catalogue_lint_workflow::{
-    LintRuleKind, LintRuleSpec, RunCatalogueLint, RunCatalogueLintCommand,
-    RunCatalogueLintInteractor,
-};
+use cli_composition::CliApp;
 
 use crate::CliError;
 
 /// Execute the `sotp track lint` subcommand.
 ///
-/// Wires `FsCatalogueLoader` + `InMemoryCatalogueLinter` +
-/// `RunCatalogueLintInteractor` at the composition root and runs a hardcoded
-/// demo rule set against the specified layer catalogue.
-///
 /// # Errors
 ///
-/// Returns `CliError::Message` when rule construction fails or the interactor
-/// returns an error (invalid track / layer / catalogue load failure).
+/// Returns `CliError::Message` when the underlying `CliApp` composition fails.
 pub fn execute_lint(
     workspace_root: PathBuf,
     track_id: String,
     layer_id: String,
 ) -> Result<ExitCode, CliError> {
-    // Build the hardcoded demo rule set:
-    //   1) FieldEmpty on value_object / target_field=expected_methods
-    //   2) KindLayerConstraint on domain_service / permitted_layers=[domain, usecase]
-    let rules = vec![
-        LintRuleSpec {
-            kind: LintRuleKind::FieldEmpty,
-            target_kind: "value_object".to_owned(),
-            target_field: Some("expected_methods".to_owned()),
-            permitted_layers: vec![],
-        },
-        LintRuleSpec {
-            kind: LintRuleKind::KindLayerConstraint,
-            target_kind: "domain_service".to_owned(),
-            target_field: None,
-            permitted_layers: vec!["domain".to_owned(), "usecase".to_owned()],
-        },
-    ];
-
-    // Compose secondary ports and interactor.
-    let items_dir = workspace_root.join("track/items");
-    let rules_path = workspace_root.join("architecture-rules.json");
-    let loader = FsCatalogueLoader::new(items_dir, rules_path, workspace_root.clone());
-    let linter = InMemoryCatalogueLinter::new();
-    let interactor = RunCatalogueLintInteractor::new(loader, linter);
-
-    // Dispatch through the primary port.
-    let runner: &dyn RunCatalogueLint = &interactor;
-    let violations = runner
-        .execute(RunCatalogueLintCommand { track_id, layer_id, rules })
-        .map_err(|e| CliError::Message(format!("catalogue lint failed: {e}")))?;
-
-    // Print per-violation lines.
-    for v in &violations {
-        println!("{:?} on {}: {}", v.rule_kind(), v.entry_name(), v.message());
+    let outcome = CliApp::new()
+        .track_lint(Some(track_id), layer_id, workspace_root)
+        .map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
     }
-
-    // Print summary to stderr.
-    let count = violations.len();
-    eprintln!("Found {count} violation(s)");
-
-    if count > 0 { Ok(ExitCode::FAILURE) } else { Ok(ExitCode::SUCCESS) }
+    if let Some(ref s) = outcome.stderr {
+        eprintln!("{s}");
+    }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 #[cfg(test)]

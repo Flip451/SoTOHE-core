@@ -5,9 +5,10 @@
 
 use std::io::{self, Write};
 use std::process::ExitCode;
+#[cfg(test)]
 use std::time::Duration;
 
-use infrastructure::review_v2::{CodexReviewOutcome, CodexReviewer};
+use cli_composition::ReviewRunCodexInput;
 
 use super::{CodexLocalArgs, validate_auto_record_args};
 
@@ -22,65 +23,24 @@ pub(super) fn execute_codex_local(args: &CodexLocalArgs) -> ExitCode {
 }
 
 fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
-    // Step 1: Validate record args before building composition (fail fast).
+    // Step 1: Validate record args before delegating to CliApp (fail fast).
     let validated = validate_auto_record_args(args)?;
 
-    // Step 2: Check whether the scope has a configured briefing file.
-    // Log a warning if the path is unsafe (prompt injection guard) but do not
-    // fail — `append_scope_briefing_reference_str` skips injection on unsafe paths.
-    let maybe_briefing = infrastructure::review_v2::get_briefing_for_scope_str(
-        &validated.group_name,
-        &validated.track_id,
-        &validated.items_dir,
-    )?;
-    if let Some(path) = &maybe_briefing {
-        if !is_safe_briefing_path(path) {
-            eprintln!(
-                "[WARN] briefing_file for scope '{}' contains unsafe characters — \
-                 scope-specific severity policy injection skipped",
-                validated.group_name
-            );
-        }
-    }
+    // Step 2: Build DTO and delegate to CliApp.review_run_codex.
+    let input = ReviewRunCodexInput {
+        model: args.model.clone(),
+        timeout_seconds: args.timeout_seconds,
+        briefing_file: args.briefing_file.clone(),
+        prompt: args.prompt.clone(),
+        track_id: Some(validated.track_id),
+        round_type: validated.round_type_str,
+        group: validated.group_name,
+        items_dir: validated.items_dir,
+    };
 
-    // Step 3: Build base prompt and append the scope-specific severity policy reference.
-    let mut base_prompt = build_base_prompt(args)?;
-    infrastructure::review_v2::append_scope_briefing_reference_str(
-        &mut base_prompt,
-        &validated.group_name,
-        &validated.track_id,
-        &validated.items_dir,
-        is_safe_briefing_path,
-    )?;
+    let outcome = cli_composition::CliApp::new().review_run_codex(input)?;
 
-    // Step 4: Build v2 composition with real CodexReviewer.
-    let timeout = Duration::from_secs(args.timeout_seconds);
-    let reviewer = CodexReviewer::new(&args.model, timeout, base_prompt)
-        .with_scope_label(&validated.group_name);
-
-    // Step 5: Run the review cycle via infrastructure (handles all domain types internally).
-    let outcome = infrastructure::review_v2::run_codex_review_str(
-        &validated.track_id,
-        &validated.items_dir,
-        &validated.group_name,
-        &validated.round_type_str,
-        reviewer,
-    )?;
-
-    match outcome {
-        CodexReviewOutcome::Skipped { scope_label } => {
-            emit_skip_output(&scope_label)?;
-            Ok(0)
-        }
-        CodexReviewOutcome::FinalCompleted { verdict_json, exit_code } => {
-            emit_stdout_line(&verdict_json)?;
-            Ok(exit_code)
-        }
-        CodexReviewOutcome::FastCompleted { verdict_json, exit_code } => {
-            emit_stdout_line(&verdict_json)?;
-            Ok(exit_code)
-        }
-    }
+    emit_outcome_output(outcome.stdout.as_deref(), outcome.exit_code)
 }
 
 /// Builds the base prompt from CLI args (briefing file or inline prompt).
@@ -90,6 +50,7 @@ fn run_execute_codex_local(args: &CodexLocalArgs) -> Result<u8, String> {
 ///
 /// # Errors
 /// Returns an error if the briefing file does not exist or neither arg is provided.
+#[cfg(test)]
 pub(super) fn build_base_prompt(args: &CodexLocalArgs) -> Result<String, String> {
     if let Some(path) = &args.briefing_file {
         if !path.is_file() {
@@ -124,7 +85,7 @@ pub(super) fn append_scope_briefing_reference(
     track_id: &str,
     items_dir: &std::path::Path,
 ) -> Result<(), String> {
-    infrastructure::review_v2::append_scope_briefing_reference_str(
+    cli_composition::review_v2::append_scope_briefing_reference_str(
         prompt,
         scope_name,
         track_id,
@@ -154,6 +115,7 @@ pub(super) fn append_scope_briefing_reference(
 ///   `/` or `\`
 ///
 /// Empty paths are also rejected.
+#[cfg(test)]
 pub(super) fn is_safe_briefing_path(path: &str) -> bool {
     if path.is_empty() {
         return false;
@@ -179,14 +141,12 @@ pub(super) fn is_safe_briefing_path(path: &str) -> bool {
     true
 }
 
-/// Prints the skip message and zero_findings JSON for an empty scope.
-fn emit_skip_output(scope: &str) -> Result<(), String> {
-    eprintln!("[auto-record] Scope '{scope}' is empty, skipping");
-    emit_stdout_line(r#"{"verdict":"zero_findings","findings":[]}"#)
-}
-
-fn emit_stdout_line(line: &str) -> Result<(), String> {
-    writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))
+/// Emits the review outcome to stdout and returns the exit code.
+fn emit_outcome_output(stdout: Option<&str>, exit_code: u8) -> Result<u8, String> {
+    if let Some(line) = stdout {
+        writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))?;
+    }
+    Ok(exit_code)
 }
 
 // ---------------------------------------------------------------------------

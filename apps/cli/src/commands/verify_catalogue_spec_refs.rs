@@ -15,6 +15,9 @@ use crate::CliError;
 
 /// Entry point for `sotp verify catalogue-spec-refs`.
 ///
+/// Used by integration tests only — production dispatch is handled by
+/// `cli_composition::CliApp::verify_catalogue_spec_refs`.
+///
 /// # Errors
 ///
 /// Returns `CliError` when the track id is invalid or any fatal I/O /

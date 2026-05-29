@@ -189,6 +189,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "clap",
+ "cli_composition",
  "infrastructure",
  "libc",
  "rstest",
@@ -199,6 +200,19 @@ dependencies = [
  "thiserror",
  "usecase",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "cli_composition"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "domain",
+ "infrastructure",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "usecase",
 ]
 
 [[package]]

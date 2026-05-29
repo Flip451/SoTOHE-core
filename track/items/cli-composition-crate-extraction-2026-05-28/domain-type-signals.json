@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-29T04:48:49Z",
+  "declaration_hash": "488afb82e56a16a64c8f4beba0bba4b8cced158a3eda62e2f7b08ab4c385622c",
+  "signals": [
+    {
+      "type_name": "CommitHashReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CommitHashWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewExistsPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewWriter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

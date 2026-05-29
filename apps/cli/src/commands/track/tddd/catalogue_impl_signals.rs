@@ -1,87 +1,31 @@
 //! `sotp track catalogue-impl-signals` — diagnose SoT Chain ③ (catalogue ↔ implementation).
 //!
-//! Loads `<layer>-types.json` (CatalogueDocument / TypeGraph A), reads
-//! `<layer>-types-baseline.json` as TypeGraph B (`rustdoc_types::Crate`), captures
-//! TypeGraph C live via `cargo +nightly rustdoc`, and evaluates the 3-way
-//! `SignalEvaluatorV2` producing a `ThreeWayEvaluationReport`.
-//!
-//! Outputs a markdown report to stdout. Exits with code 1 when any Red signals
-//! are present.
-//!
-//! This command is an on-demand diagnostic tool (ADR 2026-05-11-2330 §D1 / D3):
-//! it has no `--output` flag (no persisted view) and no Makefile wrapper.
+//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 
 use std::path::PathBuf;
 use std::process::ExitCode;
-use std::sync::Arc;
 
-use infrastructure::FsSymlinkGuard;
-use infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
-use infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter;
-use infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2;
-use infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader;
-use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
-use usecase::catalogue_impl_signals::{
-    CatalogueImplSignalsInteractor, CatalogueImplSignalsService,
-};
+use cli_composition::CliApp;
 
 use crate::CliError;
 
 /// Execute the `track catalogue-impl-signals` command.
 ///
-/// Thin CLI adapter: constructs the concrete infrastructure adapters, wires up
-/// `CatalogueImplSignalsInteractor`, and delegates all orchestration to the
-/// usecase layer. Prints the returned report to stdout.
-///
-/// The track items directory is derived from `workspace_root` as
-/// `<workspace_root>/track/items` (canonical layout). Symlink guards are
-/// applied inside the interactor via the injected [`domain::SymlinkGuardPort`]
-/// (`FsSymlinkGuard`), keeping filesystem I/O out of the usecase layer.
-///
-/// Exits with code 1 if any Red signals are found across all layers. Red
-/// detection is done by scanning the returned report string for the "🔴 Red"
-/// marker emitted by the interactor's formatter.
-///
 /// # Errors
 ///
-/// Returns [`CliError`] when the track ID is invalid, any file is missing, or
-/// the evaluation fails.
+/// Returns `CliError` when the underlying `CliApp` composition fails.
 pub fn execute_catalogue_impl_signals(
     track_id: String,
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Build the concrete adapters at the composition root (apps/cli).
-    let catalogue_loader = Arc::new(FsCatalogueDocumentLoader::new());
-    let ext_crate_codec = Arc::new(CatalogueToExtendedCrateCodec::new());
-    let evaluator = Arc::new(SignalEvaluatorV2::new());
-    let rustdoc_crate_port = Arc::new(RustdocCrateAdapter::new(workspace_root.clone()));
-    let layer_bindings_port = Arc::new(FsTdddLayerBindingsAdapter::new());
-    let symlink_guard = Arc::new(FsSymlinkGuard::new());
-
-    // Wire up the interactor via the usecase layer.
-    // Symlink guards are now applied inside the interactor via the injected
-    // SymlinkGuardPort (FsSymlinkGuard), keeping I/O out of the usecase layer.
-    let interactor = CatalogueImplSignalsInteractor::new(
-        catalogue_loader,
-        ext_crate_codec,
-        evaluator,
-        rustdoc_crate_port,
-        layer_bindings_port,
-        symlink_guard,
-    );
-
-    // Delegate all orchestration to the usecase interactor.
-    // items_dir is derived from workspace_root inside the interactor
-    // (workspace_root/track/items) per CatalogueImplSignalsService contract.
-    let report = interactor
-        .run(track_id, workspace_root, layer)
-        .map_err(|e| CliError::Message(e.to_string()))?;
-
-    // D3: stdout-only output.  any_red is computed by the interactor.
-    println!("{}", report.text);
-
-    if report.any_red { Ok(ExitCode::FAILURE) } else { Ok(ExitCode::SUCCESS) }
+    let outcome = CliApp::new()
+        .track_catalogue_impl_signals(Some(track_id), workspace_root, layer)
+        .map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
+    }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 #[cfg(test)]

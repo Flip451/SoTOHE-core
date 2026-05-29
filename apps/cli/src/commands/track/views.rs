@@ -1,79 +1,54 @@
-use std::sync::Arc;
+use std::path::Path;
+use std::process::ExitCode;
 
-use infrastructure::git_cli::SystemGitRepo;
-use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
+use cli_composition::CliApp;
 
 use crate::CliError;
 
-use super::*;
+use super::{ViewAction, resolve_track_id_from_root_for_write};
 
 pub(super) fn execute_views(action: ViewAction) -> Result<ExitCode, CliError> {
+    let app = CliApp::new();
     match action {
         ViewAction::Validate { project_root } => {
-            render::validate_track_snapshots(&project_root).map_err(|err| {
-                CliError::Message(format!("track metadata validation failed: {err}"))
-            })?;
-            println!("[OK] Track metadata is valid");
-            Ok(ExitCode::SUCCESS)
+            let outcome = app.track_views_validate(project_root).map_err(CliError::Message)?;
+            if let Some(ref s) = outcome.stdout {
+                println!("{s}");
+            }
+            Ok(ExitCode::from(outcome.exit_code))
         }
         ViewAction::Sync { project_root, track_id } => {
-            // If `--track-id` was not given, try to detect the active track from
-            // the current git branch (`track/<id>`). This makes
-            // `cargo make track-sync-views` "do the right thing" inside an
-            // active track checkout without requiring the caller to repeat the
-            // track id. When the current branch is not a track/plan branch
-            // (e.g., on `main`), or when git is unavailable, fall back to
-            // registry-only mode (CN-01 documented exception: no-track mode
-            // is preserved for track views sync because registry.md is
-            // track-independent).
-            //
             // When an explicit --track-id is given, the WRITE guard validates
             // that it matches the current git branch (AC-18, D7): a mismatch
             // is fail-closed. This prevents accidentally syncing views for a
             // different track than the one the developer is working on.
             let resolved_track_id = match track_id {
                 Some(id) => {
-                    // WRITE guard: verify explicit id matches the current branch (D7 / AC-18).
-                    // resolve_track_id_from_root_for_write validates the id format and performs
-                    // the branch-id comparison fail-closed. On success the id is returned as-is.
                     let validated_id =
-                        super::resolve_track_id_from_root_for_write(Some(id), &project_root)
+                        resolve_track_id_from_root_for_write(Some(id), &project_root)
                             .map_err(CliError::Message)?;
                     Some(validated_id)
                 }
                 None => detect_active_track_from_branch(&project_root),
             };
-            let changed = render::sync_rendered_views(&project_root, resolved_track_id.as_deref())
+            let outcome = app
+                .track_views_sync(project_root, resolved_track_id)
                 .map_err(|err| CliError::Message(format!("sync-views failed: {err}")))?;
-            if changed.is_empty() {
-                println!("[OK] All views already up to date");
-            } else {
-                for path in changed {
-                    match path.strip_prefix(&project_root) {
-                        Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
-                        Err(_) => println!("[OK] Rendered: {}", path.display()),
-                    }
-                }
+            if let Some(ref s) = outcome.stdout {
+                println!("{s}");
             }
-            Ok(ExitCode::SUCCESS)
+            Ok(ExitCode::from(outcome.exit_code))
         }
     }
 }
 
-/// Detect the active track id from the current git branch via the shared
-/// `ActiveTrackResolveInteractor` (IN-09: consolidates individual auto-detect
-/// implementations onto the shared interactor path).
+/// Detect the active track id from the current git branch.
 ///
 /// Only `track/<id>` branches are resolved; any other branch (e.g. `main`,
 /// detached HEAD) or git failure resolves to `None` so the caller can fall
 /// back to registry-only mode without surfacing an error.
-///
-/// Uses `project_root` for git discovery so that auto-detection is consistent
-/// with `--project-root` invocations and does not depend on the process CWD.
-fn detect_active_track_from_branch(project_root: &std::path::Path) -> Option<String> {
-    let repo = SystemGitRepo::discover_from(project_root).ok()?;
-    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-    interactor.resolve_active_track().ok()
+fn detect_active_track_from_branch(project_root: &Path) -> Option<String> {
+    CliApp::new().detect_active_track_from_branch(project_root)
 }
 
 #[cfg(test)]

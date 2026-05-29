@@ -11,7 +11,10 @@
       "patterns": ["libs/infrastructure/**"]
     },
     "cli": {
-      "patterns": ["apps/**"]
+      "patterns": ["apps/cli/**"]
+    },
+    "cli_composition": {
+      "patterns": ["apps/cli-composition/**"]
     },
     "plan-artifacts": {
       "patterns": [

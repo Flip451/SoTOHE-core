@@ -4,6 +4,7 @@ members = [
   "libs/usecase",
   "libs/infrastructure",
   "apps/cli",
+  "apps/cli-composition",
 ]
 exclude = ["vendor/*"]
 resolver = "2"

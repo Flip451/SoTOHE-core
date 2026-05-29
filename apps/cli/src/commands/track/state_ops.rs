@@ -1,34 +1,11 @@
 //! CLI handlers for add-task, set-override, clear-override, next-task, and task-counts.
 
+use std::path::PathBuf;
+use std::process::ExitCode;
+
+use cli_composition::CliApp;
+
 use crate::CliError;
-
-use super::*;
-use usecase::task_ops::{TaskOperationService as _, TaskQueryService as _};
-use usecase::track_resolution::{BranchReadError, BranchReaderPort};
-
-#[derive(Debug)]
-struct LazyBranchReader {
-    project_root: PathBuf,
-}
-
-impl LazyBranchReader {
-    fn new(project_root: PathBuf) -> Self {
-        Self { project_root }
-    }
-}
-
-impl BranchReaderPort for LazyBranchReader {
-    fn current_branch(&self) -> Result<Option<String>, BranchReadError> {
-        let repo = SystemGitRepo::discover_from(&self.project_root).map_err(|e| {
-            BranchReadError::ReadFailed(format!("failed to discover git repo: {e}"))
-        })?;
-        BranchReaderPort::current_branch(&repo)
-    }
-}
-
-fn build_branch_reader(project_root: &std::path::Path) -> Option<Arc<dyn BranchReaderPort>> {
-    Some(Arc::new(LazyBranchReader::new(project_root.to_path_buf())))
-}
 
 pub(super) fn execute_add_task(
     items_dir: PathBuf,
@@ -37,49 +14,14 @@ pub(super) fn execute_add_task(
     section: Option<String>,
     after: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Validate track_id as a safe slug before any filesystem probe.
-    validate_track_id_str(&track_id).map_err(CliError::Message)?;
-
-    let repo_dir = items_dir.clone();
-    let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
-
-    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let branch_reader = build_branch_reader(&project_root);
-    let service =
-        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
-
-    // If --after is provided but not a valid TaskId (format: T followed by one
-    // or more digits that fit in u64), silently ignore it and append to the end
-    // of the section. This preserves the historical lenient behavior where
-    // invalid after-task IDs were treated as "not found" → append.
-    // Mirrors domain::TaskId::try_new exactly (T prefix + non-empty digits + u64 parse).
-    let after_task_id = after.filter(|a| {
-        a.strip_prefix('T').is_some_and(|digits| {
-            !digits.is_empty()
-                && digits.chars().all(|ch| ch.is_ascii_digit())
-                && digits.parse::<u64>().is_ok()
-        })
-    });
-
-    let cmd = usecase::task_ops::AddTaskCommand {
-        items_dir,
-        track_id: track_id.clone(),
-        description: description.clone(),
-        section,
-        after_task_id,
-    };
-    let output = service
-        .add_task(cmd)
-        .map_err(|err| CliError::Message(format!("add-task failed: {err}")))?;
-
-    let new_task_id = output.task_id.as_deref().unwrap_or("?");
-    println!(
-        "[OK] Added task {new_task_id}: {description} (track status: {})",
-        output.derived_status
-    );
-
-    sync_views(&project_root, &output.track_id);
-    Ok(ExitCode::SUCCESS)
+    let app = CliApp::new();
+    let outcome = app
+        .track_add_task_resolved(items_dir, track_id, description, section, after)
+        .map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
+    }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 pub(super) fn execute_set_override(
@@ -88,142 +30,51 @@ pub(super) fn execute_set_override(
     status: String,
     reason: String,
 ) -> Result<ExitCode, CliError> {
-    // Validate track_id as a safe slug before any filesystem probe.
-    validate_track_id_str(&track_id).map_err(CliError::Message)?;
-
-    let repo_dir = items_dir.clone();
-    let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
-
-    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let branch_reader = build_branch_reader(&project_root);
-    let service =
-        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
-
-    let cmd = usecase::task_ops::SetOverrideCommand {
-        items_dir,
-        track_id: track_id.clone(),
-        status: status.clone(),
-        reason,
-    };
-    let output = service
-        .set_override(cmd)
-        .map_err(|err| CliError::Message(format!("set-override failed: {err}")))?;
-
-    println!("[OK] Override set to '{}' (track status: {})", status, output.derived_status);
-
-    sync_views(&project_root, &output.track_id);
-    Ok(ExitCode::SUCCESS)
+    let app = CliApp::new();
+    let outcome = app
+        .track_set_override_resolved(items_dir, track_id, status, reason)
+        .map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
+    }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 pub(super) fn execute_clear_override(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    // Validate track_id as a safe slug before any filesystem probe.
-    validate_track_id_str(&track_id).map_err(CliError::Message)?;
-
-    let repo_dir = items_dir.clone();
-    let project_root = resolve_project_root(&repo_dir).map_err(CliError::Message)?;
-
-    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let branch_reader = build_branch_reader(&project_root);
-    let service =
-        usecase::task_ops::TaskOperationInteractor::new(Arc::clone(&store), branch_reader);
-
-    let cmd = usecase::task_ops::ClearOverrideCommand { items_dir, track_id: track_id.clone() };
-    let output = service
-        .clear_override(cmd)
-        .map_err(|err| CliError::Message(format!("clear-override failed: {err}")))?;
-
-    println!("[OK] Override cleared (track status: {})", output.derived_status);
-
-    sync_views(&project_root, &output.track_id);
-    Ok(ExitCode::SUCCESS)
+    let app = CliApp::new();
+    let outcome =
+        app.track_clear_override_resolved(items_dir, track_id).map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
+    }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 pub(super) fn execute_next_task(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let service = usecase::task_ops::TaskQueryInteractor::new(Arc::clone(&store));
-
-    // Retrieve the next open task. `NextTaskOutput` does not carry a status
-    // field, so the task status is determined separately via `task_counts`.
-    //
-    // `domain::ImplPlanDocument::next_open_task` returns in_progress tasks
-    // before todo tasks (in_progress has priority). Therefore:
-    //   - counts.in_progress > 0 → the returned task is an in_progress task.
-    //   - counts.in_progress == 0 → the returned task is a todo task.
-    // Both calls read the same underlying store, so counts and next_task are
-    // consistent within a single CLI invocation.
-    let next = service
-        .next_task(track_id.clone(), items_dir.clone())
-        .map_err(|err| CliError::Message(format!("next-task failed: {err}")))?;
-
-    match next {
-        Some(task) => {
-            // Determine the task's status from counts. In_progress tasks take
-            // priority in `next_open_task`, so the returned task is in_progress
-            // if and only if `counts.in_progress > 0`.
-            let counts = service
-                .task_counts(track_id, items_dir)
-                .map_err(|err| CliError::Message(format!("next-task failed (counts): {err}")))?;
-            let task_status = if counts.in_progress > 0 { "in_progress" } else { "todo" };
-            let payload = serde_json::json!({
-                "task_id": task.task_id,
-                "description": task.description,
-                "status": task_status,
-            });
-            println!("{payload}");
-            Ok(ExitCode::SUCCESS)
-        }
-        None => {
-            let payload = serde_json::json!({
-                "task_id": null,
-                "description": null,
-                "status": null,
-            });
-            println!("{payload}");
-            Ok(ExitCode::SUCCESS)
-        }
+    let app = CliApp::new();
+    let outcome = app.track_next_task_resolved(items_dir, track_id).map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
     }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 pub(super) fn execute_task_counts(
     items_dir: PathBuf,
     track_id: String,
 ) -> Result<ExitCode, CliError> {
-    let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-    let service = usecase::task_ops::TaskQueryInteractor::new(Arc::clone(&store));
-
-    let counts = service
-        .task_counts(track_id, items_dir)
-        .map_err(|err| CliError::Message(format!("task-counts failed: {err}")))?;
-
-    let total = counts.todo + counts.in_progress + counts.done + counts.skipped;
-    println!(
-        r#"{{"total":{total},"todo":{},"in_progress":{},"done":{},"skipped":{}}}"#,
-        counts.todo, counts.in_progress, counts.done, counts.skipped
-    );
-    Ok(ExitCode::SUCCESS)
-}
-
-/// Sync rendered views, printing results. Non-fatal on failure.
-fn sync_views(project_root: &std::path::Path, track_id: &str) {
-    match render::sync_rendered_views(project_root, Some(track_id)) {
-        Ok(changed) => {
-            for path in changed {
-                match path.strip_prefix(project_root) {
-                    Ok(relative) => println!("[OK] Rendered: {}", relative.display()),
-                    Err(_) => println!("[OK] Rendered: {}", path.display()),
-                }
-            }
-        }
-        Err(err) => {
-            eprintln!("warning: operation persisted but sync-views failed: {err}");
-        }
+    let app = CliApp::new();
+    let outcome = app.track_task_counts_resolved(items_dir, track_id).map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
     }
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 #[cfg(test)]

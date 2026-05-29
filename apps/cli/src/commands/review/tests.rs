@@ -905,7 +905,7 @@ fn build_review_v2_rejects_items_dir_outside_repo_root() {
     let _lock = env_lock().lock().unwrap();
     // Use /tmp as items_dir — this should always be outside the repo root.
     let result =
-        infrastructure::review_v2::build_review_v2_str("test-track", std::path::Path::new("/tmp"));
+        cli_composition::review_v2::build_review_v2_str("test-track", std::path::Path::new("/tmp"));
     assert!(result.is_err(), "build_review_v2_str should reject items_dir outside repo root");
     let err = result.err().expect("checked is_err above");
     assert!(
@@ -925,7 +925,7 @@ fn build_review_v2_rejects_traversal_items_dir_outside_repo_root() {
 
     // "items/../../../tmp" — resolves outside repo root
     let traversal_path = PathBuf::from("items/../../../tmp");
-    let result = infrastructure::review_v2::build_review_v2_str("test-track", &traversal_path);
+    let result = cli_composition::review_v2::build_review_v2_str("test-track", &traversal_path);
     assert!(result.is_err(), "items_dir outside repo should be rejected");
     let err = result.err().expect("checked is_err above");
     assert!(

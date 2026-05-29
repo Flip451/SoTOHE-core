@@ -13,19 +13,20 @@ path = "src/main.rs"
 workspace = true
 
 [dev-dependencies]
+infrastructure = { path = "../../libs/infrastructure" }
 rstest = { workspace = true }
 rustdoc-types = "0.57"
 tempfile = "3.27.0"
+usecase = { path = "../../libs/usecase" }
 
 [dependencies]
 chrono = { version = "0.4.44", features = ["serde"] }
 clap = { version = "4.5.60", features = ["derive", "env"] }
-infrastructure = { path = "../../libs/infrastructure" }
+cli_composition = { path = "../../apps/cli-composition" }
 libc = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1.0.149"
 thiserror = { workspace = true }
-usecase = { path = "../../libs/usecase" }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_IO"] }

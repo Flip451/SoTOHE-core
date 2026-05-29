@@ -1,132 +1,32 @@
-//! `sotp track catalogue-spec-signals` — regenerate
-//! `<layer>-catalogue-spec-signals.json` for each catalogue-spec-enabled layer.
+//! `sotp track catalogue-spec-signals` — regenerate per-layer catalogue-spec-signals.json.
 //!
-//! The command reads the LOCAL `<layer>-types.json` (not the origin blob —
-//! unlike the merge-gate path) because the refresh is a pre-commit step that
-//! must reflect uncommitted changes in the workspace. It delegates the per-entry
-//! signal computation to the domain pure function
-//! `evaluate_catalogue_entry_signal` and the atomic write to
-//! `FsCatalogueSpecSignalsStore` (T012).
-//!
-//! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
-//! §D2 / §D3.1 / IN-09.
+//! Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
-use usecase::TrackId;
+use cli_composition::CliApp;
 
 use crate::CliError;
-use crate::commands::track::tddd::signals::resolve_layers;
 
 /// Per-layer refresh entry point.
 ///
-/// Track id validation and format check are performed here; the branch-based
-/// WRITE guard (AC-18 / D7) is enforced at the CLI dispatch layer via
-/// `resolve_track_id_from_root_for_write` in `mod.rs` before this function is
-/// called. Architecture-rules.json resolution is fail-closed via `resolve_layers`.
-///
 /// # Errors
 ///
-/// Returns `CliError` when the track id is invalid, the layer filter is unknown,
-/// any per-layer `<layer>-types.json` is missing or fails to decode, or the atomic
-/// write fails.
+/// Returns `CliError` when the underlying `CliApp` composition fails.
 pub fn execute_catalogue_spec_signals(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
     layer: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    // Validate track_id format by attempting to parse it (CN-01 / AC-03).
-    // This must happen before any filesystem access so that path-traversal ids
-    // are rejected before touching the filesystem.
-    TrackId::try_new(&track_id)
-        .map_err(|e| CliError::Message(format!("invalid track ID '{track_id}': {e}")))?;
-
-    // Branch guard is enforced at the CLI dispatch layer (mod.rs) via
-    // `resolve_track_id_from_root_for_write` (D7 / AC-18 / CN-02 / CN-03).
-    // Inline duplication removed per T016.
-
-    // Security: verify the items_dir root itself is not a symlink before using it as the
-    // trusted anchor for `reject_symlinks_below`. That helper only checks components
-    // *below* the trusted_root, so a symlinked items_dir would bypass all path guards.
-    // Mirrors `execute_baseline_capture` (baseline.rs).
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(CliError::Message(format!(
-                "symlink guard: refusing to follow symlink at items_dir: {}",
-                items_dir.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(CliError::Message(format!(
-                "symlink guard: cannot stat items_dir {}: {e}",
-                items_dir.display()
-            )));
-        }
-    }
-
-    // Security: verify the track directory itself is not a symlink before using
-    // it as a path component for metadata / impl-plan reads. The `items_dir`
-    // check above only covers `items_dir` itself; a symlinked
-    // `items_dir/<track_id>` would escape the trusted tree before the per-layer
-    // `reject_symlinks_below` guard (anchored at `items_dir`) can catch it.
-    let track_dir = items_dir.join(&track_id);
-    match track_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(CliError::Message(format!(
-                "symlink guard: refusing to follow symlink at track directory: {}",
-                track_dir.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            // Track directory absent — the layer/catalogue reads below will produce
-            // a clear error message. Don't short-circuit here.
-        }
-        Err(e) => {
-            return Err(CliError::Message(format!(
-                "symlink guard: cannot stat track directory {}: {e}",
-                track_dir.display()
-            )));
-        }
-    }
-
-    // Resolve layers — `catalogue_spec_signal.enabled` flag is introduced by
-    // T018; until then we fall back to every `tddd.enabled` layer so this
-    // command is usable during the transition period.
-    let bindings = resolve_layers(&workspace_root, layer.as_deref())?;
-    if bindings.is_empty() {
-        return Err(CliError::Message(
-            "no tddd.enabled layers found in architecture-rules.json; \
-             nothing to evaluate"
-                .to_owned(),
-        ));
-    }
-
-    // Pass `items_dir` (not `workspace_root`) so the store writes under the same
-    // tree the reader is using. The default resolution is `workspace_root/track/items`,
-    // but a `--items-dir` override must propagate to both read and write paths —
-    // the previous `workspace_root`-based wiring left the two tracking distinct
-    // trees when `--items-dir` diverged from the default (PR #111 P1 finding).
-    let writer = FsCatalogueSpecSignalsStore::new(items_dir.clone());
-
-    for binding in &bindings {
-        if !binding.catalogue_spec_signal_enabled() {
-            // Per ADR §D5.4 phased activation: skip layers that have not
-            // opted in via `architecture-rules.json`
-            // `tddd.catalogue_spec_signal.enabled`.
-            continue;
-        }
-        infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer(
-            &items_dir, &track_dir, &track_id, binding, &writer,
-        )
+    let outcome = CliApp::new()
+        .track_catalogue_spec_signals(items_dir, Some(track_id), workspace_root, layer)
         .map_err(CliError::Message)?;
+    if let Some(ref s) = outcome.stdout {
+        println!("{s}");
     }
-
-    Ok(ExitCode::SUCCESS)
+    Ok(ExitCode::from(outcome.exit_code))
 }
 
 #[cfg(test)]

@@ -1,17 +1,9 @@
-//! CLI subcommand for track operations using FsTrackStore.
+//! CLI subcommand for track operations.
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitCode;
-use std::sync::Arc;
 
 use clap::{Args, Subcommand};
-use infrastructure::git_cli::SystemGitRepo;
-use infrastructure::track::fs_store::FsTrackStore;
-use infrastructure::track::render;
-use usecase::track_resolution::{
-    ActiveTrackResolveError, ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
-    TrackResolutionError,
-};
 
 mod branch_ops;
 mod resolve;
@@ -19,289 +11,13 @@ mod signals;
 mod state_ops;
 pub(crate) mod tddd;
 mod transition;
+mod validate;
 mod views;
 
-/// Validates a track ID string (lowercase slug: `[a-z0-9]([a-z0-9-]*[a-z0-9])?`).
-///
-/// Mirrors the validation performed by `domain::TrackId::try_new` without
-/// importing domain types.
-///
-/// # Errors
-///
-/// Returns an error string describing the failure.
-pub(crate) fn validate_track_id_str(value: &str) -> Result<(), String> {
-    if value.is_empty() {
-        return Err(format!("invalid track id: '{value}' (must not be empty)"));
-    }
-    let mut chars = value.chars();
-    match chars.next() {
-        Some(first) if first.is_ascii_lowercase() || first.is_ascii_digit() => {}
-        _ => {
-            return Err(format!(
-                "invalid track id: '{value}' (must start with lowercase letter or digit)"
-            ));
-        }
-    }
-    let mut previous_was_hyphen = false;
-    for ch in chars {
-        let is_valid = ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-';
-        if !is_valid {
-            return Err(format!("invalid track id: '{value}' (invalid character '{ch}')"));
-        }
-        if ch == '-' && previous_was_hyphen {
-            return Err(format!("invalid track id: '{value}' (double hyphen not allowed)"));
-        }
-        previous_was_hyphen = ch == '-';
-    }
-    if previous_was_hyphen {
-        return Err(format!("invalid track id: '{value}' (must not end with hyphen)"));
-    }
-    Ok(())
-}
-
-/// Validates a track branch name string (`track/<valid-track-id>`).
-///
-/// Mirrors the validation performed by `domain::TrackBranch::try_new` without
-/// importing domain types.
-///
-/// # Errors
-///
-/// Returns an error string describing the failure.
-pub(crate) fn validate_track_branch_str(value: &str) -> Result<(), String> {
-    match value.strip_prefix("track/") {
-        Some(slug) => validate_track_id_str(slug)
-            .map_err(|_| format!("invalid track branch: '{value}' (slug part is invalid)")),
-        None => Err(format!("invalid track branch: '{value}' (must be in 'track/<id>' form)")),
-    }
-}
-
-/// Discriminator for READ vs WRITE resolution semantics (CN-02 / CN-03 / D7).
-///
-/// - `Read`: `explicit_id` short-circuits git discovery (CN-02 / AC-19).
-/// - `Write`: git branch is always read and compared against `explicit_id` (D7 / AC-18).
-#[derive(Copy, Clone)]
-enum ResolveMode {
-    Read,
-    Write,
-}
-
-/// Core resolution pipeline shared by all four public helpers.
-///
-/// All public wrappers (`resolve_track_id` / `resolve_track_id_from_root` /
-/// `resolve_track_id_for_write` / `resolve_track_id_from_root_for_write`) derive
-/// their `anchor` path (a git-discoverable directory) and delegate here.
-///
-/// READ mode (CN-02 / AC-19):
-/// - `explicit_id` is `Some` → returned as-is; git discovery is skipped.
-/// - `explicit_id` is `None` → branch derived from the repo at `anchor`.
-///
-/// WRITE mode (D7 / AC-18 / CN-03):
-/// - git branch is always read from the repo at `anchor`.
-/// - `explicit_id` is `Some` → branch-derived id must match; mismatch is fail-closed.
-/// - `explicit_id` is `None` → branch-derived id is returned directly.
-///
-/// # Errors
-///
-/// Returns a human-readable error string on git discovery failure or resolution failure.
-fn resolve_track_id_inner(
-    explicit_id: Option<String>,
-    anchor: &std::path::Path,
-    mode: ResolveMode,
-) -> Result<String, String> {
-    // READ short-circuit: explicit id overrides branch derivation (CN-02 / AC-19).
-    // WRITE: skip the short-circuit — the branch must always be read for comparison.
-    if matches!(mode, ResolveMode::Read) {
-        if let Some(id) = explicit_id {
-            return Ok(id);
-        }
-    }
-    let repo = SystemGitRepo::discover_from(anchor)
-        .map_err(|e| format!("cannot discover git repository from {}: {e}", anchor.display()))?;
-    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-    match mode {
-        ResolveMode::Read => interactor.resolve_for_read(None).map_err(format_resolve_error),
-        ResolveMode::Write => {
-            interactor.resolve_for_write(explicit_id).map_err(|e| format_write_error(&e))
-        }
-    }
-}
-
-/// Resolves a track ID for a READ operation, anchored to the repository that
-/// owns `items_dir` (derived via [`resolve_project_root`]).
-///
-/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Read`.
-/// When `explicit_id` is `Some`, git discovery is skipped entirely (CN-02 / AC-19);
-/// `items_dir` is not validated in this case (the caller is responsible for
-/// ensuring a safe path before any filesystem probing).
-/// When `explicit_id` is `None`, `items_dir` is validated via [`resolve_project_root`]
-/// and git is discovered from the owning repo.
-/// Fail-closed on non-track branches (CN-01, AC-01, AC-02).
-///
-/// # Errors
-///
-/// Returns a human-readable error string when `explicit_id` is `None` and
-/// `items_dir` is not in the `<root>/track/items` form, or when the branch
-/// cannot be resolved.
-pub(crate) fn resolve_track_id(
-    explicit_id: Option<String>,
-    items_dir: &std::path::Path,
-) -> Result<String, String> {
-    // Short-circuit for explicit id: skip items_dir validation and git discovery
-    // entirely (CN-02 / AC-19). The inner helper would also short-circuit, but
-    // calling resolve_project_root before it would reject non-canonical items_dir
-    // paths even when git discovery is not needed.
-    if let Some(id) = explicit_id {
-        return Ok(id);
-    }
-    let project_root = resolve_project_root(items_dir)?;
-    resolve_track_id_inner(None, &project_root, ResolveMode::Read)
-}
-
-/// Resolves a track ID for a READ operation, anchored to `workspace_root`.
-///
-/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Read`.
-/// For commands that use `--workspace-root` instead of `--items-dir`.
-/// When `explicit_id` is `Some`, git discovery is skipped entirely (CN-02 / AC-19).
-///
-/// # Errors
-///
-/// Returns a human-readable error string when `workspace_root` is not inside a
-/// git repository, or when the branch cannot be resolved.
-pub(crate) fn resolve_track_id_from_root(
-    explicit_id: Option<String>,
-    workspace_root: &Path,
-) -> Result<String, String> {
-    resolve_track_id_inner(explicit_id, workspace_root, ResolveMode::Read)
-}
-
-#[cfg(test)]
-fn resolve_track_id_with_branch_reader(
-    explicit_id: Option<String>,
-    branch_reader: Arc<dyn usecase::track_resolution::BranchReaderPort>,
-) -> Result<String, String> {
-    // Delegate the full READ semantics (including the Some short-circuit) to the
-    // interactor — no git discovery is needed in tests since the stub reader is
-    // injected directly.
-    let interactor = ActiveTrackResolveInteractor::new(branch_reader);
-    interactor.resolve_for_read(explicit_id).map_err(format_resolve_error)
-}
-
-/// Resolves a track ID for a WRITE operation, anchored to the repository that
-/// owns `items_dir` (derived via [`resolve_project_root`]).
-///
-/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Write`.
-/// The git branch is always read; `explicit_id` (if `Some`) must match the
-/// branch-derived id (D7, AC-18, CN-02, CN-03). Fail-closed on mismatch or
-/// on non-track branches.
-///
-/// # Errors
-///
-/// Returns a human-readable error string when:
-/// - `items_dir` is not in the `<root>/track/items` form.
-/// - `explicit_id` is `Some` and the branch-derived id does not match.
-/// - The current branch is not a track branch.
-pub(crate) fn resolve_track_id_for_write(
-    explicit_id: Option<String>,
-    items_dir: &std::path::Path,
-) -> Result<String, String> {
-    let project_root = resolve_project_root(items_dir)?;
-    resolve_track_id_inner(explicit_id, &project_root, ResolveMode::Write)
-}
-
-/// Resolves a track ID for a WRITE operation, anchored to `workspace_root`.
-///
-/// Delegates to [`resolve_track_id_inner`] with `ResolveMode::Write`.
-/// For commands that use `--workspace-root` instead of `--items-dir` (AC-18).
-/// The git branch is always read from `workspace_root`; `explicit_id` (if `Some`)
-/// must match the branch-derived id (D7, CN-03).
-///
-/// # Errors
-///
-/// Returns a human-readable error string when:
-/// - `workspace_root` is not inside a git repository.
-/// - `explicit_id` is `Some` and the branch-derived id does not match.
-/// - The current branch is not a track branch.
-pub(crate) fn resolve_track_id_from_root_for_write(
-    explicit_id: Option<String>,
-    workspace_root: &Path,
-) -> Result<String, String> {
-    resolve_track_id_inner(explicit_id, workspace_root, ResolveMode::Write)
-}
-
-/// Formats an [`ActiveTrackResolveError`] into a user-facing CLI error string
-/// with a hint for READ operations (non-WRITE path, AC-19).
-fn format_resolve_error(e: ActiveTrackResolveError) -> String {
-    match &e {
-        ActiveTrackResolveError::Resolution(TrackResolutionError::DetachedHead) => {
-            format!(
-                "{e}\nHint: provide an explicit track-id argument, or switch to a track branch (track/<id>) first."
-            )
-        }
-        ActiveTrackResolveError::BranchRead(_) | ActiveTrackResolveError::Resolution(_) => {
-            format!(
-                "{e}\nHint: provide an explicit track-id argument, or switch to a track branch (track/<id>) first."
-            )
-        }
-        ActiveTrackResolveError::BranchMismatch { explicit_id, branch_id } => {
-            format!(
-                "WRITE operation rejected: explicit --track-id '{explicit_id}' does not match \
-                 the current branch-derived track id '{branch_id}'.\n\
-                 Hint: switch to branch 'track/{explicit_id}' first, or omit --track-id to \
-                 operate on the current branch's track."
-            )
-        }
-    }
-}
-
-/// Formats an [`ActiveTrackResolveError`] into a user-facing CLI error string
-/// for WRITE operations, preserving the existing hint messages (AC-18, D7).
-fn format_write_error(e: &ActiveTrackResolveError) -> String {
-    match e {
-        ActiveTrackResolveError::BranchMismatch { explicit_id, branch_id } => {
-            format!(
-                "WRITE operation rejected: explicit --track-id '{explicit_id}' does not match \
-                 the current branch-derived track id '{branch_id}'.\n\
-                 Hint: switch to branch 'track/{explicit_id}' first, or omit --track-id to \
-                 operate on the current branch's track."
-            )
-        }
-        ActiveTrackResolveError::Resolution(_) | ActiveTrackResolveError::BranchRead(_) => {
-            // For WRITE, a branch resolution failure means we cannot validate the explicit id.
-            format!(
-                "WRITE operation requires the current branch to be the target track branch, \
-                 but branch resolution failed: {e}\n\
-                 Hint: switch to a track branch (track/<id>) before passing --track-id."
-            )
-        }
-    }
-}
-
-pub(super) fn resolve_project_root(items_dir: &std::path::Path) -> Result<PathBuf, String> {
-    let items_name = items_dir.file_name().and_then(|name| name.to_str());
-    let track_dir = items_dir.parent();
-    let track_name = track_dir.and_then(std::path::Path::file_name).and_then(|name| name.to_str());
-    let project_root = track_dir.and_then(std::path::Path::parent);
-
-    match (items_name, track_name, project_root) {
-        (Some("items"), Some("track"), Some(root)) => {
-            // When items_dir is a bare relative path like "track/items", Path::parent()
-            // returns an empty path ("") rather than ".".  An empty path passed to
-            // Command::current_dir causes ENOENT on spawn (e.g. in render.rs's git
-            // branch discovery).  Normalise the empty root to "." so all callers get
-            // a usable current-directory path, consistent with how relative joins
-            // elsewhere in the render pipeline behave.
-            if root.as_os_str().is_empty() {
-                Ok(PathBuf::from("."))
-            } else {
-                Ok(root.to_path_buf())
-            }
-        }
-        _ => Err(format!(
-            "--items-dir must point to '<project-root>/track/items'; got {}",
-            items_dir.display()
-        )),
-    }
-}
+pub(crate) use validate::{
+    resolve_project_root, resolve_track_id, resolve_track_id_for_write, resolve_track_id_from_root,
+    resolve_track_id_from_root_for_write, validate_track_branch_str, validate_track_id_str,
+};
 
 #[derive(Debug, Subcommand)]
 pub enum TrackCommand {
@@ -905,7 +621,11 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
-    use usecase::track_resolution::{BranchReadError, BranchReaderPort};
+    use std::sync::Arc;
+    use usecase::track_resolution::{
+        ActiveTrackResolveError, ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
+        BranchReadError, BranchReaderPort, TrackResolutionError,
+    };
 
     #[derive(Debug)]
     struct StubBranchReader {
@@ -926,6 +646,57 @@ mod tests {
 
     fn branch_reader(branch: Option<&str>) -> Arc<dyn BranchReaderPort> {
         Arc::new(StubBranchReader::new(branch))
+    }
+
+    fn format_resolve_error(e: ActiveTrackResolveError) -> String {
+        match &e {
+            ActiveTrackResolveError::Resolution(TrackResolutionError::DetachedHead) => {
+                format!(
+                    "{e}\nHint: provide an explicit track-id argument, or switch to a track branch (track/<id>) first."
+                )
+            }
+            ActiveTrackResolveError::BranchRead(_) | ActiveTrackResolveError::Resolution(_) => {
+                format!(
+                    "{e}\nHint: provide an explicit track-id argument, or switch to a track branch (track/<id>) first."
+                )
+            }
+            ActiveTrackResolveError::BranchMismatch { explicit_id, branch_id } => {
+                format!(
+                    "WRITE operation rejected: explicit --track-id '{explicit_id}' does not match \
+                     the current branch-derived track id '{branch_id}'.\n\
+                     Hint: switch to branch 'track/{explicit_id}' first, or omit --track-id to \
+                     operate on the current branch's track."
+                )
+            }
+        }
+    }
+
+    fn format_write_error(e: &ActiveTrackResolveError) -> String {
+        match e {
+            ActiveTrackResolveError::BranchMismatch { explicit_id, branch_id } => {
+                format!(
+                    "WRITE operation rejected: explicit --track-id '{explicit_id}' does not match \
+                     the current branch-derived track id '{branch_id}'.\n\
+                     Hint: switch to branch 'track/{explicit_id}' first, or omit --track-id to \
+                     operate on the current branch's track."
+                )
+            }
+            ActiveTrackResolveError::Resolution(_) | ActiveTrackResolveError::BranchRead(_) => {
+                format!(
+                    "WRITE operation requires the current branch to be the target track branch, \
+                     but branch resolution failed: {e}\n\
+                     Hint: switch to a track branch (track/<id>) before passing --track-id."
+                )
+            }
+        }
+    }
+
+    fn resolve_track_id_with_branch_reader(
+        explicit_id: Option<String>,
+        branch_reader: Arc<dyn BranchReaderPort>,
+    ) -> Result<String, String> {
+        let interactor = ActiveTrackResolveInteractor::new(branch_reader);
+        interactor.resolve_for_read(explicit_id).map_err(format_resolve_error)
     }
 
     // --- resolve_track_id ---
