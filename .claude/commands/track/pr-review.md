@@ -54,22 +54,20 @@ This executes `sotp pr review-cycle` which:
 2. Creates/reuses the PR
 3. Posts `@codex review` comment on the PR
 4. Polls GitHub API for the Codex Cloud review (default: 15s interval, 10min timeout)
-5. Parses the review result (body + inline comments)
-6. Reports findings summary
+5. Collects the latest review round (sanitized `review.body` + inline comments) — without interpreting or grading them
+6. Surfaces those comments for you to judge, or reports a machine PASS when the bot signalled zero findings
 
 ## Step 3: Handle results
 
 After `cargo make track-pr-review` completes:
 
-- If **zero actionable findings (P0/P1)**: the review passed. Proceed to `/track:commit`.
-- If **findings exist**: fix the issues locally, then run `/track:pr-review` again to push, trigger a new review round, and verify fixes.
+- If the bot **signalled zero findings** (👍 reaction or a "no major issues" comment): this is a machine PASS. Proceed to `/track:commit`.
+- Otherwise the command surfaces the latest review round's comments verbatim (sanitized `review.body` + inline comments). Read them and decide which are actionable — the command does not grade them for you. Fix the actionable ones locally, then run `/track:pr-review` again to push, trigger a new round, and verify the fixes.
 
 Report to the user:
 1. PR URL
-2. Review state (APPROVED / CHANGES_REQUESTED / COMMENTED)
-3. Finding counts by severity
-4. List of actionable findings with file locations
-5. Recommended next action
+2. **Machine PASS** (zero-findings signal): state that the bot signalled zero findings and the recommended next action is `/track:commit`.
+3. **Comments surfaced**: review state (APPROVED / CHANGES_REQUESTED / COMMENTED), the review body and each inline comment with its `path:line`, your assessment of which comments are actionable, and the recommended next action.
 
 ## Async handling
 
@@ -120,6 +118,6 @@ parsed by automated reviewers.
 
 After execution, summarize:
 1. PR number and URL
-2. Review round result (pass/fail)
-3. Finding count and severity breakdown
-4. Recommended next command (`/track:pr-review` to retry, or `/track:commit <message>`)
+2. Outcome: machine PASS (zero-findings signal) or comments surfaced for judgment
+3. If comments were surfaced: the review body + inline comments with `path:line`, and your actionability assessment
+4. Recommended next command (`/track:pr-review` to retry after fixes, or `/track:commit <message>`)
