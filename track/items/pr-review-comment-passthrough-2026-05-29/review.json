@@ -67,6 +67,104 @@
           "findings": [],
           "hash": "rvw1:sha256:610ab738d8c3767e7becdd1849f97d42b56b904981fae55d74fad8ea7667e086",
           "at": "2026-05-29T07:16:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dffe4537a59482ccc8d3c29b5363a893bc4dd0a533da89a1687bfdb59b847b9",
+          "at": "2026-05-29T07:32:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2dffe4537a59482ccc8d3c29b5363a893bc4dd0a533da89a1687bfdb59b847b9",
+          "at": "2026-05-29T07:34:08Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bc6604a3bd1f1ed320be30793335eb13d3a0d687c1a27ebf53bee5fc98f082e",
+          "at": "2026-05-29T07:32:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bc6604a3bd1f1ed320be30793335eb13d3a0d687c1a27ebf53bee5fc98f082e",
+          "at": "2026-05-29T07:34:36Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ea9fd1c715d54ee9e89127c185344354b200e41f09dfdefaffe358597dcb5b0",
+          "at": "2026-05-29T07:32:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ea9fd1c715d54ee9e89127c185344354b200e41f09dfdefaffe358597dcb5b0",
+          "at": "2026-05-29T07:35:14Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_review_summary` still truncates each inline comment body to 120 characters, so the new pass-through output can silently drop the tail of a review comment and prevent the agent from judging longer findings reliably.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr/poll.rs",
+              "line": 543,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4c362862aa253c8bbcf04c3c8a27b785066ddfcca9d015b6e367c2834c251681",
+          "at": "2026-05-29T07:34:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c362862aa253c8bbcf04c3c8a27b785066ddfcca9d015b6e367c2834c251681",
+          "at": "2026-05-29T07:37:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_review_summary` still truncates each inline comment body to 120 characters before emitting it. This breaks the new pass-through contract because longer Codex review comments can lose the details the calling agent is supposed to judge.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/pr/poll.rs",
+              "line": 543,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4c362862aa253c8bbcf04c3c8a27b785066ddfcca9d015b6e367c2834c251681",
+          "at": "2026-05-29T07:39:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba88c0bb88a5b606c03ff35eae165f891e7141756f0d3fd0aad5ca852d7eeceb",
+          "at": "2026-05-29T07:42:00Z"
         }
       ]
     }
