@@ -1,0 +1,272 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bce936ceb4c0df67985d1d578e40b716ec1540a521e89e81236f63ca5a2a5baf",
+          "at": "2026-05-29T13:27:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR selects LanceDB as the first candidate stack in D2, but the reassessment trigger describes hitting sqlite-vec-style full-scan limits as a reason for a future migration to `LanceDB / USearch`. That makes the rollout baseline ambiguous: readers cannot tell whether Phase 1 starts on LanceDB as decided or on sqlite-vec with LanceDB deferred.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-29-1118-semantic-dup-detection-discoverability-gate.md",
+              "line": 91,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bce936ceb4c0df67985d1d578e40b716ec1540a521e89e81236f63ca5a2a5baf",
+          "at": "2026-05-29T13:31:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49ef5c1d2bef669335eae8863eb6284cf26472198ba047ff7520fee9f5d13629",
+          "at": "2026-05-29T13:32:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:846369f654f37b4332a18fe94841e028a1ce0fdb7e95fbfeda61286b93544c80",
+          "at": "2026-05-29T14:11:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 assigns the workspace scanner/extractor to `BuildIndexInteractor`, but the usecase design only gives interactors `EmbeddingPort` and `SemanticIndexPort` and `BuildIndexCommand` only carries `workspace_root`. With no fragment-extraction port or pre-extracted fragments in the command, implementation must either put filesystem scanning inside the usecase interactor, contradicting the stated pure-orchestrator/no-I/O hexagonal design, or leave `dup-index build` without a way to obtain fragments.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 40,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:846369f654f37b4332a18fe94841e028a1ce0fdb7e95fbfeda61286b93544c80",
+          "at": "2026-05-29T14:14:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01/IN-02 name the port implementations as `EmbeddingAdapter` and `SemanticIndexAdapter`, but the same design later declares the ports as `EmbeddingPort` and `SemanticIndexPort` in IN-07 and the usecase catalogue. This conflates adapter and port names at the spec layer, so the infrastructure tasks are grounded in the wrong named design elements.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+              "line": 45,
+              "category": "factual error"
+            },
+            {
+              "message": "T009 still says `dup-check` accepts diff fragments via `--file <path>` while the section narrative and the same sentence say the concrete interface is `--files-from <newline-separated-file>`. That leaves the required CLI surface contradictory for the implementation task.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/impl-plan.json",
+              "line": 54,
+              "category": "contradiction"
+            },
+            {
+              "message": "T003 requires `BuildIndexInteractor` to walk the filesystem and extract `CodeFragment` values, but T007 is later defined as the task that implements the scanner/extractor that `BuildIndexInteractor` calls. With T007 depending on the T003 interface, T003 cannot be completed as written without doing T007's work first or duplicating it.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/impl-plan.json",
+              "line": 18,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d5da4abf0f7158800b31f9e94e3de81e2f1938427d17b834b8ee3b5a9fbc082b",
+          "at": "2026-05-29T14:20:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "MeasureQualityInteractor is specified as a pure orchestrator that delegates entirely to EmbeddingPort and SemanticIndexPort, but the measure-quality command/API is driven by a workspace_root and even has an Io error variant. With no fragment-extraction port, pre-extracted fragments, or helper task for measure-quality, the implementation must either do filesystem scanning inside this supposedly pure interactor or cannot obtain the Rust source fragments needed for AC-03.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 17,
+              "category": "contradiction"
+            },
+            {
+              "message": "SimilarityScore is defined as a cosine similarity score constrained to [0.0, 1.0], and the plan tests rejection of negative values, but raw cosine similarity can be negative and AC-03 requires measuring the cosine similarity distribution. This makes valid cosine results unrepresentable unless the design explicitly normalizes them before constructing SimilarityScore.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/domain-types.json",
+              "line": 71,
+              "category": "factual error"
+            },
+            {
+              "message": "The measure-quality design promises a false_positive_rate, but MeasureQualityCommand only supplies workspace_root and T009 only wires --workspace-root. A false-positive rate requires a definition of positives/negatives or labelled/evaluation input; with only an unlabeled workspace the task can output a score distribution, but not a meaningful false-positive rate for the ADR's PoC decision.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/usecase-types.json",
+              "line": 199,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:99ffb5a0ea9bf037576ac0152b7da6b00d2583c126b77834a2e06f93abf3eff3",
+          "at": "2026-05-29T14:28:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 places the recursive Rust-file scanner in `libs/usecase/src/semantic_dup.rs` and has the interactors perform filesystem traversal. That is a wrong layer placement for this repository's hexagonal convention: usecase is supposed to stay an orchestration layer and filesystem I/O belongs outside it or behind an infrastructure port. Implementing this plan as written will bake a layer violation into the implementation plan.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 40,
+              "category": "architecture violation"
+            },
+            {
+              "message": "The plan says T007 depends only on T001, but the same task also surfaces failures as `BuildIndexError::Io` and replaces the `BuildIndexInteractor` stub. Those symbols are introduced by T002/T003, so T007 cannot be implemented or tested as a T001-only task. The dependency ordering is internally inconsistent and can send implementers into an impossible task split.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 38,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:1fb9ad58022143c4362a56f96f67c3273d0a8d1548f9cb211ac8c9222b55c85b",
+          "at": "2026-05-29T14:32:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 requires the workspace scanner/extractor to live in `libs/usecase/src/semantic_dup.rs` and use `std::fs`, and states that this is accepted. That contradicts the required hexagonal convention's Usecase Layer Purity Rules, which explicitly forbid `std::fs::*` in usecase and direct file reading to CLI or an adapter boundary. Implementing the plan as written would bake in a usecase-purity/layer violation.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 40,
+              "category": "architecture violation"
+            },
+            {
+              "message": "S2 says `MeasureQualityInteractor` is a pure orchestrator that delegates entirely to `EmbeddingPort` and `SemanticIndexPort`, but T003 later says it walks `MeasureQualityCommand.workspace_root` to extract fragments. With no extraction port or pre-extracted fragments in the command, the plan is internally contradictory about whether this interactor performs filesystem scanning or remains a pure orchestrator.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:305018904d0f4309a0bc77ade98f93de325dc5df89c5db68889365c83ba0b89a",
+          "at": "2026-05-29T14:37:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BuildIndexInteractor` is still documented as scanning workspace Rust files, but the plan explicitly says all interactors are pure usecase orchestrators with no filesystem I/O and that extraction is done by the infrastructure helper before constructing `BuildIndexCommand`. If implementers follow this catalogue text, the usecase layer will own filesystem scanning, contradicting the hexagonal split fixed elsewhere in the plan.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/usecase-types.json",
+              "line": 314,
+              "category": "contradiction"
+            },
+            {
+              "message": "T001 says `SemanticDupError` should be implemented with `Debug/Clone/Copy/Display/Error` “as specified in domain-types.json”, but the domain catalogue only declares `Debug`, `Display`, and `Error` for `SemanticDupError`. Following the task text would add trait implementations that the catalogue does not specify, so the implementation plan and the type contract disagree.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 12,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6861f7c3acf9168b7b4d4034a78acd143a7b5fd8d688276253345a59895fe754",
+          "at": "2026-05-29T14:44:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 requires `sotp find-similar` to let callers specify `k`, but the CLI task only lists parsing fragment text / `--file` for find-similar and `--workspace-root` for build. Since T008 is the CLI wiring task that claims to cover AC-01, the implementation plan does not actually instruct implementers to expose the required top-k option.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 49,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-03/IN-05 require the quality measurement output to include the cosine similarity distribution and false-positive rate, but `QualityMetrics` only contains `mean_score` and `false_positive_rate`. A mean is not a distribution, so the type catalogue cannot satisfy the stated measurement output contract.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/usecase-types.json",
+              "line": 237,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2e14a8a42189d7c20478d302ed91a70f5babbf5f3656e881f11924d122943579",
+          "at": "2026-05-29T14:49:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03/IN-05 require the quality command to report the cosine similarity distribution for threshold calibration, but `QualityMetrics` represents that distribution using `SimilarityScore`; `SimilarityScore` is defined as a clamped/normalized [0,1] value even though the same catalogue acknowledges raw cosine is [-1,1]. That means negative cosine values are collapsed before the mean/distribution is reported, so the plan no longer measures the cosine distribution it says it will measure.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/usecase-types.json",
+              "line": 246,
+              "category": "contradiction"
+            },
+            {
+              "message": "`sotp find-similar` is specified to accept raw fragment text, and T008 constructs `FindSimilarCommand { fragment, top_k }` from that text, but the only fragment type is `CodeFragment` and it requires an originating `source_path`. The plan does not define a pathless query-fragment type or an explicit sentinel path, so the raw-text CLI contract is inconsistent with the type design and would require inventing fake source metadata.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/domain-types.json",
+              "line": 14,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:526b1ed641a95dec0530a3e84b359f69dd2fb1b98c02c6d5dc1abb528ab0abfe",
+          "at": "2026-05-29T14:53:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03/IN-05 require the quality command to output the cosine similarity distribution and false-positive rate, but `QualityMetrics` only carries mean, standard deviation, and a heuristic false-positive field. Since T009 only serializes these metrics, the plan cannot satisfy the stated measurement contract or provide the distribution needed for threshold calibration.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/usecase-types.json",
+              "line": 237,
+              "category": "contradiction"
+            },
+            {
+              "message": "`false_positive_rate` is defined as the fraction of randomly sampled cross-file pairs above the threshold, treating them as non-duplicates. That is not a meaningful false-positive rate without labeled positives/negatives, so the plan's PoC metric does not actually measure the ADR/spec requirement it claims to cover.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/usecase-types.json",
+              "line": 246,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:316a149e35334e39008b057e64ee0061a519b4843e10f90b9d4c871570dd32c5",
+          "at": "2026-05-29T14:57:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03/IN-05 require the quality command to report a false-positive rate, but the planned `QualityMetrics` only exposes `above_threshold_rate` and explicitly defines it as a proxy from unlabeled random cross-file pairs. Since T003/T009 only compute and serialize these metrics, the plan cannot satisfy the stated measurement contract unless it either adds labeled/evaluation input for a true false-positive rate or relaxes the spec to require the proxy metric instead.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/usecase-types.json",
+              "line": 247,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a0c19bfeb3c3356f66e7a4e21a241dd560e4c1f7a5d0c097a48401ccfdd9001a",
+          "at": "2026-05-29T15:00:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92e70d5448584915d9d61b5ca243883e52476744655e77eb2706a2589becbe0c",
+          "at": "2026-05-29T15:09:17Z"
+        }
+      ]
+    }
+  }
+}

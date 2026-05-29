@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "semantic-dup-detection-2026-05-29",
+  "title": "コード意味重複検出による DRY 防止（discoverability + soft gate）",
+  "branch": "track/semantic-dup-detection-2026-05-29",
+  "created_at": "2026-05-29T13:21:25Z",
+  "updated_at": "2026-05-29T13:21:25Z"
+}

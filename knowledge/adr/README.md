@@ -177,6 +177,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | ADR | Status | Date |
 |-----|--------|------|
 | [`cargo make llvm-cov` を nextest 経路に統一する](2026-04-27-0124-llvm-cov-nextest-harness-alignment.md) | — | 2026-04-27 |
+| [コード意味重複検出による DRY 防止（discoverability + soft gate）](2026-05-29-1118-semantic-dup-detection-discoverability-gate.md) | — | 2026-05-29 |
 
 ### Review コマンド / API
 

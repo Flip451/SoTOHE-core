@@ -1,0 +1,107 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "FastEmbedAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup::embedding",
+      "docs": "Infrastructure adapter implementing EmbeddingPort using fastembed-rs (ONNX Runtime, Jina v2 base code model, synchronous API, Tokio-independent). CN-04: fastembed-rs / ort dependencies are confined to infrastructure.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-01",
+          "hash": "0218d661039306562673d17fa84af958eb1c6c73ffa5a59e3a3bcefae7c9270f"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "LanceDbSemanticIndexAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup::index",
+      "docs": "Infrastructure adapter implementing SemanticIndexPort using LanceDB (local file DB, Apache 2.0, official Rust SDK). CN-04: lancedb dependency is confined to infrastructure.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-02",
+          "hash": "2af161a605bcc29ff92fa5b4e66576542eaa485ac3b57ee242d62412ad444386"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "FastEmbedAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Result<FastEmbedAdapter, usecase::semantic_dup::EmbeddingError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "db_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<LanceDbSemanticIndexAdapter, usecase::semantic_dup::SemanticIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "trait_ref": "usecase::semantic_dup::EmbeddingPort",
+      "for_type": "FastEmbedAdapter"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FastEmbedAdapter"
+    },
+    {
+      "trait_ref": "usecase::semantic_dup::SemanticIndexPort",
+      "for_type": "LanceDbSemanticIndexAdapter"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LanceDbSemanticIndexAdapter"
+    }
+  ]
+}

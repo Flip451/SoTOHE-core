@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "452976c1e7d966f7aa62a86e19bcd33819683d82c1e3c76a92831741bac7d860",
+  "signals": [
+    {
+      "type_name": "FastEmbedAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "signal": "blue"
+    }
+  ]
+}

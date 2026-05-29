@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-29T15:11:01Z",
+  "declaration_hash": "452976c1e7d966f7aa62a86e19bcd33819683d82c1e3c76a92831741bac7d860",
+  "signals": [
+    {
+      "type_name": "FastEmbedAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "EmbeddingPort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "SemanticIndexPort",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}
