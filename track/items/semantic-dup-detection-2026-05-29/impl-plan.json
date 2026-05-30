@@ -40,17 +40,18 @@
     {
       "id": "T007",
       "description": "Implement the workspace Rust-file scanner and code-fragment extractor in `libs/infrastructure/src/semantic_dup/extractor.rs`. This is a standalone helper (no port implementation) that uses `std::fs` to walk a workspace root recursively, find `*.rs` files, and yield `Vec<CodeFragment>`. It is called by the CLI composition root (T008/T009) before constructing `BuildIndexCommand` or `MeasureQualityCommand`. IO errors from this extractor are propagated by the CLI; the CLI may wrap them in `BuildIndexError::Io` / `MeasureQualityError::Io` (defined in T002/T003). This task depends on T001 (`CodeFragment` type) and T004 (infrastructure dependency gating must be complete). Granularity decision (per this plan): one fragment per function or top-level `impl` block, extracted by splitting on `fn ` and `impl ` boundaries. Rationale: item-level granularity captures the semantic unit most likely to be re-implemented, without exploding index size. Document this choice in the extractor's `///` doc comment.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "66b9997e307d5177b9dc89d560cf205089846595"
     },
     {
       "id": "T008",
       "description": "Wire CLI subcommands for `sotp find-similar` and `sotp dup-index build` in `apps/cli/src/commands/` (or `apps/cli-composition`): `find-similar` parses fragment text or `--file <path>` and `--top-k <k>` (optional, default 5 per AC-01); constructs `FindSimilarCommand { fragment, top_k }`, invokes `FindSimilarInteractor`; outputs top-k results as `path | score | content_snippet`. `dup-index build` parses `--workspace-root` and `--db-path`; calls the T007 infrastructure extractor to obtain `Vec<CodeFragment>`, constructs `BuildIndexCommand { fragments }`, constructs `FastEmbedAdapter` and `LanceDbSemanticIndexAdapter`, invokes `BuildIndexInteractor.build_index(cmd)`; prints fragment count on success. Exit 0 on success.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T009",
       "description": "Wire CLI subcommands for `sotp dup-check` (soft gate) and `sotp dup-index measure-quality` in `apps/cli/src/commands/`: `dup-check` accepts diff fragments via `--files-from <newline-separated-file>` (each line is a path to a fragment file), reads each file to construct `CodeFragment` values, builds `DupCheckCommand { fragments, threshold }`, and invokes `DupCheckInteractor`; if warnings exist, print them to stderr and continue (exit 0 per CN-02/AC-04). `dup-check` also supports `--ack` / `--ack-file` flag that records an acknowledgement hash and suppresses warnings on re-run (AC-05). `measure-quality` accepts `--workspace-root`, calls the T007 infrastructure extractor to get fragments, builds `MeasureQualityCommand { fragments }`, invokes `MeasureQualityInteractor`, and outputs JSON metrics to stdout (AC-03).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T010",

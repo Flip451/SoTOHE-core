@@ -1,6 +1,293 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 160,
+              "category": "domain invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:25:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
+          "at": "2026-05-29T15:27:41Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`semantic_dup_check` silently ignores `ack = true` when `ack_file` is `None`, so a public caller can request ack persistence and get a success result with no file written. That makes the exported DTO accept an illegal state and drops the user's `--ack` intent without an error. Reject this combination up front or make the invariant unrepresentable in the input type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 292,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f481ebfc06c6b8801a3c3ee45a82e220945c1bae401eda0b2f4335969e81e596",
+          "at": "2026-05-30T04:24:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
+          "at": "2026-05-30T04:27:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
+          "at": "2026-05-30T04:30:40Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:32:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:34:52Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:15:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:33:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:43:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:44:12Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
+          "at": "2026-05-30T01:11:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
+          "at": "2026-05-30T01:33:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`search()` interprets LanceDB results as cosine similarity (`1.0 - _distance`, then clamp to `[0,1]`), but the query never sets `DistanceType::Cosine`. LanceDB `vector_search` defaults to L2, so this adapter will rank by L2 while reporting cosine-based scores, which can collapse most results to `0.0` and makes the returned similarities incorrect.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 182,
+              "category": "incorrect metric"
+            },
+            {
+              "message": "`search()` treats any `open_table()` failure as “table missing” and returns `Ok(Vec::new())`. That silently hides real storage errors such as permission failures, corruption, or schema problems; only `TableNotFound` should be converted to an empty result set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 177,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:1fd1efa920d3b055df9ccb303a9bd98f52cbc69bad79be2f5288b0a10fec65aa",
+          "at": "2026-05-30T02:47:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LanceDbSemanticIndexAdapter` calls `Runtime::block_on` in `new`, `insert`, and `search`. Tokio documents that `block_on` panics when invoked from an async execution context, so constructing or using this adapter from async code will crash instead of returning `SemanticIndexError`. That is a panic path in library code.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 67,
+              "category": "panic"
+            },
+            {
+              "message": "The first-insert path is a non-atomic `open_table(...); if missing -> create_table(...)` sequence. Because `insert` is `&self` and the adapter is `Send + Sync`, two callers can race on an empty database: both observe \"table not found\", one creates the table, and the other fails with a spurious `TableAlreadyExists`/`InsertFailed`, dropping the insert. Use LanceDB's create-if-exists mode or retry on table-exists.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 133,
+              "category": "concurrency"
+            }
+          ],
+          "hash": "rvw1:sha256:9e4bb28eb383e2399ffb0f9ed55091a57d24e921434b9de8e474898b61d5baae",
+          "at": "2026-05-30T02:57:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`std::thread::spawn` panics if the OS cannot create a new thread, so this helper can crash the library instead of returning a `Result`. The same pattern also appears in `new()` at line 83, which means `insert`/`search` inherit an unrecoverable panic path under thread-exhaustion or spawn failure.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 134,
+              "category": "panic"
+            },
+            {
+              "message": "`to_string_lossy()` silently rewrites non-UTF-8 paths, so `new()` can open/create the wrong LanceDB directory on Unix, and `insert()` stores `source_path` values that cannot round-trip back to the original `PathBuf`. That loses user data for any fragment or database path containing invalid UTF-8 bytes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 81,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d92b96f8b0bc2e4511f413e48e64a24e410db5cc6b46a8d5d074e6e917a93a90",
+          "at": "2026-05-30T03:11:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A `current_thread` Tokio runtime is paired with `Handle::block_on` in both `new()` and `block_on_thread()`, but `Handle::block_on` does not drive a current-thread runtime. LanceDB's async `connect`/`open_table`/`add`/`search` futures will not make progress unless some thread is concurrently calling `Runtime::block_on`, so this adapter can hang or fail at startup and on every index operation.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 73,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d92b96f8b0bc2e4511f413e48e64a24e410db5cc6b46a8d5d074e6e917a93a90",
+          "at": "2026-05-30T03:12:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac26e7c4f8c06563324fdf65c81e692f4638d1babdac54e3f43731c873fafc68",
+          "at": "2026-05-30T03:19:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_table_not_found` does not match LanceDB's actual missing-table error text (`Table '{name}' was not found`), so the fresh-database path never triggers. As a result, the intended first-run behavior in `insert` and `search` is broken: both will surface `InsertFailed`/`SearchFailed` instead of creating the table or returning an empty result set. Match `lancedb::Error::TableNotFound` directly instead of substring-searching `to_string()`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 343,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ac26e7c4f8c06563324fdf65c81e692f4638d1babdac54e3f43731c873fafc68",
+          "at": "2026-05-30T03:20:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35c313ed30b50f8c363ab92352beeb829b1b2ce663bd2b76cfa8f5a74497e097",
+          "at": "2026-05-30T03:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LanceDbSemanticIndexAdapter` owns a `tokio::runtime::Runtime` directly, but the adapter is explicitly made safe to construct and call from an existing Tokio executor by using bridge threads. If such an adapter is dropped inside that async context, Tokio's runtime destructor can panic while shutting down its blocking pool. This leaves a library-level panic path despite the no-panics rule; store the runtime in an `Option` and move/shutdown it from a non-runtime thread in `Drop`, or otherwise avoid owning a `Runtime` with normal in-context destruction.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 48,
+              "category": "panic"
+            },
+            {
+              "message": "`FastEmbedAdapter::new` does not honor the documented/plan-required `FASTEMBED_CACHE_PATH` cache override. The code uses `InitOptions::new(...)` without `with_cache_dir`, and fastembed 5.14's built-in lookup uses `FASTEMBED_CACHE_DIR`/`HF_HOME` instead, so CI or operators following this adapter's docs will have their pre-populated cache ignored and may trigger a runtime model download into the default cache location.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 49,
+              "category": "configuration"
+            }
+          ],
+          "hash": "rvw1:sha256:35c313ed30b50f8c363ab92352beeb829b1b2ce663bd2b76cfa8f5a74497e097",
+          "at": "2026-05-30T03:33:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e5cbba62cfc7ecba261d5cb56e6ad5a0217f68f429b303e2a99827d088b2cc6",
+          "at": "2026-05-30T03:41:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:071d1a8b3d1999a802a7e3c30ba8a17ad44c7c2527de4c6f4257886cf1595f82",
+          "at": "2026-05-30T04:05:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:071d1a8b3d1999a802a7e3c30ba8a17ad44c7c2527de4c6f4257886cf1595f82",
+          "at": "2026-05-30T04:10:53Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -476,209 +763,79 @@
           "findings": [],
           "hash": "rvw1:sha256:f1017dcb1607e225586420f716f04a2f783dca1446fb8861dc6442eaaff7461c",
           "at": "2026-05-30T04:06:46Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
-          "at": "2026-05-30T01:11:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
-          "at": "2026-05-30T01:33:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`search()` interprets LanceDB results as cosine similarity (`1.0 - _distance`, then clamp to `[0,1]`), but the query never sets `DistanceType::Cosine`. LanceDB `vector_search` defaults to L2, so this adapter will rank by L2 while reporting cosine-based scores, which can collapse most results to `0.0` and makes the returned similarities incorrect.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 182,
-              "category": "incorrect metric"
-            },
-            {
-              "message": "`search()` treats any `open_table()` failure as “table missing” and returns `Ok(Vec::new())`. That silently hides real storage errors such as permission failures, corruption, or schema problems; only `TableNotFound` should be converted to an empty result set.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 177,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:1fd1efa920d3b055df9ccb303a9bd98f52cbc69bad79be2f5288b0a10fec65aa",
-          "at": "2026-05-30T02:47:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`LanceDbSemanticIndexAdapter` calls `Runtime::block_on` in `new`, `insert`, and `search`. Tokio documents that `block_on` panics when invoked from an async execution context, so constructing or using this adapter from async code will crash instead of returning `SemanticIndexError`. That is a panic path in library code.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 67,
-              "category": "panic"
-            },
-            {
-              "message": "The first-insert path is a non-atomic `open_table(...); if missing -> create_table(...)` sequence. Because `insert` is `&self` and the adapter is `Send + Sync`, two callers can race on an empty database: both observe \"table not found\", one creates the table, and the other fails with a spurious `TableAlreadyExists`/`InsertFailed`, dropping the insert. Use LanceDB's create-if-exists mode or retry on table-exists.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 133,
-              "category": "concurrency"
-            }
-          ],
-          "hash": "rvw1:sha256:9e4bb28eb383e2399ffb0f9ed55091a57d24e921434b9de8e474898b61d5baae",
-          "at": "2026-05-30T02:57:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`std::thread::spawn` panics if the OS cannot create a new thread, so this helper can crash the library instead of returning a `Result`. The same pattern also appears in `new()` at line 83, which means `insert`/`search` inherit an unrecoverable panic path under thread-exhaustion or spawn failure.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 134,
-              "category": "panic"
-            },
-            {
-              "message": "`to_string_lossy()` silently rewrites non-UTF-8 paths, so `new()` can open/create the wrong LanceDB directory on Unix, and `insert()` stores `source_path` values that cannot round-trip back to the original `PathBuf`. That loses user data for any fragment or database path containing invalid UTF-8 bytes.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 81,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d92b96f8b0bc2e4511f413e48e64a24e410db5cc6b46a8d5d074e6e917a93a90",
-          "at": "2026-05-30T03:11:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "A `current_thread` Tokio runtime is paired with `Handle::block_on` in both `new()` and `block_on_thread()`, but `Handle::block_on` does not drive a current-thread runtime. LanceDB's async `connect`/`open_table`/`add`/`search` futures will not make progress unless some thread is concurrently calling `Runtime::block_on`, so this adapter can hang or fail at startup and on every index operation.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 73,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d92b96f8b0bc2e4511f413e48e64a24e410db5cc6b46a8d5d074e6e917a93a90",
-          "at": "2026-05-30T03:12:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ac26e7c4f8c06563324fdf65c81e692f4638d1babdac54e3f43731c873fafc68",
-          "at": "2026-05-30T03:19:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`is_table_not_found` does not match LanceDB's actual missing-table error text (`Table '{name}' was not found`), so the fresh-database path never triggers. As a result, the intended first-run behavior in `insert` and `search` is broken: both will surface `InsertFailed`/`SearchFailed` instead of creating the table or returning an empty result set. Match `lancedb::Error::TableNotFound` directly instead of substring-searching `to_string()`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 343,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ac26e7c4f8c06563324fdf65c81e692f4638d1babdac54e3f43731c873fafc68",
-          "at": "2026-05-30T03:20:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35c313ed30b50f8c363ab92352beeb829b1b2ce663bd2b76cfa8f5a74497e097",
-          "at": "2026-05-30T03:28:06Z"
+          "hash": "rvw1:sha256:85d690ec0d0020326d29ec1c969d6209cd25f36f492b46bc0e447224c6ddd2fc",
+          "at": "2026-05-30T04:20:41Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`LanceDbSemanticIndexAdapter` owns a `tokio::runtime::Runtime` directly, but the adapter is explicitly made safe to construct and call from an existing Tokio executor by using bridge threads. If such an adapter is dropped inside that async context, Tokio's runtime destructor can panic while shutting down its blocking pool. This leaves a library-level panic path despite the no-panics rule; store the runtime in an `Option` and move/shutdown it from a non-runtime thread in `Drop`, or otherwise avoid owning a `Runtime` with normal in-context destruction.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 48,
-              "category": "panic"
-            },
-            {
-              "message": "`FastEmbedAdapter::new` does not honor the documented/plan-required `FASTEMBED_CACHE_PATH` cache override. The code uses `InitOptions::new(...)` without `with_cache_dir`, and fastembed 5.14's built-in lookup uses `FASTEMBED_CACHE_DIR`/`HF_HOME` instead, so CI or operators following this adapter's docs will have their pre-populated cache ignored and may trigger a runtime model download into the default cache location.",
+              "message": "The plan-artifacts briefing says this scope is only T008/T009 bookkeeping, with only those two statuses moving to `in_progress`, but `impl-plan.json` also marks T007 as `done` and adds a `commit_hash`. That extra task-state transition changes the rendered plan to `7/11 resolved` and claims T007 completion, so the artifact no longer matches the intended bookkeeping scope for this change.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 49,
-              "category": "configuration"
+              "file": "track/items/semantic-dup-detection-2026-05-29/impl-plan.json",
+              "line": 43,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:35c313ed30b50f8c363ab92352beeb829b1b2ce663bd2b76cfa8f5a74497e097",
-          "at": "2026-05-30T03:33:20Z"
+          "hash": "rvw1:sha256:85d690ec0d0020326d29ec1c969d6209cd25f36f492b46bc0e447224c6ddd2fc",
+          "at": "2026-05-30T04:22:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 is marked `done` with a `commit_hash`, but this plan-artifact update is scoped to T008/T009 bookkeeping only. That also drives the generated plan to show 7/11 resolved and T007 checked, so the artifact now records an extra task-state transition outside the described plan update.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/impl-plan.json",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:85d690ec0d0020326d29ec1c969d6209cd25f36f492b46bc0e447224c6ddd2fc",
+          "at": "2026-05-30T04:24:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The scope briefing says this bookkeeping change should only move T008 and T009 to `in_progress`, but `impl-plan.json` also marks T007 as `done` and adds a completion hash, with the generated plan rendering T007 as checked. That records an extra task completion outside the stated T008/T009 cycle; either revert T007 to its prior in-progress state in these artifacts or include/justify the T007 completion in the scope.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/impl-plan.json",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:85d690ec0d0020326d29ec1c969d6209cd25f36f492b46bc0e447224c6ddd2fc",
+          "at": "2026-05-30T04:30:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0e5cbba62cfc7ecba261d5cb56e6ad5a0217f68f429b303e2a99827d088b2cc6",
-          "at": "2026-05-30T03:41:31Z"
+          "hash": "rvw1:sha256:5e5153ba5db76775041ee4739e3bfeeff1179f221cee32f8c5c10ebf7f601793",
+          "at": "2026-05-30T04:32:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:071d1a8b3d1999a802a7e3c30ba8a17ad44c7c2527de4c6f4257886cf1595f82",
-          "at": "2026-05-30T04:05:29Z"
+          "hash": "rvw1:sha256:85d690ec0d0020326d29ec1c969d6209cd25f36f492b46bc0e447224c6ddd2fc",
+          "at": "2026-05-30T04:35:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:071d1a8b3d1999a802a7e3c30ba8a17ad44c7c2527de4c6f4257886cf1595f82",
-          "at": "2026-05-30T04:10:53Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:15:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:33:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:43:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:44:12Z"
+          "hash": "rvw1:sha256:85d690ec0d0020326d29ec1c969d6209cd25f36f492b46bc0e447224c6ddd2fc",
+          "at": "2026-05-30T04:36:59Z"
         }
       ]
     },
@@ -722,54 +879,80 @@
         }
       ]
     },
-    "domain": {
+    "cli": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FindSimilarArgs` leaves both `fragment` and `file` optional, so `sotp find-similar` with no query parses successfully and only fails later in `resolve_fragment_text`. The briefing explicitly assigns this layer the `find-similar <fragment>` / `--file` parse contract, so the CLI help/usage and validation are currently out of sync with AC-01.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 23,
+              "category": "cli parsing"
+            },
+            {
+              "message": "`dup-index measure-quality` is specified here as a `--workspace-root` command, but this CLI adds and forwards `--db-path` for that subcommand. That leaks an irrelevant index-path dependency into AC-03: the downstream measure-quality wiring opens the DB path before computing metrics, so a bad or unwritable path can make the command fail even though the quality calculation is defined only from workspace fragments.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 86,
+              "category": "requirements coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
+          "at": "2026-05-30T04:26:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "line": 23,
+              "category": "cli parsing"
+            },
+            {
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "line": 86,
+              "category": "requirements coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
+          "at": "2026-05-30T04:27:03Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
-          "at": "2026-05-29T15:22:49Z"
+          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
+          "at": "2026-05-30T04:33:13Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
+              "message": "`read_lines_file` takes `&PathBuf`, which triggers Clippy's default `ptr_arg` warning. This repo runs Clippy with `-D warnings` in `clippy-local`/`ci-rust`, so the new CLI scope will fail the required gate even though the code would compile. Change the helper to accept `&Path` and import/use `std::path::Path`.",
               "severity": "P1",
-              "file": "libs/domain/src/semantic_dup.rs",
-              "line": 160,
-              "category": "domain invariant"
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 199,
+              "category": "ci"
             }
           ],
-          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
-          "at": "2026-05-29T15:25:09Z"
+          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
+          "at": "2026-05-30T04:37:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
-          "at": "2026-05-29T15:27:41Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
-          "at": "2026-05-30T01:32:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
-          "at": "2026-05-30T01:34:52Z"
+          "hash": "rvw1:sha256:3ac4e04528714b3152bd73a5bd9d754cc5c4131f9a8acc92d3dc4f8d11a52e14",
+          "at": "2026-05-30T04:40:13Z"
         }
       ]
     }

@@ -72,6 +72,15 @@ enum CliCommand {
     },
     /// Replaces Makefile.toml shell wrappers with safe Rust dispatch.
     Make(commands::make::MakeArgs),
+    /// Find semantically similar code fragments in the index (information-only).
+    FindSimilar(commands::semantic_dup::FindSimilarArgs),
+    /// Manage the semantic duplicate detection index (build, measure-quality).
+    DupIndex {
+        #[command(subcommand)]
+        cmd: commands::semantic_dup::DupIndexCommand,
+    },
+    /// Check diff fragments for semantic near-duplicates (soft gate, exit 0).
+    DupCheck(commands::semantic_dup::DupCheckArgs),
     /// Run the example track state machine demo.
     Demo,
 }
@@ -91,6 +100,9 @@ fn main() -> ExitCode {
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
         Some(CliCommand::Make(args)) => commands::make::execute(args),
+        Some(CliCommand::FindSimilar(args)) => commands::semantic_dup::execute_find_similar(args),
+        Some(CliCommand::DupIndex { cmd }) => commands::semantic_dup::execute_dup_index(cmd),
+        Some(CliCommand::DupCheck(args)) => commands::semantic_dup::execute_dup_check(args),
         Some(CliCommand::Demo) | None => match CliApp::new().demo() {
             Ok(outcome) => {
                 if let Some(msg) = outcome.stdout {

@@ -18,6 +18,7 @@ mod hook;
 mod make;
 mod pr;
 pub mod review_v2;
+mod semantic_dup;
 mod track;
 mod verify;
 
@@ -28,6 +29,9 @@ mod verify;
 pub use domain::ExportSchemaInput;
 pub use review_v2::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
+};
+pub use semantic_dup::{
+    DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
 };
 
 // ---------------------------------------------------------------------------
