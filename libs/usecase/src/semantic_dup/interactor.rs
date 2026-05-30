@@ -321,35 +321,37 @@ impl MeasureQualityService for MeasureQualityInteractor {
     /// cosine similarities on the sample, and return the resulting distribution
     /// as [`QualityMetrics`].
     ///
-    /// Similarities are computed only on **randomly sampled cross-file pairs**
-    /// (fragments from different source paths), which is the PoC proxy for
-    /// false-positive risk (AC-03/IN-05).  Self-pairs (same source path) are
-    /// always excluded.
+    /// Similarities are computed only on **cross-file pairs** (fragments from
+    /// different source paths), which is the PoC proxy for false-positive risk
+    /// (AC-03/IN-05).  Self-pairs (same source path) are always excluded.
     ///
     /// When fewer than two fragments are present, or no cross-file pairs
     /// exist, all metrics are returned as `0.0`.
     ///
-    /// ## Implementation: bounded pair sampling (AC-03 conformant)
+    /// ## Implementation: cross-file-pair-count-based branching (AC-03 conformant)
     ///
     /// The method is **deterministic** for a given input: all random choices
     /// derive from a seed that is a pure function of `n` (the fragment count),
     /// with no wall-clock or external entropy, satisfying CN-04/AC-03.
     ///
-    /// Let `total_pairs = n*(n-1)/2`:
+    /// Let `cross_file_pairs` = C(n,2) − Σ C(|bucket|,2) where each bucket
+    /// groups fragments sharing the same `source_path`.  This count is computed
+    /// in O(n) without any O(n²) scan.
     ///
-    /// - **Exact branch** (`total_pairs ≤ PAIR_BUDGET`): enumerate all i<j
-    ///   pairs in order, skip same-source-path, compute cosine for each
-    ///   cross-file pair.  Metrics are exact (no sampling approximation).
+    /// - **Exact branch** (`cross_file_pairs ≤ PAIR_BUDGET`): enumerate
+    ///   cross-file pairs DIRECTLY by iterating over each unordered pair of
+    ///   distinct buckets and their cartesian product, computing one cosine per
+    ///   pair.  Produces exactly `cross_file_pairs` cosines in O(cross_file_pairs).
+    ///   Metrics are exact (no sampling approximation).
     ///
-    /// - **Sampled branch** (`total_pairs > PAIR_BUDGET`): draw random pairs
-    ///   with replacement using a XorShift64 PRNG seeded from `(n as u64) | 1`
-    ///   (never zero).  Each draw picks indices `a, b` in `[0, n)` via
-    ///   Lemire's multiply-high method (bias-free); pairs where `a == b` or
-    ///   both fragments share a source path are retried.  Sampling stops when
-    ///   `PAIR_BUDGET` cross-file cosines are collected or the attempt cap
-    ///   (`PAIR_BUDGET * 64`) is reached (guards against corpora where
-    ///   cross-file pairs are extremely sparse).  Metrics are then computed
-    ///   from the collected sample (an unbiased estimate per AC-03).
+    /// - **Sampled branch** (`cross_file_pairs > PAIR_BUDGET`): O(b)-preprocessing
+    ///   row-CDF two-step sampling (b = number of distinct source paths; b ≤ n).
+    ///   A b-entry row CDF is built in O(b); each draw uses `lemire_exact_u128`
+    ///   (bias-free, Lemire 2019 scaled to u128), an O(log b) binary search, and O(1) arithmetic.
+    ///   Every draw is a valid cross-file pair; the budget is always filled
+    ///   regardless of same-file-pair density.  Seeded from `(n as u64) | 1`
+    ///   (deterministic).  Metrics are computed from the sample (an unbiased
+    ///   estimate per AC-03).
     ///
     /// All metrics (mean, population std-dev, 7 percentiles, above-threshold
     /// rate) are derived from the collected sample `Vec<f32>`.
@@ -460,14 +462,47 @@ fn xorshift64_next(state: &mut u64) -> u64 {
     *state
 }
 
-/// Draw a bias-free uniform random index in `[0, n)` from a 64-bit PRNG value
-/// using Lemire's multiply-high method (2019).
+/// Draw a bias-free uniform random index in `[0, range)` for a u128 `range`
+/// using two XorShift64 draws combined into a 128-bit value.
 ///
-/// `rng_val` is the raw 64-bit PRNG output; `n` must be > 0.
-#[inline]
-fn lemire_index(rng_val: u64, n: usize) -> usize {
-    // floor(rng_val * n / 2^64) using 128-bit intermediate — exact, no modulo bias.
-    (((rng_val as u128).wrapping_mul(n as u128)) >> 64) as usize
+/// Applies the Lemire 2019 multiply-high approach scaled to 128-bit inputs,
+/// with a rejection step to eliminate residual bias.  `range` must be > 0.
+fn lemire_exact_u128(rng: &mut u64, range: u128) -> u128 {
+    // Draw a 128-bit random word from two consecutive u64 PRNG values.
+    let draw_u128 = |rng: &mut u64| -> u128 {
+        let lo = xorshift64_next(rng) as u128;
+        let hi = xorshift64_next(rng) as u128;
+        (hi << 64) | lo
+    };
+    // floor(x * range / 2^128): 4-limb schoolbook multiply, keeping top 128 bits.
+    // x = x_hi*2^64 + x_lo, range = r_hi*2^64 + r_lo; mid carries accumulate at 2^64.
+    let mul_high_u128 = |x: u128| -> u128 {
+        let (x_lo, x_hi) = (x & (u64::MAX as u128), x >> 64);
+        let (r_lo, r_hi) = (range & (u64::MAX as u128), range >> 64);
+        let (ll, lh, hl, hh) = (
+            x_lo.wrapping_mul(r_lo),
+            x_lo.wrapping_mul(r_hi),
+            x_hi.wrapping_mul(r_lo),
+            x_hi.wrapping_mul(r_hi),
+        );
+        let mid =
+            (ll >> 64).wrapping_add(lh & (u64::MAX as u128)).wrapping_add(hl & (u64::MAX as u128));
+        hh.wrapping_add(lh >> 64).wrapping_add(hl >> 64).wrapping_add(mid >> 64)
+    };
+
+    let mut x = draw_u128(rng);
+    let mut m = mul_high_u128(x);
+    // x * range mod 2^128 (low 128 bits of the 256-bit product).
+    let mut leftover = x.wrapping_mul(range);
+    if leftover < range {
+        let threshold = range.wrapping_neg() % range;
+        while leftover < threshold {
+            x = draw_u128(rng);
+            m = mul_high_u128(x);
+            leftover = x.wrapping_mul(range);
+        }
+    }
+    m
 }
 
 /// Collect a bounded sample of cross-file cosine similarities from `fragments`
@@ -478,18 +513,31 @@ fn lemire_index(rng_val: u64, n: usize) -> usize {
 ///
 /// ## Algorithm
 ///
-/// Let `total_pairs = n*(n-1)/2` (all i<j pairs):
+/// Fragments are grouped into buckets by `source_path` using O(n log n)
+/// sort-then-contiguous-run grouping.  An index vector `order` (length n) is
+/// sorted by `fragments[i].source_path`, then walked once (O(n)) to form
+/// contiguous runs of equal `source_path` into buckets.  This is deterministic
+/// and uses no external dependencies.
 ///
-/// - **Exact branch** (`total_pairs ≤ pair_budget`): enumerate all i<j pairs,
-///   skip same-source-path, compute cosine for each cross-file pair.  The
-///   result is the complete cross-file cosine set.
+/// Let `cross_file_pairs` = C(n,2) − Σ C(|bucket|,2).
 ///
-/// - **Sampled branch** (`total_pairs > pair_budget`): draw pairs with
-///   replacement using a XorShift64 PRNG seeded from `(n as u64) | 1` (no
-///   wall-clock; deterministic for a given `n`).  Pairs where both indices are
-///   equal, or both fragments share a source path, are retried.  Stops when
-///   `pair_budget` cross-file cosines are collected or `pair_budget * 64`
-///   attempts are exhausted (sparse-corpus guard).
+/// - **Exact branch** (`cross_file_pairs ≤ pair_budget`): enumerate
+///   cross-file pairs DIRECTLY by iterating over each unordered pair of
+///   distinct buckets and their cartesian product.  Produces exactly
+///   `cross_file_pairs` cosines in O(cross_file_pairs) — no O(n²) scan.
+///   This is correct even when `total_pairs = n*(n-1)/2 > pair_budget` but
+///   `cross_file_pairs ≤ pair_budget` (sparse cross-file corpus).
+///
+/// - **Sampled branch** (`cross_file_pairs > pair_budget`): O(b)-preprocessing
+///   row-CDF two-step sampling (b = number of distinct buckets, b ≤ n).  A
+///   b-entry row CDF is built where row_weight[i] = |bucket_i| × tail_count[i],
+///   uniformly distributing the selection over all cross-file pairs in O(b).
+///   Each draw uses `lemire_exact_u128` (exact bias-free Lemire 2019, u128 range) to pick a
+///   row-CDF position, an O(log b) binary search to find the row bucket, then
+///   O(1) arithmetic to resolve the specific pair.  Every draw is a valid
+///   cross-file pair; the budget is always filled regardless of same-file-pair
+///   density.  Total: O(b + pair_budget × log b) time, O(b) space.  Seeded
+///   from `(n as u64) | 1` (deterministic).
 ///
 /// Returns an empty `Vec` when `n < 2` or no cross-file pairs exist.
 fn sample_cross_file_cosines(
@@ -502,56 +550,146 @@ fn sample_cross_file_cosines(
         return Vec::new();
     }
 
-    // total_pairs = n*(n-1)/2.  Use saturating arithmetic to avoid overflow on
-    // huge n; if n is large enough to overflow usize we are firmly in the
-    // sampled branch.
-    let total_pairs = n.saturating_sub(1).saturating_mul(n) / 2;
+    // Group fragment indices by source_path using O(n log n) sort + O(n) contiguous-run walk.
+    // Build an index vector and sort it by source_path — total order, no panic.
+    let mut order: Vec<usize> = (0..n).collect();
+    order.sort_by(|&a, &b| {
+        // Guarded access: both indices are in [0, n) by construction.
+        let path_a = fragments.get(a).map(|f| f.source_path.as_path());
+        let path_b = fragments.get(b).map(|f| f.source_path.as_path());
+        match (path_a, path_b) {
+            (Some(pa), Some(pb)) => pa.cmp(pb),
+            (None, Some(_)) => std::cmp::Ordering::Less,
+            (Some(_), None) => std::cmp::Ordering::Greater,
+            (None, None) => std::cmp::Ordering::Equal,
+        }
+    });
 
-    if total_pairs <= pair_budget {
-        // Exact branch: enumerate all i<j cross-file pairs.
-        let mut sample = Vec::new();
-        for i in 0..n {
-            for j in (i + 1)..n {
-                let Some(fi) = fragments.get(i) else { continue };
-                let Some(fj) = fragments.get(j) else { continue };
-                if fi.source_path == fj.source_path {
-                    continue;
+    // Walk sorted order once, grouping contiguous runs of equal source_path into buckets.
+    // Each bucket is Vec<usize> of original fragment indices sharing a source_path.
+    let mut buckets: Vec<Vec<usize>> = Vec::new();
+    let mut prev_path: Option<&std::path::Path> = None;
+    for &i in &order {
+        let Some(f) = fragments.get(i) else { continue };
+        let path = f.source_path.as_path();
+        if prev_path == Some(path) {
+            // Extend the last bucket (same source_path as previous).
+            if let Some(last) = buckets.last_mut() {
+                last.push(i);
+            }
+        } else {
+            // New source_path: start a new bucket.
+            buckets.push(vec![i]);
+            prev_path = Some(path);
+        }
+    }
+
+    // Compute cross_file_pairs = C(n,2) - sum_over_buckets C(|bucket|,2).
+    // Use u128 to avoid overflow on large n.
+    let n_u128 = n as u128;
+    let total_pairs_u128: u128 = n_u128.saturating_mul(n_u128.saturating_sub(1)) / 2;
+    let same_file_pairs_u128: u128 = buckets.iter().fold(0u128, |acc, indices| {
+        let m = indices.len() as u128;
+        acc.saturating_add(m.saturating_mul(m.saturating_sub(1)) / 2)
+    });
+    let cross_file_pairs_u128 = total_pairs_u128.saturating_sub(same_file_pairs_u128);
+
+    if cross_file_pairs_u128 == 0 {
+        return Vec::new();
+    }
+
+    // Branch decision is on cross_file_pairs, not total_pairs.
+    let cross_file_pairs_fits = cross_file_pairs_u128 <= pair_budget as u128;
+
+    if cross_file_pairs_fits {
+        // Exact branch: enumerate cross-file pairs DIRECTLY via distinct-bucket
+        // cartesian products.  O(cross_file_pairs) — no O(n²) all-pairs scan.
+        let capacity = cross_file_pairs_u128 as usize;
+        let mut sample = Vec::with_capacity(capacity);
+        for bi in 0..buckets.len() {
+            for bj in (bi + 1)..buckets.len() {
+                // Both bi and bj are in-bounds by construction (loop bounds).
+                let Some(bucket_i) = buckets.get(bi) else { continue };
+                let Some(bucket_j) = buckets.get(bj) else { continue };
+                for &idx_i in bucket_i {
+                    for &idx_j in bucket_j {
+                        let Some(ei) = embeddings.get(idx_i) else { continue };
+                        let Some(ej) = embeddings.get(idx_j) else { continue };
+                        sample.push(cosine_similarity(ei, ej));
+                    }
                 }
-                let Some(ei) = embeddings.get(i) else { continue };
-                let Some(ej) = embeddings.get(j) else { continue };
-                sample.push(cosine_similarity(ei, ej));
             }
         }
         sample
     } else {
-        // Sampled branch: draw random pairs with replacement.
+        // Sampled branch: O(b) preprocessing, O(log b) per draw (b = distinct buckets).
+        // Row CDF: row_cdf[i] = Σ(k≤i) |bucket_k| × tail_count[k], where
+        // tail_count[k] = Σ(j>k) |bucket_j|.  Each draw uses lemire_exact_u128 to pick a
+        // position, binary-searches row_cdf to find bi, then resolves
+        // (r_in_row / tc_i, r_in_row % tc_i) to the exact (fragment_in_bi,
+        // tail_fragment) pair.  Always fills budget; no cross-file pair rejection.
         // Seed is a pure function of n — deterministic, no wall-clock.
         let mut rng_state: u64 = (n as u64) | 1;
+        let nb = buckets.len();
+
+        // Bucket sizes and start offsets within `order` (sorted by source_path).
+        let mut bucket_sizes: Vec<usize> = Vec::with_capacity(nb);
+        let mut bucket_starts: Vec<usize> = Vec::with_capacity(nb + 1);
+        let mut start = 0usize;
+        for b in &buckets {
+            bucket_starts.push(start);
+            bucket_sizes.push(b.len());
+            start = start.saturating_add(b.len());
+        }
+        bucket_starts.push(n);
+
+        // tail_count[i] = Σ(k>i) bucket_sizes[k].
+        let mut tail_count: Vec<usize> = vec![0usize; nb];
+        let mut tail = 0usize;
+        for i in (0..nb).rev() {
+            if let Some(slot) = tail_count.get_mut(i) {
+                *slot = tail;
+            }
+            tail = tail.saturating_add(bucket_sizes.get(i).copied().unwrap_or(0));
+        }
+
+        // Build row CDF using u128 to match cross_file_pairs_u128 range.
+        let mut row_cdf: Vec<u128> = Vec::with_capacity(nb);
+        let mut cumulative: u128 = 0;
+        for i in 0..nb {
+            let w = (bucket_sizes.get(i).copied().unwrap_or(0) as u128)
+                .saturating_mul(tail_count.get(i).copied().unwrap_or(0) as u128);
+            cumulative = cumulative.saturating_add(w);
+            row_cdf.push(cumulative);
+        }
+        let total_row_weight = cumulative;
+        if total_row_weight == 0 {
+            return Vec::new();
+        }
         let mut sample = Vec::with_capacity(pair_budget);
-        let attempt_cap = pair_budget.saturating_mul(64);
-        let mut attempts = 0usize;
-
-        while sample.len() < pair_budget && attempts < attempt_cap {
-            attempts += 1;
-
-            // Draw index a in [0, n).
-            let a = lemire_index(xorshift64_next(&mut rng_state), n);
-            // Draw index b in [0, n).
-            let b = lemire_index(xorshift64_next(&mut rng_state), n);
-
-            if a == b {
+        while sample.len() < pair_budget {
+            // lemire_exact_u128 draws a bias-free uniform value in [0, total_row_weight).
+            // Uses u128 range to handle cross_file_pairs that exceed u64::MAX.
+            let r = lemire_exact_u128(&mut rng_state, total_row_weight);
+            let bi = row_cdf.partition_point(|&cum| cum <= r);
+            let Some(&bsz_i) = bucket_sizes.get(bi) else { continue };
+            let Some(&tc_i) = tail_count.get(bi) else { continue };
+            if bsz_i == 0 || tc_i == 0 {
                 continue;
             }
-
-            let Some(fa) = fragments.get(a) else { continue };
-            let Some(fb) = fragments.get(b) else { continue };
-            if fa.source_path == fb.source_path {
-                continue;
-            }
-
-            let Some(ea) = embeddings.get(a) else { continue };
-            let Some(eb) = embeddings.get(b) else { continue };
-            sample.push(cosine_similarity(ea, eb));
+            let prev_cum = if bi > 0 { row_cdf.get(bi - 1).copied().unwrap_or(0) } else { 0 };
+            // r_in_row stays in u128; ki and r_tail fit in usize (bounded by bucket sizes).
+            let r_in_row = r.saturating_sub(prev_cum);
+            let ki = (r_in_row / tc_i as u128) as usize;
+            let r_tail = (r_in_row % tc_i as u128) as usize;
+            let tail_start = bucket_starts.get(bi + 1).copied().unwrap_or(n);
+            let order_pos = tail_start + r_tail;
+            let Some(bucket_i) = buckets.get(bi) else { continue };
+            let Some(&idx_i) = bucket_i.get(ki) else { continue };
+            let Some(&idx_j) = order.get(order_pos) else { continue };
+            let Some(ei) = embeddings.get(idx_i) else { continue };
+            let Some(ej) = embeddings.get(idx_j) else { continue };
+            sample.push(cosine_similarity(ei, ej));
         }
 
         sample
@@ -559,7 +697,6 @@ fn sample_cross_file_cosines(
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
-
 #[cfg(test)]
 mod tests {
     #![allow(
@@ -1315,8 +1452,8 @@ mod tests {
     #[test]
     fn test_measure_quality_deterministic_same_input_yields_identical_metrics() {
         // Determinism: two calls with the same fragments must return identical metrics.
-        // Uses 200 fragments so total_pairs = 19_900 > PAIR_BUDGET (10_000),
-        // exercising the sampled branch.
+        // Uses 200 fragments on 200 distinct paths so cross_file_pairs = 19_900 >
+        // PAIR_BUDGET (10_000), exercising the sampled branch.
         let n = 200usize;
         let frags: Vec<CodeFragment> = (0..n)
             .map(|i| make_fragment(&format!("src/{i}.rs"), &format!("fn f{i}() {{}}")))
@@ -1384,8 +1521,8 @@ mod tests {
 
     #[test]
     fn test_measure_quality_small_input_exact_metrics_match_hand_computed() {
-        // Small-input exactness: 3 fragments on 3 paths → 3 pairs, all cross-file.
-        // total_pairs = 3 ≤ PAIR_BUDGET (10_000) → exact branch.
+        // Small-input exactness: 3 fragments on 3 paths → 3 cross-file pairs.
+        // cross_file_pairs = 3 ≤ PAIR_BUDGET (10_000) → exact branch.
         // Embeddings:
         //   a = [1, 0], b = [1, 0], c = [0, 1]
         // Cross-file cosines:
@@ -1582,7 +1719,7 @@ mod tests {
 
     #[test]
     fn test_sample_cross_file_cosines_sampled_branch_budget_respected() {
-        // n=200 → total_pairs = 19_900 > PAIR_BUDGET (10) used here → sampled branch.
+        // n=200 on 200 distinct paths → cross_file_pairs = 19_900 > budget (10) → sampled branch.
         // Assert the returned sample has at most `budget` entries.
         let n = 200usize;
         let frags: Vec<_> = (0..n)
@@ -1619,5 +1756,187 @@ mod tests {
         let r1 = sample_cross_file_cosines(&frags, &embeddings, n, budget);
         let r2 = sample_cross_file_cosines(&frags, &embeddings, n, budget);
         assert_eq!(r1, r2, "sample_cross_file_cosines must be deterministic for same input");
+    }
+
+    // ── Sparse-cross-file corpus: the Codex P1 correctness case ──────────────
+
+    #[test]
+    fn test_sample_cross_file_cosines_sparse_cross_file_exact_branch_taken() {
+        // The Codex P1 finding: a corpus where total_pairs > PAIR_BUDGET but
+        // cross_file_pairs ≤ PAIR_BUDGET must take the EXACT branch and measure
+        // ALL cross-file pairs — not the biased tiny subset that rejection sampling
+        // would produce.
+        //
+        // Arithmetic (PAIR_BUDGET = 10_000):
+        //   File A: 145 fragments → C(145,2) = 145*144/2 = 10_440 (same-file pairs)
+        //   File B: 1 fragment   → C(1,2)   = 0
+        //   total n = 146
+        //   total_pairs  = C(146,2) = 146*145/2 = 10_585  > 10_000  (would force sampled
+        //                                                              branch under old code)
+        //   cross_file_pairs = 10_585 - 10_440 - 0 = 145  ≤ 10_000  (exact branch correct)
+        //
+        // All embeddings are identical unit vectors [1,0], so every cross-file
+        // cosine = 1.0.  With the exact branch we expect exactly 145 cosines all = 1.0.
+        let n_a = 145usize;
+        let n_b = 1usize;
+        let n = n_a + n_b;
+
+        // PAIR_BUDGET hard-coded to match the constant in measure_quality.
+        let pair_budget: usize = 10_000;
+
+        // Verify the arithmetic used in the test comment (not product code, just assertion).
+        let total_pairs = n * (n - 1) / 2;
+        let same_file_pairs_a = n_a * (n_a - 1) / 2;
+        let cross_file_pairs = total_pairs - same_file_pairs_a;
+        assert!(total_pairs > pair_budget, "total_pairs={total_pairs} must exceed budget");
+        assert!(
+            cross_file_pairs <= pair_budget,
+            "cross_file_pairs={cross_file_pairs} must be within budget"
+        );
+        assert_eq!(cross_file_pairs, n_a, "cross_file_pairs should equal n_a={n_a}");
+
+        // Build corpus: first n_a fragments in "src/a.rs", last 1 in "src/b.rs".
+        let mut frags: Vec<_> =
+            (0..n_a).map(|i| make_fragment("src/a.rs", &format!("fn fa{i}() {{}}"))).collect();
+        frags.push(make_fragment("src/b.rs", "fn fb0() {}"));
+
+        // All unit vectors [1,0] → cosine similarity = 1.0 for every pair.
+        let embeddings: Vec<Vec<f32>> = (0..n).map(|_| vec![1.0_f32, 0.0]).collect();
+
+        let result = sample_cross_file_cosines(&frags, &embeddings, n, pair_budget);
+
+        // Exact branch: must measure ALL cross_file_pairs cosines (none skipped).
+        assert_eq!(
+            result.len(),
+            cross_file_pairs,
+            "exact branch must produce exactly cross_file_pairs={cross_file_pairs} cosines, got {}",
+            result.len()
+        );
+        // Every cosine should be 1.0 (identical unit vectors).
+        for (idx, &c) in result.iter().enumerate() {
+            assert!(
+                (c - 1.0_f32).abs() < 1e-6,
+                "cosine[{idx}] should be 1.0 (identical unit vectors), got {c}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_measure_quality_sparse_cross_file_corpus_exact_metrics() {
+        // Integration-level version of the P1 finding: MeasureQualityInteractor
+        // must return exact metrics (not a biased sample) for a sparse-cross-file
+        // corpus where total_pairs > PAIR_BUDGET but cross_file_pairs ≤ PAIR_BUDGET.
+        //
+        // Same arithmetic as the unit test above: 145 fragments in a.rs + 1 in b.rs.
+        // cross_file_pairs = 145 ≤ 10_000; all cosines = 1.0 (identical embeddings).
+        //
+        // Expected metrics from the full 145-pair exact set:
+        //   mean_cosine = 1.0, std_dev = 0.0, above_threshold_rate = 1.0.
+        let n_a = 145usize;
+        let n_b = 1usize;
+        let n = n_a + n_b;
+
+        let mut frags: Vec<_> =
+            (0..n_a).map(|i| make_fragment("src/a.rs", &format!("fn fa{i}() {{}}"))).collect();
+        frags.push(make_fragment("src/b.rs", "fn fb0() {}"));
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(n).returning(|_| Ok(vec![1.0_f32, 0.0]));
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        assert!(
+            (metrics.mean_cosine - 1.0).abs() < 1e-4,
+            "sparse-cross-file exact branch: mean_cosine must be 1.0, got {}",
+            metrics.mean_cosine
+        );
+        assert!(
+            metrics.cosine_std_dev.abs() < 1e-4,
+            "sparse-cross-file exact branch: cosine_std_dev must be 0.0, got {}",
+            metrics.cosine_std_dev
+        );
+        assert!(
+            (metrics.above_threshold_rate - 1.0).abs() < 1e-4,
+            "sparse-cross-file exact branch: above_threshold_rate must be 1.0, got {}",
+            metrics.above_threshold_rate
+        );
+        assert_eq!(metrics.cosine_percentiles.len(), 7);
+        for (i, &p) in metrics.cosine_percentiles.iter().enumerate() {
+            assert!(
+                (p - 1.0).abs() < 1e-4,
+                "cosine_percentiles[{i}] must be 1.0 in sparse-cross-file exact branch, got {p}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_sample_cross_file_cosines_many_distinct_single_fragment_files_exact_and_deterministic()
+    {
+        // Exercises the O(n log n) sort-based grouping path with many distinct
+        // paths (50 files × 1 fragment each) — the common workspace case.
+        //
+        // With 50 single-fragment files:
+        //   same_file_pairs = Σ C(1,2) = 0
+        //   cross_file_pairs = C(50,2) = 50*49/2 = 1_225  ≤  10_000  (exact branch)
+        //
+        // All embeddings are identical unit vectors [1,0] → every cosine = 1.0.
+        // Metrics must be exact (not sampled) and deterministic across two calls.
+        let n = 50usize;
+        let frags: Vec<_> = (0..n)
+            .map(|i| make_fragment(&format!("src/file_{i:02}.rs"), &format!("fn f{i}() {{}}")))
+            .collect();
+        let embeddings: Vec<Vec<f32>> = (0..n).map(|_| vec![1.0_f32, 0.0]).collect();
+        let pair_budget = 10_000usize;
+
+        let expected_cross_file_pairs = n * (n - 1) / 2; // 1_225
+
+        // First call.
+        let r1 = sample_cross_file_cosines(&frags, &embeddings, n, pair_budget);
+        // Second call — must be identical (determinism).
+        let r2 = sample_cross_file_cosines(&frags, &embeddings, n, pair_budget);
+
+        assert_eq!(
+            r1.len(),
+            expected_cross_file_pairs,
+            "50 distinct-file corpus: exact branch must produce {expected_cross_file_pairs} cosines, got {}",
+            r1.len()
+        );
+        assert_eq!(r1, r2, "results must be deterministic across two calls with the same input");
+
+        // All cosines must be 1.0 (identical unit vectors).
+        for (idx, &c) in r1.iter().enumerate() {
+            assert!(
+                (c - 1.0_f32).abs() < 1e-6,
+                "cosine[{idx}] should be 1.0 (identical unit vectors), got {c}"
+            );
+        }
+
+        // Verify aggregate metrics via the full interactor path.
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(n).returning(|_| Ok(vec![1.0_f32, 0.0]));
+        let mock_index = MockMockSemanticIndexPort::new();
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        assert!(
+            (metrics.mean_cosine - 1.0).abs() < 1e-4,
+            "mean_cosine must be 1.0 for many-distinct-paths corpus, got {}",
+            metrics.mean_cosine
+        );
+        assert!(
+            metrics.cosine_std_dev.abs() < 1e-4,
+            "cosine_std_dev must be 0.0, got {}",
+            metrics.cosine_std_dev
+        );
+        assert!(
+            (metrics.above_threshold_rate - 1.0).abs() < 1e-4,
+            "above_threshold_rate must be 1.0, got {}",
+            metrics.above_threshold_rate
+        );
+        assert_eq!(metrics.cosine_percentiles.len(), 7);
     }
 }
