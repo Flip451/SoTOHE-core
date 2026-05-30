@@ -1,21 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:15:17Z"
+          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
+          "at": "2026-05-30T01:11:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:33:45Z"
+          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
+          "at": "2026-05-30T01:33:15Z"
         }
       ]
     },
@@ -363,6 +363,50 @@
           "findings": [],
           "hash": "rvw1:sha256:fc00f2a3e2bf9ce94879112ef88c3355f93286ecc9b5ed167cc25bc3232459a7",
           "at": "2026-05-30T01:38:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This sentence says the CLI composition root in `T008/T009` extracts fragments using `T007`, but `T009`’s own task text says `dup-check` reads each file listed by `--files-from` directly into `CodeFragment` values. That makes the fragment-acquisition path inconsistent for `dup-check` and overstates `T007`’s role.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e46e3885e919462d138ec99f796bd6fe5beb791e25602e112a4d447394c0d02d",
+          "at": "2026-05-30T01:50:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9568556d94c4c9a8ef736561ca4f8db1ffcc1e350de487708e99d847d9a1cb8e",
+          "at": "2026-05-30T01:52:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004` is now recorded as `done` with a commit hash, and the rendered plan marks it resolved, even though this plan-artifacts scope is described as only advancing `T002` and `T003` to `in_progress`. That makes the plan state claim completion of the infrastructure dependency task as part of unrelated T002/T003 bookkeeping, so the rendered task progress is semantically inconsistent with the scope/design intent.",
+              "severity": "P1",
+              "file": "track/items/semantic-dup-detection-2026-05-29/impl-plan.json",
+              "line": 23,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9568556d94c4c9a8ef736561ca4f8db1ffcc1e350de487708e99d847d9a1cb8e",
+          "at": "2026-05-30T01:54:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9568556d94c4c9a8ef736561ca4f8db1ffcc1e350de487708e99d847d9a1cb8e",
+          "at": "2026-05-30T01:56:41Z"
         }
       ]
     },
@@ -399,6 +443,64 @@
         }
       ]
     },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dup_check` hard-codes `DUP_CHECK_TOP_K` to 10, so `SemanticIndexPort::search` can never return all above-threshold matches when more than 10 candidates qualify. That makes `DupCheckWarning.similar_fragments` incomplete and can suppress a warning that the soft gate should emit.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 526,
+              "category": "correctness"
+            },
+            {
+              "message": "`measure_quality` evaluates every cross-file pair instead of using a random sample, but AC-03 defines the threshold-exceed metric as a random-sampled proxy. As written, the reported `above_threshold_rate` is biased and the routine scales as O(n^2) on larger workspaces.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 674,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4cd036df2ec04f552b59341be66dd17c4e9f8916291a0a964b75907879347294",
+          "at": "2026-05-30T01:51:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bcc64ea886b68a3b697d17acf9b8e4ce428946b7f29badcf24635ff9720483b",
+          "at": "2026-05-30T02:00:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bcc64ea886b68a3b697d17acf9b8e4ce428946b7f29badcf24635ff9720483b",
+          "at": "2026-05-30T02:03:26Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:15:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:33:45Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -414,24 +516,6 @@
           "findings": [],
           "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
           "at": "2026-05-30T01:34:52Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
-          "at": "2026-05-30T01:11:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
-          "at": "2026-05-30T01:33:15Z"
         }
       ]
     }

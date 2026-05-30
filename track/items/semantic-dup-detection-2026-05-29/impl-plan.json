@@ -10,17 +10,18 @@
     {
       "id": "T002",
       "description": "Add the usecase ports and error types in `libs/usecase/src/semantic_dup.rs`: define `EmbeddingPort` (embed method) and `SemanticIndexPort` (insert + search methods) as secondary-port traits with `Send + Sync` bounds; define `EmbeddingError`, `SemanticIndexError`, `FindSimilarError`, `DupCheckError`, `BuildIndexError`, `MeasureQualityError` enums with Display/Error impls and From conversions as specified in usecase-types.json. No I/O or external crate in this module. Wire into `libs/usecase/src/lib.rs`.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T003",
       "description": "Add the usecase command/output types and application-service traits in `libs/usecase/src/semantic_dup.rs`: implement `FindSimilarCommand`, `FindSimilarOutput`, `DupCheckCommand`, `DupCheckWarning`, `DupCheckOutput`, `BuildIndexCommand` (carries pre-extracted `Vec<CodeFragment>`), `BuildIndexOutput`, `MeasureQualityCommand` (carries pre-extracted `Vec<CodeFragment>`), `QualityMetrics`; define `FindSimilarService`, `DupCheckService`, `BuildIndexService`, `MeasureQualityService` traits. Also implement the four interactors (`FindSimilarInteractor`, `DupCheckInteractor`, `BuildIndexInteractor`, `MeasureQualityInteractor`) with their `new` constructors and application-service trait impls, each delegating entirely to `EmbeddingPort` and `SemanticIndexPort` — no filesystem I/O in any interactor. `BuildIndexInteractor` iterates over `BuildIndexCommand.fragments`, embeds each, and inserts into the index. `MeasureQualityInteractor` embeds all fragments in `MeasureQualityCommand.fragments`, computes pairwise similarities, and returns `QualityMetrics`. `DupCheckInteractor` implements CN-03 (diff-fragments-only, no full-codebase scan). `FindSimilarInteractor` implements CN-05 (information-only, no block). `BuildIndexError::Io` is available for the CLI composition root to surface filesystem errors from the T007 extraction step before calling the interactor.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",
       "description": "Add infrastructure dependency declarations to `libs/infrastructure/Cargo.toml`: add `fastembed`, `ort`, and `lancedb` under `[dependencies]`. Verify that `libs/domain/Cargo.toml` and `libs/usecase/Cargo.toml` do NOT gain these dependencies. Run `cargo make check-layers` and `cargo make deny` to confirm AC-06 and AC-07 are satisfied before proceeding to adapter implementation.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "4eb4eddcff703cf48fe91150f0cea6f3eac3ee39"
     },
     {
       "id": "T005",
@@ -78,7 +79,7 @@
         "title": "Usecase ports, errors, and interactors",
         "description": [
           "T002 defines the two secondary-port traits (`EmbeddingPort`, `SemanticIndexPort`) and all error types in the usecase layer — no I/O, no external crates, just type definitions and From conversions.",
-          "T003 adds the command/output data types, the four application-service traits, and their interactor implementations. All four interactors are pure orchestrators that delegate entirely to EmbeddingPort and SemanticIndexPort. No interactor performs filesystem I/O — fragments arrive pre-extracted in the command (BuildIndexCommand.fragments, MeasureQualityCommand.fragments, DupCheckCommand.fragments); the CLI composition root (T008/T009) extracts them using the infrastructure helper (T007).",
+          "T003 adds the command/output data types, the four application-service traits, and their interactor implementations. All four interactors are pure orchestrators that delegate entirely to EmbeddingPort and SemanticIndexPort. No interactor performs filesystem I/O — fragments arrive pre-extracted in the command. For `BuildIndexCommand` and `MeasureQualityCommand`, the CLI composition root (T008 and the measure-quality subcommand of T009) calls the T007 infrastructure extractor to obtain the fragment list. For `DupCheckCommand`, the CLI (T009) reads each file listed in `--files-from` directly into `CodeFragment` values — the T007 workspace extractor is not involved.",
           "T002 must land before T003 because the interactors reference the port traits and error types."
         ],
         "task_ids": [

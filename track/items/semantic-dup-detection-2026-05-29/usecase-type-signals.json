@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-30T01:39:27Z",
+  "generated_at": "2026-05-30T02:04:07Z",
   "declaration_hash": "f89daa8079de8447e81580d5388382c9b6bf6899058a6dca8882d6521a97b418",
   "signals": [
     {
       "type_name": "BuildIndexCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -16,9 +16,9 @@
     {
       "type_name": "BuildIndexError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<EmbeddingError>",
         "core::convert::From<SemanticIndexError>",
         "core::error::Error",
@@ -29,9 +29,9 @@
     {
       "type_name": "BuildIndexInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "BuildIndexService",
         "core::fmt::Debug"
       ]
@@ -39,9 +39,9 @@
     {
       "type_name": "BuildIndexOutput",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -49,15 +49,15 @@
     {
       "type_name": "BuildIndexService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "DupCheckCommand",
       "kind_tag": "query",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -65,9 +65,9 @@
     {
       "type_name": "DupCheckError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<EmbeddingError>",
         "core::convert::From<SemanticIndexError>",
         "core::error::Error",
@@ -78,9 +78,9 @@
     {
       "type_name": "DupCheckInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "DupCheckService",
         "core::fmt::Debug"
       ]
@@ -88,9 +88,9 @@
     {
       "type_name": "DupCheckOutput",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -98,15 +98,15 @@
     {
       "type_name": "DupCheckService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "DupCheckWarning",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -114,9 +114,9 @@
     {
       "type_name": "EmbeddingError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -125,15 +125,15 @@
     {
       "type_name": "EmbeddingPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FindSimilarCommand",
       "kind_tag": "query",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -141,9 +141,9 @@
     {
       "type_name": "FindSimilarError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<EmbeddingError>",
         "core::convert::From<SemanticIndexError>",
         "core::error::Error",
@@ -154,9 +154,9 @@
     {
       "type_name": "FindSimilarInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "FindSimilarService",
         "core::fmt::Debug"
       ]
@@ -164,9 +164,9 @@
     {
       "type_name": "FindSimilarOutput",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -174,15 +174,15 @@
     {
       "type_name": "FindSimilarService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "MeasureQualityCommand",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -190,9 +190,9 @@
     {
       "type_name": "MeasureQualityError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::convert::From<EmbeddingError>",
         "core::convert::From<SemanticIndexError>",
         "core::error::Error",
@@ -203,9 +203,9 @@
     {
       "type_name": "MeasureQualityInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "MeasureQualityService",
         "core::fmt::Debug"
       ]
@@ -213,15 +213,15 @@
     {
       "type_name": "MeasureQualityService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "QualityMetrics",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -229,9 +229,9 @@
     {
       "type_name": "SemanticIndexError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -240,8 +240,8 @@
     {
       "type_name": "SemanticIndexPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }
