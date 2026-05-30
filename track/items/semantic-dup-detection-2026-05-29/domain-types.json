@@ -11,10 +11,9 @@
         "shape": {
           "kind": "plain",
           "fields": [
-            { "name": "source_path", "ty": "std::path::PathBuf" },
-            { "name": "content", "ty": "String" }
+            { "name": "source_path", "ty": "std::path::PathBuf" }
           ],
-          "has_stripped_fields": false
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -62,8 +61,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["f32"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -85,8 +84,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["usize"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -108,8 +107,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["f32"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -180,7 +179,7 @@
           "name": "new",
           "receiver": null,
           "params": [{ "name": "value", "ty": "f32" }],
-          "returns": "Result<SimilarityScore, SemanticDupError>",
+          "returns": "Result<Self, SemanticDupError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -205,7 +204,7 @@
           "name": "new",
           "receiver": null,
           "params": [{ "name": "k", "ty": "usize" }],
-          "returns": "Result<TopK, SemanticDupError>",
+          "returns": "Result<Self, SemanticDupError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -230,7 +229,7 @@
           "name": "new",
           "receiver": null,
           "params": [{ "name": "value", "ty": "f32" }],
-          "returns": "Result<SimilarityThreshold, SemanticDupError>",
+          "returns": "Result<Self, SemanticDupError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -258,7 +257,17 @@
             { "name": "source_path", "ty": "std::path::PathBuf" },
             { "name": "content", "ty": "String" }
           ],
-          "returns": "Result<CodeFragment, SemanticDupError>",
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "content",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,

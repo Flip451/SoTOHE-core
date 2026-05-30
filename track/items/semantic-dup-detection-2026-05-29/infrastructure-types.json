@@ -120,7 +120,7 @@
           "name": "new",
           "receiver": null,
           "params": [],
-          "returns": "Result<FastEmbedAdapter, usecase::semantic_dup::EmbeddingError>",
+          "returns": "Result<Self, usecase::semantic_dup::EmbeddingError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -137,7 +137,7 @@
           "params": [
             { "name": "db_path", "ty": "std::path::PathBuf" }
           ],
-          "returns": "Result<LanceDbSemanticIndexAdapter, usecase::semantic_dup::SemanticIndexError>",
+          "returns": "Result<Self, usecase::semantic_dup::SemanticIndexError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,

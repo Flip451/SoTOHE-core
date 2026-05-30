@@ -4,11 +4,11 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CodeFragment | value_object | — | — | 🟡 | 🔵 |
+| CodeFragment | value_object | — | — | 🔵 | 🔵 |
 | SimilarFragment | value_object | — | — | 🔵 | 🔵 |
-| SimilarityScore | value_object | — | — | 🟡 | 🔵 |
-| SimilarityThreshold | value_object | — | — | 🟡 | 🔵 |
-| TopK | value_object | — | — | 🟡 | 🔵 |
+| SimilarityScore | value_object | — | — | 🔵 | 🔵 |
+| SimilarityThreshold | value_object | — | — | 🔵 | 🔵 |
+| TopK | value_object | — | — | 🔵 | 🔵 |
 
 ## Error Types
 

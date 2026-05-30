@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-30T15:39:31Z",
-  "declaration_hash": "4093e55311c528d823f247b056c2dd62b1ed59e336664a9952492c79420cb918",
+  "generated_at": "2026-05-30T18:02:53Z",
+  "declaration_hash": "5dfbc292e42d1c3b8dcd1b70238d593ae59562666ee2300a4169eea913d01748",
   "signals": [
     {
       "type_name": "CodeFragment",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -37,7 +37,7 @@
     {
       "type_name": "SimilarityScore",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -48,7 +48,7 @@
     {
       "type_name": "SimilarityThreshold",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -59,7 +59,7 @@
     {
       "type_name": "TopK",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

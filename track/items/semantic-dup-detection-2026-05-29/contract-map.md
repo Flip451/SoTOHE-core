@@ -31,6 +31,7 @@ subgraph domain["domain"]
     direction TB
     T26_domain_domain_CodeFragment__self[CodeFragment]
     T26_domain_domain_CodeFragment_new([new])
+    T26_domain_domain_CodeFragment_content([content])
   end
   subgraph T30_domain_domain_SemanticDupError["semantic_dup::SemanticDupError"]
     direction TB
@@ -222,12 +223,12 @@ T26_domain_domain_CodeFragment_new --> T26_domain_domain_CodeFragment__self
 T26_domain_domain_CodeFragment_new --> T30_domain_domain_SemanticDupError__self
 T29_domain_domain_SimilarFragment__self --o|fragment| T26_domain_domain_CodeFragment__self
 T29_domain_domain_SimilarFragment__self --o|score| T29_domain_domain_SimilarityScore__self
-T29_domain_domain_SimilarityScore_new --> T30_domain_domain_SemanticDupError__self
 T29_domain_domain_SimilarityScore_new --> T29_domain_domain_SimilarityScore__self
-T33_domain_domain_SimilarityThreshold_new --> T30_domain_domain_SemanticDupError__self
+T29_domain_domain_SimilarityScore_new --> T30_domain_domain_SemanticDupError__self
 T33_domain_domain_SimilarityThreshold_new --> T33_domain_domain_SimilarityThreshold__self
-T18_domain_domain_TopK_new --> T30_domain_domain_SemanticDupError__self
+T33_domain_domain_SimilarityThreshold_new --> T30_domain_domain_SemanticDupError__self
 T18_domain_domain_TopK_new --> T18_domain_domain_TopK__self
+T18_domain_domain_TopK_new --> T30_domain_domain_SemanticDupError__self
 T33_usecase_usecase_BuildIndexCommand__self --o|fragments| T26_domain_domain_CodeFragment__self
 T31_usecase_usecase_BuildIndexError_Embedding --o T30_usecase_usecase_EmbeddingError__self
 T31_usecase_usecase_BuildIndexError_Index --o T34_usecase_usecase_SemanticIndexError__self
@@ -282,6 +283,7 @@ F93_infrastructure_infrastructure_infrastructure__semantic_dup__extractor__extra
 T46_infrastructure_infrastructure_FastEmbedAdapter__self -.impl.-> R29_usecase_usecase_EmbeddingPort__self
 T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter__self -.impl.-> R33_usecase_usecase_SemanticIndexPort__self
 class T26_domain_domain_CodeFragment_new method_node
+class T26_domain_domain_CodeFragment_content method_node
 class T26_domain_domain_CodeFragment__self value_object
 class T30_domain_domain_SemanticDupError_InvalidScore variant_node
 class T30_domain_domain_SemanticDupError_InvalidTopK variant_node

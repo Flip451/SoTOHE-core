@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4093e55311c528d823f247b056c2dd62b1ed59e336664a9952492c79420cb918",
+  "catalogue_declaration_hash": "5dfbc292e42d1c3b8dcd1b70238d593ae59562666ee2300a4169eea913d01748",
   "signals": [
     {
       "type_name": "CodeFragment",
