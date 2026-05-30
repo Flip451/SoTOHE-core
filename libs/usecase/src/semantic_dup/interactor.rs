@@ -1,372 +1,19 @@
-//! Use-case layer for semantic duplicate detection.
-//!
-//! Ports, error types, command/output types, application-service traits, and
-//! interactors for the discoverability soft-gate feature
-//! (ADR 2026-05-29-1118-semantic-dup-detection-discoverability-gate).
-//!
-//! Ports are placed here (not in domain) because embedding and vector-index
-//! capabilities are infrastructure concerns — the domain carries no concept of
-//! ML inference or ANN search. Analogous to `ReviewHasher`.
+//! Application-service traits and interactor implementations for semantic
+//! duplicate detection.
 
 use std::fmt;
 use std::sync::Arc;
 
-use domain::semantic_dup::{CodeFragment, SimilarFragment, SimilarityThreshold, TopK};
-use thiserror::Error;
+use domain::semantic_dup::TopK;
 
-// ── Secondary ports ───────────────────────────────────────────────────────────
-
-/// Secondary port for embedding computation.
-///
-/// Abstracts fastembed-rs / ONNX Runtime from use-case logic. Placed in
-/// usecase (not domain) because embedding is an infrastructure capability —
-/// the domain carries no concept of ML inference. Analogous to `ReviewHasher`.
-pub trait EmbeddingPort: Send + Sync {
-    /// Compute an embedding vector for the given code fragment.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`EmbeddingError::ModelLoadFailed`] if the model is not yet
-    /// loaded or fails to initialise.
-    /// Returns [`EmbeddingError::InferenceFailed`] if inference fails.
-    fn embed(&self, fragment: &CodeFragment) -> Result<Vec<f32>, EmbeddingError>;
-}
-
-/// Secondary port for the local semantic vector index.
-///
-/// Abstracts LanceDB from use-case logic. Placed in usecase (not domain)
-/// because vector indexing is an infrastructure capability with no domain
-/// entity semantics. Analogous to `ReviewHasher`.
-pub trait SemanticIndexPort: Send + Sync {
-    /// Insert a fragment and its embedding vector into the index.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`SemanticIndexError::InsertFailed`] if the insert operation fails.
-    fn insert(&self, fragment: &CodeFragment, embedding: &[f32]) -> Result<(), SemanticIndexError>;
-
-    /// Search the index for the top-k fragments nearest to `embedding`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`SemanticIndexError::SearchFailed`] if the search operation fails.
-    fn search(
-        &self,
-        embedding: &[f32],
-        top_k: TopK,
-    ) -> Result<Vec<SimilarFragment>, SemanticIndexError>;
-}
-
-// ── Error types ───────────────────────────────────────────────────────────────
-
-/// Error type for the [`EmbeddingPort`].
-///
-/// `source` is an opaque string from fastembed-rs — no domain concept.
-#[derive(Debug)]
-pub enum EmbeddingError {
-    /// The embedding model failed to load or initialise.
-    ModelLoadFailed {
-        /// Opaque error string from the underlying fastembed-rs error.
-        source: String,
-    },
-    /// Inference over a fragment failed.
-    InferenceFailed {
-        /// Opaque error string from the underlying fastembed-rs error.
-        source: String,
-    },
-}
-
-impl fmt::Display for EmbeddingError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::ModelLoadFailed { source } => {
-                write!(f, "embedding model load failed: {source}")
-            }
-            Self::InferenceFailed { source } => {
-                write!(f, "embedding inference failed: {source}")
-            }
-        }
-    }
-}
-
-impl std::error::Error for EmbeddingError {}
-
-/// Error type for the [`SemanticIndexPort`].
-///
-/// `source` is an opaque string from LanceDB — no domain concept.
-#[derive(Debug)]
-pub enum SemanticIndexError {
-    /// Opening (or creating) the vector index failed.
-    OpenFailed {
-        /// Opaque error string from the underlying LanceDB error.
-        source: String,
-    },
-    /// Inserting a fragment+embedding into the index failed.
-    InsertFailed {
-        /// Opaque error string from the underlying LanceDB error.
-        source: String,
-    },
-    /// Searching the index failed.
-    SearchFailed {
-        /// Opaque error string from the underlying LanceDB error.
-        source: String,
-    },
-}
-
-impl fmt::Display for SemanticIndexError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::OpenFailed { source } => {
-                write!(f, "semantic index open failed: {source}")
-            }
-            Self::InsertFailed { source } => {
-                write!(f, "semantic index insert failed: {source}")
-            }
-            Self::SearchFailed { source } => {
-                write!(f, "semantic index search failed: {source}")
-            }
-        }
-    }
-}
-
-impl std::error::Error for SemanticIndexError {}
-
-/// Composite error for the find-similar use case.
-#[derive(Debug, Error)]
-pub enum FindSimilarError {
-    /// An embedding operation failed.
-    #[error(transparent)]
-    Embedding(#[from] EmbeddingError),
-    /// An index operation failed.
-    #[error(transparent)]
-    Index(#[from] SemanticIndexError),
-}
-
-/// Composite error for the dup-check use case.
-#[derive(Debug, Error)]
-pub enum DupCheckError {
-    /// An embedding operation failed.
-    #[error(transparent)]
-    Embedding(#[from] EmbeddingError),
-    /// An index operation failed.
-    #[error(transparent)]
-    Index(#[from] SemanticIndexError),
-}
-
-/// Composite error for the build-index use case.
-#[derive(Debug)]
-pub enum BuildIndexError {
-    /// An embedding operation failed.
-    Embedding(EmbeddingError),
-    /// An index operation failed.
-    Index(SemanticIndexError),
-    /// A filesystem I/O operation failed.
-    Io {
-        /// The path that was being accessed when the error occurred.
-        path: std::path::PathBuf,
-        /// Opaque error string from the underlying I/O error.
-        source: String,
-    },
-}
-
-impl fmt::Display for BuildIndexError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Embedding(e) => fmt::Display::fmt(e, f),
-            Self::Index(e) => fmt::Display::fmt(e, f),
-            Self::Io { path, source } => {
-                write!(f, "I/O error at {}: {source}", path.display())
-            }
-        }
-    }
-}
-
-impl std::error::Error for BuildIndexError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Self::Embedding(e) => Some(e),
-            Self::Index(e) => Some(e),
-            Self::Io { .. } => None,
-        }
-    }
-}
-
-impl From<EmbeddingError> for BuildIndexError {
-    fn from(e: EmbeddingError) -> Self {
-        Self::Embedding(e)
-    }
-}
-
-impl From<SemanticIndexError> for BuildIndexError {
-    fn from(e: SemanticIndexError) -> Self {
-        Self::Index(e)
-    }
-}
-
-/// Composite error for the measure-quality use case.
-#[derive(Debug)]
-pub enum MeasureQualityError {
-    /// An embedding operation failed.
-    Embedding(EmbeddingError),
-    /// An index operation failed.
-    Index(SemanticIndexError),
-    /// A filesystem I/O operation failed.
-    Io {
-        /// The path that was being accessed when the error occurred.
-        path: std::path::PathBuf,
-        /// Opaque error string from the underlying I/O error.
-        source: String,
-    },
-}
-
-impl fmt::Display for MeasureQualityError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Embedding(e) => fmt::Display::fmt(e, f),
-            Self::Index(e) => fmt::Display::fmt(e, f),
-            Self::Io { path, source } => {
-                write!(f, "I/O error at {}: {source}", path.display())
-            }
-        }
-    }
-}
-
-impl std::error::Error for MeasureQualityError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Self::Embedding(e) => Some(e),
-            Self::Index(e) => Some(e),
-            Self::Io { .. } => None,
-        }
-    }
-}
-
-impl From<EmbeddingError> for MeasureQualityError {
-    fn from(e: EmbeddingError) -> Self {
-        Self::Embedding(e)
-    }
-}
-
-impl From<SemanticIndexError> for MeasureQualityError {
-    fn from(e: SemanticIndexError) -> Self {
-        Self::Index(e)
-    }
-}
-
-// ── Command / output types ────────────────────────────────────────────────────
-
-/// Query input for find-similar: given a code fragment, retrieve top-k
-/// semantically similar fragments from the index.
-#[derive(Debug, Clone)]
-pub struct FindSimilarCommand {
-    /// The query fragment whose similar counterparts are to be retrieved.
-    pub fragment: CodeFragment,
-    /// How many similar fragments to return at most.
-    pub top_k: TopK,
-}
-
-/// Output from find-similar: the top-k semantically similar fragments
-/// retrieved from the index.
-#[derive(Debug, Clone)]
-pub struct FindSimilarOutput {
-    /// The retrieved similar fragments, ordered by descending similarity score.
-    pub results: Vec<SimilarFragment>,
-}
-
-/// Query input for dup-check: a list of diff fragments to check against the
-/// index at a given similarity threshold.
-///
-/// Implements CN-03 (diff fragments only).
-#[derive(Debug, Clone)]
-pub struct DupCheckCommand {
-    /// The fragments from the current diff to check for near-duplicates.
-    pub fragments: Vec<CodeFragment>,
-    /// The cosine similarity threshold above which a match is flagged.
-    pub threshold: SimilarityThreshold,
-}
-
-/// A single soft-gate warning: one input fragment together with the similar
-/// existing fragments that exceed the threshold.
-#[derive(Debug, Clone)]
-pub struct DupCheckWarning {
-    /// The input fragment that triggered the warning.
-    pub input_fragment: CodeFragment,
-    /// Existing fragments in the index whose similarity to `input_fragment`
-    /// exceeds the configured threshold.
-    pub similar_fragments: Vec<SimilarFragment>,
-}
-
-/// Output from dup-check: all soft-gate warnings for the supplied diff
-/// fragments.
-///
-/// Empty `warnings` means no duplicates were found above the threshold.
-#[derive(Debug, Clone)]
-pub struct DupCheckOutput {
-    /// Warnings for each input fragment that has at least one near-duplicate
-    /// above the threshold. Empty if no duplicates were found.
-    pub warnings: Vec<DupCheckWarning>,
-}
-
-/// Command to build the semantic index.
-///
-/// Carries pre-extracted [`CodeFragment`]s (extracted by the CLI from workspace
-/// Rust sources via the infrastructure-layer extractor, T007), and instructs
-/// the interactor to compute embeddings and populate the local LanceDB index.
-#[derive(Debug, Clone)]
-pub struct BuildIndexCommand {
-    /// The pre-extracted code fragments to embed and insert into the index.
-    pub fragments: Vec<CodeFragment>,
-}
-
-/// Output from build-index: count of code fragments successfully indexed.
-#[derive(Debug, Clone)]
-pub struct BuildIndexOutput {
-    /// The number of fragments that were successfully embedded and indexed.
-    pub fragments_indexed: usize,
-}
-
-/// Command to measure embedding model quality.
-///
-/// Carries pre-extracted [`CodeFragment`]s (extracted by the CLI from workspace
-/// Rust sources via the infrastructure-layer extractor, T007). The interactor
-/// computes pairwise cosine similarities and assembles [`QualityMetrics`].
-#[derive(Debug, Clone)]
-pub struct MeasureQualityCommand {
-    /// The pre-extracted code fragments to use as the evaluation corpus.
-    pub fragments: Vec<CodeFragment>,
-}
-
-/// Output from measure-quality: the cosine similarity distribution (AC-03/IN-05).
-///
-/// Represented as mean, standard deviation, and percentile buckets for threshold
-/// calibration.
-///
-/// - `mean_cosine` and `cosine_std_dev` are the raw cosine similarity mean and
-///   standard deviation (in `[-1.0, 1.0]`).
-/// - `cosine_percentiles` is `[p10, p25, p50, p75, p90, p95, p99]` of the
-///   cosine similarity distribution. Exact when the cross-file pair count is
-///   ≤ `MAX_SAMPLE` (10 000); for larger corpora, computed from a deterministic
-///   reservoir sample (PoC approximation, sufficient for threshold calibration
-///   per AC-03).
-/// - `above_threshold_rate` is the fraction of randomly sampled cross-file
-///   fragment pairs whose raw cosine exceeds the default threshold (the PoC
-///   proxy for false-positive risk, as defined in AC-03/IN-05).
-///
-/// Raw `f32` values; no domain constraint enforced at this PoC stage.
-#[derive(Debug, Clone)]
-pub struct QualityMetrics {
-    /// Mean raw cosine similarity across the sampled fragment pairs.
-    pub mean_cosine: f32,
-    /// Standard deviation of raw cosine similarity across the sampled pairs.
-    pub cosine_std_dev: f32,
-    /// Percentile values `[p10, p25, p50, p75, p90, p95, p99]` of the cosine
-    /// similarity distribution. Exact when cross-file pair count ≤ 10 000;
-    /// a deterministic reservoir-sample approximation for larger corpora (PoC).
-    pub cosine_percentiles: Vec<f32>,
-    /// Fraction of cross-file fragment pairs whose raw cosine exceeds the
-    /// default similarity threshold (false-positive proxy).
-    pub above_threshold_rate: f32,
-}
+use super::command::{
+    BuildIndexCommand, BuildIndexOutput, DupCheckCommand, DupCheckOutput, DupCheckWarning,
+    FindSimilarCommand, FindSimilarOutput, MeasureQualityCommand, QualityMetrics,
+};
+use super::errors::{
+    BuildIndexError, DupCheckError, FindSimilarError, MeasureQualityError, SemanticIndexError,
+};
+use super::ports::{EmbeddingPort, SemanticIndexPort};
 
 // ── Application-service traits ────────────────────────────────────────────────
 
@@ -552,7 +199,7 @@ impl DupCheckService for DupCheckInteractor {
             let embedding = self.embedding_port.embed(fragment)?;
             let candidates = self.index_port.search(&embedding, top_k)?;
 
-            let above_threshold: Vec<SimilarFragment> = candidates
+            let above_threshold: Vec<_> = candidates
                 .into_iter()
                 .filter(|sf| sf.score.value() >= cmd.threshold.value())
                 .collect();
@@ -571,7 +218,7 @@ impl DupCheckService for DupCheckInteractor {
 
 /// Interactor implementing [`BuildIndexService`].
 ///
-/// Receives pre-extracted [`CodeFragment`]s (via [`BuildIndexCommand::fragments`],
+/// Receives pre-extracted [`domain::semantic_dup::CodeFragment`]s (via [`BuildIndexCommand::fragments`],
 /// extracted by the CLI using the infrastructure extractor), embeds each
 /// fragment via [`EmbeddingPort`], and inserts into the index via
 /// [`SemanticIndexPort`]. No filesystem I/O in this interactor.
@@ -841,11 +488,13 @@ mod tests {
     #![allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::type_complexity)]
 
     use std::path::PathBuf;
+    use std::sync::Arc;
 
     use domain::semantic_dup::{CodeFragment, SimilarFragment, SimilarityScore};
-    use mockall::{mock, predicate};
+    use mockall::mock;
 
     use super::*;
+    use crate::semantic_dup::errors::{EmbeddingError, SemanticIndexError};
 
     // ── Mock port definitions ─────────────────────────────────────────────────
     //
@@ -972,7 +621,7 @@ mod tests {
     #[test]
     fn test_dup_check_interactor_produces_warning_for_fragment_above_threshold() {
         // CN-03: only diff fragments are checked.
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
         let frag = make_fragment("src/new.rs", "fn new_impl() {}");
 
         // The mock returns a result with score 0.9 > threshold 0.8.
@@ -999,7 +648,7 @@ mod tests {
 
     #[test]
     fn test_dup_check_interactor_produces_no_warning_for_fragment_below_threshold() {
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
         let frag = make_fragment("src/new.rs", "fn new_impl() {}");
 
         // The mock returns a result with score 0.7 < threshold 0.8.
@@ -1025,7 +674,7 @@ mod tests {
     #[test]
     fn test_dup_check_interactor_produces_warning_when_score_equals_threshold() {
         // Boundary: score exactly at threshold is >= threshold so should warn.
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
         let frag = make_fragment("src/new.rs", "fn new_impl() {}");
 
         let at_threshold_result =
@@ -1053,7 +702,7 @@ mod tests {
 
     #[test]
     fn test_dup_check_interactor_with_empty_fragments_returns_no_warnings() {
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
 
         let mock_embed = MockMockEmbeddingPort::new();
         let mock_index = MockMockSemanticIndexPort::new();
@@ -1069,7 +718,7 @@ mod tests {
     #[test]
     fn test_dup_check_interactor_checks_only_supplied_diff_fragments_not_full_codebase() {
         // CN-03: only the supplied fragments are embedded and searched.
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
         let frag1 = make_fragment("src/a.rs", "fn a() {}");
         let frag2 = make_fragment("src/b.rs", "fn b() {}");
 
@@ -1092,7 +741,7 @@ mod tests {
 
     #[test]
     fn test_dup_check_interactor_propagates_embedding_error() {
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
         let frag = make_fragment("src/new.rs", "fn new_impl() {}");
 
         let mut mock_embed = MockMockEmbeddingPort::new();
@@ -1111,7 +760,7 @@ mod tests {
 
     #[test]
     fn test_dup_check_interactor_propagates_index_error() {
-        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
         let frag = make_fragment("src/new.rs", "fn new_impl() {}");
 
         let mut mock_embed = MockMockEmbeddingPort::new();
@@ -1208,6 +857,8 @@ mod tests {
 
     #[test]
     fn test_build_index_interactor_propagates_index_insert_error() {
+        use mockall::predicate;
+
         let frags = vec![make_fragment("src/a.rs", "fn a() {}")];
 
         let mut mock_embed = MockMockEmbeddingPort::new();
