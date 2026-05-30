@@ -232,7 +232,28 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
 
         // Remove any stale backup from a prior run before renaming the current
         // index aside — avoids a failure if the old backup still exists.
-        if backup_path.exists() {
+        // Only remove it when it is a recognizable LanceDB index (our own stale
+        // backup from a crashed run).  If something unrelated already occupies
+        // that path, refuse to clobber it and ask the user to resolve the
+        // conflict manually.
+        //
+        // Use `symlink_metadata` (does NOT follow symlinks) so that a broken
+        // symlink at `backup_path` also triggers the guard.  `Path::exists()`
+        // returns `false` for broken symlinks, which would silently skip the
+        // guard and let the subsequent `rename(db_path, backup_path)` overwrite
+        // the symlink entry — an unrelated user artefact.
+        if std::fs::symlink_metadata(&backup_path).is_ok() {
+            if !is_recognizable_lancedb_index(&backup_path) {
+                return Err(format!(
+                    "the path '{}' already exists and does not appear to be a \
+                     LanceDB index (missing '{}' marker); refusing to overwrite \
+                     it to prevent data loss. \
+                     Please remove or rename '{}' manually and retry.",
+                    backup_path.display(),
+                    LANCEDB_TABLE_MARKER,
+                    backup_path.display(),
+                ));
+            }
             std::fs::remove_dir_all(&backup_path).map_err(|e| {
                 format!("failed to remove stale backup at {}: {e}", backup_path.display())
             })?;
@@ -326,10 +347,19 @@ impl CliApp {
 
         // Step 1b: Recover from a crash that occurred between the two renames in
         // `commit_rebuilt_index`.  If `db_path` is absent but the deterministic
-        // backup sibling exists, rename the backup back so the old index is
-        // restored before we proceed with a fresh rebuild.
+        // backup sibling exists AND it is a recognizable LanceDB index, rename
+        // the backup back so the old index is restored before we proceed with a
+        // fresh rebuild.
+        //
+        // If `.old` exists but is NOT a recognizable LanceDB index, it is
+        // unrelated user data that happened to occupy that path.  Leave it
+        // completely untouched — `db_path` being absent is a valid fresh-build
+        // state in this case.
         let crash_backup = backup_path_for(&input.db_path)?;
-        if !input.db_path.exists() && crash_backup.exists() {
+        if !input.db_path.exists()
+            && crash_backup.exists()
+            && is_recognizable_lancedb_index(&crash_backup)
+        {
             std::fs::rename(&crash_backup, &input.db_path).map_err(|e| {
                 format!(
                     "found orphaned backup {} from a previous crash but failed to \
@@ -1212,6 +1242,177 @@ mod tests {
             "restored db_path must contain original content"
         );
         assert!(!backup_path.exists(), "backup must be gone after restore");
+    }
+
+    #[test]
+    fn test_index_build_does_not_restore_unrecognized_old_sibling() {
+        // Step 1b crash-recovery guard: when `.old` exists but is NOT a
+        // recognizable LanceDB index, it must be left completely untouched.
+        // `db_path` being absent is treated as a valid fresh-build state.
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        // workspace has no .rs files → extract_code_fragments returns empty
+        let db_path = dir.path().join("index.db");
+        let unrelated_old = dir.path().join(".index.db.old");
+
+        // Set up an unrelated dir at the `.old` path — no `fragments.lance/` marker.
+        std::fs::create_dir_all(&unrelated_old).unwrap();
+        std::fs::write(unrelated_old.join("user_data.txt"), "precious").unwrap();
+
+        assert!(!db_path.exists(), "pre-condition: db_path must be absent");
+        assert!(unrelated_old.exists(), "pre-condition: unrelated .old dir must exist");
+
+        let app = crate::CliApp;
+        let input =
+            DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
+        let outcome = app.semantic_dup_index_build(input).unwrap();
+        assert_eq!(outcome.exit_code, 0);
+
+        // The unrelated `.old` dir must be completely untouched.
+        assert!(unrelated_old.exists(), "unrelated .old dir must not be touched by crash-recovery");
+        assert!(
+            unrelated_old.join("user_data.txt").exists(),
+            "sentinel file inside unrelated .old dir must be preserved"
+        );
+        // db_path must remain absent (zero fragments → fresh-build, no restore).
+        assert!(!db_path.exists(), "db_path must not be created when unrelated .old was skipped");
+    }
+
+    #[test]
+    fn test_commit_rebuilt_index_refuses_to_remove_unrecognized_backup_path() {
+        // commit_rebuilt_index must return Err (not delete) when `backup_path`
+        // exists but is not a recognizable LanceDB index.
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+        let unrelated_old = dir.path().join(".index.db.old");
+
+        // Existing db_path = recognizable fake index.
+        create_fake_lancedb_index(&db_path);
+        std::fs::write(db_path.join("current_sentinel.txt"), "current").unwrap();
+
+        // Unrelated dir at the backup path — no `fragments.lance/` marker.
+        std::fs::create_dir_all(&unrelated_old).unwrap();
+        std::fs::write(unrelated_old.join("user_data.txt"), "precious").unwrap();
+
+        // temp = recognizable fake index.
+        create_fake_lancedb_index(&temp_path);
+        std::fs::write(temp_path.join("new_marker.txt"), "new").unwrap();
+
+        let result = commit_rebuilt_index(&temp_path, &db_path);
+        assert!(
+            result.is_err(),
+            "commit_rebuilt_index must return Err when backup_path is not a LanceDB index"
+        );
+
+        // The unrelated `.old` dir must be preserved.
+        assert!(unrelated_old.exists(), "unrelated backup_path must not be deleted");
+        assert!(
+            unrelated_old.join("user_data.txt").exists(),
+            "sentinel file in unrelated backup_path must be preserved"
+        );
+        // db_path must still be intact (rename aside should not have happened yet).
+        assert!(
+            db_path.exists(),
+            "db_path must be preserved when commit_rebuilt_index returns Err"
+        );
+    }
+
+    /// Verify that a *broken* symlink at `backup_path` (i.e. one whose target
+    /// does not exist) is treated as "backup path occupied by something
+    /// unrecognized" and causes `commit_rebuilt_index` to return `Err` rather
+    /// than silently overwriting it with the `rename(db_path, backup_path)` call.
+    ///
+    /// `Path::exists()` returns `false` for broken symlinks, so the old guard
+    /// `if backup_path.exists()` would skip this block entirely and let the
+    /// subsequent rename clobber the symlink entry.  The fix uses
+    /// `symlink_metadata` (does NOT follow symlinks) instead.
+    #[cfg(unix)]
+    #[test]
+    fn test_commit_rebuilt_index_refuses_to_clobber_broken_symlink_at_backup_path() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+        let backup_path = dir.path().join(".index.db.old");
+
+        // Existing db_path = recognizable fake index.
+        create_fake_lancedb_index(&db_path);
+        std::fs::write(db_path.join("current_sentinel.txt"), "current").unwrap();
+
+        // Create a broken symlink at the backup path — its target does not exist.
+        // `Path::exists()` returns false for broken symlinks; `symlink_metadata`
+        // returns Ok so the guard fires correctly.
+        let nonexistent_target = dir.path().join("does_not_exist");
+        std::os::unix::fs::symlink(&nonexistent_target, &backup_path).unwrap();
+        // Verify the test precondition: broken symlink is invisible to `exists()`.
+        assert!(
+            !backup_path.exists(),
+            "pre-condition: broken symlink must NOT satisfy Path::exists()"
+        );
+        assert!(
+            backup_path.symlink_metadata().is_ok(),
+            "pre-condition: broken symlink MUST be visible to symlink_metadata"
+        );
+
+        // temp = recognizable fake index.
+        create_fake_lancedb_index(&temp_path);
+        std::fs::write(temp_path.join("new_marker.txt"), "new").unwrap();
+
+        let result = commit_rebuilt_index(&temp_path, &db_path);
+        assert!(
+            result.is_err(),
+            "commit_rebuilt_index must return Err when a broken symlink occupies backup_path"
+        );
+
+        // The broken symlink entry itself must not have been removed or replaced.
+        assert!(
+            backup_path.symlink_metadata().is_ok(),
+            "broken symlink at backup_path must not be removed"
+        );
+        // db_path must be completely intact (rename aside must not have happened).
+        assert!(db_path.exists(), "db_path must be preserved when Err is returned");
+        assert!(db_path.join("current_sentinel.txt").exists(), "db_path content must be untouched");
+    }
+
+    #[test]
+    fn test_commit_rebuilt_index_removes_recognizable_stale_backup_on_swap() {
+        // When `backup_path` IS a recognizable LanceDB index (stale from a prior
+        // crashed run), commit_rebuilt_index must remove it and complete the swap.
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+        let stale_backup = dir.path().join(".index.db.old");
+
+        // Existing db_path = recognizable fake index.
+        create_fake_lancedb_index(&db_path);
+        std::fs::write(db_path.join("current_sentinel.txt"), "current").unwrap();
+
+        // Recognizable stale backup — this is our own leftover from a prior crash.
+        create_fake_lancedb_index(&stale_backup);
+        std::fs::write(stale_backup.join("stale_sentinel.txt"), "stale_backup").unwrap();
+
+        // temp = recognizable fake index with new content.
+        create_fake_lancedb_index(&temp_path);
+        std::fs::write(temp_path.join("new_marker.txt"), "new").unwrap();
+
+        let result = commit_rebuilt_index(&temp_path, &db_path);
+        assert!(
+            result.is_ok(),
+            "commit_rebuilt_index must succeed when backup_path is a recognizable index: {:?}",
+            result.err()
+        );
+
+        // db_path must now contain the new content.
+        assert!(db_path.exists(), "db_path must exist after swap");
+        assert!(
+            db_path.join("new_marker.txt").exists(),
+            "db_path must contain the newly built content"
+        );
+        // Stale backup must be gone (removed during swap).
+        assert!(!stale_backup.exists(), "recognizable stale backup must be removed during swap");
+        // Temp path must be gone.
+        assert!(!temp_path.exists(), "temp_path must be removed after successful swap");
     }
 
     // ── truncate_snippet ──────────────────────────────────────────────────────

@@ -1,94 +1,604 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`FindSimilarArgs` leaves both `fragment` and `file` optional, so `sotp find-similar` with no query parses successfully and only fails later in `resolve_fragment_text`. The briefing explicitly assigns this layer the `find-similar <fragment>` / `--file` parse contract, so the CLI help/usage and validation are currently out of sync with AC-01.",
+              "message": "`semantic_dup_check` silently ignores `ack = true` when `ack_file` is `None`, so a public caller can request ack persistence and get a success result with no file written. That makes the exported DTO accept an illegal state and drops the user's `--ack` intent without an error. Reject this combination up front or make the invariant unrepresentable in the input type.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 23,
-              "category": "cli parsing"
-            },
-            {
-              "message": "`dup-index measure-quality` is specified here as a `--workspace-root` command, but this CLI adds and forwards `--db-path` for that subcommand. That leaks an irrelevant index-path dependency into AC-03: the downstream measure-quality wiring opens the DB path before computing metrics, so a bad or unwritable path can make the command fail even though the quality calculation is defined only from workspace fragments.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 86,
-              "category": "requirements coverage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 292,
+              "category": "error handling"
             }
           ],
-          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
-          "at": "2026-05-30T04:26:28Z"
+          "hash": "rvw1:sha256:f481ebfc06c6b8801a3c3ee45a82e220945c1bae401eda0b2f4335969e81e596",
+          "at": "2026-05-30T04:24:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
+          "at": "2026-05-30T04:27:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
+          "at": "2026-05-30T04:30:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf5575e174450c3be1cbf593b4f3e99fd90ce670c14cc2314c67112ebda7f3df",
+          "at": "2026-05-30T04:54:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf5575e174450c3be1cbf593b4f3e99fd90ce670c14cc2314c67112ebda7f3df",
+          "at": "2026-05-30T04:56:59Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
+              "message": "This destructive rebuild path has no regression test in the file for the new behavior: first-run no-op, repeated rebuild replacing stale rows, or propagation of `remove_dir_all` failures. Because `dup-index build` now deletes data before rebuilding, that coverage gap leaves the stale-index fix and the new failure mode unprotected from regression.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
-              "line": 23,
-              "category": "cli parsing"
-            },
-            {
-              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
-              "line": 86,
-              "category": "requirements coverage"
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 118,
+              "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
-          "at": "2026-05-30T04:27:03Z"
+          "hash": "rvw1:sha256:403ca96d94c1886b170b4a5b16c188b4d8bdcfa7b41d6b91e07939040dae2d06",
+          "at": "2026-05-30T05:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `input.db_path` here can wipe arbitrary user data if the CLI is invoked with an overlapping or misconfigured `--db-path` (for example, pointing at the workspace root or another real directory). Because this happens before fragment extraction, a single bad invocation can erase the project tree before the command fails. Reject unsafe path overlaps or constrain cleanup to a dedicated index directory before calling `remove_dir_all`.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 126,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:403ca96d94c1886b170b4a5b16c188b4d8bdcfa7b41d6b91e07939040dae2d06",
+          "at": "2026-05-30T05:46:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This destructive rebuild path has no tests covering the new behavior: neither the happy path where an existing `--db-path` is wiped and rebuilt, nor the refusal path when `--db-path` overlaps the workspace root. Because this method now deletes data before adapter construction, the missing coverage leaves a high-risk regression surface unverified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 118,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:eaed466c4e96e8b82dca4a44a842ec67b22a8de30285f8d5ca58b8a5b0922b2a",
+          "at": "2026-05-30T05:50:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
-          "at": "2026-05-30T04:33:13Z"
+          "hash": "rvw1:sha256:af490b7a9db172da4370b7f80d828907e5920127356c683a20cb4edfb7f20dd1",
+          "at": "2026-05-30T06:08:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af490b7a9db172da4370b7f80d828907e5920127356c683a20cb4edfb7f20dd1",
+          "at": "2026-05-30T06:10:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_recognizable_lancedb_index()` treats any existing `fragments.lance` entry as a valid LanceDB marker because it only checks `.exists()`. An unrelated directory that happens to contain a file or symlink with that name will be classified as an index and then recursively deleted by `remove_dir_all`, which defeats the new data-loss guard. This needs to verify the marker is the expected directory/layout, not just that some path exists.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 113,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:25f3dad3b3594e7eb9c71f7afa5b4a4acf4903fb0c79da4877c1bf8a5c7467a4",
+          "at": "2026-05-30T06:34:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49337a0293eac9af076856b76c9e433dd99f78ab731a881b0bfdebd49f6c1b56",
+          "at": "2026-05-30T06:37:11Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`read_lines_file` takes `&PathBuf`, which triggers Clippy's default `ptr_arg` warning. This repo runs Clippy with `-D warnings` in `clippy-local`/`ci-rust`, so the new CLI scope will fail the required gate even though the code would compile. Change the helper to accept `&Path` and import/use `std::path::Path`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 199,
-              "category": "ci"
+              "message": "`Path::is_dir()` follows symlinks, so an existing non-index directory that contains a `fragments.lance` symlink to any directory is accepted as a recognizable index and then `remove_dir_all(db_path)` deletes that whole user directory. This leaves a data-loss bypass of the new guard; use non-following metadata for the marker and reject symlinks.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 116,
+              "category": "data_loss"
             }
           ],
-          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
-          "at": "2026-05-30T04:37:44Z"
+          "hash": "rvw1:sha256:49337a0293eac9af076856b76c9e433dd99f78ab731a881b0bfdebd49f6c1b56",
+          "at": "2026-05-30T06:38:45Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3ac4e04528714b3152bd73a5bd9d754cc5c4131f9a8acc92d3dc4f8d11a52e14",
-          "at": "2026-05-30T04:40:13Z"
+          "hash": "rvw1:sha256:67f7bbc29338d5e41539f99a00f931d1b1be21e7bfcf8235645369edb889c4a2",
+          "at": "2026-05-30T06:42:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
-          "at": "2026-05-30T08:42:40Z"
+          "hash": "rvw1:sha256:7a042d09840ebb27ad60570f7470d69b830c82f5b752e42d9187980bbc684343",
+          "at": "2026-05-30T08:43:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
-          "at": "2026-05-30T08:44:48Z"
+          "hash": "rvw1:sha256:7a042d09840ebb27ad60570f7470d69b830c82f5b752e42d9187980bbc684343",
+          "at": "2026-05-30T08:45:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If the rename of `temp_path` into `db_path` fails after the existing index has already been renamed aside, the function returns `Err` with `db_path` absent and only the `.old` backup left behind. That breaks the non-destructive rebuild guarantee and can make a transient filesystem error look like data loss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 229,
+              "category": "correctness"
+            },
+            {
+              "message": "The `fragment_count == 0` early return skips `commit_rebuilt_index`, so a rebuild of an emptied workspace leaves any pre-existing index in place. Because `dup-index build` is a rebuild command, this preserves stale semantic-index data instead of reflecting the current tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 321,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5c3a77b7b784435e89ecabf4ce05d775e1db3f21cc6c3e11c194ec1c1410e3d1",
+          "at": "2026-05-30T08:59:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `commit_rebuilt_index` does not actually guarantee the old index is preserved on a failed swap. After moving `db_path` to the backup, it ignores the result of restoring the backup if `rename(temp_path, db_path)` fails. If that restore also fails, the command returns an error with `db_path` still missing, which contradicts the stated non-destructive rebuild guarantee.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 244,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:31c79084ffb6597cdb7c887909854f22e68a3035dd88ad1a2ed5ed2bbeda5fb8",
+          "at": "2026-05-30T09:06:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`commit_rebuilt_index` is not atomic as a whole: once `db_path` has been renamed to `.{filename}.old`, a crash, kill, or power loss before the `temp_path -> db_path` rename leaves `db_path` missing and only the hidden backup remains. The rollback path only runs when `rename(temp_path, db_path)` returns an error, so this still violates the non-destructive rebuild guarantee the change is meant to provide.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 233,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c77dd013661d9ead3774843a4655b64fdd8dbbd0e36f452955cea6e69198ffa2",
+          "at": "2026-05-30T09:11:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`semantic_dup_index_build` still deletes the live `db_path` when `extract_code_fragments` returns an empty set, so an empty or sparse workspace can wipe a previously working index instead of preserving it. That breaks the new non-destructive rebuild intent for `dup-index build` and makes a typo'd `--workspace-root` data-destructive.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 375,
+              "category": "correctness"
+            },
+            {
+              "message": "The new rollback/swap behavior in `semantic_dup_index_build` is not exercised directly by any test in this file. The added unit tests only cover private helpers, so the public API's critical paths (stale-temp cleanup, crash-backup restore, and atomic commit failure handling) can regress without detection.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 320,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:352d4abd7ac68f33607d5bbe9f92db70fc7b2b147d154fde57b2895cbc0db311",
+          "at": "2026-05-30T09:16:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33222d96db44a25b0d1acf9cdaef3c90421b1e55de62bad987b61465f2206a88",
+          "at": "2026-05-30T09:21:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33222d96db44a25b0d1acf9cdaef3c90421b1e55de62bad987b61465f2206a88",
+          "at": "2026-05-30T09:25:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4fd1d76b875ee4e770c257e60dd6d1d5d017dc28957df15d0900138399986c4",
+          "at": "2026-05-30T09:41:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The guard uses `backup_path.exists()`, which returns false for broken symlinks. If a user already has a broken `.index.db.old` symlink, this block is skipped and the later `rename(db_path, backup_path)` overwrites that unrelated path instead of refusing to clobber it. Use `symlink_metadata`/`try_exists` on the backup path itself before deciding it is absent, then apply the recognizable-index check.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 239,
+              "category": "data_loss"
+            }
+          ],
+          "hash": "rvw1:sha256:b4fd1d76b875ee4e770c257e60dd6d1d5d017dc28957df15d0900138399986c4",
+          "at": "2026-05-30T09:43:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9193482101db409a055e230ad8e7b2be80965a6f337ff678f3bee9afa61421",
+          "at": "2026-05-30T09:46:42Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 160,
+              "category": "domain invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:25:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
+          "at": "2026-05-29T15:27:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
+          "at": "2026-05-30T04:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
+          "at": "2026-05-30T04:55:19Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dup_check` hard-codes `DUP_CHECK_TOP_K` to 10, so `SemanticIndexPort::search` can never return all above-threshold matches when more than 10 candidates qualify. That makes `DupCheckWarning.similar_fragments` incomplete and can suppress a warning that the soft gate should emit.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 526,
+              "category": "correctness"
+            },
+            {
+              "message": "`measure_quality` evaluates every cross-file pair instead of using a random sample, but AC-03 defines the threshold-exceed metric as a random-sampled proxy. As written, the reported `above_threshold_rate` is biased and the routine scales as O(n^2) on larger workspaces.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 674,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4cd036df2ec04f552b59341be66dd17c4e9f8916291a0a964b75907879347294",
+          "at": "2026-05-30T01:51:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bcc64ea886b68a3b697d17acf9b8e4ce428946b7f29badcf24635ff9720483b",
+          "at": "2026-05-30T02:00:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bcc64ea886b68a3b697d17acf9b8e4ce428946b7f29badcf24635ff9720483b",
+          "at": "2026-05-30T02:03:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:958a348a47a06be31fa05279e5b54f6da7d18f3568eba60922dabfab1e02bef4",
+          "at": "2026-05-30T04:53:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The threshold boundary test name encodes the opposite expected result: `test_dup_check_interactor_produces_no_warning_when_score_equals_threshold` asserts one warning and its message says equality should warn. Because the project convention puts the expected result in the test name, this makes the boundary behavior contradictory in the test suite; rename it to the asserted behavior or change the assertion if equality should not warn.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 944,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:958a348a47a06be31fa05279e5b54f6da7d18f3568eba60922dabfab1e02bef4",
+          "at": "2026-05-30T04:57:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The usecase test module adds only 14 `#[test]` functions, while the briefing/design intent for this scope says T010 adds 15 unit tests for the four interactors. That leaves the usecase test task incomplete unless the missing test is added or the scope intent is corrected.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 841,
+              "category": "test_coverage"
+            },
+            {
+              "message": "`test_find_similar_interactor_delegates_embed_then_search` does not verify the actual delegation arguments: the `search` mock accepts any embedding and any `TopK`, so an implementation that ignores the embedding result or forwards the wrong `top_k` would still pass. This does not assert the intended embed-to-search delegation contract.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 858,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:28312f977016c66bc2fc47ab861684d7411f880fede1a48db59ec21d5596662f",
+          "at": "2026-05-30T05:01:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new T010 tests leave exercisable public error paths untested: `DupCheckInteractor::dup_check` has no case for embedding failure or index search failure, and `BuildIndexInteractor::build_index` has no case for insert failure. Those services' public contracts promise error propagation, so regressions that swallow or mis-map these errors would still pass this test suite.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 914,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8ce817148dbe57951cf5b3439ca50d50c42a2cf15d6c9f538f2641361865046f",
+          "at": "2026-05-30T05:04:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The only cross-file metrics test uses orthogonal embeddings and asserts a zero mean plus percentile length, so it would still pass if `measure_quality` skipped pair computation and returned the no-pairs zero metrics. This leaves the non-empty metrics path effectively untested; use a non-zero similarity case and assert the actual metric values.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 1179,
+              "category": "testing"
+            },
+            {
+              "message": "This expectation accepts any fragment and any embedding for all three `insert` calls. An implementation that embeds three fragments but inserts the same fragment repeatedly, or inserts an embedding unrelated to the embedding port result, would still pass, so the test does not verify the intended per-fragment insert delegation.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 1095,
+              "category": "testing"
+            },
+            {
+              "message": "The find-similar happy-path expectation ignores the `top_k` argument passed to `search`. If the interactor stopped forwarding the caller's requested `TopK`, this test would still pass, leaving part of the public delegation contract uncovered.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 863,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:cded25beca49797f864f26ca6952bf2960539c9f5cd2ef34054b83e5f31f2825",
+          "at": "2026-05-30T05:08:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_build_index_interactor_calls_insert_for_each_fragment` captures only the embedding argument and ignores the `fragment` passed to `insert`. An implementation that embeds each input but inserts the same or wrong `CodeFragment` on every call would still pass, so the test does not verify the intended per-fragment insert delegation contract.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 1107,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:aa833e5947374cb69da7ef5ff9c9cdfe0b552b9b65fc6c740f894af9b3e58d17",
+          "at": "2026-05-30T05:13:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 test coverage gap: the cross-file `MeasureQualityInteractor` happy-path test only verifies `mean_cosine` and `cosine_percentiles`, but leaves the other public metrics (`cosine_std_dev` and `above_threshold_rate`) unchecked for the non-empty pair case. A regression that returns an incorrect standard deviation or threshold rate while preserving mean/percentiles would still pass this test, so the public API's metrics behavior is not fully covered as required.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_dup.rs",
+              "line": 1197,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c1fe8c0292e2455aab9fe54eee00bc53561007969d32820a9cc8698fa2426584",
+          "at": "2026-05-30T05:17:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0ed1774c43a129874028f546f0c883de61205fca3ee64412175719ed5f1307e",
+          "at": "2026-05-30T05:19:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56ae75ac8fd3abc21eb7f5e242eea3f60ae46fce9ee3cc14485a2973b9f33af5",
+          "at": "2026-05-30T05:42:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56ae75ac8fd3abc21eb7f5e242eea3f60ae46fce9ee3cc14485a2973b9f33af5",
+          "at": "2026-05-30T05:44:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The reservoir update is not Algorithm R: once `reservoir` reaches `MAX_SAMPLE`, every new similarity is unconditionally inserted and only a previously stored item is evicted. That makes the sample strongly biased toward later pairs, so the streaming estimates for large corpora are not uniform and can diverge materially from the intended sampled semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
+              "line": 747,
+              "category": "correctness"
+            },
+            {
+              "message": "`cosine_percentiles` are now computed from the reservoir rather than from the full set of pairwise similarities. Even if the reservoir sampler were fixed, this changes the percentile outputs for any corpus with more than `MAX_SAMPLE` pairs, whereas the previous implementation returned exact percentiles over all similarities.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
+              "line": 775,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e9c87276fadec6fd5e3d90c921ba0bb5d05e3d1d0203601f26f40bde3887b811",
+          "at": "2026-05-30T06:34:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cosine_percentiles` is documented as the full cosine-similarity distribution, but this code now derives it from the `reservoir` sample once the corpus exceeds `MAX_SAMPLE`. That makes `QualityMetrics` approximate for large inputs and changes the public API's percentile values versus the previous exact implementation, which can materially skew threshold calibration.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
+              "line": 780,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f60a85293394df99fb382c8796e7c61c05aecb50385f2cac6984d7f6b28348d4",
+          "at": "2026-05-30T06:38:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The reservoir sampler is not actually uniform: `xorshift_state as usize % welford_count` introduces modulo bias, so replacement decisions are slightly skewed toward lower indices. That breaks the stated Algorithm R guarantee and can bias `cosine_percentiles` and `above_threshold_rate` on large corpora.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
+              "line": 761,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:42dc0275531ba8bf104f4147ddeb3eb94ef2c2606fc315fa6d7e18fff9747b50",
+          "at": "2026-05-30T06:43:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94a719ecea7d20dadb2350b552e6b1bc60c8557d50b9a9bea376cab557b52ba3",
+          "at": "2026-05-30T06:46:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94a719ecea7d20dadb2350b552e6b1bc60c8557d50b9a9bea376cab557b52ba3",
+          "at": "2026-05-30T06:49:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63e13fe4c62acb49037a769cb8d27d5da6d7941c6a000a5bd2ab05b42d63e8eb",
+          "at": "2026-05-30T08:13:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63e13fe4c62acb49037a769cb8d27d5da6d7941c6a000a5bd2ab05b42d63e8eb",
+          "at": "2026-05-30T08:17:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fdf276b3d7f0a41435fc963436bf19571f18f9b99fdb890b39b32a77f99ba5b",
+          "at": "2026-05-30T08:28:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fdf276b3d7f0a41435fc963436bf19571f18f9b99fdb890b39b32a77f99ba5b",
+          "at": "2026-05-30T08:29:25Z"
         }
       ]
     },
@@ -678,320 +1188,140 @@
         }
       ]
     },
-    "cli_composition": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`semantic_dup_check` silently ignores `ack = true` when `ack_file` is `None`, so a public caller can request ack persistence and get a success result with no file written. That makes the exported DTO accept an illegal state and drops the user's `--ack` intent without an error. Reject this combination up front or make the invariant unrepresentable in the input type.",
+              "message": "`FindSimilarArgs` leaves both `fragment` and `file` optional, so `sotp find-similar` with no query parses successfully and only fails later in `resolve_fragment_text`. The briefing explicitly assigns this layer the `find-similar <fragment>` / `--file` parse contract, so the CLI help/usage and validation are currently out of sync with AC-01.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 292,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:f481ebfc06c6b8801a3c3ee45a82e220945c1bae401eda0b2f4335969e81e596",
-          "at": "2026-05-30T04:24:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
-          "at": "2026-05-30T04:27:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
-          "at": "2026-05-30T04:30:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf5575e174450c3be1cbf593b4f3e99fd90ce670c14cc2314c67112ebda7f3df",
-          "at": "2026-05-30T04:54:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf5575e174450c3be1cbf593b4f3e99fd90ce670c14cc2314c67112ebda7f3df",
-          "at": "2026-05-30T04:56:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This destructive rebuild path has no regression test in the file for the new behavior: first-run no-op, repeated rebuild replacing stale rows, or propagation of `remove_dir_all` failures. Because `dup-index build` now deletes data before rebuilding, that coverage gap leaves the stale-index fix and the new failure mode unprotected from regression.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 118,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:403ca96d94c1886b170b4a5b16c188b4d8bdcfa7b41d6b91e07939040dae2d06",
-          "at": "2026-05-30T05:44:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `input.db_path` here can wipe arbitrary user data if the CLI is invoked with an overlapping or misconfigured `--db-path` (for example, pointing at the workspace root or another real directory). Because this happens before fragment extraction, a single bad invocation can erase the project tree before the command fails. Reject unsafe path overlaps or constrain cleanup to a dedicated index directory before calling `remove_dir_all`.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 126,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:403ca96d94c1886b170b4a5b16c188b4d8bdcfa7b41d6b91e07939040dae2d06",
-          "at": "2026-05-30T05:46:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This destructive rebuild path has no tests covering the new behavior: neither the happy path where an existing `--db-path` is wiped and rebuilt, nor the refusal path when `--db-path` overlaps the workspace root. Because this method now deletes data before adapter construction, the missing coverage leaves a high-risk regression surface unverified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 118,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:eaed466c4e96e8b82dca4a44a842ec67b22a8de30285f8d5ca58b8a5b0922b2a",
-          "at": "2026-05-30T05:50:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af490b7a9db172da4370b7f80d828907e5920127356c683a20cb4edfb7f20dd1",
-          "at": "2026-05-30T06:08:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af490b7a9db172da4370b7f80d828907e5920127356c683a20cb4edfb7f20dd1",
-          "at": "2026-05-30T06:10:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`is_recognizable_lancedb_index()` treats any existing `fragments.lance` entry as a valid LanceDB marker because it only checks `.exists()`. An unrelated directory that happens to contain a file or symlink with that name will be classified as an index and then recursively deleted by `remove_dir_all`, which defeats the new data-loss guard. This needs to verify the marker is the expected directory/layout, not just that some path exists.",
-              "severity": "P0",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 113,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:25f3dad3b3594e7eb9c71f7afa5b4a4acf4903fb0c79da4877c1bf8a5c7467a4",
-          "at": "2026-05-30T06:34:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49337a0293eac9af076856b76c9e433dd99f78ab731a881b0bfdebd49f6c1b56",
-          "at": "2026-05-30T06:37:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Path::is_dir()` follows symlinks, so an existing non-index directory that contains a `fragments.lance` symlink to any directory is accepted as a recognizable index and then `remove_dir_all(db_path)` deletes that whole user directory. This leaves a data-loss bypass of the new guard; use non-following metadata for the marker and reject symlinks.",
-              "severity": "P0",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 116,
-              "category": "data_loss"
-            }
-          ],
-          "hash": "rvw1:sha256:49337a0293eac9af076856b76c9e433dd99f78ab731a881b0bfdebd49f6c1b56",
-          "at": "2026-05-30T06:38:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67f7bbc29338d5e41539f99a00f931d1b1be21e7bfcf8235645369edb889c4a2",
-          "at": "2026-05-30T06:42:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a042d09840ebb27ad60570f7470d69b830c82f5b752e42d9187980bbc684343",
-          "at": "2026-05-30T08:43:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a042d09840ebb27ad60570f7470d69b830c82f5b752e42d9187980bbc684343",
-          "at": "2026-05-30T08:45:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "If the rename of `temp_path` into `db_path` fails after the existing index has already been renamed aside, the function returns `Err` with `db_path` absent and only the `.old` backup left behind. That breaks the non-destructive rebuild guarantee and can make a transient filesystem error look like data loss.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 229,
-              "category": "correctness"
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 23,
+              "category": "cli parsing"
             },
             {
-              "message": "The `fragment_count == 0` early return skips `commit_rebuilt_index`, so a rebuild of an emptied workspace leaves any pre-existing index in place. Because `dup-index build` is a rebuild command, this preserves stale semantic-index data instead of reflecting the current tree.",
+              "message": "`dup-index measure-quality` is specified here as a `--workspace-root` command, but this CLI adds and forwards `--db-path` for that subcommand. That leaks an irrelevant index-path dependency into AC-03: the downstream measure-quality wiring opens the DB path before computing metrics, so a bad or unwritable path can make the command fail even though the quality calculation is defined only from workspace fragments.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 321,
-              "category": "correctness"
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 86,
+              "category": "requirements coverage"
             }
           ],
-          "hash": "rvw1:sha256:5c3a77b7b784435e89ecabf4ce05d775e1db3f21cc6c3e11c194ec1c1410e3d1",
-          "at": "2026-05-30T08:59:55Z"
+          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
+          "at": "2026-05-30T04:26:28Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `commit_rebuilt_index` does not actually guarantee the old index is preserved on a failed swap. After moving `db_path` to the backup, it ignores the result of restoring the backup if `rename(temp_path, db_path)` fails. If that restore also fails, the command returns an error with `db_path` still missing, which contradicts the stated non-destructive rebuild guarantee.",
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 244,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:31c79084ffb6597cdb7c887909854f22e68a3035dd88ad1a2ed5ed2bbeda5fb8",
-          "at": "2026-05-30T09:06:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`commit_rebuilt_index` is not atomic as a whole: once `db_path` has been renamed to `.{filename}.old`, a crash, kill, or power loss before the `temp_path -> db_path` rename leaves `db_path` missing and only the hidden backup remains. The rollback path only runs when `rename(temp_path, db_path)` returns an error, so this still violates the non-destructive rebuild guarantee the change is meant to provide.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 233,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c77dd013661d9ead3774843a4655b64fdd8dbbd0e36f452955cea6e69198ffa2",
-          "at": "2026-05-30T09:11:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`semantic_dup_index_build` still deletes the live `db_path` when `extract_code_fragments` returns an empty set, so an empty or sparse workspace can wipe a previously working index instead of preserving it. That breaks the new non-destructive rebuild intent for `dup-index build` and makes a typo'd `--workspace-root` data-destructive.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 375,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "line": 23,
+              "category": "cli parsing"
             },
             {
-              "message": "The new rollback/swap behavior in `semantic_dup_index_build` is not exercised directly by any test in this file. The added unit tests only cover private helpers, so the public API's critical paths (stale-temp cleanup, crash-backup restore, and atomic commit failure handling) can regress without detection.",
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 320,
-              "category": "testing"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "line": 86,
+              "category": "requirements coverage"
             }
           ],
-          "hash": "rvw1:sha256:352d4abd7ac68f33607d5bbe9f92db70fc7b2b147d154fde57b2895cbc0db311",
-          "at": "2026-05-30T09:16:46Z"
+          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
+          "at": "2026-05-30T04:27:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33222d96db44a25b0d1acf9cdaef3c90421b1e55de62bad987b61465f2206a88",
-          "at": "2026-05-30T09:21:21Z"
+          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
+          "at": "2026-05-30T04:33:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_lines_file` takes `&PathBuf`, which triggers Clippy's default `ptr_arg` warning. This repo runs Clippy with `-D warnings` in `clippy-local`/`ci-rust`, so the new CLI scope will fail the required gate even though the code would compile. Change the helper to accept `&Path` and import/use `std::path::Path`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 199,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
+          "at": "2026-05-30T04:37:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33222d96db44a25b0d1acf9cdaef3c90421b1e55de62bad987b61465f2206a88",
-          "at": "2026-05-30T09:25:46Z"
+          "hash": "rvw1:sha256:3ac4e04528714b3152bd73a5bd9d754cc5c4131f9a8acc92d3dc4f8d11a52e14",
+          "at": "2026-05-30T04:40:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
+          "at": "2026-05-30T08:42:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
+          "at": "2026-05-30T08:44:48Z"
         }
       ]
     },
-    "harness-policy": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
-          "at": "2026-05-30T01:32:58Z"
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:15:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
-          "at": "2026-05-30T01:34:52Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
-          "at": "2026-05-29T15:22:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
-              "severity": "P1",
-              "file": "libs/domain/src/semantic_dup.rs",
-              "line": 160,
-              "category": "domain invariant"
-            }
-          ],
-          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
-          "at": "2026-05-29T15:25:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
-          "at": "2026-05-29T15:27:41Z"
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:33:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
-          "at": "2026-05-30T04:53:58Z"
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:43:04Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
-          "at": "2026-05-30T04:55:19Z"
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:44:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
+          "at": "2026-05-30T06:05:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
+          "at": "2026-05-30T06:07:21Z"
         }
       ]
     },
@@ -1452,322 +1782,21 @@
         }
       ]
     },
-    "other": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:15:17Z"
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:32:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:33:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:43:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:44:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
-          "at": "2026-05-30T06:05:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
-          "at": "2026-05-30T06:07:21Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dup_check` hard-codes `DUP_CHECK_TOP_K` to 10, so `SemanticIndexPort::search` can never return all above-threshold matches when more than 10 candidates qualify. That makes `DupCheckWarning.similar_fragments` incomplete and can suppress a warning that the soft gate should emit.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 526,
-              "category": "correctness"
-            },
-            {
-              "message": "`measure_quality` evaluates every cross-file pair instead of using a random sample, but AC-03 defines the threshold-exceed metric as a random-sampled proxy. As written, the reported `above_threshold_rate` is biased and the routine scales as O(n^2) on larger workspaces.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 674,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4cd036df2ec04f552b59341be66dd17c4e9f8916291a0a964b75907879347294",
-          "at": "2026-05-30T01:51:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bcc64ea886b68a3b697d17acf9b8e4ce428946b7f29badcf24635ff9720483b",
-          "at": "2026-05-30T02:00:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bcc64ea886b68a3b697d17acf9b8e4ce428946b7f29badcf24635ff9720483b",
-          "at": "2026-05-30T02:03:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:958a348a47a06be31fa05279e5b54f6da7d18f3568eba60922dabfab1e02bef4",
-          "at": "2026-05-30T04:53:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The threshold boundary test name encodes the opposite expected result: `test_dup_check_interactor_produces_no_warning_when_score_equals_threshold` asserts one warning and its message says equality should warn. Because the project convention puts the expected result in the test name, this makes the boundary behavior contradictory in the test suite; rename it to the asserted behavior or change the assertion if equality should not warn.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 944,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:958a348a47a06be31fa05279e5b54f6da7d18f3568eba60922dabfab1e02bef4",
-          "at": "2026-05-30T04:57:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The usecase test module adds only 14 `#[test]` functions, while the briefing/design intent for this scope says T010 adds 15 unit tests for the four interactors. That leaves the usecase test task incomplete unless the missing test is added or the scope intent is corrected.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 841,
-              "category": "test_coverage"
-            },
-            {
-              "message": "`test_find_similar_interactor_delegates_embed_then_search` does not verify the actual delegation arguments: the `search` mock accepts any embedding and any `TopK`, so an implementation that ignores the embedding result or forwards the wrong `top_k` would still pass. This does not assert the intended embed-to-search delegation contract.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 858,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:28312f977016c66bc2fc47ab861684d7411f880fede1a48db59ec21d5596662f",
-          "at": "2026-05-30T05:01:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new T010 tests leave exercisable public error paths untested: `DupCheckInteractor::dup_check` has no case for embedding failure or index search failure, and `BuildIndexInteractor::build_index` has no case for insert failure. Those services' public contracts promise error propagation, so regressions that swallow or mis-map these errors would still pass this test suite.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 914,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:8ce817148dbe57951cf5b3439ca50d50c42a2cf15d6c9f538f2641361865046f",
-          "at": "2026-05-30T05:04:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The only cross-file metrics test uses orthogonal embeddings and asserts a zero mean plus percentile length, so it would still pass if `measure_quality` skipped pair computation and returned the no-pairs zero metrics. This leaves the non-empty metrics path effectively untested; use a non-zero similarity case and assert the actual metric values.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 1179,
-              "category": "testing"
-            },
-            {
-              "message": "This expectation accepts any fragment and any embedding for all three `insert` calls. An implementation that embeds three fragments but inserts the same fragment repeatedly, or inserts an embedding unrelated to the embedding port result, would still pass, so the test does not verify the intended per-fragment insert delegation.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 1095,
-              "category": "testing"
-            },
-            {
-              "message": "The find-similar happy-path expectation ignores the `top_k` argument passed to `search`. If the interactor stopped forwarding the caller's requested `TopK`, this test would still pass, leaving part of the public delegation contract uncovered.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 863,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:cded25beca49797f864f26ca6952bf2960539c9f5cd2ef34054b83e5f31f2825",
-          "at": "2026-05-30T05:08:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_build_index_interactor_calls_insert_for_each_fragment` captures only the embedding argument and ignores the `fragment` passed to `insert`. An implementation that embeds each input but inserts the same or wrong `CodeFragment` on every call would still pass, so the test does not verify the intended per-fragment insert delegation contract.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 1107,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:aa833e5947374cb69da7ef5ff9c9cdfe0b552b9b65fc6c740f894af9b3e58d17",
-          "at": "2026-05-30T05:13:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 test coverage gap: the cross-file `MeasureQualityInteractor` happy-path test only verifies `mean_cosine` and `cosine_percentiles`, but leaves the other public metrics (`cosine_std_dev` and `above_threshold_rate`) unchecked for the non-empty pair case. A regression that returns an incorrect standard deviation or threshold rate while preserving mean/percentiles would still pass this test, so the public API's metrics behavior is not fully covered as required.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_dup.rs",
-              "line": 1197,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:c1fe8c0292e2455aab9fe54eee00bc53561007969d32820a9cc8698fa2426584",
-          "at": "2026-05-30T05:17:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b0ed1774c43a129874028f546f0c883de61205fca3ee64412175719ed5f1307e",
-          "at": "2026-05-30T05:19:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56ae75ac8fd3abc21eb7f5e242eea3f60ae46fce9ee3cc14485a2973b9f33af5",
-          "at": "2026-05-30T05:42:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56ae75ac8fd3abc21eb7f5e242eea3f60ae46fce9ee3cc14485a2973b9f33af5",
-          "at": "2026-05-30T05:44:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The reservoir update is not Algorithm R: once `reservoir` reaches `MAX_SAMPLE`, every new similarity is unconditionally inserted and only a previously stored item is evicted. That makes the sample strongly biased toward later pairs, so the streaming estimates for large corpora are not uniform and can diverge materially from the intended sampled semantics.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
-              "line": 747,
-              "category": "correctness"
-            },
-            {
-              "message": "`cosine_percentiles` are now computed from the reservoir rather than from the full set of pairwise similarities. Even if the reservoir sampler were fixed, this changes the percentile outputs for any corpus with more than `MAX_SAMPLE` pairs, whereas the previous implementation returned exact percentiles over all similarities.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
-              "line": 775,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e9c87276fadec6fd5e3d90c921ba0bb5d05e3d1d0203601f26f40bde3887b811",
-          "at": "2026-05-30T06:34:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cosine_percentiles` is documented as the full cosine-similarity distribution, but this code now derives it from the `reservoir` sample once the corpus exceeds `MAX_SAMPLE`. That makes `QualityMetrics` approximate for large inputs and changes the public API's percentile values versus the previous exact implementation, which can materially skew threshold calibration.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
-              "line": 780,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f60a85293394df99fb382c8796e7c61c05aecb50385f2cac6984d7f6b28348d4",
-          "at": "2026-05-30T06:38:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The reservoir sampler is not actually uniform: `xorshift_state as usize % welford_count` introduces modulo bias, so replacement decisions are slightly skewed toward lower indices. That breaks the stated Algorithm R guarantee and can bias `cosine_percentiles` and `above_threshold_rate` on large corpora.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
-              "line": 761,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:42dc0275531ba8bf104f4147ddeb3eb94ef2c2606fc315fa6d7e18fff9747b50",
-          "at": "2026-05-30T06:43:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94a719ecea7d20dadb2350b552e6b1bc60c8557d50b9a9bea376cab557b52ba3",
-          "at": "2026-05-30T06:46:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94a719ecea7d20dadb2350b552e6b1bc60c8557d50b9a9bea376cab557b52ba3",
-          "at": "2026-05-30T06:49:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63e13fe4c62acb49037a769cb8d27d5da6d7941c6a000a5bd2ab05b42d63e8eb",
-          "at": "2026-05-30T08:13:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63e13fe4c62acb49037a769cb8d27d5da6d7941c6a000a5bd2ab05b42d63e8eb",
-          "at": "2026-05-30T08:17:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fdf276b3d7f0a41435fc963436bf19571f18f9b99fdb890b39b32a77f99ba5b",
-          "at": "2026-05-30T08:28:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fdf276b3d7f0a41435fc963436bf19571f18f9b99fdb890b39b32a77f99ba5b",
-          "at": "2026-05-30T08:29:25Z"
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:34:52Z"
         }
       ]
     }
