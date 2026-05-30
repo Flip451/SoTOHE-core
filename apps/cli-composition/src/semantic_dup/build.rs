@@ -61,8 +61,15 @@ fn is_tool_owned_index(dir: &Path) -> bool {
 
 /// Validate that `db_path` is safe to overwrite during an index rebuild.
 ///
-/// This helper checks both safety guards WITHOUT deleting anything:
+/// This helper checks all safety guards WITHOUT deleting anything:
 ///
+/// 0. Rejects `db_path` that is itself a symlink (real or broken).  The atomic
+///    swap in `commit_rebuilt_index` renames the `db_path` ENTRY itself, so a
+///    symlink would be moved aside and the new index installed at the link path —
+///    silently detaching from the symlink's target (e.g. a shared/cache index).
+///    `symlink_metadata` (which does NOT follow symlinks) is used so that a
+///    broken/dangling symlink is also caught.  Only a real directory or a
+///    non-existent path (fresh build) is accepted.
 /// 1. Rejects `db_path` values that are equal to or an ancestor of
 ///    `workspace_root` (path-overlap data-loss guard).
 /// 2. If `db_path` exists but is NOT a recognizable LanceDB index (missing
@@ -72,9 +79,28 @@ fn is_tool_owned_index(dir: &Path) -> bool {
 ///
 /// # Errors
 ///
-/// Returns `Err` if the path-overlap guard fires, if `canonicalize` fails,
-/// or if the directory exists but is not a recognizable LanceDB index.
+/// Returns `Err` if the symlink guard fires, if the path-overlap guard fires,
+/// if `canonicalize` fails, or if the directory exists but is not a recognizable
+/// LanceDB index.
 fn validate_db_path_for_rebuild(db_path: &Path, workspace_root: &Path) -> Result<(), String> {
+    // Guard 0: reject a symlinked --db-path.  The atomic swap in
+    // `commit_rebuilt_index` renames the db_path ENTRY itself, so a symlink
+    // would be moved aside and the new index installed at the link path —
+    // silently detaching from the symlink's target (e.g. a shared/cache index).
+    // `symlink_metadata` does NOT follow the link, so this also catches a
+    // broken/dangling symlink.  Require a real directory, or a path that does
+    // not exist yet (fresh build).
+    if let Ok(meta) = std::fs::symlink_metadata(db_path) {
+        if meta.file_type().is_symlink() {
+            return Err(format!(
+                "--db-path '{}' is a symlink; point it at a real directory instead \
+                 (rebuild renames the path entry, which would replace the link rather \
+                 than its target)",
+                db_path.display(),
+            ));
+        }
+    }
+
     if !db_path.exists() {
         return Ok(());
     }
@@ -564,6 +590,63 @@ mod tests {
         let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_ok(), "no-op on absent path must succeed: {:?}", result.err());
         assert!(!db_path.exists(), "absent db_path must still not exist after validate");
+    }
+
+    /// A `db_path` that is a symlink pointing to a recognizable LanceDB index
+    /// must be rejected.  The atomic swap in `commit_rebuilt_index` would rename
+    /// the symlink entry aside, silently detaching future accesses from the target.
+    #[cfg(unix)]
+    #[test]
+    fn test_validate_db_path_for_rebuild_rejects_db_path_that_is_symlink_to_index() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+
+        // Create a real recognizable index as the symlink target.
+        let real_index = dir.path().join("real_index.db");
+        create_fake_lancedb_index(&real_index);
+
+        // db_path is a symlink pointing at the real index.
+        let db_path = dir.path().join("link_index.db");
+        std::os::unix::fs::symlink(&real_index, &db_path).unwrap();
+        assert!(
+            db_path.symlink_metadata().unwrap().file_type().is_symlink(),
+            "pre-condition: db_path must be a symlink"
+        );
+        assert!(db_path.exists(), "pre-condition: symlink target must exist (not broken)");
+
+        let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
+        assert!(result.is_err(), "a symlinked db_path must be rejected");
+        let msg = result.unwrap_err();
+        assert!(msg.contains("symlink"), "error message must mention 'symlink', got: {msg}");
+    }
+
+    /// A `db_path` that is a BROKEN symlink (dangling — target does not exist)
+    /// must also be rejected.  `Path::exists()` returns `false` for broken
+    /// symlinks, so without the symlink guard the code would reach the
+    /// `if !db_path.exists() { return Ok(()) }` early-return and silently accept
+    /// a dangling link as a "fresh build" path.
+    #[cfg(unix)]
+    #[test]
+    fn test_validate_db_path_for_rebuild_rejects_broken_symlink_db_path() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+
+        // Create a symlink whose target does not exist (broken/dangling).
+        let nonexistent_target = dir.path().join("does_not_exist");
+        let db_path = dir.path().join("broken_link.db");
+        std::os::unix::fs::symlink(&nonexistent_target, &db_path).unwrap();
+        assert!(
+            db_path.symlink_metadata().unwrap().file_type().is_symlink(),
+            "pre-condition: db_path must be a symlink"
+        );
+        assert!(!db_path.exists(), "pre-condition: broken symlink must NOT satisfy Path::exists()");
+
+        let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
+        assert!(result.is_err(), "a broken-symlink db_path must be rejected");
+        let msg = result.unwrap_err();
+        assert!(msg.contains("symlink"), "error message must mention 'symlink', got: {msg}");
     }
 
     // ── commit_rebuilt_index: atomic swap ────────────────────────────────────
