@@ -317,26 +317,42 @@ impl MeasureQualityInteractor {
 }
 
 impl MeasureQualityService for MeasureQualityInteractor {
-    /// Embed all fragments, compute pairwise cosine similarities, and return
-    /// the resulting distribution as [`QualityMetrics`].
+    /// Embed all fragments, sample bounded cross-file fragment pairs, compute
+    /// cosine similarities on the sample, and return the resulting distribution
+    /// as [`QualityMetrics`].
     ///
-    /// Pairwise similarities are computed only between fragments from
-    /// different source paths (cross-file pairs), which is the PoC proxy
-    /// for false-positive risk (AC-03/IN-05). Self-pairs (same source path)
-    /// are excluded.
+    /// Similarities are computed only on **randomly sampled cross-file pairs**
+    /// (fragments from different source paths), which is the PoC proxy for
+    /// false-positive risk (AC-03/IN-05).  Self-pairs (same source path) are
+    /// always excluded.
     ///
     /// When fewer than two fragments are present, or no cross-file pairs
     /// exist, all metrics are returned as `0.0`.
     ///
-    /// ## Implementation: single-pass streaming
+    /// ## Implementation: bounded pair sampling (AC-03 conformant)
     ///
-    /// Mean and variance are accumulated via Welford's online algorithm so
-    /// that O(n²) pairs are never materialised in memory.  For
-    /// `above_threshold_rate`, a reservoir sample of at most `MAX_SAMPLE`
-    /// entries is maintained using the same XorShift64 PRNG already used for
-    /// determinism; the reservoir is filled in-order and then replaced
-    /// probabilistically.  Percentiles are computed from the reservoir (which
-    /// is exact when pair count ≤ `MAX_SAMPLE`).
+    /// The method is **deterministic** for a given input: all random choices
+    /// derive from a seed that is a pure function of `n` (the fragment count),
+    /// with no wall-clock or external entropy, satisfying CN-04/AC-03.
+    ///
+    /// Let `total_pairs = n*(n-1)/2`:
+    ///
+    /// - **Exact branch** (`total_pairs ≤ PAIR_BUDGET`): enumerate all i<j
+    ///   pairs in order, skip same-source-path, compute cosine for each
+    ///   cross-file pair.  Metrics are exact (no sampling approximation).
+    ///
+    /// - **Sampled branch** (`total_pairs > PAIR_BUDGET`): draw random pairs
+    ///   with replacement using a XorShift64 PRNG seeded from `(n as u64) | 1`
+    ///   (never zero).  Each draw picks indices `a, b` in `[0, n)` via
+    ///   Lemire's multiply-high method (bias-free); pairs where `a == b` or
+    ///   both fragments share a source path are retried.  Sampling stops when
+    ///   `PAIR_BUDGET` cross-file cosines are collected or the attempt cap
+    ///   (`PAIR_BUDGET * 64`) is reached (guards against corpora where
+    ///   cross-file pairs are extremely sparse).  Metrics are then computed
+    ///   from the collected sample (an unbiased estimate per AC-03).
+    ///
+    /// All metrics (mean, population std-dev, 7 percentiles, above-threshold
+    /// rate) are derived from the collected sample `Vec<f32>`.
     ///
     /// # Errors
     ///
@@ -347,7 +363,7 @@ impl MeasureQualityService for MeasureQualityInteractor {
         &self,
         cmd: &MeasureQualityCommand,
     ) -> Result<QualityMetrics, MeasureQualityError> {
-        // Embed all fragments.
+        // Embed all fragments (O(n) — linear and necessary).
         let embeddings: Vec<Vec<f32>> = cmd
             .fragments
             .iter()
@@ -355,86 +371,17 @@ impl MeasureQualityService for MeasureQualityInteractor {
             .collect::<Result<Vec<_>, _>>()?;
 
         // Default threshold for the above-threshold-rate proxy (0.8 is the
-        // typical starting point for the soft gate; the exact value is
-        // calibrated from the percentile distribution).
+        // typical starting point for the soft gate; calibrated from the
+        // percentile distribution).
         let default_threshold: f32 = 0.8;
-        // Maximum reservoir size for percentile computation and threshold-rate
-        // estimation.  When pair count ≤ MAX_SAMPLE the reservoir is exact.
-        const MAX_SAMPLE: usize = 10_000;
+        // Budget for the number of cross-file cosine computations.
+        // When total cross-file pairs ≤ PAIR_BUDGET the exact branch is taken.
+        const PAIR_BUDGET: usize = 10_000;
 
-        // Single-pass streaming accumulators — no O(n²) Vec materialisation.
-        //
-        // Welford's online algorithm for mean and M2 (sum of squared deltas):
-        //   mean_n = mean_{n-1} + (x - mean_{n-1}) / n
-        //   M2_n   = M2_{n-1}  + (x - mean_{n-1}) * (x - mean_n)
-        //   variance = M2 / n  (population variance)
-        let mut welford_count: u64 = 0;
-        let mut welford_mean: f64 = 0.0;
-        let mut welford_m2: f64 = 0.0;
+        let n = cmd.fragments.len();
+        let sample = sample_cross_file_cosines(&cmd.fragments, &embeddings, n, PAIR_BUDGET);
 
-        // Reservoir for percentile / threshold-rate computation.
-        // Seeded with `1` so that the XorShift64 state is never zero before
-        // any pair has been seen.  The seed is updated on the first pair using
-        // the pair count, matching the original approach.
-        let mut reservoir: Vec<f32> = Vec::with_capacity(MAX_SAMPLE.min(1024));
-        let mut xorshift_state: u64 = 1;
-        let mut xorshift_seeded = false;
-
-        let n_frags = cmd.fragments.len();
-        for i in 0..n_frags {
-            for j in (i + 1)..n_frags {
-                // Only cross-file pairs (CN-03 / AC-03 scope).
-                let Some(fi) = cmd.fragments.get(i) else { continue };
-                let Some(fj) = cmd.fragments.get(j) else { continue };
-                if fi.source_path == fj.source_path {
-                    continue;
-                }
-                let Some(ei) = embeddings.get(i) else { continue };
-                let Some(ej) = embeddings.get(j) else { continue };
-                let sim = cosine_similarity(ei, ej);
-
-                // ── Welford update ────────────────────────────────────────────
-                welford_count += 1;
-                let delta = f64::from(sim) - welford_mean;
-                welford_mean += delta / welford_count as f64;
-                let delta2 = f64::from(sim) - welford_mean;
-                welford_m2 += delta * delta2;
-
-                // ── Reservoir update (Algorithm R) ────────────────────────────
-                // On the very first pair, seed the PRNG from the pair index so
-                // determinism matches the original subsample approach.
-                if !xorshift_seeded {
-                    xorshift_state = welford_count | 1;
-                    xorshift_seeded = true;
-                }
-
-                if reservoir.len() < MAX_SAMPLE {
-                    reservoir.push(sim);
-                } else {
-                    // Algorithm R: accept the n-th item with probability k/n,
-                    // where k = MAX_SAMPLE and n = welford_count (current pair
-                    // index, 1-based).
-                    //
-                    // Generate a bias-free uniform random index j in [0, n) via
-                    // Lemire's multiply-high method (2019): map the 64-bit PRNG
-                    // output to [0, n) without modulo bias.
-                    //   j = floor(rng * n / 2^64)  using 128-bit intermediate
-                    // This is exact (no modulo bias) and branch-free.
-                    xorshift_state ^= xorshift_state << 13;
-                    xorshift_state ^= xorshift_state >> 7;
-                    xorshift_state ^= xorshift_state << 17;
-                    let n = welford_count as u128;
-                    let j = (((xorshift_state as u128).wrapping_mul(n)) >> 64) as usize;
-                    if j < MAX_SAMPLE {
-                        if let Some(slot) = reservoir.get_mut(j) {
-                            *slot = sim;
-                        }
-                    }
-                }
-            }
-        }
-
-        if welford_count == 0 {
+        if sample.is_empty() {
             return Ok(QualityMetrics {
                 mean_cosine: 0.0,
                 cosine_std_dev: 0.0,
@@ -443,13 +390,22 @@ impl MeasureQualityService for MeasureQualityInteractor {
             });
         }
 
-        let mean_cosine = welford_mean as f32;
-        let variance = if welford_count > 0 { welford_m2 / welford_count as f64 } else { 0.0 };
-        let cosine_std_dev = (variance.sqrt()) as f32;
+        // Compute mean and population variance over the sample.
+        let count = sample.len();
+        let mean_f64: f64 = sample.iter().map(|&x| f64::from(x)).sum::<f64>() / count as f64;
+        let variance_f64: f64 = sample
+            .iter()
+            .map(|&x| {
+                let d = f64::from(x) - mean_f64;
+                d * d
+            })
+            .sum::<f64>()
+            / count as f64;
+        let mean_cosine = mean_f64 as f32;
+        let cosine_std_dev = variance_f64.sqrt() as f32;
 
-        // Percentiles are computed from the reservoir (exact when ≤ MAX_SAMPLE
-        // pairs; approximate but deterministic for larger workspaces).
-        let mut sorted = reservoir.clone();
+        // Percentiles from sorted sample.
+        let mut sorted = sample.clone();
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
 
         let percentile = |p: f32| -> f32 {
@@ -467,11 +423,9 @@ impl MeasureQualityService for MeasureQualityInteractor {
             percentile(99.0),
         ];
 
-        // above_threshold_rate: fraction of reservoir entries above threshold.
-        // When pair count ≤ MAX_SAMPLE this equals the full-population rate.
-        let above = reservoir.iter().filter(|&&s| s >= default_threshold).count();
-        let above_threshold_rate =
-            if reservoir.is_empty() { 0.0 } else { above as f32 / reservoir.len() as f32 };
+        // above_threshold_rate: fraction of sample entries at or above threshold.
+        let above = sample.iter().filter(|&&s| s >= default_threshold).count();
+        let above_threshold_rate = above as f32 / sample.len() as f32;
 
         Ok(QualityMetrics { mean_cosine, cosine_std_dev, cosine_percentiles, above_threshold_rate })
     }
@@ -494,11 +448,126 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     dot / (mag_a * mag_b)
 }
 
+/// Advance a XorShift64 PRNG state by one step.
+///
+/// The caller must ensure `state != 0` before the first call.
+/// The standard XorShift64 parameters (13, 7, 17) are used.
+#[inline]
+fn xorshift64_next(state: &mut u64) -> u64 {
+    *state ^= *state << 13;
+    *state ^= *state >> 7;
+    *state ^= *state << 17;
+    *state
+}
+
+/// Draw a bias-free uniform random index in `[0, n)` from a 64-bit PRNG value
+/// using Lemire's multiply-high method (2019).
+///
+/// `rng_val` is the raw 64-bit PRNG output; `n` must be > 0.
+#[inline]
+fn lemire_index(rng_val: u64, n: usize) -> usize {
+    // floor(rng_val * n / 2^64) using 128-bit intermediate — exact, no modulo bias.
+    (((rng_val as u128).wrapping_mul(n as u128)) >> 64) as usize
+}
+
+/// Collect a bounded sample of cross-file cosine similarities from `fragments`
+/// and their pre-computed `embeddings`.
+///
+/// Returns a `Vec<f32>` of at most `pair_budget` cosine similarity values,
+/// computed only for cross-file pairs (different `source_path`).
+///
+/// ## Algorithm
+///
+/// Let `total_pairs = n*(n-1)/2` (all i<j pairs):
+///
+/// - **Exact branch** (`total_pairs ≤ pair_budget`): enumerate all i<j pairs,
+///   skip same-source-path, compute cosine for each cross-file pair.  The
+///   result is the complete cross-file cosine set.
+///
+/// - **Sampled branch** (`total_pairs > pair_budget`): draw pairs with
+///   replacement using a XorShift64 PRNG seeded from `(n as u64) | 1` (no
+///   wall-clock; deterministic for a given `n`).  Pairs where both indices are
+///   equal, or both fragments share a source path, are retried.  Stops when
+///   `pair_budget` cross-file cosines are collected or `pair_budget * 64`
+///   attempts are exhausted (sparse-corpus guard).
+///
+/// Returns an empty `Vec` when `n < 2` or no cross-file pairs exist.
+fn sample_cross_file_cosines(
+    fragments: &[domain::semantic_dup::CodeFragment],
+    embeddings: &[Vec<f32>],
+    n: usize,
+    pair_budget: usize,
+) -> Vec<f32> {
+    if n < 2 || pair_budget == 0 {
+        return Vec::new();
+    }
+
+    // total_pairs = n*(n-1)/2.  Use saturating arithmetic to avoid overflow on
+    // huge n; if n is large enough to overflow usize we are firmly in the
+    // sampled branch.
+    let total_pairs = n.saturating_sub(1).saturating_mul(n) / 2;
+
+    if total_pairs <= pair_budget {
+        // Exact branch: enumerate all i<j cross-file pairs.
+        let mut sample = Vec::new();
+        for i in 0..n {
+            for j in (i + 1)..n {
+                let Some(fi) = fragments.get(i) else { continue };
+                let Some(fj) = fragments.get(j) else { continue };
+                if fi.source_path == fj.source_path {
+                    continue;
+                }
+                let Some(ei) = embeddings.get(i) else { continue };
+                let Some(ej) = embeddings.get(j) else { continue };
+                sample.push(cosine_similarity(ei, ej));
+            }
+        }
+        sample
+    } else {
+        // Sampled branch: draw random pairs with replacement.
+        // Seed is a pure function of n — deterministic, no wall-clock.
+        let mut rng_state: u64 = (n as u64) | 1;
+        let mut sample = Vec::with_capacity(pair_budget);
+        let attempt_cap = pair_budget.saturating_mul(64);
+        let mut attempts = 0usize;
+
+        while sample.len() < pair_budget && attempts < attempt_cap {
+            attempts += 1;
+
+            // Draw index a in [0, n).
+            let a = lemire_index(xorshift64_next(&mut rng_state), n);
+            // Draw index b in [0, n).
+            let b = lemire_index(xorshift64_next(&mut rng_state), n);
+
+            if a == b {
+                continue;
+            }
+
+            let Some(fa) = fragments.get(a) else { continue };
+            let Some(fb) = fragments.get(b) else { continue };
+            if fa.source_path == fb.source_path {
+                continue;
+            }
+
+            let Some(ea) = embeddings.get(a) else { continue };
+            let Some(eb) = embeddings.get(b) else { continue };
+            sample.push(cosine_similarity(ea, eb));
+        }
+
+        sample
+    }
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
-    #![allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::type_complexity)]
+    #![allow(
+        clippy::unwrap_used,
+        clippy::expect_used,
+        clippy::indexing_slicing,
+        clippy::type_complexity
+    )]
 
     use std::path::PathBuf;
     use std::sync::Arc;
@@ -1239,5 +1308,316 @@ mod tests {
             metrics.above_threshold_rate
         );
         assert_eq!(metrics.cosine_percentiles.len(), 7);
+    }
+
+    // ── MeasureQualityInteractor: bounded pair-sampling behaviour ─────────────
+
+    #[test]
+    fn test_measure_quality_deterministic_same_input_yields_identical_metrics() {
+        // Determinism: two calls with the same fragments must return identical metrics.
+        // Uses 200 fragments so total_pairs = 19_900 > PAIR_BUDGET (10_000),
+        // exercising the sampled branch.
+        let n = 200usize;
+        let frags: Vec<CodeFragment> = (0..n)
+            .map(|i| make_fragment(&format!("src/{i}.rs"), &format!("fn f{i}() {{}}")))
+            .collect();
+
+        // Alternating unit vectors so cosine similarities are either 1.0 or 0.0,
+        // giving a non-trivial distribution (not all-1.0).
+        let embeds: Vec<Vec<f32>> = (0..n)
+            .map(|i| if i % 2 == 0 { vec![1.0_f32, 0.0] } else { vec![0.0_f32, 1.0] })
+            .collect();
+
+        // Build both interactors with separate mock objects returning the same data.
+        let mut mock_embed1 = MockMockEmbeddingPort::new();
+        let embeds1 = embeds.clone();
+        {
+            let mut c = 0usize;
+            mock_embed1.expect_embed().times(n).returning(move |_| {
+                let v = embeds1[c].clone();
+                c += 1;
+                Ok(v)
+            });
+        }
+
+        let mut mock_embed2 = MockMockEmbeddingPort::new();
+        let embeds2 = embeds.clone();
+        {
+            let mut c = 0usize;
+            mock_embed2.expect_embed().times(n).returning(move |_| {
+                let v = embeds2[c].clone();
+                c += 1;
+                Ok(v)
+            });
+        }
+
+        let interactor1 = MeasureQualityInteractor::new(
+            Arc::new(mock_embed1),
+            Arc::new(MockMockSemanticIndexPort::new()),
+        );
+        let interactor2 = MeasureQualityInteractor::new(
+            Arc::new(mock_embed2),
+            Arc::new(MockMockSemanticIndexPort::new()),
+        );
+
+        let cmd = MeasureQualityCommand { fragments: frags };
+        let m1 = interactor1.measure_quality(&cmd).unwrap();
+        let m2 = interactor2.measure_quality(&cmd).unwrap();
+
+        assert_eq!(
+            m1.mean_cosine, m2.mean_cosine,
+            "mean_cosine must be identical across two calls with the same input"
+        );
+        assert_eq!(
+            m1.cosine_std_dev, m2.cosine_std_dev,
+            "cosine_std_dev must be identical across two calls with the same input"
+        );
+        assert_eq!(
+            m1.above_threshold_rate, m2.above_threshold_rate,
+            "above_threshold_rate must be identical across two calls with the same input"
+        );
+        assert_eq!(
+            m1.cosine_percentiles, m2.cosine_percentiles,
+            "cosine_percentiles must be identical across two calls with the same input"
+        );
+    }
+
+    #[test]
+    fn test_measure_quality_small_input_exact_metrics_match_hand_computed() {
+        // Small-input exactness: 3 fragments on 3 paths → 3 pairs, all cross-file.
+        // total_pairs = 3 ≤ PAIR_BUDGET (10_000) → exact branch.
+        // Embeddings:
+        //   a = [1, 0], b = [1, 0], c = [0, 1]
+        // Cross-file cosines:
+        //   (a,b) = 1.0,  (a,c) = 0.0,  (b,c) = 0.0
+        // Mean = 1/3, population variance = ((1-1/3)^2 + 2*(0-1/3)^2) / 3
+        let frags = vec![
+            make_fragment("src/a.rs", "fn a() {}"),
+            make_fragment("src/b.rs", "fn b() {}"),
+            make_fragment("src/c.rs", "fn c() {}"),
+        ];
+        let embeds_data = vec![vec![1.0_f32, 0.0], vec![1.0_f32, 0.0], vec![0.0_f32, 1.0]];
+
+        let mut call_idx = 0usize;
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        let embeds_clone = embeds_data.clone();
+        mock_embed.expect_embed().times(3).returning(move |_| {
+            let v = embeds_clone[call_idx].clone();
+            call_idx += 1;
+            Ok(v)
+        });
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        // Hand-computed expected values.
+        let expected_mean = 1.0_f32 / 3.0;
+        let expected_variance = ((1.0 - expected_mean).powi(2)
+            + (0.0 - expected_mean).powi(2)
+            + (0.0 - expected_mean).powi(2))
+            / 3.0;
+        let expected_std_dev = expected_variance.sqrt();
+
+        assert!(
+            (metrics.mean_cosine - expected_mean).abs() < 1e-5,
+            "mean_cosine mismatch: expected {expected_mean}, got {}",
+            metrics.mean_cosine
+        );
+        assert!(
+            (metrics.cosine_std_dev - expected_std_dev).abs() < 1e-5,
+            "cosine_std_dev mismatch: expected {expected_std_dev}, got {}",
+            metrics.cosine_std_dev
+        );
+        // 1 of 3 sampled cosines >= 0.8 → above_threshold_rate = 1/3.
+        assert!(
+            (metrics.above_threshold_rate - 1.0_f32 / 3.0).abs() < 1e-5,
+            "above_threshold_rate mismatch: expected ≈ 0.3333, got {}",
+            metrics.above_threshold_rate
+        );
+        assert_eq!(metrics.cosine_percentiles.len(), 7);
+    }
+
+    #[test]
+    fn test_measure_quality_less_than_two_fragments_returns_zero_metrics() {
+        // < 2 fragments → no pairs possible → all-zero metrics.
+        // Zero fragments case.
+        let mock_embed_empty = MockMockEmbeddingPort::new();
+        let interactor_empty = MeasureQualityInteractor::new(
+            Arc::new(mock_embed_empty),
+            Arc::new(MockMockSemanticIndexPort::new()),
+        );
+        let m_empty =
+            interactor_empty.measure_quality(&MeasureQualityCommand { fragments: vec![] }).unwrap();
+        assert_eq!(m_empty.mean_cosine, 0.0);
+        assert_eq!(m_empty.cosine_std_dev, 0.0);
+        assert_eq!(m_empty.above_threshold_rate, 0.0);
+        assert_eq!(m_empty.cosine_percentiles, vec![0.0; 7]);
+
+        // One fragment case.
+        let frag = make_fragment("src/a.rs", "fn a() {}");
+        let mut mock_embed_one = MockMockEmbeddingPort::new();
+        mock_embed_one.expect_embed().times(1).returning(|_| Ok(vec![1.0, 0.0]));
+        let interactor_one = MeasureQualityInteractor::new(
+            Arc::new(mock_embed_one),
+            Arc::new(MockMockSemanticIndexPort::new()),
+        );
+        let m_one = interactor_one
+            .measure_quality(&MeasureQualityCommand { fragments: vec![frag] })
+            .unwrap();
+        assert_eq!(m_one.mean_cosine, 0.0);
+        assert_eq!(m_one.cosine_std_dev, 0.0);
+        assert_eq!(m_one.above_threshold_rate, 0.0);
+    }
+
+    #[test]
+    fn test_measure_quality_same_file_pairs_excluded_returns_zero_metrics() {
+        // All fragments on the same source_path → no cross-file pairs → all-zero.
+        let frags = vec![
+            make_fragment("src/a.rs", "fn x() {}"),
+            make_fragment("src/a.rs", "fn y() {}"),
+            make_fragment("src/a.rs", "fn z() {}"),
+        ];
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(3).returning(|_| Ok(vec![1.0_f32, 0.0]));
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        assert_eq!(metrics.mean_cosine, 0.0, "same-path-only input must yield zero mean");
+        assert_eq!(metrics.cosine_std_dev, 0.0);
+        assert_eq!(metrics.above_threshold_rate, 0.0);
+        assert_eq!(metrics.cosine_percentiles, vec![0.0; 7]);
+    }
+
+    #[test]
+    fn test_measure_quality_large_corpus_sampled_branch_returns_finite_capped_metrics() {
+        // Large-input bounding: n=200 → total_pairs=19_900 > PAIR_BUDGET (10_000).
+        // Exercises the sampled branch.  Asserts:
+        // (a) the call completes without panic,
+        // (b) all metric values are in the expected [-1, 1] range (finite, bounded),
+        // (c) exactly 7 percentiles are returned.
+        //
+        // Embeddings alternate between two orthogonal unit vectors so cosines
+        // are either 1.0 (same-direction pairs) or 0.0 (orthogonal pairs) —
+        // both in [-1, 1], giving a non-trivial but predictable distribution.
+        let n = 200usize;
+        let frags: Vec<CodeFragment> = (0..n)
+            .map(|i| make_fragment(&format!("src/{i}.rs"), &format!("fn f{i}() {{}}")))
+            .collect();
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        {
+            let mut c = 0usize;
+            mock_embed.expect_embed().times(n).returning(move |_| {
+                let v = if c % 2 == 0 { vec![1.0_f32, 0.0] } else { vec![0.0_f32, 1.0] };
+                c += 1;
+                Ok(v)
+            });
+        }
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics = interactor
+            .measure_quality(&MeasureQualityCommand { fragments: frags })
+            .expect("measure_quality must not fail on large corpus");
+
+        assert!(
+            (-1.0_f32..=1.0).contains(&metrics.mean_cosine),
+            "mean_cosine out of [-1,1]: {}",
+            metrics.mean_cosine
+        );
+        assert!(
+            (0.0_f32..=1.0).contains(&metrics.cosine_std_dev),
+            "cosine_std_dev out of [0,1]: {}",
+            metrics.cosine_std_dev
+        );
+        assert!(
+            (0.0_f32..=1.0).contains(&metrics.above_threshold_rate),
+            "above_threshold_rate out of [0,1]: {}",
+            metrics.above_threshold_rate
+        );
+        assert_eq!(metrics.cosine_percentiles.len(), 7, "must return exactly 7 percentile values");
+        for (i, &p) in metrics.cosine_percentiles.iter().enumerate() {
+            assert!((-1.0_f32..=1.0).contains(&p), "cosine_percentiles[{i}] out of [-1,1]: {p}");
+        }
+    }
+
+    // ── sample_cross_file_cosines unit tests (private helper) ─────────────────
+
+    #[test]
+    fn test_sample_cross_file_cosines_exact_branch_two_paths() {
+        // 2 fragments on 2 paths → 1 pair → total_pairs (1) ≤ budget → exact branch.
+        let frags =
+            vec![make_fragment("src/a.rs", "fn a() {}"), make_fragment("src/b.rs", "fn b() {}")];
+        let embeddings = vec![vec![1.0_f32, 0.0], vec![1.0_f32, 0.0]];
+        let result = sample_cross_file_cosines(&frags, &embeddings, 2, 10_000);
+        assert_eq!(result.len(), 1, "must collect exactly 1 cross-file cosine");
+        assert!((result[0] - 1.0).abs() < 1e-6, "cosine of identical unit vectors must be 1.0");
+    }
+
+    #[test]
+    fn test_sample_cross_file_cosines_exact_branch_same_path_excluded() {
+        // 2 fragments on the SAME path → 0 cross-file pairs → empty result.
+        let frags =
+            vec![make_fragment("src/a.rs", "fn a() {}"), make_fragment("src/a.rs", "fn b() {}")];
+        let embeddings = vec![vec![1.0_f32, 0.0], vec![1.0_f32, 0.0]];
+        let result = sample_cross_file_cosines(&frags, &embeddings, 2, 10_000);
+        assert!(result.is_empty(), "same-path pair must be excluded");
+    }
+
+    #[test]
+    fn test_sample_cross_file_cosines_n_less_than_2_returns_empty() {
+        // n < 2 → no pairs → empty result.
+        let frags = vec![make_fragment("src/a.rs", "fn a() {}")];
+        let embeddings = vec![vec![1.0_f32, 0.0]];
+        let result = sample_cross_file_cosines(&frags, &embeddings, 1, 10_000);
+        assert!(result.is_empty(), "n<2 must return empty");
+
+        let result_zero = sample_cross_file_cosines(&[], &[], 0, 10_000);
+        assert!(result_zero.is_empty(), "n=0 must return empty");
+    }
+
+    #[test]
+    fn test_sample_cross_file_cosines_sampled_branch_budget_respected() {
+        // n=200 → total_pairs = 19_900 > PAIR_BUDGET (10) used here → sampled branch.
+        // Assert the returned sample has at most `budget` entries.
+        let n = 200usize;
+        let frags: Vec<_> = (0..n)
+            .map(|i| make_fragment(&format!("src/{i}.rs"), &format!("fn f{i}() {{}}")))
+            .collect();
+        let embeddings: Vec<Vec<f32>> = (0..n).map(|_| vec![1.0_f32, 0.0]).collect();
+        let budget = 10usize;
+        let result = sample_cross_file_cosines(&frags, &embeddings, n, budget);
+        assert!(
+            result.len() <= budget,
+            "sampled branch must collect at most budget={budget} cosines, got {}",
+            result.len()
+        );
+        // With 200 distinct-path fragments, cross-file pairs are plentiful;
+        // the result should reach exactly the budget.
+        assert_eq!(
+            result.len(),
+            budget,
+            "sampled branch should reach the full budget when cross-file pairs are plentiful"
+        );
+    }
+
+    #[test]
+    fn test_sample_cross_file_cosines_deterministic_for_same_n() {
+        // Two calls with the same fragments and n must return identical Vec<f32>.
+        let n = 200usize;
+        let frags: Vec<_> = (0..n)
+            .map(|i| make_fragment(&format!("src/{i}.rs"), &format!("fn f{i}() {{}}")))
+            .collect();
+        let embeddings: Vec<Vec<f32>> = (0..n)
+            .map(|i| if i % 2 == 0 { vec![1.0_f32, 0.0] } else { vec![0.0_f32, 1.0] })
+            .collect();
+        let budget = 500usize;
+        let r1 = sample_cross_file_cosines(&frags, &embeddings, n, budget);
+        let r2 = sample_cross_file_cosines(&frags, &embeddings, n, budget);
+        assert_eq!(r1, r2, "sample_cross_file_cosines must be deterministic for same input");
     }
 }
