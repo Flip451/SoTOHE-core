@@ -8,10 +8,33 @@ exclude-dev = true
 feature-depth = 1
 
 [advisories]
-ignore = []
+ignore = [
+    # paste crate is unmaintained (archived by author); used transitively via lancedb/fastembed dep trees.
+    # The crate is stable and no security vulnerability is involved — this is an informational advisory only.
+    { id = "RUSTSEC-2024-0436", reason = "paste is unmaintained but has no security issue; transitive dep via lancedb/fastembed" },
+]
 
 [licenses]
-allow = ["MIT", "Apache-2.0", "Unicode-3.0"]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Unicode-3.0",
+    # BSD licenses — permissive, OSI-approved; brought in by lancedb/fastembed transitive deps
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    # Other permissive licenses from lancedb/fastembed/ort transitive deps
+    "ISC",
+    "Zlib",
+    "NCSA",
+    # MPL-2.0 — weak copyleft, OSI-approved; brought in via option-ext → dirs → hf-hub (fastembed)
+    "MPL-2.0",
+    # CC0-1.0 — public domain dedication; from tiny-keccak → const-random → ahash → arrow (lancedb)
+    "CC0-1.0",
+    # CDLA-Permissive-2.0 — Community Data License, permissive variant; from webpki-root-certs/webpki-roots (lancedb TLS)
+    "CDLA-Permissive-2.0",
+    # BSL-1.0 — Boost Software License, permissive OSI-approved; from xxhash-rust (lancedb/fastembed)
+    "BSL-1.0",
+]
 confidence-threshold = 0.8
 exceptions = []
 

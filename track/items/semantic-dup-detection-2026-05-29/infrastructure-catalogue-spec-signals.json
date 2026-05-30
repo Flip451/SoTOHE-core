@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "85fc8a1ba9db4b5cb493de83204e0b3a34f85da69ff86e852d401b330a794079",
+  "signals": [
+    {
+      "type_name": "ExtractError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FastEmbedAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
+      "signal": "blue"
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Add the domain module `libs/domain/src/semantic_dup.rs`: implement `CodeFragment` (non-empty content guard, Debug+Clone), `SimilarityScore` (range [0,1] guard, Debug+Clone+Copy), `TopK` (>=1 guard, Debug+Clone+Copy), `SimilarityThreshold` (range [0,1] guard, Debug+Clone+Copy), `SimilarFragment` (Debug+Clone), and `SemanticDupError` (Debug+Display+Error) as specified in domain-types.json. Wire the new module into `libs/domain/src/lib.rs`. No external crate dependencies added in this task.",
+      "status": "done",
+      "commit_hash": "1841d358bb4cd92aba7fbbd6f94e91db1f78115b"
+    },
+    {
+      "id": "T002",
+      "description": "Add the usecase ports and error types in `libs/usecase/src/semantic_dup.rs`: define `EmbeddingPort` (embed method) and `SemanticIndexPort` (insert + search methods) as secondary-port traits with `Send + Sync` bounds; define `EmbeddingError`, `SemanticIndexError`, `FindSimilarError`, `DupCheckError`, `BuildIndexError`, `MeasureQualityError` enums with Display/Error impls and From conversions as specified in usecase-types.json. No I/O or external crate in this module. Wire into `libs/usecase/src/lib.rs`.",
+      "status": "done",
+      "commit_hash": "78a7f69b15a97bc17e56fc993b317cd078adac00"
+    },
+    {
+      "id": "T003",
+      "description": "Add the usecase command/output types and application-service traits in `libs/usecase/src/semantic_dup.rs`: implement `FindSimilarCommand`, `FindSimilarOutput`, `DupCheckCommand`, `DupCheckWarning`, `DupCheckOutput`, `BuildIndexCommand` (carries pre-extracted `Vec<CodeFragment>`), `BuildIndexOutput`, `MeasureQualityCommand` (carries pre-extracted `Vec<CodeFragment>`), `QualityMetrics`; define `FindSimilarService`, `DupCheckService`, `BuildIndexService`, `MeasureQualityService` traits. Also implement the four interactors (`FindSimilarInteractor`, `DupCheckInteractor`, `BuildIndexInteractor`, `MeasureQualityInteractor`) with their `new` constructors and application-service trait impls, each delegating entirely to `EmbeddingPort` and `SemanticIndexPort` — no filesystem I/O in any interactor. `BuildIndexInteractor` iterates over `BuildIndexCommand.fragments`, embeds each, and inserts into the index. `MeasureQualityInteractor` embeds all fragments in `MeasureQualityCommand.fragments`, computes pairwise similarities, and returns `QualityMetrics`. `DupCheckInteractor` implements CN-03 (diff-fragments-only, no full-codebase scan). `FindSimilarInteractor` implements CN-05 (information-only, no block). `BuildIndexError::Io` is available for the CLI composition root to surface filesystem errors from the T007 extraction step before calling the interactor.",
+      "status": "done",
+      "commit_hash": "78a7f69b15a97bc17e56fc993b317cd078adac00"
+    },
+    {
+      "id": "T004",
+      "description": "Add infrastructure dependency declarations to `libs/infrastructure/Cargo.toml`: add `fastembed`, `ort`, and `lancedb` under `[dependencies]`. Verify that `libs/domain/Cargo.toml` and `libs/usecase/Cargo.toml` do NOT gain these dependencies. Run `cargo make check-layers` and `cargo make deny` to confirm AC-06 and AC-07 are satisfied before proceeding to adapter implementation.",
+      "status": "done",
+      "commit_hash": "4eb4eddcff703cf48fe91150f0cea6f3eac3ee39"
+    },
+    {
+      "id": "T005",
+      "description": "Implement `FastEmbedAdapter` in `libs/infrastructure/src/semantic_dup/embedding.rs`: `new()` loads Jina v2 base code model via fastembed-rs ONNX Runtime (synchronous, Tokio-independent); implement `EmbeddingPort::embed`. Model weights are obtained on-demand at first construction via fastembed-rs's built-in model cache (`~/.cache/huggingface/hub` or `FASTEMBED_CACHE_PATH`). Document the cache path in a `/// # Model Cache` doc comment so operators know where weights land. No network call at compile time; CI runs with `FASTEMBED_CACHE_PATH` pointing to a pre-populated volume mount (addressed by CI environment setup, not by this code task, per OS-07 deferral).",
+      "status": "done",
+      "commit_hash": "89776d5d7d46e985e56f5573afb14c659ad88b5a"
+    },
+    {
+      "id": "T006",
+      "description": "Implement `LanceDbSemanticIndexAdapter` in `libs/infrastructure/src/semantic_dup/index.rs`: `new(db_path)` opens or creates a LanceDB table at the given path (local file, no network); implement `SemanticIndexPort::insert` (stores fragment source_path + content + embedding vector) and `SemanticIndexPort::search` (ANN cosine similarity top-k query). Wire both new adapter modules into `libs/infrastructure/src/lib.rs` and expose them under `pub mod semantic_dup`.",
+      "status": "done",
+      "commit_hash": "89776d5d7d46e985e56f5573afb14c659ad88b5a"
+    },
+    {
+      "id": "T007",
+      "description": "Implement the workspace Rust-file scanner and code-fragment extractor in `libs/infrastructure/src/semantic_dup/extractor.rs`. This is a standalone helper (no port implementation) that uses `std::fs` to walk a workspace root recursively, find `*.rs` files, and yield `Vec<CodeFragment>`. It is called by the CLI composition root (T008/T009) before constructing `BuildIndexCommand` or `MeasureQualityCommand`. IO errors from this extractor are propagated by the CLI; the CLI may wrap them in `BuildIndexError::Io` / `MeasureQualityError::Io` (defined in T002/T003). This task depends on T001 (`CodeFragment` type) and T004 (infrastructure dependency gating must be complete). Granularity decision (per this plan): one fragment per function or top-level `impl` block, extracted by splitting on `fn ` and `impl ` boundaries. Rationale: item-level granularity captures the semantic unit most likely to be re-implemented, without exploding index size. Document this choice in the extractor's `///` doc comment.",
+      "status": "done",
+      "commit_hash": "66b9997e307d5177b9dc89d560cf205089846595"
+    },
+    {
+      "id": "T008",
+      "description": "Wire CLI subcommands for `sotp find-similar` and `sotp dup-index build` in `apps/cli/src/commands/` (or `apps/cli-composition`): `find-similar` parses fragment text or `--file <path>` and `--top-k <k>` (optional, default 5 per AC-01); constructs `FindSimilarCommand { fragment, top_k }`, invokes `FindSimilarInteractor`; outputs top-k results as `path | score | content_snippet`. `dup-index build` parses `--workspace-root` and `--db-path`; calls the T007 infrastructure extractor to obtain `Vec<CodeFragment>`, constructs `BuildIndexCommand { fragments }`, constructs `FastEmbedAdapter` and `LanceDbSemanticIndexAdapter`, invokes `BuildIndexInteractor.build_index(cmd)`; prints fragment count on success. Exit 0 on success.",
+      "status": "done",
+      "commit_hash": "3a86c01d9d404c0d247d6490e9eb79675916c34e"
+    },
+    {
+      "id": "T009",
+      "description": "Wire CLI subcommands for `sotp dup-check` (soft gate) and `sotp dup-index measure-quality` in `apps/cli/src/commands/`: `dup-check` accepts diff fragments via `--files-from <newline-separated-file>` (each line is a path to a fragment file), reads each file to construct `CodeFragment` values, builds `DupCheckCommand { fragments, threshold }`, and invokes `DupCheckInteractor`; if warnings exist, print them to stderr and continue (exit 0 per CN-02/AC-04). `dup-check` also supports `--ack` / `--ack-file` flag that records an acknowledgement hash and suppresses warnings on re-run (AC-05). `measure-quality` accepts `--workspace-root`, calls the T007 infrastructure extractor to get fragments, builds `MeasureQualityCommand { fragments }`, invokes `MeasureQualityInteractor`, and outputs JSON metrics to stdout (AC-03).",
+      "status": "done",
+      "commit_hash": "3a86c01d9d404c0d247d6490e9eb79675916c34e"
+    },
+    {
+      "id": "T010",
+      "description": "Add unit tests for domain value-object invariants in `libs/domain/src/semantic_dup.rs` (happy path + boundary + error path): `CodeFragment::new` rejects empty content; `SimilarityScore::new` accepts 0.0, 1.0, rejects -0.001 and 1.001; `TopK::new` accepts 1, rejects 0; `SimilarityThreshold::new` accepts 0.0/1.0, rejects out-of-range. Add unit tests for all four interactors in `libs/usecase/src/semantic_dup.rs` using mock ports (`mockall`): `FindSimilarInteractor` delegates embed + search; `DupCheckInteractor` produces warnings only for fragments above threshold (CN-03); `BuildIndexInteractor` calls insert for each fragment; `MeasureQualityInteractor` returns metrics.",
+      "status": "done",
+      "commit_hash": "9e34b2739cf9fd5d138594838ca3c26e02722a06"
+    },
+    {
+      "id": "T011",
+      "description": "Add integration-level tests for infrastructure adapters and CLI commands: test `LanceDbSemanticIndexAdapter` with a temp directory (insert + search round-trip, confirming CN-01 local-only operation). Test the `sotp dup-check` command with a pre-populated index and a controlled diff fragment to verify exit-0 soft-gate behavior (AC-04) and ack suppression (AC-05). Run `cargo make ci` to confirm AC-08 (fmt-check + clippy + nextest + deny + check-layers + verify-*).",
+      "status": "done",
+      "commit_hash": "9e34b2739cf9fd5d138594838ca3c26e02722a06"
+    }
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Domain value-object layer",
+        "description": [
+          "T001 lays down the domain module with all value objects (`CodeFragment`, `SimilarityScore`, `TopK`, `SimilarityThreshold`, `SimilarFragment`) and the domain error type `SemanticDupError`.",
+          "No external crate dependencies are introduced here; this task compiles independently and is the prerequisite for every layer above it.",
+          "All constructors enforce invariants (non-empty content, score/threshold in [0,1], k>=1) so illegal states are unrepresentable per .claude/rules/04-coding-principles.md."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Usecase ports, errors, and interactors",
+        "description": [
+          "T002 defines the two secondary-port traits (`EmbeddingPort`, `SemanticIndexPort`) and all error types in the usecase layer — no I/O, no external crates, just type definitions and From conversions.",
+          "T003 adds the command/output data types, the four application-service traits, and their interactor implementations. All four interactors are pure orchestrators that delegate entirely to EmbeddingPort and SemanticIndexPort. No interactor performs filesystem I/O — fragments arrive pre-extracted in the command. For `BuildIndexCommand` and `MeasureQualityCommand`, the CLI composition root (T008 and the measure-quality subcommand of T009) calls the T007 infrastructure extractor to obtain the fragment list. For `DupCheckCommand`, the CLI (T009) reads each file listed in `--files-from` directly into `CodeFragment` values — the T007 workspace extractor is not involved.",
+          "T002 must land before T003 because the interactors reference the port traits and error types."
+        ],
+        "task_ids": [
+          "T002",
+          "T003"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Infrastructure dependency gating and adapter implementation",
+        "description": [
+          "T004 adds the three new crate dependencies (`fastembed`, `ort`, `lancedb`) solely to `libs/infrastructure/Cargo.toml` and runs the layer checks to confirm CN-04/AC-06/AC-07 before any adapter code lands.",
+          "T005 implements `FastEmbedAdapter` (fastembed-rs + ONNX + Jina v2 base code, synchronous API). Model weights are obtained on-demand via the fastembed-rs cache mechanism; the cache path is documented in the adapter's doc comment to satisfy OS-07 transparency.",
+          "T006 implements `LanceDbSemanticIndexAdapter` (local file DB, Apache 2.0, insert + ANN cosine search).",
+          "T004 must precede T005 and T006; T005 and T006 can proceed in parallel once T004 lands."
+        ],
+        "task_ids": [
+          "T004",
+          "T005",
+          "T006"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Fragment extractor",
+        "description": [
+          "T007 implements the workspace Rust-file scanner and code-fragment extractor in `libs/infrastructure` — consistent with hexagonal architecture (filesystem I/O stays in infrastructure, not usecase).",
+          "Granularity is item-level (per-function / per-impl-block), documented in the extractor's doc comment.",
+          "This task depends on T001 (`CodeFragment` type) and T004 (infrastructure crate setup). The CLI (T008/T009) calls this extractor before constructing commands for the interactors."
+        ],
+        "task_ids": [
+          "T007"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "CLI wiring",
+        "description": [
+          "T008 wires `sotp find-similar` and `sotp dup-index build` subcommands: argument parsing, calling the T007 infrastructure extractor for `dup-index build` (CLI composition root extracts fragments from workspace, constructs `BuildIndexCommand { fragments }`), adapter construction, interactor dispatch, stdout output.",
+          "T009 wires `sotp dup-check` (soft gate, CN-02/CN-03, diff fragments via `--files-from`, ack suppression per AC-05) and `sotp dup-index measure-quality` (calls T007 extractor for workspace scan, constructs `MeasureQualityCommand { fragments }`, JSON metrics output per AC-03).",
+          "Both tasks depend on T003-T007 (all usecase and infra layers complete). T008 and T009 can proceed in parallel once the adapters and extractor are ready.",
+          "The `dup-check` diff-fragment acquisition interface is `--files-from <newline-separated-file>`, matching CN-03 (explicit diff fragment list) without requiring git integration."
+        ],
+        "task_ids": [
+          "T008",
+          "T009"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "Tests and CI gate",
+        "description": [
+          "T010 covers domain invariant unit tests and usecase interactor tests with mock ports.",
+          "T011 adds infrastructure round-trip tests and CLI integration tests (soft-gate exit-0 behavior, ack suppression), and confirms `cargo make ci` (AC-08) passes end-to-end.",
+          "T010 can start as soon as T001-T003 land; T011 requires all prior tasks to be complete."
+        ],
+        "task_ids": [
+          "T010",
+          "T011"
+        ]
+      }
+    ]
+  }
+}

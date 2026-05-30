@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5dfbc292e42d1c3b8dcd1b70238d593ae59562666ee2300a4169eea913d01748",
+  "signals": [
+    {
+      "type_name": "CodeFragment",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticDupError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SimilarFragment",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SimilarityScore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SimilarityThreshold",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TopK",
+      "signal": "blue"
+    }
+  ]
+}

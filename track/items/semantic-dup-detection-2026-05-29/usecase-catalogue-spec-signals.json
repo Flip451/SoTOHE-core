@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "f89daa8079de8447e81580d5388382c9b6bf6899058a6dca8882d6521a97b418",
+  "signals": [
+    {
+      "type_name": "BuildIndexCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BuildIndexError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BuildIndexInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BuildIndexOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DupCheckCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DupCheckError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DupCheckInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DupCheckOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DupCheckWarning",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EmbeddingError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FindSimilarCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FindSimilarError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FindSimilarInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FindSimilarOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MeasureQualityCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MeasureQualityError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MeasureQualityInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "QualityMetrics",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticIndexError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "BuildIndexService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DupCheckService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EmbeddingPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FindSimilarService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MeasureQualityService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticIndexPort",
+      "signal": "blue"
+    }
+  ]
+}

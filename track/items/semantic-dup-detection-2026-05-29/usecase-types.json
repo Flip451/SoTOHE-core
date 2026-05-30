@@ -1,0 +1,1032 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "FindSimilarCommand": {
+      "action": "add",
+      "role": "Query",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "fragment", "ty": "domain::semantic_dup::CodeFragment" },
+            { "name": "top_k", "ty": "domain::semantic_dup::TopK" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Query input for find-similar: given a code fragment, retrieve top-k semantically similar fragments from the index.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-03",
+          "hash": "50264d00ecc07b92b52998627e86c4531a70e8d8867a8f56cc3acc55172382cf"
+        },
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "6238d721fff3e0fa6a773368af92349270058134a3a6929cc4b75537c58ff892"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FindSimilarOutput": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "results", "ty": "Vec<domain::semantic_dup::SimilarFragment>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Output from find-similar: the top-k semantically similar fragments retrieved from the index.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "6238d721fff3e0fa6a773368af92349270058134a3a6929cc4b75537c58ff892"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DupCheckCommand": {
+      "action": "add",
+      "role": "Query",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "fragments", "ty": "Vec<domain::semantic_dup::CodeFragment>" },
+            { "name": "threshold", "ty": "domain::semantic_dup::SimilarityThreshold" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Query input for dup-check: a list of diff fragments to check against the index at a given similarity threshold. Implements CN-03 (diff fragments only).",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-06",
+          "hash": "ee2e4a8d866f71546314d2b35e85557db3cc4e211410747dd6e3aa47a5575eba"
+        },
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-04",
+          "hash": "efb1507be8435e107aee39c23f564e9f0f00d6e9c6008fef9d720659fc4da6ff"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DupCheckWarning": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "input_fragment", "ty": "domain::semantic_dup::CodeFragment" },
+            { "name": "similar_fragments", "ty": "Vec<domain::semantic_dup::SimilarFragment>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "A single soft-gate warning: one input fragment together with the similar existing fragments that exceed the threshold.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-04",
+          "hash": "efb1507be8435e107aee39c23f564e9f0f00d6e9c6008fef9d720659fc4da6ff"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DupCheckOutput": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "warnings", "ty": "Vec<DupCheckWarning>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Output from dup-check: all soft-gate warnings for the supplied diff fragments. Empty warnings means no duplicates found above threshold.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-04",
+          "hash": "efb1507be8435e107aee39c23f564e9f0f00d6e9c6008fef9d720659fc4da6ff"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BuildIndexCommand": {
+      "action": "add",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "fragments", "ty": "Vec<domain::semantic_dup::CodeFragment>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Command to build the semantic index: carries pre-extracted CodeFragments (extracted by the CLI from workspace Rust sources via the infrastructure-layer extractor, T007), and instructs the interactor to compute embeddings and populate the local LanceDB index.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "c9c9cae2754b0c591fb1001c0364c594d01e91ffe6962b1bf0cde34c0b535d19"
+        },
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-02",
+          "hash": "89dbe777247309a6de34d0930c1c9fd8b414a70bb3db5bbf2f82bcb307a5b6a1"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BuildIndexOutput": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "fragments_indexed", "ty": "usize" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Output from build-index: count of code fragments successfully indexed.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-02",
+          "hash": "89dbe777247309a6de34d0930c1c9fd8b414a70bb3db5bbf2f82bcb307a5b6a1"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "MeasureQualityCommand": {
+      "action": "add",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "fragments", "ty": "Vec<domain::semantic_dup::CodeFragment>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Command to measure embedding model quality: carries pre-extracted CodeFragments (extracted by the CLI from workspace Rust sources via the infrastructure-layer extractor, T007). The interactor computes pairwise cosine similarities and assembles QualityMetrics.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "9f985859bc7b67084798019f1ad88d673d31037c5e5fa6918a44f0199dd246c3"
+        },
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-03",
+          "hash": "9dba277f8d755762747cb64f66502dc8acbaebe4548d3f61b742d2ee51560c2d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "QualityMetrics": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "mean_cosine", "ty": "f32" },
+            { "name": "cosine_std_dev", "ty": "f32" },
+            { "name": "cosine_percentiles", "ty": "Vec<f32>" },
+            { "name": "above_threshold_rate", "ty": "f32" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Output from measure-quality: the cosine similarity distribution (AC-03/IN-05) represented as mean, standard deviation, and percentile buckets for threshold calibration. mean_cosine and cosine_std_dev are the raw cosine similarity mean and std_dev (in [-1.0, 1.0]). cosine_percentiles is [p10, p25, p50, p75, p90, p95, p99] — the full distribution needed to calibrate the soft-gate threshold (AC-03). above_threshold_rate is the fraction of randomly sampled cross-file fragment pairs whose raw cosine exceeds the default threshold (the PoC proxy for false-positive risk, as defined in AC-03/IN-05). Raw f32 values; no domain constraint enforced at this PoC stage.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-03",
+          "hash": "9dba277f8d755762747cb64f66502dc8acbaebe4548d3f61b742d2ee51560c2d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FindSimilarInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Interactor implementing FindSimilarService. Orchestrates EmbeddingPort (embed query) and SemanticIndexPort (search index).",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-03",
+          "hash": "50264d00ecc07b92b52998627e86c4531a70e8d8867a8f56cc3acc55172382cf"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DupCheckInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Interactor implementing DupCheckService. Orchestrates EmbeddingPort and SemanticIndexPort to detect soft-gate duplicates.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-06",
+          "hash": "ee2e4a8d866f71546314d2b35e85557db3cc4e211410747dd6e3aa47a5575eba"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BuildIndexInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Interactor implementing BuildIndexService. Receives pre-extracted CodeFragments (via BuildIndexCommand.fragments, extracted by the CLI using the infrastructure extractor), embeds each fragment via EmbeddingPort, and inserts into the index via SemanticIndexPort. No filesystem I/O in this interactor.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "c9c9cae2754b0c591fb1001c0364c594d01e91ffe6962b1bf0cde34c0b535d19"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "MeasureQualityInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Interactor implementing MeasureQualityService. Drives the PoC quality measurement pipeline.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "9f985859bc7b67084798019f1ad88d673d31037c5e5fa6918a44f0199dd246c3"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "EmbeddingError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ModelLoadFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          },
+          {
+            "name": "InferenceFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Error type for the EmbeddingPort. source is an opaque string from fastembed-rs — no domain concept.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-07",
+          "hash": "253fc9d63c0c7540482e3162c08300e93fdec77fc59c92c3a778ebe4edfcaae8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticIndexError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OpenFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          },
+          {
+            "name": "InsertFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          },
+          {
+            "name": "SearchFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Error type for the SemanticIndexPort. source is an opaque string from LanceDB — no domain concept.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-07",
+          "hash": "253fc9d63c0c7540482e3162c08300e93fdec77fc59c92c3a778ebe4edfcaae8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FindSimilarError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Embedding",
+            "payload": { "kind": "tuple", "fields": ["EmbeddingError"] }
+          },
+          {
+            "name": "Index",
+            "payload": { "kind": "tuple", "fields": ["SemanticIndexError"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Composite error for the find-similar use case.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "6238d721fff3e0fa6a773368af92349270058134a3a6929cc4b75537c58ff892"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DupCheckError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Embedding",
+            "payload": { "kind": "tuple", "fields": ["EmbeddingError"] }
+          },
+          {
+            "name": "Index",
+            "payload": { "kind": "tuple", "fields": ["SemanticIndexError"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Composite error for the dup-check use case.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-04",
+          "hash": "efb1507be8435e107aee39c23f564e9f0f00d6e9c6008fef9d720659fc4da6ff"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BuildIndexError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Embedding",
+            "payload": { "kind": "tuple", "fields": ["EmbeddingError"] }
+          },
+          {
+            "name": "Index",
+            "payload": { "kind": "tuple", "fields": ["SemanticIndexError"] }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "source", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Composite error for the build-index use case.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-02",
+          "hash": "89dbe777247309a6de34d0930c1c9fd8b414a70bb3db5bbf2f82bcb307a5b6a1"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "MeasureQualityError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Embedding",
+            "payload": { "kind": "tuple", "fields": ["EmbeddingError"] }
+          },
+          {
+            "name": "Index",
+            "payload": { "kind": "tuple", "fields": ["SemanticIndexError"] }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "source", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Composite error for the measure-quality use case.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-03",
+          "hash": "9dba277f8d755762747cb64f66502dc8acbaebe4548d3f61b742d2ee51560c2d"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "EmbeddingPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "embed",
+          "receiver": "&self",
+          "params": [
+            { "name": "fragment", "ty": "&domain::semantic_dup::CodeFragment" }
+          ],
+          "returns": "Result<Vec<f32>, EmbeddingError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "semantic_dup",
+      "docs": "Secondary port for embedding computation. Abstracts fastembed-rs / ONNX Runtime from usecase logic. Placed in usecase (not domain) because embedding is an infrastructure capability — the domain carries no concept of ML inference. Analogous to ReviewHasher.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-07",
+          "hash": "253fc9d63c0c7540482e3162c08300e93fdec77fc59c92c3a778ebe4edfcaae8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticIndexPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "insert",
+          "receiver": "&self",
+          "params": [
+            { "name": "fragment", "ty": "&domain::semantic_dup::CodeFragment" },
+            { "name": "embedding", "ty": "&[f32]" }
+          ],
+          "returns": "Result<(), SemanticIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "search",
+          "receiver": "&self",
+          "params": [
+            { "name": "embedding", "ty": "&[f32]" },
+            { "name": "top_k", "ty": "domain::semantic_dup::TopK" }
+          ],
+          "returns": "Result<Vec<domain::semantic_dup::SimilarFragment>, SemanticIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "semantic_dup",
+      "docs": "Secondary port for the local semantic vector index. Abstracts LanceDB from usecase logic. Placed in usecase (not domain) because vector indexing is an infrastructure capability with no domain entity semantics. Analogous to ReviewHasher.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-07",
+          "hash": "253fc9d63c0c7540482e3162c08300e93fdec77fc59c92c3a778ebe4edfcaae8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FindSimilarService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "find_similar",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&FindSimilarCommand" }
+          ],
+          "returns": "Result<FindSimilarOutput, FindSimilarError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "semantic_dup",
+      "docs": "Application service for the find-similar use case (sotp find-similar).",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-03",
+          "hash": "50264d00ecc07b92b52998627e86c4531a70e8d8867a8f56cc3acc55172382cf"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DupCheckService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "dup_check",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&DupCheckCommand" }
+          ],
+          "returns": "Result<DupCheckOutput, DupCheckError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "semantic_dup",
+      "docs": "Application service for the dup-check soft gate (sotp dup-check).",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-06",
+          "hash": "ee2e4a8d866f71546314d2b35e85557db3cc4e211410747dd6e3aa47a5575eba"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "BuildIndexService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "build_index",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&BuildIndexCommand" }
+          ],
+          "returns": "Result<BuildIndexOutput, BuildIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "semantic_dup",
+      "docs": "Application service for the index-build command (sotp dup-index build).",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "c9c9cae2754b0c591fb1001c0364c594d01e91ffe6962b1bf0cde34c0b535d19"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "MeasureQualityService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "measure_quality",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&MeasureQualityCommand" }
+          ],
+          "returns": "Result<QualityMetrics, MeasureQualityError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "semantic_dup",
+      "docs": "Application service for the PoC quality measurement command (sotp dup-index measure-quality).",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "9f985859bc7b67084798019f1ad88d673d31037c5e5fa6918a44f0199dd246c3"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "FindSimilarInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "embedding_port", "ty": "std::sync::Arc<dyn EmbeddingPort>" },
+            { "name": "index_port", "ty": "std::sync::Arc<dyn SemanticIndexPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DupCheckInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "embedding_port", "ty": "std::sync::Arc<dyn EmbeddingPort>" },
+            { "name": "index_port", "ty": "std::sync::Arc<dyn SemanticIndexPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "BuildIndexInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "embedding_port", "ty": "std::sync::Arc<dyn EmbeddingPort>" },
+            { "name": "index_port", "ty": "std::sync::Arc<dyn SemanticIndexPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "MeasureQualityInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "embedding_port", "ty": "std::sync::Arc<dyn EmbeddingPort>" },
+            { "name": "index_port", "ty": "std::sync::Arc<dyn SemanticIndexPort>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FindSimilarCommand"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FindSimilarCommand"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FindSimilarOutput"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FindSimilarOutput"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DupCheckCommand"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DupCheckCommand"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DupCheckWarning"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DupCheckWarning"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DupCheckOutput"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DupCheckOutput"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BuildIndexCommand"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "BuildIndexCommand"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BuildIndexOutput"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "BuildIndexOutput"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "MeasureQualityCommand"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "MeasureQualityCommand"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "QualityMetrics"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "QualityMetrics"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FindSimilarInteractor"
+    },
+    {
+      "trait_ref": "FindSimilarService",
+      "for_type": "FindSimilarInteractor"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DupCheckInteractor"
+    },
+    {
+      "trait_ref": "DupCheckService",
+      "for_type": "DupCheckInteractor"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BuildIndexInteractor"
+    },
+    {
+      "trait_ref": "BuildIndexService",
+      "for_type": "BuildIndexInteractor"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "MeasureQualityInteractor"
+    },
+    {
+      "trait_ref": "MeasureQualityService",
+      "for_type": "MeasureQualityInteractor"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "EmbeddingError"
+    },
+    {
+      "trait_ref": "core::fmt::Display",
+      "for_type": "EmbeddingError"
+    },
+    {
+      "trait_ref": "core::error::Error",
+      "for_type": "EmbeddingError"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticIndexError"
+    },
+    {
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SemanticIndexError"
+    },
+    {
+      "trait_ref": "core::error::Error",
+      "for_type": "SemanticIndexError"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "trait_ref": "core::fmt::Display",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "trait_ref": "core::error::Error",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "trait_ref": "core::convert::From<EmbeddingError>",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "trait_ref": "core::convert::From<SemanticIndexError>",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DupCheckError"
+    },
+    {
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DupCheckError"
+    },
+    {
+      "trait_ref": "core::error::Error",
+      "for_type": "DupCheckError"
+    },
+    {
+      "trait_ref": "core::convert::From<EmbeddingError>",
+      "for_type": "DupCheckError"
+    },
+    {
+      "trait_ref": "core::convert::From<SemanticIndexError>",
+      "for_type": "DupCheckError"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "trait_ref": "core::fmt::Display",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "trait_ref": "core::error::Error",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "trait_ref": "core::convert::From<EmbeddingError>",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "trait_ref": "core::convert::From<SemanticIndexError>",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "MeasureQualityError"
+    },
+    {
+      "trait_ref": "core::fmt::Display",
+      "for_type": "MeasureQualityError"
+    },
+    {
+      "trait_ref": "core::error::Error",
+      "for_type": "MeasureQualityError"
+    },
+    {
+      "trait_ref": "core::convert::From<EmbeddingError>",
+      "for_type": "MeasureQualityError"
+    },
+    {
+      "trait_ref": "core::convert::From<SemanticIndexError>",
+      "for_type": "MeasureQualityError"
+    }
+  ]
+}

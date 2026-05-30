@@ -13,6 +13,7 @@ pub mod make;
 pub mod plan;
 pub mod pr;
 pub mod review;
+pub mod semantic_dup;
 pub mod track;
 pub mod verify;
 #[cfg(test)]

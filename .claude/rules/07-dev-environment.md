@@ -10,6 +10,13 @@ docker compose version
 # 任意（補助実行用）
 rustup show
 rustup component add rustfmt clippy
+
+# ホスト側 protoc（TDDD type-signals 用）
+# `bin/sotp track type-signals`（commit gate の track-active-gate / track-local-review が呼ぶ）は
+# ホスト上で `cargo rustdoc` を実行する。TDDD 対象 crate（infrastructure 等）が protoc を要求する依存
+# （例: lancedb → lance-encoding）を持つ場合、Docker イメージだけでなくホストにも protoc が必要。
+# Debian/Ubuntu: sudo apt-get install -y protobuf-compiler
+protoc --version
 ```
 
 ## Task Runner: cargo-make

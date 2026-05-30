@@ -1,0 +1,345 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "CodeFragment": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "source_path", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "A code fragment with its text content and an associated path. For fragments extracted from source files, source_path is the originating file path. For query fragments provided via CLI (e.g., sotp find-similar), source_path is set to a sentinel value (PathBuf::from(\"<query>\")) since there is no originating file. Content must be non-empty.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "c9c9cae2754b0c591fb1001c0364c594d01e91ffe6962b1bf0cde34c0b535d19"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SimilarFragment": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "fragment", "ty": "CodeFragment" },
+            { "name": "score", "ty": "SimilarityScore" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "A code fragment that was retrieved as semantically similar to a query, paired with its cosine similarity score.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-03",
+          "hash": "50264d00ecc07b92b52998627e86c4531a70e8d8867a8f56cc3acc55172382cf"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SimilarityScore": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Cosine similarity score in the range [0.0, 1.0]. Values outside this range are rejected at construction. Raw cosine similarity (range [-1.0, 1.0]) is normalized to this range by the SemanticIndexPort adapter before constructing a SimilarityScore (e.g., via clamping negative values to 0.0, since the Jina v2 base code model produces near-zero negative similarities in practice).",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "6238d721fff3e0fa6a773368af92349270058134a3a6929cc4b75537c58ff892"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TopK": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Top-k count for similarity search results. Must be >= 1.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "6238d721fff3e0fa6a773368af92349270058134a3a6929cc4b75537c58ff892"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SimilarityThreshold": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Cosine similarity threshold for the soft-gate duplicate check. Must be in [0.0, 1.0].",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-06",
+          "hash": "ee2e4a8d866f71546314d2b35e85557db3cc4e211410747dd6e3aa47a5575eba"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticDupError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidScore",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "value", "ty": "f32" }]
+            }
+          },
+          {
+            "name": "InvalidTopK",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "value", "ty": "usize" }]
+            }
+          },
+          {
+            "name": "InvalidThreshold",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "value", "ty": "f32" }]
+            }
+          },
+          {
+            "name": "EmptyContent",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Domain-level errors for semantic duplicate detection value object invariant violations.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "AC-01",
+          "hash": "6238d721fff3e0fa6a773368af92349270058134a3a6929cc4b75537c58ff892"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "SimilarityScore",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "f32" }],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "f32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "TopK",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "k", "ty": "usize" }],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "SimilarityThreshold",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "f32" }],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "f32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "CodeFragment",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "source_path", "ty": "std::path::PathBuf" },
+            { "name": "content", "ty": "String" }
+          ],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "content",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CodeFragment"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CodeFragment"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SimilarFragment"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SimilarFragment"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SimilarityScore"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SimilarityScore"
+    },
+    {
+      "trait_ref": "core::marker::Copy",
+      "for_type": "SimilarityScore"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TopK"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TopK"
+    },
+    {
+      "trait_ref": "core::marker::Copy",
+      "for_type": "TopK"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SimilarityThreshold"
+    },
+    {
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SimilarityThreshold"
+    },
+    {
+      "trait_ref": "core::marker::Copy",
+      "for_type": "SimilarityThreshold"
+    },
+    {
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticDupError"
+    },
+    {
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SemanticDupError"
+    },
+    {
+      "trait_ref": "core::error::Error",
+      "for_type": "SemanticDupError"
+    }
+  ]
+}

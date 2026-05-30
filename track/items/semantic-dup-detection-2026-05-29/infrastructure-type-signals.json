@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-30T18:03:01Z",
+  "declaration_hash": "85fc8a1ba9db4b5cb493de83204e0b3a34f85da69ff86e852d401b330a794079",
+  "signals": [
+    {
+      "type_name": "ExtractError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "FastEmbedAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EmbeddingPort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SemanticIndexPort",
+        "core::fmt::Debug",
+        "core::ops::drop::Drop"
+      ]
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
