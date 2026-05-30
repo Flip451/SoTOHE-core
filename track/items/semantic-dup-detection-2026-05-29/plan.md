@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # コード意味重複検出による DRY 防止（discoverability + soft gate）
 
-## Tasks (9/11 resolved)
+## Tasks (11/11 resolved)
 
 ### S1 — Domain value-object layer
 
@@ -55,5 +55,5 @@
 > T011 adds infrastructure round-trip tests and CLI integration tests (soft-gate exit-0 behavior, ack suppression), and confirms `cargo make ci` (AC-08) passes end-to-end.
 > T010 can start as soon as T001-T003 land; T011 requires all prior tasks to be complete.
 
-- [~] **T010**: Add unit tests for domain value-object invariants in `libs/domain/src/semantic_dup.rs` (happy path + boundary + error path): `CodeFragment::new` rejects empty content; `SimilarityScore::new` accepts 0.0, 1.0, rejects -0.001 and 1.001; `TopK::new` accepts 1, rejects 0; `SimilarityThreshold::new` accepts 0.0/1.0, rejects out-of-range. Add unit tests for all four interactors in `libs/usecase/src/semantic_dup.rs` using mock ports (`mockall`): `FindSimilarInteractor` delegates embed + search; `DupCheckInteractor` produces warnings only for fragments above threshold (CN-03); `BuildIndexInteractor` calls insert for each fragment; `MeasureQualityInteractor` returns metrics.
-- [~] **T011**: Add integration-level tests for infrastructure adapters and CLI commands: test `LanceDbSemanticIndexAdapter` with a temp directory (insert + search round-trip, confirming CN-01 local-only operation). Test the `sotp dup-check` command with a pre-populated index and a controlled diff fragment to verify exit-0 soft-gate behavior (AC-04) and ack suppression (AC-05). Run `cargo make ci` to confirm AC-08 (fmt-check + clippy + nextest + deny + check-layers + verify-*).
+- [x] **T010**: Add unit tests for domain value-object invariants in `libs/domain/src/semantic_dup.rs` (happy path + boundary + error path): `CodeFragment::new` rejects empty content; `SimilarityScore::new` accepts 0.0, 1.0, rejects -0.001 and 1.001; `TopK::new` accepts 1, rejects 0; `SimilarityThreshold::new` accepts 0.0/1.0, rejects out-of-range. Add unit tests for all four interactors in `libs/usecase/src/semantic_dup.rs` using mock ports (`mockall`): `FindSimilarInteractor` delegates embed + search; `DupCheckInteractor` produces warnings only for fragments above threshold (CN-03); `BuildIndexInteractor` calls insert for each fragment; `MeasureQualityInteractor` returns metrics. (`9e34b2739cf9fd5d138594838ca3c26e02722a06`)
+- [x] **T011**: Add integration-level tests for infrastructure adapters and CLI commands: test `LanceDbSemanticIndexAdapter` with a temp directory (insert + search round-trip, confirming CN-01 local-only operation). Test the `sotp dup-check` command with a pre-populated index and a controlled diff fragment to verify exit-0 soft-gate behavior (AC-04) and ack suppression (AC-05). Run `cargo make ci` to confirm AC-08 (fmt-check + clippy + nextest + deny + check-layers + verify-*). (`9e34b2739cf9fd5d138594838ca3c26e02722a06`)

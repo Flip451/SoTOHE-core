@@ -58,12 +58,14 @@
     {
       "id": "T010",
       "description": "Add unit tests for domain value-object invariants in `libs/domain/src/semantic_dup.rs` (happy path + boundary + error path): `CodeFragment::new` rejects empty content; `SimilarityScore::new` accepts 0.0, 1.0, rejects -0.001 and 1.001; `TopK::new` accepts 1, rejects 0; `SimilarityThreshold::new` accepts 0.0/1.0, rejects out-of-range. Add unit tests for all four interactors in `libs/usecase/src/semantic_dup.rs` using mock ports (`mockall`): `FindSimilarInteractor` delegates embed + search; `DupCheckInteractor` produces warnings only for fragments above threshold (CN-03); `BuildIndexInteractor` calls insert for each fragment; `MeasureQualityInteractor` returns metrics.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9e34b2739cf9fd5d138594838ca3c26e02722a06"
     },
     {
       "id": "T011",
       "description": "Add integration-level tests for infrastructure adapters and CLI commands: test `LanceDbSemanticIndexAdapter` with a temp directory (insert + search round-trip, confirming CN-01 local-only operation). Test the `sotp dup-check` command with a pre-populated index and a controlled diff fragment to verify exit-0 soft-gate behavior (AC-04) and ack suppression (AC-05). Run `cargo make ci` to confirm AC-08 (fmt-check + clippy + nextest + deny + check-layers + verify-*).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "9e34b2739cf9fd5d138594838ca3c26e02722a06"
     }
   ],
   "plan": {
