@@ -96,22 +96,55 @@ pub struct DupIndexBuildInput {
     pub db_path: PathBuf,
 }
 
+/// The subdirectory name LanceDB creates for the `fragments` table.
+///
+/// LanceDB stores each table as a `{table_name}.lance/` directory inside the
+/// database root.  Checking for this marker lets us distinguish a genuine
+/// LanceDB index from an arbitrary directory that the user accidentally
+/// pointed `--db-path` at.
+const LANCEDB_TABLE_MARKER: &str = "fragments.lance";
+
+/// Return `true` when `db_path` looks like a LanceDB index previously
+/// created by this tool.
+///
+/// The check is intentionally conservative: a directory qualifies as a
+/// recognizable index only when it contains the `fragments.lance/`
+/// subdirectory that LanceDB creates for the `fragments` table.  The marker
+/// must be a real directory (not a file or symlink) to avoid treating an
+/// unrelated directory that happens to contain a same-named file or symlink
+/// as a valid index.
+///
+/// `std::fs::symlink_metadata` is used deliberately (it does NOT follow
+/// symlinks), so a `fragments.lance` symlink — even one pointing at a
+/// directory — does NOT satisfy this check.  This prevents a data-loss bypass
+/// where an attacker or accidental user creates a `fragments.lance` symlink
+/// inside an unrelated directory to trick the guard into accepting it as a
+/// recognizable index and subsequently deleting that directory.
+fn is_recognizable_lancedb_index(db_path: &Path) -> bool {
+    match std::fs::symlink_metadata(db_path.join(LANCEDB_TABLE_MARKER)) {
+        Ok(meta) => meta.file_type().is_dir(),
+        Err(_) => false,
+    }
+}
+
 /// Prepare a fresh index directory at `db_path` for a rebuild.
 ///
 /// This helper:
 /// 1. Rejects `db_path` values that are equal to or an ancestor of
 ///    `workspace_root` (path-overlap safety guard).
-/// 2. Removes the existing directory at `db_path` (if any) so that the
+/// 2. Checks that the directory at `db_path` is a recognizable LanceDB index
+///    (contains `fragments.lance/`).  If it exists but does NOT look like an
+///    index, returns an error rather than deleting arbitrary user data.
+/// 3. Removes the existing index directory at `db_path` so that the
 ///    subsequent adapter construction always starts from an empty slate.
 ///
-/// The removal uses `std::fs::remove_dir_all`, which is safe because LanceDB
-/// stores its data as a directory tree (not a single file).  If `db_path`
-/// does not exist yet this function is a no-op.
+/// If `db_path` does not exist yet this function is a no-op.
 ///
 /// # Errors
 ///
-/// Returns `Err` if the path-overlap guard fires, if `canonicalize` fails, or
-/// if `remove_dir_all` fails.
+/// Returns `Err` if the path-overlap guard fires, if `canonicalize` fails,
+/// if the directory exists but is not a recognizable LanceDB index, or if
+/// `remove_dir_all` fails.
 fn prepare_fresh_index_dir(db_path: &Path, workspace_root: &Path) -> Result<(), String> {
     if !db_path.exists() {
         return Ok(());
@@ -129,6 +162,19 @@ fn prepare_fresh_index_dir(db_path: &Path, workspace_root: &Path) -> Result<(), 
              refusing to remove it to prevent data loss",
             db_path.display(),
             workspace_root.display(),
+        ));
+    }
+    // Reject if the directory exists but is not a recognizable LanceDB index.
+    // A typo'd --db-path pointing at an unrelated directory would otherwise
+    // be silently and recursively deleted.
+    if !is_recognizable_lancedb_index(db_path) {
+        return Err(format!(
+            "--db-path '{}' exists but does not appear to be a LanceDB index \
+             (missing '{}' marker); refusing to remove it to prevent data loss. \
+             If this is a new path, remove the directory manually first or \
+             choose a path that does not exist yet.",
+            db_path.display(),
+            LANCEDB_TABLE_MARKER,
         ));
     }
     std::fs::remove_dir_all(db_path)
@@ -685,6 +731,14 @@ mod tests {
     // a `.fastembed_cache/` directory and attempt a model download — forbidden
     // in CI).
 
+    /// Create a directory that looks like a LanceDB index (contains the
+    /// `fragments.lance/` marker subdirectory).
+    fn create_fake_lancedb_index(db_path: &std::path::Path) {
+        std::fs::create_dir_all(db_path.join(LANCEDB_TABLE_MARKER)).unwrap();
+        // Also write a sentinel file so we can verify the whole tree is removed.
+        std::fs::write(db_path.join("stale.txt"), "stale").unwrap();
+    }
+
     #[test]
     fn test_prepare_fresh_index_dir_rejects_db_path_equal_to_workspace_root() {
         let dir = tempfile::tempdir().unwrap();
@@ -711,20 +765,48 @@ mod tests {
     }
 
     #[test]
-    fn test_prepare_fresh_index_dir_removes_existing_db_dir() {
+    fn test_prepare_fresh_index_dir_removes_existing_lancedb_index() {
         let dir = tempfile::tempdir().unwrap();
         let workspace_root = dir.path().join("workspace");
         std::fs::create_dir_all(&workspace_root).unwrap();
         let db_path = dir.path().join("index.db");
-        // Pre-create a directory at db_path to simulate a prior build.
-        std::fs::create_dir_all(&db_path).unwrap();
-        // Place a sentinel file inside to verify it gets removed.
-        std::fs::write(db_path.join("stale.txt"), "stale").unwrap();
+        // Pre-create a directory at db_path with the LanceDB marker.
+        create_fake_lancedb_index(&db_path);
         assert!(db_path.exists(), "pre-condition: db_path must exist");
+        assert!(
+            db_path.join(LANCEDB_TABLE_MARKER).exists(),
+            "pre-condition: LanceDB marker must exist"
+        );
 
         let result = prepare_fresh_index_dir(&db_path, &workspace_root);
         assert!(result.is_ok(), "removal should succeed: {:?}", result.err());
         assert!(!db_path.exists(), "existing index directory must be removed");
+    }
+
+    #[test]
+    fn test_prepare_fresh_index_dir_rejects_non_index_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        let db_path = dir.path().join("some_other_dir");
+        // Create a directory WITHOUT the LanceDB marker — simulates a typo'd path.
+        std::fs::create_dir_all(&db_path).unwrap();
+        std::fs::write(db_path.join("important_data.txt"), "user data").unwrap();
+        assert!(db_path.exists(), "pre-condition: db_path must exist");
+
+        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
+        assert!(result.is_err(), "non-index directory must be rejected, not deleted");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("does not appear to be a LanceDB index"),
+            "error message must explain the rejection, got: {msg}"
+        );
+        // The directory must NOT have been deleted.
+        assert!(db_path.exists(), "non-index directory must not be deleted");
+        assert!(
+            db_path.join("important_data.txt").exists(),
+            "user data inside non-index directory must be preserved"
+        );
     }
 
     #[test]

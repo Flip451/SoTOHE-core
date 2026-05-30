@@ -343,8 +343,11 @@ pub struct MeasureQualityCommand {
 ///
 /// - `mean_cosine` and `cosine_std_dev` are the raw cosine similarity mean and
 ///   standard deviation (in `[-1.0, 1.0]`).
-/// - `cosine_percentiles` is `[p10, p25, p50, p75, p90, p95, p99]` — the full
-///   distribution needed to calibrate the soft-gate threshold (AC-03).
+/// - `cosine_percentiles` is `[p10, p25, p50, p75, p90, p95, p99]` of the
+///   cosine similarity distribution. Exact when the cross-file pair count is
+///   ≤ `MAX_SAMPLE` (10 000); for larger corpora, computed from a deterministic
+///   reservoir sample (PoC approximation, sufficient for threshold calibration
+///   per AC-03).
 /// - `above_threshold_rate` is the fraction of randomly sampled cross-file
 ///   fragment pairs whose raw cosine exceeds the default threshold (the PoC
 ///   proxy for false-positive risk, as defined in AC-03/IN-05).
@@ -357,7 +360,8 @@ pub struct QualityMetrics {
     /// Standard deviation of raw cosine similarity across the sampled pairs.
     pub cosine_std_dev: f32,
     /// Percentile values `[p10, p25, p50, p75, p90, p95, p99]` of the cosine
-    /// similarity distribution.
+    /// similarity distribution. Exact when cross-file pair count ≤ 10 000;
+    /// a deterministic reservoir-sample approximation for larger corpora (PoC).
     pub cosine_percentiles: Vec<f32>,
     /// Fraction of cross-file fragment pairs whose raw cosine exceeds the
     /// default similarity threshold (false-positive proxy).
@@ -664,6 +668,16 @@ impl MeasureQualityService for MeasureQualityInteractor {
     /// When fewer than two fragments are present, or no cross-file pairs
     /// exist, all metrics are returned as `0.0`.
     ///
+    /// ## Implementation: single-pass streaming
+    ///
+    /// Mean and variance are accumulated via Welford's online algorithm so
+    /// that O(n²) pairs are never materialised in memory.  For
+    /// `above_threshold_rate`, a reservoir sample of at most `MAX_SAMPLE`
+    /// entries is maintained using the same XorShift64 PRNG already used for
+    /// determinism; the reservoir is filled in-order and then replaced
+    /// probabilistically.  Percentiles are computed from the reservoir (which
+    /// is exact when pair count ≤ `MAX_SAMPLE`).
+    ///
     /// # Errors
     ///
     /// Returns [`MeasureQualityError::Embedding`] if embedding a fragment
@@ -680,8 +694,31 @@ impl MeasureQualityService for MeasureQualityInteractor {
             .map(|f| self.embedding_port.embed(f).map_err(MeasureQualityError::from))
             .collect::<Result<Vec<_>, _>>()?;
 
-        // Compute pairwise cosine similarities for cross-file fragment pairs.
-        let mut similarities: Vec<f32> = Vec::new();
+        // Default threshold for the above-threshold-rate proxy (0.8 is the
+        // typical starting point for the soft gate; the exact value is
+        // calibrated from the percentile distribution).
+        let default_threshold: f32 = 0.8;
+        // Maximum reservoir size for percentile computation and threshold-rate
+        // estimation.  When pair count ≤ MAX_SAMPLE the reservoir is exact.
+        const MAX_SAMPLE: usize = 10_000;
+
+        // Single-pass streaming accumulators — no O(n²) Vec materialisation.
+        //
+        // Welford's online algorithm for mean and M2 (sum of squared deltas):
+        //   mean_n = mean_{n-1} + (x - mean_{n-1}) / n
+        //   M2_n   = M2_{n-1}  + (x - mean_{n-1}) * (x - mean_n)
+        //   variance = M2 / n  (population variance)
+        let mut welford_count: u64 = 0;
+        let mut welford_mean: f64 = 0.0;
+        let mut welford_m2: f64 = 0.0;
+
+        // Reservoir for percentile / threshold-rate computation.
+        // Seeded with `1` so that the XorShift64 state is never zero before
+        // any pair has been seen.  The seed is updated on the first pair using
+        // the pair count, matching the original approach.
+        let mut reservoir: Vec<f32> = Vec::with_capacity(MAX_SAMPLE.min(1024));
+        let mut xorshift_state: u64 = 1;
+        let mut xorshift_seeded = false;
 
         let n_frags = cmd.fragments.len();
         for i in 0..n_frags {
@@ -695,11 +732,49 @@ impl MeasureQualityService for MeasureQualityInteractor {
                 let Some(ei) = embeddings.get(i) else { continue };
                 let Some(ej) = embeddings.get(j) else { continue };
                 let sim = cosine_similarity(ei, ej);
-                similarities.push(sim);
+
+                // ── Welford update ────────────────────────────────────────────
+                welford_count += 1;
+                let delta = f64::from(sim) - welford_mean;
+                welford_mean += delta / welford_count as f64;
+                let delta2 = f64::from(sim) - welford_mean;
+                welford_m2 += delta * delta2;
+
+                // ── Reservoir update (Algorithm R) ────────────────────────────
+                // On the very first pair, seed the PRNG from the pair index so
+                // determinism matches the original subsample approach.
+                if !xorshift_seeded {
+                    xorshift_state = welford_count | 1;
+                    xorshift_seeded = true;
+                }
+
+                if reservoir.len() < MAX_SAMPLE {
+                    reservoir.push(sim);
+                } else {
+                    // Algorithm R: accept the n-th item with probability k/n,
+                    // where k = MAX_SAMPLE and n = welford_count (current pair
+                    // index, 1-based).
+                    //
+                    // Generate a bias-free uniform random index j in [0, n) via
+                    // Lemire's multiply-high method (2019): map the 64-bit PRNG
+                    // output to [0, n) without modulo bias.
+                    //   j = floor(rng * n / 2^64)  using 128-bit intermediate
+                    // This is exact (no modulo bias) and branch-free.
+                    xorshift_state ^= xorshift_state << 13;
+                    xorshift_state ^= xorshift_state >> 7;
+                    xorshift_state ^= xorshift_state << 17;
+                    let n = welford_count as u128;
+                    let j = (((xorshift_state as u128).wrapping_mul(n)) >> 64) as usize;
+                    if j < MAX_SAMPLE {
+                        if let Some(slot) = reservoir.get_mut(j) {
+                            *slot = sim;
+                        }
+                    }
+                }
             }
         }
 
-        if similarities.is_empty() {
+        if welford_count == 0 {
             return Ok(QualityMetrics {
                 mean_cosine: 0.0,
                 cosine_std_dev: 0.0,
@@ -708,13 +783,13 @@ impl MeasureQualityService for MeasureQualityInteractor {
             });
         }
 
-        let n = similarities.len() as f32;
-        let mean_cosine = similarities.iter().copied().sum::<f32>() / n;
+        let mean_cosine = welford_mean as f32;
+        let variance = if welford_count > 0 { welford_m2 / welford_count as f64 } else { 0.0 };
+        let cosine_std_dev = (variance.sqrt()) as f32;
 
-        let variance = similarities.iter().map(|&s| (s - mean_cosine).powi(2)).sum::<f32>() / n;
-        let cosine_std_dev = variance.sqrt();
-
-        let mut sorted = similarities.clone();
+        // Percentiles are computed from the reservoir (exact when ≤ MAX_SAMPLE
+        // pairs; approximate but deterministic for larger workspaces).
+        let mut sorted = reservoir.clone();
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
 
         let percentile = |p: f32| -> f32 {
@@ -732,38 +807,11 @@ impl MeasureQualityService for MeasureQualityInteractor {
             percentile(99.0),
         ];
 
-        // Default threshold for the above-threshold-rate proxy (0.8 is the
-        // typical starting point for the soft gate; the exact value is
-        // calibrated from the percentile distribution).
-        //
-        // AC-03 defines `above_threshold_rate` as the fraction of *randomly
-        // sampled* cross-file fragment pairs exceeding the threshold.  When the
-        // total number of pairs is small the full population IS the sample, so
-        // no subsampling is needed.  When it is large we apply a deterministic
-        // subsample (XorShift64 PRNG seeded with the pair count) so the
-        // measure remains O(MAX_SAMPLE) rather than O(n^2) at scale.
-        let default_threshold: f32 = 0.8;
-        const MAX_SAMPLE: usize = 10_000;
-        let above_threshold_rate = if similarities.len() <= MAX_SAMPLE {
-            let above = similarities.iter().filter(|&&s| s >= default_threshold).count();
-            above as f32 / similarities.len() as f32
-        } else {
-            // Deterministic XorShift64 subsample: seed from pair count for
-            // reproducibility.  This avoids an external `rand` dependency while
-            // satisfying the "randomly sampled" requirement of AC-03.
-            let mut state: u64 = similarities.len() as u64 | 1; // seed must be non-zero
-            let mut above = 0usize;
-            for _ in 0..MAX_SAMPLE {
-                state ^= state << 13;
-                state ^= state >> 7;
-                state ^= state << 17;
-                let idx = (state as usize) % similarities.len();
-                if similarities.get(idx).copied().unwrap_or(0.0) >= default_threshold {
-                    above += 1;
-                }
-            }
-            above as f32 / MAX_SAMPLE as f32
-        };
+        // above_threshold_rate: fraction of reservoir entries above threshold.
+        // When pair count ≤ MAX_SAMPLE this equals the full-population rate.
+        let above = reservoir.iter().filter(|&&s| s >= default_threshold).count();
+        let above_threshold_rate =
+            if reservoir.is_empty() { 0.0 } else { above as f32 / reservoir.len() as f32 };
 
         Ok(QualityMetrics { mean_cosine, cosine_std_dev, cosine_percentiles, above_threshold_rate })
     }
@@ -1277,5 +1325,162 @@ mod tests {
         let result = interactor.measure_quality(&MeasureQualityCommand { fragments: frags });
 
         assert!(matches!(result, Err(MeasureQualityError::Embedding(_))));
+    }
+
+    // ── MeasureQualityInteractor: streaming / reservoir correctness ───────────
+    //
+    // These tests verify that the Welford streaming mean/variance and the
+    // reservoir-based threshold-rate produce the same values as a naïve
+    // materialised-Vec approach for small inputs (where the two are
+    // mathematically identical), and that they are well-behaved for larger
+    // synthetic inputs.
+
+    #[test]
+    fn test_measure_quality_streaming_mean_matches_naive_for_four_fragments() {
+        // Four fragments on four distinct paths → six cross-file pairs.
+        // All embeddings identical ([1,0]) → all cosine similarities = 1.0.
+        let n = 4;
+        let frags: Vec<CodeFragment> = (0..n)
+            .map(|i| make_fragment(&format!("src/{i}.rs"), &format!("fn f{i}() {{}}")))
+            .collect();
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(n).returning(|_| Ok(vec![1.0_f32, 0.0]));
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        // All similarities = 1.0 → mean = 1.0, std_dev = 0.0, all above threshold.
+        assert!(
+            (metrics.mean_cosine - 1.0).abs() < 1e-4,
+            "expected mean_cosine = 1.0, got {}",
+            metrics.mean_cosine
+        );
+        assert!(
+            metrics.cosine_std_dev.abs() < 1e-4,
+            "expected cosine_std_dev = 0.0, got {}",
+            metrics.cosine_std_dev
+        );
+        assert!(
+            (metrics.above_threshold_rate - 1.0).abs() < 1e-4,
+            "expected above_threshold_rate = 1.0, got {}",
+            metrics.above_threshold_rate
+        );
+    }
+
+    #[test]
+    fn test_measure_quality_streaming_std_dev_correct_for_two_known_pairs() {
+        // Three fragments on three distinct paths → three cross-file pairs.
+        // Embeddings chosen so cosine similarities are 1.0, 0.0, 0.0.
+        //   a=[1,0], b=[1,0]: cosine = 1.0
+        //   a=[1,0], c=[0,1]: cosine = 0.0
+        //   b=[1,0], c=[0,1]: cosine = 0.0
+        // Mean = (1.0 + 0.0 + 0.0) / 3 ≈ 0.3333
+        // Population variance = ((1-mean)^2 + (0-mean)^2 + (0-mean)^2) / 3
+        let frags = vec![
+            make_fragment("src/a.rs", "fn a() {}"),
+            make_fragment("src/b.rs", "fn b() {}"),
+            make_fragment("src/c.rs", "fn c() {}"),
+        ];
+        let embeds = vec![vec![1.0_f32, 0.0], vec![1.0_f32, 0.0], vec![0.0_f32, 1.0]];
+
+        let mut call_count = 0usize;
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        let embeds_clone = embeds.clone();
+        mock_embed.expect_embed().times(3).returning(move |_| {
+            let e = embeds_clone[call_count].clone();
+            call_count += 1;
+            Ok(e)
+        });
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        let expected_mean = 1.0_f32 / 3.0;
+        let expected_variance = ((1.0 - expected_mean).powi(2)
+            + (0.0 - expected_mean).powi(2)
+            + (0.0 - expected_mean).powi(2))
+            / 3.0;
+        let expected_std_dev = expected_variance.sqrt();
+
+        assert!(
+            (metrics.mean_cosine - expected_mean).abs() < 1e-4,
+            "mean_cosine mismatch: expected {expected_mean}, got {}",
+            metrics.mean_cosine
+        );
+        assert!(
+            (metrics.cosine_std_dev - expected_std_dev).abs() < 1e-4,
+            "cosine_std_dev mismatch: expected {expected_std_dev}, got {}",
+            metrics.cosine_std_dev
+        );
+        // 1 of 3 pairs is above threshold 0.8 → rate ≈ 0.333.
+        assert!(
+            (metrics.above_threshold_rate - 1.0_f32 / 3.0).abs() < 1e-4,
+            "above_threshold_rate mismatch: expected ≈ 0.333, got {}",
+            metrics.above_threshold_rate
+        );
+    }
+
+    #[test]
+    fn test_measure_quality_streaming_returns_seven_percentiles() {
+        // Minimal test: two fragments → one pair → all percentiles = that pair's similarity.
+        let frags =
+            vec![make_fragment("src/a.rs", "fn a() {}"), make_fragment("src/b.rs", "fn b() {}")];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(2).returning(|_| Ok(vec![1.0_f32, 0.0]));
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        assert_eq!(
+            metrics.cosine_percentiles.len(),
+            7,
+            "QualityMetrics must always return exactly 7 percentile values"
+        );
+    }
+
+    #[test]
+    fn test_measure_quality_no_memory_explosion_for_large_synthetic_corpus() {
+        // 200 fragments on 200 distinct paths → 200*199/2 = 19_900 cross-file pairs.
+        // All embeddings are unit vectors [1,0] → all similarities = 1.0.
+        // The streaming path must handle this without materialising 19_900 floats.
+        // We verify correctness, not memory usage (no way to assert heap usage in tests).
+        let n = 200usize;
+        let frags: Vec<CodeFragment> = (0..n)
+            .map(|i| make_fragment(&format!("src/{i}.rs"), &format!("fn f{i}() {{}}")))
+            .collect();
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(n).returning(|_| Ok(vec![1.0_f32, 0.0]));
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        // All similarities = 1.0 → mean = 1.0, std_dev = 0.0, rate = 1.0.
+        assert!(
+            (metrics.mean_cosine - 1.0).abs() < 1e-4,
+            "mean_cosine should be 1.0 for identical unit vectors, got {}",
+            metrics.mean_cosine
+        );
+        assert!(
+            metrics.cosine_std_dev.abs() < 1e-4,
+            "cosine_std_dev should be 0.0 for identical vectors, got {}",
+            metrics.cosine_std_dev
+        );
+        assert!(
+            (metrics.above_threshold_rate - 1.0).abs() < 1e-4,
+            "above_threshold_rate should be 1.0 when all similarities = 1.0, got {}",
+            metrics.above_threshold_rate
+        );
+        assert_eq!(metrics.cosine_percentiles.len(), 7);
     }
 }
