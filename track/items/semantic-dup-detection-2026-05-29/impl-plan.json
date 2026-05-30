@@ -10,12 +10,14 @@
     {
       "id": "T002",
       "description": "Add the usecase ports and error types in `libs/usecase/src/semantic_dup.rs`: define `EmbeddingPort` (embed method) and `SemanticIndexPort` (insert + search methods) as secondary-port traits with `Send + Sync` bounds; define `EmbeddingError`, `SemanticIndexError`, `FindSimilarError`, `DupCheckError`, `BuildIndexError`, `MeasureQualityError` enums with Display/Error impls and From conversions as specified in usecase-types.json. No I/O or external crate in this module. Wire into `libs/usecase/src/lib.rs`.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "78a7f69b15a97bc17e56fc993b317cd078adac00"
     },
     {
       "id": "T003",
       "description": "Add the usecase command/output types and application-service traits in `libs/usecase/src/semantic_dup.rs`: implement `FindSimilarCommand`, `FindSimilarOutput`, `DupCheckCommand`, `DupCheckWarning`, `DupCheckOutput`, `BuildIndexCommand` (carries pre-extracted `Vec<CodeFragment>`), `BuildIndexOutput`, `MeasureQualityCommand` (carries pre-extracted `Vec<CodeFragment>`), `QualityMetrics`; define `FindSimilarService`, `DupCheckService`, `BuildIndexService`, `MeasureQualityService` traits. Also implement the four interactors (`FindSimilarInteractor`, `DupCheckInteractor`, `BuildIndexInteractor`, `MeasureQualityInteractor`) with their `new` constructors and application-service trait impls, each delegating entirely to `EmbeddingPort` and `SemanticIndexPort` — no filesystem I/O in any interactor. `BuildIndexInteractor` iterates over `BuildIndexCommand.fragments`, embeds each, and inserts into the index. `MeasureQualityInteractor` embeds all fragments in `MeasureQualityCommand.fragments`, computes pairwise similarities, and returns `QualityMetrics`. `DupCheckInteractor` implements CN-03 (diff-fragments-only, no full-codebase scan). `FindSimilarInteractor` implements CN-05 (information-only, no block). `BuildIndexError::Io` is available for the CLI composition root to surface filesystem errors from the T007 extraction step before calling the interactor.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "78a7f69b15a97bc17e56fc993b317cd078adac00"
     },
     {
       "id": "T004",
@@ -26,12 +28,12 @@
     {
       "id": "T005",
       "description": "Implement `FastEmbedAdapter` in `libs/infrastructure/src/semantic_dup/embedding.rs`: `new()` loads Jina v2 base code model via fastembed-rs ONNX Runtime (synchronous, Tokio-independent); implement `EmbeddingPort::embed`. Model weights are obtained on-demand at first construction via fastembed-rs's built-in model cache (`~/.cache/huggingface/hub` or `FASTEMBED_CACHE_PATH`). Document the cache path in a `/// # Model Cache` doc comment so operators know where weights land. No network call at compile time; CI runs with `FASTEMBED_CACHE_PATH` pointing to a pre-populated volume mount (addressed by CI environment setup, not by this code task, per OS-07 deferral).",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T006",
       "description": "Implement `LanceDbSemanticIndexAdapter` in `libs/infrastructure/src/semantic_dup/index.rs`: `new(db_path)` opens or creates a LanceDB table at the given path (local file, no network); implement `SemanticIndexPort::insert` (stores fragment source_path + content + embedding vector) and `SemanticIndexPort::search` (ANN cosine similarity top-k query). Wire both new adapter modules into `libs/infrastructure/src/lib.rs` and expose them under `pub mod semantic_dup`.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T007",

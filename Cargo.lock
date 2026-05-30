@@ -2958,11 +2958,14 @@ dependencies = [
 name = "infrastructure"
 version = "0.1.0"
 dependencies = [
+ "arrow-array",
+ "arrow-schema",
  "chrono",
  "conch-parser",
  "domain",
  "fastembed",
  "fs4",
+ "futures",
  "globset",
  "lancedb",
  "libc",
@@ -2978,6 +2981,7 @@ dependencies = [
  "syn 2.0.117",
  "tempfile",
  "thiserror",
+ "tokio",
  "toml",
  "usecase",
 ]

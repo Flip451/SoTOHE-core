@@ -102,6 +102,10 @@
     {
       "trait_ref": "core::fmt::Debug",
       "for_type": "LanceDbSemanticIndexAdapter"
+    },
+    {
+      "trait_ref": "core::ops::drop::Drop",
+      "for_type": "LanceDbSemanticIndexAdapter"
     }
   ]
 }

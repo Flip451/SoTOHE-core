@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "452976c1e7d966f7aa62a86e19bcd33819683d82c1e3c76a92831741bac7d860",
+  "catalogue_declaration_hash": "ce7295013b42e491793234e23b5f5e3f6de19012b747774b0e3085ae28ce4ce4",
   "signals": [
     {
       "type_name": "FastEmbedAdapter",

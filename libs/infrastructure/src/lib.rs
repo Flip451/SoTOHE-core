@@ -13,6 +13,7 @@ pub mod schema_export;
 pub mod schema_export_codec;
 #[cfg(test)]
 mod schema_export_tests;
+pub mod semantic_dup;
 pub mod shell;
 pub mod spec;
 pub mod task_coverage_codec;
