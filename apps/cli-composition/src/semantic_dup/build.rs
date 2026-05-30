@@ -297,7 +297,31 @@ impl CliApp {
         let temp_path = temp_build_path(&input.db_path)?;
 
         // Step 3: Remove any leftover temp dir from a prior crashed run.
-        if temp_path.exists() {
+        //
+        // Use `symlink_metadata` (does NOT follow symlinks) so that a broken
+        // symlink at `temp_path` also triggers the guard — `Path::exists()`
+        // returns `false` for broken symlinks and would silently bypass it.
+        //
+        // Only remove the stale temp dir when it is a recognizable LanceDB
+        // index (our own leftover from a prior crashed build).  If an unrelated
+        // directory or file already occupies `.{name}.tmp-build`, refuse to
+        // clobber it and ask the user to resolve the conflict manually.  This
+        // mirrors the same guard applied to the `.old` backup in
+        // `commit_rebuilt_index`.
+        if std::fs::symlink_metadata(&temp_path).is_ok() {
+            if !is_recognizable_lancedb_index(&temp_path) {
+                return Err(format!(
+                    "the path '{}' already exists and does not appear to be a \
+                     LanceDB index (missing '{}' marker); refusing to delete it \
+                     to prevent data loss. \
+                     Please remove or rename '{}' manually, or choose a \
+                     --db-path whose sibling '{}' does not collide.",
+                    temp_path.display(),
+                    LANCEDB_TABLE_MARKER,
+                    temp_path.display(),
+                    temp_path.display(),
+                ));
+            }
             std::fs::remove_dir_all(&temp_path).map_err(|e| {
                 format!("failed to remove stale temp build dir {}: {e}", temp_path.display())
             })?;
@@ -570,7 +594,10 @@ mod tests {
     // ── semantic_dup_index_build: public-API critical paths ──────────────────
 
     #[test]
-    fn test_index_build_cleans_stale_temp_dir_before_build() {
+    fn test_index_build_cleans_recognizable_stale_temp_dir_before_build() {
+        // When `.{name}.tmp-build` exists AND is a recognizable LanceDB index
+        // (our own leftover from a prior crashed run), it must be cleaned up
+        // before the build starts.
         let dir = tempfile::tempdir().unwrap();
         let workspace_root = dir.path().join("workspace");
         std::fs::create_dir_all(&workspace_root).unwrap();
@@ -578,8 +605,10 @@ mod tests {
         let db_path = dir.path().join("index.db");
         let temp_path = dir.path().join(".index.db.tmp-build");
 
-        // Place a stale temp dir (simulates a leftover from a previous crash).
-        std::fs::create_dir_all(&temp_path).unwrap();
+        // Place a recognizable stale temp dir (simulates a leftover from a
+        // previous crash — it has the `fragments.lance/` marker because the
+        // prior run built into it before crashing).
+        create_fake_lancedb_index(&temp_path);
         std::fs::write(temp_path.join("stale_temp.txt"), "stale").unwrap();
 
         let app = crate::CliApp;
@@ -588,10 +617,56 @@ mod tests {
         let outcome = app.semantic_dup_index_build(input).unwrap();
         // Zero-fragment build succeeds.
         assert_eq!(outcome.exit_code, 0);
-        // Stale temp dir must be cleaned up.
-        assert!(!temp_path.exists(), "stale temp dir must be removed before build starts");
+        // Recognizable stale temp dir must be cleaned up.
+        assert!(
+            !temp_path.exists(),
+            "recognizable stale temp dir must be removed before build starts"
+        );
         // db_path was absent and zero fragments were found → must still be absent.
         assert!(!db_path.exists(), "db_path must not be created when no fragments are indexed");
+    }
+
+    #[test]
+    fn test_index_build_refuses_to_delete_unrecognized_stale_temp_dir() {
+        // Step 3 guard: when `.{name}.tmp-build` exists but is NOT a
+        // recognizable LanceDB index, the build must return Err and leave the
+        // directory completely untouched.
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        // workspace has no .rs files — Step 3 errors before do_build_into anyway.
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+
+        // Create an unrelated dir at the temp path — no `fragments.lance/`
+        // marker, with a sentinel file to verify it is untouched after the call.
+        std::fs::create_dir_all(&temp_path).unwrap();
+        std::fs::write(temp_path.join("unrelated_sentinel.txt"), "precious_data").unwrap();
+        assert!(temp_path.exists(), "pre-condition: temp_path must exist");
+        assert!(!temp_path.join(LANCEDB_TABLE_MARKER).exists(), "pre-condition: no marker present");
+
+        let app = crate::CliApp;
+        let input =
+            DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
+        let result = app.semantic_dup_index_build(input);
+
+        // Must return Err — refuse to delete unrecognized data.
+        assert!(
+            result.is_err(),
+            "build must return Err when unrecognized dir occupies the temp path"
+        );
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("does not appear to be a LanceDB index"),
+            "error message must explain the rejection, got: {msg}"
+        );
+
+        // The unrelated temp dir and its sentinel must be completely intact.
+        assert!(temp_path.exists(), "unrelated temp dir must NOT be deleted on Err");
+        assert!(
+            temp_path.join("unrelated_sentinel.txt").exists(),
+            "sentinel file inside unrelated temp dir must be preserved"
+        );
     }
 
     #[test]
