@@ -70,16 +70,28 @@ pub fn extract_code_fragments(workspace_root: &Path) -> Result<Vec<CodeFragment>
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
 /// Recursively walk `dir`, appending fragments from every `*.rs` file found.
+///
+/// Directory entries are sorted by path before processing to guarantee a
+/// deterministic, filesystem-independent traversal order.  This ensures that
+/// the index-to-fragment mapping produced by [`extract_code_fragments`] is
+/// reproducible across machines and filesystems, which is required for the
+/// index-based sampling in `measure_quality` to produce consistent results.
 fn collect_rs_fragments(dir: &Path, out: &mut Vec<CodeFragment>) -> Result<(), ExtractError> {
     let read_dir = std::fs::read_dir(dir).map_err(|e| ExtractError::Io {
         source: format!("cannot read directory '{}': {e}", dir.display()),
     })?;
 
+    // Collect all entries first, then sort by path for deterministic order.
+    let mut entries = Vec::new();
     for entry_result in read_dir {
         let entry = entry_result.map_err(|e| ExtractError::Io {
             source: format!("cannot read directory entry in '{}': {e}", dir.display()),
         })?;
+        entries.push(entry);
+    }
+    entries.sort_by_key(|a| a.path());
 
+    for entry in entries {
         let path = entry.path();
         let file_type = entry.file_type().map_err(|e| ExtractError::Io {
             source: format!("cannot determine file type of '{}': {e}", path.display()),
@@ -536,5 +548,63 @@ mod tests {
                 fragment.source_path.display()
             );
         }
+    }
+
+    // ── deterministic traversal order ─────────────────────────────────────────
+
+    /// Verify that `extract_code_fragments` returns fragments in a
+    /// deterministic, path-sorted order, regardless of filesystem iteration
+    /// order.  The returned `source_path` sequence must match the
+    /// lexicographically sorted set of source paths, and two calls on the same
+    /// workspace must yield identical sequences.
+    #[test]
+    fn test_extract_code_fragments_returns_deterministic_sorted_order() {
+        use std::fs;
+        use tempfile::tempdir;
+
+        let root = tempdir().unwrap();
+        let root_path = root.path();
+
+        // Create several `.rs` files spread across sub-directories so that
+        // filesystem iteration order (which is unspecified) could produce
+        // different sequences.
+        let sub_a = root_path.join("aaa");
+        let sub_b = root_path.join("bbb");
+        let sub_c = root_path.join("ccc");
+        fs::create_dir_all(&sub_a).unwrap();
+        fs::create_dir_all(&sub_b).unwrap();
+        fs::create_dir_all(&sub_c).unwrap();
+
+        // Each file has exactly one function so fragment→file mapping is 1:1.
+        fs::write(sub_c.join("z_file.rs"), "pub fn z_fn() {}\n").unwrap();
+        fs::write(sub_a.join("a_file.rs"), "pub fn a_fn() {}\n").unwrap();
+        fs::write(sub_b.join("m_file.rs"), "pub fn m_fn() {}\n").unwrap();
+        fs::write(root_path.join("root_file.rs"), "pub fn root_fn() {}\n").unwrap();
+
+        // The expected path order (sorted lexicographically by full path).
+        let mut expected_paths = vec![
+            root_path.join("root_file.rs"),
+            sub_a.join("a_file.rs"),
+            sub_b.join("m_file.rs"),
+            sub_c.join("z_file.rs"),
+        ];
+        expected_paths.sort();
+
+        // First call.
+        let fragments1 = extract_code_fragments(root_path).unwrap();
+        assert_eq!(fragments1.len(), expected_paths.len(), "fragment count mismatch on first call");
+        let paths1: Vec<_> = fragments1.iter().map(|f| f.source_path.clone()).collect();
+        assert_eq!(
+            paths1, expected_paths,
+            "first call: source_path sequence does not match sorted order"
+        );
+
+        // Second call must yield the identical sequence.
+        let fragments2 = extract_code_fragments(root_path).unwrap();
+        let paths2: Vec<_> = fragments2.iter().map(|f| f.source_path.clone()).collect();
+        assert_eq!(
+            paths1, paths2,
+            "second call returned a different sequence — traversal is not deterministic"
+        );
     }
 }

@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use domain::semantic_dup::{CodeFragment, TopK};
+use domain::semantic_dup::{CodeFragment, SimilarFragment, TopK};
 use infrastructure::semantic_dup::{
     embedding::FastEmbedAdapter, index::LanceDbSemanticIndexAdapter,
 };
@@ -11,7 +11,7 @@ use usecase::semantic_dup::{FindSimilarCommand, FindSimilarInteractor, FindSimil
 
 use crate::{CliApp, CommandOutcome};
 
-use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index, truncate_snippet};
+use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
 
 /// Input DTO for `sotp find-similar`.
 #[derive(Debug, Clone)]
@@ -24,6 +24,37 @@ pub struct FindSimilarInput {
     pub db_path: PathBuf,
 }
 
+/// Format a slice of [`SimilarFragment`]s into a human-readable, non-lossy
+/// string for display.
+///
+/// Each result is rendered as a numbered block:
+/// ```text
+/// # 1  path/to/file.rs  (score: 0.9123)
+/// <full fragment body, verbatim>
+///
+/// # 2  path/to/other.rs  (score: 0.8456)
+/// <full fragment body, verbatim>
+/// ```
+///
+/// Results are separated by a blank line.  The full fragment body is printed
+/// verbatim — no truncation is applied.
+fn format_find_similar_results(results: &[SimilarFragment]) -> String {
+    results
+        .iter()
+        .enumerate()
+        .map(|(i, sf)| {
+            format!(
+                "# {}  {}  (score: {:.4})\n{}",
+                i + 1,
+                sf.fragment.source_path.display(),
+                sf.score.value(),
+                sf.fragment.content(),
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n\n")
+}
+
 impl CliApp {
     /// Run `sotp find-similar`: embed the query fragment and retrieve top-k
     /// similar entries from the index.
@@ -34,6 +65,11 @@ impl CliApp {
     /// the command returns `Err` instead of silently reporting "no results"
     /// (which would be misleading — "nothing found" and "index absent" are
     /// distinct situations).
+    ///
+    /// Each result is printed as a numbered block containing the source file
+    /// path, similarity score, and the **full fragment body** (verbatim, not
+    /// truncated) so the user can inspect the matched implementation without
+    /// opening the file separately.
     ///
     /// # Errors
     ///
@@ -83,18 +119,7 @@ impl CliApp {
             return Ok(CommandOutcome::success(Some("(no results found)".to_owned())));
         }
 
-        let mut lines = Vec::new();
-        for sf in &output.results {
-            let snippet = truncate_snippet(sf.fragment.content(), 80);
-            lines.push(format!(
-                "{} | {:.4} | {}",
-                sf.fragment.source_path.display(),
-                sf.score.value(),
-                snippet
-            ));
-        }
-
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
+        Ok(CommandOutcome::success(Some(format_find_similar_results(&output.results))))
     }
 }
 
@@ -104,7 +129,105 @@ impl CliApp {
 mod tests {
     #![allow(clippy::unwrap_used, clippy::expect_used)]
 
+    use std::path::PathBuf;
+
+    use domain::semantic_dup::{CodeFragment, SimilarFragment, SimilarityScore};
+
     use super::*;
+
+    // ── format_find_similar_results (pure formatter) ──────────────────────────
+
+    fn make_fragment(path: &str, content: &str) -> CodeFragment {
+        CodeFragment::new(PathBuf::from(path), content.to_owned()).unwrap()
+    }
+
+    fn make_score(v: f32) -> SimilarityScore {
+        SimilarityScore::new(v).unwrap()
+    }
+
+    #[test]
+    fn test_format_find_similar_results_empty_slice_returns_empty_string() {
+        let output = format_find_similar_results(&[]);
+        assert_eq!(output, "");
+    }
+
+    #[test]
+    fn test_format_find_similar_results_single_result_contains_path_score_and_full_body() {
+        let body = "fn hello() {\n    println!(\"hello\");\n}";
+        let sf = SimilarFragment {
+            fragment: make_fragment("src/hello.rs", body),
+            score: make_score(0.9123),
+        };
+        let output = format_find_similar_results(&[sf]);
+
+        // Header line must contain the path and score.
+        assert!(output.contains("src/hello.rs"), "output must contain the source path");
+        assert!(output.contains("0.9123"), "output must contain the score");
+        // The FULL body must appear verbatim — including lines beyond the first.
+        assert!(output.contains("fn hello() {"), "output must contain the first line of the body");
+        assert!(
+            output.contains("    println!(\"hello\");"),
+            "output must contain the second line (non-lossy)"
+        );
+        assert!(output.contains('}'), "output must contain the closing brace");
+        // Must not be truncated: body has more than 80 chars total? not needed here,
+        // but body is multi-line and the second line must be present.
+    }
+
+    #[test]
+    fn test_format_find_similar_results_multiline_body_shown_in_full_not_truncated() {
+        // Build a fragment whose first line is short but whose full body is
+        // much longer than 80 characters (the old truncation limit).
+        let long_line = "x".repeat(200);
+        let body = format!("fn long_body() {{\n    let x = \"{long_line}\";\n}}");
+        let sf = SimilarFragment {
+            fragment: make_fragment("src/long.rs", &body),
+            score: make_score(0.7500),
+        };
+        let output = format_find_similar_results(&[sf]);
+
+        // The 200-char string must appear in full.
+        assert!(
+            output.contains(&long_line),
+            "output must contain the full 200-char string (non-lossy)"
+        );
+        assert!(!output.contains('…'), "output must NOT contain a truncation ellipsis");
+    }
+
+    #[test]
+    fn test_format_find_similar_results_multiple_results_numbered_and_separated() {
+        let sf1 = SimilarFragment {
+            fragment: make_fragment("src/a.rs", "fn alpha() {}"),
+            score: make_score(0.9500),
+        };
+        let sf2 = SimilarFragment {
+            fragment: make_fragment("src/b.rs", "fn beta() {}"),
+            score: make_score(0.8000),
+        };
+        let output = format_find_similar_results(&[sf1, sf2]);
+
+        // Both paths must appear.
+        assert!(output.contains("src/a.rs"), "output must contain path of result 1");
+        assert!(output.contains("src/b.rs"), "output must contain path of result 2");
+        // Index markers.
+        assert!(output.contains("# 1"), "output must contain '# 1' index marker");
+        assert!(output.contains("# 2"), "output must contain '# 2' index marker");
+        // Both bodies must appear.
+        assert!(output.contains("fn alpha() {}"), "output must contain body of result 1");
+        assert!(output.contains("fn beta() {}"), "output must contain body of result 2");
+        // Results must be separated by a blank line.
+        assert!(output.contains("\n\n"), "results must be separated by a blank line");
+    }
+
+    #[test]
+    fn test_format_find_similar_results_index_starts_at_1() {
+        let sf = SimilarFragment {
+            fragment: make_fragment("src/x.rs", "fn x() {}"),
+            score: make_score(0.5),
+        };
+        let output = format_find_similar_results(&[sf]);
+        assert!(output.starts_with("# 1"), "first result must start with '# 1'");
+    }
 
     // ── Missing-index guard (P1 fail-open fix) ────────────────────────────────
 
