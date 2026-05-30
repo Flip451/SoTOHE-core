@@ -192,3 +192,151 @@ pub struct SimilarFragment {
     /// The cosine similarity score between this fragment and the query.
     pub score: SimilarityScore,
 }
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use std::path::PathBuf;
+
+    use super::*;
+
+    // ── CodeFragment ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn test_code_fragment_new_with_valid_content_succeeds() {
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned());
+        assert!(result.is_ok());
+        let frag = result.unwrap();
+        assert_eq!(frag.content(), "fn foo() {}");
+        assert_eq!(frag.source_path, PathBuf::from("src/lib.rs"));
+    }
+
+    #[test]
+    fn test_code_fragment_new_with_empty_content_returns_empty_content_error() {
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), String::new());
+        assert!(matches!(result, Err(SemanticDupError::EmptyContent)));
+    }
+
+    #[test]
+    fn test_code_fragment_new_with_whitespace_only_content_succeeds() {
+        // Whitespace is technically non-empty; the invariant only rejects
+        // zero-length strings.
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "   ".to_owned());
+        assert!(result.is_ok());
+    }
+
+    // ── SimilarityScore ───────────────────────────────────────────────────────
+
+    #[test]
+    fn test_similarity_score_new_with_zero_succeeds() {
+        let result = SimilarityScore::new(0.0);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().value(), 0.0);
+    }
+
+    #[test]
+    fn test_similarity_score_new_with_one_succeeds() {
+        let result = SimilarityScore::new(1.0);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().value(), 1.0);
+    }
+
+    #[test]
+    fn test_similarity_score_new_with_midpoint_succeeds() {
+        let result = SimilarityScore::new(0.5);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_similarity_score_new_with_negative_epsilon_returns_invalid_score_error() {
+        let result = SimilarityScore::new(-0.001);
+        assert!(
+            matches!(result, Err(SemanticDupError::InvalidScore { value }) if (value - (-0.001)).abs() < 1e-6)
+        );
+    }
+
+    #[test]
+    fn test_similarity_score_new_with_above_one_epsilon_returns_invalid_score_error() {
+        let result = SimilarityScore::new(1.001);
+        assert!(
+            matches!(result, Err(SemanticDupError::InvalidScore { value }) if (value - 1.001).abs() < 1e-6)
+        );
+    }
+
+    // ── TopK ──────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn test_top_k_new_with_one_succeeds() {
+        let result = TopK::new(1);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().value(), 1);
+    }
+
+    #[test]
+    fn test_top_k_new_with_large_value_succeeds() {
+        let result = TopK::new(100);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().value(), 100);
+    }
+
+    #[test]
+    fn test_top_k_new_with_zero_returns_invalid_top_k_error() {
+        let result = TopK::new(0);
+        assert!(matches!(result, Err(SemanticDupError::InvalidTopK { value: 0 })));
+    }
+
+    // ── SimilarityThreshold ───────────────────────────────────────────────────
+
+    #[test]
+    fn test_similarity_threshold_new_with_zero_succeeds() {
+        let result = SimilarityThreshold::new(0.0);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().value(), 0.0);
+    }
+
+    #[test]
+    fn test_similarity_threshold_new_with_one_succeeds() {
+        let result = SimilarityThreshold::new(1.0);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap().value(), 1.0);
+    }
+
+    #[test]
+    fn test_similarity_threshold_new_with_midpoint_succeeds() {
+        let result = SimilarityThreshold::new(0.8);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_similarity_threshold_new_with_negative_epsilon_returns_invalid_threshold_error() {
+        let result = SimilarityThreshold::new(-0.001);
+        assert!(
+            matches!(result, Err(SemanticDupError::InvalidThreshold { value }) if (value - (-0.001)).abs() < 1e-6)
+        );
+    }
+
+    #[test]
+    fn test_similarity_threshold_new_with_above_one_epsilon_returns_invalid_threshold_error() {
+        let result = SimilarityThreshold::new(1.001);
+        assert!(
+            matches!(result, Err(SemanticDupError::InvalidThreshold { value }) if (value - 1.001).abs() < 1e-6)
+        );
+    }
+
+    // ── SemanticDupError Display ──────────────────────────────────────────────
+
+    #[test]
+    fn test_semantic_dup_error_display_invalid_score_contains_value() {
+        let err = SemanticDupError::InvalidScore { value: -0.5 };
+        assert!(err.to_string().contains("-0.5"));
+    }
+
+    #[test]
+    fn test_semantic_dup_error_display_empty_content_is_non_empty_string() {
+        let err = SemanticDupError::EmptyContent;
+        assert!(!err.to_string().is_empty());
+    }
+}

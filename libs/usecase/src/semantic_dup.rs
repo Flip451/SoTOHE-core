@@ -779,3 +779,497 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 
     dot / (mag_a * mag_b)
 }
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::type_complexity)]
+
+    use std::path::PathBuf;
+
+    use domain::semantic_dup::{CodeFragment, SimilarFragment, SimilarityScore};
+    use mockall::{mock, predicate};
+
+    use super::*;
+
+    // ── Mock port definitions ─────────────────────────────────────────────────
+    //
+    // We use `mock!` (not `#[automock]`) so that production trait definitions
+    // are not modified and the catalogued public shapes remain unchanged.
+
+    mock! {
+        pub MockEmbeddingPort {}
+        impl EmbeddingPort for MockEmbeddingPort {
+            fn embed(&self, fragment: &CodeFragment) -> Result<Vec<f32>, EmbeddingError>;
+        }
+    }
+
+    mock! {
+        pub MockSemanticIndexPort {}
+        impl SemanticIndexPort for MockSemanticIndexPort {
+            fn insert(
+                &self,
+                fragment: &CodeFragment,
+                embedding: &[f32],
+            ) -> Result<(), SemanticIndexError>;
+
+            fn search(
+                &self,
+                embedding: &[f32],
+                top_k: domain::semantic_dup::TopK,
+            ) -> Result<Vec<SimilarFragment>, SemanticIndexError>;
+        }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    fn make_fragment(path: &str, content: &str) -> CodeFragment {
+        CodeFragment::new(PathBuf::from(path), content.to_owned()).unwrap()
+    }
+
+    fn make_score(v: f32) -> SimilarityScore {
+        SimilarityScore::new(v).unwrap()
+    }
+
+    fn make_similar_fragment(path: &str, content: &str, score: f32) -> SimilarFragment {
+        SimilarFragment { fragment: make_fragment(path, content), score: make_score(score) }
+    }
+
+    // ── FindSimilarInteractor ─────────────────────────────────────────────────
+
+    #[test]
+    fn test_find_similar_interactor_delegates_embed_then_search() {
+        let query = make_fragment("<query>", "fn query() {}");
+        let top_k = domain::semantic_dup::TopK::new(3).unwrap();
+
+        let expected_embedding = vec![0.1_f32, 0.2, 0.3];
+        let expected_results = vec![make_similar_fragment("src/foo.rs", "fn foo() {}", 0.9)];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        {
+            let emb = expected_embedding.clone();
+            mock_embed.expect_embed().times(1).returning(move |_| Ok(emb.clone()));
+        }
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        {
+            let results = expected_results.clone();
+            let expected_emb = expected_embedding.clone();
+            let expected_top_k = top_k.value();
+            // Verify that search receives the exact embedding returned by embed and the
+            // caller-supplied top_k.
+            mock_index
+                .expect_search()
+                .times(1)
+                .withf(move |emb, k| emb == expected_emb.as_slice() && k.value() == expected_top_k)
+                .returning(move |_, _| Ok(results.clone()));
+        }
+
+        let interactor = FindSimilarInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output =
+            interactor.find_similar(&FindSimilarCommand { fragment: query, top_k }).unwrap();
+
+        assert_eq!(output.results.len(), 1);
+        assert_eq!(output.results[0].fragment.source_path, PathBuf::from("src/foo.rs"));
+    }
+
+    #[test]
+    fn test_find_similar_interactor_propagates_index_error() {
+        let query = make_fragment("<query>", "fn query() {}");
+        let top_k = domain::semantic_dup::TopK::new(1).unwrap();
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![0.1, 0.2]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        // search is called (embed succeeded) but returns an error.
+        mock_index.expect_search().times(1).returning(|_, _| {
+            Err(SemanticIndexError::SearchFailed { source: "search error".to_owned() })
+        });
+
+        let interactor = FindSimilarInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let result = interactor.find_similar(&FindSimilarCommand { fragment: query, top_k });
+
+        assert!(matches!(result, Err(FindSimilarError::Index(_))));
+    }
+
+    #[test]
+    fn test_find_similar_interactor_propagates_embedding_error() {
+        let query = make_fragment("<query>", "fn query() {}");
+        let top_k = domain::semantic_dup::TopK::new(1).unwrap();
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| {
+            Err(EmbeddingError::InferenceFailed { source: "inference error".to_owned() })
+        });
+
+        let mock_index = MockMockSemanticIndexPort::new();
+        // search must NOT be called when embed fails.
+
+        let interactor = FindSimilarInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let result = interactor.find_similar(&FindSimilarCommand { fragment: query, top_k });
+
+        assert!(matches!(result, Err(FindSimilarError::Embedding(_))));
+    }
+
+    // ── DupCheckInteractor ────────────────────────────────────────────────────
+
+    #[test]
+    fn test_dup_check_interactor_produces_warning_for_fragment_above_threshold() {
+        // CN-03: only diff fragments are checked.
+        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let frag = make_fragment("src/new.rs", "fn new_impl() {}");
+
+        // The mock returns a result with score 0.9 > threshold 0.8.
+        let above_threshold_result =
+            vec![make_similar_fragment("src/existing.rs", "fn existing() {}", 0.9)];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![0.1, 0.2]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        {
+            let res = above_threshold_result.clone();
+            mock_index.expect_search().times(1).returning(move |_, _| Ok(res.clone()));
+        }
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output =
+            interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold }).unwrap();
+
+        assert_eq!(output.warnings.len(), 1, "expected one warning for the above-threshold result");
+        assert_eq!(output.warnings[0].similar_fragments.len(), 1);
+        assert_eq!(output.warnings[0].similar_fragments[0].score.value(), 0.9);
+    }
+
+    #[test]
+    fn test_dup_check_interactor_produces_no_warning_for_fragment_below_threshold() {
+        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let frag = make_fragment("src/new.rs", "fn new_impl() {}");
+
+        // The mock returns a result with score 0.7 < threshold 0.8.
+        let below_threshold_result =
+            vec![make_similar_fragment("src/existing.rs", "fn existing() {}", 0.7)];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![0.1, 0.2]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        {
+            let res = below_threshold_result.clone();
+            mock_index.expect_search().times(1).returning(move |_, _| Ok(res.clone()));
+        }
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output =
+            interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold }).unwrap();
+
+        assert!(output.warnings.is_empty(), "expected no warnings for below-threshold result");
+    }
+
+    #[test]
+    fn test_dup_check_interactor_produces_warning_when_score_equals_threshold() {
+        // Boundary: score exactly at threshold is >= threshold so should warn.
+        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let frag = make_fragment("src/new.rs", "fn new_impl() {}");
+
+        let at_threshold_result =
+            vec![make_similar_fragment("src/existing.rs", "fn existing() {}", 0.8)];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![0.1, 0.2]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        {
+            let res = at_threshold_result.clone();
+            mock_index.expect_search().times(1).returning(move |_, _| Ok(res.clone()));
+        }
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output =
+            interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold }).unwrap();
+
+        assert_eq!(
+            output.warnings.len(),
+            1,
+            "expected warning when score equals threshold (>= comparison)"
+        );
+    }
+
+    #[test]
+    fn test_dup_check_interactor_with_empty_fragments_returns_no_warnings() {
+        let threshold = SimilarityThreshold::new(0.8).unwrap();
+
+        let mock_embed = MockMockEmbeddingPort::new();
+        let mock_index = MockMockSemanticIndexPort::new();
+        // Neither embed nor search should be called for empty input.
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output =
+            interactor.dup_check(&DupCheckCommand { fragments: vec![], threshold }).unwrap();
+
+        assert!(output.warnings.is_empty());
+    }
+
+    #[test]
+    fn test_dup_check_interactor_checks_only_supplied_diff_fragments_not_full_codebase() {
+        // CN-03: only the supplied fragments are embedded and searched.
+        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let frag1 = make_fragment("src/a.rs", "fn a() {}");
+        let frag2 = make_fragment("src/b.rs", "fn b() {}");
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        // embed must be called exactly twice — once per supplied fragment.
+        mock_embed.expect_embed().times(2).returning(|_| Ok(vec![0.1]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        // search must be called exactly twice — once per supplied fragment.
+        mock_index.expect_search().times(2).returning(|_, _| Ok(vec![]));
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output = interactor
+            .dup_check(&DupCheckCommand { fragments: vec![frag1, frag2], threshold })
+            .unwrap();
+
+        // Both results are below threshold (empty results from mock), no warnings.
+        assert!(output.warnings.is_empty());
+    }
+
+    #[test]
+    fn test_dup_check_interactor_propagates_embedding_error() {
+        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let frag = make_fragment("src/new.rs", "fn new_impl() {}");
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| {
+            Err(EmbeddingError::InferenceFailed { source: "embed error".to_owned() })
+        });
+
+        let mock_index = MockMockSemanticIndexPort::new();
+        // search must NOT be called when embed fails.
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let result = interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold });
+
+        assert!(matches!(result, Err(DupCheckError::Embedding(_))));
+    }
+
+    #[test]
+    fn test_dup_check_interactor_propagates_index_error() {
+        let threshold = SimilarityThreshold::new(0.8).unwrap();
+        let frag = make_fragment("src/new.rs", "fn new_impl() {}");
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![0.1, 0.2]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        // search is called (embed succeeded) but returns an error.
+        mock_index.expect_search().times(1).returning(|_, _| {
+            Err(SemanticIndexError::SearchFailed { source: "search error".to_owned() })
+        });
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let result = interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold });
+
+        assert!(matches!(result, Err(DupCheckError::Index(_))));
+    }
+
+    // ── BuildIndexInteractor ──────────────────────────────────────────────────
+
+    #[test]
+    fn test_build_index_interactor_calls_insert_for_each_fragment() {
+        use std::sync::Mutex;
+
+        let frags = vec![
+            make_fragment("src/a.rs", "fn a() {}"),
+            make_fragment("src/b.rs", "fn b() {}"),
+            make_fragment("src/c.rs", "fn c() {}"),
+        ];
+
+        // Each fragment gets a distinct embedding so we can verify the interactor
+        // passes the correct per-fragment embedding to insert.
+        let embed_counter = Arc::new(Mutex::new(0u32));
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        let counter_clone = Arc::clone(&embed_counter);
+        mock_embed.expect_embed().times(3).returning(move |_| {
+            let mut c = counter_clone.lock().unwrap();
+            let v = *c as f32;
+            *c += 1;
+            Ok(vec![v, 0.0]) // embedding [0,0], [1,0], [2,0] for frags a, b, c
+        });
+
+        // Capture (source_path, embedding) pairs passed to insert to verify correct
+        // per-fragment delegation: each fragment must be inserted with its own embedding.
+        let inserted: Arc<Mutex<Vec<(PathBuf, Vec<f32>)>>> = Arc::new(Mutex::new(Vec::new()));
+        let inserted_clone = Arc::clone(&inserted);
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        // insert called once per fragment; capture both arguments.
+        mock_index.expect_insert().times(3).returning(move |frag, emb| {
+            inserted_clone.lock().unwrap().push((frag.source_path.clone(), emb.to_vec()));
+            Ok(())
+        });
+
+        let interactor = BuildIndexInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output = interactor.build_index(&BuildIndexCommand { fragments: frags }).unwrap();
+
+        assert_eq!(output.fragments_indexed, 3);
+        // Verify each insert received the correct fragment (by path) and its corresponding
+        // per-fragment embedding, confirming the embed-to-insert delegation is correct.
+        let calls = inserted.lock().unwrap();
+        assert_eq!(calls.len(), 3);
+        assert_eq!(calls[0], (PathBuf::from("src/a.rs"), vec![0.0_f32, 0.0]));
+        assert_eq!(calls[1], (PathBuf::from("src/b.rs"), vec![1.0_f32, 0.0]));
+        assert_eq!(calls[2], (PathBuf::from("src/c.rs"), vec![2.0_f32, 0.0]));
+    }
+
+    #[test]
+    fn test_build_index_interactor_with_empty_fragments_indexes_zero() {
+        let mock_embed = MockMockEmbeddingPort::new();
+        let mock_index = MockMockSemanticIndexPort::new();
+        // Neither embed nor insert should be called.
+
+        let interactor = BuildIndexInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output = interactor.build_index(&BuildIndexCommand { fragments: vec![] }).unwrap();
+
+        assert_eq!(output.fragments_indexed, 0);
+    }
+
+    #[test]
+    fn test_build_index_interactor_propagates_embedding_error() {
+        let frags = vec![make_fragment("src/a.rs", "fn a() {}")];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| {
+            Err(EmbeddingError::ModelLoadFailed { source: "model failed".to_owned() })
+        });
+
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = BuildIndexInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let result = interactor.build_index(&BuildIndexCommand { fragments: frags });
+
+        assert!(matches!(result, Err(BuildIndexError::Embedding(_))));
+    }
+
+    #[test]
+    fn test_build_index_interactor_propagates_index_insert_error() {
+        let frags = vec![make_fragment("src/a.rs", "fn a() {}")];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![1.0, 0.0]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        // insert is called (embed succeeded) but returns an error.
+        mock_index
+            .expect_insert()
+            .times(1)
+            .with(predicate::always(), predicate::always())
+            .returning(|_, _| {
+                Err(SemanticIndexError::InsertFailed { source: "insert error".to_owned() })
+            });
+
+        let interactor = BuildIndexInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let result = interactor.build_index(&BuildIndexCommand { fragments: frags });
+
+        assert!(matches!(result, Err(BuildIndexError::Index(_))));
+    }
+
+    // ── MeasureQualityInteractor ──────────────────────────────────────────────
+
+    #[test]
+    fn test_measure_quality_interactor_returns_metrics_for_cross_file_fragments() {
+        // Two fragments from different paths — one cross-file pair exists.
+        let frags =
+            vec![make_fragment("src/a.rs", "fn a() {}"), make_fragment("src/b.rs", "fn b() {}")];
+
+        // Use identical unit vectors: cosine similarity = 1.0 (non-zero, distinguishable
+        // from the no-pairs zero-metrics path).
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(2).returning(|_| Ok(vec![1.0_f32, 0.0]));
+
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        // Cosine similarity of [1,0] and [1,0] = 1.0; mean and all percentiles should be 1.0.
+        assert!(
+            (metrics.mean_cosine - 1.0).abs() < 1e-4,
+            "expected mean_cosine ≈ 1.0, got {}",
+            metrics.mean_cosine
+        );
+        // Single pair → variance = 0; std dev must be 0.0.
+        assert!(
+            metrics.cosine_std_dev.abs() < 1e-4,
+            "expected cosine_std_dev ≈ 0.0, got {}",
+            metrics.cosine_std_dev
+        );
+        assert_eq!(metrics.cosine_percentiles.len(), 7);
+        for (i, &p) in metrics.cosine_percentiles.iter().enumerate() {
+            assert!((p - 1.0).abs() < 1e-4, "cosine_percentiles[{}] should be ≈ 1.0, got {}", i, p);
+        }
+        // Similarity 1.0 >= default threshold 0.8, so above_threshold_rate must be 1.0.
+        assert!(
+            (metrics.above_threshold_rate - 1.0).abs() < 1e-4,
+            "expected above_threshold_rate ≈ 1.0, got {}",
+            metrics.above_threshold_rate
+        );
+    }
+
+    #[test]
+    fn test_measure_quality_interactor_with_single_fragment_returns_zero_metrics() {
+        let frags = vec![make_fragment("src/a.rs", "fn a() {}")];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![1.0, 0.0]));
+
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        // Single fragment = no cross-file pairs = zero metrics.
+        assert_eq!(metrics.mean_cosine, 0.0);
+        assert_eq!(metrics.cosine_std_dev, 0.0);
+        assert_eq!(metrics.above_threshold_rate, 0.0);
+    }
+
+    #[test]
+    fn test_measure_quality_interactor_with_same_path_fragments_returns_zero_metrics() {
+        // Two fragments from the SAME path: cross-file filter excludes them.
+        let frags =
+            vec![make_fragment("src/a.rs", "fn a() {}"), make_fragment("src/a.rs", "fn b() {}")];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(2).returning(|_| Ok(vec![1.0, 0.0]));
+
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let metrics =
+            interactor.measure_quality(&MeasureQualityCommand { fragments: frags }).unwrap();
+
+        assert_eq!(metrics.mean_cosine, 0.0, "same-path pairs should be excluded");
+    }
+
+    #[test]
+    fn test_measure_quality_interactor_propagates_embedding_error() {
+        let frags = vec![make_fragment("src/a.rs", "fn a() {}")];
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed
+            .expect_embed()
+            .times(1)
+            .returning(|_| Err(EmbeddingError::InferenceFailed { source: "bad".to_owned() }));
+
+        let mock_index = MockMockSemanticIndexPort::new();
+
+        let interactor = MeasureQualityInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let result = interactor.measure_quality(&MeasureQualityCommand { fragments: frags });
+
+        assert!(matches!(result, Err(MeasureQualityError::Embedding(_))));
+    }
+}

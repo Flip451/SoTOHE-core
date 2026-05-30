@@ -46,22 +46,24 @@
     {
       "id": "T008",
       "description": "Wire CLI subcommands for `sotp find-similar` and `sotp dup-index build` in `apps/cli/src/commands/` (or `apps/cli-composition`): `find-similar` parses fragment text or `--file <path>` and `--top-k <k>` (optional, default 5 per AC-01); constructs `FindSimilarCommand { fragment, top_k }`, invokes `FindSimilarInteractor`; outputs top-k results as `path | score | content_snippet`. `dup-index build` parses `--workspace-root` and `--db-path`; calls the T007 infrastructure extractor to obtain `Vec<CodeFragment>`, constructs `BuildIndexCommand { fragments }`, constructs `FastEmbedAdapter` and `LanceDbSemanticIndexAdapter`, invokes `BuildIndexInteractor.build_index(cmd)`; prints fragment count on success. Exit 0 on success.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3a86c01d9d404c0d247d6490e9eb79675916c34e"
     },
     {
       "id": "T009",
       "description": "Wire CLI subcommands for `sotp dup-check` (soft gate) and `sotp dup-index measure-quality` in `apps/cli/src/commands/`: `dup-check` accepts diff fragments via `--files-from <newline-separated-file>` (each line is a path to a fragment file), reads each file to construct `CodeFragment` values, builds `DupCheckCommand { fragments, threshold }`, and invokes `DupCheckInteractor`; if warnings exist, print them to stderr and continue (exit 0 per CN-02/AC-04). `dup-check` also supports `--ack` / `--ack-file` flag that records an acknowledgement hash and suppresses warnings on re-run (AC-05). `measure-quality` accepts `--workspace-root`, calls the T007 infrastructure extractor to get fragments, builds `MeasureQualityCommand { fragments }`, invokes `MeasureQualityInteractor`, and outputs JSON metrics to stdout (AC-03).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3a86c01d9d404c0d247d6490e9eb79675916c34e"
     },
     {
       "id": "T010",
       "description": "Add unit tests for domain value-object invariants in `libs/domain/src/semantic_dup.rs` (happy path + boundary + error path): `CodeFragment::new` rejects empty content; `SimilarityScore::new` accepts 0.0, 1.0, rejects -0.001 and 1.001; `TopK::new` accepts 1, rejects 0; `SimilarityThreshold::new` accepts 0.0/1.0, rejects out-of-range. Add unit tests for all four interactors in `libs/usecase/src/semantic_dup.rs` using mock ports (`mockall`): `FindSimilarInteractor` delegates embed + search; `DupCheckInteractor` produces warnings only for fragments above threshold (CN-03); `BuildIndexInteractor` calls insert for each fragment; `MeasureQualityInteractor` returns metrics.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T011",
       "description": "Add integration-level tests for infrastructure adapters and CLI commands: test `LanceDbSemanticIndexAdapter` with a temp directory (insert + search round-trip, confirming CN-01 local-only operation). Test the `sotp dup-check` command with a pre-populated index and a controlled diff fragment to verify exit-0 soft-gate behavior (AC-04) and ack suppression (AC-05). Run `cargo make ci` to confirm AC-08 (fmt-check + clippy + nextest + deny + check-layers + verify-*).",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {

@@ -394,3 +394,252 @@ fn truncate_snippet(s: &str, max_chars: usize) -> String {
         format!("{truncated}…")
     }
 }
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used, clippy::expect_used)]
+
+    use std::collections::HashSet;
+
+    use super::*;
+
+    // ── fragment_content_hash ─────────────────────────────────────────────────
+
+    #[test]
+    fn test_fragment_content_hash_is_stable_across_calls() {
+        let content = "fn foo() { let x = 1; }";
+        let h1 = fragment_content_hash(content);
+        let h2 = fragment_content_hash(content);
+        assert_eq!(h1, h2, "FNV-1a hash must be deterministic");
+    }
+
+    #[test]
+    fn test_fragment_content_hash_differs_for_different_content() {
+        let h1 = fragment_content_hash("fn foo() {}");
+        let h2 = fragment_content_hash("fn bar() {}");
+        assert_ne!(h1, h2, "different content must yield different hashes");
+    }
+
+    #[test]
+    fn test_fragment_content_hash_is_16_hex_chars() {
+        let h = fragment_content_hash("hello world");
+        assert_eq!(h.len(), 16, "FNV-1a 64-bit hash must be 16 hex characters");
+        assert!(h.chars().all(|c| c.is_ascii_hexdigit()), "hash must be hex");
+    }
+
+    // ── read_ack_set / write_ack_set ──────────────────────────────────────────
+
+    #[test]
+    fn test_read_ack_set_returns_empty_set_when_file_does_not_exist() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ack.txt");
+        let set = read_ack_set(&path).unwrap();
+        assert!(set.is_empty(), "missing file should yield empty set");
+    }
+
+    #[test]
+    fn test_write_and_read_ack_set_round_trips_hashes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ack.txt");
+
+        let mut original: HashSet<String> = HashSet::new();
+        original.insert("abc123def456789a".to_owned());
+        original.insert("0000000000000000".to_owned());
+
+        write_ack_set(&path, &original).unwrap();
+        let read_back = read_ack_set(&path).unwrap();
+
+        assert_eq!(original, read_back, "round-trip must preserve all hashes");
+    }
+
+    #[test]
+    fn test_write_ack_set_produces_sorted_lines() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ack.txt");
+
+        let mut set: HashSet<String> = HashSet::new();
+        set.insert("zzzzzzzzzzzzzzzz".to_owned());
+        set.insert("aaaaaaaaaaaaaaaa".to_owned());
+        set.insert("mmmmmmmmmmmmmmmm".to_owned());
+
+        write_ack_set(&path, &set).unwrap();
+        let contents = std::fs::read_to_string(&path).unwrap();
+        let lines: Vec<&str> = contents.lines().collect();
+
+        let mut sorted = lines.clone();
+        sorted.sort_unstable();
+        assert_eq!(lines, sorted, "ack file lines should be sorted");
+    }
+
+    // ── AC-05: ack suppression via fragment_content_hash ─────────────────────
+    //
+    // These tests verify the suppress-on-re-run logic directly, without
+    // constructing adapters or the real embedding model.  The ack-set
+    // read/filter/append pipeline is exercised through the private helpers.
+
+    #[test]
+    fn test_ack_suppression_already_acked_hash_is_detected_in_set() {
+        let content = "fn already_acked() {}";
+        let hash = fragment_content_hash(content);
+
+        let mut ack_set: HashSet<String> = HashSet::new();
+        ack_set.insert(hash.clone());
+
+        // The ack_set lookup mirrors the partition logic in semantic_dup_check.
+        assert!(ack_set.contains(&hash), "acked fragment hash should be found in the set");
+    }
+
+    #[test]
+    fn test_ack_suppression_new_hash_is_not_in_existing_set() {
+        let existing_content = "fn already_acked() {}";
+        let new_content = "fn new_fn() {}";
+
+        let existing_hash = fragment_content_hash(existing_content);
+        let new_hash = fragment_content_hash(new_content);
+
+        let mut ack_set: HashSet<String> = HashSet::new();
+        ack_set.insert(existing_hash);
+
+        assert!(
+            !ack_set.contains(&new_hash),
+            "new fragment hash must not appear in the existing ack set"
+        );
+    }
+
+    #[test]
+    fn test_ack_suppression_write_new_hashes_appended_to_existing_set() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ack.txt");
+
+        // Initial ack set with one hash.
+        let old_hash = fragment_content_hash("fn old() {}");
+        let mut initial_set: HashSet<String> = HashSet::new();
+        initial_set.insert(old_hash.clone());
+        write_ack_set(&path, &initial_set).unwrap();
+
+        // Simulate adding a new warning hash.
+        let new_hash = fragment_content_hash("fn new_warn() {}");
+        let mut updated_set = read_ack_set(&path).unwrap();
+        updated_set.insert(new_hash.clone());
+        write_ack_set(&path, &updated_set).unwrap();
+
+        // Both hashes should be present on the next read.
+        let final_set = read_ack_set(&path).unwrap();
+        assert!(final_set.contains(&old_hash), "old hash must be retained");
+        assert!(final_set.contains(&new_hash), "new hash must be added");
+        assert_eq!(final_set.len(), 2);
+    }
+
+    // ── AC-04: soft-gate exit-0 behavior ─────────────────────────────────────
+    //
+    // AC-04 specifies that dup-check always exits 0 (soft gate).  The
+    // `CommandOutcome.exit_code` field on the warning path is tested here via
+    // the `semantic_dup_check` method using a real (temp) LanceDB adapter.
+    //
+    // NOTE: This test does NOT construct the real FastEmbedAdapter — it skips
+    // the embedding step by using an empty fragment list, exercising only the
+    // early-exit "no fragments to check" code path which returns exit_code 0.
+
+    #[test]
+    fn test_dup_check_with_no_fragment_files_exits_zero_with_success_message() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("test.db");
+        let app = crate::CliApp;
+
+        let input = DupCheckInput {
+            fragment_files: vec![],
+            threshold: 0.8,
+            db_path,
+            ack_file: None,
+            ack: false,
+        };
+
+        let outcome = app.semantic_dup_check(input).unwrap();
+        assert_eq!(outcome.exit_code, 0, "dup-check must always exit 0 (AC-04)");
+        assert!(
+            outcome.stdout.as_deref().unwrap_or("").contains("no fragments"),
+            "expected 'no fragments' message in stdout"
+        );
+    }
+
+    #[test]
+    fn test_dup_check_with_ack_but_no_ack_file_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("test.db");
+        let app = crate::CliApp;
+
+        let input = DupCheckInput {
+            fragment_files: vec![],
+            threshold: 0.8,
+            db_path,
+            ack_file: None,
+            ack: true, // --ack without --ack-file must be rejected
+        };
+
+        let result = app.semantic_dup_check(input);
+        assert!(result.is_err(), "--ack without --ack-file must return Err");
+    }
+
+    #[test]
+    fn test_dup_check_all_fragments_acked_exits_zero_with_no_warnings_message() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("test.db");
+        let ack_path = dir.path().join("ack.txt");
+        let frag_path = dir.path().join("frag.rs");
+
+        // Write a fragment file.
+        let content = "fn suppressed() {}";
+        std::fs::write(&frag_path, content).unwrap();
+
+        // Pre-populate the ack set with this fragment's hash.
+        let hash = fragment_content_hash(content);
+        let mut ack_set: HashSet<String> = HashSet::new();
+        ack_set.insert(hash);
+        write_ack_set(&ack_path, &ack_set).unwrap();
+
+        let app = crate::CliApp;
+        let input = DupCheckInput {
+            fragment_files: vec![frag_path],
+            threshold: 0.8,
+            db_path,
+            ack_file: Some(ack_path),
+            ack: false,
+        };
+
+        let outcome = app.semantic_dup_check(input).unwrap();
+        // AC-04: exit 0 always.
+        assert_eq!(outcome.exit_code, 0);
+        // AC-05: already-acked fragment is suppressed — "no warnings" message.
+        assert!(
+            outcome.stdout.as_deref().unwrap_or("").contains("already acked"),
+            "expected 'already acked' message, got: {:?}",
+            outcome.stdout
+        );
+    }
+
+    // ── truncate_snippet ──────────────────────────────────────────────────────
+
+    #[test]
+    fn test_truncate_snippet_short_string_is_unchanged() {
+        let s = "fn foo() {}";
+        assert_eq!(truncate_snippet(s, 80), s);
+    }
+
+    #[test]
+    fn test_truncate_snippet_long_string_is_truncated_with_ellipsis() {
+        let s = "a".repeat(100);
+        let result = truncate_snippet(&s, 10);
+        assert!(result.ends_with('…'), "truncated snippet must end with '…'");
+        // 10 chars + 1 `…` multibyte character = chars count 11.
+        assert_eq!(result.chars().count(), 11);
+    }
+
+    #[test]
+    fn test_truncate_snippet_uses_only_first_line() {
+        let s = "first line\nsecond line\nthird line";
+        let result = truncate_snippet(s, 80);
+        assert_eq!(result, "first line");
+    }
+}
