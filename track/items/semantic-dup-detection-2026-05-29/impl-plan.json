@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "Add the domain module `libs/domain/src/semantic_dup.rs`: implement `CodeFragment` (non-empty content guard, Debug+Clone), `SimilarityScore` (range [0,1] guard, Debug+Clone+Copy), `TopK` (>=1 guard, Debug+Clone+Copy), `SimilarityThreshold` (range [0,1] guard, Debug+Clone+Copy), `SimilarFragment` (Debug+Clone), and `SemanticDupError` (Debug+Display+Error) as specified in domain-types.json. Wire the new module into `libs/domain/src/lib.rs`. No external crate dependencies added in this task.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "1841d358bb4cd92aba7fbbd6f94e91db1f78115b"
     },
     {
       "id": "T002",
@@ -19,7 +20,7 @@
     {
       "id": "T004",
       "description": "Add infrastructure dependency declarations to `libs/infrastructure/Cargo.toml`: add `fastembed`, `ort`, and `lancedb` under `[dependencies]`. Verify that `libs/domain/Cargo.toml` and `libs/usecase/Cargo.toml` do NOT gain these dependencies. Run `cargo make check-layers` and `cargo make deny` to confirm AC-06 and AC-07 are satisfied before proceeding to adapter implementation.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T005",

@@ -15,6 +15,10 @@ decisions:
     review_finding_ref: "deep-research-2026-05-29:semantic-dup-detection"
     user_decision_ref: "chat_segment:adr-add:2026-05-29:semantic-dup-detection"
     status: proposed
+  - id: D4
+    review_finding_ref: "impl-discovery:2026-05-30:lancedb-protoc-and-license-gate"
+    user_decision_ref: "chat_segment:adr2pr:2026-05-30:lancedb-toolchain-license-prereqs"
+    status: proposed
 ---
 # コード意味重複検出による DRY 防止（discoverability + soft gate）
 
@@ -44,6 +48,10 @@ decisions:
 ### D3: 段階導入とし、ハードゲート化は実測まで保留する
 
 導入は段階的に行う。(1) まず discoverability（例: `sotp find-similar` 相当の、類似既存フラグメント top-k を提示する情報提供のみのサブコマンド）。(2) PoC で Jina の Rust コードへの転移品質（cosine 類似度分布・false positive 率）を実測する。(3) 実測後に、追加・変更された差分フラグメントのみを対象とする soft gate（warning 止まり・ack 付き override 可。`module_size` 検証が warning 止まりである前例と整合）。(4) ハードブロック化は、実測で十分な精度が確認できるまで保留し、本 ADR では判断しない。
+
+### D4: lancedb 採用に伴うビルド環境とライセンス許可リストを拡張する
+
+D2 で選んだ lancedb スタックを Docker CI 環境で動かすために必要な前提条件として、(1) ビルドツール（`protoc`）の Docker イメージへの追加、および (2) `deny.toml` ライセンス許可リストへの追加許諾（`BSD-2-Clause`, `BSD-3-Clause`, `ISC`, `Zlib`, `NCSA`, `BSL-1.0`, `CC0-1.0`, `CDLA-Permissive-2.0`, `MPL-2.0`、および `RUSTSEC-2024-0436` の accept）を行う。詳細は `## Consequences` の「D2 実現に必要だった前提条件」を参照。
 
 ## Rejected Alternatives
 
@@ -78,6 +86,32 @@ decisions:
 - 埋め込みモデル重み（~550MB）のキャッシュ・配布管理が必要（ビルドキャッシュ同梱の要否は要確認）。
 - Rust への転移品質が未検証のため、PoC コストが先行する。
 - インデックス鮮度の管理と ANN の非決定性に対する運用上の工夫（しきい値・固定スナップショットのハッシュ管理・差分のみ判定）が要る。
+
+### D2 実現に必要だった前提条件（D4）
+
+D2 で選んだスタック（lancedb / fastembed）を、このプロジェクトの再現可能な Docker CI 環境で実際に動かすために、実装中に次の2点の対処が必要と判明し、利用者の承認を得た上で対応した。
+
+**前提条件1: ビルドツール追加（`protoc`）**
+
+lancedb の推移的な依存クレート `lance-encoding` のビルドスクリプトが Protocol Buffers コンパイラ（`protoc`）を要求する。そのため `protobuf-compiler` を次の2か所に追加した。
+
+- **Docker ツールイメージ**（`Dockerfile`）: `cargo make ci` など Docker 経由でのビルドに対応する。
+- **開発者のホストマシン**（直接インストール）: `bin/sotp track type-signals` が呼び出す `cargo rustdoc` はホスト上で実行されるため、ホストにも `protoc` が必要になる。コミットゲート（`track-active-gate`）や `track-local-review` もこのパスを経由する。これはすべての開発者のマシンに適用される。
+
+**前提条件2: ライセンス許可リストの拡張（`deny.toml`）**
+
+それまでの許可リストは `MIT` / `Apache-2.0` / `Unicode-3.0` のみだった。lancedb および fastembed の推移的依存が次のライセンスを追加的に必要とするため、許可リストを拡張した:
+
+- `BSD-2-Clause`, `BSD-3-Clause`, `ISC`, `Zlib`, `NCSA`, `BSL-1.0`, `CC0-1.0`（いずれも帰属表示のみを要求する許可的ライセンス）
+- `CDLA-Permissive-2.0`（データライセンスであり、コードの配布条件には影響しない）
+- `MPL-2.0`（ファイル単位の弱いコピーレフト。MPL-2.0 対象ファイルを配布する際はそのファイルのソースを提供する義務が生じるが、同一バイナリに含まれる他のファイル（MIT/Apache-2.0 等）にソース開示は波及しない）
+- `RUSTSEC-2024-0436`（`paste` クレート: メンテナンス終了扱いのアドバイザリ。セキュリティ上の問題はなく、accept 扱いとした）
+
+この拡張はプロジェクト自身の配布ライセンス（MIT/Apache-2.0）を変更しない。追加したライセンスのうち `BSD-2-Clause`/`BSD-3-Clause`/`ISC`/`Zlib`/`NCSA`/`BSL-1.0`/`CC0-1.0` は許可的ライセンス、`CDLA-Permissive-2.0` は非コード用途のデータライセンスであり、`MPL-2.0` は MPL 対象ファイルを配布する際そのファイルのソース提供義務が生じるが他ファイルへの波及はない弱いコピーレフトである。`RUSTSEC-2024-0436` はライセンスではなく、セキュリティ上の問題のないアドバイザリの accept 扱いである。プロジェクトのコードは引き続き MIT/Apache-2.0 で配布できる。
+
+**補足: lancedb の非同期 API ブリッジ**
+
+D2 では fastembed の同期 API を「Tokio 非依存」と記述しているが、lancedb の Rust SDK は async API（tokio/reqwest ベース）を持つ。`SemanticIndexPort` のアダプタ実装は、ポートのインタフェース（同期）と lancedb の async API を橋渡しする責務を担う。「Tokio 非依存」の性質は fastembed 側に適用されるもので、lancedb 側のアダプタには適用されない。
 
 ### Neutral
 

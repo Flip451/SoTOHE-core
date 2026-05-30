@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # コード意味重複検出による DRY 防止（discoverability + soft gate）
 
-## Tasks (0/11 resolved)
+## Tasks (1/11 resolved)
 
 ### S1 — Domain value-object layer
 
@@ -9,7 +9,7 @@
 > No external crate dependencies are introduced here; this task compiles independently and is the prerequisite for every layer above it.
 > All constructors enforce invariants (non-empty content, score/threshold in [0,1], k>=1) so illegal states are unrepresentable per .claude/rules/04-coding-principles.md.
 
-- [~] **T001**: Add the domain module `libs/domain/src/semantic_dup.rs`: implement `CodeFragment` (non-empty content guard, Debug+Clone), `SimilarityScore` (range [0,1] guard, Debug+Clone+Copy), `TopK` (>=1 guard, Debug+Clone+Copy), `SimilarityThreshold` (range [0,1] guard, Debug+Clone+Copy), `SimilarFragment` (Debug+Clone), and `SemanticDupError` (Debug+Display+Error) as specified in domain-types.json. Wire the new module into `libs/domain/src/lib.rs`. No external crate dependencies added in this task.
+- [x] **T001**: Add the domain module `libs/domain/src/semantic_dup.rs`: implement `CodeFragment` (non-empty content guard, Debug+Clone), `SimilarityScore` (range [0,1] guard, Debug+Clone+Copy), `TopK` (>=1 guard, Debug+Clone+Copy), `SimilarityThreshold` (range [0,1] guard, Debug+Clone+Copy), `SimilarFragment` (Debug+Clone), and `SemanticDupError` (Debug+Display+Error) as specified in domain-types.json. Wire the new module into `libs/domain/src/lib.rs`. No external crate dependencies added in this task. (`1841d358bb4cd92aba7fbbd6f94e91db1f78115b`)
 
 ### S2 — Usecase ports, errors, and interactors
 
@@ -27,7 +27,7 @@
 > T006 implements `LanceDbSemanticIndexAdapter` (local file DB, Apache 2.0, insert + ANN cosine search).
 > T004 must precede T005 and T006; T005 and T006 can proceed in parallel once T004 lands.
 
-- [ ] **T004**: Add infrastructure dependency declarations to `libs/infrastructure/Cargo.toml`: add `fastembed`, `ort`, and `lancedb` under `[dependencies]`. Verify that `libs/domain/Cargo.toml` and `libs/usecase/Cargo.toml` do NOT gain these dependencies. Run `cargo make check-layers` and `cargo make deny` to confirm AC-06 and AC-07 are satisfied before proceeding to adapter implementation.
+- [~] **T004**: Add infrastructure dependency declarations to `libs/infrastructure/Cargo.toml`: add `fastembed`, `ort`, and `lancedb` under `[dependencies]`. Verify that `libs/domain/Cargo.toml` and `libs/usecase/Cargo.toml` do NOT gain these dependencies. Run `cargo make check-layers` and `cargo make deny` to confirm AC-06 and AC-07 are satisfied before proceeding to adapter implementation.
 - [ ] **T005**: Implement `FastEmbedAdapter` in `libs/infrastructure/src/semantic_dup/embedding.rs`: `new()` loads Jina v2 base code model via fastembed-rs ONNX Runtime (synchronous, Tokio-independent); implement `EmbeddingPort::embed`. Model weights are obtained on-demand at first construction via fastembed-rs's built-in model cache (`~/.cache/huggingface/hub` or `FASTEMBED_CACHE_PATH`). Document the cache path in a `/// # Model Cache` doc comment so operators know where weights land. No network call at compile time; CI runs with `FASTEMBED_CACHE_PATH` pointing to a pre-populated volume mount (addressed by CI environment setup, not by this code task, per OS-07 deferral).
 - [ ] **T006**: Implement `LanceDbSemanticIndexAdapter` in `libs/infrastructure/src/semantic_dup/index.rs`: `new(db_path)` opens or creates a LanceDB table at the given path (local file, no network); implement `SemanticIndexPort::insert` (stores fragment source_path + content + embedding vector) and `SemanticIndexPort::search` (ANN cosine similarity top-k query). Wire both new adapter modules into `libs/infrastructure/src/lib.rs` and expose them under `pub mod semantic_dup`.
 

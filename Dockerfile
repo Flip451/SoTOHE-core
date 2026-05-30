@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     ripgrep \
     pkg-config \
     libssl-dev \
+    protobuf-compiler \
     && rm -rf /var/lib/apt/lists/* \
     && rustup component add --toolchain ${RUST_VERSION} rustfmt clippy \
     && curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh

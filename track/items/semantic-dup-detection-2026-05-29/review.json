@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:15:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:33:45Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -294,6 +312,57 @@
           "findings": [],
           "hash": "rvw1:sha256:fca4cbceb112abf32a60ac36f8b518421da9043c08704c8b411552b9ee670b7e",
           "at": "2026-05-29T15:37:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The closing sentence overstates the license set: immediately above, `MPL-2.0` is explicitly classified as weak copyleft, and `RUSTSEC-2024-0436` is an advisory accept rather than a license. That makes the claim that all added items are \"permissive or non-code-only\" internally inconsistent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-29-1118-semantic-dup-detection-discoverability-gate.md",
+              "line": 107,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:00517b81407cae598af278c9f23ed4cd50c04ad8610226e9f340b22d498d7847",
+          "at": "2026-05-30T01:10:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40e75216aff43e8ac9b5405d27cc6b71b1918e80926b4bb88dd048bb41ab6867",
+          "at": "2026-05-30T01:12:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3c84e40bd017b7b23de94352f01bd64fc528e3537fe8c9b13d5ec7d308aff9a",
+          "at": "2026-05-30T01:33:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR says MPL-2.0 has no source-disclosure obligation when used unmodified, but MPL-2.0 source-availability obligations can still apply to MPL-covered files when distributing an executable/larger work even if those files were not modified. This is a semantic license-governance error in the consequence being recorded for the allowlist expansion.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-29-1118-semantic-dup-detection-discoverability-gate.md",
+              "line": 107,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:a3c84e40bd017b7b23de94352f01bd64fc528e3537fe8c9b13d5ec7d308aff9a",
+          "at": "2026-05-30T01:35:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc00f2a3e2bf9ce94879112ef88c3355f93286ecc9b5ed167cc25bc3232459a7",
+          "at": "2026-05-30T01:38:05Z"
         }
       ]
     },
@@ -327,6 +396,42 @@
           "findings": [],
           "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
           "at": "2026-05-29T15:27:41Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:32:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:34:52Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
+          "at": "2026-05-30T01:11:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
+          "at": "2026-05-30T01:33:15Z"
         }
       ]
     }
