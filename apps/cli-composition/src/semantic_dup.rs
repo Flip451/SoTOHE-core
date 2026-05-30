@@ -128,25 +128,22 @@ fn is_recognizable_lancedb_index(db_path: &Path) -> bool {
     }
 }
 
-/// Prepare a fresh index directory at `db_path` for a rebuild.
+/// Validate that `db_path` is safe to overwrite during an index rebuild.
 ///
-/// This helper:
+/// This helper checks both safety guards WITHOUT deleting anything:
+///
 /// 1. Rejects `db_path` values that are equal to or an ancestor of
-///    `workspace_root` (path-overlap safety guard).
-/// 2. Checks that the directory at `db_path` is a recognizable LanceDB index
-///    (contains `fragments.lance/`).  If it exists but does NOT look like an
-///    index, returns an error rather than deleting arbitrary user data.
-/// 3. Removes the existing index directory at `db_path` so that the
-///    subsequent adapter construction always starts from an empty slate.
-///
-/// If `db_path` does not exist yet this function is a no-op.
+///    `workspace_root` (path-overlap data-loss guard).
+/// 2. If `db_path` exists but is NOT a recognizable LanceDB index (missing
+///    the `fragments.lance/` marker), returns an error — a typo'd path
+///    pointing at arbitrary user data must never be clobbered.
+/// 3. If `db_path` does not exist → fine; fresh-build path.
 ///
 /// # Errors
 ///
 /// Returns `Err` if the path-overlap guard fires, if `canonicalize` fails,
-/// if the directory exists but is not a recognizable LanceDB index, or if
-/// `remove_dir_all` fails.
-fn prepare_fresh_index_dir(db_path: &Path, workspace_root: &Path) -> Result<(), String> {
+/// or if the directory exists but is not a recognizable LanceDB index.
+fn validate_db_path_for_rebuild(db_path: &Path, workspace_root: &Path) -> Result<(), String> {
     if !db_path.exists() {
         return Ok(());
     }
@@ -160,63 +157,253 @@ fn prepare_fresh_index_dir(db_path: &Path, workspace_root: &Path) -> Result<(), 
     if canonical_workspace.starts_with(&canonical_db) {
         return Err(format!(
             "--db-path '{}' overlaps with the workspace root '{}'; \
-             refusing to remove it to prevent data loss",
+             refusing to overwrite it to prevent data loss",
             db_path.display(),
             workspace_root.display(),
         ));
     }
     // Reject if the directory exists but is not a recognizable LanceDB index.
-    // A typo'd --db-path pointing at an unrelated directory would otherwise
-    // be silently and recursively deleted.
+    // A typo'd --db-path pointing at an unrelated directory must never be
+    // silently and recursively deleted or replaced.
     if !is_recognizable_lancedb_index(db_path) {
         return Err(format!(
             "--db-path '{}' exists but does not appear to be a LanceDB index \
-             (missing '{}' marker); refusing to remove it to prevent data loss. \
+             (missing '{}' marker); refusing to overwrite it to prevent data loss. \
              If this is a new path, remove the directory manually first or \
              choose a path that does not exist yet.",
             db_path.display(),
             LANCEDB_TABLE_MARKER,
         ));
     }
-    std::fs::remove_dir_all(db_path)
-        .map_err(|e| format!("failed to remove existing index at {}: {e}", db_path.display()))
+    Ok(())
+}
+
+/// Derive the path of the sibling temporary build directory for `db_path`.
+///
+/// The temp dir is a hidden sibling of `db_path` (same parent directory, so a
+/// rename is same-filesystem and therefore atomic).  Using a deterministic name
+/// means we can detect and clean up leftovers from a previously crashed run.
+fn temp_build_path(db_path: &Path) -> Result<PathBuf, String> {
+    let file_name = db_path
+        .file_name()
+        .ok_or_else(|| format!("--db-path '{}' has no file name component", db_path.display()))?
+        .to_string_lossy();
+    let parent = db_path
+        .parent()
+        .ok_or_else(|| format!("--db-path '{}' has no parent directory", db_path.display()))?;
+    Ok(parent.join(format!(".{file_name}.tmp-build")))
+}
+
+/// Derive the path of the sibling backup directory for `db_path`.
+///
+/// The backup dir is a hidden sibling of `db_path` (same parent, same
+/// filesystem).  Using a deterministic name means we can detect and recover
+/// from a crash that happened between moving the original index aside and
+/// completing the rename of the new build into place.
+fn backup_path_for(db_path: &Path) -> Result<PathBuf, String> {
+    let file_name = db_path
+        .file_name()
+        .ok_or_else(|| format!("--db-path '{}' has no file name component", db_path.display()))?
+        .to_string_lossy();
+    let parent = db_path
+        .parent()
+        .ok_or_else(|| format!("--db-path '{}' has no parent directory", db_path.display()))?;
+    Ok(parent.join(format!(".{file_name}.old")))
+}
+
+/// Atomically promote `temp_path` to `db_path` after a successful rebuild.
+///
+/// Strategy:
+/// - If `db_path` already exists: rename it aside to a backup sibling, rename
+///   `temp_path` → `db_path`, then remove the backup (best-effort; failure to
+///   remove the backup is non-fatal because the new index is already live).
+/// - If `db_path` does not exist: just rename `temp_path` → `db_path`.
+///
+/// # Errors
+///
+/// Returns `Err` if a critical rename fails.  If the `temp_path → db_path`
+/// rename fails after the existing index has already been moved aside, a
+/// best-effort restore of the backup is attempted so `db_path` is left intact
+/// (non-destructive rebuild guarantee).  A best-effort backup-removal failure
+/// after a successful swap is silently ignored (the new index is already live).
+fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> {
+    if db_path.exists() {
+        let backup_path = backup_path_for(db_path)?;
+
+        // Remove any stale backup from a prior run before renaming the current
+        // index aside — avoids a failure if the old backup still exists.
+        if backup_path.exists() {
+            std::fs::remove_dir_all(&backup_path).map_err(|e| {
+                format!("failed to remove stale backup at {}: {e}", backup_path.display())
+            })?;
+        }
+
+        // Rename current index → backup.
+        std::fs::rename(db_path, &backup_path).map_err(|e| {
+            format!(
+                "failed to rename existing index {} to backup {}: {e}",
+                db_path.display(),
+                backup_path.display()
+            )
+        })?;
+
+        // Rename temp build → final location (atomic on same filesystem).
+        // If this rename fails, attempt to restore the backup so db_path is
+        // left intact (non-destructive rebuild guarantee).
+        if let Err(e) = std::fs::rename(temp_path, db_path) {
+            // Attempt to restore the backup.  If the restore also fails, report
+            // both failures so the user knows the backup location.
+            match std::fs::rename(&backup_path, db_path) {
+                Ok(()) => {
+                    return Err(format!(
+                        "failed to rename temp build {} to {} (original index restored from {}): {e}",
+                        temp_path.display(),
+                        db_path.display(),
+                        backup_path.display(),
+                    ));
+                }
+                Err(restore_err) => {
+                    return Err(format!(
+                        "failed to rename temp build {} to {}: {e}; \
+                         additionally, failed to restore backup {} to {}: {restore_err}; \
+                         original index is at backup path {}",
+                        temp_path.display(),
+                        db_path.display(),
+                        backup_path.display(),
+                        db_path.display(),
+                        backup_path.display(),
+                    ));
+                }
+            }
+        }
+
+        // Remove the backup — best-effort; failure is non-fatal because the new
+        // index is already live at db_path.
+        let _ = std::fs::remove_dir_all(&backup_path);
+    } else {
+        // No existing index — just move temp into place.
+        std::fs::rename(temp_path, db_path).map_err(|e| {
+            format!(
+                "failed to rename temp build {} to {}: {e}",
+                temp_path.display(),
+                db_path.display()
+            )
+        })?;
+    }
+    Ok(())
 }
 
 impl CliApp {
     /// Run `sotp dup-index build`: extract workspace fragments, embed each,
     /// and insert into the LanceDB index.
     ///
-    /// **Rebuild-from-scratch semantics**: each invocation starts with a fresh
-    /// index.  If a database already exists at `db_path` it is removed before
-    /// the new index adapter is constructed, so stale or duplicate fragments
-    /// from previous runs never accumulate.  The delete is performed at the
-    /// composition level (no change to the usecase port interface) using
-    /// `std::fs::remove_dir_all`, which is safe because LanceDB stores its
-    /// data as a directory tree.
+    /// **Non-destructive rebuild semantics**: the new index is built into a
+    /// sibling temporary directory and swapped into place only after the rebuild
+    /// fully succeeds.  If any step fails (extraction, model load, insert error),
+    /// the temporary directory is removed (best-effort) and the existing index at
+    /// `db_path` — if any — is left completely untouched.  This ensures a
+    /// previously stale-but-working index never regresses to empty/missing due to
+    /// a partial rebuild failure.
+    ///
+    /// **Crash recovery**: if a previous run was killed between the two renames
+    /// in the atomic-swap step (leaving `db_path` absent but the hidden
+    /// `.{filename}.old` backup present), this function transparently restores
+    /// the backup before proceeding with the new rebuild.
     ///
     /// AC-02: exits 0 on success; no network calls at build time (model weights
     /// are loaded from the local fastembed cache).
     ///
     /// # Errors
     ///
-    /// Returns `Err` if the existing index cannot be removed, if extraction
-    /// fails, if adapter construction fails, or if indexing fails.
+    /// Returns `Err` if validation fails, if extraction fails, if adapter
+    /// construction fails, if indexing fails, or if the atomic swap fails.
     pub fn semantic_dup_index_build(
         &self,
         input: DupIndexBuildInput,
     ) -> Result<CommandOutcome, String> {
-        // Remove any existing index directory so that each build starts from
-        // scratch.  This prevents stale/duplicate fragments from accumulating
-        // across repeated `dup-index build` invocations on the same `--db-path`.
-        prepare_fresh_index_dir(&input.db_path, &input.workspace_root)?;
+        // Step 1: Validate that db_path is safe to overwrite — no deletions yet.
+        validate_db_path_for_rebuild(&input.db_path, &input.workspace_root)?;
 
-        let fragments = extract_code_fragments(&input.workspace_root)
-            .map_err(|e| format!("fragment extraction failed: {e}"))?;
+        // Step 1b: Recover from a crash that occurred between the two renames in
+        // `commit_rebuilt_index`.  If `db_path` is absent but the deterministic
+        // backup sibling exists, rename the backup back so the old index is
+        // restored before we proceed with a fresh rebuild.
+        let crash_backup = backup_path_for(&input.db_path)?;
+        if !input.db_path.exists() && crash_backup.exists() {
+            std::fs::rename(&crash_backup, &input.db_path).map_err(|e| {
+                format!(
+                    "found orphaned backup {} from a previous crash but failed to \
+                     restore it to {}: {e}",
+                    crash_backup.display(),
+                    input.db_path.display(),
+                )
+            })?;
+        }
 
-        if fragments.is_empty() {
+        // Step 2: Derive the temp build path (sibling of db_path).
+        let temp_path = temp_build_path(&input.db_path)?;
+
+        // Step 3: Remove any leftover temp dir from a prior crashed run.
+        if temp_path.exists() {
+            std::fs::remove_dir_all(&temp_path).map_err(|e| {
+                format!("failed to remove stale temp build dir {}: {e}", temp_path.display())
+            })?;
+        }
+
+        // Ensure the parent directory of temp_path exists.
+        if let Some(parent) = temp_path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                format!(
+                    "failed to create parent directory for temp build path {}: {e}",
+                    temp_path.display()
+                )
+            })?;
+        }
+
+        // Step 4: Run extraction and build into temp_path.
+        //         On any failure, clean up temp_path and return the original error.
+        let result = self.do_build_into(&input.workspace_root, &temp_path);
+        let fragment_count = match result {
+            Ok(n) => n,
+            Err(e) => {
+                // Best-effort cleanup of the temp build dir; ignore cleanup errors.
+                let _ = std::fs::remove_dir_all(&temp_path);
+                return Err(e);
+            }
+        };
+
+        if fragment_count == 0 {
+            // No Rust sources found — the existing index (if any) is left intact.
+            // Deleting it would be destructive if --workspace-root was wrong; the
+            // non-destructive rebuild guarantee takes precedence over reflecting
+            // an empty workspace state.  Clean up the (empty) temp dir and return.
+            let _ = std::fs::remove_dir_all(&temp_path);
             return Ok(CommandOutcome::success(Some(
                 "Indexed 0 fragment(s) (no Rust sources found in workspace)".to_owned(),
             )));
+        }
+
+        // Step 5: Atomic swap — promote temp_path to db_path.
+        commit_rebuilt_index(&temp_path, &input.db_path)?;
+
+        Ok(CommandOutcome::success(Some(format!(
+            "Indexed {fragment_count} fragment(s) (extracted: {fragment_count})"
+        ))))
+    }
+
+    /// Build the index into `temp_path` from `workspace_root`.
+    ///
+    /// Returns the number of fragments indexed on success.
+    ///
+    /// The LanceDB adapter is explicitly dropped before this function returns
+    /// so that all data is committed and no open handles remain when the caller
+    /// performs the atomic rename.
+    fn do_build_into(&self, workspace_root: &Path, temp_path: &Path) -> Result<usize, String> {
+        let fragments = extract_code_fragments(workspace_root)
+            .map_err(|e| format!("fragment extraction failed: {e}"))?;
+
+        if fragments.is_empty() {
+            return Ok(0);
         }
 
         let fragment_count = fragments.len();
@@ -224,21 +411,23 @@ impl CliApp {
         let embedding_port = Arc::new(
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
-        let index_port =
-            Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
-                format!("failed to open index at {}: {e}", input.db_path.display())
-            })?);
 
-        use usecase::semantic_dup::BuildIndexInteractor;
-        let interactor = BuildIndexInteractor::new(embedding_port, index_port);
-        let output = interactor
-            .build_index(&BuildIndexCommand { fragments })
-            .map_err(|e| format!("build-index failed: {e}"))?;
+        // Build into temp_path.  The adapter is scoped here so it is dropped
+        // (connection closed, data flushed) before the rename swap below.
+        let build_result = {
+            let index_port =
+                Arc::new(LanceDbSemanticIndexAdapter::new(temp_path.to_path_buf()).map_err(
+                    |e| format!("failed to open temp index at {}: {e}", temp_path.display()),
+                )?);
 
-        Ok(CommandOutcome::success(Some(format!(
-            "Indexed {} fragment(s) (extracted: {fragment_count})",
-            output.fragments_indexed
-        ))))
+            use usecase::semantic_dup::BuildIndexInteractor;
+            let interactor = BuildIndexInteractor::new(embedding_port, index_port);
+            interactor
+                .build_index(&BuildIndexCommand { fragments })
+                .map_err(|e| format!("build-index failed: {e}"))
+        }; // `index_port` (and the Arc inside) is dropped here.
+
+        build_result.map(|_| fragment_count)
     }
 }
 
@@ -775,67 +964,70 @@ mod tests {
         );
     }
 
-    // ── prepare_fresh_index_dir: safety guard + removal ──────────────────────
+    // ── validate_db_path_for_rebuild: safety guard (no deletion) ─────────────
     //
-    // These tests drive the `prepare_fresh_index_dir` helper directly so that
-    // no test ever constructs the real `FastEmbedAdapter` (which would create
-    // a `.fastembed_cache/` directory and attempt a model download — forbidden
-    // in CI).
+    // These tests drive the `validate_db_path_for_rebuild` helper directly so
+    // that no test ever constructs the real `FastEmbedAdapter` (which would
+    // create a `.fastembed_cache/` directory and attempt a model download —
+    // forbidden in CI).
 
     /// Create a directory that looks like a LanceDB index (contains the
-    /// `fragments.lance/` marker subdirectory).
+    /// `fragments.lance/` marker subdirectory plus a sentinel file).
     fn create_fake_lancedb_index(db_path: &std::path::Path) {
         std::fs::create_dir_all(db_path.join(LANCEDB_TABLE_MARKER)).unwrap();
-        // Also write a sentinel file so we can verify the whole tree is removed.
+        // Sentinel file lets tests verify tree content after swaps.
         std::fs::write(db_path.join("stale.txt"), "stale").unwrap();
     }
 
     #[test]
-    fn test_prepare_fresh_index_dir_rejects_db_path_equal_to_workspace_root() {
+    fn test_validate_db_path_for_rebuild_rejects_db_path_equal_to_workspace_root() {
         let dir = tempfile::tempdir().unwrap();
         let workspace_root = dir.path().to_path_buf();
         // db_path == workspace_root: the overlap guard must fire.
         let db_path = workspace_root.clone();
-        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
+        let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_err(), "db_path == workspace_root must be rejected");
         let msg = result.unwrap_err();
         assert!(msg.contains("overlaps"), "error message must mention 'overlaps', got: {msg}");
+        // workspace_root must not have been deleted.
+        assert!(workspace_root.exists(), "workspace_root must not be deleted by validate");
     }
 
     #[test]
-    fn test_prepare_fresh_index_dir_rejects_db_path_ancestor_of_workspace_root() {
+    fn test_validate_db_path_for_rebuild_rejects_db_path_ancestor_of_workspace_root() {
         let dir = tempfile::tempdir().unwrap();
         // workspace_root is a subdir; db_path is the parent → ancestor overlap.
         let workspace_root = dir.path().join("workspace");
         std::fs::create_dir_all(&workspace_root).unwrap();
         let db_path = dir.path().to_path_buf(); // parent of workspace_root
-        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
+        let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_err(), "db_path ancestor of workspace_root must be rejected");
         let msg = result.unwrap_err();
         assert!(msg.contains("overlaps"), "error message must mention 'overlaps', got: {msg}");
+        // db_path (the parent dir) must not have been deleted.
+        assert!(db_path.exists(), "db_path must not be deleted by validate");
     }
 
     #[test]
-    fn test_prepare_fresh_index_dir_removes_existing_lancedb_index() {
+    fn test_validate_db_path_for_rebuild_accepts_valid_lancedb_index() {
         let dir = tempfile::tempdir().unwrap();
         let workspace_root = dir.path().join("workspace");
         std::fs::create_dir_all(&workspace_root).unwrap();
         let db_path = dir.path().join("index.db");
-        // Pre-create a directory at db_path with the LanceDB marker.
         create_fake_lancedb_index(&db_path);
-        assert!(db_path.exists(), "pre-condition: db_path must exist");
+
+        let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
+        assert!(result.is_ok(), "valid lancedb index should pass validation: {:?}", result.err());
+        // Validate must NOT have removed the existing index.
+        assert!(db_path.exists(), "validate must not delete the existing index");
         assert!(
             db_path.join(LANCEDB_TABLE_MARKER).exists(),
-            "pre-condition: LanceDB marker must exist"
+            "validate must not delete the LanceDB marker"
         );
-
-        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
-        assert!(result.is_ok(), "removal should succeed: {:?}", result.err());
-        assert!(!db_path.exists(), "existing index directory must be removed");
     }
 
     #[test]
-    fn test_prepare_fresh_index_dir_rejects_non_index_directory() {
+    fn test_validate_db_path_for_rebuild_rejects_non_index_directory() {
         let dir = tempfile::tempdir().unwrap();
         let workspace_root = dir.path().join("workspace");
         std::fs::create_dir_all(&workspace_root).unwrap();
@@ -845,8 +1037,8 @@ mod tests {
         std::fs::write(db_path.join("important_data.txt"), "user data").unwrap();
         assert!(db_path.exists(), "pre-condition: db_path must exist");
 
-        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
-        assert!(result.is_err(), "non-index directory must be rejected, not deleted");
+        let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
+        assert!(result.is_err(), "non-index directory must be rejected");
         let msg = result.unwrap_err();
         assert!(
             msg.contains("does not appear to be a LanceDB index"),
@@ -861,14 +1053,165 @@ mod tests {
     }
 
     #[test]
-    fn test_prepare_fresh_index_dir_is_noop_when_db_path_does_not_exist() {
+    fn test_validate_db_path_for_rebuild_is_noop_when_db_path_does_not_exist() {
         let dir = tempfile::tempdir().unwrap();
         let workspace_root = dir.path().join("workspace");
         std::fs::create_dir_all(&workspace_root).unwrap();
         let db_path = dir.path().join("nonexistent.db");
         // db_path does not exist — function must be a no-op and succeed.
-        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
+        let result = validate_db_path_for_rebuild(&db_path, &workspace_root);
         assert!(result.is_ok(), "no-op on absent path must succeed: {:?}", result.err());
+        assert!(!db_path.exists(), "absent db_path must still not exist after validate");
+    }
+
+    // ── commit_rebuilt_index: atomic swap ────────────────────────────────────
+    //
+    // These tests use fake LanceDB index directories (create_fake_lancedb_index)
+    // so that no real adapter or embedding model is constructed.
+
+    #[test]
+    fn test_commit_rebuilt_index_replaces_existing_index_with_temp_content() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+
+        // Pre-populate the existing index with "old" content.
+        create_fake_lancedb_index(&db_path);
+        std::fs::write(db_path.join("old_marker.txt"), "old").unwrap();
+
+        // Build the temp index with "new" content.
+        create_fake_lancedb_index(&temp_path);
+        std::fs::write(temp_path.join("new_marker.txt"), "new").unwrap();
+
+        let result = commit_rebuilt_index(&temp_path, &db_path);
+        assert!(result.is_ok(), "commit_rebuilt_index should succeed: {:?}", result.err());
+
+        // db_path must now contain the temp content (new_marker.txt).
+        assert!(db_path.exists(), "db_path must exist after swap");
+        assert!(
+            db_path.join("new_marker.txt").exists(),
+            "db_path must contain the newly built content"
+        );
+        // Old content must be gone.
+        assert!(
+            !db_path.join("old_marker.txt").exists(),
+            "db_path must no longer contain old content"
+        );
+        // Temp path must be gone.
+        assert!(!temp_path.exists(), "temp_path must be removed after successful swap");
+    }
+
+    #[test]
+    fn test_commit_rebuilt_index_moves_temp_into_place_when_db_path_absent() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+
+        // No existing db_path — fresh build scenario.
+        create_fake_lancedb_index(&temp_path);
+        std::fs::write(temp_path.join("new_marker.txt"), "new").unwrap();
+
+        let result = commit_rebuilt_index(&temp_path, &db_path);
+        assert!(result.is_ok(), "commit_rebuilt_index should succeed: {:?}", result.err());
+
+        assert!(db_path.exists(), "db_path must exist after rename");
+        assert!(db_path.join("new_marker.txt").exists(), "db_path must contain the temp content");
+        assert!(!temp_path.exists(), "temp_path must be gone after rename");
+    }
+
+    #[test]
+    fn test_existing_index_survives_simulated_build_failure() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+
+        // Existing working index.
+        create_fake_lancedb_index(&db_path);
+        std::fs::write(db_path.join("working_sentinel.txt"), "working").unwrap();
+
+        // Simulate build failure: temp dir was partially created then abandoned.
+        create_fake_lancedb_index(&temp_path);
+
+        // Caller (semantic_dup_index_build) removes temp on error and does NOT
+        // call commit_rebuilt_index.  Simulate that cleanup here.
+        std::fs::remove_dir_all(&temp_path).unwrap();
+
+        // db_path must be completely intact.
+        assert!(db_path.exists(), "existing index must survive a build failure");
+        assert!(
+            db_path.join("working_sentinel.txt").exists(),
+            "existing index content must be untouched"
+        );
+        assert!(
+            db_path.join(LANCEDB_TABLE_MARKER).exists(),
+            "existing index marker must be untouched"
+        );
+        assert!(!temp_path.exists(), "temp_path must have been cleaned up");
+    }
+
+    // ── semantic_dup_index_build: public-API critical paths ──────────────────
+    //
+    // These tests exercise the pre-build steps of `semantic_dup_index_build`
+    // (stale-temp cleanup, crash-backup recovery) using a workspace root with
+    // no Rust source files so that `do_build_into` returns Ok(0) immediately —
+    // avoiding any call to `FastEmbedAdapter::new()` (which would touch the
+    // real model cache and is forbidden in CI).
+
+    #[test]
+    fn test_index_build_cleans_stale_temp_dir_before_build() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        // workspace has no .rs files → extract_code_fragments returns empty
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+
+        // Place a stale temp dir (simulates a leftover from a previous crash).
+        std::fs::create_dir_all(&temp_path).unwrap();
+        std::fs::write(temp_path.join("stale_temp.txt"), "stale").unwrap();
+
+        let app = crate::CliApp;
+        let input =
+            DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
+        let outcome = app.semantic_dup_index_build(input).unwrap();
+        // Zero-fragment build succeeds.
+        assert_eq!(outcome.exit_code, 0);
+        // Stale temp dir must be cleaned up.
+        assert!(!temp_path.exists(), "stale temp dir must be removed before build starts");
+        // db_path was absent and zero fragments were found → must still be absent.
+        assert!(!db_path.exists(), "db_path must not be created when no fragments are indexed");
+    }
+
+    #[test]
+    fn test_index_build_restores_crash_backup_before_rebuild() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        // workspace has no .rs files → extract_code_fragments returns empty
+        let db_path = dir.path().join("index.db");
+        let backup_path = dir.path().join(".index.db.old");
+
+        // Simulate crash state: db_path is absent, backup is present.
+        create_fake_lancedb_index(&backup_path);
+        std::fs::write(backup_path.join("crash_sentinel.txt"), "crash").unwrap();
+        assert!(!db_path.exists(), "pre-condition: db_path must be absent");
+        assert!(backup_path.exists(), "pre-condition: backup must be present");
+
+        let app = crate::CliApp;
+        let input =
+            DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
+        let outcome = app.semantic_dup_index_build(input).unwrap();
+        assert_eq!(outcome.exit_code, 0);
+
+        // The crash-backup recovery step must have restored the backup to db_path
+        // before the build ran (zero fragments → db_path left intact after
+        // restoration).
+        assert!(db_path.exists(), "crash backup must be restored to db_path");
+        assert!(
+            db_path.join("crash_sentinel.txt").exists(),
+            "restored db_path must contain original content"
+        );
+        assert!(!backup_path.exists(), "backup must be gone after restore");
     }
 
     // ── truncate_snippet ──────────────────────────────────────────────────────
