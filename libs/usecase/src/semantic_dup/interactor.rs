@@ -167,6 +167,15 @@ impl DupCheckService for DupCheckInteractor {
     /// collected as a [`DupCheckWarning`]. Fragments with no matches above the
     /// threshold produce no warning.
     ///
+    /// A candidate whose `source_path` and `content` are both identical to
+    /// the input fragment is treated as the fragment's own indexed copy and
+    /// is excluded from warnings. This prevents false-positive self-match
+    /// warnings (score ≈ 1.0) when the index already contains the exact
+    /// fragment being checked (e.g. after a full index rebuild). Candidates
+    /// with the same `source_path` but different `content` (e.g. a modified
+    /// version of a function in the same file) are still reported, preserving
+    /// detection of intra-file and modified-version near-duplicates.
+    ///
     /// # Errors
     ///
     /// Returns [`DupCheckError::Embedding`] if embedding a fragment fails.
@@ -201,7 +210,11 @@ impl DupCheckService for DupCheckInteractor {
 
             let above_threshold: Vec<_> = candidates
                 .into_iter()
-                .filter(|sf| sf.score.value() >= cmd.threshold.value())
+                .filter(|sf| {
+                    sf.score.value() >= cmd.threshold.value()
+                        && !(sf.fragment.source_path == fragment.source_path
+                            && sf.fragment.content() == fragment.content())
+                })
                 .collect();
 
             if !above_threshold.is_empty() {
@@ -776,6 +789,99 @@ mod tests {
         let result = interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold });
 
         assert!(matches!(result, Err(DupCheckError::Index(_))));
+    }
+
+    #[test]
+    fn test_dup_check_self_match_excluded_real_dup_retained() {
+        // When the index returns both an exact self-match (same source_path AND
+        // same content) and a genuine near-duplicate (different source_path),
+        // only the genuine near-duplicate should appear in the warning.
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
+        let frag = make_fragment("src/new.rs", "fn new_impl() {}");
+
+        // Self-match: same path and same content, score 1.0.
+        let self_match = make_similar_fragment("src/new.rs", "fn new_impl() {}", 1.0);
+        // Genuine duplicate: different path, score 0.9 >= threshold.
+        let real_dup = make_similar_fragment("src/existing.rs", "fn existing_impl() {}", 0.9);
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![0.1, 0.2]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        {
+            let results = vec![self_match, real_dup.clone()];
+            mock_index.expect_search().times(1).returning(move |_, _| Ok(results.clone()));
+        }
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output =
+            interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold }).unwrap();
+
+        assert_eq!(output.warnings.len(), 1, "expected one warning (self-match removed)");
+        let sims = &output.warnings[0].similar_fragments;
+        assert_eq!(sims.len(), 1, "only the real duplicate should remain");
+        assert_eq!(sims[0].fragment.source_path, std::path::PathBuf::from("src/existing.rs"));
+        assert!(
+            (sims[0].score.value() - 0.9).abs() < 1e-6,
+            "real dup score should be 0.9, got {}",
+            sims[0].score.value()
+        );
+    }
+
+    #[test]
+    fn test_dup_check_only_self_match_produces_no_warning() {
+        // When the index returns only the exact self-match, the warning list
+        // should be empty (no genuine near-duplicates found).
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
+        let frag = make_fragment("src/new.rs", "fn new_impl() {}");
+
+        // Only the self-match is returned.
+        let self_match = make_similar_fragment("src/new.rs", "fn new_impl() {}", 1.0);
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![0.1, 0.2]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        mock_index.expect_search().times(1).returning(move |_, _| Ok(vec![self_match.clone()]));
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output =
+            interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold }).unwrap();
+
+        assert!(output.warnings.is_empty(), "self-match only should produce no warning");
+    }
+
+    #[test]
+    fn test_dup_check_same_path_different_content_is_not_excluded() {
+        // A candidate with the same source_path but different content is a
+        // legitimate intra-file or modified-version near-duplicate and must
+        // NOT be excluded.
+        let threshold = domain::semantic_dup::SimilarityThreshold::new(0.8).unwrap();
+        let frag = make_fragment("src/new.rs", "fn new_impl() {}");
+
+        // Same path, but different content (a different function in the same file).
+        let intra_file_dup =
+            make_similar_fragment("src/new.rs", "fn other_impl_in_same_file() {}", 0.85);
+
+        let mut mock_embed = MockMockEmbeddingPort::new();
+        mock_embed.expect_embed().times(1).returning(|_| Ok(vec![0.1, 0.2]));
+
+        let mut mock_index = MockMockSemanticIndexPort::new();
+        {
+            let results = vec![intra_file_dup];
+            mock_index.expect_search().times(1).returning(move |_, _| Ok(results.clone()));
+        }
+
+        let interactor = DupCheckInteractor::new(Arc::new(mock_embed), Arc::new(mock_index));
+        let output =
+            interactor.dup_check(&DupCheckCommand { fragments: vec![frag], threshold }).unwrap();
+
+        assert_eq!(output.warnings.len(), 1, "intra-file near-duplicate should be reported");
+        assert_eq!(output.warnings[0].similar_fragments.len(), 1);
+        assert_eq!(
+            output.warnings[0].similar_fragments[0].fragment.source_path,
+            std::path::PathBuf::from("src/new.rs")
+        );
     }
 
     // ── BuildIndexInteractor ──────────────────────────────────────────────────
