@@ -58,22 +58,16 @@ fn write_ack_set(path: &Path, set: &std::collections::HashSet<String>) -> Result
         .map_err(|e| format!("cannot write ack file {}: {e}", path.display()))
 }
 
-/// Compute a stable content hash for a fragment (SHA-256 of the content bytes).
+/// Compute a stable, collision-resistant content hash for a fragment.
+///
+/// Returns the lowercase SHA-256 hex digest (64 characters) of the UTF-8
+/// content bytes.  SHA-256 is used so that a crafted or accidental hash
+/// collision cannot cause a different fragment to be silently treated as
+/// already-acknowledged (AC-05 ack-suppression).
 fn fragment_content_hash(content: &str) -> String {
-    // Simple stable hash using std only: we XOR-fold SHA-256 via FNV-1a 64-bit
-    // so there are no extra dependencies.  For ack suppression, collision
-    // resistance is not critical; what matters is stable reproducibility across
-    // runs for the same content.
-    //
-    // Using FNV-1a 64-bit hash of the UTF-8 content bytes.
-    const FNV_OFFSET: u64 = 14_695_981_039_346_656_037;
-    const FNV_PRIME: u64 = 1_099_511_628_211;
-    let mut hash: u64 = FNV_OFFSET;
-    for byte in content.as_bytes() {
-        hash ^= u64::from(*byte);
-        hash = hash.wrapping_mul(FNV_PRIME);
-    }
-    format!("{hash:016x}")
+    use sha2::{Digest as _, Sha256};
+    let digest = Sha256::digest(content.as_bytes());
+    format!("{digest:x}")
 }
 
 impl CliApp {
@@ -234,21 +228,22 @@ mod tests {
         let content = "fn foo() { let x = 1; }";
         let h1 = fragment_content_hash(content);
         let h2 = fragment_content_hash(content);
-        assert_eq!(h1, h2, "FNV-1a hash must be deterministic");
+        assert_eq!(h1, h2, "SHA-256 hash must be deterministic");
     }
 
     #[test]
     fn test_fragment_content_hash_differs_for_different_content() {
         let h1 = fragment_content_hash("fn foo() {}");
         let h2 = fragment_content_hash("fn bar() {}");
-        assert_ne!(h1, h2, "different content must yield different hashes");
+        assert_ne!(h1, h2, "different content must yield different SHA-256 hashes");
     }
 
     #[test]
-    fn test_fragment_content_hash_is_16_hex_chars() {
+    fn test_fragment_content_hash_is_64_hex_chars() {
         let h = fragment_content_hash("hello world");
-        assert_eq!(h.len(), 16, "FNV-1a 64-bit hash must be 16 hex characters");
+        assert_eq!(h.len(), 64, "SHA-256 hash must be 64 lowercase hex characters");
         assert!(h.chars().all(|c| c.is_ascii_hexdigit()), "hash must be hex");
+        assert!(h.chars().all(|c| !c.is_uppercase()), "hash must be lowercase");
     }
 
     // ── read_ack_set / write_ack_set ──────────────────────────────────────────
