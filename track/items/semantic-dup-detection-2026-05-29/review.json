@@ -19,144 +19,6 @@
         }
       ]
     },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
-          "at": "2026-05-29T15:22:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
-              "severity": "P1",
-              "file": "libs/domain/src/semantic_dup.rs",
-              "line": 160,
-              "category": "domain invariant"
-            }
-          ],
-          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
-          "at": "2026-05-29T15:25:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
-          "at": "2026-05-29T15:27:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
-          "at": "2026-05-30T04:53:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
-          "at": "2026-05-30T04:55:19Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FindSimilarArgs` leaves both `fragment` and `file` optional, so `sotp find-similar` with no query parses successfully and only fails later in `resolve_fragment_text`. The briefing explicitly assigns this layer the `find-similar <fragment>` / `--file` parse contract, so the CLI help/usage and validation are currently out of sync with AC-01.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 23,
-              "category": "cli parsing"
-            },
-            {
-              "message": "`dup-index measure-quality` is specified here as a `--workspace-root` command, but this CLI adds and forwards `--db-path` for that subcommand. That leaks an irrelevant index-path dependency into AC-03: the downstream measure-quality wiring opens the DB path before computing metrics, so a bad or unwritable path can make the command fail even though the quality calculation is defined only from workspace fragments.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 86,
-              "category": "requirements coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
-          "at": "2026-05-30T04:26:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
-              "line": 23,
-              "category": "cli parsing"
-            },
-            {
-              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
-              "line": 86,
-              "category": "requirements coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
-          "at": "2026-05-30T04:27:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
-          "at": "2026-05-30T04:33:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_lines_file` takes `&PathBuf`, which triggers Clippy's default `ptr_arg` warning. This repo runs Clippy with `-D warnings` in `clippy-local`/`ci-rust`, so the new CLI scope will fail the required gate even though the code would compile. Change the helper to accept `&Path` and import/use `std::path::Path`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 199,
-              "category": "ci"
-            }
-          ],
-          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
-          "at": "2026-05-30T04:37:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ac4e04528714b3152bd73a5bd9d754cc5c4131f9a8acc92d3dc4f8d11a52e14",
-          "at": "2026-05-30T04:40:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
-          "at": "2026-05-30T08:42:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
-          "at": "2026-05-30T08:44:48Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -743,6 +605,97 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FindSimilarArgs` leaves both `fragment` and `file` optional, so `sotp find-similar` with no query parses successfully and only fails later in `resolve_fragment_text`. The briefing explicitly assigns this layer the `find-similar <fragment>` / `--file` parse contract, so the CLI help/usage and validation are currently out of sync with AC-01.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 23,
+              "category": "cli parsing"
+            },
+            {
+              "message": "`dup-index measure-quality` is specified here as a `--workspace-root` command, but this CLI adds and forwards `--db-path` for that subcommand. That leaks an irrelevant index-path dependency into AC-03: the downstream measure-quality wiring opens the DB path before computing metrics, so a bad or unwritable path can make the command fail even though the quality calculation is defined only from workspace fragments.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 86,
+              "category": "requirements coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
+          "at": "2026-05-30T04:26:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "line": 23,
+              "category": "cli parsing"
+            },
+            {
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "line": 86,
+              "category": "requirements coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
+          "at": "2026-05-30T04:27:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
+          "at": "2026-05-30T04:33:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_lines_file` takes `&PathBuf`, which triggers Clippy's default `ptr_arg` warning. This repo runs Clippy with `-D warnings` in `clippy-local`/`ci-rust`, so the new CLI scope will fail the required gate even though the code would compile. Change the helper to accept `&Path` and import/use `std::path::Path`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 199,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
+          "at": "2026-05-30T04:37:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ac4e04528714b3152bd73a5bd9d754cc5c4131f9a8acc92d3dc4f8d11a52e14",
+          "at": "2026-05-30T04:40:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
+          "at": "2026-05-30T08:42:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
+          "at": "2026-05-30T08:44:48Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -1041,66 +994,6 @@
           "findings": [],
           "hash": "rvw1:sha256:3e04f316fb4a3e0139c20da8c418f32a9014d5a15cd50af32e20481cc0492a31",
           "at": "2026-05-30T11:34:58Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:15:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:33:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:43:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:44:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
-          "at": "2026-05-30T06:05:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
-          "at": "2026-05-30T06:07:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b42bef37788c57655c0e44e8f2f12c217ba2de9092898d35091677bc63f53d4",
-          "at": "2026-05-30T11:12:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b42bef37788c57655c0e44e8f2f12c217ba2de9092898d35091677bc63f53d4",
-          "at": "2026-05-30T11:14:46Z"
         }
       ]
     },
@@ -1970,6 +1863,127 @@
           "findings": [],
           "hash": "rvw1:sha256:5abbd0d532cbc43f8b8f2ec7cf876bffbcfce67b5998b14ff48b872cd5815260",
           "at": "2026-05-30T12:09:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f327ba29ba674ba197639eb027bbbd6e95514e996dcaffad9ad4d14c80604cc6",
+          "at": "2026-05-30T12:24:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f327ba29ba674ba197639eb027bbbd6e95514e996dcaffad9ad4d14c80604cc6",
+          "at": "2026-05-30T12:26:56Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 160,
+              "category": "domain invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:25:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
+          "at": "2026-05-29T15:27:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
+          "at": "2026-05-30T04:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
+          "at": "2026-05-30T04:55:19Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:15:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:33:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:43:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:44:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
+          "at": "2026-05-30T06:05:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
+          "at": "2026-05-30T06:07:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b42bef37788c57655c0e44e8f2f12c217ba2de9092898d35091677bc63f53d4",
+          "at": "2026-05-30T11:12:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b42bef37788c57655c0e44e8f2f12c217ba2de9092898d35091677bc63f53d4",
+          "at": "2026-05-30T11:14:46Z"
         }
       ]
     }

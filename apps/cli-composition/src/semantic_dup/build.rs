@@ -11,6 +11,8 @@ use usecase::semantic_dup::{BuildIndexCommand, BuildIndexService as _};
 
 use crate::{CliApp, CommandOutcome};
 
+use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index};
+
 /// Input DTO for `sotp dup-index build`.
 #[derive(Debug, Clone)]
 pub struct DupIndexBuildInput {
@@ -19,14 +21,6 @@ pub struct DupIndexBuildInput {
     /// Path to the local LanceDB database.
     pub db_path: PathBuf,
 }
-
-/// The subdirectory name LanceDB creates for the `fragments` table.
-///
-/// LanceDB stores each table as a `{table_name}.lance/` directory inside the
-/// database root.  Checking for this marker lets us distinguish a genuine
-/// LanceDB index from an arbitrary directory that the user accidentally
-/// pointed `--db-path` at.
-const LANCEDB_TABLE_MARKER: &str = "fragments.lance";
 
 /// Hidden file written at the root of every index directory this tool creates.
 ///
@@ -63,29 +57,6 @@ fn is_tool_owned_index(dir: &Path) -> bool {
     std::fs::symlink_metadata(dir.join(OWNERSHIP_MARKER))
         .map(|m| m.file_type().is_file())
         .unwrap_or(false)
-}
-
-/// Return `true` when `db_path` looks like a LanceDB index previously
-/// created by this tool.
-///
-/// The check is intentionally conservative: a directory qualifies as a
-/// recognizable index only when it contains the `fragments.lance/`
-/// subdirectory that LanceDB creates for the `fragments` table.  The marker
-/// must be a real directory (not a file or symlink) to avoid treating an
-/// unrelated directory that happens to contain a same-named file or symlink
-/// as a valid index.
-///
-/// `std::fs::symlink_metadata` is used deliberately (it does NOT follow
-/// symlinks), so a `fragments.lance` symlink — even one pointing at a
-/// directory — does NOT satisfy this check.  This prevents a data-loss bypass
-/// where an attacker or accidental user creates a `fragments.lance` symlink
-/// inside an unrelated directory to trick the guard into accepting it as a
-/// recognizable index and subsequently deleting that directory.
-fn is_recognizable_lancedb_index(db_path: &Path) -> bool {
-    match std::fs::symlink_metadata(db_path.join(LANCEDB_TABLE_MARKER)) {
-        Ok(meta) => meta.file_type().is_dir(),
-        Err(_) => false,
-    }
 }
 
 /// Validate that `db_path` is safe to overwrite during an index rebuild.

@@ -11,7 +11,7 @@ use usecase::semantic_dup::{DupCheckCommand, DupCheckInteractor, DupCheckService
 
 use crate::{CliApp, CommandOutcome};
 
-use super::common::truncate_snippet;
+use super::common::{LANCEDB_TABLE_MARKER, is_recognizable_lancedb_index, truncate_snippet};
 
 /// Input DTO for `sotp dup-check`.
 #[derive(Debug, Clone)]
@@ -84,8 +84,14 @@ impl CliApp {
     ///
     /// # Errors
     ///
-    /// Returns `Err` only on hard infrastructure failures (adapter construction
-    /// or file I/O errors for the ack file), not on warnings.
+    /// Returns `Err` on hard infrastructure failures (adapter construction or
+    /// file I/O errors for the ack file), not on warnings.
+    ///
+    /// Also returns `Err` when `input.db_path` is absent or does not contain the
+    /// `fragments.lance/` marker, i.e. is not a recognizable LanceDB index.  A
+    /// missing or typo'd index silently disables the duplicate gate, so the
+    /// command fails loudly instead.  Run `sotp dup-index build` first to create
+    /// a valid index.
     pub fn semantic_dup_check(&self, input: DupCheckInput) -> Result<CommandOutcome, String> {
         // Reject the illegal combination: --ack requires --ack-file to be set.
         if input.ack && input.ack_file.is_none() {
@@ -131,6 +137,21 @@ impl CliApp {
             return Ok(CommandOutcome::success(Some(
                 "dup-check: all fragments already acked; no warnings".to_owned(),
             )));
+        }
+
+        // Validate that the semantic index exists and is recognizable BEFORE
+        // constructing the embedding or index adapters.  An absent or typo'd
+        // --db-path would otherwise be treated as an empty index (no
+        // `fragments` table → no search results → exit 0 "no near-duplicates
+        // found"), silently disabling the duplicate gate.
+        if !is_recognizable_lancedb_index(&input.db_path) {
+            return Err(format!(
+                "dup-check: no semantic index found at '{}' (missing '{}' marker); \
+                 run `sotp dup-index build` first — refusing to run the duplicate \
+                 gate against a missing index",
+                input.db_path.display(),
+                LANCEDB_TABLE_MARKER,
+            ));
         }
 
         let embedding_port = Arc::new(
@@ -404,6 +425,119 @@ mod tests {
         assert!(
             outcome.stdout.as_deref().unwrap_or("").contains("already acked"),
             "expected 'already acked' message, got: {:?}",
+            outcome.stdout
+        );
+    }
+
+    // ── Missing-index guard (P1 fail-open fix) ────────────────────────────────
+
+    /// Create a minimal fragment file in `dir` and return its path.
+    fn write_fragment_file(dir: &std::path::Path, name: &str, content: &str) -> std::path::PathBuf {
+        let path = dir.join(name);
+        std::fs::write(&path, content).unwrap();
+        path
+    }
+
+    #[test]
+    fn test_dup_check_with_fragment_and_nonexistent_db_path_returns_err_missing_index() {
+        // P1 fix: a fragment that reaches the gate but whose db_path does not
+        // exist at all must produce Err, not a silent "no near-duplicates found".
+        let dir = tempfile::tempdir().unwrap();
+        let frag_path = write_fragment_file(dir.path(), "frag.rs", "fn guard_test() {}");
+        // db_path points to a path that does not exist.
+        let db_path = dir.path().join("nonexistent_index.db");
+        assert!(!db_path.exists(), "pre-condition: db_path must not exist");
+
+        let app = crate::CliApp;
+        let input = DupCheckInput {
+            fragment_files: vec![frag_path],
+            threshold: 0.8,
+            db_path: db_path.clone(),
+            ack_file: None,
+            ack: false,
+        };
+
+        let result = app.semantic_dup_check(input);
+        assert!(
+            result.is_err(),
+            "dup-check must return Err when db_path does not exist, got: {:?}",
+            result.ok()
+        );
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("dup-index build"),
+            "error message must reference 'dup-index build', got: {msg}"
+        );
+        assert!(msg.contains("missing"), "error message must mention 'missing', got: {msg}");
+    }
+
+    #[test]
+    fn test_dup_check_with_fragment_and_dir_without_marker_returns_err_missing_index() {
+        // P1 fix: a db_path that exists as a directory but does NOT contain the
+        // `fragments.lance/` marker must produce Err, not a silent pass.
+        let dir = tempfile::tempdir().unwrap();
+        let frag_path = write_fragment_file(dir.path(), "frag.rs", "fn guard_test_dir() {}");
+        // Create a directory at db_path WITHOUT the LanceDB marker.
+        let db_path = dir.path().join("not_an_index");
+        std::fs::create_dir_all(&db_path).unwrap();
+        std::fs::write(db_path.join("some_other_file.txt"), "unrelated").unwrap();
+        assert!(db_path.exists(), "pre-condition: db_path dir must exist");
+        assert!(
+            !db_path.join(super::super::common::LANCEDB_TABLE_MARKER).exists(),
+            "pre-condition: marker must be absent"
+        );
+
+        let app = crate::CliApp;
+        let input = DupCheckInput {
+            fragment_files: vec![frag_path],
+            threshold: 0.8,
+            db_path: db_path.clone(),
+            ack_file: None,
+            ack: false,
+        };
+
+        let result = app.semantic_dup_check(input);
+        assert!(
+            result.is_err(),
+            "dup-check must return Err when db_path exists but has no LanceDB marker, got: {:?}",
+            result.ok()
+        );
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("dup-index build"),
+            "error message must reference 'dup-index build', got: {msg}"
+        );
+        // The directory must be completely untouched.
+        assert!(db_path.exists(), "db_path directory must not be deleted on Err");
+        assert!(
+            db_path.join("some_other_file.txt").exists(),
+            "unrelated file inside db_path must be preserved"
+        );
+    }
+
+    #[test]
+    fn test_dup_check_with_no_fragments_returns_ok_regardless_of_db_path() {
+        // Regression: the missing-index guard must NOT fire when there are zero
+        // fragments to check — that early-return path exits before the guard.
+        let dir = tempfile::tempdir().unwrap();
+        // db_path does not exist — would trigger the guard if fragments were present.
+        let db_path = dir.path().join("nonexistent_index.db");
+        assert!(!db_path.exists(), "pre-condition: db_path must not exist");
+
+        let app = crate::CliApp;
+        let input = DupCheckInput {
+            fragment_files: vec![], // zero fragments → early return before guard
+            threshold: 0.8,
+            db_path,
+            ack_file: None,
+            ack: false,
+        };
+
+        let outcome = app.semantic_dup_check(input).unwrap();
+        assert_eq!(outcome.exit_code, 0, "zero-fragment check must exit 0 (AC-04)");
+        assert!(
+            outcome.stdout.as_deref().unwrap_or("").contains("no fragments"),
+            "expected 'no fragments' message, got: {:?}",
             outcome.stdout
         );
     }
