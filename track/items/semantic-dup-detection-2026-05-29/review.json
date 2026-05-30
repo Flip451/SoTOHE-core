@@ -1,284 +1,49 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`semantic_dup_check` silently ignores `ack = true` when `ack_file` is `None`, so a public caller can request ack persistence and get a success result with no file written. That makes the exported DTO accept an illegal state and drops the user's `--ack` intent without an error. Reject this combination up front or make the invariant unrepresentable in the input type.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 292,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:f481ebfc06c6b8801a3c3ee45a82e220945c1bae401eda0b2f4335969e81e596",
-          "at": "2026-05-30T04:24:19Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
-          "at": "2026-05-30T04:27:18Z"
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:15:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
-          "at": "2026-05-30T04:30:40Z"
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:33:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf5575e174450c3be1cbf593b4f3e99fd90ce670c14cc2314c67112ebda7f3df",
-          "at": "2026-05-30T04:54:29Z"
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:43:04Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf5575e174450c3be1cbf593b4f3e99fd90ce670c14cc2314c67112ebda7f3df",
-          "at": "2026-05-30T04:56:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This destructive rebuild path has no regression test in the file for the new behavior: first-run no-op, repeated rebuild replacing stale rows, or propagation of `remove_dir_all` failures. Because `dup-index build` now deletes data before rebuilding, that coverage gap leaves the stale-index fix and the new failure mode unprotected from regression.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 118,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:403ca96d94c1886b170b4a5b16c188b4d8bdcfa7b41d6b91e07939040dae2d06",
-          "at": "2026-05-30T05:44:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Deleting `input.db_path` here can wipe arbitrary user data if the CLI is invoked with an overlapping or misconfigured `--db-path` (for example, pointing at the workspace root or another real directory). Because this happens before fragment extraction, a single bad invocation can erase the project tree before the command fails. Reject unsafe path overlaps or constrain cleanup to a dedicated index directory before calling `remove_dir_all`.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 126,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:403ca96d94c1886b170b4a5b16c188b4d8bdcfa7b41d6b91e07939040dae2d06",
-          "at": "2026-05-30T05:46:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This destructive rebuild path has no tests covering the new behavior: neither the happy path where an existing `--db-path` is wiped and rebuilt, nor the refusal path when `--db-path` overlaps the workspace root. Because this method now deletes data before adapter construction, the missing coverage leaves a high-risk regression surface unverified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 118,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:eaed466c4e96e8b82dca4a44a842ec67b22a8de30285f8d5ca58b8a5b0922b2a",
-          "at": "2026-05-30T05:50:01Z"
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:44:12Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af490b7a9db172da4370b7f80d828907e5920127356c683a20cb4edfb7f20dd1",
-          "at": "2026-05-30T06:08:38Z"
+          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
+          "at": "2026-05-30T06:05:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af490b7a9db172da4370b7f80d828907e5920127356c683a20cb4edfb7f20dd1",
-          "at": "2026-05-30T06:10:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`is_recognizable_lancedb_index()` treats any existing `fragments.lance` entry as a valid LanceDB marker because it only checks `.exists()`. An unrelated directory that happens to contain a file or symlink with that name will be classified as an index and then recursively deleted by `remove_dir_all`, which defeats the new data-loss guard. This needs to verify the marker is the expected directory/layout, not just that some path exists.",
-              "severity": "P0",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 113,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:25f3dad3b3594e7eb9c71f7afa5b4a4acf4903fb0c79da4877c1bf8a5c7467a4",
-          "at": "2026-05-30T06:34:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49337a0293eac9af076856b76c9e433dd99f78ab731a881b0bfdebd49f6c1b56",
-          "at": "2026-05-30T06:37:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Path::is_dir()` follows symlinks, so an existing non-index directory that contains a `fragments.lance` symlink to any directory is accepted as a recognizable index and then `remove_dir_all(db_path)` deletes that whole user directory. This leaves a data-loss bypass of the new guard; use non-following metadata for the marker and reject symlinks.",
-              "severity": "P0",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 116,
-              "category": "data_loss"
-            }
-          ],
-          "hash": "rvw1:sha256:49337a0293eac9af076856b76c9e433dd99f78ab731a881b0bfdebd49f6c1b56",
-          "at": "2026-05-30T06:38:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67f7bbc29338d5e41539f99a00f931d1b1be21e7bfcf8235645369edb889c4a2",
-          "at": "2026-05-30T06:42:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a042d09840ebb27ad60570f7470d69b830c82f5b752e42d9187980bbc684343",
-          "at": "2026-05-30T08:43:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a042d09840ebb27ad60570f7470d69b830c82f5b752e42d9187980bbc684343",
-          "at": "2026-05-30T08:45:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "If the rename of `temp_path` into `db_path` fails after the existing index has already been renamed aside, the function returns `Err` with `db_path` absent and only the `.old` backup left behind. That breaks the non-destructive rebuild guarantee and can make a transient filesystem error look like data loss.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 229,
-              "category": "correctness"
-            },
-            {
-              "message": "The `fragment_count == 0` early return skips `commit_rebuilt_index`, so a rebuild of an emptied workspace leaves any pre-existing index in place. Because `dup-index build` is a rebuild command, this preserves stale semantic-index data instead of reflecting the current tree.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 321,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:5c3a77b7b784435e89ecabf4ce05d775e1db3f21cc6c3e11c194ec1c1410e3d1",
-          "at": "2026-05-30T08:59:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `commit_rebuilt_index` does not actually guarantee the old index is preserved on a failed swap. After moving `db_path` to the backup, it ignores the result of restoring the backup if `rename(temp_path, db_path)` fails. If that restore also fails, the command returns an error with `db_path` still missing, which contradicts the stated non-destructive rebuild guarantee.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 244,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:31c79084ffb6597cdb7c887909854f22e68a3035dd88ad1a2ed5ed2bbeda5fb8",
-          "at": "2026-05-30T09:06:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`commit_rebuilt_index` is not atomic as a whole: once `db_path` has been renamed to `.{filename}.old`, a crash, kill, or power loss before the `temp_path -> db_path` rename leaves `db_path` missing and only the hidden backup remains. The rollback path only runs when `rename(temp_path, db_path)` returns an error, so this still violates the non-destructive rebuild guarantee the change is meant to provide.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 233,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c77dd013661d9ead3774843a4655b64fdd8dbbd0e36f452955cea6e69198ffa2",
-          "at": "2026-05-30T09:11:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`semantic_dup_index_build` still deletes the live `db_path` when `extract_code_fragments` returns an empty set, so an empty or sparse workspace can wipe a previously working index instead of preserving it. That breaks the new non-destructive rebuild intent for `dup-index build` and makes a typo'd `--workspace-root` data-destructive.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 375,
-              "category": "correctness"
-            },
-            {
-              "message": "The new rollback/swap behavior in `semantic_dup_index_build` is not exercised directly by any test in this file. The added unit tests only cover private helpers, so the public API's critical paths (stale-temp cleanup, crash-backup restore, and atomic commit failure handling) can regress without detection.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
-              "line": 320,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:352d4abd7ac68f33607d5bbe9f92db70fc7b2b147d154fde57b2895cbc0db311",
-          "at": "2026-05-30T09:16:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33222d96db44a25b0d1acf9cdaef3c90421b1e55de62bad987b61465f2206a88",
-          "at": "2026-05-30T09:21:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33222d96db44a25b0d1acf9cdaef3c90421b1e55de62bad987b61465f2206a88",
-          "at": "2026-05-30T09:25:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4fd1d76b875ee4e770c257e60dd6d1d5d017dc28957df15d0900138399986c4",
-          "at": "2026-05-30T09:41:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The guard uses `backup_path.exists()`, which returns false for broken symlinks. If a user already has a broken `.index.db.old` symlink, this block is skipped and the later `rename(db_path, backup_path)` overwrites that unrelated path instead of refusing to clobber it. Use `symlink_metadata`/`try_exists` on the backup path itself before deciding it is absent, then apply the recognizable-index check.",
-              "severity": "P0",
-              "file": "apps/cli-composition/src/semantic_dup.rs",
-              "line": 239,
-              "category": "data_loss"
-            }
-          ],
-          "hash": "rvw1:sha256:b4fd1d76b875ee4e770c257e60dd6d1d5d017dc28957df15d0900138399986c4",
-          "at": "2026-05-30T09:43:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b9193482101db409a055e230ad8e7b2be80965a6f337ff678f3bee9afa61421",
-          "at": "2026-05-30T09:46:42Z"
+          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
+          "at": "2026-05-30T06:07:21Z"
         }
       ]
     },
@@ -1188,6 +953,24 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:32:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:34:52Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -1279,49 +1062,313 @@
         }
       ]
     },
-    "other": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:15:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:33:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:43:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:44:12Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`semantic_dup_check` silently ignores `ack = true` when `ack_file` is `None`, so a public caller can request ack persistence and get a success result with no file written. That makes the exported DTO accept an illegal state and drops the user's `--ack` intent without an error. Reject this combination up front or make the invariant unrepresentable in the input type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 292,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:f481ebfc06c6b8801a3c3ee45a82e220945c1bae401eda0b2f4335969e81e596",
+          "at": "2026-05-30T04:24:19Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
-          "at": "2026-05-30T06:05:20Z"
+          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
+          "at": "2026-05-30T04:27:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
-          "at": "2026-05-30T06:07:21Z"
+          "hash": "rvw1:sha256:a650ef7acbf3ec1314e438e7404091db3394e76673fced2c276a357a9b6eb801",
+          "at": "2026-05-30T04:30:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf5575e174450c3be1cbf593b4f3e99fd90ce670c14cc2314c67112ebda7f3df",
+          "at": "2026-05-30T04:54:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf5575e174450c3be1cbf593b4f3e99fd90ce670c14cc2314c67112ebda7f3df",
+          "at": "2026-05-30T04:56:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This destructive rebuild path has no regression test in the file for the new behavior: first-run no-op, repeated rebuild replacing stale rows, or propagation of `remove_dir_all` failures. Because `dup-index build` now deletes data before rebuilding, that coverage gap leaves the stale-index fix and the new failure mode unprotected from regression.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 118,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:403ca96d94c1886b170b4a5b16c188b4d8bdcfa7b41d6b91e07939040dae2d06",
+          "at": "2026-05-30T05:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting `input.db_path` here can wipe arbitrary user data if the CLI is invoked with an overlapping or misconfigured `--db-path` (for example, pointing at the workspace root or another real directory). Because this happens before fragment extraction, a single bad invocation can erase the project tree before the command fails. Reject unsafe path overlaps or constrain cleanup to a dedicated index directory before calling `remove_dir_all`.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 126,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:403ca96d94c1886b170b4a5b16c188b4d8bdcfa7b41d6b91e07939040dae2d06",
+          "at": "2026-05-30T05:46:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This destructive rebuild path has no tests covering the new behavior: neither the happy path where an existing `--db-path` is wiped and rebuilt, nor the refusal path when `--db-path` overlaps the workspace root. Because this method now deletes data before adapter construction, the missing coverage leaves a high-risk regression surface unverified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 118,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:eaed466c4e96e8b82dca4a44a842ec67b22a8de30285f8d5ca58b8a5b0922b2a",
+          "at": "2026-05-30T05:50:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af490b7a9db172da4370b7f80d828907e5920127356c683a20cb4edfb7f20dd1",
+          "at": "2026-05-30T06:08:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af490b7a9db172da4370b7f80d828907e5920127356c683a20cb4edfb7f20dd1",
+          "at": "2026-05-30T06:10:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_recognizable_lancedb_index()` treats any existing `fragments.lance` entry as a valid LanceDB marker because it only checks `.exists()`. An unrelated directory that happens to contain a file or symlink with that name will be classified as an index and then recursively deleted by `remove_dir_all`, which defeats the new data-loss guard. This needs to verify the marker is the expected directory/layout, not just that some path exists.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 113,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:25f3dad3b3594e7eb9c71f7afa5b4a4acf4903fb0c79da4877c1bf8a5c7467a4",
+          "at": "2026-05-30T06:34:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49337a0293eac9af076856b76c9e433dd99f78ab731a881b0bfdebd49f6c1b56",
+          "at": "2026-05-30T06:37:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Path::is_dir()` follows symlinks, so an existing non-index directory that contains a `fragments.lance` symlink to any directory is accepted as a recognizable index and then `remove_dir_all(db_path)` deletes that whole user directory. This leaves a data-loss bypass of the new guard; use non-following metadata for the marker and reject symlinks.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 116,
+              "category": "data_loss"
+            }
+          ],
+          "hash": "rvw1:sha256:49337a0293eac9af076856b76c9e433dd99f78ab731a881b0bfdebd49f6c1b56",
+          "at": "2026-05-30T06:38:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67f7bbc29338d5e41539f99a00f931d1b1be21e7bfcf8235645369edb889c4a2",
+          "at": "2026-05-30T06:42:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a042d09840ebb27ad60570f7470d69b830c82f5b752e42d9187980bbc684343",
+          "at": "2026-05-30T08:43:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a042d09840ebb27ad60570f7470d69b830c82f5b752e42d9187980bbc684343",
+          "at": "2026-05-30T08:45:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If the rename of `temp_path` into `db_path` fails after the existing index has already been renamed aside, the function returns `Err` with `db_path` absent and only the `.old` backup left behind. That breaks the non-destructive rebuild guarantee and can make a transient filesystem error look like data loss.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 229,
+              "category": "correctness"
+            },
+            {
+              "message": "The `fragment_count == 0` early return skips `commit_rebuilt_index`, so a rebuild of an emptied workspace leaves any pre-existing index in place. Because `dup-index build` is a rebuild command, this preserves stale semantic-index data instead of reflecting the current tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 321,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5c3a77b7b784435e89ecabf4ce05d775e1db3f21cc6c3e11c194ec1c1410e3d1",
+          "at": "2026-05-30T08:59:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `commit_rebuilt_index` does not actually guarantee the old index is preserved on a failed swap. After moving `db_path` to the backup, it ignores the result of restoring the backup if `rename(temp_path, db_path)` fails. If that restore also fails, the command returns an error with `db_path` still missing, which contradicts the stated non-destructive rebuild guarantee.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 244,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:31c79084ffb6597cdb7c887909854f22e68a3035dd88ad1a2ed5ed2bbeda5fb8",
+          "at": "2026-05-30T09:06:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`commit_rebuilt_index` is not atomic as a whole: once `db_path` has been renamed to `.{filename}.old`, a crash, kill, or power loss before the `temp_path -> db_path` rename leaves `db_path` missing and only the hidden backup remains. The rollback path only runs when `rename(temp_path, db_path)` returns an error, so this still violates the non-destructive rebuild guarantee the change is meant to provide.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 233,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c77dd013661d9ead3774843a4655b64fdd8dbbd0e36f452955cea6e69198ffa2",
+          "at": "2026-05-30T09:11:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`semantic_dup_index_build` still deletes the live `db_path` when `extract_code_fragments` returns an empty set, so an empty or sparse workspace can wipe a previously working index instead of preserving it. That breaks the new non-destructive rebuild intent for `dup-index build` and makes a typo'd `--workspace-root` data-destructive.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 375,
+              "category": "correctness"
+            },
+            {
+              "message": "The new rollback/swap behavior in `semantic_dup_index_build` is not exercised directly by any test in this file. The added unit tests only cover private helpers, so the public API's critical paths (stale-temp cleanup, crash-backup restore, and atomic commit failure handling) can regress without detection.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "line": 320,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:352d4abd7ac68f33607d5bbe9f92db70fc7b2b147d154fde57b2895cbc0db311",
+          "at": "2026-05-30T09:16:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33222d96db44a25b0d1acf9cdaef3c90421b1e55de62bad987b61465f2206a88",
+          "at": "2026-05-30T09:21:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33222d96db44a25b0d1acf9cdaef3c90421b1e55de62bad987b61465f2206a88",
+          "at": "2026-05-30T09:25:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4fd1d76b875ee4e770c257e60dd6d1d5d017dc28957df15d0900138399986c4",
+          "at": "2026-05-30T09:41:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The guard uses `backup_path.exists()`, which returns false for broken symlinks. If a user already has a broken `.index.db.old` symlink, this block is skipped and the later `rename(db_path, backup_path)` overwrites that unrelated path instead of refusing to clobber it. Use `symlink_metadata`/`try_exists` on the backup path itself before deciding it is absent, then apply the recognizable-index check.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 239,
+              "category": "data_loss"
+            }
+          ],
+          "hash": "rvw1:sha256:b4fd1d76b875ee4e770c257e60dd6d1d5d017dc28957df15d0900138399986c4",
+          "at": "2026-05-30T09:43:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b9193482101db409a055e230ad8e7b2be80965a6f337ff678f3bee9afa61421",
+          "at": "2026-05-30T09:46:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d83615e45dec5479d43c8bf737d7336dd5a3145fc8c5a6799161d4c5fb7ded18",
+          "at": "2026-05-30T10:02:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The tracked patch deletes the monolithic `semantic_dup.rs`, but the replacement `semantic_dup/` module files are untracked and therefore not present in `git diff`. A submitted checkout would have `mod semantic_dup;` with no tracked module file, breaking compilation and removing the semantic-dup DTOs/method implementations. Add the new module files to the patch or keep the original file tracked.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
+              "line": 1,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:d83615e45dec5479d43c8bf737d7336dd5a3145fc8c5a6799161d4c5fb7ded18",
+          "at": "2026-05-30T10:05:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a0067856e648768637f5cd830be48e27527b98cb2b26daa3d44b862eb37ef76",
+          "at": "2026-05-30T10:09:18Z"
         }
       ]
     },
@@ -1779,24 +1826,6 @@
           "findings": [],
           "hash": "rvw1:sha256:87b105b55c1260a3c02b228ce0ee2d8f3f2d3757b01eb3cc503ca88f31729161",
           "at": "2026-05-30T07:51:06Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
-          "at": "2026-05-30T01:32:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
-          "at": "2026-05-30T01:34:52Z"
         }
       ]
     }

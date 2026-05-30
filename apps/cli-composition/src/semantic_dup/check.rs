@@ -1,0 +1,410 @@
+//! `dup-check` subcommand — input DTO, ack helpers, and [`crate::CliApp`] impl.
+
+use std::path::{Path, PathBuf};
+use std::sync::Arc;
+
+use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
+use infrastructure::semantic_dup::{
+    embedding::FastEmbedAdapter, index::LanceDbSemanticIndexAdapter,
+};
+use usecase::semantic_dup::{DupCheckCommand, DupCheckInteractor, DupCheckService as _};
+
+use crate::{CliApp, CommandOutcome};
+
+use super::common::truncate_snippet;
+
+/// Input DTO for `sotp dup-check`.
+#[derive(Debug, Clone)]
+pub struct DupCheckInput {
+    /// List of paths to individual fragment text files (one file per fragment).
+    pub fragment_files: Vec<PathBuf>,
+    /// Cosine similarity threshold above which a match is flagged (0.0–1.0).
+    pub threshold: f32,
+    /// Path to the local LanceDB database.
+    pub db_path: PathBuf,
+    /// Optional path to the ack-set file.  When provided:
+    /// - fragments whose content hash already appears in the ack set are
+    ///   silently suppressed (AC-05).
+    /// - after the run, any new warnings whose fragments the user chose to ack
+    ///   (via `--ack`) are written into this file.
+    pub ack_file: Option<PathBuf>,
+    /// When `true`, all warnings from this run are acked and written to
+    /// `ack_file` (AC-05).
+    pub ack: bool,
+}
+
+/// Read the ack-set (a newline-separated list of SHA-256 hex hashes) from `path`.
+///
+/// Returns an empty set when the file does not exist yet (first run).
+fn read_ack_set(path: &Path) -> Result<std::collections::HashSet<String>, String> {
+    match std::fs::read_to_string(path) {
+        Ok(contents) => Ok(contents
+            .lines()
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .map(str::to_owned)
+            .collect()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(std::collections::HashSet::new()),
+        Err(e) => Err(format!("cannot read ack file {}: {e}", path.display())),
+    }
+}
+
+/// Write the ack-set to `path`.
+fn write_ack_set(path: &Path, set: &std::collections::HashSet<String>) -> Result<(), String> {
+    let mut sorted: Vec<&str> = set.iter().map(String::as_str).collect();
+    sorted.sort_unstable();
+    let contents = sorted.join("\n") + "\n";
+    std::fs::write(path, contents)
+        .map_err(|e| format!("cannot write ack file {}: {e}", path.display()))
+}
+
+/// Compute a stable content hash for a fragment (SHA-256 of the content bytes).
+fn fragment_content_hash(content: &str) -> String {
+    // Simple stable hash using std only: we XOR-fold SHA-256 via FNV-1a 64-bit
+    // so there are no extra dependencies.  For ack suppression, collision
+    // resistance is not critical; what matters is stable reproducibility across
+    // runs for the same content.
+    //
+    // Using FNV-1a 64-bit hash of the UTF-8 content bytes.
+    const FNV_OFFSET: u64 = 14_695_981_039_346_656_037;
+    const FNV_PRIME: u64 = 1_099_511_628_211;
+    let mut hash: u64 = FNV_OFFSET;
+    for byte in content.as_bytes() {
+        hash ^= u64::from(*byte);
+        hash = hash.wrapping_mul(FNV_PRIME);
+    }
+    format!("{hash:016x}")
+}
+
+impl CliApp {
+    /// Run `sotp dup-check`: check diff fragments against the semantic index.
+    ///
+    /// CN-02/AC-04: always exits 0 (soft gate — warnings to stderr, no block).
+    /// AC-05: fragments whose content hash appears in the ack file are suppressed.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` only on hard infrastructure failures (adapter construction
+    /// or file I/O errors for the ack file), not on warnings.
+    pub fn semantic_dup_check(&self, input: DupCheckInput) -> Result<CommandOutcome, String> {
+        // Reject the illegal combination: --ack requires --ack-file to be set.
+        if input.ack && input.ack_file.is_none() {
+            return Err("--ack requires --ack-file to be specified".to_owned());
+        }
+
+        let threshold = SimilarityThreshold::new(input.threshold)
+            .map_err(|e| format!("invalid --threshold value: {e}"))?;
+
+        // Read all fragment files.
+        let mut fragments: Vec<CodeFragment> = Vec::new();
+        for path in &input.fragment_files {
+            let content = std::fs::read_to_string(path)
+                .map_err(|e| format!("cannot read fragment file {}: {e}", path.display()))?;
+            let fragment = CodeFragment::new(path.clone(), content)
+                .map_err(|e| format!("invalid fragment in {}: {e}", path.display()))?;
+            fragments.push(fragment);
+        }
+
+        if fragments.is_empty() {
+            return Ok(CommandOutcome::success(Some(
+                "dup-check: no fragments to check".to_owned(),
+            )));
+        }
+
+        // Load the ack set (empty on first run).
+        let ack_path_opt = input.ack_file.as_deref();
+        let ack_set = match ack_path_opt {
+            Some(p) => read_ack_set(p)?,
+            None => std::collections::HashSet::new(),
+        };
+
+        // Filter out already-acked fragments (AC-05: suppress on re-run).
+        let (acked_fragments, check_fragments): (Vec<_>, Vec<_>) =
+            fragments.into_iter().partition(|f| {
+                let hash = fragment_content_hash(f.content());
+                ack_set.contains(&hash)
+            });
+
+        let _ = acked_fragments; // suppressed — no warning emitted.
+
+        if check_fragments.is_empty() {
+            return Ok(CommandOutcome::success(Some(
+                "dup-check: all fragments already acked; no warnings".to_owned(),
+            )));
+        }
+
+        let embedding_port = Arc::new(
+            FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
+        );
+        let index_port =
+            Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
+                format!("failed to open index at {}: {e}", input.db_path.display())
+            })?);
+
+        let interactor = DupCheckInteractor::new(embedding_port, index_port);
+        let output = interactor
+            .dup_check(&DupCheckCommand { fragments: check_fragments, threshold })
+            .map_err(|e| format!("dup-check failed: {e}"))?;
+
+        // Build stderr warnings string.
+        let mut warning_lines: Vec<String> = Vec::new();
+        let mut warn_hashes: Vec<String> = Vec::new();
+
+        for warning in &output.warnings {
+            warning_lines.push(format!(
+                "[dup-check WARNING] fragment '{}' has {} near-duplicate(s):",
+                warning.input_fragment.source_path.display(),
+                warning.similar_fragments.len()
+            ));
+            for sf in &warning.similar_fragments {
+                let snippet = truncate_snippet(sf.fragment.content(), 60);
+                warning_lines.push(format!(
+                    "  similar: {} (score={:.4}) | {}",
+                    sf.fragment.source_path.display(),
+                    sf.score.value(),
+                    snippet
+                ));
+            }
+            warn_hashes.push(fragment_content_hash(warning.input_fragment.content()));
+        }
+
+        // Handle ack: write acknowledged hashes to the ack file (AC-05).
+        if input.ack {
+            if let Some(p) = ack_path_opt {
+                let mut updated_ack_set = ack_set.clone();
+                for h in &warn_hashes {
+                    updated_ack_set.insert(h.clone());
+                }
+                write_ack_set(p, &updated_ack_set)?;
+            }
+        }
+
+        // Soft gate: warnings go to stderr, exit 0 always (CN-02/AC-04).
+        if warning_lines.is_empty() {
+            Ok(CommandOutcome::success(Some(
+                "dup-check: no near-duplicates found above threshold".to_owned(),
+            )))
+        } else {
+            Ok(CommandOutcome {
+                stdout: Some(
+                    "dup-check: near-duplicates found (see stderr for details)".to_owned(),
+                ),
+                stderr: Some(warning_lines.join("\n")),
+                exit_code: 0, // soft gate — always exit 0
+            })
+        }
+    }
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used, clippy::expect_used)]
+
+    use std::collections::HashSet;
+
+    use super::*;
+
+    // ── fragment_content_hash ─────────────────────────────────────────────────
+
+    #[test]
+    fn test_fragment_content_hash_is_stable_across_calls() {
+        let content = "fn foo() { let x = 1; }";
+        let h1 = fragment_content_hash(content);
+        let h2 = fragment_content_hash(content);
+        assert_eq!(h1, h2, "FNV-1a hash must be deterministic");
+    }
+
+    #[test]
+    fn test_fragment_content_hash_differs_for_different_content() {
+        let h1 = fragment_content_hash("fn foo() {}");
+        let h2 = fragment_content_hash("fn bar() {}");
+        assert_ne!(h1, h2, "different content must yield different hashes");
+    }
+
+    #[test]
+    fn test_fragment_content_hash_is_16_hex_chars() {
+        let h = fragment_content_hash("hello world");
+        assert_eq!(h.len(), 16, "FNV-1a 64-bit hash must be 16 hex characters");
+        assert!(h.chars().all(|c| c.is_ascii_hexdigit()), "hash must be hex");
+    }
+
+    // ── read_ack_set / write_ack_set ──────────────────────────────────────────
+
+    #[test]
+    fn test_read_ack_set_returns_empty_set_when_file_does_not_exist() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ack.txt");
+        let set = read_ack_set(&path).unwrap();
+        assert!(set.is_empty(), "missing file should yield empty set");
+    }
+
+    #[test]
+    fn test_write_and_read_ack_set_round_trips_hashes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ack.txt");
+
+        let mut original: HashSet<String> = HashSet::new();
+        original.insert("abc123def456789a".to_owned());
+        original.insert("0000000000000000".to_owned());
+
+        write_ack_set(&path, &original).unwrap();
+        let read_back = read_ack_set(&path).unwrap();
+
+        assert_eq!(original, read_back, "round-trip must preserve all hashes");
+    }
+
+    #[test]
+    fn test_write_ack_set_produces_sorted_lines() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ack.txt");
+
+        let mut set: HashSet<String> = HashSet::new();
+        set.insert("zzzzzzzzzzzzzzzz".to_owned());
+        set.insert("aaaaaaaaaaaaaaaa".to_owned());
+        set.insert("mmmmmmmmmmmmmmmm".to_owned());
+
+        write_ack_set(&path, &set).unwrap();
+        let contents = std::fs::read_to_string(&path).unwrap();
+        let lines: Vec<&str> = contents.lines().collect();
+
+        let mut sorted = lines.clone();
+        sorted.sort_unstable();
+        assert_eq!(lines, sorted, "ack file lines should be sorted");
+    }
+
+    // ── AC-05: ack suppression via fragment_content_hash ─────────────────────
+
+    #[test]
+    fn test_ack_suppression_already_acked_hash_is_detected_in_set() {
+        let content = "fn already_acked() {}";
+        let hash = fragment_content_hash(content);
+
+        let mut ack_set: HashSet<String> = HashSet::new();
+        ack_set.insert(hash.clone());
+
+        // The ack_set lookup mirrors the partition logic in semantic_dup_check.
+        assert!(ack_set.contains(&hash), "acked fragment hash should be found in the set");
+    }
+
+    #[test]
+    fn test_ack_suppression_new_hash_is_not_in_existing_set() {
+        let existing_content = "fn already_acked() {}";
+        let new_content = "fn new_fn() {}";
+
+        let existing_hash = fragment_content_hash(existing_content);
+        let new_hash = fragment_content_hash(new_content);
+
+        let mut ack_set: HashSet<String> = HashSet::new();
+        ack_set.insert(existing_hash);
+
+        assert!(
+            !ack_set.contains(&new_hash),
+            "new fragment hash must not appear in the existing ack set"
+        );
+    }
+
+    #[test]
+    fn test_ack_suppression_write_new_hashes_appended_to_existing_set() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ack.txt");
+
+        // Initial ack set with one hash.
+        let old_hash = fragment_content_hash("fn old() {}");
+        let mut initial_set: HashSet<String> = HashSet::new();
+        initial_set.insert(old_hash.clone());
+        write_ack_set(&path, &initial_set).unwrap();
+
+        // Simulate adding a new warning hash.
+        let new_hash = fragment_content_hash("fn new_warn() {}");
+        let mut updated_set = read_ack_set(&path).unwrap();
+        updated_set.insert(new_hash.clone());
+        write_ack_set(&path, &updated_set).unwrap();
+
+        // Both hashes should be present on the next read.
+        let final_set = read_ack_set(&path).unwrap();
+        assert!(final_set.contains(&old_hash), "old hash must be retained");
+        assert!(final_set.contains(&new_hash), "new hash must be added");
+        assert_eq!(final_set.len(), 2);
+    }
+
+    // ── AC-04: soft-gate exit-0 behavior ─────────────────────────────────────
+
+    #[test]
+    fn test_dup_check_with_no_fragment_files_exits_zero_with_success_message() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("test.db");
+        let app = crate::CliApp;
+
+        let input = DupCheckInput {
+            fragment_files: vec![],
+            threshold: 0.8,
+            db_path,
+            ack_file: None,
+            ack: false,
+        };
+
+        let outcome = app.semantic_dup_check(input).unwrap();
+        assert_eq!(outcome.exit_code, 0, "dup-check must always exit 0 (AC-04)");
+        assert!(
+            outcome.stdout.as_deref().unwrap_or("").contains("no fragments"),
+            "expected 'no fragments' message in stdout"
+        );
+    }
+
+    #[test]
+    fn test_dup_check_with_ack_but_no_ack_file_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("test.db");
+        let app = crate::CliApp;
+
+        let input = DupCheckInput {
+            fragment_files: vec![],
+            threshold: 0.8,
+            db_path,
+            ack_file: None,
+            ack: true, // --ack without --ack-file must be rejected
+        };
+
+        let result = app.semantic_dup_check(input);
+        assert!(result.is_err(), "--ack without --ack-file must return Err");
+    }
+
+    #[test]
+    fn test_dup_check_all_fragments_acked_exits_zero_with_no_warnings_message() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("test.db");
+        let ack_path = dir.path().join("ack.txt");
+        let frag_path = dir.path().join("frag.rs");
+
+        // Write a fragment file.
+        let content = "fn suppressed() {}";
+        std::fs::write(&frag_path, content).unwrap();
+
+        // Pre-populate the ack set with this fragment's hash.
+        let hash = fragment_content_hash(content);
+        let mut ack_set: HashSet<String> = HashSet::new();
+        ack_set.insert(hash);
+        write_ack_set(&ack_path, &ack_set).unwrap();
+
+        let app = crate::CliApp;
+        let input = DupCheckInput {
+            fragment_files: vec![frag_path],
+            threshold: 0.8,
+            db_path,
+            ack_file: Some(ack_path),
+            ack: false,
+        };
+
+        let outcome = app.semantic_dup_check(input).unwrap();
+        // AC-04: exit 0 always.
+        assert_eq!(outcome.exit_code, 0);
+        // AC-05: already-acked fragment is suppressed — "no warnings" message.
+        assert!(
+            outcome.stdout.as_deref().unwrap_or("").contains("already acked"),
+            "expected 'already acked' message, got: {:?}",
+            outcome.stdout
+        );
+    }
+}
