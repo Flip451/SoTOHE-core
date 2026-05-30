@@ -9,7 +9,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use domain::semantic_dup::{CodeFragment, SimilarityThreshold, TopK};
+use domain::semantic_dup::{CodeFragment, SimilarFragment, SimilarityThreshold, TopK};
 use infrastructure::semantic_dup::{
     embedding::FastEmbedAdapter, extractor::extract_code_fragments,
     index::LanceDbSemanticIndexAdapter,
@@ -18,6 +18,7 @@ use usecase::semantic_dup::{
     BuildIndexCommand, BuildIndexService as _, DupCheckCommand, DupCheckInteractor,
     DupCheckService as _, FindSimilarCommand, FindSimilarInteractor, FindSimilarService as _,
     MeasureQualityCommand, MeasureQualityInteractor, MeasureQualityService as _,
+    SemanticIndexError, SemanticIndexPort,
 };
 
 use crate::{CliApp, CommandOutcome};
@@ -428,24 +429,52 @@ impl CliApp {
 
 // ── dup-index measure-quality ─────────────────────────────────────────────────
 
+/// No-op implementation of [`SemanticIndexPort`] for use by
+/// [`MeasureQualityInteractor`], which only computes embedding metrics and
+/// never reads from or writes to an index.
+///
+/// Using a no-op port removes the spurious dependency on LanceDB state /
+/// filesystem permissions that would otherwise be required by the real adapter.
+struct NoopSemanticIndexPort;
+
+impl SemanticIndexPort for NoopSemanticIndexPort {
+    fn insert(
+        &self,
+        _fragment: &CodeFragment,
+        _embedding: &[f32],
+    ) -> Result<(), SemanticIndexError> {
+        Ok(())
+    }
+
+    fn search(
+        &self,
+        _embedding: &[f32],
+        _top_k: TopK,
+    ) -> Result<Vec<SimilarFragment>, SemanticIndexError> {
+        Ok(Vec::new())
+    }
+}
+
 /// Input DTO for `sotp dup-index measure-quality`.
 #[derive(Debug, Clone)]
 pub struct DupIndexMeasureQualityInput {
     /// Root of the workspace to scan for Rust sources.
     pub workspace_root: PathBuf,
-    /// Path to the local LanceDB database (used by the index port in the
-    /// interactor even though measure-quality operates in-memory).
-    pub db_path: PathBuf,
 }
 
 impl CliApp {
     /// Run `sotp dup-index measure-quality`: compute embedding model quality
     /// metrics over workspace fragments and output JSON to stdout (AC-03).
     ///
+    /// The index port is not used by [`MeasureQualityInteractor`] (metrics are
+    /// computed from embeddings alone, not index lookups), so a no-op port is
+    /// supplied here — avoiding a spurious dependency on LanceDB state or
+    /// filesystem permissions.
+    ///
     /// # Errors
     ///
-    /// Returns `Err` if extraction, adapter construction, or the interactor call
-    /// fails.
+    /// Returns `Err` if extraction, embedding adapter construction, or the
+    /// interactor call fails.
     pub fn semantic_dup_index_measure_quality(
         &self,
         input: DupIndexMeasureQualityInput,
@@ -456,10 +485,7 @@ impl CliApp {
         let embedding_port = Arc::new(
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
-        let index_port =
-            Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
-                format!("failed to open index at {}: {e}", input.db_path.display())
-            })?);
+        let index_port = Arc::new(NoopSemanticIndexPort);
 
         let interactor = MeasureQualityInteractor::new(embedding_port, index_port);
         let metrics = interactor
@@ -509,6 +535,31 @@ mod tests {
     use std::collections::HashSet;
 
     use super::*;
+
+    // ── NoopSemanticIndexPort ─────────────────────────────────────────────────
+
+    #[test]
+    fn test_noop_semantic_index_port_insert_returns_ok() {
+        let port = NoopSemanticIndexPort;
+        let fragment = CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned())
+            .expect("valid fragment");
+        let embedding = vec![0.1_f32, 0.2, 0.3];
+        let result = port.insert(&fragment, &embedding);
+        assert!(result.is_ok(), "NoopSemanticIndexPort::insert must always return Ok");
+    }
+
+    #[test]
+    fn test_noop_semantic_index_port_search_returns_empty_vec() {
+        let port = NoopSemanticIndexPort;
+        let embedding = vec![0.1_f32, 0.2, 0.3];
+        let top_k = TopK::new(5).expect("valid top_k");
+        let result = port.search(&embedding, top_k);
+        assert!(result.is_ok(), "NoopSemanticIndexPort::search must return Ok");
+        assert!(
+            result.unwrap().is_empty(),
+            "NoopSemanticIndexPort::search must return an empty Vec"
+        );
+    }
 
     // ── fragment_content_hash ─────────────────────────────────────────────────
 

@@ -87,10 +87,6 @@ pub struct DupIndexMeasureQualityArgs {
     /// Workspace root to scan for `*.rs` source files.
     #[arg(long, default_value = ".")]
     pub workspace_root: PathBuf,
-
-    /// Path to the local LanceDB semantic index database.
-    #[arg(long, default_value = ".semantic_index")]
-    pub db_path: PathBuf,
 }
 
 /// Execute `sotp dup-index <subcommand>`.
@@ -106,7 +102,6 @@ pub fn execute_dup_index(cmd: DupIndexCommand) -> ExitCode {
         DupIndexCommand::MeasureQuality(args) => {
             outcome_to_exit(app.semantic_dup_index_measure_quality(DupIndexMeasureQualityInput {
                 workspace_root: args.workspace_root,
-                db_path: args.db_path,
             }))
         }
     }
