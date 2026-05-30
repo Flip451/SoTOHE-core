@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # コード意味重複検出による DRY 防止（discoverability + soft gate）
 
-## Tasks (4/11 resolved)
+## Tasks (6/11 resolved)
 
 ### S1 — Domain value-object layer
 
@@ -28,8 +28,8 @@
 > T004 must precede T005 and T006; T005 and T006 can proceed in parallel once T004 lands.
 
 - [x] **T004**: Add infrastructure dependency declarations to `libs/infrastructure/Cargo.toml`: add `fastembed`, `ort`, and `lancedb` under `[dependencies]`. Verify that `libs/domain/Cargo.toml` and `libs/usecase/Cargo.toml` do NOT gain these dependencies. Run `cargo make check-layers` and `cargo make deny` to confirm AC-06 and AC-07 are satisfied before proceeding to adapter implementation. (`4eb4eddcff703cf48fe91150f0cea6f3eac3ee39`)
-- [~] **T005**: Implement `FastEmbedAdapter` in `libs/infrastructure/src/semantic_dup/embedding.rs`: `new()` loads Jina v2 base code model via fastembed-rs ONNX Runtime (synchronous, Tokio-independent); implement `EmbeddingPort::embed`. Model weights are obtained on-demand at first construction via fastembed-rs's built-in model cache (`~/.cache/huggingface/hub` or `FASTEMBED_CACHE_PATH`). Document the cache path in a `/// # Model Cache` doc comment so operators know where weights land. No network call at compile time; CI runs with `FASTEMBED_CACHE_PATH` pointing to a pre-populated volume mount (addressed by CI environment setup, not by this code task, per OS-07 deferral).
-- [~] **T006**: Implement `LanceDbSemanticIndexAdapter` in `libs/infrastructure/src/semantic_dup/index.rs`: `new(db_path)` opens or creates a LanceDB table at the given path (local file, no network); implement `SemanticIndexPort::insert` (stores fragment source_path + content + embedding vector) and `SemanticIndexPort::search` (ANN cosine similarity top-k query). Wire both new adapter modules into `libs/infrastructure/src/lib.rs` and expose them under `pub mod semantic_dup`.
+- [x] **T005**: Implement `FastEmbedAdapter` in `libs/infrastructure/src/semantic_dup/embedding.rs`: `new()` loads Jina v2 base code model via fastembed-rs ONNX Runtime (synchronous, Tokio-independent); implement `EmbeddingPort::embed`. Model weights are obtained on-demand at first construction via fastembed-rs's built-in model cache (`~/.cache/huggingface/hub` or `FASTEMBED_CACHE_PATH`). Document the cache path in a `/// # Model Cache` doc comment so operators know where weights land. No network call at compile time; CI runs with `FASTEMBED_CACHE_PATH` pointing to a pre-populated volume mount (addressed by CI environment setup, not by this code task, per OS-07 deferral). (`89776d5d7d46e985e56f5573afb14c659ad88b5a`)
+- [x] **T006**: Implement `LanceDbSemanticIndexAdapter` in `libs/infrastructure/src/semantic_dup/index.rs`: `new(db_path)` opens or creates a LanceDB table at the given path (local file, no network); implement `SemanticIndexPort::insert` (stores fragment source_path + content + embedding vector) and `SemanticIndexPort::search` (ANN cosine similarity top-k query). Wire both new adapter modules into `libs/infrastructure/src/lib.rs` and expose them under `pub mod semantic_dup`. (`89776d5d7d46e985e56f5573afb14c659ad88b5a`)
 
 ### S4 — Fragment extractor
 
@@ -37,7 +37,7 @@
 > Granularity is item-level (per-function / per-impl-block), documented in the extractor's doc comment.
 > This task depends on T001 (`CodeFragment` type) and T004 (infrastructure crate setup). The CLI (T008/T009) calls this extractor before constructing commands for the interactors.
 
-- [ ] **T007**: Implement the workspace Rust-file scanner and code-fragment extractor in `libs/infrastructure/src/semantic_dup/extractor.rs`. This is a standalone helper (no port implementation) that uses `std::fs` to walk a workspace root recursively, find `*.rs` files, and yield `Vec<CodeFragment>`. It is called by the CLI composition root (T008/T009) before constructing `BuildIndexCommand` or `MeasureQualityCommand`. IO errors from this extractor are propagated by the CLI; the CLI may wrap them in `BuildIndexError::Io` / `MeasureQualityError::Io` (defined in T002/T003). This task depends on T001 (`CodeFragment` type) and T004 (infrastructure dependency gating must be complete). Granularity decision (per this plan): one fragment per function or top-level `impl` block, extracted by splitting on `fn ` and `impl ` boundaries. Rationale: item-level granularity captures the semantic unit most likely to be re-implemented, without exploding index size. Document this choice in the extractor's `///` doc comment.
+- [~] **T007**: Implement the workspace Rust-file scanner and code-fragment extractor in `libs/infrastructure/src/semantic_dup/extractor.rs`. This is a standalone helper (no port implementation) that uses `std::fs` to walk a workspace root recursively, find `*.rs` files, and yield `Vec<CodeFragment>`. It is called by the CLI composition root (T008/T009) before constructing `BuildIndexCommand` or `MeasureQualityCommand`. IO errors from this extractor are propagated by the CLI; the CLI may wrap them in `BuildIndexError::Io` / `MeasureQualityError::Io` (defined in T002/T003). This task depends on T001 (`CodeFragment` type) and T004 (infrastructure dependency gating must be complete). Granularity decision (per this plan): one fragment per function or top-level `impl` block, extracted by splitting on `fn ` and `impl ` boundaries. Rationale: item-level granularity captures the semantic unit most likely to be re-implemented, without exploding index size. Document this choice in the extractor's `///` doc comment.
 
 ### S5 — CLI wiring
 

@@ -3,6 +3,40 @@
   "crate_name": "infrastructure",
   "layer": "infrastructure",
   "types": {
+    "ExtractError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "source", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup::extractor",
+      "docs": "Errors that can occur while scanning the workspace and extracting code fragments.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "c9c9cae2754b0c591fb1001c0364c594d01e91ffe6962b1bf0cde34c0b535d19"
+        },
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "9f985859bc7b67084798019f1ad88d673d31037c5e5fa6918a44f0199dd246c3"
+        }
+      ],
+      "informal_grounds": []
+    },
     "FastEmbedAdapter": {
       "action": "add",
       "role": "SecondaryAdapter",
@@ -51,7 +85,33 @@
     }
   },
   "traits": {},
-  "functions": {},
+  "functions": {
+    "infrastructure::semantic_dup::extractor::extract_code_fragments": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "workspace_root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<Vec<domain::semantic_dup::CodeFragment>, ExtractError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Walk workspace_root recursively, collect every *.rs file, and split each file into item-level CodeFragment values (one per fn or impl block). Called by the CLI composition root before constructing BuildIndexCommand or MeasureQualityCommand.",
+      "spec_refs": [
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-04",
+          "hash": "c9c9cae2754b0c591fb1001c0364c594d01e91ffe6962b1bf0cde34c0b535d19"
+        },
+        {
+          "file": "track/items/semantic-dup-detection-2026-05-29/spec.json",
+          "anchor": "IN-05",
+          "hash": "9f985859bc7b67084798019f1ad88d673d31037c5e5fa6918a44f0199dd246c3"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [
     {
       "type_name": "FastEmbedAdapter",
@@ -87,6 +147,21 @@
     }
   ],
   "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ExtractError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ExtractError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ExtractError"
+    },
     {
       "trait_ref": "usecase::semantic_dup::EmbeddingPort",
       "for_type": "FastEmbedAdapter"

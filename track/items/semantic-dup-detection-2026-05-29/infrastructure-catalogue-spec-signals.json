@@ -1,13 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ce7295013b42e491793234e23b5f5e3f6de19012b747774b0e3085ae28ce4ce4",
+  "catalogue_declaration_hash": "21e551fc0286b20149d1863c9018b230d7f7276bf9f774568ff4488d1b384462",
   "signals": [
+    {
+      "type_name": "ExtractError",
+      "signal": "blue"
+    },
     {
       "type_name": "FastEmbedAdapter",
       "signal": "blue"
     },
     {
       "type_name": "LanceDbSemanticIndexAdapter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
       "signal": "blue"
     }
   ]

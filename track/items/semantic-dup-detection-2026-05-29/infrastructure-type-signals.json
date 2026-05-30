@@ -1,8 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-30T03:53:15Z",
-  "declaration_hash": "ce7295013b42e491793234e23b5f5e3f6de19012b747774b0e3085ae28ce4ce4",
+  "generated_at": "2026-05-30T04:11:32Z",
+  "declaration_hash": "21e551fc0286b20149d1863c9018b230d7f7276bf9f774568ff4488d1b384462",
   "signals": [
+    {
+      "type_name": "ExtractError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
     {
       "type_name": "FastEmbedAdapter",
       "kind_tag": "secondary_adapter",
@@ -23,6 +34,12 @@
         "core::fmt::Debug",
         "core::ops::drop::Drop"
       ]
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }
