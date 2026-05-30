@@ -28,6 +28,43 @@ pub struct DupIndexBuildInput {
 /// pointed `--db-path` at.
 const LANCEDB_TABLE_MARKER: &str = "fragments.lance";
 
+/// Hidden file written at the root of every index directory this tool creates.
+///
+/// This is a tool-ownership marker: it proves that a given directory (the
+/// deterministic `.{name}.tmp-build` temp dir or `.{name}.old` backup) was
+/// created by `sotp dup-index build`, not by an unrelated LanceDB database that
+/// happens to reside at the same deterministic sibling path.  Any recognizable
+/// LanceDB index (i.e. one that passes `is_recognizable_lancedb_index`) that
+/// lacks this file is treated as foreign and is never auto-restored or
+/// auto-deleted by this tool.
+const OWNERSHIP_MARKER: &str = ".sotp-semantic-dup-index";
+
+/// Return `true` when `dir` was created by this tool.
+///
+/// Two conditions must both hold:
+///
+/// 1. `dir` itself is a real directory (not a symlink).  `std::fs::symlink_metadata` is
+///    used so that a symlink at `dir` — even one pointing at a real directory that
+///    contains the ownership marker — does NOT count as tool-owned.  The tool never
+///    creates these deterministic sibling paths as symlinks, so a symlink there is a
+///    foreign artefact that must not be touched.
+///
+/// 2. `dir/OWNERSHIP_MARKER` exists AND is a regular file.  A symlink at the marker
+///    path — even one pointing to a file — does NOT count as owned.
+///    `std::fs::symlink_metadata` is used so that a broken symlink at the marker path
+///    also returns `false` (no bypass).
+fn is_tool_owned_index(dir: &Path) -> bool {
+    // Condition 1: `dir` itself must be a real directory (not a symlink).
+    match std::fs::symlink_metadata(dir) {
+        Ok(m) if m.file_type().is_dir() => {}
+        _ => return false,
+    }
+    // Condition 2: `dir/OWNERSHIP_MARKER` must be a regular file.
+    std::fs::symlink_metadata(dir.join(OWNERSHIP_MARKER))
+        .map(|m| m.file_type().is_file())
+        .unwrap_or(false)
+}
+
 /// Return `true` when `db_path` looks like a LanceDB index previously
 /// created by this tool.
 ///
@@ -155,10 +192,11 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
 
         // Remove any stale backup from a prior run before renaming the current
         // index aside — avoids a failure if the old backup still exists.
-        // Only remove it when it is a recognizable LanceDB index (our own stale
-        // backup from a crashed run).  If something unrelated already occupies
-        // that path, refuse to clobber it and ask the user to resolve the
-        // conflict manually.
+        // Only remove it when it is TOOL-OWNED (has the OWNERSHIP_MARKER file we
+        // wrote during the build), confirming we created it.  A recognizable
+        // LanceDB index at the backup path that lacks the marker is a foreign
+        // database that happens to sit at our deterministic sibling path; refuse
+        // to clobber it and ask the user to resolve the conflict manually.
         //
         // Use `symlink_metadata` (does NOT follow symlinks) so that a broken
         // symlink at `backup_path` also triggers the guard.  `Path::exists()`
@@ -166,14 +204,14 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
         // guard and let the subsequent `rename(db_path, backup_path)` overwrite
         // the symlink entry — an unrelated user artefact.
         if std::fs::symlink_metadata(&backup_path).is_ok() {
-            if !is_recognizable_lancedb_index(&backup_path) {
+            if !is_tool_owned_index(&backup_path) {
                 return Err(format!(
-                    "the path '{}' already exists and does not appear to be a \
-                     LanceDB index (missing '{}' marker); refusing to overwrite \
-                     it to prevent data loss. \
+                    "the path '{}' already exists but is not owned by this tool \
+                     (missing '{}' ownership marker); refusing to overwrite it to \
+                     prevent data loss. \
                      Please remove or rename '{}' manually and retry.",
                     backup_path.display(),
-                    LANCEDB_TABLE_MARKER,
+                    OWNERSHIP_MARKER,
                     backup_path.display(),
                 ));
             }
@@ -181,6 +219,21 @@ fn commit_rebuilt_index(temp_path: &Path, db_path: &Path) -> Result<(), String> 
                 format!("failed to remove stale backup at {}: {e}", backup_path.display())
             })?;
         }
+
+        // Write the ownership marker into the existing index before renaming it
+        // to the backup path.  A tool-owned backup is required for crash recovery
+        // (Step 1b checks `is_tool_owned_index(&crash_backup)`).  If `db_path`
+        // was already built by this tool it already has the marker; writing it
+        // again is idempotent.  For a legacy index (built before this marker was
+        // introduced) the marker is stamped now so the backup is recoverable.
+        //
+        // This is a hard error, not best-effort: if the write fails (e.g. the
+        // index directory is read-only), we must NOT proceed with the rename —
+        // an unowned backup left on disk after a crash would not be restored by
+        // Step 1b, breaking the non-destructive rebuild guarantee.
+        std::fs::write(db_path.join(OWNERSHIP_MARKER), b"sotp-semantic-dup\n").map_err(|e| {
+            format!("failed to write ownership marker in existing index {}: {e}", db_path.display())
+        })?;
 
         // Rename current index → backup.
         std::fs::rename(db_path, &backup_path).map_err(|e| {
@@ -270,18 +323,20 @@ impl CliApp {
 
         // Step 1b: Recover from a crash that occurred between the two renames in
         // `commit_rebuilt_index`.  If `db_path` is absent but the deterministic
-        // backup sibling exists AND it is a recognizable LanceDB index, rename
-        // the backup back so the old index is restored before we proceed with a
-        // fresh rebuild.
+        // backup sibling exists AND it is TOOL-OWNED (has the OWNERSHIP_MARKER
+        // file we wrote), rename the backup back so the old index is restored
+        // before we proceed with a fresh rebuild.
         //
-        // If `.old` exists but is NOT a recognizable LanceDB index, it is
-        // unrelated user data that happened to occupy that path.  Leave it
-        // completely untouched — `db_path` being absent is a valid fresh-build
-        // state in this case.
+        // Ownership (OWNERSHIP_MARKER) is required — not just recognizability —
+        // because ANY LanceDB database has a `fragments.lance/` dir.  An
+        // unrelated LanceDB index that happens to sit at the deterministic
+        // `.{name}.old` path must NOT be restored into `db_path`.  If `.old`
+        // exists but is NOT tool-owned, leave it completely untouched — an
+        // absent `db_path` is a valid fresh-build state in that case.
         let crash_backup = backup_path_for(&input.db_path)?;
         if !input.db_path.exists()
-            && crash_backup.exists()
-            && is_recognizable_lancedb_index(&crash_backup)
+            && std::fs::symlink_metadata(&crash_backup).is_ok()
+            && is_tool_owned_index(&crash_backup)
         {
             std::fs::rename(&crash_backup, &input.db_path).map_err(|e| {
                 format!(
@@ -302,22 +357,24 @@ impl CliApp {
         // symlink at `temp_path` also triggers the guard — `Path::exists()`
         // returns `false` for broken symlinks and would silently bypass it.
         //
-        // Only remove the stale temp dir when it is a recognizable LanceDB
-        // index (our own leftover from a prior crashed build).  If an unrelated
-        // directory or file already occupies `.{name}.tmp-build`, refuse to
-        // clobber it and ask the user to resolve the conflict manually.  This
-        // mirrors the same guard applied to the `.old` backup in
-        // `commit_rebuilt_index`.
+        // Only remove the stale temp dir when it is TOOL-OWNED (has the
+        // OWNERSHIP_MARKER file we wrote during the prior build).  Ownership
+        // is required — not just recognizability — because ANY LanceDB database
+        // has a `fragments.lance/` dir, so a foreign database sitting at the
+        // deterministic `.{name}.tmp-build` path would otherwise be deleted.
+        // If something unrelated occupies that path (foreign LanceDB index or
+        // arbitrary file/dir), refuse to clobber it and ask the user to resolve
+        // the conflict manually.
         if std::fs::symlink_metadata(&temp_path).is_ok() {
-            if !is_recognizable_lancedb_index(&temp_path) {
+            if !is_tool_owned_index(&temp_path) {
                 return Err(format!(
-                    "the path '{}' already exists and does not appear to be a \
-                     LanceDB index (missing '{}' marker); refusing to delete it \
-                     to prevent data loss. \
+                    "the path '{}' already exists but is not owned by this tool \
+                     (missing '{}' ownership marker); refusing to delete it to \
+                     prevent data loss. \
                      Please remove or rename '{}' manually, or choose a \
                      --db-path whose sibling '{}' does not collide.",
                     temp_path.display(),
-                    LANCEDB_TABLE_MARKER,
+                    OWNERSHIP_MARKER,
                     temp_path.display(),
                     temp_path.display(),
                 ));
@@ -385,13 +442,32 @@ impl CliApp {
 
         let fragment_count = fragments.len();
 
+        // Create the temp directory and write the ownership marker BEFORE invoking
+        // LanceDB.  This closes the crash window that existed when the marker was
+        // written only after a successful build: if the process was killed after
+        // LanceDB had created `fragments.lance/` inside `temp_path` but before the
+        // marker write completed, the next run would see a recognizable (has
+        // `fragments.lance/`) but unowned temp dir and Step 3 would refuse to clean
+        // it up, blocking all subsequent rebuilds until manual intervention.
+        //
+        // With the marker written first, any crash state left in `temp_path` is
+        // tool-owned and Step 3 will remove it on the next run.  The zero-fragment
+        // early-return above exits before this point, so no marker is written (and
+        // no `temp_path` is created) when there is nothing to build.
+        std::fs::create_dir_all(temp_path).map_err(|e| {
+            format!("failed to create temp build directory {}: {e}", temp_path.display())
+        })?;
+        std::fs::write(temp_path.join(OWNERSHIP_MARKER), b"sotp-semantic-dup\n").map_err(|e| {
+            format!("failed to write ownership marker in {}: {e}", temp_path.display())
+        })?;
+
         let embedding_port = Arc::new(
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
 
         // Build into temp_path.  The adapter is scoped here so it is dropped
         // (connection closed, data flushed) before the rename swap below.
-        let build_result = {
+        {
             let index_port =
                 Arc::new(LanceDbSemanticIndexAdapter::new(temp_path.to_path_buf()).map_err(
                     |e| format!("failed to open temp index at {}: {e}", temp_path.display()),
@@ -402,9 +478,9 @@ impl CliApp {
             interactor
                 .build_index(&BuildIndexCommand { fragments })
                 .map_err(|e| format!("build-index failed: {e}"))
-        }; // `index_port` (and the Arc inside) is dropped here.
+        }?; // `index_port` (and the Arc inside) is dropped here.
 
-        build_result.map(|_| fragment_count)
+        Ok(fragment_count)
     }
 }
 
@@ -418,10 +494,20 @@ mod tests {
 
     /// Create a directory that looks like a LanceDB index (contains the
     /// `fragments.lance/` marker subdirectory plus a sentinel file).
+    ///
+    /// NOTE: does NOT write the ownership marker.  Use `create_tool_owned_index`
+    /// when the index should also carry the `OWNERSHIP_MARKER` file.
     fn create_fake_lancedb_index(db_path: &std::path::Path) {
         std::fs::create_dir_all(db_path.join(LANCEDB_TABLE_MARKER)).unwrap();
         // Sentinel file lets tests verify tree content after swaps.
         std::fs::write(db_path.join("stale.txt"), "stale").unwrap();
+    }
+
+    /// Create a directory that looks like a tool-owned LanceDB index: the
+    /// `fragments.lance/` marker plus the `OWNERSHIP_MARKER` regular file.
+    fn create_tool_owned_index(db_path: &std::path::Path) {
+        create_fake_lancedb_index(db_path);
+        std::fs::write(db_path.join(OWNERSHIP_MARKER), b"sotp-semantic-dup\n").unwrap();
     }
 
     #[test]
@@ -605,10 +691,10 @@ mod tests {
         let db_path = dir.path().join("index.db");
         let temp_path = dir.path().join(".index.db.tmp-build");
 
-        // Place a recognizable stale temp dir (simulates a leftover from a
-        // previous crash — it has the `fragments.lance/` marker because the
-        // prior run built into it before crashing).
-        create_fake_lancedb_index(&temp_path);
+        // Place a tool-owned stale temp dir (simulates a leftover from a
+        // previous crash — it has the `fragments.lance/` marker AND the
+        // ownership marker because the prior run built into it before crashing).
+        create_tool_owned_index(&temp_path);
         std::fs::write(temp_path.join("stale_temp.txt"), "stale").unwrap();
 
         let app = crate::CliApp;
@@ -617,10 +703,10 @@ mod tests {
         let outcome = app.semantic_dup_index_build(input).unwrap();
         // Zero-fragment build succeeds.
         assert_eq!(outcome.exit_code, 0);
-        // Recognizable stale temp dir must be cleaned up.
+        // Tool-owned stale temp dir must be cleaned up.
         assert!(
             !temp_path.exists(),
-            "recognizable stale temp dir must be removed before build starts"
+            "tool-owned stale temp dir must be removed before build starts"
         );
         // db_path was absent and zero fragments were found → must still be absent.
         assert!(!db_path.exists(), "db_path must not be created when no fragments are indexed");
@@ -650,14 +736,14 @@ mod tests {
             DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
         let result = app.semantic_dup_index_build(input);
 
-        // Must return Err — refuse to delete unrecognized data.
+        // Must return Err — refuse to delete data not owned by this tool.
         assert!(
             result.is_err(),
             "build must return Err when unrecognized dir occupies the temp path"
         );
         let msg = result.unwrap_err();
         assert!(
-            msg.contains("does not appear to be a LanceDB index"),
+            msg.contains("not owned by this tool"),
             "error message must explain the rejection, got: {msg}"
         );
 
@@ -678,8 +764,8 @@ mod tests {
         let db_path = dir.path().join("index.db");
         let backup_path = dir.path().join(".index.db.old");
 
-        // Simulate crash state: db_path is absent, backup is present.
-        create_fake_lancedb_index(&backup_path);
+        // Simulate crash state: db_path is absent, backup is present and tool-owned.
+        create_tool_owned_index(&backup_path);
         std::fs::write(backup_path.join("crash_sentinel.txt"), "crash").unwrap();
         assert!(!db_path.exists(), "pre-condition: db_path must be absent");
         assert!(backup_path.exists(), "pre-condition: backup must be present");
@@ -845,8 +931,8 @@ mod tests {
         create_fake_lancedb_index(&db_path);
         std::fs::write(db_path.join("current_sentinel.txt"), "current").unwrap();
 
-        // Recognizable stale backup — this is our own leftover from a prior crash.
-        create_fake_lancedb_index(&stale_backup);
+        // Tool-owned stale backup — this is our own leftover from a prior crash.
+        create_tool_owned_index(&stale_backup);
         std::fs::write(stale_backup.join("stale_sentinel.txt"), "stale_backup").unwrap();
 
         // temp = recognizable fake index with new content.
@@ -867,8 +953,242 @@ mod tests {
             "db_path must contain the newly built content"
         );
         // Stale backup must be gone (removed during swap).
-        assert!(!stale_backup.exists(), "recognizable stale backup must be removed during swap");
+        assert!(!stale_backup.exists(), "tool-owned stale backup must be removed during swap");
         // Temp path must be gone.
         assert!(!temp_path.exists(), "temp_path must be removed after successful swap");
+    }
+
+    // ── is_tool_owned_index: unit tests ─────────────────────────────────────
+
+    #[test]
+    fn test_is_tool_owned_index_returns_true_when_marker_is_regular_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let index_path = dir.path().join("my.db");
+        create_tool_owned_index(&index_path);
+        assert!(
+            is_tool_owned_index(&index_path),
+            "is_tool_owned_index must return true when OWNERSHIP_MARKER is a regular file"
+        );
+    }
+
+    #[test]
+    fn test_is_tool_owned_index_returns_false_when_marker_absent() {
+        let dir = tempfile::tempdir().unwrap();
+        let index_path = dir.path().join("my.db");
+        // Recognizable index without ownership marker.
+        create_fake_lancedb_index(&index_path);
+        assert!(
+            !is_tool_owned_index(&index_path),
+            "is_tool_owned_index must return false when OWNERSHIP_MARKER is absent"
+        );
+    }
+
+    #[test]
+    fn test_is_tool_owned_index_returns_false_when_marker_is_a_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        let index_path = dir.path().join("my.db");
+        create_fake_lancedb_index(&index_path);
+        // Create the ownership marker path as a directory instead of a file.
+        std::fs::create_dir_all(index_path.join(OWNERSHIP_MARKER)).unwrap();
+        assert!(
+            !is_tool_owned_index(&index_path),
+            "is_tool_owned_index must return false when OWNERSHIP_MARKER is a directory"
+        );
+    }
+
+    /// A symlink at `dir` that points to a real tool-owned directory must NOT count
+    /// as tool-owned.  The tool never creates the deterministic sibling paths as
+    /// symlinks, so a symlink there is a foreign artefact that must not be touched.
+    #[cfg(unix)]
+    #[test]
+    fn test_is_tool_owned_index_returns_false_when_dir_itself_is_a_symlink() {
+        let dir = tempfile::tempdir().unwrap();
+        // Create a real tool-owned index at `real_index`.
+        let real_index = dir.path().join("real.db");
+        create_tool_owned_index(&real_index);
+        // Create a symlink at `symlink_index` pointing to `real_index`.
+        let symlink_index = dir.path().join("symlink.db");
+        std::os::unix::fs::symlink(&real_index, &symlink_index).unwrap();
+        // Verify the test precondition.
+        assert!(
+            real_index.join(OWNERSHIP_MARKER).exists(),
+            "pre-condition: real index must have ownership marker"
+        );
+        assert!(
+            symlink_index.symlink_metadata().unwrap().file_type().is_symlink(),
+            "pre-condition: symlink_index must be a symlink"
+        );
+        // Even though the symlink points to a tool-owned directory, the symlink
+        // itself is not a real directory — it must not be treated as tool-owned.
+        assert!(
+            !is_tool_owned_index(&symlink_index),
+            "is_tool_owned_index must return false when dir itself is a symlink"
+        );
+    }
+
+    // ── Ownership semantics: crash-recovery guards ───────────────────────────
+
+    #[test]
+    fn test_crash_recovery_does_not_restore_recognizable_but_unowned_old() {
+        // Step 1b: a recognizable `.old` that lacks OWNERSHIP_MARKER must NOT be
+        // restored into `db_path`.  `db_path` absent + unowned `.old` →
+        // `.old` and its sentinel survive untouched; build proceeds normally.
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        // workspace has no .rs files → zero-fragment build
+        let db_path = dir.path().join("index.db");
+        let old_path = dir.path().join(".index.db.old");
+
+        // Place a recognizable (has fragments.lance/) but NOT tool-owned `.old`.
+        create_fake_lancedb_index(&old_path);
+        std::fs::write(old_path.join("foreign_sentinel.txt"), "foreign_data").unwrap();
+        assert!(!db_path.exists(), "pre-condition: db_path must be absent");
+        assert!(old_path.exists(), "pre-condition: .old must be present");
+        assert!(!is_tool_owned_index(&old_path), "pre-condition: .old must NOT be tool-owned");
+
+        let app = crate::CliApp;
+        let input =
+            DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
+        let outcome = app.semantic_dup_index_build(input).unwrap();
+        assert_eq!(outcome.exit_code, 0, "zero-fragment build must succeed");
+
+        // `.old` and its sentinel must survive completely untouched.
+        assert!(old_path.exists(), "unowned recognizable .old must NOT be restored/deleted");
+        assert!(
+            old_path.join("foreign_sentinel.txt").exists(),
+            "sentinel file inside unowned .old must be preserved"
+        );
+        assert!(
+            old_path.join(LANCEDB_TABLE_MARKER).exists(),
+            "LanceDB marker inside unowned .old must be preserved"
+        );
+        // db_path must remain absent (no restore occurred).
+        assert!(!db_path.exists(), "db_path must remain absent when unowned .old was skipped");
+    }
+
+    #[test]
+    fn test_crash_recovery_restores_tool_owned_old_to_db_path() {
+        // Step 1b: a tool-owned `.old` MUST be restored into `db_path`.
+        // `db_path` absent + tool-owned `.old` →
+        // `.old` content is renamed back to `db_path`.
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        // workspace has no .rs files → zero-fragment build (db_path preserved after restore)
+        let db_path = dir.path().join("index.db");
+        let old_path = dir.path().join(".index.db.old");
+
+        // Place a tool-owned `.old` simulating a mid-swap crash.
+        create_tool_owned_index(&old_path);
+        std::fs::write(old_path.join("restored_sentinel.txt"), "restored_data").unwrap();
+        assert!(!db_path.exists(), "pre-condition: db_path must be absent");
+        assert!(old_path.exists(), "pre-condition: .old must be present");
+        assert!(is_tool_owned_index(&old_path), "pre-condition: .old must be tool-owned");
+
+        let app = crate::CliApp;
+        let input =
+            DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
+        let outcome = app.semantic_dup_index_build(input).unwrap();
+        assert_eq!(outcome.exit_code, 0, "build must succeed after crash recovery");
+
+        // The `.old` content must have been moved to `db_path`.
+        assert!(db_path.exists(), "db_path must exist after crash-recovery restore");
+        assert!(
+            db_path.join("restored_sentinel.txt").exists(),
+            "restored db_path must contain the original content"
+        );
+        assert!(!old_path.exists(), "tool-owned .old must be gone after restore");
+    }
+
+    // ── Ownership semantics: commit_rebuilt_index guards ─────────────────────
+
+    #[test]
+    fn test_commit_rebuilt_index_returns_err_and_preserves_recognizable_unowned_old() {
+        // `backup_path` exists + is recognizable (has fragments.lance/) but NOT
+        // tool-owned → commit_rebuilt_index must return Err and leave it intact.
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+        let backup_path = dir.path().join(".index.db.old");
+
+        // Existing db_path.
+        create_fake_lancedb_index(&db_path);
+        std::fs::write(db_path.join("current_sentinel.txt"), "current").unwrap();
+
+        // Recognizable but NOT tool-owned backup at the deterministic sibling path.
+        create_fake_lancedb_index(&backup_path);
+        std::fs::write(backup_path.join("foreign_sentinel.txt"), "foreign_data").unwrap();
+
+        // temp = tool-owned fake index.
+        create_tool_owned_index(&temp_path);
+        std::fs::write(temp_path.join("new_marker.txt"), "new").unwrap();
+
+        let result = commit_rebuilt_index(&temp_path, &db_path);
+        assert!(
+            result.is_err(),
+            "commit_rebuilt_index must return Err for recognizable-but-unowned backup_path"
+        );
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("not owned by this tool"),
+            "error message must mention ownership, got: {msg}"
+        );
+
+        // The unowned backup must be completely preserved.
+        assert!(backup_path.exists(), "unowned recognizable backup_path must not be deleted");
+        assert!(
+            backup_path.join("foreign_sentinel.txt").exists(),
+            "sentinel inside unowned backup_path must be preserved"
+        );
+        // db_path must remain intact (rename aside must not have occurred).
+        assert!(db_path.exists(), "db_path must be preserved when Err is returned");
+        assert!(
+            db_path.join("current_sentinel.txt").exists(),
+            "db_path content must be untouched when Err is returned"
+        );
+    }
+
+    // ── Ownership semantics: Step 3 tmp-build guard ──────────────────────────
+
+    #[test]
+    fn test_step3_returns_err_and_preserves_recognizable_unowned_tmp_build() {
+        // Step 3: `temp_path` exists + is recognizable (has fragments.lance/) but
+        // NOT tool-owned → build must return Err and leave it intact.
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        let db_path = dir.path().join("index.db");
+        let temp_path = dir.path().join(".index.db.tmp-build");
+
+        // Recognizable (has fragments.lance/) but NOT tool-owned at temp path.
+        create_fake_lancedb_index(&temp_path);
+        std::fs::write(temp_path.join("foreign_sentinel.txt"), "foreign_data").unwrap();
+        assert!(!is_tool_owned_index(&temp_path), "pre-condition: temp_path must NOT be owned");
+
+        let app = crate::CliApp;
+        let input =
+            DupIndexBuildInput { workspace_root: workspace_root.clone(), db_path: db_path.clone() };
+        let result = app.semantic_dup_index_build(input);
+        assert!(
+            result.is_err(),
+            "build must return Err when recognizable-but-unowned dir occupies temp_path"
+        );
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("not owned by this tool"),
+            "error message must mention ownership, got: {msg}"
+        );
+
+        // temp_path and its sentinel must survive untouched.
+        assert!(temp_path.exists(), "unowned recognizable temp_path must NOT be deleted");
+        assert!(
+            temp_path.join("foreign_sentinel.txt").exists(),
+            "sentinel inside unowned temp_path must be preserved"
+        );
+        assert!(
+            temp_path.join(LANCEDB_TABLE_MARKER).exists(),
+            "LanceDB marker inside unowned temp_path must be preserved"
+        );
     }
 }

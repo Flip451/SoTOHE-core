@@ -1,534 +1,159 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
-          "at": "2026-05-30T01:11:34Z"
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:32:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
-          "at": "2026-05-30T01:33:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`search()` interprets LanceDB results as cosine similarity (`1.0 - _distance`, then clamp to `[0,1]`), but the query never sets `DistanceType::Cosine`. LanceDB `vector_search` defaults to L2, so this adapter will rank by L2 while reporting cosine-based scores, which can collapse most results to `0.0` and makes the returned similarities incorrect.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 182,
-              "category": "incorrect metric"
-            },
-            {
-              "message": "`search()` treats any `open_table()` failure as “table missing” and returns `Ok(Vec::new())`. That silently hides real storage errors such as permission failures, corruption, or schema problems; only `TableNotFound` should be converted to an empty result set.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 177,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:1fd1efa920d3b055df9ccb303a9bd98f52cbc69bad79be2f5288b0a10fec65aa",
-          "at": "2026-05-30T02:47:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`LanceDbSemanticIndexAdapter` calls `Runtime::block_on` in `new`, `insert`, and `search`. Tokio documents that `block_on` panics when invoked from an async execution context, so constructing or using this adapter from async code will crash instead of returning `SemanticIndexError`. That is a panic path in library code.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 67,
-              "category": "panic"
-            },
-            {
-              "message": "The first-insert path is a non-atomic `open_table(...); if missing -> create_table(...)` sequence. Because `insert` is `&self` and the adapter is `Send + Sync`, two callers can race on an empty database: both observe \"table not found\", one creates the table, and the other fails with a spurious `TableAlreadyExists`/`InsertFailed`, dropping the insert. Use LanceDB's create-if-exists mode or retry on table-exists.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 133,
-              "category": "concurrency"
-            }
-          ],
-          "hash": "rvw1:sha256:9e4bb28eb383e2399ffb0f9ed55091a57d24e921434b9de8e474898b61d5baae",
-          "at": "2026-05-30T02:57:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`std::thread::spawn` panics if the OS cannot create a new thread, so this helper can crash the library instead of returning a `Result`. The same pattern also appears in `new()` at line 83, which means `insert`/`search` inherit an unrecoverable panic path under thread-exhaustion or spawn failure.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 134,
-              "category": "panic"
-            },
-            {
-              "message": "`to_string_lossy()` silently rewrites non-UTF-8 paths, so `new()` can open/create the wrong LanceDB directory on Unix, and `insert()` stores `source_path` values that cannot round-trip back to the original `PathBuf`. That loses user data for any fragment or database path containing invalid UTF-8 bytes.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 81,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d92b96f8b0bc2e4511f413e48e64a24e410db5cc6b46a8d5d074e6e917a93a90",
-          "at": "2026-05-30T03:11:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "A `current_thread` Tokio runtime is paired with `Handle::block_on` in both `new()` and `block_on_thread()`, but `Handle::block_on` does not drive a current-thread runtime. LanceDB's async `connect`/`open_table`/`add`/`search` futures will not make progress unless some thread is concurrently calling `Runtime::block_on`, so this adapter can hang or fail at startup and on every index operation.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 73,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:d92b96f8b0bc2e4511f413e48e64a24e410db5cc6b46a8d5d074e6e917a93a90",
-          "at": "2026-05-30T03:12:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac26e7c4f8c06563324fdf65c81e692f4638d1babdac54e3f43731c873fafc68",
-          "at": "2026-05-30T03:19:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`is_table_not_found` does not match LanceDB's actual missing-table error text (`Table '{name}' was not found`), so the fresh-database path never triggers. As a result, the intended first-run behavior in `insert` and `search` is broken: both will surface `InsertFailed`/`SearchFailed` instead of creating the table or returning an empty result set. Match `lancedb::Error::TableNotFound` directly instead of substring-searching `to_string()`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 343,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ac26e7c4f8c06563324fdf65c81e692f4638d1babdac54e3f43731c873fafc68",
-          "at": "2026-05-30T03:20:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35c313ed30b50f8c363ab92352beeb829b1b2ce663bd2b76cfa8f5a74497e097",
-          "at": "2026-05-30T03:28:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`LanceDbSemanticIndexAdapter` owns a `tokio::runtime::Runtime` directly, but the adapter is explicitly made safe to construct and call from an existing Tokio executor by using bridge threads. If such an adapter is dropped inside that async context, Tokio's runtime destructor can panic while shutting down its blocking pool. This leaves a library-level panic path despite the no-panics rule; store the runtime in an `Option` and move/shutdown it from a non-runtime thread in `Drop`, or otherwise avoid owning a `Runtime` with normal in-context destruction.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 48,
-              "category": "panic"
-            },
-            {
-              "message": "`FastEmbedAdapter::new` does not honor the documented/plan-required `FASTEMBED_CACHE_PATH` cache override. The code uses `InitOptions::new(...)` without `with_cache_dir`, and fastembed 5.14's built-in lookup uses `FASTEMBED_CACHE_DIR`/`HF_HOME` instead, so CI or operators following this adapter's docs will have their pre-populated cache ignored and may trigger a runtime model download into the default cache location.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 49,
-              "category": "configuration"
-            }
-          ],
-          "hash": "rvw1:sha256:35c313ed30b50f8c363ab92352beeb829b1b2ce663bd2b76cfa8f5a74497e097",
-          "at": "2026-05-30T03:33:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e5cbba62cfc7ecba261d5cb56e6ad5a0217f68f429b303e2a99827d088b2cc6",
-          "at": "2026-05-30T03:41:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:071d1a8b3d1999a802a7e3c30ba8a17ad44c7c2527de4c6f4257886cf1595f82",
-          "at": "2026-05-30T04:05:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:071d1a8b3d1999a802a7e3c30ba8a17ad44c7c2527de4c6f4257886cf1595f82",
-          "at": "2026-05-30T04:10:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:73edc67561b2755a0f038b56811b9d4aa23642eaf81ddc5dfa60752aecd57b97",
-          "at": "2026-05-30T04:55:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The round-trip test inserts `frag_b` with `emb_b` but never searches with `emb_b`, even though the test and briefing require verifying that each inserted fragment is returned as the top match for its own embedding. As written, a regression where only the first queried vector path works would still pass this coverage, so add the symmetric `adapter.search(&emb_b, TopK::new(2)...)` assertion for `src/b.rs`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/tests/semantic_dup_index.rs",
-              "line": 51,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:73edc67561b2755a0f038b56811b9d4aa23642eaf81ddc5dfa60752aecd57b97",
-          "at": "2026-05-30T04:58:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0c5bc5a355eef25052c6cbef52fcc3c0ab9266fa6ff5ae828bb9fac625851b4",
-          "at": "2026-05-30T05:00:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`is_item_boundary` still misses real Rust items like `extern \"C\" fn` / `pub extern \"C\" fn`: after consuming `extern`, the ABI string becomes the next token and the function boundary is not detected, so those files will not be split at the correct item start.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/extractor.rs",
-              "line": 227,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e280adb14f9fa2b7b9656dbc70baeeba9fb729c9e554739de35dc6b4c3b2d8a1",
-          "at": "2026-05-30T05:43:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:889804f4ea7a97b2324a62aba2fa2f6c8dc8b329da9475b41e086b120ad28ab9",
-          "at": "2026-05-30T05:48:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:889804f4ea7a97b2324a62aba2fa2f6c8dc8b329da9475b41e086b120ad28ab9",
-          "at": "2026-05-30T05:50:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`expected_model_onnx_path()` is checking the wrong cache layout for fastembed/hf-hub. The real cache path for a populated model is `models--<repo>/snapshots/<commit>/onnx/model.onnx`, not `{cache}/models--<repo>/onnx/model.onnx`, and `pull_from_hf()` can also switch the cache root to `HF_HOME`. As written, `FastEmbedAdapter::new()` will reject a valid pre-populated cache instead of only failing when the model is actually absent, and the offline preflight does not reliably match the loader's real cache location.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 87,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:55df936f747c2b6ba16222ceabe374f29428d26395b628ed6578bead9cf3b75f",
-          "at": "2026-05-30T06:36:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_cache_dir()` only consults `FASTEMBED_CACHE_DIR`, but fastembed's loader path still honors `HF_HOME` when it is set. That means `FastEmbedAdapter::new()` can preflight one cache root and initialize `TextEmbedding` against another, so a valid offline cache may be rejected or a runtime fetch can still happen.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 78,
-              "category": "correctness"
-            },
-            {
-              "message": "The new tests only exercise `model_snapshots_dir` / `model_onnx_exists_in_cache`; they never call `FastEmbedAdapter::new()` on an empty temp cache or a populated cache. The changed public behavior is therefore still unverified, which leaves the offline-preflight path free to regress silently.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 243,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:4eb78c25c36d91738abbf44c127a5d1cadaa16c96f2cd74edbcbe6d6ffa8b9f9",
-          "at": "2026-05-30T06:46:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This check can return true for any stale `snapshots/<commit>/onnx/model.onnx` directory, but hf-hub resolves the active file via `refs/<revision>` before looking in `snapshots/` (`hf-hub-0.5.0/src/lib.rs:141-147`). If the cached snapshot is not the one pointed to by `refs/main`, `FastEmbedAdapter::new()` will still fall through to `TextEmbedding::try_new()` and can hit the network. The offline preflight needs to validate the revision-selected snapshot, not just any snapshot.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 130,
-              "category": "correctness"
-            },
-            {
-              "message": "Even when this preflight passes, `TextEmbedding::try_new()` still loads tokenizer/config assets from Hugging Face (`load_tokenizer_hf_hub(...)`), so a cache containing only `onnx/model.onnx` is not enough to keep `FastEmbedAdapter::new()` offline. That means the constructor can still perform runtime downloads unless the tokenizer files are also preflighted or the loader path is changed to be fully local-only.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 199,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7fa9eceab2ed1e3e8963a913103ef68eb60ca6b461bf72101298eb52e106e0ec",
-          "at": "2026-05-30T06:53:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Using `HF_HOME/hub` here does not match fastembed 5.14's `pull_from_hf`, which forwards `HF_HOME` itself as the cache dir. A cache populated under the actual `HF_HOME` root will be treated as missing and `FastEmbedAdapter::new()` will fail even though the model is present.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 107,
-              "category": "correctness"
-            },
-            {
-              "message": "The offline preflight only checks `onnx/model.onnx` and `tokenizer.json`, but `TextEmbedding::try_new()` still calls `load_tokenizer_hf_hub()`, which fetches `config.json`, `special_tokens_map.json`, and `tokenizer_config.json` via `ApiRepo::get()` when they are absent. As written, `FastEmbedAdapter::new()` can still reach the network after the preflight passes, so the no-runtime-download guarantee is not enforced.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 152,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6a1c2fad5cf96f6dc387c22836668f00bd4073273a127b0709392f9b7dcb46bc",
-          "at": "2026-05-30T07:00:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new test assertions move `result` in `matches!(result, ...)` and then borrow it again in `result.err()` for the failure message. That is a use-after-move and this test module will not compile. The same pattern is repeated in the other two `new_with_cache_dir` tests.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 528,
-              "category": "tests"
-            },
-            {
-              "message": "The patch never exercises the public `FastEmbedAdapter::new()` path; all new tests call the private `new_with_cache_dir` helper instead. That leaves the env-resolution logic in `resolve_cache_dir()` and the actual no-download guarantee of the public constructor unverified, so a regression in the shipped API could still slip through CI.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 222,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:2bfecf6309d10b34c802963bfdc3385a87aa35f87d64ba09da36ee8b4f034021",
-          "at": "2026-05-30T07:11:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Empty `HF_HOME` is treated as unset here, but `fastembed::pull_from_hf()` treats any set `HF_HOME` as authoritative. If `HF_HOME` is exported as an empty string, the preflight checks the fallback cache while the real loader uses the empty path, so `FastEmbedAdapter::new()` can still reach the network and violate the offline-only guarantee.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 123,
-              "category": "bug"
-            },
-            {
-              "message": "The `new()` test is vacuous: it only asserts when the constructor returns `Err`, so on a machine that already has a cache it passes without exercising the offline-failure path. That leaves the public constructor's no-download behavior unverified.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 538,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:e686fb703d69bd7b8679233b332eb3337d535753c5316027996ba89a65673bcd",
-          "at": "2026-05-30T07:17:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "These assertions move `result` into `matches!` and then use `result.as_ref().err()` / `result.err()` in the formatted message, which is a use-after-move compile error. The new test module will not build until the error value is captured before the `matches!` call or the formatting is rewritten.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 541,
-              "category": "testing"
-            },
-            {
-              "message": "`resolve_cache_dir()` treats an empty `FASTEMBED_CACHE_DIR` as if it were unset, but fastembed itself treats a set-empty value as authoritative. With `FASTEMBED_CACHE_DIR=\"\"`, `new()` will preflight `.fastembed_cache` while `TextEmbedding::try_new()` resolves the empty path, so the adapter can still fall through to a network download despite the supposed offline-only preflight.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 129,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1e3265ae5bad9a2ee774a83ce2ef7b7f8c94c669f64f6c1dd5cf98d0dcb938c2",
-          "at": "2026-05-30T07:22:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_new_returns_error_when_no_env_vars_set` is not a deterministic test of the public constructor: it silently returns when `HF_HOME` or `FASTEMBED_CACHE_DIR` is set and it relies on the ambient working directory not containing a `.fastembed_cache` tree. That leaves the only `FastEmbedAdapter::new()` coverage environment-dependent, so regressions in `resolve_cache_dir()` or the constructor's env precedence can slip through CI.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 531,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:cbd9dc8f40948869e8dbdbcf4502e8cc39522a945eb56a41a0e8fd8a537d16eb",
-          "at": "2026-05-30T07:28:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The constructor tests do not actually cover `resolve_cache_dir()`'s env precedence. `new_with_cache_dir()` bypasses that logic entirely, and the only `new()` test assumes a clean ambient environment, so regressions in `HF_HOME` vs `FASTEMBED_CACHE_DIR` selection can still ship unnoticed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 517,
-              "category": "test_coverage"
-            },
-            {
-              "message": "There is no happy-path test for the public constructor after a pre-populated cache is present. Every added assertion only checks the `Err(ModelLoadFailed)` branch, so the code path that should still return `Ok(FastEmbedAdapter)` is unverified.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 563,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e24dc1868798b652275974de129d53fca5f762c6d63f11951a22131ae87d4f4f",
-          "at": "2026-05-30T07:35:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_new_returns_error_in_clean_ci_environment` is not hermetic: it assumes both `HF_HOME` and `FASTEMBED_CACHE_DIR` are unset and that no `.fastembed_cache` exists in the current working directory. On a developer machine or cached CI runner where any of those are present, `FastEmbedAdapter::new()` can take a different path or even succeed, so this regression test is flaky and does not reliably validate the public constructor's offline behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 546,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:e24dc1868798b652275974de129d53fca5f762c6d63f11951a22131ae87d4f4f",
-          "at": "2026-05-30T07:38:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new constructor path is not tested directly: every test in this file exercises `new_with_cache_dir(...)` instead of the public `FastEmbedAdapter::new()`, so regressions in `resolve_cache_dir()` or the `with_cache_dir(...)` wiring would still pass the suite. The comment claiming end-to-end coverage for `new()` is therefore inaccurate.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 515,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:5b82b091ce587d66dbb66c88994fc6abe4fa2fd7e1f4c631dd64848fc375ca5e",
-          "at": "2026-05-30T07:43:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87b105b55c1260a3c02b228ce0ee2d8f3f2d3757b01eb3cc503ca88f31729161",
-          "at": "2026-05-30T07:47:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87b105b55c1260a3c02b228ce0ee2d8f3f2d3757b01eb3cc503ca88f31729161",
-          "at": "2026-05-30T07:51:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0eb51b1eaa41e97c7cd945ec632fc26bca0c0b0ff7dcc0c852b2bd0ecc2a98e",
-          "at": "2026-05-30T10:55:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0eb51b1eaa41e97c7cd945ec632fc26bca0c0b0ff7dcc0c852b2bd0ecc2a98e",
-          "at": "2026-05-30T10:57:23Z"
+          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
+          "at": "2026-05-30T01:34:52Z"
         }
       ]
     },
-    "other": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:15:17Z"
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:22:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 160,
+              "category": "domain invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
+          "at": "2026-05-29T15:25:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
-          "at": "2026-05-30T01:33:45Z"
+          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
+          "at": "2026-05-29T15:27:41Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:43:04Z"
+          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
+          "at": "2026-05-30T04:53:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
-          "at": "2026-05-30T02:44:12Z"
+          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
+          "at": "2026-05-30T04:55:19Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FindSimilarArgs` leaves both `fragment` and `file` optional, so `sotp find-similar` with no query parses successfully and only fails later in `resolve_fragment_text`. The briefing explicitly assigns this layer the `find-similar <fragment>` / `--file` parse contract, so the CLI help/usage and validation are currently out of sync with AC-01.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 23,
+              "category": "cli parsing"
+            },
+            {
+              "message": "`dup-index measure-quality` is specified here as a `--workspace-root` command, but this CLI adds and forwards `--db-path` for that subcommand. That leaks an irrelevant index-path dependency into AC-03: the downstream measure-quality wiring opens the DB path before computing metrics, so a bad or unwritable path can make the command fail even though the quality calculation is defined only from workspace fragments.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 86,
+              "category": "requirements coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
+          "at": "2026-05-30T04:26:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "line": 23,
+              "category": "cli parsing"
+            },
+            {
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "line": 86,
+              "category": "requirements coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
+          "at": "2026-05-30T04:27:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
-          "at": "2026-05-30T06:05:20Z"
+          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
+          "at": "2026-05-30T04:33:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_lines_file` takes `&PathBuf`, which triggers Clippy's default `ptr_arg` warning. This repo runs Clippy with `-D warnings` in `clippy-local`/`ci-rust`, so the new CLI scope will fail the required gate even though the code would compile. Change the helper to accept `&Path` and import/use `std::path::Path`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "line": 199,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
+          "at": "2026-05-30T04:37:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
-          "at": "2026-05-30T06:07:21Z"
+          "hash": "rvw1:sha256:3ac4e04528714b3152bd73a5bd9d754cc5c4131f9a8acc92d3dc4f8d11a52e14",
+          "at": "2026-05-30T04:40:13Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b42bef37788c57655c0e44e8f2f12c217ba2de9092898d35091677bc63f53d4",
-          "at": "2026-05-30T11:12:47Z"
+          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
+          "at": "2026-05-30T08:42:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b42bef37788c57655c0e44e8f2f12c217ba2de9092898d35091677bc63f53d4",
-          "at": "2026-05-30T11:14:46Z"
+          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
+          "at": "2026-05-30T08:44:48Z"
         }
       ]
     },
@@ -1419,159 +1044,534 @@
         }
       ]
     },
-    "harness-policy": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
-          "at": "2026-05-30T01:32:58Z"
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:15:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:52f41b8b4ec289ad74b1d0524024e11c120219976547176932992500c6629ad7",
-          "at": "2026-05-30T01:34:52Z"
+          "hash": "rvw1:sha256:50db5c52373aeaf6baaf03795a63c5b87952583e1129dcda91afe2b59ed65b4f",
+          "at": "2026-05-30T01:33:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:43:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70e238ca6d99c91ca628e407e37a4b7d502f196b26502ac26dfc8f6c27c4c7ad",
+          "at": "2026-05-30T02:44:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
+          "at": "2026-05-30T06:05:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0956003f1fa4077090cd1444a2caaa48007fdb264d3041a8f48bcdca14e8ee39",
+          "at": "2026-05-30T06:07:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b42bef37788c57655c0e44e8f2f12c217ba2de9092898d35091677bc63f53d4",
+          "at": "2026-05-30T11:12:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b42bef37788c57655c0e44e8f2f12c217ba2de9092898d35091677bc63f53d4",
+          "at": "2026-05-30T11:14:46Z"
         }
       ]
     },
-    "cli": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FindSimilarArgs` leaves both `fragment` and `file` optional, so `sotp find-similar` with no query parses successfully and only fails later in `resolve_fragment_text`. The briefing explicitly assigns this layer the `find-similar <fragment>` / `--file` parse contract, so the CLI help/usage and validation are currently out of sync with AC-01.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 23,
-              "category": "cli parsing"
-            },
-            {
-              "message": "`dup-index measure-quality` is specified here as a `--workspace-root` command, but this CLI adds and forwards `--db-path` for that subcommand. That leaks an irrelevant index-path dependency into AC-03: the downstream measure-quality wiring opens the DB path before computing metrics, so a bad or unwritable path can make the command fail even though the quality calculation is defined only from workspace fragments.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
-              "line": 86,
-              "category": "requirements coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
-          "at": "2026-05-30T04:26:28Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
+          "at": "2026-05-30T01:11:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c879be1638aa19c85b5bf196c00072eef9d3040b1c5bc4412fd56e6d8f3d31c3",
+          "at": "2026-05-30T01:33:15Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
+              "message": "`search()` interprets LanceDB results as cosine similarity (`1.0 - _distance`, then clamp to `[0,1]`), but the query never sets `DistanceType::Cosine`. LanceDB `vector_search` defaults to L2, so this adapter will rank by L2 while reporting cosine-based scores, which can collapse most results to `0.0` and makes the returned similarities incorrect.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
-              "line": 23,
-              "category": "cli parsing"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 182,
+              "category": "incorrect metric"
             },
             {
-              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
+              "message": "`search()` treats any `open_table()` failure as “table missing” and returns `Ok(Vec::new())`. That silently hides real storage errors such as permission failures, corruption, or schema problems; only `TableNotFound` should be converted to an empty result set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
-              "line": 86,
-              "category": "requirements coverage"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 177,
+              "category": "missing error handling"
             }
           ],
-          "hash": "rvw1:sha256:5fa6862f3f3b21ef0e022778f0787e96904e5a2401086f2a50f8652e5f1f0ebd",
-          "at": "2026-05-30T04:27:03Z"
+          "hash": "rvw1:sha256:1fd1efa920d3b055df9ccb303a9bd98f52cbc69bad79be2f5288b0a10fec65aa",
+          "at": "2026-05-30T02:47:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LanceDbSemanticIndexAdapter` calls `Runtime::block_on` in `new`, `insert`, and `search`. Tokio documents that `block_on` panics when invoked from an async execution context, so constructing or using this adapter from async code will crash instead of returning `SemanticIndexError`. That is a panic path in library code.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 67,
+              "category": "panic"
+            },
+            {
+              "message": "The first-insert path is a non-atomic `open_table(...); if missing -> create_table(...)` sequence. Because `insert` is `&self` and the adapter is `Send + Sync`, two callers can race on an empty database: both observe \"table not found\", one creates the table, and the other fails with a spurious `TableAlreadyExists`/`InsertFailed`, dropping the insert. Use LanceDB's create-if-exists mode or retry on table-exists.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 133,
+              "category": "concurrency"
+            }
+          ],
+          "hash": "rvw1:sha256:9e4bb28eb383e2399ffb0f9ed55091a57d24e921434b9de8e474898b61d5baae",
+          "at": "2026-05-30T02:57:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`std::thread::spawn` panics if the OS cannot create a new thread, so this helper can crash the library instead of returning a `Result`. The same pattern also appears in `new()` at line 83, which means `insert`/`search` inherit an unrecoverable panic path under thread-exhaustion or spawn failure.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 134,
+              "category": "panic"
+            },
+            {
+              "message": "`to_string_lossy()` silently rewrites non-UTF-8 paths, so `new()` can open/create the wrong LanceDB directory on Unix, and `insert()` stores `source_path` values that cannot round-trip back to the original `PathBuf`. That loses user data for any fragment or database path containing invalid UTF-8 bytes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 81,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d92b96f8b0bc2e4511f413e48e64a24e410db5cc6b46a8d5d074e6e917a93a90",
+          "at": "2026-05-30T03:11:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A `current_thread` Tokio runtime is paired with `Handle::block_on` in both `new()` and `block_on_thread()`, but `Handle::block_on` does not drive a current-thread runtime. LanceDB's async `connect`/`open_table`/`add`/`search` futures will not make progress unless some thread is concurrently calling `Runtime::block_on`, so this adapter can hang or fail at startup and on every index operation.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 73,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d92b96f8b0bc2e4511f413e48e64a24e410db5cc6b46a8d5d074e6e917a93a90",
+          "at": "2026-05-30T03:12:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
-          "at": "2026-05-30T04:33:13Z"
+          "hash": "rvw1:sha256:ac26e7c4f8c06563324fdf65c81e692f4638d1babdac54e3f43731c873fafc68",
+          "at": "2026-05-30T03:19:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_table_not_found` does not match LanceDB's actual missing-table error text (`Table '{name}' was not found`), so the fresh-database path never triggers. As a result, the intended first-run behavior in `insert` and `search` is broken: both will surface `InsertFailed`/`SearchFailed` instead of creating the table or returning an empty result set. Match `lancedb::Error::TableNotFound` directly instead of substring-searching `to_string()`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 343,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ac26e7c4f8c06563324fdf65c81e692f4638d1babdac54e3f43731c873fafc68",
+          "at": "2026-05-30T03:20:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35c313ed30b50f8c363ab92352beeb829b1b2ce663bd2b76cfa8f5a74497e097",
+          "at": "2026-05-30T03:28:06Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`read_lines_file` takes `&PathBuf`, which triggers Clippy's default `ptr_arg` warning. This repo runs Clippy with `-D warnings` in `clippy-local`/`ci-rust`, so the new CLI scope will fail the required gate even though the code would compile. Change the helper to accept `&Path` and import/use `std::path::Path`.",
+              "message": "`LanceDbSemanticIndexAdapter` owns a `tokio::runtime::Runtime` directly, but the adapter is explicitly made safe to construct and call from an existing Tokio executor by using bridge threads. If such an adapter is dropped inside that async context, Tokio's runtime destructor can panic while shutting down its blocking pool. This leaves a library-level panic path despite the no-panics rule; store the runtime in an `Option` and move/shutdown it from a non-runtime thread in `Drop`, or otherwise avoid owning a `Runtime` with normal in-context destruction.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 48,
+              "category": "panic"
+            },
+            {
+              "message": "`FastEmbedAdapter::new` does not honor the documented/plan-required `FASTEMBED_CACHE_PATH` cache override. The code uses `InitOptions::new(...)` without `with_cache_dir`, and fastembed 5.14's built-in lookup uses `FASTEMBED_CACHE_DIR`/`HF_HOME` instead, so CI or operators following this adapter's docs will have their pre-populated cache ignored and may trigger a runtime model download into the default cache location.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/semantic_dup.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 49,
+              "category": "configuration"
+            }
+          ],
+          "hash": "rvw1:sha256:35c313ed30b50f8c363ab92352beeb829b1b2ce663bd2b76cfa8f5a74497e097",
+          "at": "2026-05-30T03:33:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e5cbba62cfc7ecba261d5cb56e6ad5a0217f68f429b303e2a99827d088b2cc6",
+          "at": "2026-05-30T03:41:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:071d1a8b3d1999a802a7e3c30ba8a17ad44c7c2527de4c6f4257886cf1595f82",
+          "at": "2026-05-30T04:05:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:071d1a8b3d1999a802a7e3c30ba8a17ad44c7c2527de4c6f4257886cf1595f82",
+          "at": "2026-05-30T04:10:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73edc67561b2755a0f038b56811b9d4aa23642eaf81ddc5dfa60752aecd57b97",
+          "at": "2026-05-30T04:55:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The round-trip test inserts `frag_b` with `emb_b` but never searches with `emb_b`, even though the test and briefing require verifying that each inserted fragment is returned as the top match for its own embedding. As written, a regression where only the first queried vector path works would still pass this coverage, so add the symmetric `adapter.search(&emb_b, TopK::new(2)...)` assertion for `src/b.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/semantic_dup_index.rs",
+              "line": 51,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:73edc67561b2755a0f038b56811b9d4aa23642eaf81ddc5dfa60752aecd57b97",
+          "at": "2026-05-30T04:58:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0c5bc5a355eef25052c6cbef52fcc3c0ab9266fa6ff5ae828bb9fac625851b4",
+          "at": "2026-05-30T05:00:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_item_boundary` still misses real Rust items like `extern \"C\" fn` / `pub extern \"C\" fn`: after consuming `extern`, the ABI string becomes the next token and the function boundary is not detected, so those files will not be split at the correct item start.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/extractor.rs",
+              "line": 227,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e280adb14f9fa2b7b9656dbc70baeeba9fb729c9e554739de35dc6b4c3b2d8a1",
+          "at": "2026-05-30T05:43:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:889804f4ea7a97b2324a62aba2fa2f6c8dc8b329da9475b41e086b120ad28ab9",
+          "at": "2026-05-30T05:48:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:889804f4ea7a97b2324a62aba2fa2f6c8dc8b329da9475b41e086b120ad28ab9",
+          "at": "2026-05-30T05:50:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`expected_model_onnx_path()` is checking the wrong cache layout for fastembed/hf-hub. The real cache path for a populated model is `models--<repo>/snapshots/<commit>/onnx/model.onnx`, not `{cache}/models--<repo>/onnx/model.onnx`, and `pull_from_hf()` can also switch the cache root to `HF_HOME`. As written, `FastEmbedAdapter::new()` will reject a valid pre-populated cache instead of only failing when the model is actually absent, and the offline preflight does not reliably match the loader's real cache location.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 87,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:55df936f747c2b6ba16222ceabe374f29428d26395b628ed6578bead9cf3b75f",
+          "at": "2026-05-30T06:36:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_cache_dir()` only consults `FASTEMBED_CACHE_DIR`, but fastembed's loader path still honors `HF_HOME` when it is set. That means `FastEmbedAdapter::new()` can preflight one cache root and initialize `TextEmbedding` against another, so a valid offline cache may be rejected or a runtime fetch can still happen.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 78,
+              "category": "correctness"
+            },
+            {
+              "message": "The new tests only exercise `model_snapshots_dir` / `model_onnx_exists_in_cache`; they never call `FastEmbedAdapter::new()` on an empty temp cache or a populated cache. The changed public behavior is therefore still unverified, which leaves the offline-preflight path free to regress silently.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 243,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb78c25c36d91738abbf44c127a5d1cadaa16c96f2cd74edbcbe6d6ffa8b9f9",
+          "at": "2026-05-30T06:46:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This check can return true for any stale `snapshots/<commit>/onnx/model.onnx` directory, but hf-hub resolves the active file via `refs/<revision>` before looking in `snapshots/` (`hf-hub-0.5.0/src/lib.rs:141-147`). If the cached snapshot is not the one pointed to by `refs/main`, `FastEmbedAdapter::new()` will still fall through to `TextEmbedding::try_new()` and can hit the network. The offline preflight needs to validate the revision-selected snapshot, not just any snapshot.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 130,
+              "category": "correctness"
+            },
+            {
+              "message": "Even when this preflight passes, `TextEmbedding::try_new()` still loads tokenizer/config assets from Hugging Face (`load_tokenizer_hf_hub(...)`), so a cache containing only `onnx/model.onnx` is not enough to keep `FastEmbedAdapter::new()` offline. That means the constructor can still perform runtime downloads unless the tokenizer files are also preflighted or the loader path is changed to be fully local-only.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 199,
-              "category": "ci"
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:32fdb5cbe5ebffe976e531188cc7d8f646e3d191fef2561bda9d04d33cc3ce1b",
-          "at": "2026-05-30T04:37:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ac4e04528714b3152bd73a5bd9d754cc5c4131f9a8acc92d3dc4f8d11a52e14",
-          "at": "2026-05-30T04:40:13Z"
+          "hash": "rvw1:sha256:7fa9eceab2ed1e3e8963a913103ef68eb60ca6b461bf72101298eb52e106e0ec",
+          "at": "2026-05-30T06:53:19Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
-          "at": "2026-05-30T08:42:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eace2ff116f6ee4b3d838f53768800884fdfc3093ca56e83bfd1f57e368f3795",
-          "at": "2026-05-30T08:44:48Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
-          "at": "2026-05-29T15:22:49Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`CodeFragment` documents and validates that `content` is always non-empty, but the `content` field is public, so callers can construct `CodeFragment { source_path, content: String::new() }` or clear it after `new()` succeeds, bypassing `SemanticDupError::EmptyContent`. This leaves the illegal empty-fragment state representable outside the constructor; keep the field private and expose read accessors if needed.",
+              "message": "Using `HF_HOME/hub` here does not match fastembed 5.14's `pull_from_hf`, which forwards `HF_HOME` itself as the cache dir. A cache populated under the actual `HF_HOME` root will be treated as missing and `FastEmbedAdapter::new()` will fail even though the model is present.",
               "severity": "P1",
-              "file": "libs/domain/src/semantic_dup.rs",
-              "line": 160,
-              "category": "domain invariant"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 107,
+              "category": "correctness"
+            },
+            {
+              "message": "The offline preflight only checks `onnx/model.onnx` and `tokenizer.json`, but `TextEmbedding::try_new()` still calls `load_tokenizer_hf_hub()`, which fetches `config.json`, `special_tokens_map.json`, and `tokenizer_config.json` via `ApiRepo::get()` when they are absent. As written, `FastEmbedAdapter::new()` can still reach the network after the preflight passes, so the no-runtime-download guarantee is not enforced.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 152,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:66ca2643e0f117a9fb50749e43d158bff8e7f795e9e8566457a46a63d193abfa",
-          "at": "2026-05-29T15:25:09Z"
+          "hash": "rvw1:sha256:6a1c2fad5cf96f6dc387c22836668f00bd4073273a127b0709392f9b7dcb46bc",
+          "at": "2026-05-30T07:00:06Z"
         },
         {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b75a8ebc28c766515896c7a16c8a1b860523f42799aa3628fffbfcf6f2c9e77",
-          "at": "2026-05-29T15:27:41Z"
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new test assertions move `result` in `matches!(result, ...)` and then borrow it again in `result.err()` for the failure message. That is a use-after-move and this test module will not compile. The same pattern is repeated in the other two `new_with_cache_dir` tests.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 528,
+              "category": "tests"
+            },
+            {
+              "message": "The patch never exercises the public `FastEmbedAdapter::new()` path; all new tests call the private `new_with_cache_dir` helper instead. That leaves the env-resolution logic in `resolve_cache_dir()` and the actual no-download guarantee of the public constructor unverified, so a regression in the shipped API could still slip through CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 222,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:2bfecf6309d10b34c802963bfdc3385a87aa35f87d64ba09da36ee8b4f034021",
+          "at": "2026-05-30T07:11:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Empty `HF_HOME` is treated as unset here, but `fastembed::pull_from_hf()` treats any set `HF_HOME` as authoritative. If `HF_HOME` is exported as an empty string, the preflight checks the fallback cache while the real loader uses the empty path, so `FastEmbedAdapter::new()` can still reach the network and violate the offline-only guarantee.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 123,
+              "category": "bug"
+            },
+            {
+              "message": "The `new()` test is vacuous: it only asserts when the constructor returns `Err`, so on a machine that already has a cache it passes without exercising the offline-failure path. That leaves the public constructor's no-download behavior unverified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 538,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:e686fb703d69bd7b8679233b332eb3337d535753c5316027996ba89a65673bcd",
+          "at": "2026-05-30T07:17:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These assertions move `result` into `matches!` and then use `result.as_ref().err()` / `result.err()` in the formatted message, which is a use-after-move compile error. The new test module will not build until the error value is captured before the `matches!` call or the formatting is rewritten.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 541,
+              "category": "testing"
+            },
+            {
+              "message": "`resolve_cache_dir()` treats an empty `FASTEMBED_CACHE_DIR` as if it were unset, but fastembed itself treats a set-empty value as authoritative. With `FASTEMBED_CACHE_DIR=\"\"`, `new()` will preflight `.fastembed_cache` while `TextEmbedding::try_new()` resolves the empty path, so the adapter can still fall through to a network download despite the supposed offline-only preflight.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 129,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e3265ae5bad9a2ee774a83ce2ef7b7f8c94c669f64f6c1dd5cf98d0dcb938c2",
+          "at": "2026-05-30T07:22:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_new_returns_error_when_no_env_vars_set` is not a deterministic test of the public constructor: it silently returns when `HF_HOME` or `FASTEMBED_CACHE_DIR` is set and it relies on the ambient working directory not containing a `.fastembed_cache` tree. That leaves the only `FastEmbedAdapter::new()` coverage environment-dependent, so regressions in `resolve_cache_dir()` or the constructor's env precedence can slip through CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 531,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cbd9dc8f40948869e8dbdbcf4502e8cc39522a945eb56a41a0e8fd8a537d16eb",
+          "at": "2026-05-30T07:28:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The constructor tests do not actually cover `resolve_cache_dir()`'s env precedence. `new_with_cache_dir()` bypasses that logic entirely, and the only `new()` test assumes a clean ambient environment, so regressions in `HF_HOME` vs `FASTEMBED_CACHE_DIR` selection can still ship unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 517,
+              "category": "test_coverage"
+            },
+            {
+              "message": "There is no happy-path test for the public constructor after a pre-populated cache is present. Every added assertion only checks the `Err(ModelLoadFailed)` branch, so the code path that should still return `Ok(FastEmbedAdapter)` is unverified.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 563,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e24dc1868798b652275974de129d53fca5f762c6d63f11951a22131ae87d4f4f",
+          "at": "2026-05-30T07:35:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_new_returns_error_in_clean_ci_environment` is not hermetic: it assumes both `HF_HOME` and `FASTEMBED_CACHE_DIR` are unset and that no `.fastembed_cache` exists in the current working directory. On a developer machine or cached CI runner where any of those are present, `FastEmbedAdapter::new()` can take a different path or even succeed, so this regression test is flaky and does not reliably validate the public constructor's offline behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 546,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e24dc1868798b652275974de129d53fca5f762c6d63f11951a22131ae87d4f4f",
+          "at": "2026-05-30T07:38:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new constructor path is not tested directly: every test in this file exercises `new_with_cache_dir(...)` instead of the public `FastEmbedAdapter::new()`, so regressions in `resolve_cache_dir()` or the `with_cache_dir(...)` wiring would still pass the suite. The comment claiming end-to-end coverage for `new()` is therefore inaccurate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 515,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:5b82b091ce587d66dbb66c88994fc6abe4fa2fd7e1f4c631dd64848fc375ca5e",
+          "at": "2026-05-30T07:43:41Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
-          "at": "2026-05-30T04:53:58Z"
+          "hash": "rvw1:sha256:87b105b55c1260a3c02b228ce0ee2d8f3f2d3757b01eb3cc503ca88f31729161",
+          "at": "2026-05-30T07:47:28Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:51e15166a2c4b529d4fad3a8c59d163bbd328de34177ce7d80b87b791b8a380e",
-          "at": "2026-05-30T04:55:19Z"
+          "hash": "rvw1:sha256:87b105b55c1260a3c02b228ce0ee2d8f3f2d3757b01eb3cc503ca88f31729161",
+          "at": "2026-05-30T07:51:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0eb51b1eaa41e97c7cd945ec632fc26bca0c0b0ff7dcc0c852b2bd0ecc2a98e",
+          "at": "2026-05-30T10:55:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0eb51b1eaa41e97c7cd945ec632fc26bca0c0b0ff7dcc0c852b2bd0ecc2a98e",
+          "at": "2026-05-30T10:57:23Z"
         }
       ]
     },
@@ -1896,6 +1896,80 @@
           "findings": [],
           "hash": "rvw1:sha256:1e84b3183fb43f3f426bd50def6471cbf170fcad4c571ffeeb95a6f2ae4e4087",
           "at": "2026-05-30T10:25:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Writing the ownership marker only after `build_index` succeeds leaves a crash window: if the process dies after the LanceDB temp index has been built but before `std::fs::write(temp_path.join(OWNERSHIP_MARKER), ...)` completes, the next run sees a recognizable `.tmp-build` without the marker and Step 3 now rejects it instead of cleaning or restoring it. That strands a self-generated temp tree and blocks subsequent rebuilds until manual intervention.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup/build.rs",
+              "line": 435,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:9b7d87cdd17e076d6fd9feb6f94cbf7ea8b9bd470de84d3b9ae6967aeed086e0",
+          "at": "2026-05-30T11:54:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cce05a7a621efcc7f049b6890325a30a1d8b11b9c87579ae269f4d99c2d7e23d",
+          "at": "2026-05-30T11:58:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_tool_owned_index` checks only `dir/OWNERSHIP_MARKER`, so a symlink at `.index.db.old` or `.index.db.tmp-build` to any directory containing that regular marker is treated as tool-owned. The tool never creates those sibling paths as symlinks, but Step 1b can rename such a foreign `.old` symlink into `db_path`, and the stale-sibling cleanup paths can auto-touch it. Reject `dir` itself unless `symlink_metadata(dir)` is a real directory before checking the marker.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/semantic_dup/build.rs",
+              "line": 48,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:cce05a7a621efcc7f049b6890325a30a1d8b11b9c87579ae269f4d99c2d7e23d",
+          "at": "2026-05-30T12:01:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`commit_rebuilt_index` renames the current `db_path` to the deterministic `.old` backup without first ensuring that the current index has the ownership marker. `validate_db_path_for_rebuild` still accepts recognizable but unowned indexes, so any pre-existing/legacy index can enter this path; if the process crashes after this rename and before `temp_path` is promoted, the next run's crash recovery requires `is_tool_owned_index(&crash_backup)` and will skip restoring the unmarked backup, leaving `db_path` absent and the old index stranded. The commit path needs to mark the existing index before/while creating the backup, or otherwise make the backup tool-owned before any crash window where recovery depends on that marker.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/semantic_dup/build.rs",
+              "line": 224,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fe40eac8448b1c594e016493df989d2dd5a84d81d39cb9ef6a66ab815c0f4e53",
+          "at": "2026-05-30T12:04:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`commit_rebuilt_index` silently ignores failure to write the ownership marker before moving the existing index to `.old`. If the index directory is not writable but the parent directory is, the marker write can fail while `rename(db_path, backup_path)` still succeeds; a crash before the temp rename then leaves a real backup that `Step 1b` will not restore because it is unowned. That breaks the crash-recovery/non-destructive rebuild guarantee. Propagate this error before renaming so the original index stays in place unless the backup will be tool-owned.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/semantic_dup/build.rs",
+              "line": 232,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b9b6307b2b8ba25f6223d3835b5f2affd914c38f311a5b08446ac398d7e64646",
+          "at": "2026-05-30T12:07:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5abbd0d532cbc43f8b8f2ec7cf876bffbcfce67b5998b14ff48b872cd5815260",
+          "at": "2026-05-30T12:09:33Z"
         }
       ]
     }
