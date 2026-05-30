@@ -96,22 +96,81 @@ pub struct DupIndexBuildInput {
     pub db_path: PathBuf,
 }
 
+/// Prepare a fresh index directory at `db_path` for a rebuild.
+///
+/// This helper:
+/// 1. Rejects `db_path` values that are equal to or an ancestor of
+///    `workspace_root` (path-overlap safety guard).
+/// 2. Removes the existing directory at `db_path` (if any) so that the
+///    subsequent adapter construction always starts from an empty slate.
+///
+/// The removal uses `std::fs::remove_dir_all`, which is safe because LanceDB
+/// stores its data as a directory tree (not a single file).  If `db_path`
+/// does not exist yet this function is a no-op.
+///
+/// # Errors
+///
+/// Returns `Err` if the path-overlap guard fires, if `canonicalize` fails, or
+/// if `remove_dir_all` fails.
+fn prepare_fresh_index_dir(db_path: &Path, workspace_root: &Path) -> Result<(), String> {
+    if !db_path.exists() {
+        return Ok(());
+    }
+    let canonical_db = db_path
+        .canonicalize()
+        .map_err(|e| format!("failed to resolve index path {}: {e}", db_path.display()))?;
+    let canonical_workspace = workspace_root.canonicalize().map_err(|e| {
+        format!("failed to resolve workspace root {}: {e}", workspace_root.display())
+    })?;
+    // Reject if db_path is an ancestor of (or equal to) the workspace root.
+    if canonical_workspace.starts_with(&canonical_db) {
+        return Err(format!(
+            "--db-path '{}' overlaps with the workspace root '{}'; \
+             refusing to remove it to prevent data loss",
+            db_path.display(),
+            workspace_root.display(),
+        ));
+    }
+    std::fs::remove_dir_all(db_path)
+        .map_err(|e| format!("failed to remove existing index at {}: {e}", db_path.display()))
+}
+
 impl CliApp {
     /// Run `sotp dup-index build`: extract workspace fragments, embed each,
     /// and insert into the LanceDB index.
+    ///
+    /// **Rebuild-from-scratch semantics**: each invocation starts with a fresh
+    /// index.  If a database already exists at `db_path` it is removed before
+    /// the new index adapter is constructed, so stale or duplicate fragments
+    /// from previous runs never accumulate.  The delete is performed at the
+    /// composition level (no change to the usecase port interface) using
+    /// `std::fs::remove_dir_all`, which is safe because LanceDB stores its
+    /// data as a directory tree.
     ///
     /// AC-02: exits 0 on success; no network calls at build time (model weights
     /// are loaded from the local fastembed cache).
     ///
     /// # Errors
     ///
-    /// Returns `Err` if extraction, adapter construction, or indexing fails.
+    /// Returns `Err` if the existing index cannot be removed, if extraction
+    /// fails, if adapter construction fails, or if indexing fails.
     pub fn semantic_dup_index_build(
         &self,
         input: DupIndexBuildInput,
     ) -> Result<CommandOutcome, String> {
+        // Remove any existing index directory so that each build starts from
+        // scratch.  This prevents stale/duplicate fragments from accumulating
+        // across repeated `dup-index build` invocations on the same `--db-path`.
+        prepare_fresh_index_dir(&input.db_path, &input.workspace_root)?;
+
         let fragments = extract_code_fragments(&input.workspace_root)
             .map_err(|e| format!("fragment extraction failed: {e}"))?;
+
+        if fragments.is_empty() {
+            return Ok(CommandOutcome::success(Some(
+                "Indexed 0 fragment(s) (no Rust sources found in workspace)".to_owned(),
+            )));
+        }
 
         let fragment_count = fragments.len();
 
@@ -617,6 +676,66 @@ mod tests {
             "expected 'already acked' message, got: {:?}",
             outcome.stdout
         );
+    }
+
+    // ── prepare_fresh_index_dir: safety guard + removal ──────────────────────
+    //
+    // These tests drive the `prepare_fresh_index_dir` helper directly so that
+    // no test ever constructs the real `FastEmbedAdapter` (which would create
+    // a `.fastembed_cache/` directory and attempt a model download — forbidden
+    // in CI).
+
+    #[test]
+    fn test_prepare_fresh_index_dir_rejects_db_path_equal_to_workspace_root() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().to_path_buf();
+        // db_path == workspace_root: the overlap guard must fire.
+        let db_path = workspace_root.clone();
+        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
+        assert!(result.is_err(), "db_path == workspace_root must be rejected");
+        let msg = result.unwrap_err();
+        assert!(msg.contains("overlaps"), "error message must mention 'overlaps', got: {msg}");
+    }
+
+    #[test]
+    fn test_prepare_fresh_index_dir_rejects_db_path_ancestor_of_workspace_root() {
+        let dir = tempfile::tempdir().unwrap();
+        // workspace_root is a subdir; db_path is the parent → ancestor overlap.
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        let db_path = dir.path().to_path_buf(); // parent of workspace_root
+        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
+        assert!(result.is_err(), "db_path ancestor of workspace_root must be rejected");
+        let msg = result.unwrap_err();
+        assert!(msg.contains("overlaps"), "error message must mention 'overlaps', got: {msg}");
+    }
+
+    #[test]
+    fn test_prepare_fresh_index_dir_removes_existing_db_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        let db_path = dir.path().join("index.db");
+        // Pre-create a directory at db_path to simulate a prior build.
+        std::fs::create_dir_all(&db_path).unwrap();
+        // Place a sentinel file inside to verify it gets removed.
+        std::fs::write(db_path.join("stale.txt"), "stale").unwrap();
+        assert!(db_path.exists(), "pre-condition: db_path must exist");
+
+        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
+        assert!(result.is_ok(), "removal should succeed: {:?}", result.err());
+        assert!(!db_path.exists(), "existing index directory must be removed");
+    }
+
+    #[test]
+    fn test_prepare_fresh_index_dir_is_noop_when_db_path_does_not_exist() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        std::fs::create_dir_all(&workspace_root).unwrap();
+        let db_path = dir.path().join("nonexistent.db");
+        // db_path does not exist — function must be a no-op and succeed.
+        let result = prepare_fresh_index_dir(&db_path, &workspace_root);
+        assert!(result.is_ok(), "no-op on absent path must succeed: {:?}", result.err());
     }
 
     // ── truncate_snippet ──────────────────────────────────────────────────────

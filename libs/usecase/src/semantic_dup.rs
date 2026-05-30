@@ -521,14 +521,20 @@ impl DupCheckService for DupCheckInteractor {
     /// Returns [`DupCheckError::Embedding`] if embedding a fragment fails.
     /// Returns [`DupCheckError::Index`] if an index search fails.
     fn dup_check(&self, cmd: &DupCheckCommand) -> Result<DupCheckOutput, DupCheckError> {
-        // Retrieve all above-threshold candidates per fragment. Using usize::MAX
-        // signals to the index adapter "return as many as you have"; the adapter
-        // clamps to its actual row count so the value is safe.  A fixed small
-        // constant (e.g. 10) would silently truncate when there are more matches,
-        // making DupCheckWarning.similar_fragments incomplete.
+        // Use a generous-but-bounded cap instead of usize::MAX so the LanceDB
+        // adapter never receives an unbounded `.limit(usize::MAX)` call.
         //
-        // SAFETY: usize::MAX >= 1, so TopK::new always returns Ok.
-        let top_k = match TopK::new(usize::MAX) {
+        // 100_000 is large enough to surface all realistic near-duplicate
+        // candidates in a workspace without risking an unbounded result set.
+        // The LanceDB adapter additionally clamps to a safe maximum on its
+        // side (see `LanceDbSemanticIndexAdapter::search`), so the effective
+        // limit is `min(DUP_CHECK_MAX_RESULTS, adapter_cap)`.
+        //
+        // A fixed small constant (e.g. 10) would silently truncate when there
+        // are more matches, making DupCheckWarning.similar_fragments incomplete.
+        const DUP_CHECK_MAX_RESULTS: usize = 100_000;
+        // DUP_CHECK_MAX_RESULTS >= 1, so TopK::new always returns Ok.
+        let top_k = match TopK::new(DUP_CHECK_MAX_RESULTS) {
             Ok(k) => k,
             Err(_) => {
                 return Err(DupCheckError::Index(SemanticIndexError::SearchFailed {

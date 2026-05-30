@@ -331,7 +331,13 @@ impl SemanticIndexPort for LanceDbSemanticIndexAdapter {
         embedding: &[f32],
         top_k: domain::semantic_dup::TopK,
     ) -> Result<Vec<SimilarFragment>, SemanticIndexError> {
-        let k = top_k.value();
+        // Clamp the requested k to a sane maximum before forwarding to LanceDB's
+        // `.limit()` call.  Passing an extremely large value (e.g. usize::MAX)
+        // to LanceDB can cause oversized/unbounded result sets.  1_000_000 is a
+        // generous cap that exceeds realistic workspace sizes while remaining
+        // representable as a `usize` on all supported platforms.
+        const MAX_SEARCH_LIMIT: usize = 1_000_000;
+        let k = top_k.value().min(MAX_SEARCH_LIMIT);
         let query_vec: Vec<f32> = embedding.to_vec();
         let connection = Arc::clone(&self.connection);
 
