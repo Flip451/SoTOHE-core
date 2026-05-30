@@ -86,6 +86,9 @@ fn collect_rs_fragments(dir: &Path, out: &mut Vec<CodeFragment>) -> Result<(), E
         })?;
 
         if file_type.is_dir() {
+            if is_excluded_dir(&path) {
+                continue;
+            }
             collect_rs_fragments(&path, out)?;
         } else if file_type.is_file() && has_rs_extension(&path) {
             let file_fragments = extract_from_file(&path)?;
@@ -100,6 +103,30 @@ fn collect_rs_fragments(dir: &Path, out: &mut Vec<CodeFragment>) -> Result<(), E
 /// Return `true` when `path` has the `.rs` extension (case-sensitive).
 fn has_rs_extension(path: &Path) -> bool {
     path.extension().is_some_and(|ext| ext == "rs")
+}
+
+/// Return `true` when `path` is a directory that should be skipped during
+/// recursive scanning.
+///
+/// Two categories are excluded:
+/// - `target`: Cargo's build-output directory.  Generated `.rs` files there
+///   (e.g. proc-macro expansions, build-script outputs) are not workspace
+///   sources and would skew similarity results.
+/// - Dot-prefixed (hidden) directories: covers `.git` (VCS internals),
+///   `.fastembed_cache` (model-download cache), and temporary rebuild
+///   siblings such as `.{name}.tmp-build` / `.{name}.old`.  None of these
+///   contain workspace source code.
+///
+/// The LanceDB index directory (`--db-path`) holds only LanceDB data files,
+/// not `.rs` source, so it contributes nothing even if descended.  Because
+/// its path is user-configurable, name-based exclusion of `target` and
+/// dot-prefixed dirs is the pragmatic, dependency-free solution — no
+/// `.gitignore` parsing required.
+fn is_excluded_dir(path: &Path) -> bool {
+    match path.file_name().and_then(|n| n.to_str()) {
+        Some(name) => name == "target" || name.starts_with('.'),
+        None => false,
+    }
 }
 
 /// Read `file_path` and split its content into item-level [`CodeFragment`]s.
@@ -432,5 +459,82 @@ mod tests {
     fn test_is_item_boundary_empty_line_not_boundary() {
         assert!(!is_item_boundary(""));
         assert!(!is_item_boundary("   "));
+    }
+
+    // ── is_excluded_dir ───────────────────────────────────────────────────────
+
+    #[test]
+    fn test_is_excluded_dir_target() {
+        assert!(is_excluded_dir(std::path::Path::new("/workspace/target")));
+    }
+
+    #[test]
+    fn test_is_excluded_dir_hidden_git() {
+        assert!(is_excluded_dir(std::path::Path::new("/workspace/.git")));
+    }
+
+    #[test]
+    fn test_is_excluded_dir_hidden_fastembed_cache() {
+        assert!(is_excluded_dir(std::path::Path::new("/workspace/.fastembed_cache")));
+    }
+
+    #[test]
+    fn test_is_excluded_dir_hidden_tmp_build() {
+        assert!(is_excluded_dir(std::path::Path::new("/workspace/.mylib.tmp-build")));
+    }
+
+    #[test]
+    fn test_is_excluded_dir_regular_src_not_excluded() {
+        assert!(!is_excluded_dir(std::path::Path::new("/workspace/src")));
+    }
+
+    #[test]
+    fn test_is_excluded_dir_regular_libs_not_excluded() {
+        assert!(!is_excluded_dir(std::path::Path::new("/workspace/libs")));
+    }
+
+    // ── collect_rs_fragments exclusion (integration) ──────────────────────────
+
+    /// Verify that `extract_code_fragments` only picks up sources from real
+    /// source directories and skips `target/`, `.git/`, and other hidden dirs.
+    #[test]
+    fn test_extract_code_fragments_skips_excluded_dirs() {
+        use std::fs;
+        use tempfile::tempdir;
+
+        let root = tempdir().unwrap();
+        let root_path = root.path();
+
+        // A real source file at the workspace root — must be extracted.
+        let src_content = "pub fn real_fn() {}\n";
+        fs::write(root_path.join("real_source.rs"), src_content).unwrap();
+
+        // target/generated.rs — must be skipped.
+        let target_dir = root_path.join("target");
+        fs::create_dir_all(&target_dir).unwrap();
+        fs::write(target_dir.join("generated.rs"), "pub fn generated() {}\n").unwrap();
+
+        // .git/hooks.rs — must be skipped.
+        let git_dir = root_path.join(".git");
+        fs::create_dir_all(&git_dir).unwrap();
+        fs::write(git_dir.join("hooks.rs"), "pub fn git_hook() {}\n").unwrap();
+
+        // .hidden_dir/foo.rs — must be skipped.
+        let hidden_dir = root_path.join(".hidden_dir");
+        fs::create_dir_all(&hidden_dir).unwrap();
+        fs::write(hidden_dir.join("foo.rs"), "pub fn hidden_fn() {}\n").unwrap();
+
+        let fragments = extract_code_fragments(root_path).unwrap();
+
+        // All returned fragments must come from real_source.rs only.
+        assert!(!fragments.is_empty(), "expected at least one fragment from real_source.rs");
+        for fragment in &fragments {
+            assert_eq!(
+                fragment.source_path,
+                root_path.join("real_source.rs"),
+                "unexpected fragment from excluded path: {}",
+                fragment.source_path.display()
+            );
+        }
     }
 }
