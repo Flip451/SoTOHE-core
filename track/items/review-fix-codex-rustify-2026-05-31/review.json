@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
+          "at": "2026-05-31T14:25:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
+          "at": "2026-05-31T14:28:42Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -274,128 +292,65 @@
           "findings": [],
           "hash": "rvw1:sha256:b3add431fd7e8d935f6d4b229ba2cf3a8e2302e59147d2f7bd6d394f4d86990a",
           "at": "2026-05-31T15:49:40Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
-          "at": "2026-05-31T14:25:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
-          "at": "2026-05-31T14:28:42Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
-          "at": "2026-05-31T08:42:34Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The ADR states that `network_access=true` opens only the nested reviewer’s LLM reachability, but D2 enables network on the outer fixer sandbox, so every process the fixer runs can make outbound network calls. Since the same design also makes `CODEX_HOME`/`~/.codex` writable for session creation, this overstates the safety boundary: push prevention may still hold, but general outbound access is broader than LLM-only access and can mislead the implementation plan’s security assumptions.",
+              "message": "`SessionLogCleanup` is left armed for every parsed sentinel, so `REVIEW_FIX_STATUS: failed` and `blocked_cross_scope` runs delete the session log before returning exit codes 1/2. The briefing requires logs to be removed only for clean success and retained for diagnostic failure paths; disarm the guard for non-`completed` statuses before returning.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md",
-              "line": 82,
-              "category": "factual error (semantic)"
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner.rs",
+              "line": 714,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
-          "at": "2026-05-31T08:47:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:156c1b09ba96ebae31b8150b3fd4335e8d2490bedd6d6fc720ab02c0a1621bcd",
-          "at": "2026-05-31T08:49:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
-          "at": "2026-05-31T09:24:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
-          "at": "2026-05-31T09:30:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T09:55:59Z"
+          "hash": "rvw1:sha256:9d377b780b52e9b94bbdc30a857c91ddc64a5c977e73c5c62802a4748f15541f",
+          "at": "2026-05-31T17:06:58Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`plan.md`/`impl-plan.json` present T001 as only in progress, but the generated `usecase-types.md` now marks every T001 usecase catalogue entry as Blue instead of Yellow. In this workflow Yellow is the WIP declaration state and Blue is the implemented/confirmed state, so the plan artifacts now give conflicting status signals for the same T001 work and can falsely present the usecase contract as already complete.",
+              "message": "`CREDENTIAL_VARS` omits `OPENAI_BASE_URL`, but `build_safe_env` passes that variable through to the nested Codex run. If the base URL contains embedded userinfo or token material and the child echoes its config/env on failure, `write_session_log` persists it unredacted, violating the briefing's requirement to redact credential-bearing SAFE_VARS values before writing persistent logs.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner.rs",
+              "line": 554,
+              "category": "security"
+            },
+            {
+              "message": "The `read_to_string(&output_last_message)` error path returns with `?` before disarming `SessionLogCleanup`, so the guard deletes the session log even though the error message points callers at that log path. If the child removes or makes the output-last-message file unreadable, this failure path loses the diagnostic log that the new RAII cleanup is supposed to retain for failures.",
               "severity": "P1",
-              "file": "track/items/review-fix-codex-rustify-2026-05-31/usecase-types.md",
-              "line": 7,
-              "category": "contradiction"
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner.rs",
+              "line": 694,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T09:58:57Z"
+          "hash": "rvw1:sha256:a45b6c08fd25cd1757ae34d510dad87437cf8894b2e8a7fa277a5f030066447c",
+          "at": "2026-05-31T17:11:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Credential redaction can leak part of a secret when one credential value is a prefix or substring of another. For example, if OPENAI_API_KEY is `sk-abc` and CODEX_API_KEY is `sk-abcdef`, replacing OPENAI_API_KEY first changes the log to `[REDACTED:OPENAI_API_KEY]def`, so the CODEX_API_KEY value no longer matches and the suffix remains in the persisted diagnostic log. Redact all credential values without overlap leakage, e.g. by collecting non-empty values and replacing longest values first.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner.rs",
+              "line": 562,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:08f831ab1c01d2ea5408f53b2e6978e1d587deee2ac09db8461aa58e42cfdd67",
+          "at": "2026-05-31T17:15:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T10:02:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
-          "at": "2026-05-31T14:23:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
-          "at": "2026-05-31T14:27:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9b25a5b36ec7b463badbadd4437ee9afcaaa1157313cd748c357c5b860fa18f",
-          "at": "2026-05-31T16:02:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f8a2acb38e57bb3c3c795577e54d00857a9a006b6dc5cb17115b4e5a050d5ff0",
-          "at": "2026-05-31T16:50:12Z"
+          "hash": "rvw1:sha256:64ba0479a2c3995c89b63d9d65567e3309e12402238aec1d6b8b4b0aa3b0323e",
+          "at": "2026-05-31T17:19:41Z"
         }
       ]
     },
@@ -650,6 +605,110 @@
           "findings": [],
           "hash": "rvw1:sha256:77e5ab7d4d91eb466180381c343de1ab0ca63f97e0b6a0be04dcd2967f8f2de6",
           "at": "2026-05-31T14:28:54Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
+          "at": "2026-05-31T08:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR states that `network_access=true` opens only the nested reviewer’s LLM reachability, but D2 enables network on the outer fixer sandbox, so every process the fixer runs can make outbound network calls. Since the same design also makes `CODEX_HOME`/`~/.codex` writable for session creation, this overstates the safety boundary: push prevention may still hold, but general outbound access is broader than LLM-only access and can mislead the implementation plan’s security assumptions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md",
+              "line": 82,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
+          "at": "2026-05-31T08:47:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:156c1b09ba96ebae31b8150b3fd4335e8d2490bedd6d6fc720ab02c0a1621bcd",
+          "at": "2026-05-31T08:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
+          "at": "2026-05-31T09:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
+          "at": "2026-05-31T09:30:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T09:55:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md`/`impl-plan.json` present T001 as only in progress, but the generated `usecase-types.md` now marks every T001 usecase catalogue entry as Blue instead of Yellow. In this workflow Yellow is the WIP declaration state and Blue is the implemented/confirmed state, so the plan artifacts now give conflicting status signals for the same T001 work and can falsely present the usecase contract as already complete.",
+              "severity": "P1",
+              "file": "track/items/review-fix-codex-rustify-2026-05-31/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T09:58:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T10:02:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
+          "at": "2026-05-31T14:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
+          "at": "2026-05-31T14:27:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9b25a5b36ec7b463badbadd4437ee9afcaaa1157313cd748c357c5b860fa18f",
+          "at": "2026-05-31T16:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8a2acb38e57bb3c3c795577e54d00857a9a006b6dc5cb17115b4e5a050d5ff0",
+          "at": "2026-05-31T16:50:12Z"
         }
       ]
     }
