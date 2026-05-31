@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
+          "at": "2026-05-31T08:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR states that `network_access=true` opens only the nested reviewer’s LLM reachability, but D2 enables network on the outer fixer sandbox, so every process the fixer runs can make outbound network calls. Since the same design also makes `CODEX_HOME`/`~/.codex` writable for session creation, this overstates the safety boundary: push prevention may still hold, but general outbound access is broader than LLM-only access and can mislead the implementation plan’s security assumptions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md",
+              "line": 82,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
+          "at": "2026-05-31T08:47:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:156c1b09ba96ebae31b8150b3fd4335e8d2490bedd6d6fc720ab02c0a1621bcd",
+          "at": "2026-05-31T08:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
+          "at": "2026-05-31T09:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
+          "at": "2026-05-31T09:30:14Z"
+        }
+      ]
+    }
+  }
+}

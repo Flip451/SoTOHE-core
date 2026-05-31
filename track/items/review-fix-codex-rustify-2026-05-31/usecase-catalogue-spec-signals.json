@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "bfc16fc8b8a7c50d3bc45195d284c60777e668fd68864461c7310cad6aa43ad9",
+  "signals": [
+    {
+      "type_name": "ReviewFixRunnerError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewFixCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewFixInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewFixOutput",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ReviewFixRunner",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RunReviewFixService",
+      "signal": "blue"
+    }
+  ]
+}

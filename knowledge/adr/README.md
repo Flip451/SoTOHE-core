@@ -171,6 +171,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [review-fix-lead の provider を選択可能にする (Claude デフォルト、Codex オプション)](2026-05-23-1848-review-fix-lead-codex-migration.md) | Proposed | 2026-05-23 |
 | [reviewer capability の provider を選択可能にする (Codex デフォルト、Claude オプション)](2026-05-23-2236-reviewer-provider-selectable-claude-option.md) | Proposed | 2026-05-23 |
 | [Claude モデル baseline を Opus 4.7 から 4.8 へ更新する](2026-05-28-2246-claude-opus-4-8-baseline-migration.md) | Proposed | 2026-05-28 |
+| [Codex review-fix-lead の hexagonal Rust 化 + 入れ子 reviewer session 失敗の解消 + 自己 dogfooding](2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md) | Proposed | 2026-05-31 |
 
 ### テスト・CI ツーリング
 

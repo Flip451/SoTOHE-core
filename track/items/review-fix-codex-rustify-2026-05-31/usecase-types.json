@@ -1,0 +1,323 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "RunReviewFixCommand": {
+      "action": "add",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "scope", "ty": "String" },
+            { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "round_type", "ty": "String" },
+            { "name": "reviewer_model", "ty": "String" },
+            { "name": "model", "ty": "String" },
+            { "name": "scope_files", "ty": "Vec<std::path::PathBuf>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "CQRS command for the run-review-fix use case (sotp review fix-local). Carries stdlib-typed fields only (String, PathBuf — no domain / infrastructure types) per AC-01 and CN-01. Maps to the 7 CLI flags: --scope / --briefing-file / --track-id / --round-type / --reviewer-model / --model / --scope-files. round_type is a plain String (converted to ReviewRoundType internally by the interactor). The 7-flag shape mirrors the current Makefile.toml track-local-review-fix-codex bash arguments.",
+      "spec_refs": [
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "IN-01",
+          "hash": "80069ef0d72de2ec8a90d2d458a7b5a6ded2fd08bd16fd328d3fd019aeffc477"
+        },
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "AC-01",
+          "hash": "41ae9b69b26d85060c82d3068d5f359dfa658abd685881681a097d1662e26f49"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixOutput": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "status", "ty": "String" },
+            { "name": "exit_code", "ty": "i32" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "DTO returned by RunReviewFixService. status carries the sentinel string from the codex output: 'completed' | 'blocked_cross_scope' | 'failed'. Using String (not an enum) keeps the public usecase boundary free of domain types per AC-01 — consistent with RunReviewOutput.verdict_kind. exit_code maps the sentinel to a CLI exit code (0=completed, 1=blocked_cross_scope, 2=failed). The interactor parses and validates the sentinel before returning.",
+      "spec_refs": [
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "IN-01",
+          "hash": "80069ef0d72de2ec8a90d2d458a7b5a6ded2fd08bd16fd328d3fd019aeffc477"
+        },
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "AC-01",
+          "hash": "41ae9b69b26d85060c82d3068d5f359dfa658abd685881681a097d1662e26f49"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidScope",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          },
+          {
+            "name": "InvalidTrackId",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          },
+          {
+            "name": "InvalidRoundType",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          },
+          {
+            "name": "SmokeTestFailed",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          },
+          {
+            "name": "FixRunnerFailed",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Error type for RunReviewFixService. InvalidScope / InvalidTrackId / InvalidRoundType cover argument validation failures. SmokeTestFailed covers forbidden sandbox flag detection or codex version range failure per CN-04. FixRunnerFailed wraps the ReviewFixRunnerError from the port without leaking infrastructure types.",
+      "spec_refs": [
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "IN-01",
+          "hash": "80069ef0d72de2ec8a90d2d458a7b5a6ded2fd08bd16fd328d3fd019aeffc477"
+        },
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "CN-04",
+          "hash": "9d5cb948b1aef7d5418aa9ce0fc7de33d8452afce978158f86b04a18135b06e6"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ReviewFixRunnerError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SmokeTestFailed",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          },
+          {
+            "name": "SpawnFailed",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          },
+          {
+            "name": "SentinelNotFound",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Unexpected",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Error type for the ReviewFixRunner secondary port. SmokeTestFailed covers forbidden sandbox flag or codex version range failures (CN-04). SpawnFailed covers codex exec launch failure. SentinelNotFound covers the case where no REVIEW_FIX_STATUS sentinel was found in the output (AC-08). Unexpected wraps any other error.",
+      "spec_refs": [
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "IN-01",
+          "hash": "80069ef0d72de2ec8a90d2d458a7b5a6ded2fd08bd16fd328d3fd019aeffc477"
+        },
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "IN-02",
+          "hash": "51f325b2ed746157f751b628c1aa99d20c6ddd4b3d894e6b28a66aab2cf98a45"
+        },
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "AC-08",
+          "hash": "2478e2aec36a8b6a5766be73f8ce22ec2150e09993f3992b23a7b2f81471b252"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Concrete interactor implementing RunReviewFixService. Validates the command fields (scope / track_id / round_type strings) then delegates to the injected ReviewFixRunner port. Converts ReviewFixRunnerError to RunReviewFixError without leaking infra types. The run_fn field (function pointer supplied by cli-composition) performs the domain+infra wiring — mirroring the RunReviewInteractor pattern.",
+      "spec_refs": [
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "IN-01",
+          "hash": "80069ef0d72de2ec8a90d2d458a7b5a6ded2fd08bd16fd328d3fd019aeffc477"
+        },
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "AC-01",
+          "hash": "41ae9b69b26d85060c82d3068d5f359dfa658abd685881681a097d1662e26f49"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "ReviewFixRunner": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "run_fix",
+          "receiver": "&self",
+          "params": [
+            { "name": "command", "ty": "RunReviewFixCommand" }
+          ],
+          "returns": "Result<RunReviewFixOutput, ReviewFixRunnerError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Secondary port for the review-fix-lead fixer. Implemented by infrastructure adapters (e.g. CodexReviewFixRunner). Accepts RunReviewFixCommand and returns RunReviewFixOutput on success, ReviewFixRunnerError on failure. The usecase interactor drives this port; the infrastructure adapter implements it — mirroring the Reviewer port.",
+      "spec_refs": [
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "IN-01",
+          "hash": "80069ef0d72de2ec8a90d2d458a7b5a6ded2fd08bd16fd328d3fd019aeffc477"
+        },
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "AC-01",
+          "hash": "41ae9b69b26d85060c82d3068d5f359dfa658abd685881681a097d1662e26f49"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "run",
+          "receiver": "&self",
+          "params": [
+            { "name": "command", "ty": "RunReviewFixCommand" }
+          ],
+          "returns": "Result<RunReviewFixOutput, RunReviewFixError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Primary port (ApplicationService) for the run-review-fix use case. Driven by apps/cli via apps/cli-composition. The CLI never imports domain or infrastructure types directly — it calls this service through the composition root. Mirrors RunReviewService in run_review.rs.",
+      "spec_refs": [
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "IN-01",
+          "hash": "80069ef0d72de2ec8a90d2d458a7b5a6ded2fd08bd16fd328d3fd019aeffc477"
+        },
+        {
+          "file": "track/items/review-fix-codex-rustify-2026-05-31/spec.json",
+          "anchor": "AC-01",
+          "hash": "41ae9b69b26d85060c82d3068d5f359dfa658abd685881681a097d1662e26f49"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RunReviewFixInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "run_fn",
+              "ty": "std::sync::Arc<dyn Fn(RunReviewFixCommand) -> Result<RunReviewFixOutput, RunReviewFixError> + Send + Sync>"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "RunReviewFixService",
+      "for_type": "RunReviewFixInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RunReviewFixError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RunReviewFixError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "RunReviewFixError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ReviewFixRunnerError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ReviewFixRunnerError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ReviewFixRunnerError"
+    }
+  ]
+}

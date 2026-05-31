@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-31T09:33:06Z",
+  "declaration_hash": "139870a783c0ecb5955625ba1fa4a3a018118169738210fd99c32b55b1a09c79",
+  "signals": [
+    {
+      "type_name": "CodexReviewFixRunner",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ReviewFixRunner"
+      ]
+    }
+  ]
+}
