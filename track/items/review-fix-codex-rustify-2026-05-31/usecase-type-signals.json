@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-31T10:07:41Z",
-  "declaration_hash": "bfc16fc8b8a7c50d3bc45195d284c60777e668fd68864461c7310cad6aa43ad9",
+  "generated_at": "2026-05-31T15:54:45Z",
+  "declaration_hash": "22ffaf0dbf434502d8bc8dea283fa91b429d68fc91c5bf017276d9a93383b529",
   "signals": [
     {
       "type_name": "ReviewFixRunner",

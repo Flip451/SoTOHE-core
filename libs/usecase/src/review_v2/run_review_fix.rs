@@ -39,7 +39,7 @@ pub struct RunReviewFixCommand {
 /// Using `String` (not an enum) keeps the public usecase boundary free of domain
 /// types per AC-01 — consistent with `RunReviewOutput.verdict_kind`.
 /// `exit_code` maps the sentinel to a CLI exit code
-/// (0=completed, 1=blocked_cross_scope, 2=failed).
+/// (0=completed, 2=blocked_cross_scope, 1=failed).
 /// The interactor parses and validates the sentinel before returning.
 pub struct RunReviewFixOutput {
     pub status: String,
@@ -60,8 +60,8 @@ pub enum ReviewFixRunnerError {
     SmokeTestFailed(String),
     #[error("spawn failed: {0}")]
     SpawnFailed(String),
-    #[error("sentinel not found in output")]
-    SentinelNotFound,
+    #[error("sentinel not found in output: {0}")]
+    SentinelNotFound(String),
     #[error("unexpected error: {0}")]
     Unexpected(String),
 }
@@ -178,12 +178,12 @@ impl RunReviewFixService for RunReviewFixInteractor {
         let out = (self.run_fn)(command)?;
         // Validate the returned DTO: status must be one of the three sentinels,
         // and exit_code must match the canonical mapping (completed=0,
-        // blocked_cross_scope=1, failed=2). Mismatched output is surfaced as an
+        // blocked_cross_scope=2, failed=1). Mismatched output is surfaced as an
         // error so the boundary never leaks an inconsistent DTO to the caller.
         let expected_exit_code = match out.status.as_str() {
             "completed" => 0,
-            "blocked_cross_scope" => 1,
-            "failed" => 2,
+            "blocked_cross_scope" => 2,
+            "failed" => 1,
             other => {
                 return Err(RunReviewFixError::FixRunnerFailed(format!(
                     "invalid status sentinel: '{other}' (expected 'completed', \
@@ -268,8 +268,8 @@ mod tests {
 
     #[test]
     fn test_review_fix_runner_error_sentinel_not_found_variant_exists() {
-        let e = ReviewFixRunnerError::SentinelNotFound;
-        assert!(matches!(e, ReviewFixRunnerError::SentinelNotFound));
+        let e = ReviewFixRunnerError::SentinelNotFound("no sentinel found".to_owned());
+        assert!(matches!(e, ReviewFixRunnerError::SentinelNotFound(_)));
     }
 
     #[test]
@@ -340,14 +340,14 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_delegates_blocked_cross_scope_to_run_fn() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "blocked_cross_scope".to_owned(), exit_code: 1 })
+            Ok(RunReviewFixOutput { status: "blocked_cross_scope".to_owned(), exit_code: 2 })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         let mut cmd = make_valid_command();
         cmd.round_type = "final".to_owned();
         let out = interactor.run(cmd).unwrap();
         assert_eq!(out.status, "blocked_cross_scope");
-        assert_eq!(out.exit_code, 1);
+        assert_eq!(out.exit_code, 2);
     }
 
     // ── Interactor delegation: failed scenario ────────────────────────────────
@@ -355,12 +355,12 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_delegates_failed_to_run_fn() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "failed".to_owned(), exit_code: 2 })
+            Ok(RunReviewFixOutput { status: "failed".to_owned(), exit_code: 1 })
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         let out = interactor.run(make_valid_command()).unwrap();
         assert_eq!(out.status, "failed");
-        assert_eq!(out.exit_code, 2);
+        assert_eq!(out.exit_code, 1);
     }
 
     // ── Interactor delegation: run_fn error propagation ──────────────────────
@@ -434,8 +434,8 @@ mod tests {
                     ReviewFixRunnerError::SpawnFailed(s) => {
                         ReviewFixRunnerError::SpawnFailed(s.clone())
                     }
-                    ReviewFixRunnerError::SentinelNotFound => {
-                        ReviewFixRunnerError::SentinelNotFound
+                    ReviewFixRunnerError::SentinelNotFound(s) => {
+                        ReviewFixRunnerError::SentinelNotFound(s.clone())
                     }
                     ReviewFixRunnerError::Unexpected(s) => {
                         ReviewFixRunnerError::Unexpected(s.clone())
@@ -460,29 +460,31 @@ mod tests {
     fn test_review_fix_runner_mock_blocked_cross_scope_scenario() {
         let runner = MockReviewFixRunner::returning(Ok(RunReviewFixOutput {
             status: "blocked_cross_scope".to_owned(),
-            exit_code: 1,
+            exit_code: 2,
         }));
         let out = runner.run_fix(make_valid_command()).unwrap();
         assert_eq!(out.status, "blocked_cross_scope");
-        assert_eq!(out.exit_code, 1);
+        assert_eq!(out.exit_code, 2);
     }
 
     #[test]
     fn test_review_fix_runner_mock_failed_scenario() {
         let runner = MockReviewFixRunner::returning(Ok(RunReviewFixOutput {
             status: "failed".to_owned(),
-            exit_code: 2,
+            exit_code: 1,
         }));
         let out = runner.run_fix(make_valid_command()).unwrap();
         assert_eq!(out.status, "failed");
-        assert_eq!(out.exit_code, 2);
+        assert_eq!(out.exit_code, 1);
     }
 
     #[test]
     fn test_review_fix_runner_mock_sentinel_not_found_scenario() {
-        let runner = MockReviewFixRunner::returning(Err(ReviewFixRunnerError::SentinelNotFound));
+        let runner = MockReviewFixRunner::returning(Err(ReviewFixRunnerError::SentinelNotFound(
+            "no sentinel".to_owned(),
+        )));
         match runner.run_fix(make_valid_command()) {
-            Err(e) => assert!(matches!(e, ReviewFixRunnerError::SentinelNotFound)),
+            Err(e) => assert!(matches!(e, ReviewFixRunnerError::SentinelNotFound(_))),
             Ok(_) => panic!("expected Err(SentinelNotFound), got Ok"),
         }
     }

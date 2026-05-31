@@ -1,0 +1,25 @@
+# Docker build-context excludes.
+# compose.yml builds the `tools` image with `context: .` (repo root). Without this
+# file the whole repo — including the multi-GB cargo `target/` — is sent to the
+# daemon as build context (observed: 146 GB). These paths are NOT needed to build
+# the image: the image builds its own dependencies (cargo-chef), and the host
+# `target/`, `.cache/sccache`, and `.git` are bind-mounted into the container at
+# RUNTIME (see compose.yml `volumes:`), so they must not be copied into the image.
+
+# Cargo build output (the context bloat). Includes per-worker dirs from WORKER_ID
+# isolation (target-w1/, target-w2/, ... via CARGO_TARGET_DIR_RELATIVE).
+target/
+target-*/
+
+# Caches (sccache / cargo / container HOME) — bind-mounted at runtime.
+.cache/
+
+# Transient scratch (reviewer-runtime, track-commit, adr drafts) and tmpfs dirs.
+tmp/
+private/
+
+# Host-built sotp binary (rebuilt via `cargo make build-sotp`; not used by the image build).
+bin/sotp
+
+# Logs.
+*.log

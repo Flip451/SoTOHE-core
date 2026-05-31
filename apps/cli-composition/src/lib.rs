@@ -22,6 +22,16 @@ mod semantic_dup;
 mod track;
 mod verify;
 
+#[cfg(test)]
+pub(crate) mod test_support {
+    use std::sync::{Mutex, OnceLock};
+
+    pub(crate) fn process_env_lock() -> &'static Mutex<()> {
+        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Public re-exports for all DTOs (callers use `cli_composition::ReviewRunCodexInput` etc.)
 // ---------------------------------------------------------------------------
@@ -29,6 +39,7 @@ mod verify;
 pub use domain::ExportSchemaInput;
 pub use review_v2::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
+    RunReviewFixLocalInput,
 };
 pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,

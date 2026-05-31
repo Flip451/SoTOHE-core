@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "bfc16fc8b8a7c50d3bc45195d284c60777e668fd68864461c7310cad6aa43ad9",
+  "catalogue_declaration_hash": "22ffaf0dbf434502d8bc8dea283fa91b429d68fc91c5bf017276d9a93383b529",
   "signals": [
     {
       "type_name": "ReviewFixRunnerError",
