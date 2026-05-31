@@ -25,7 +25,7 @@ pub struct FixLocalArgs {
 
     /// Path to the briefing file that the fixer should read.
     #[arg(long)]
-    pub(super) briefing_file: Option<PathBuf>,
+    pub(super) briefing_file: PathBuf,
 
     /// Track ID (required; used to identify the active track).
     #[arg(long)]
@@ -142,10 +142,7 @@ mod tests {
         let input = build_run_review_fix_local_input(&cli.args);
 
         assert_eq!(input.scope, "cli");
-        assert_eq!(
-            input.briefing_file,
-            Some(PathBuf::from("tmp/reviewer runtime/briefing cli.md"))
-        );
+        assert_eq!(input.briefing_file, PathBuf::from("tmp/reviewer runtime/briefing cli.md"));
         assert_eq!(input.track_id, "review-fix");
         assert_eq!(input.round_type, "fast");
         assert_eq!(input.reviewer_model, "gpt-5.4-mini");
@@ -165,6 +162,8 @@ mod tests {
             "test",
             "--scope",
             "cli",
+            "--briefing-file",
+            "tmp/reviewer-runtime/briefing.md",
             "--track-id",
             "review-fix",
             "--round-type",
@@ -221,6 +220,8 @@ mod tests {
             "test",
             "--scope",
             "cli",
+            "--briefing-file",
+            "tmp/reviewer-runtime/briefing.md",
             "--track-id",
             "review-fix",
             "--round-type",
@@ -245,6 +246,8 @@ mod tests {
             "test",
             "--scope",
             "cli",
+            "--briefing-file",
+            "tmp/reviewer-runtime/briefing.md",
             "--track-id",
             "review-fix",
             "--round-type",
@@ -262,5 +265,24 @@ mod tests {
             Some("my-override-model".to_owned()),
             "explicit --model must be forwarded as Some(...) to the input DTO"
         );
+    }
+
+    /// Omitting `--briefing-file` must cause clap to reject the command with
+    /// a deterministic validation error (it is now a required argument).
+    #[test]
+    fn test_fix_local_args_missing_briefing_file_is_rejected() {
+        let err = <TestCli as clap::Parser>::try_parse_from([
+            "test",
+            "--scope",
+            "cli",
+            "--track-id",
+            "review-fix",
+            "--round-type",
+            "fast",
+            "--reviewer-model",
+            "gpt-5.4-mini",
+        ]);
+
+        assert!(err.is_err(), "missing --briefing-file must be rejected by clap");
     }
 }

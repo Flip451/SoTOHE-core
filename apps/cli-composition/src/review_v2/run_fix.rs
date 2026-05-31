@@ -161,7 +161,7 @@ mod tests {
         let interactor = RunReviewFixInteractor::new(run_fn);
         let command = RunReviewFixCommand {
             scope: "cli".to_owned(),
-            briefing_file: None,
+            briefing_file: std::path::PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: "test-track".to_owned(),
             round_type: "fast".to_owned(),
             reviewer_model: "gpt-5.4-mini".to_owned(),
@@ -208,7 +208,7 @@ mod tests {
         let interactor = RunReviewFixInteractor::new(run_fn);
         let command = RunReviewFixCommand {
             scope: "cli".to_owned(),
-            briefing_file: None,
+            briefing_file: std::path::PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: "test-track".to_owned(),
             round_type: "fast".to_owned(),
             reviewer_model: "gpt-5.4-mini".to_owned(),

@@ -50,8 +50,8 @@ pub struct ReviewRunLocalInput {
 pub struct RunReviewFixLocalInput {
     /// Scope name (e.g., `"cli"`, `"infrastructure"`).
     pub scope: String,
-    /// Path to the briefing file passed to the fixer.
-    pub briefing_file: Option<std::path::PathBuf>,
+    /// Path to the briefing file passed to the fixer. Required.
+    pub briefing_file: std::path::PathBuf,
     /// Track ID. Required (no auto-resolve from branch for write operations).
     pub track_id: String,
     /// Round type: `"fast"` or `"final"`.

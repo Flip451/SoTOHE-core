@@ -44,7 +44,7 @@
           "params": [
             { "name": "model", "ty": "String" },
             { "name": "scope", "ty": "String" },
-            { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
             { "name": "scope_files", "ty": "Vec<std::path::PathBuf>" }
           ],
           "returns": "Self",

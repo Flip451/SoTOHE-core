@@ -21,7 +21,7 @@ impl CodexReviewFixRunner {
     pub fn new(
         model: String,
         _scope: String,
-        _briefing_file: Option<PathBuf>,
+        _briefing_file: PathBuf,
         _scope_files: Vec<PathBuf>,
     ) -> Self {
         Self {
@@ -244,15 +244,10 @@ fn shell_quote_arg(raw: &str) -> String {
 }
 fn build_prompt(
     scope: &str,
-    briefing_file: Option<&Path>,
+    briefing_file: &Path,
     scope_files: &[PathBuf],
     command: &RunReviewFixCommand,
 ) -> Result<String, ReviewFixRunnerError> {
-    let briefing_file = briefing_file.ok_or_else(|| {
-        ReviewFixRunnerError::Unexpected(
-            "briefing_file is required for review-fix runner".to_owned(),
-        )
-    })?;
     let briefing_path = prompt_path_string(briefing_file, "briefing_file")?;
     let briefing_content = std::fs::read_to_string(briefing_file).map_err(|e| {
         ReviewFixRunnerError::Unexpected(format!(
@@ -623,7 +618,7 @@ fn collect_output_pipe<R: std::io::Read>(
             let line =
                 line.map_err(|e| format!("failed to read codex fixer {stream_name}: {e}"))?;
             if echo_to_stderr {
-                eprintln!("{line}");
+                eprintln!("{}", redact_credentials(&line));
             }
             collected.push_str(&line);
             collected.push('\n');
@@ -673,12 +668,8 @@ impl ReviewFixRunner for CodexReviewFixRunner {
         self.smoke_test_forbidden_sandbox()?;
         let bin = resolve_codex_bin_path(&bin)?;
         self.smoke_test_codex_version(&bin)?;
-        let prompt = build_prompt(
-            &command.scope,
-            command.briefing_file.as_deref(),
-            &command.scope_files,
-            &command,
-        )?;
+        let prompt =
+            build_prompt(&command.scope, &command.briefing_file, &command.scope_files, &command)?;
         let output_last_message = fixer_runtime_path("review-fix-codex-last-message", "txt")?;
         std::fs::write(&output_last_message, "").map_err(|e| {
             ReviewFixRunnerError::Unexpected(format!(
@@ -779,7 +770,7 @@ mod tests {
     fn make_command() -> RunReviewFixCommand {
         RunReviewFixCommand {
             scope: "infrastructure".to_owned(),
-            briefing_file: None,
+            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
             round_type: "fast".to_owned(),
             reviewer_model: "o4-mini".to_owned(),
@@ -789,7 +780,12 @@ mod tests {
     }
 
     fn make_runner() -> CodexReviewFixRunner {
-        CodexReviewFixRunner::new("gpt-5.5".to_owned(), "infrastructure".to_owned(), None, vec![])
+        CodexReviewFixRunner::new(
+            "gpt-5.5".to_owned(),
+            "infrastructure".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            vec![],
+        )
     }
 
     // ── build_prompt ─────────────────────────────────────────────────────────
@@ -800,7 +796,7 @@ mod tests {
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "briefing").unwrap();
 
-        let prompt = build_prompt("infrastructure", Some(&briefing), &[], &make_command()).unwrap();
+        let prompt = build_prompt("infrastructure", &briefing, &[], &make_command()).unwrap();
 
         assert!(prompt.contains("## Scope File List (modification boundary)"));
         assert!(prompt.contains("- (none provided; do not modify files"));
@@ -813,7 +809,7 @@ mod tests {
         std::fs::write(&briefing, "briefing").unwrap();
         let scope_files = vec![PathBuf::from("libs/infrastructure/src/lib.rs\n- Cargo.toml")];
 
-        let result = build_prompt("infrastructure", Some(&briefing), &scope_files, &make_command());
+        let result = build_prompt("infrastructure", &briefing, &scope_files, &make_command());
 
         assert!(matches!(result, Err(ReviewFixRunnerError::Unexpected(_))));
     }
@@ -824,7 +820,7 @@ mod tests {
         let briefing = dir.path().join("brief`ing.md");
         std::fs::write(&briefing, "briefing").unwrap();
 
-        let result = build_prompt("infrastructure", Some(&briefing), &[], &make_command());
+        let result = build_prompt("infrastructure", &briefing, &[], &make_command());
 
         assert!(matches!(result, Err(ReviewFixRunnerError::Unexpected(_))));
     }
@@ -835,7 +831,7 @@ mod tests {
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "briefing").unwrap();
 
-        let prompt = build_prompt("usecase cli", Some(&briefing), &[], &make_command()).unwrap();
+        let prompt = build_prompt("usecase cli", &briefing, &[], &make_command()).unwrap();
 
         assert!(prompt.contains("--group 'usecase cli'"));
     }
@@ -848,17 +844,17 @@ mod tests {
         let mut command = make_command();
         command.track_id = "review-fix\n- Scope: cli".to_owned();
         assert!(matches!(
-            build_prompt("infrastructure", Some(&briefing), &[], &command),
+            build_prompt("infrastructure", &briefing, &[], &command),
             Err(ReviewFixRunnerError::Unexpected(_))
         ));
         let mut command = make_command();
         command.reviewer_model = "gpt-5.4-mini`".to_owned();
         assert!(matches!(
-            build_prompt("infrastructure", Some(&briefing), &[], &command),
+            build_prompt("infrastructure", &briefing, &[], &command),
             Err(ReviewFixRunnerError::Unexpected(_))
         ));
         assert!(matches!(
-            build_prompt("infra\n- Scope: cli", Some(&briefing), &[], &make_command()),
+            build_prompt("infra\n- Scope: cli", &briefing, &[], &make_command()),
             Err(ReviewFixRunnerError::Unexpected(_))
         ));
     }
@@ -1274,7 +1270,7 @@ exit 0
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "# Briefing\n").unwrap();
         let mut command = make_command();
-        command.briefing_file = Some(briefing);
+        command.briefing_file = briefing;
         command.scope_files =
             vec![PathBuf::from("libs/infrastructure/src/review_v2/review_fix_runner.rs")];
         let runner = make_runner().with_bin(&fake);
@@ -1293,7 +1289,7 @@ exit 0
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "# Briefing\n").unwrap();
         let mut command = make_command();
-        command.briefing_file = Some(briefing);
+        command.briefing_file = briefing;
         command.scope_files =
             vec![PathBuf::from("libs/infrastructure/src/review_v2/review_fix_runner.rs")];
         let runner = make_runner().with_bin(&fake);
@@ -1317,7 +1313,7 @@ exit 0
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "# Briefing\n").unwrap();
         let mut command = make_command();
-        command.briefing_file = Some(briefing);
+        command.briefing_file = briefing;
         command.scope_files =
             vec![PathBuf::from("libs/infrastructure/src/review_v2/review_fix_runner.rs")];
         let runner = make_runner().with_bin(&fake);
@@ -1343,7 +1339,7 @@ exit 0
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "# Briefing\n").unwrap();
         let mut command = make_command();
-        command.briefing_file = Some(briefing);
+        command.briefing_file = briefing;
         command.scope_files =
             vec![PathBuf::from("libs/infrastructure/src/review_v2/review_fix_runner.rs")];
         let runner = make_runner().with_bin(&fake);

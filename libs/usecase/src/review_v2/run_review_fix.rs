@@ -22,7 +22,8 @@ use thiserror::Error;
 /// `track-local-review-fix-codex` bash arguments.
 pub struct RunReviewFixCommand {
     pub scope: String,
-    pub briefing_file: Option<PathBuf>,
+    /// Path to the briefing file passed to the fixer. Required.
+    pub briefing_file: PathBuf,
     pub track_id: String,
     pub round_type: String,
     pub reviewer_model: String,
@@ -225,7 +226,7 @@ mod tests {
     fn make_valid_command() -> RunReviewFixCommand {
         RunReviewFixCommand {
             scope: "domain".to_owned(),
-            briefing_file: None,
+            briefing_file: std::path::PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: "my-track-2026-05-31".to_owned(),
             round_type: "fast".to_owned(),
             reviewer_model: "o4-mini".to_owned(),

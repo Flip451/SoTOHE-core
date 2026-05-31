@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "139870a783c0ecb5955625ba1fa4a3a018118169738210fd99c32b55b1a09c79",
+  "catalogue_declaration_hash": "e293e1a2ea8da786d4fd12e2c3bec6bbef7cb23b5901b1735d49b1cf875d3044",
   "signals": [
     {
       "type_name": "CodexReviewFixRunner",

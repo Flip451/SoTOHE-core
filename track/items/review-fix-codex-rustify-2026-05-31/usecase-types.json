@@ -12,7 +12,7 @@
           "kind": "plain",
           "fields": [
             { "name": "scope", "ty": "String" },
-            { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
             { "name": "track_id", "ty": "String" },
             { "name": "round_type", "ty": "String" },
             { "name": "reviewer_model", "ty": "String" },

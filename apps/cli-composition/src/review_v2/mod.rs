@@ -819,7 +819,7 @@ exit 0
     fn run_review_fix_input(briefing_file: PathBuf) -> crate::review_v2::RunReviewFixLocalInput {
         crate::review_v2::RunReviewFixLocalInput {
             scope: "cli_composition".to_owned(),
-            briefing_file: Some(briefing_file),
+            briefing_file,
             track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
             round_type: "fast".to_owned(),
             reviewer_model: "gpt-5.4-mini".to_owned(),
