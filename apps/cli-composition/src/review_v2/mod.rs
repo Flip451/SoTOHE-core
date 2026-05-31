@@ -7,6 +7,7 @@ mod inputs;
 pub(crate) mod null_reviewer;
 pub(crate) mod results;
 pub(crate) mod run;
+mod run_fix;
 pub(crate) mod scope;
 pub(crate) mod shared;
 
@@ -34,7 +35,7 @@ use shared::{build_scope_query_interactor_no_diff_str, build_scope_query_interac
 use std::path::PathBuf;
 use std::time::Duration;
 
-use infrastructure::review_v2::{ClaudeReviewer, CodexReviewFixRunner, CodexReviewer};
+use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
 
 use crate::{CliApp, CommandOutcome};
 
@@ -265,102 +266,7 @@ impl CliApp {
         &self,
         input: RunReviewFixLocalInput,
     ) -> Result<CommandOutcome, String> {
-        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
-        use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-        use std::sync::Arc;
-        use usecase::review_v2::run_review_fix::{
-            ReviewFixRunner as _, ReviewFixRunnerError, RunReviewFixCommand, RunReviewFixError,
-            RunReviewFixInteractor, RunReviewFixService as _,
-        };
-
-        let repo = SystemGitRepo::discover()
-            .map_err(|e| format!("[ERROR] failed to discover git repository root: {e}"))?;
-        let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
-            .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
-
-        let track_id = input.track_id.trim().to_owned();
-        validate_track_id_str(&track_id).map_err(|e| format!("invalid --track-id: {e}"))?;
-
-        let scope = input.scope.trim().to_owned();
-        validate_review_group_name_str(&scope).map_err(|e| format!("invalid --scope: {e}"))?;
-
-        let infra_round_type = match input.round_type.as_str() {
-            "fast" => RoundType::Fast,
-            "final" => RoundType::Final,
-            other => {
-                return Err(format!(
-                    "[ERROR] unknown round type '{other}' (expected 'fast' or 'final')"
-                ));
-            }
-        };
-        let resolved =
-            profiles.resolve_execution("review-fix-lead", infra_round_type).ok_or_else(|| {
-                "[ERROR] review-fix-lead capability not defined in agent-profiles.json".to_owned()
-            })?;
-
-        let model = resolved.model.clone().unwrap_or_else(|| input.model.clone());
-
-        eprintln!("[sotp review fix-local] provider={} model={}", resolved.provider, &model);
-
-        match resolved.provider.as_str() {
-            "codex" => {
-                let runner = CodexReviewFixRunner::new(
-                    model,
-                    scope.clone(),
-                    input.briefing_file.clone(),
-                    input.scope_files.clone(),
-                );
-                let runner_arc = Arc::new(runner);
-                let run_fn = Arc::new(
-                    move |cmd: RunReviewFixCommand| -> Result<
-                        usecase::review_v2::run_review_fix::RunReviewFixOutput,
-                        RunReviewFixError,
-                    > {
-                        runner_arc.as_ref().run_fix(cmd).map_err(|e| match e {
-                            ReviewFixRunnerError::SmokeTestFailed(message) => {
-                                RunReviewFixError::SmokeTestFailed(message)
-                            }
-                            ReviewFixRunnerError::SpawnFailed(_) => {
-                                RunReviewFixError::FixRunnerFailed(
-                                    "fix runner process failed".to_owned(),
-                                )
-                            }
-                            ReviewFixRunnerError::SentinelNotFound(_) => {
-                                RunReviewFixError::FixRunnerFailed(
-                                    "fix runner did not report a completion status".to_owned(),
-                                )
-                            }
-                            ReviewFixRunnerError::Unexpected(_) => {
-                                RunReviewFixError::FixRunnerFailed(
-                                    "fix runner failed unexpectedly".to_owned(),
-                                )
-                            }
-                        })
-                    },
-                );
-                let interactor = RunReviewFixInteractor::new(run_fn);
-                let command = RunReviewFixCommand {
-                    scope,
-                    briefing_file: input.briefing_file,
-                    track_id,
-                    round_type: input.round_type,
-                    reviewer_model: input.reviewer_model,
-                    model: input.model,
-                    scope_files: input.scope_files,
-                };
-                let output = interactor.run(command).map_err(|e| format!("[ERROR] {e}"))?;
-                Ok(CommandOutcome {
-                    stdout: Some(format!("REVIEW_FIX_STATUS: {}", output.status)),
-                    stderr: None,
-                    exit_code: u8::try_from(output.exit_code).unwrap_or(1),
-                })
-            }
-            other => Err(format!(
-                "[ERROR] unsupported review-fix-lead provider '{other}' \
-                 (supported: 'codex')"
-            )),
-        }
+        run_fix::run_fix_local(input)
     }
 
     /// Check if the review state is approved and code hash is current.

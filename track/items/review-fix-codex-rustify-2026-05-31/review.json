@@ -1,6 +1,121 @@
 {
   "schema_version": 2,
   "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
+          "at": "2026-05-31T08:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR states that `network_access=true` opens only the nested reviewer’s LLM reachability, but D2 enables network on the outer fixer sandbox, so every process the fixer runs can make outbound network calls. Since the same design also makes `CODEX_HOME`/`~/.codex` writable for session creation, this overstates the safety boundary: push prevention may still hold, but general outbound access is broader than LLM-only access and can mislead the implementation plan’s security assumptions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md",
+              "line": 82,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
+          "at": "2026-05-31T08:47:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:156c1b09ba96ebae31b8150b3fd4335e8d2490bedd6d6fc720ab02c0a1621bcd",
+          "at": "2026-05-31T08:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
+          "at": "2026-05-31T09:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
+          "at": "2026-05-31T09:30:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T09:55:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md`/`impl-plan.json` present T001 as only in progress, but the generated `usecase-types.md` now marks every T001 usecase catalogue entry as Blue instead of Yellow. In this workflow Yellow is the WIP declaration state and Blue is the implemented/confirmed state, so the plan artifacts now give conflicting status signals for the same T001 work and can falsely present the usecase contract as already complete.",
+              "severity": "P1",
+              "file": "track/items/review-fix-codex-rustify-2026-05-31/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T09:58:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T10:02:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
+          "at": "2026-05-31T14:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
+          "at": "2026-05-31T14:27:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9b25a5b36ec7b463badbadd4437ee9afcaaa1157313cd748c357c5b860fa18f",
+          "at": "2026-05-31T16:02:24Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
+          "at": "2026-05-31T14:25:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
+          "at": "2026-05-31T14:28:42Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -137,6 +252,13 @@
           "findings": [],
           "hash": "rvw1:sha256:6b39dcf31bc5b133161a4eb81b1028060684d25f9d8b071c4baee1601f547d26",
           "at": "2026-05-31T14:53:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bc8178179ea440a7a21d0df7be7883f56ff7523d2d6742498f51c70ecda40c4",
+          "at": "2026-05-31T16:20:29Z"
         }
       ]
     },
@@ -162,61 +284,6 @@
           "findings": [],
           "hash": "rvw1:sha256:77e5ab7d4d91eb466180381c343de1ab0ca63f97e0b6a0be04dcd2967f8f2de6",
           "at": "2026-05-31T14:28:54Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dispatch_track_local_review_fix_codex()` is not a transparent passthrough for valid cargo-make inputs: it re-tokenizes `${@}` with `split_whitespace`, so quoted `--briefing-file` or `--scope-files` values containing spaces are split apart before Clap sees them. The new make task will misparse those legitimate paths and can invoke `sotp review fix-local` with the wrong arguments.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
-              "line": 458,
-              "category": "argument_forwarding"
-            },
-            {
-              "message": "The new `sotp review fix-local` public entry point ships without any happy-path or error-path tests covering `FixLocalArgs` -> `RunReviewFixLocalInput` mapping and `RunReviewFixOutput.exit_code` propagation. That leaves regressions in the new CLI wiring and exit-code behavior unguarded, which violates the repo's testing requirement for public APIs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/fix_local.rs",
-              "line": 19,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:7f4c2d7725a52219b801d025139290f943c9cfd17f5a7777aaac851566c7a869",
-          "at": "2026-05-31T14:20:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The shell-word parser drops every backslash inside double quotes, so a legitimate quoted value like `--briefing-file \"tmp/a\\b.md\"` is forwarded as `tmp/ab.md`. That silently corrupts path-like arguments in the new make passthrough.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
-              "line": 533,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c6dceb8d9a39b899c89a83a1fb8f24e87052a48535368c38dcfb949e9589c9a1",
-          "at": "2026-05-31T14:31:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b16244773cef70fd4b6e084bbb79155e8cc41c176e4f7600123d5bea9febd88d",
-          "at": "2026-05-31T14:38:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b16244773cef70fd4b6e084bbb79155e8cc41c176e4f7600123d5bea9febd88d",
-          "at": "2026-05-31T14:43:17Z"
         }
       ]
     },
@@ -496,118 +563,65 @@
         }
       ]
     },
-    "other": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
-          "at": "2026-05-31T14:25:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
-          "at": "2026-05-31T14:28:42Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
-          "at": "2026-05-31T08:42:34Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The ADR states that `network_access=true` opens only the nested reviewer’s LLM reachability, but D2 enables network on the outer fixer sandbox, so every process the fixer runs can make outbound network calls. Since the same design also makes `CODEX_HOME`/`~/.codex` writable for session creation, this overstates the safety boundary: push prevention may still hold, but general outbound access is broader than LLM-only access and can mislead the implementation plan’s security assumptions.",
+              "message": "`dispatch_track_local_review_fix_codex()` is not a transparent passthrough for valid cargo-make inputs: it re-tokenizes `${@}` with `split_whitespace`, so quoted `--briefing-file` or `--scope-files` values containing spaces are split apart before Clap sees them. The new make task will misparse those legitimate paths and can invoke `sotp review fix-local` with the wrong arguments.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md",
-              "line": 82,
-              "category": "factual error (semantic)"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 458,
+              "category": "argument_forwarding"
+            },
+            {
+              "message": "The new `sotp review fix-local` public entry point ships without any happy-path or error-path tests covering `FixLocalArgs` -> `RunReviewFixLocalInput` mapping and `RunReviewFixOutput.exit_code` propagation. That leaves regressions in the new CLI wiring and exit-code behavior unguarded, which violates the repo's testing requirement for public APIs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/fix_local.rs",
+              "line": 19,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
-          "at": "2026-05-31T08:47:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:156c1b09ba96ebae31b8150b3fd4335e8d2490bedd6d6fc720ab02c0a1621bcd",
-          "at": "2026-05-31T08:49:23Z"
+          "hash": "rvw1:sha256:7f4c2d7725a52219b801d025139290f943c9cfd17f5a7777aaac851566c7a869",
+          "at": "2026-05-31T14:20:40Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
-          "at": "2026-05-31T09:24:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
-          "at": "2026-05-31T09:30:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T09:55:59Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`plan.md`/`impl-plan.json` present T001 as only in progress, but the generated `usecase-types.md` now marks every T001 usecase catalogue entry as Blue instead of Yellow. In this workflow Yellow is the WIP declaration state and Blue is the implemented/confirmed state, so the plan artifacts now give conflicting status signals for the same T001 work and can falsely present the usecase contract as already complete.",
+              "message": "The shell-word parser drops every backslash inside double quotes, so a legitimate quoted value like `--briefing-file \"tmp/a\\b.md\"` is forwarded as `tmp/ab.md`. That silently corrupts path-like arguments in the new make passthrough.",
               "severity": "P1",
-              "file": "track/items/review-fix-codex-rustify-2026-05-31/usecase-types.md",
-              "line": 7,
-              "category": "contradiction"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "line": 533,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T09:58:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T10:02:37Z"
+          "hash": "rvw1:sha256:c6dceb8d9a39b899c89a83a1fb8f24e87052a48535368c38dcfb949e9589c9a1",
+          "at": "2026-05-31T14:31:42Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
-          "at": "2026-05-31T14:23:07Z"
+          "hash": "rvw1:sha256:b16244773cef70fd4b6e084bbb79155e8cc41c176e4f7600123d5bea9febd88d",
+          "at": "2026-05-31T14:38:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
-          "at": "2026-05-31T14:27:20Z"
+          "hash": "rvw1:sha256:b16244773cef70fd4b6e084bbb79155e8cc41c176e4f7600123d5bea9febd88d",
+          "at": "2026-05-31T14:43:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e9b25a5b36ec7b463badbadd4437ee9afcaaa1157313cd748c357c5b860fa18f",
-          "at": "2026-05-31T16:02:24Z"
+          "hash": "rvw1:sha256:ac6d59569cf3399e9d2b1ad9698f06120d64855233c4ff560688f71012ba79aa",
+          "at": "2026-05-31T16:21:39Z"
         }
       ]
     }
