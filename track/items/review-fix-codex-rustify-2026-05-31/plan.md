@@ -14,7 +14,7 @@ T006 has a hard dependency on T001-T005: the dogfooding only succeeds after the 
 > Adds libs/usecase/src/review_v2/run_review_fix.rs with all types from the usecase catalogue: RunReviewFixCommand, RunReviewFixOutput, RunReviewFixError, ReviewFixRunnerError, ReviewFixRunner (secondary port), RunReviewFixService (primary port), RunReviewFixInteractor (Arc<dyn Fn> pattern). Unit tests cover the three outcome scenarios (completed / blocked_cross_scope / failed) with a mock runner.
 > Layer constraint: no std::process::* in usecase; public face exposes only stdlib types (String, PathBuf). Mirrors run_review.rs pattern exactly.
 
-- [ ] **T001**: Add usecase layer module: RunReviewFixCommand / RunReviewFixOutput / RunReviewFixError / ReviewFixRunnerError structs+enum, ReviewFixRunner secondary port trait, RunReviewFixService primary port trait, RunReviewFixInteractor concrete struct with Arc<dyn Fn> pattern, trait impls, and unit tests (completed / blocked_cross_scope / failed mock scenarios) in libs/usecase/src/review_v2/run_review_fix.rs
+- [~] **T001**: Add usecase layer module: RunReviewFixCommand / RunReviewFixOutput / RunReviewFixError / ReviewFixRunnerError structs+enum, ReviewFixRunner secondary port trait, RunReviewFixService primary port trait, RunReviewFixInteractor concrete struct with Arc<dyn Fn> pattern, trait impls, and unit tests (completed / blocked_cross_scope / failed mock scenarios) in libs/usecase/src/review_v2/run_review_fix.rs
 
 ### S2 — Infrastructure layer — CodexReviewFixRunner adapter
 

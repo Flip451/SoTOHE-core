@@ -1,6 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9ccca18765364cc36acdecd07c05cfe64809b2b845864f2c3ea30f3bcc01036",
+          "at": "2026-05-31T09:55:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RunReviewFixInteractor::run` returns the injected closure's `RunReviewFixOutput` unchanged, so the service can successfully surface an arbitrary status or a mismatched exit code such as `status = \"completed\"` with `exit_code = 2`. The usecase contract limits results to `completed`/`blocked_cross_scope`/`failed` with fixed exit-code mapping, so the boundary should validate the returned DTO and convert invalid output to an error before returning.",
+              "severity": "P1",
+              "file": "libs/usecase/src/review_v2/run_review_fix.rs",
+              "line": 178,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:d9ccca18765364cc36acdecd07c05cfe64809b2b845864f2c3ea30f3bcc01036",
+          "at": "2026-05-31T09:59:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6eecd7cf8e87256471fbde8f4d0bdcc83346ff1d7c0f39b716a573ef8437745",
+          "at": "2026-05-31T10:06:07Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -45,6 +78,35 @@
           "findings": [],
           "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
           "at": "2026-05-31T09:30:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T09:55:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md`/`impl-plan.json` present T001 as only in progress, but the generated `usecase-types.md` now marks every T001 usecase catalogue entry as Blue instead of Yellow. In this workflow Yellow is the WIP declaration state and Blue is the implemented/confirmed state, so the plan artifacts now give conflicting status signals for the same T001 work and can falsely present the usecase contract as already complete.",
+              "severity": "P1",
+              "file": "track/items/review-fix-codex-rustify-2026-05-31/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T09:58:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T10:02:37Z"
         }
       ]
     }
