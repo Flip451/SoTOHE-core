@@ -11,7 +11,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ReviewFixRunnerError | error_type | — | SmokeTestFailed, SpawnFailed, SentinelNotFound, Unexpected | 🔵 | 🔵 |
-| RunReviewFixError | error_type | — | InvalidScope, InvalidTrackId, InvalidRoundType, SmokeTestFailed, FixRunnerFailed | 🔵 | 🔵 |
+| RunReviewFixError | error_type | — | InvalidScope, InvalidTrackId, InvalidRoundType, EmptyScopeFiles, SmokeTestFailed, FixRunnerFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
 

@@ -59,7 +59,9 @@ pub struct RunReviewFixLocalInput {
     /// Model for the nested reviewer subprocess.
     pub reviewer_model: String,
     /// Model for the fixer (Codex) subprocess.
-    pub model: String,
+    /// `None` means "use the model from `agent-profiles.json`".
+    /// An explicit value overrides the profile model.
+    pub model: Option<String>,
     /// Files the fixer may modify (modification boundary).
     pub scope_files: Vec<std::path::PathBuf>,
 }

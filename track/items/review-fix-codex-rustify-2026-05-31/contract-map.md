@@ -48,6 +48,7 @@ subgraph usecase["usecase"]
     T33_usecase_usecase_RunReviewFixError_InvalidScope[InvalidScope]
     T33_usecase_usecase_RunReviewFixError_InvalidTrackId[InvalidTrackId]
     T33_usecase_usecase_RunReviewFixError_InvalidRoundType[InvalidRoundType]
+    T33_usecase_usecase_RunReviewFixError_EmptyScopeFiles[EmptyScopeFiles]
     T33_usecase_usecase_RunReviewFixError_SmokeTestFailed[SmokeTestFailed]
     T33_usecase_usecase_RunReviewFixError_FixRunnerFailed[FixRunnerFailed]
   end
@@ -102,6 +103,7 @@ class T35_usecase_usecase_RunReviewFixCommand__self command
 class T33_usecase_usecase_RunReviewFixError_InvalidScope variant_node
 class T33_usecase_usecase_RunReviewFixError_InvalidTrackId variant_node
 class T33_usecase_usecase_RunReviewFixError_InvalidRoundType variant_node
+class T33_usecase_usecase_RunReviewFixError_EmptyScopeFiles variant_node
 class T33_usecase_usecase_RunReviewFixError_SmokeTestFailed variant_node
 class T33_usecase_usecase_RunReviewFixError_FixRunnerFailed variant_node
 class T33_usecase_usecase_RunReviewFixError__self error_type

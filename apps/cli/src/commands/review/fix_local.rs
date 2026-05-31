@@ -40,8 +40,10 @@ pub struct FixLocalArgs {
     pub(super) reviewer_model: String,
 
     /// Model for the fixer (Codex) subprocess.
-    #[arg(long, default_value = "gpt-5.5")]
-    pub(super) model: String,
+    /// When omitted the model is resolved from `agent-profiles.json`
+    /// `review-fix-lead.model` (or `fast_model` for fast round).
+    #[arg(long)]
+    pub(super) model: Option<String>,
 
     /// Comma-separated list of files the fixer may modify (modification boundary).
     #[arg(long, value_delimiter = ',', num_args = 0..)]
@@ -49,19 +51,26 @@ pub struct FixLocalArgs {
 }
 
 pub(super) fn execute_fix_local(args: &FixLocalArgs) -> ExitCode {
-    match run_execute_fix_local(args) {
-        Ok(code) => ExitCode::from(code),
+    let input = build_run_review_fix_local_input(args);
+    match cli_composition::CliApp::new().review_run_fix_local(input) {
+        Ok(outcome) => {
+            // Smoke-test failures (exit_code 2) and normal outcomes all arrive
+            // as Ok(CommandOutcome) — the typed RunReviewFixError::SmokeTestFailed
+            // mapping is made in cli-composition/run_fix.rs before stringification,
+            // keeping the exit-code decision on the typed boundary, not a string match.
+            match emit_fix_local_outcome(&outcome) {
+                Ok(()) => ExitCode::from(outcome.exit_code),
+                Err(e) => {
+                    eprintln!("{e}");
+                    ExitCode::from(1)
+                }
+            }
+        }
         Err(msg) => {
             eprintln!("{msg}");
             ExitCode::from(1)
         }
     }
-}
-
-fn run_execute_fix_local(args: &FixLocalArgs) -> Result<u8, String> {
-    let input = build_run_review_fix_local_input(args);
-    let outcome = cli_composition::CliApp::new().review_run_fix_local(input)?;
-    emit_fix_local_outcome(outcome)
 }
 
 fn build_run_review_fix_local_input(args: &FixLocalArgs) -> RunReviewFixLocalInput {
@@ -81,11 +90,22 @@ fn build_run_review_fix_local_input(args: &FixLocalArgs) -> RunReviewFixLocalInp
     }
 }
 
-fn emit_fix_local_outcome(outcome: cli_composition::CommandOutcome) -> Result<u8, String> {
+/// Writes `outcome.stderr` then `outcome.stdout` to the appropriate streams.
+///
+/// `stderr` (e.g. the smoke-test failure message placed there by the composition
+/// layer) is printed before stdout so the diagnostic always appears even when
+/// the caller redirects stdout.
+///
+/// # Errors
+/// Returns `Err` if writing to stdout fails.
+fn emit_fix_local_outcome(outcome: &cli_composition::CommandOutcome) -> Result<(), String> {
+    if let Some(msg) = &outcome.stderr {
+        eprintln!("{msg}");
+    }
     if let Some(line) = &outcome.stdout {
         writeln!(io::stdout(), "{line}").map_err(|e| format!("failed to write stdout: {e}"))?;
     }
-    Ok(outcome.exit_code)
+    Ok(())
 }
 
 #[cfg(test)]
@@ -129,7 +149,7 @@ mod tests {
         assert_eq!(input.track_id, "review-fix");
         assert_eq!(input.round_type, "fast");
         assert_eq!(input.reviewer_model, "gpt-5.4-mini");
-        assert_eq!(input.model, "gpt-5.5");
+        assert_eq!(input.model, Some("gpt-5.5".to_owned()));
         assert_eq!(
             input.scope_files,
             vec![
@@ -156,7 +176,7 @@ mod tests {
         let input = build_run_review_fix_local_input(&cli.args);
 
         assert_eq!(input.round_type, "final");
-        assert_eq!(input.model, "gpt-5.5");
+        assert_eq!(input.model, None);
         assert!(input.scope_files.is_empty());
     }
 
@@ -177,10 +197,70 @@ mod tests {
         assert!(err.is_err());
     }
 
+    /// `emit_fix_local_outcome` must return `Ok(())` for any valid outcome and the
+    /// caller reads `outcome.exit_code` directly (exit_code 2 for smoke-test, etc.).
     #[test]
-    fn test_emit_fix_local_outcome_propagates_exit_code() {
+    fn test_emit_fix_local_outcome_returns_ok_for_exit_code_2() {
         let outcome = cli_composition::CommandOutcome { stdout: None, stderr: None, exit_code: 2 };
+        assert!(emit_fix_local_outcome(&outcome).is_ok());
+    }
 
-        assert_eq!(emit_fix_local_outcome(outcome).unwrap(), 2);
+    /// The CLI propagates whatever exit_code the composition layer placed in the
+    /// outcome (0, 1, or 2 — including smoke-test exit 2 from run_fix.rs).
+    #[test]
+    fn test_emit_fix_local_outcome_returns_ok_for_exit_code_0() {
+        let outcome = cli_composition::CommandOutcome { stdout: None, stderr: None, exit_code: 0 };
+        assert!(emit_fix_local_outcome(&outcome).is_ok());
+    }
+
+    /// Finding 2: when --model is omitted, `model` is `None` (profile model will
+    /// be used as the default in run_fix.rs).
+    #[test]
+    fn test_model_absent_maps_to_none_in_input() {
+        let cli = <TestCli as clap::Parser>::parse_from([
+            "test",
+            "--scope",
+            "cli",
+            "--track-id",
+            "review-fix",
+            "--round-type",
+            "fast",
+            "--reviewer-model",
+            "gpt-5.4-mini",
+        ]);
+
+        let input = build_run_review_fix_local_input(&cli.args);
+
+        assert_eq!(
+            input.model, None,
+            "omitted --model must produce None so the profile model is used as default"
+        );
+    }
+
+    /// Finding 2: when --model is explicitly provided, it is forwarded in `input.model`
+    /// so run_fix.rs can honor the override over the profile model.
+    #[test]
+    fn test_explicit_model_is_forwarded_to_input() {
+        let cli = <TestCli as clap::Parser>::parse_from([
+            "test",
+            "--scope",
+            "cli",
+            "--track-id",
+            "review-fix",
+            "--round-type",
+            "fast",
+            "--reviewer-model",
+            "gpt-5.4-mini",
+            "--model",
+            "my-override-model",
+        ]);
+
+        let input = build_run_review_fix_local_input(&cli.args);
+
+        assert_eq!(
+            input.model,
+            Some("my-override-model".to_owned()),
+            "explicit --model must be forwarded as Some(...) to the input DTO"
+        );
     }
 }

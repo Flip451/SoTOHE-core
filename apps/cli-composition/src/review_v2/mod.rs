@@ -823,7 +823,7 @@ exit 0
             track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
             round_type: "fast".to_owned(),
             reviewer_model: "gpt-5.4-mini".to_owned(),
-            model: "gpt-5.5".to_owned(),
+            model: Some("gpt-5.5".to_owned()),
             scope_files: vec![PathBuf::from("apps/cli-composition/src/review_v2/mod.rs")],
         }
     }
