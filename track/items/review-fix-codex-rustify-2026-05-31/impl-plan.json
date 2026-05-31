@@ -10,27 +10,27 @@
     {
       "id": "T002",
       "description": "Add infrastructure layer module: CodexReviewFixRunner adapter in libs/infrastructure/src/review_v2/review_fix_runner.rs implementing ReviewFixRunner — (1) smoke-test: forbidden sandbox flag env check and codex CLI version range check (>= 0.115.0, < 1.0.0); (2) credential isolation: GITHUB_TOKEN / SSH_AUTH_SOCK / GIT_SSH / GIT_SSH_COMMAND=/bin/false / SSH_CONNECTION / SSH_CLIENT excluded, HOME replaced with temp dir; (3) D2 sandbox config: sandbox_workspace_write.writable_roots=[CODEX_HOME] and network_access=true; (4) codex exec spawning; (5) sentinel parsing (REVIEW_FIX_STATUS full-line match); (6) exit-code mapping; plus unit tests for smoke-test rejection and sentinel parsing",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T003",
       "description": "Add cli-composition wiring module: apps/cli-composition/src/review_v2/ submodule for review-fix-lead, CliApp::review_run_fix_local method that resolves 'review-fix-lead' capability via profiles.resolve_execution and wires CodexReviewFixRunner, RunReviewFixInteractor, and the run_fn closure; expose RunReviewFixLocalInput and necessary re-exports from cli-composition lib",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T004",
       "description": "Add apps/cli clap subcommand: apps/cli/src/commands/review/fix_local.rs with FixLocalArgs accepting 7 flags (--scope / --briefing-file / --track-id / --round-type / --reviewer-model / --model / --scope-files), dispatch function calling cli_composition::CliApp::new().review_run_fix_local; register ReviewCommand::FixLocal variant in apps/cli/src/commands/review/mod.rs; no direct use of usecase:: or infrastructure:: in apps/cli",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "Replace Makefile.toml track-local-review-fix-codex bash implementation with thin passthrough: script_runner calls bin/sotp make track-local-review-fix-codex \"$@\"; add TrackLocalReviewFixCodex variant to MakeTask enum in apps/cli/src/commands/make.rs; add dispatch_track_local_review_fix_codex forwarding to 'review fix-local'; remove all inline bash logic from the task",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "Dogfooding: set review-fix-lead.provider=codex in .harness/config/agent-profiles.json; run the new Codex fixer on this track's own change set (self-referential dogfooding per ADR D3); record outcome in track/items/review-fix-codex-rustify-2026-05-31/observations.md (completed / reverted to claude if unstable); verify cargo make ci passes as final gate",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
