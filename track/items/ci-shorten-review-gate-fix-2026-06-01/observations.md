@@ -77,3 +77,30 @@ CI 所要時間(AC-04)の実測は **GitHub Actions の実行(push/PR)でのみ*
 **ユーザー決定(2026-06-01): Option C のまま PR の GitHub Actions run で実測・反復する。** PR 検証手順: PR の CI で `Run CI suite` step の所要時間を観測する。
 - 依然 ~13 分のままなら、volume seed 以外の要因(例: cook 済み artifact の再利用不能、workspace crate 側の compile/link 支配、別 cache key の不一致)を再調査し、Option B(host `target/` actions/cache 化)や cook 先/CARGO_TARGET_DIR の見直しへ反復する。
 - baseline(~4 分)に近づけば Option C が機能している。
+
+## T002 反復: PR #147 の GHA 実測結果と真因(2026-06-01)
+
+### Option C は効かなかった(実測)
+PR #147 の GHA CI(commit 9cef4a08)で `Run CI suite` = 776s、ベースライン 783s とほぼ不変。Seed step は 9s で走ったが短縮効果ゼロ。
+
+### sccache 統計の duration 別比較(decisive)
+| Run | duration | Compile requests | Rust misses | Rust hit rate | C/C++ hit rate |
+|---|---|---|---|---|---|
+| ~4分 baseline(pre-lancedb) | ~4分 | 275 | 186 | 0.00% | — |
+| ~28分 cold spike | ~28分 | 1327 | 1012 | 0.00% | 100% |
+| ~15分 steady | ~15分 | 1327 | 1012 | 0.00% | 100% |
+| PR #147(Option C) | 776s | 1327 | 1012 | 0.00% | 100% |
+
+**sccache の Rust ヒット率は全 run で一貫して 0%**(~4分 baseline ですら)。sccache は CI 間で Rust を一度もキャッシュできていない慢性問題。CI 時間は毎回スクラッチ compile する Rust crate 数(186→1012)で決まっていた。Option C(volume）は数値を一切動かさず。
+
+### 真因(Codex + Claude の独立並列調査が一致)
+**`CARGO_INCREMENTAL` が CI で 0 に設定されていない。** Cargo の dev/test profile は incremental=true がデフォルトで、rustc に `-C incremental=<path>` が付く。**sccache は incremental compile をキャッシュできない**(sccache 公式 Rust ドキュメントが明記)。C/C++ は cargo の incremental 経路を使わないので 100% ヒット → 「Rust 0% / C/C++ 100%」の正体。
+
+### 修正(cache-config のみ・機能不変)
+1. Option C(`compose.ci.yml` の named volume + `Seed ci-target volume from image` step)を **revert**(0% を動かさず、sccache が真因のため不要)。
+2. `Run CI suite` を `docker exec -e CARGO_INCREMENTAL=0 ci-runner cargo make ci-container` に変更(runtime build を incremental 無効化 → rustc 結果が sccache キャッシュ可能になる)。
+3. sccache の actions/cache key を `-v2` セグメント追加で bump(現行 key の incremental 汚染キャッシュは actions/cache 仕様で再保存されないため、フレッシュなキャッシュを保存させる)。
+
+### 検証(PR で 2 run 必要)
+- run1(`-v2` cold): フルコンパイルだが今回は cacheable → 新キャッシュ保存。duration はまだ長い見込み。
+- run2(同 key restore): `sccache --show-stats` の **Rust hit rate が 0% → 高ヒット率**に上がり、`Run CI suite` が大幅短縮されれば解消。
