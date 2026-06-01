@@ -1,6 +1,31 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
+          "at": "2026-05-31T14:25:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
+          "at": "2026-05-31T14:28:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9775d39fe43821a98327f1a14ea520eb99a3f0ef80eb78b4b849e2267f117061",
+          "at": "2026-06-01T02:42:08Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -59,144 +84,6 @@
           "findings": [],
           "hash": "rvw1:sha256:d9d65d460effdc2315159dd51265163073f02edabda846fd71324a1a6be117f3",
           "at": "2026-05-31T23:50:47Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77e5ab7d4d91eb466180381c343de1ab0ca63f97e0b6a0be04dcd2967f8f2de6",
-          "at": "2026-05-31T14:23:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77e5ab7d4d91eb466180381c343de1ab0ca63f97e0b6a0be04dcd2967f8f2de6",
-          "at": "2026-05-31T14:27:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77e5ab7d4d91eb466180381c343de1ab0ca63f97e0b6a0be04dcd2967f8f2de6",
-          "at": "2026-05-31T14:28:54Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`review_run_fix_local()` collapses every `ReviewFixRunnerError` into `RunReviewFixError::FixRunnerFailed`, so `CodexReviewFixRunner::SmokeTestFailed` never reaches the dedicated `RunReviewFixError::SmokeTestFailed` variant. That breaks the service error taxonomy and hides smoke-test/environment/version failures behind a generic runner failure.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
-              "line": 317,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:66b08fbaf5b849a2b362a5b640d302a474542c55bd6e39042ad184932f21c1bb",
-          "at": "2026-05-31T14:19:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`review_run_fix_local` forwards `scope` and `track_id` into `RunReviewFixCommand` without any of the existing domain validation used by `review_run_local`. The interactor only checks for non-empty strings, so malformed values can reach `CodexReviewFixRunner::build_prompt` and be interpolated directly into the nested agent prompt and orchestration text.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
-              "line": 282,
-              "category": "security"
-            },
-            {
-              "message": "`make_track_local_review_fix_codex` uses `strip_leading_separator`, which tokenizes a single `${@}` payload by whitespace instead of shell words. Quoted arguments and paths with spaces (for example `--briefing-file '/tmp/a b.md'` or `--scope-files 'x y.rs'`) will be split incorrectly before they reach `sotp review fix-local`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 405,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2c3b210bc2c8b1901fe84b5e77872d65b9917dda787cd70699067acff1b0b29f",
-          "at": "2026-05-31T14:26:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The shell-word parser used here drops literal backslashes inside double quotes. For a single raw arg like `--briefing-file \"tmp/a\\b.md\"`, this rewrites the value to `tmp/ab.md` instead of preserving the backslash, so quoted paths or regexes with backslashes are corrupted before being forwarded to `sotp review fix-local`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
-              "line": 81,
-              "category": "correctness"
-            },
-            {
-              "message": "Mapping every non-smoke-test `ReviewFixRunnerError` through `other.to_string()` leaks infrastructure details to CLI users. `SentinelNotFound` and `Unexpected` can include the temporary session log path and other internal execution details, and `CliApp::review_run_fix_local` re-emits them verbatim as `[ERROR] ...`, which violates the repo's no-internal-details rule for error messages.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
-              "line": 320,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:8f6805db7f6f766b87d69b5e9feaf7bcb9e21c3093a90ddb4f7ff1aa3ca48895",
-          "at": "2026-05-31T14:34:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public `review_run_fix_local` / `make_track_local_review_fix_codex` entry points have no direct happy-path or error-path tests in this scope. The only added tests exercise the private shell-word helper, so provider resolution, unsupported-provider rejection, and `REVIEW_FIX_STATUS` propagation can regress without coverage.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
-              "line": 264,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:e104b724e4f29a036c8ee30f53984a7add276b215f7e92f17c58c31bc89940e2",
-          "at": "2026-05-31T14:41:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b39dcf31bc5b133161a4eb81b1028060684d25f9d8b071c4baee1601f547d26",
-          "at": "2026-05-31T14:50:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b39dcf31bc5b133161a4eb81b1028060684d25f9d8b071c4baee1601f547d26",
-          "at": "2026-05-31T14:53:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bc8178179ea440a7a21d0df7be7883f56ff7523d2d6742498f51c70ecda40c4",
-          "at": "2026-05-31T16:20:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b48989eaef4f746a45b764070a7f522706562b76437e9591220806f1d5317ce6",
-          "at": "2026-05-31T16:48:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9413066df470e96d0f734bb9a1cc0963879c42be061178180ea83cc7ac3e78d6",
-          "at": "2026-05-31T23:51:02Z"
         }
       ]
     },
@@ -273,6 +160,117 @@
           "findings": [],
           "hash": "rvw1:sha256:cba1e98d021af0dcf463d309542db8fe5bc11e67fbdb0e312c18c7ed31bf99a9",
           "at": "2026-05-31T23:50:44Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
+          "at": "2026-05-31T08:42:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR states that `network_access=true` opens only the nested reviewer’s LLM reachability, but D2 enables network on the outer fixer sandbox, so every process the fixer runs can make outbound network calls. Since the same design also makes `CODEX_HOME`/`~/.codex` writable for session creation, this overstates the safety boundary: push prevention may still hold, but general outbound access is broader than LLM-only access and can mislead the implementation plan’s security assumptions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md",
+              "line": 82,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
+          "at": "2026-05-31T08:47:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:156c1b09ba96ebae31b8150b3fd4335e8d2490bedd6d6fc720ab02c0a1621bcd",
+          "at": "2026-05-31T08:49:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
+          "at": "2026-05-31T09:24:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
+          "at": "2026-05-31T09:30:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T09:55:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md`/`impl-plan.json` present T001 as only in progress, but the generated `usecase-types.md` now marks every T001 usecase catalogue entry as Blue instead of Yellow. In this workflow Yellow is the WIP declaration state and Blue is the implemented/confirmed state, so the plan artifacts now give conflicting status signals for the same T001 work and can falsely present the usecase contract as already complete.",
+              "severity": "P1",
+              "file": "track/items/review-fix-codex-rustify-2026-05-31/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T09:58:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
+          "at": "2026-05-31T10:02:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
+          "at": "2026-05-31T14:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
+          "at": "2026-05-31T14:27:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9b25a5b36ec7b463badbadd4437ee9afcaaa1157313cd748c357c5b860fa18f",
+          "at": "2026-05-31T16:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8a2acb38e57bb3c3c795577e54d00857a9a006b6dc5cb17115b4e5a050d5ff0",
+          "at": "2026-05-31T16:50:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cf4ab3fd5fd808e688381187d3282875d63a0ff10812ded7d425bc40fd28ff5",
+          "at": "2026-05-31T23:50:55Z"
         }
       ]
     },
@@ -637,135 +635,224 @@
           "findings": [],
           "hash": "rvw1:sha256:3bd9ff54a59cd6793219f616c7bd57fa48ecd81cf16b38534814bca39e16adac",
           "at": "2026-06-01T00:31:32Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
-          "at": "2026-05-31T14:25:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:923421d9c4bc0f4e2452abbf2ef520131ae4aef2fdbcc67b98fae5dcb2d55136",
-          "at": "2026-05-31T14:28:42Z"
-        }
-      ]
-    },
-    "plan-artifacts": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
-          "at": "2026-05-31T08:42:34Z"
+          "hash": "rvw1:sha256:f342e7a22c33a57333178bede45221a1603a38a93c7835efde169168f79af513",
+          "at": "2026-06-01T00:48:12Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The ADR states that `network_access=true` opens only the nested reviewer’s LLM reachability, but D2 enables network on the outer fixer sandbox, so every process the fixer runs can make outbound network calls. Since the same design also makes `CODEX_HOME`/`~/.codex` writable for session creation, this overstates the safety boundary: push prevention may still hold, but general outbound access is broader than LLM-only access and can mislead the implementation plan’s security assumptions.",
+              "message": "When the adapter is invoked directly without the Makefile wrapper setting CODEX_BIN, this falls back to the bare `codex` name and no longer resolves it to an absolute binary before the sanitized `env_clear()` launch. In an asdf-based install, the smoke test can pass under the parent environment, but the real fixer process is spawned through the asdf shim with the temporary HOME and without ASDF_DIR/ASDF_DATA_DIR, so the nested codex session fails to start. The infrastructure adapter should keep resolving `codex` with `asdf which`/`command -v` before credential isolation, or otherwise ensure the sanitized launch never executes the shim path.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md",
-              "line": 82,
-              "category": "factual error (semantic)"
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/mod.rs",
+              "line": 132,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:629c3e5542b607b1c47121917470a6d4ec8ca35187fed45a4f968a6fafe2c643",
-          "at": "2026-05-31T08:47:12Z"
+          "hash": "rvw1:sha256:6182e09dc45fdee481523a1006427d011a0c000b32d3a3494250d775f581f010",
+          "at": "2026-06-01T02:13:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:156c1b09ba96ebae31b8150b3fd4335e8d2490bedd6d6fc720ab02c0a1621bcd",
-          "at": "2026-05-31T08:49:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
-          "at": "2026-05-31T09:24:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9693b3bcff4c36f2a57a80c4b53280d991723cf8bf4a9b829b544411d0e0f665",
-          "at": "2026-05-31T09:30:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T09:55:59Z"
+          "hash": "rvw1:sha256:d542846594b6347a0043fd1aa19cbcb5c1b704e42967043007cb83484e5d6bc7",
+          "at": "2026-06-01T02:18:52Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`plan.md`/`impl-plan.json` present T001 as only in progress, but the generated `usecase-types.md` now marks every T001 usecase catalogue entry as Blue instead of Yellow. In this workflow Yellow is the WIP declaration state and Blue is the implemented/confirmed state, so the plan artifacts now give conflicting status signals for the same T001 work and can falsely present the usecase contract as already complete.",
+              "message": "When `CODEX_BIN` is not set, the runner now falls back to the bare `codex` command instead of resolving it to the real executable before `env_clear()`. With the common asdf setup, the version smoke test can still pass under the parent environment, but the actual nested `codex exec` is spawned with `HOME` replaced by the safe temp dir and without the previously supplied `ASDF_DIR`/`ASDF_DATA_DIR`, so the asdf shim on `PATH` cannot resolve/run Codex. This regresses the briefing-required behavior to resolve `asdf which codex` before credential isolation and keep asdf defaults available.",
               "severity": "P1",
-              "file": "track/items/review-fix-codex-rustify-2026-05-31/usecase-types.md",
-              "line": 7,
-              "category": "contradiction"
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/mod.rs",
+              "line": 120,
+              "category": "runtime correctness"
             }
           ],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T09:58:57Z"
+          "hash": "rvw1:sha256:7f1c33dc8f4e425dee3f8e0a9b194ef72ca3dadf4437ba61d5de723c217dab2b",
+          "at": "2026-06-01T02:28:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c134be9f8a321407b05aa3f5fdcd3976185f5a55d6f8fed65d1861b1e0bc05b7",
-          "at": "2026-05-31T10:02:37Z"
+          "hash": "rvw1:sha256:de2bb7385c45f464f4c3d2a7c3a83ada6ae07045e7c3193d7a2e6462276782f2",
+          "at": "2026-06-01T02:34:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`prepend_dir_to_path` now imports `std::os::unix::ffi::OsStringExt` unconditionally, so this module no longer compiles on non-Unix targets even though the surrounding code still has `#[cfg(not(unix))]` paths. Use `std::env::join_paths`/`split_paths` or gate the Unix-specific implementation so the infrastructure crate remains portable.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/env.rs",
+              "line": 119,
+              "category": "portability"
+            }
+          ],
+          "hash": "rvw1:sha256:c82c21a11020aafd9dc58cf9420a3c30c28df55afd690499d3f58ddf64726dd5",
+          "at": "2026-06-01T02:42:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41a7fca812ddcd5c9a6a4310e89299a635ce005f078ed1b7389b0ff1d9a6f857",
+          "at": "2026-06-01T02:47:09Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_run_fix_local()` collapses every `ReviewFixRunnerError` into `RunReviewFixError::FixRunnerFailed`, so `CodexReviewFixRunner::SmokeTestFailed` never reaches the dedicated `RunReviewFixError::SmokeTestFailed` variant. That breaks the service error taxonomy and hides smoke-test/environment/version failures behind a generic runner failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 317,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:66b08fbaf5b849a2b362a5b640d302a474542c55bd6e39042ad184932f21c1bb",
+          "at": "2026-05-31T14:19:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_run_fix_local` forwards `scope` and `track_id` into `RunReviewFixCommand` without any of the existing domain validation used by `review_run_local`. The interactor only checks for non-empty strings, so malformed values can reach `CodexReviewFixRunner::build_prompt` and be interpolated directly into the nested agent prompt and orchestration text.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 282,
+              "category": "security"
+            },
+            {
+              "message": "`make_track_local_review_fix_codex` uses `strip_leading_separator`, which tokenizes a single `${@}` payload by whitespace instead of shell words. Quoted arguments and paths with spaces (for example `--briefing-file '/tmp/a b.md'` or `--scope-files 'x y.rs'`) will be split incorrectly before they reach `sotp review fix-local`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 405,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2c3b210bc2c8b1901fe84b5e77872d65b9917dda787cd70699067acff1b0b29f",
+          "at": "2026-05-31T14:26:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The shell-word parser used here drops literal backslashes inside double quotes. For a single raw arg like `--briefing-file \"tmp/a\\b.md\"`, this rewrites the value to `tmp/ab.md` instead of preserving the backslash, so quoted paths or regexes with backslashes are corrupted before being forwarded to `sotp review fix-local`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "line": 81,
+              "category": "correctness"
+            },
+            {
+              "message": "Mapping every non-smoke-test `ReviewFixRunnerError` through `other.to_string()` leaks infrastructure details to CLI users. `SentinelNotFound` and `Unexpected` can include the temporary session log path and other internal execution details, and `CliApp::review_run_fix_local` re-emits them verbatim as `[ERROR] ...`, which violates the repo's no-internal-details rule for error messages.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 320,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:8f6805db7f6f766b87d69b5e9feaf7bcb9e21c3093a90ddb4f7ff1aa3ca48895",
+          "at": "2026-05-31T14:34:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public `review_run_fix_local` / `make_track_local_review_fix_codex` entry points have no direct happy-path or error-path tests in this scope. The only added tests exercise the private shell-word helper, so provider resolution, unsupported-provider rejection, and `REVIEW_FIX_STATUS` propagation can regress without coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "line": 264,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e104b724e4f29a036c8ee30f53984a7add276b215f7e92f17c58c31bc89940e2",
+          "at": "2026-05-31T14:41:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
-          "at": "2026-05-31T14:23:07Z"
+          "hash": "rvw1:sha256:6b39dcf31bc5b133161a4eb81b1028060684d25f9d8b071c4baee1601f547d26",
+          "at": "2026-05-31T14:50:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:544db0fe4bbd1f4a742192bb4570e87f13c03a977a7fcbeb2b19bcac2f43a92f",
-          "at": "2026-05-31T14:27:20Z"
+          "hash": "rvw1:sha256:6b39dcf31bc5b133161a4eb81b1028060684d25f9d8b071c4baee1601f547d26",
+          "at": "2026-05-31T14:53:41Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e9b25a5b36ec7b463badbadd4437ee9afcaaa1157313cd748c357c5b860fa18f",
-          "at": "2026-05-31T16:02:24Z"
+          "hash": "rvw1:sha256:6bc8178179ea440a7a21d0df7be7883f56ff7523d2d6742498f51c70ecda40c4",
+          "at": "2026-05-31T16:20:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f8a2acb38e57bb3c3c795577e54d00857a9a006b6dc5cb17115b4e5a050d5ff0",
-          "at": "2026-05-31T16:50:12Z"
+          "hash": "rvw1:sha256:b48989eaef4f746a45b764070a7f522706562b76437e9591220806f1d5317ce6",
+          "at": "2026-05-31T16:48:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5cf4ab3fd5fd808e688381187d3282875d63a0ff10812ded7d425bc40fd28ff5",
-          "at": "2026-05-31T23:50:55Z"
+          "hash": "rvw1:sha256:9413066df470e96d0f734bb9a1cc0963879c42be061178180ea83cc7ac3e78d6",
+          "at": "2026-05-31T23:51:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b454d0cf2a400234be0c0dd4e2a8c2958b624cd14ad336515b5ea5987426796",
+          "at": "2026-06-01T02:42:08Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77e5ab7d4d91eb466180381c343de1ab0ca63f97e0b6a0be04dcd2967f8f2de6",
+          "at": "2026-05-31T14:23:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77e5ab7d4d91eb466180381c343de1ab0ca63f97e0b6a0be04dcd2967f8f2de6",
+          "at": "2026-05-31T14:27:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77e5ab7d4d91eb466180381c343de1ab0ca63f97e0b6a0be04dcd2967f8f2de6",
+          "at": "2026-05-31T14:28:54Z"
         }
       ]
     }

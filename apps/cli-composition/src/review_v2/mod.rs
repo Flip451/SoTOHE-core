@@ -778,10 +778,6 @@ mod tests {
     #[cfg(unix)]
     fn write_fake_codex_bin(bin_dir: &std::path::Path) {
         fs::create_dir_all(bin_dir).unwrap();
-        let asdf = bin_dir.join("asdf");
-        fs::write(&asdf, "#!/bin/sh\nexit 1\n").unwrap();
-        make_executable(&asdf);
-
         let codex = bin_dir.join("codex");
         let script = r#"#!/bin/sh
 if [ "$1" = "--version" ]; then

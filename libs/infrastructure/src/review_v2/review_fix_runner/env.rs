@@ -1,80 +1,6 @@
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
 use usecase::review_v2::run_review_fix::ReviewFixRunnerError;
-
-pub(super) fn apply_parent_asdf_env(command: &mut Command) {
-    for (key, value) in parent_asdf_env() {
-        command.env(key, value);
-    }
-}
-
-pub(super) fn apply_extra_path_prefix(
-    command: &mut Command,
-    extra_path_prefix: Option<&Path>,
-) -> Result<(), ReviewFixRunnerError> {
-    if let Some(path) = path_with_optional_prefix(std::env::var_os("PATH"), extra_path_prefix)? {
-        command.env("PATH", path);
-    }
-    Ok(())
-}
-
-pub(super) fn bin_parent_dir(bin: &std::ffi::OsStr) -> Option<&Path> {
-    let parent = std::path::Path::new(bin).parent()?;
-    if parent.as_os_str().is_empty() {
-        return None;
-    }
-    Some(parent)
-}
-
-pub(super) fn parent_asdf_env() -> Vec<(OsString, OsString)> {
-    parent_asdf_env_from(
-        std::env::var_os("HOME"),
-        std::env::var_os("ASDF_DATA_DIR"),
-        std::env::var_os("ASDF_DIR"),
-    )
-}
-
-pub(super) fn parent_asdf_env_from(
-    parent_home: Option<OsString>,
-    asdf_data_dir: Option<OsString>,
-    asdf_dir: Option<OsString>,
-) -> Vec<(OsString, OsString)> {
-    let parent_home = parent_home.map(PathBuf::from);
-    let asdf_data_dir = asdf_data_dir
-        .or_else(|| parent_home.as_ref().map(|home| home.join(".asdf").into_os_string()));
-    let asdf_dir =
-        asdf_dir.or_else(|| parent_home.as_ref().map(|home| home.join(".asdf").into_os_string()));
-    let mut env = Vec::new();
-    if let Some(value) = asdf_data_dir {
-        env.push((OsString::from("ASDF_DATA_DIR"), value));
-    }
-    if let Some(value) = asdf_dir {
-        env.push((OsString::from("ASDF_DIR"), value));
-    }
-    env
-}
-
-pub(super) fn path_with_optional_prefix(
-    current_path: Option<OsString>,
-    extra_path_prefix: Option<&Path>,
-) -> Result<Option<OsString>, ReviewFixRunnerError> {
-    match (extra_path_prefix, current_path) {
-        (Some(prefix), Some(path)) => {
-            let mut paths = vec![prefix.to_path_buf()];
-            paths.extend(std::env::split_paths(&path));
-            let joined = std::env::join_paths(paths).map_err(|e| {
-                ReviewFixRunnerError::Unexpected(format!(
-                    "failed to build PATH for codex fixer: {e}"
-                ))
-            })?;
-            Ok(Some(joined))
-        }
-        (Some(prefix), None) => Ok(Some(prefix.as_os_str().to_os_string())),
-        (None, Some(path)) => Ok(Some(path)),
-        (None, None) => Ok(None),
-    }
-}
 
 pub(super) fn create_safe_home() -> Result<PathBuf, ReviewFixRunnerError> {
     use std::sync::atomic::{AtomicU64, Ordering};
@@ -183,6 +109,28 @@ pub(super) fn escape_config_string(raw: &str) -> String {
     raw.replace('\\', "\\\\").replace('"', "\\\"")
 }
 
+/// Prepend `dir` to the current `PATH` environment variable and return the
+/// result. When `PATH` is unset, the returned value contains only `dir`.
+///
+/// This is a pure helper used so that a colocated runtime (e.g. `node` living
+/// alongside the real codex binary) can be found under the sanitized env.
+/// The helper knows nothing about which toolchain manager placed the binary
+/// there — it simply prepends an arbitrary directory to PATH.
+pub(super) fn prepend_dir_to_path(dir: &Path) -> Result<OsString, ReviewFixRunnerError> {
+    let mut paths = vec![dir.to_path_buf()];
+    if let Some(existing) = std::env::var_os("PATH") {
+        if !existing.is_empty() {
+            paths.extend(std::env::split_paths(&existing));
+        }
+    }
+    std::env::join_paths(paths).map_err(|e| {
+        ReviewFixRunnerError::Unexpected(format!(
+            "failed to prepend {} to PATH for codex fixer: {e}",
+            dir.display()
+        ))
+    })
+}
+
 pub(super) fn build_safe_env(
     safe_home: &Path,
     codex_home: &Path,
@@ -196,17 +144,20 @@ pub(super) fn build_safe_env(
     env.push((OsString::from("GIT_SSH_COMMAND"), OsString::from("/bin/false")));
     env.push((OsString::from("HOME"), safe_home.as_os_str().to_os_string()));
     env.push((OsString::from("CODEX_HOME"), codex_home.as_os_str().to_os_string()));
-    env.extend(parent_asdf_env());
     for &var in SAFE_VARS {
         if BLOCKED.contains(&var) {
             continue;
         }
         if var == "PATH" {
-            if let Some(path) =
-                path_with_optional_prefix(std::env::var_os("PATH"), extra_path_prefix)?
-            {
-                env.push((OsString::from("PATH"), path));
-            }
+            let path_val = if let Some(prefix) = extra_path_prefix {
+                // Prepend the binary's parent dir so a colocated runtime is found first.
+                prepend_dir_to_path(prefix)?
+            } else if let Some(path) = std::env::var_os("PATH") {
+                path
+            } else {
+                continue;
+            };
+            env.push((OsString::from("PATH"), path_val));
             continue;
         }
         if let Some(val) = std::env::var_os(var) {
@@ -214,51 +165,6 @@ pub(super) fn build_safe_env(
         }
     }
     Ok(env)
-}
-
-pub(super) fn resolve_codex_bin_path(
-    bin: &std::ffi::OsStr,
-) -> Result<OsString, ReviewFixRunnerError> {
-    let bin_path = std::path::Path::new(bin);
-    if bin_path.is_absolute() {
-        return Ok(bin.to_os_string());
-    }
-    let mut asdf_cmd = Command::new("asdf");
-    apply_parent_asdf_env(&mut asdf_cmd);
-    let asdf_out = asdf_cmd
-        .args(["which", &bin.to_string_lossy()])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .stdin(Stdio::null())
-        .output()
-        .ok();
-    if let Some(out) = asdf_out {
-        if out.status.success() {
-            let resolved = String::from_utf8_lossy(&out.stdout).trim().to_owned();
-            if !resolved.is_empty() {
-                let p = std::path::Path::new(&resolved);
-                if p.is_absolute() && p.exists() {
-                    return Ok(OsString::from(resolved));
-                }
-            }
-        }
-    }
-    let which_out = Command::new("which")
-        .arg(bin)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .stdin(Stdio::null())
-        .output()
-        .ok();
-    if let Some(out) = which_out {
-        if out.status.success() {
-            let resolved = String::from_utf8_lossy(&out.stdout).trim().to_owned();
-            if !resolved.is_empty() {
-                return Ok(OsString::from(resolved));
-            }
-        }
-    }
-    Ok(bin.to_os_string())
 }
 
 #[cfg(test)]
@@ -369,6 +275,18 @@ mod tests {
     // ── build_safe_env ────────────────────────────────────────────────────────
 
     #[test]
+    fn test_build_safe_env_passes_through_path() {
+        let safe_home = PathBuf::from("/tmp/safe-home");
+        let codex_home = PathBuf::from("/home/user/.codex");
+        let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
+        let has_path = env.iter().any(|(k, _)| k == "PATH");
+        // PATH passthrough is present when the environment has PATH set (which it always does in CI)
+        if std::env::var_os("PATH").is_some() {
+            assert!(has_path, "PATH must be passed through when set in the environment");
+        }
+    }
+
+    #[test]
     fn test_build_safe_env_excludes_github_token() {
         let safe_home = PathBuf::from("/tmp/safe-home");
         let codex_home = PathBuf::from("/home/user/.codex");
@@ -432,80 +350,40 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_path_with_optional_prefix_uses_prefix_without_parent_path() {
-        let actual = path_with_optional_prefix(None, Some(Path::new("/opt/codex/bin"))).unwrap();
+    // ── prepend_dir_to_path ───────────────────────────────────────────────────
 
-        assert_eq!(actual, Some(std::ffi::OsString::from("/opt/codex/bin")));
+    #[test]
+    fn test_prepend_dir_to_path_produces_dir_colon_existing() {
+        // Test the pure logic: given a known PATH value, verify the dir is prepended.
+        // We exercise prepend_dir_to_path indirectly via build_safe_env which reads
+        // the real PATH, but we also test the helper directly with a fabricated input
+        // by calling it and checking the prefix is present.
+        let dir = Path::new("/fake/prefix/bin");
+        let result = prepend_dir_to_path(dir).unwrap();
+        let mut paths = std::env::split_paths(&result);
+        let first = paths.next();
+        assert_eq!(first.as_deref(), Some(dir), "prepended dir must come first");
+        if std::env::var_os("PATH").is_some_and(|path| !path.is_empty()) {
+            assert!(paths.next().is_some(), "existing PATH entries must be preserved");
+        }
     }
 
     #[test]
-    fn test_path_with_optional_prefix_prepends_prefix_to_parent_path() {
-        let actual = path_with_optional_prefix(
-            Some(std::ffi::OsString::from("/usr/bin")),
-            Some(Path::new("/opt/codex/bin")),
-        )
-        .unwrap();
-        let expected =
-            std::env::join_paths([PathBuf::from("/opt/codex/bin"), PathBuf::from("/usr/bin")])
-                .unwrap();
-
-        assert_eq!(actual, Some(expected));
-    }
-
-    #[test]
-    fn test_parent_asdf_env_from_defaults_to_parent_home_asdf() {
-        let env = parent_asdf_env_from(Some(OsString::from("/home/parent")), None, None);
-
-        assert_eq!(
-            env,
-            vec![
-                (OsString::from("ASDF_DATA_DIR"), OsString::from("/home/parent/.asdf")),
-                (OsString::from("ASDF_DIR"), OsString::from("/home/parent/.asdf")),
-            ]
-        );
-    }
-
-    #[test]
-    fn test_parent_asdf_env_from_preserves_explicit_asdf_values() {
-        let env = parent_asdf_env_from(
-            Some(OsString::from("/home/parent")),
-            Some(OsString::from("/custom/data")),
-            Some(OsString::from("/custom/dir")),
-        );
-
-        assert_eq!(
-            env,
-            vec![
-                (OsString::from("ASDF_DATA_DIR"), OsString::from("/custom/data")),
-                (OsString::from("ASDF_DIR"), OsString::from("/custom/dir")),
-            ]
-        );
-    }
-
-    #[test]
-    fn test_build_safe_env_sets_asdf_data_dir_with_parent_home_default() {
+    fn test_build_safe_env_with_extra_path_prefix_prepends_dir() {
         let safe_home = PathBuf::from("/tmp/safe-home");
         let codex_home = PathBuf::from("/home/user/.codex");
-        let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
-        let actual = env.iter().find(|(k, _)| k == "ASDF_DATA_DIR").map(|(_, v)| v.clone());
-        let expected = std::env::var_os("ASDF_DATA_DIR").or_else(|| {
-            std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".asdf").into_os_string())
-        });
-
-        assert_eq!(actual, expected);
-    }
-
-    #[test]
-    fn test_build_safe_env_sets_asdf_dir_with_parent_home_default() {
-        let safe_home = PathBuf::from("/tmp/safe-home");
-        let codex_home = PathBuf::from("/home/user/.codex");
-        let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
-        let actual = env.iter().find(|(k, _)| k == "ASDF_DIR").map(|(_, v)| v.clone());
-        let expected = std::env::var_os("ASDF_DIR").or_else(|| {
-            std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".asdf").into_os_string())
-        });
-
-        assert_eq!(actual, expected);
+        let prefix = Path::new("/real/node/bin");
+        let env = build_safe_env(&safe_home, &codex_home, Some(prefix)).unwrap();
+        let path_val = env
+            .iter()
+            .find(|(k, _)| k == "PATH")
+            .map(|(_, v)| v.clone())
+            .expect("PATH must be present when extra_path_prefix is given");
+        let first = std::env::split_paths(&path_val).next();
+        assert_eq!(
+            first.as_deref(),
+            Some(prefix),
+            "extra_path_prefix must be at the front of PATH"
+        );
     }
 }
