@@ -4,12 +4,14 @@
     {
       "id": "T001",
       "description": "Audit CI timing baseline: read .github/workflows/ job definitions and Makefile.toml cache configuration to identify which steps dominate the 14-16 min run time and which cache-strategy levers are available (sccache layer, GitHub Actions cache action, Docker layer cache). Produce a written finding in observations.md as input to T002. No file writes beyond observations.md.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9cef4a08"
     },
     {
       "id": "T002",
       "description": "Adjust CI cache strategy: modify only cache-related CI/container configuration in .github/workflows/, Docker Compose files/overlays, and/or Makefile.toml cache settings based on T001 findings. No changes to Rust source (libs/, apps/), Cargo.toml, or Cargo.lock. Acceptance: CI duration measurably shorter than the 14-16 min baseline and cargo make ci passes with zero Rust-source diff.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "d4f767e9"
     },
     {
       "id": "T003",

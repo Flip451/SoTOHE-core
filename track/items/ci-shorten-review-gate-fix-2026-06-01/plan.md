@@ -7,21 +7,21 @@ This track fixes two independent problems: (1) CI run time ballooned from ~3-4 m
 T001 audits the CI timing baseline before any change is made. T002 acts on those findings, modifying only cache-strategy configuration with no Rust source changes. T003 fixes the gate leniency bug by passing lenient: true on the gate path (the mechanism already exists in TypeSignalsRequest). T004 is the final cargo make ci confirmation gate.
 T002 and T003 are independent and can be committed separately. T001 must precede T002 (discovery first). T004 depends on both T002 and T003 being merged.
 
-## Tasks (1/4 resolved)
+## Tasks (2/4 resolved)
 
 ### S1 — CI cache audit (discovery only)
 
 > Read .github/workflows/ job definitions and Makefile.toml cache configuration. Identify the dominant slow steps (compile, sccache miss, Docker layer pull) and list available cache-strategy levers. Output: observations.md entry. No configuration changes in this task.
 > This discovery step is mandatory before T002 to avoid trial-and-error blind changes. The spec deliberately leaves the cache mechanism undecided (OS-03); T001 narrows the candidate mechanisms so T002 can act on evidence.
 
-- [x] **T001**: Audit CI timing baseline: read .github/workflows/ job definitions and Makefile.toml cache configuration to identify which steps dominate the 14-16 min run time and which cache-strategy levers are available (sccache layer, GitHub Actions cache action, Docker layer cache). Produce a written finding in observations.md as input to T002. No file writes beyond observations.md.
+- [x] **T001**: Audit CI timing baseline: read .github/workflows/ job definitions and Makefile.toml cache configuration to identify which steps dominate the 14-16 min run time and which cache-strategy levers are available (sccache layer, GitHub Actions cache action, Docker layer cache). Produce a written finding in observations.md as input to T002. No file writes beyond observations.md. (`9cef4a08`)
 
 ### S2 — CI cache strategy adjustment
 
 > Apply the cache-strategy changes identified in T001. Permitted change surface: .github/workflows/ workflow definitions (cache action configuration, layer cache settings, compose invocation), Docker Compose files/overlays that affect CI cache/target topology, and Makefile.toml cache-related entries. Forbidden: any file under libs/, apps/, Cargo.toml, Cargo.lock, or non-cache application/script logic.
 > Acceptance is outcome-level (AC-04): CI duration measurably reduced and cargo make ci passes with no Rust-source diff. The exact mechanism (sccache layer config, GitHub Actions cache action, Docker build cache) is resolved in T001 and applied here; the spec does not prescribe the mechanism (OS-03).
 
-- [~] **T002**: Adjust CI cache strategy: modify only cache-related CI/container configuration in .github/workflows/, Docker Compose files/overlays, and/or Makefile.toml cache settings based on T001 findings. No changes to Rust source (libs/, apps/), Cargo.toml, or Cargo.lock. Acceptance: CI duration measurably shorter than the 14-16 min baseline and cargo make ci passes with zero Rust-source diff.
+- [x] **T002**: Adjust CI cache strategy: modify only cache-related CI/container configuration in .github/workflows/, Docker Compose files/overlays, and/or Makefile.toml cache settings based on T001 findings. No changes to Rust source (libs/, apps/), Cargo.toml, or Cargo.lock. Acceptance: CI duration measurably shorter than the 14-16 min baseline and cargo make ci passes with zero Rust-source diff. (`d4f767e9`)
 
 ### S3 — Gate leniency fix — tolerate absent catalogues in track-active-gate
 
