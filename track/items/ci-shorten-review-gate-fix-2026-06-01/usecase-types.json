@@ -2,9 +2,70 @@
   "schema_version": 3,
   "crate_name": "usecase",
   "layer": "usecase",
-  "types": {},
+  "types": {
+    "BaselineCaptureRequest": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "source_workspace", "ty": "Option<std::path::PathBuf>" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "baseline_capture::service",
+      "docs": "Modified in ADR 2026-06-01-1206 D2: force field removed; baseline-capture is now always idempotent.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "OS-06",
+          "hash": "a99201d67af5063e8efccff4f6f9250cf06127a9ba5de1cc5f84d7cfc2f2d464"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsRequest": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "branch", "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "type_signals::service",
+      "docs": "Modified in ADR 2026-06-01-1206 D1: lenient field removed; type-signals now unconditionally skips absent catalogues regardless of call site.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "OS-06",
+          "hash": "a99201d67af5063e8efccff4f6f9250cf06127a9ba5de1cc5f84d7cfc2f2d464"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "traits": {},
   "functions": {},
   "inherent_impls": [],
-  "trait_impls": []
+  "trait_impls": [
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "BaselineCaptureRequest" },
+    { "action": "modify", "trait_ref": "core::clone::Clone", "for_type": "BaselineCaptureRequest" }
+  ]
 }

@@ -1,21 +1,28 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:52:33Z"
+          "hash": "rvw1:sha256:12ba9d0c8ad0e6cf1ccc45f7ce88d34f94ee2dfa4ebd5698f5770a58894fe096",
+          "at": "2026-06-01T10:53:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67a1f9b50512961eb3b744f9ac67f7b5a6ebf787071d29800410d2b6d725a998",
+          "at": "2026-06-01T13:14:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:54:13Z"
+          "hash": "rvw1:sha256:67a1f9b50512961eb3b744f9ac67f7b5a6ebf787071d29800410d2b6d725a998",
+          "at": "2026-06-01T13:17:12Z"
         }
       ]
     },
@@ -63,24 +70,66 @@
           "findings": [],
           "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
           "at": "2026-06-01T09:33:54Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
-          "at": "2026-06-01T08:53:56Z"
+          "hash": "rvw1:sha256:122a2e099fdca24d20ed96007e9abb5a8c041a57c00ba966ff94803a9e3218db",
+          "at": "2026-06-01T10:54:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
+          "at": "2026-06-01T13:14:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
-          "at": "2026-06-01T08:55:57Z"
+          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
+          "at": "2026-06-01T13:15:47Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
+          "at": "2026-06-01T09:49:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
+          "at": "2026-06-01T09:52:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3d71fd1f01735b76eff278d5e913c828b348ef70a968d4fc0e371140e219f3",
+          "at": "2026-06-01T10:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
+          "at": "2026-06-01T13:17:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
+          "at": "2026-06-01T13:20:47Z"
         }
       ]
     },
@@ -113,24 +162,203 @@
           "findings": [],
           "hash": "rvw1:sha256:f3d7f40c7463ba960c07b19337191fa90d4b96d723bb18a7516e94c899f978b6",
           "at": "2026-06-01T09:17:39Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
-          "at": "2026-06-01T09:49:33Z"
+          "hash": "rvw1:sha256:2e46b9b6ce224ac175ec0b775c0155078743a997563d3315887eb1f884653e62",
+          "at": "2026-06-01T10:54:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The deleted `force_capture_rustdoc_baseline_for_layer` entry is described with by-value `std::path::Path`/`str`/`TdddLayerBinding` parameters. That is not a valid Rust signature and is inconsistent with the borrowed signature style used for the related domain port, so the infrastructure catalogue is semantically wrong.",
+              "severity": "P1",
+              "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/infrastructure-types.json",
+              "line": 11,
+              "category": "factual error"
+            },
+            {
+              "message": "`T005` and `T006` are marked `status: done` even though both have `commit_hash: null`, and the surrounding summary says they may be committed after `T003`. That makes the task ledger internally inconsistent about whether those tasks are actually complete.",
+              "severity": "P1",
+              "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/impl-plan.json",
+              "line": 29,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3462a0f9b75b9a0c1480c00cff329db43b61d8415227eb5f4c7e6d2552bb203d",
+          "at": "2026-06-01T13:17:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:704942469a14f807ef59afa639bd045d4e09284a66afc621558dfa71982c13c9",
+          "at": "2026-06-01T13:23:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 1206 calls `catalogue-spec-signals` silently passing on a missing required catalogue a fail-open risk, but the decision then makes `type-signals` unconditionally skip missing catalogues as well and later claims that this structurally resolves the fail-open. If a missing required catalogue is a fail-open, the decision expands that behavior; if it is acceptable absent-input handling, the context/rationale is wrong. The ADR needs to reconcile that design intent before the downstream spec can be considered coherent.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-01-1206-remove-lenient-and-force-flag-paths.md",
+              "line": 27,
+              "category": "contradiction"
+            },
+            {
+              "message": "`CN-04` says `cargo make ci` must pass at each commit, and the new T005/T006 tasks are explicitly described as independently committable follow-up implementation tasks that also require `cargo make ci`. However `task-coverage.json` maps `CN-04` only to T004, which occurs before T005/T006 and cannot cover their commits. This makes the coverage artifact inconsistent with the plan's global CI-pass constraint for the newly added tasks.",
+              "severity": "P1",
+              "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/task-coverage.json",
+              "line": 14,
+              "category": "cross-doc inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:704942469a14f807ef59afa639bd045d4e09284a66afc621558dfa71982c13c9",
+          "at": "2026-06-01T13:28:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a593a949569a48e72fc5c11780325ac376c4470f2918622723fa6b4ea2f42422",
+          "at": "2026-06-01T14:25:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
-          "at": "2026-06-01T09:52:03Z"
+          "hash": "rvw1:sha256:a593a949569a48e72fc5c11780325ac376c4470f2918622723fa6b4ea2f42422",
+          "at": "2026-06-01T14:29:52Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
+          "at": "2026-06-01T08:53:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
+          "at": "2026-06-01T08:55:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test still asserts `Err` when `domain-types.json` is absent, but the new type-signals behavior skips missing catalogues unconditionally. With the fixture as written, `execute_type_signals(...)` will return `Ok`, so this test will fail and no longer matches the intended contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 128,
+              "category": "testing"
+            },
+            {
+              "message": "This `--layer usecase` regression test is still expecting an error even though the fixture omits `usecase-types.json`, and absent catalogues are now always skipped. The command will return `Ok` here, so the test no longer validates layer dispatch and will fail as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 199,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d1bd6420726650106d7192ca71af73420dd9da9ba13e196d2a335328e77d2bac",
+          "at": "2026-06-01T10:54:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8136f5502e672d58ae17f213419485c573ba2d4814121052f82ff7c4dff1c3cd",
+          "at": "2026-06-01T10:58:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
+          "at": "2026-06-01T13:15:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
+          "at": "2026-06-01T13:17:29Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83fda4ac722760d0932752a1c2aa82135c2aac665ca914a493c7871e7c5e67b5",
+          "at": "2026-06-01T10:53:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
+          "at": "2026-06-01T13:14:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
+          "at": "2026-06-01T13:17:06Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:52:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:54:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T10:54:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:13:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:15:03Z"
         }
       ]
     }

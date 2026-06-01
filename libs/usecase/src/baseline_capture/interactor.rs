@@ -62,8 +62,7 @@ impl BaselineCaptureService for BaselineCaptureInteractor {
     ///
     /// Returns [`BaselineCaptureError`] on any failure.
     fn run(&self, request: BaselineCaptureRequest) -> Result<(), BaselineCaptureError> {
-        let BaselineCaptureRequest { track_id, workspace_root, source_workspace, layer, force } =
-            request;
+        let BaselineCaptureRequest { track_id, workspace_root, source_workspace, layer } = request;
 
         // Step 1: validate track_id.
         validate_track_id(&track_id)?;
@@ -139,7 +138,7 @@ impl BaselineCaptureService for BaselineCaptureInteractor {
         for binding in &bindings {
             let layer_id = binding.layer_id.clone();
             self.capture
-                .capture(&items_dir, &track_id, rustdoc_workspace, binding, force)
+                .capture(&items_dir, &track_id, rustdoc_workspace, binding)
                 .map_err(|e| BaselineCaptureError::CaptureFailed { layer_id, reason: e.0 })?;
         }
 

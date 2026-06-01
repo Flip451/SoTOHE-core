@@ -790,9 +790,9 @@ script = ['bin/sotp make track-local-plan "$@"']
 
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: type-signals → catalogue-spec-signals → views sync. Both track-local-review and track-commit-message depend on this shared task (D4 symmetry, CN-11 DRY). Each sotp command self-resolves the active track from the current branch (D1). Fail-closed: non-zero exit aborts the chain (CN-09)."
+description = "[gate] Regen sequence: type-signals → catalogue-spec-signals → views sync. Both track-local-review and track-commit-message depend on this shared task (D4 symmetry, CN-11 DRY). Each sotp command self-resolves the active track from the current branch (D1). Absent catalogue files are skipped unconditionally. Fail-closed: non-zero exit aborts the chain (CN-09)."
 script_runner = "@shell"
-script = ['bin/sotp track type-signals --lenient && bin/sotp track catalogue-spec-signals && bin/sotp track views sync']
+script = ['bin/sotp track type-signals && bin/sotp track catalogue-spec-signals && bin/sotp track views sync']
 
 [tasks.track-local-review]
 description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the local Codex reviewer. The shared regen gate (track-active-gate) ensures the reviewer observes the same signal state that the commit gate will re-check, eliminating hash-mismatch check-approved blocks (AC-12)."

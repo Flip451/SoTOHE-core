@@ -11,6 +11,9 @@ use crate::CliError;
 
 /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
 ///
+/// The operation is always idempotent: if the baseline file already exists it is
+/// kept as-is. To re-capture, delete the baseline file first.
+///
 /// # Errors
 ///
 /// Returns `CliError` when the underlying `CliApp` composition fails.
@@ -19,10 +22,9 @@ pub fn execute_baseline_capture(
     workspace_root: PathBuf,
     source_workspace: Option<PathBuf>,
     layer: Option<String>,
-    force: bool,
 ) -> Result<ExitCode, CliError> {
     let outcome = CliApp::new()
-        .track_baseline_capture(Some(track_id), workspace_root, source_workspace, layer, force)
+        .track_baseline_capture(Some(track_id), workspace_root, source_workspace, layer)
         .map_err(CliError::Message)?;
     if let Some(ref s) = outcome.stdout {
         println!("{s}");
@@ -58,8 +60,7 @@ mod tests {
     fn test_baseline_capture_with_invalid_track_id_returns_error() {
         let dir = tempfile::tempdir().unwrap();
 
-        let result =
-            execute_baseline_capture("../evil".to_owned(), dir.path().into(), None, None, false);
+        let result = execute_baseline_capture("../evil".to_owned(), dir.path().into(), None, None);
         assert!(result.is_err(), "path traversal track_id must be rejected");
     }
 
@@ -69,13 +70,8 @@ mod tests {
         // When architecture-rules.json is absent, layer bindings load fails.
         let workspace = tempfile::tempdir().unwrap();
 
-        let result = execute_baseline_capture(
-            "test-track".to_owned(),
-            workspace.path().into(),
-            None,
-            None,
-            false,
-        );
+        let result =
+            execute_baseline_capture("test-track".to_owned(), workspace.path().into(), None, None);
         // workspace has no architecture-rules.json → layer bindings load fails
         assert!(result.is_err(), "missing architecture-rules.json must cause error");
     }
@@ -93,7 +89,6 @@ mod tests {
             workspace.path().into(),
             Some(source_workspace.path().into()),
             None,
-            false,
         );
         let err = result.unwrap_err();
         let msg = format!("{err}");
@@ -171,7 +166,7 @@ mod tests {
         init_git_repo_on_track_branch(dir.path(), "test-track");
 
         let result =
-            execute_baseline_capture("test-track".to_owned(), dir.path().into(), None, None, false);
+            execute_baseline_capture("test-track".to_owned(), dir.path().into(), None, None);
         assert!(result.is_ok(), "should skip existing baseline without error");
     }
 
@@ -209,7 +204,6 @@ mod tests {
             dir.path().into(),
             None,
             Some("usecase".to_owned()),
-            false,
         );
 
         assert!(
@@ -245,7 +239,7 @@ mod tests {
             .unwrap();
 
         let result =
-            execute_baseline_capture("test-track".to_owned(), dir.path().into(), None, None, false);
+            execute_baseline_capture("test-track".to_owned(), dir.path().into(), None, None);
 
         assert!(
             result.is_err(),

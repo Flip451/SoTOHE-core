@@ -4,7 +4,31 @@
   "layer": "infrastructure",
   "types": {},
   "traits": {},
-  "functions": {},
+  "functions": {
+    "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "items_dir", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "&str" },
+        { "name": "workspace_root", "ty": "&std::path::Path" },
+        { "name": "binding", "ty": "&TdddLayerBinding" }
+      ],
+      "returns": "Result<(), CaptureBaselineError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted in ADR 2026-06-01-1206 D2: the force overwrite path for baseline capture is removed. baseline-capture is now always idempotent.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "OS-06",
+          "hash": "a99201d67af5063e8efccff4f6f9250cf06127a9ba5de1cc5f84d7cfc2f2d464"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [],
   "trait_impls": []
 }

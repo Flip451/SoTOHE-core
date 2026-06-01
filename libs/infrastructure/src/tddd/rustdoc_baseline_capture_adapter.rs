@@ -43,9 +43,8 @@ impl RustdocBaselineCaptureAdapter {
 impl RustdocBaselineCapturePort for RustdocBaselineCaptureAdapter {
     /// Captures the rustdoc-format baseline for a single layer binding.
     ///
-    /// When `force` is `false`, the operation is idempotent: an existing valid
-    /// baseline file causes an immediate `Ok(())` return.
-    /// When `force` is `true`, an existing baseline is overwritten.
+    /// The operation is always idempotent: an existing valid baseline file causes
+    /// an immediate `Ok(())` return. To re-capture, delete the baseline file first.
     ///
     /// # Errors
     ///
@@ -58,9 +57,8 @@ impl RustdocBaselineCapturePort for RustdocBaselineCaptureAdapter {
         track_id: &str,
         rustdoc_workspace: &Path,
         binding: &TdddLayerBinding,
-        force: bool,
     ) -> Result<(), BaselineCaptureIoError> {
-        capture_baseline_inner(items_dir, track_id, rustdoc_workspace, binding, force)
+        capture_baseline_inner(items_dir, track_id, rustdoc_workspace, binding)
     }
 }
 
@@ -73,7 +71,6 @@ fn capture_baseline_inner(
     track_id: &str,
     workspace_root: &Path,
     binding: &TdddLayerBinding,
-    force: bool,
 ) -> Result<(), BaselineCaptureIoError> {
     let err = |s: String| BaselineCaptureIoError(s);
 
@@ -121,15 +118,15 @@ fn capture_baseline_inner(
     reject_symlinks_below(&baseline_path, items_dir)
         .map_err(|e| err(format!("symlink guard: {e}")))?;
 
-    // Idempotent: skip if baseline already exists as a regular file (unless force).
-    if !force && baseline_path.is_file() {
+    // Idempotent: skip if baseline already exists as a regular file.
+    if baseline_path.is_file() {
         let existing = std::fs::read_to_string(&baseline_path).map_err(|e| {
             err(format!("cannot read existing baseline at {}: {e}", baseline_path.display()))
         })?;
         if let Err(e) = BaselineRustdocCodec::from_json(&existing) {
             return Err(err(format!(
                 "{}: existing baseline failed rustdoc format validation: {e}. \
-                 Delete the file and re-run, or use `--force` to overwrite it.",
+                 Delete the file and re-run to re-capture.",
                 baseline_path.display()
             )));
         }
@@ -188,15 +185,7 @@ fn capture_baseline_inner(
     atomic_write_file(&baseline_path, json_content.as_bytes())
         .map_err(|e| err(format!("cannot write {}: {e}", baseline_path.display())))?;
 
-    if force {
-        println!(
-            "[OK] baseline-capture (rustdoc): overwrote {baseline_filename} for layer '{layer_id}'"
-        );
-    } else {
-        println!(
-            "[OK] baseline-capture (rustdoc): wrote {baseline_filename} for layer '{layer_id}'"
-        );
-    }
+    println!("[OK] baseline-capture (rustdoc): wrote {baseline_filename} for layer '{layer_id}'");
 
     Ok(())
 }
@@ -231,7 +220,7 @@ mod tests {
         let binding = domain_binding("domain");
 
         let result =
-            adapter.capture(&items_dir, "test-track-2026-01-01", workspace.path(), &binding, false);
+            adapter.capture(&items_dir, "test-track-2026-01-01", workspace.path(), &binding);
 
         let err = result.unwrap_err();
         assert!(
@@ -242,7 +231,7 @@ mod tests {
     }
 
     #[test]
-    fn test_capture_adapter_force_false_skips_existing_valid_baseline() {
+    fn test_capture_adapter_skips_existing_valid_baseline() {
         let workspace = tempfile::tempdir().unwrap();
         let items_dir = workspace.path().join("track/items");
         let track_dir = items_dir.join("test-track-2026-01-01");
@@ -266,9 +255,9 @@ mod tests {
         let adapter = RustdocBaselineCaptureAdapter::new();
         let binding = domain_binding("domain");
 
-        // force = false: existing baseline → idempotent skip → Ok(())
+        // existing baseline → idempotent skip → Ok(())
         let result =
-            adapter.capture(&items_dir, "test-track-2026-01-01", workspace.path(), &binding, false);
+            adapter.capture(&items_dir, "test-track-2026-01-01", workspace.path(), &binding);
         assert!(result.is_ok(), "existing valid baseline must be skipped: {result:?}");
     }
 
@@ -281,7 +270,7 @@ mod tests {
 
         let binding = domain_binding("domain");
 
-        let result = adapter.capture(&items_dir, "../evil", workspace.path(), &binding, false);
+        let result = adapter.capture(&items_dir, "../evil", workspace.path(), &binding);
 
         let err = result.unwrap_err();
         assert!(

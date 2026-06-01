@@ -63,7 +63,7 @@ pub use variants::{FieldDecl, VariantDecl, VariantPayload};
 
 pub use catalogue_impl_signals_ports::{
     BaselineCaptureIoError, CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
-    MissingCataloguePolicy, RustdocBaselineCapturePort, RustdocCratePort, RustdocCratePortError,
-    TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort, TrackStatusReadError,
-    TrackStatusReaderPort, TypeSignalsExecutionError, TypeSignalsExecutorPort,
+    RustdocBaselineCapturePort, RustdocCratePort, RustdocCratePortError, TdddLayerBinding,
+    TdddLayerBindingsError, TdddLayerBindingsPort, TrackStatusReadError, TrackStatusReaderPort,
+    TypeSignalsExecutionError, TypeSignalsExecutorPort,
 };

@@ -168,13 +168,6 @@ pub enum TrackCommand {
         /// disabled layer is fail-closed.
         #[arg(long)]
         layer: Option<String>,
-
-        /// When set, absent catalogue files are silently skipped instead of
-        /// failing. Used by the `track-active-gate` regen sequence at Phase 0/1
-        /// (before type catalogues exist). User-invoked calls omit this flag to
-        /// stay fail-closed on absent catalogues (AC-03/CN-03).
-        #[arg(long)]
-        lenient: bool,
     },
 
     /// Render a mermaid type graph from rustdoc schema export.
@@ -326,10 +319,8 @@ pub enum TrackCommand {
 
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
     ///
-    /// Idempotent by default: if the baseline file already exists it is kept as-is.
-    /// Re-capturing the baseline after implementation has started pollutes the
-    /// pre-implementation snapshot. Use `--force` only when explicitly migrating
-    /// from an older baseline format (e.g. TypeBaseline JSON v2 → rustdoc JSON).
+    /// Always idempotent: if the baseline file already exists it is kept as-is.
+    /// To re-capture, delete the baseline file first and then run this command again.
     ///
     /// `--source-workspace` lets you capture the API from a different Cargo
     /// workspace (e.g. a git worktree at `main`) while writing the baseline files
@@ -359,11 +350,6 @@ pub enum TrackCommand {
         /// the specified layer id must be `tddd.enabled=true`.
         #[arg(long)]
         layer: Option<String>,
-
-        /// Overwrite existing baseline files. Use only when migrating from an
-        /// older baseline format.
-        #[arg(long)]
-        force: bool,
     },
 
     /// Run catalogue lint rules against a layer catalogue and report violations.
@@ -522,12 +508,10 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 .map_err(CliError::Message)
                 .and_then(|tid| signals::execute_signals(items_dir, tid))
         }
-        TrackCommand::TypeSignals { track_id, workspace_root, layer, lenient } => {
+        TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
             let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
                 .map_err(CliError::Message);
-            resolved.and_then(|tid| {
-                tddd::signals::execute_type_signals(tid, workspace_root, layer, lenient)
-            })
+            resolved.and_then(|tid| tddd::signals::execute_type_signals(tid, workspace_root, layer))
         }
         TrackCommand::TypeGraph {
             items_dir,
@@ -569,13 +553,7 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 tddd::spec_element_hash::execute_spec_element_hash(items_dir, tid, anchor)
             })
         }
-        TrackCommand::BaselineCapture {
-            track_id,
-            workspace_root,
-            source_workspace,
-            layer,
-            force,
-        } => {
+        TrackCommand::BaselineCapture { track_id, workspace_root, source_workspace, layer } => {
             let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
                 .map_err(CliError::Message);
             resolved.and_then(|tid| {
@@ -584,7 +562,6 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                     workspace_root,
                     source_workspace,
                     layer,
-                    force,
                 )
             })
         }

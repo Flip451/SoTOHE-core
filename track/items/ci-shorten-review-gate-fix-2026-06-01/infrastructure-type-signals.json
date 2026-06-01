@@ -1,6 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-01T09:52:48Z",
-  "declaration_hash": "317bd8836fc1ce27d5020d8364fe45a8895237810a75e2c15c7dbc06ac04877e",
-  "signals": []
+  "generated_at": "2026-06-01T14:32:30Z",
+  "declaration_hash": "6c264e5aeaff01633c44a1e17e50220d4e591fc14f2e049b9aac760a1412fe07",
+  "signals": [
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
 }

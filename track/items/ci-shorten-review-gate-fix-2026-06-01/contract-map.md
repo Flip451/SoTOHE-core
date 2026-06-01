@@ -25,11 +25,44 @@ classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
 classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
 subgraph domain["domain"]
   direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph R40_domain_domain_RustdocBaselineCapturePort["tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"]
+    direction TB
+    R40_domain_domain_RustdocBaselineCapturePort__self[RustdocBaselineCapturePort]
+    R40_domain_domain_RustdocBaselineCapturePort_capture([capture])
+  end
+  subgraph R37_domain_domain_TypeSignalsExecutorPort["tddd::catalogue_v2::catalogue_impl_signals_ports::TypeSignalsExecutorPort"]
+    direction TB
+    R37_domain_domain_TypeSignalsExecutorPort__self[TypeSignalsExecutorPort]
+    R37_domain_domain_TypeSignalsExecutorPort_evaluate_layer([evaluate_layer])
+  end
+  end
 end
 subgraph usecase["usecase"]
   direction TB
+  subgraph usecase_usecase_module_baseline_capture["usecase::baseline_capture"]
+    direction TB
+  subgraph T38_usecase_usecase_BaselineCaptureRequest["baseline_capture::service::BaselineCaptureRequest"]
+    direction TB
+    T38_usecase_usecase_BaselineCaptureRequest__self[BaselineCaptureRequest]
+  end
+  end
+  subgraph usecase_usecase_module_type_signals["usecase::type_signals"]
+    direction TB
+  subgraph T34_usecase_usecase_TypeSignalsRequest["type_signals::service::TypeSignalsRequest"]
+    direction TB
+    T34_usecase_usecase_TypeSignalsRequest__self[TypeSignalsRequest]
+  end
+  end
 end
 subgraph infrastructure["infrastructure"]
   direction TB
 end
+class R40_domain_domain_RustdocBaselineCapturePort_capture method_node
+class R40_domain_domain_RustdocBaselineCapturePort__self secondary_port
+class R37_domain_domain_TypeSignalsExecutorPort_evaluate_layer method_node
+class R37_domain_domain_TypeSignalsExecutorPort__self secondary_port
+class T38_usecase_usecase_BaselineCaptureRequest__self command
+class T34_usecase_usecase_TypeSignalsRequest__self command
 ```

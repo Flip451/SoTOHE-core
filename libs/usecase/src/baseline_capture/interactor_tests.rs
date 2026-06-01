@@ -91,7 +91,6 @@ impl RustdocBaselineCapturePort for SuccessCapture {
         _track_id: &str,
         _rustdoc_workspace: &Path,
         _binding: &TdddLayerBinding,
-        _force: bool,
     ) -> Result<(), BaselineCaptureIoError> {
         Ok(())
     }
@@ -107,7 +106,6 @@ impl RustdocBaselineCapturePort for FailingCapture {
         _track_id: &str,
         _rustdoc_workspace: &Path,
         _binding: &TdddLayerBinding,
-        _force: bool,
     ) -> Result<(), BaselineCaptureIoError> {
         Err(BaselineCaptureIoError("capture failed: nightly not installed".to_owned()))
     }
@@ -135,7 +133,6 @@ fn valid_request(tmp: &std::path::Path) -> BaselineCaptureRequest {
         workspace_root: tmp.to_path_buf(),
         source_workspace: None,
         layer: None,
-        force: false,
     }
 }
 
@@ -173,7 +170,6 @@ fn test_run_with_dotdot_workspace_root_returns_symlink_rejected() {
         workspace_root: std::path::PathBuf::from("../outside"),
         source_workspace: None,
         layer: None,
-        force: false,
     };
 
     let err = interactor.run(req).unwrap_err();
@@ -256,7 +252,6 @@ fn test_run_with_multiple_layers_processes_all() {
             _track_id: &str,
             _rustdoc_workspace: &Path,
             _binding: &TdddLayerBinding,
-            _force: bool,
         ) -> Result<(), BaselineCaptureIoError> {
             self.0.fetch_add(1, Ordering::SeqCst);
             Ok(())
@@ -290,7 +285,6 @@ fn test_run_with_dotdot_source_workspace_returns_symlink_rejected() {
         workspace_root: tmp.path().to_path_buf(),
         source_workspace: Some(std::path::PathBuf::from("../outside")),
         layer: None,
-        force: false,
     };
 
     let err = interactor.run(req).unwrap_err();
@@ -316,7 +310,6 @@ fn test_run_with_symlinked_source_workspace_returns_symlink_rejected() {
         workspace_root: tmp.path().to_path_buf(),
         source_workspace: Some(source.path().to_path_buf()),
         layer: None,
-        force: false,
     };
 
     let err = interactor.run(req).unwrap_err();
@@ -339,7 +332,6 @@ fn test_run_source_workspace_is_passed_to_capture() {
             _track_id: &str,
             rustdoc_workspace: &Path,
             _binding: &TdddLayerBinding,
-            _force: bool,
         ) -> Result<(), BaselineCaptureIoError> {
             self.0.lock().unwrap().push(rustdoc_workspace.to_path_buf());
             Ok(())
@@ -359,7 +351,6 @@ fn test_run_source_workspace_is_passed_to_capture() {
         workspace_root: tmp.path().to_path_buf(),
         source_workspace: Some(source.path().to_path_buf()),
         layer: None,
-        force: false,
     };
 
     interactor.run(req).unwrap();

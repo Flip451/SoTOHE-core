@@ -14,11 +14,8 @@ impl CliApp {
     ///
     /// WRITE operation: the current branch must match `track/<track_id>`.
     ///
-    /// When `lenient` is `true`, absent catalogue files are silently skipped
-    /// (pre-commit / gate mode for Phase 0/1 before type catalogues exist).
-    /// When `false`, an absent catalogue is a hard error (user-invoked strict
-    /// mode). The gate (`track-active-gate`) passes `--lenient`; direct
-    /// user invocations omit the flag to stay fail-closed (AC-03/CN-03).
+    /// Absent catalogue files are always skipped unconditionally (no gate-vs-direct
+    /// distinction). Present catalogues are always evaluated strictly.
     ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
@@ -27,7 +24,6 @@ impl CliApp {
         track_id: Option<String>,
         workspace_root: PathBuf,
         layer: Option<String>,
-        lenient: bool,
     ) -> Result<CommandOutcome, String> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
@@ -60,7 +56,6 @@ impl CliApp {
                 branch,
                 workspace_root,
                 layer,
-                lenient,
             })
             .map_err(|e| e.to_string())?;
 
@@ -285,10 +280,10 @@ impl CliApp {
                 continue;
             }
 
-            // Absent catalogue file for a layer must be silently skipped (lenient
-            // CI path, AC-01/AC-02). The `sotp track type-signals --lenient` step
-            // already skips absent catalogues; this step does the same so that the
-            // full `track-active-gate` chain (type-signals → catalogue-spec-signals
+            // Absent catalogue file for a layer must be silently skipped
+            // (AC-01/AC-02). The `sotp track type-signals` step already skips
+            // absent catalogues unconditionally; this step does the same so that
+            // the full `track-active-gate` chain (type-signals → catalogue-spec-signals
             // → views sync) succeeds at Phase 0/1 before any catalogue exists.
             // When a catalogue IS present it is evaluated normally: a red signal
             // still blocks (AC-03/CN-02 — no fail-open on present catalogues).
@@ -383,6 +378,9 @@ impl CliApp {
     ///
     /// WRITE operation: the current branch must match `track/<track_id>`.
     ///
+    /// The operation is always idempotent: if the baseline file already exists it
+    /// is kept as-is. To re-capture, delete the baseline file first.
+    ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
     pub fn track_baseline_capture(
@@ -391,7 +389,6 @@ impl CliApp {
         workspace_root: PathBuf,
         source_workspace: Option<PathBuf>,
         layer: Option<String>,
-        force: bool,
     ) -> Result<CommandOutcome, String> {
         use infrastructure::FsSymlinkGuard;
         use infrastructure::tddd::rustdoc_baseline_capture_adapter::RustdocBaselineCaptureAdapter;
@@ -415,7 +412,6 @@ impl CliApp {
                 workspace_root,
                 source_workspace,
                 layer,
-                force,
             })
             .map_err(|e| e.to_string())?;
 
@@ -612,7 +608,7 @@ mod tests {
         assert!(result.is_err(), "layer id starting with digit must be rejected");
     }
 
-    // ── T003: catalogue-spec-signals absent-catalogue lenient path ───────────
+    // ── T003: catalogue-spec-signals absent-catalogue skip path ─────────────
 
     /// Helper: create a minimal git repo on `track/<track_id>` branch.
     fn init_git_repo_on_track_branch(root: &std::path::Path, track_id: &str) {
@@ -654,7 +650,7 @@ mod tests {
     /// AC-01/AC-02: `catalogue-spec-signals` gate at Phase 0 (no catalogue file) succeeds.
     ///
     /// The gate (`track-active-gate`) calls `sotp track catalogue-spec-signals` after
-    /// `sotp track type-signals --lenient`. When no catalogue exists, both commands
+    /// `sotp track type-signals`. When no catalogue exists, both commands
     /// must exit zero so the full gate chain succeeds at Phase 0/1.
     #[test]
     fn test_track_catalogue_spec_signals_absent_catalogue_returns_ok() {
@@ -691,7 +687,7 @@ mod tests {
         );
         assert!(
             result.is_ok(),
-            "absent catalogue in catalogue-spec-signals gate must return Ok (Phase 0 lenient), \
+            "absent catalogue in catalogue-spec-signals must return Ok (Phase 0 skip), \
              got: {result:?}"
         );
     }

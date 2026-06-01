@@ -108,6 +108,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型シグネチャ codec の generic param 名前衝突の恒久対策](2026-05-25-0423-tddd-codec-generic-name-collision-fix.md) | Proposed | 2026-05-25 |
 | [完了済みトラック保護を frozen から現在ブランチ紐付きバリデーションへ置換](2026-05-26-0518-active-track-write-guard.md) | Proposed | 2026-05-26 |
 | [typestate は struct 形状と直交配置する — 全 struct 形状を typestate 状態にする](2026-05-26-1002-typestate-struct-kind-orthogonal.md) | Proposed | 2026-05-26 |
+| [`--lenient` と `--force` の実行経路を削除する](2026-06-01-1206-remove-lenient-and-force-flag-paths.md) | — | 2026-06-01 |
 
 ### トラック・ワークフロー
 

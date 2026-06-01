@@ -1,5 +1,14 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1695363465c5f8d84294f733de660c7c731a201295dfde20f9cc61b097088a34",
-  "signals": []
+  "catalogue_declaration_hash": "5e3f24c7b402808ab0805eb65d443b154d6ab8824c8619a8aa218a80fd452ede",
+  "signals": [
+    {
+      "type_name": "BaselineCaptureRequest",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsRequest",
+      "signal": "blue"
+    }
+  ]
 }
