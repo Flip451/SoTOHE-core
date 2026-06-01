@@ -302,7 +302,22 @@ impl CliApp {
                     // handle it so the caller sees the same error as CI.
                 }
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    // Catalogue absent — skip silently (Phase 0/1 lenient path).
+                    // Catalogue absent — remove any stale signals file so that the
+                    // later `verify catalogue-spec-signals` does not find a signals
+                    // file without its backing catalogue (which would be an error).
+                    // If the signals file is also absent that is fine — nothing to do.
+                    let stale_signals_path = track_dir
+                        .join(format!("{}-catalogue-spec-signals.json", binding.layer_id()));
+                    match std::fs::remove_file(&stale_signals_path) {
+                        Ok(()) => {}
+                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+                        Err(e) => {
+                            return Err(format!(
+                                "failed to remove stale signals file '{}': {e}",
+                                stale_signals_path.display(),
+                            ));
+                        }
+                    }
                     continue;
                 }
                 Err(e) => {
@@ -781,6 +796,61 @@ mod tests {
         assert!(
             signals_path.exists(),
             "signals file must be written when catalogue IS present (not silently skipped)"
+        );
+    }
+
+    /// T003: stale signals file is removed when catalogue is absent.
+    ///
+    /// If a catalogue was removed/renamed but a previously-generated
+    /// `<layer>-catalogue-spec-signals.json` is still present, the
+    /// absent-catalogue arm must delete it so that the later
+    /// `verify catalogue-spec-signals` does not find signals without
+    /// a backing catalogue (which would be an error).
+    #[test]
+    fn test_track_catalogue_spec_signals_absent_catalogue_removes_stale_signals_file() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
+
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+
+        // Layer with catalogue_spec_signal enabled, but catalogue file is ABSENT.
+        let rules_json = r#"{
+          "layers": [{
+            "crate": "domain",
+            "tddd": {
+              "enabled": true,
+              "catalogue_file": "domain-types.json",
+              "catalogue_spec_signal": { "enabled": true }
+            }
+          }]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        // Write a stale signals file (catalogue was removed but signals remained).
+        let stale_signals_path = track_dir.join("domain-catalogue-spec-signals.json");
+        std::fs::write(&stale_signals_path, r#"{"stale": true}"#).unwrap();
+        assert!(stale_signals_path.exists(), "pre-condition: stale signals file must exist");
+
+        let app = CliApp::new();
+        let result = app.track_catalogue_spec_signals(
+            items_dir,
+            Some("test-track".to_owned()),
+            dir.path().to_path_buf(),
+            None,
+        );
+
+        assert!(
+            result.is_ok(),
+            "absent catalogue must return Ok even with a stale signals file, got: {result:?}"
+        );
+        assert!(
+            !stale_signals_path.exists(),
+            "stale signals file must be removed when catalogue is absent"
         );
     }
 }
