@@ -16,7 +16,7 @@
     {
       "id": "T003",
       "description": "Make track-active-gate lenient on absent catalogues: in apps/cli-composition/src/track/tddd.rs, change the TypeSignalsRequest built for the gate path (called from track-active-gate / track-local-review / track-commit-message) to lenient: true, leaving the user-facing `sotp track type-signals` command at lenient: false. Add unit tests that verify: (a) absent catalogue produces no-op + warning and zero exit; (b) present catalogue with red signal still blocks; (c) user-invoked path remains strict. cargo make ci must pass.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",

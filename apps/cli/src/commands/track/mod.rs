@@ -168,6 +168,13 @@ pub enum TrackCommand {
         /// disabled layer is fail-closed.
         #[arg(long)]
         layer: Option<String>,
+
+        /// When set, absent catalogue files are silently skipped instead of
+        /// failing. Used by the `track-active-gate` regen sequence at Phase 0/1
+        /// (before type catalogues exist). User-invoked calls omit this flag to
+        /// stay fail-closed on absent catalogues (AC-03/CN-03).
+        #[arg(long)]
+        lenient: bool,
     },
 
     /// Render a mermaid type graph from rustdoc schema export.
@@ -515,10 +522,12 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 .map_err(CliError::Message)
                 .and_then(|tid| signals::execute_signals(items_dir, tid))
         }
-        TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
+        TrackCommand::TypeSignals { track_id, workspace_root, layer, lenient } => {
             let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
                 .map_err(CliError::Message);
-            resolved.and_then(|tid| tddd::signals::execute_type_signals(tid, workspace_root, layer))
+            resolved.and_then(|tid| {
+                tddd::signals::execute_type_signals(tid, workspace_root, layer, lenient)
+            })
         }
         TrackCommand::TypeGraph {
             items_dir,

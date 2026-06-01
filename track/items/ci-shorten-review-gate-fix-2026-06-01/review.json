@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:52:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:54:13Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a42597bae658dc83e75898b167bca8218e50c953b4d53a20635fdcc4d883124",
+          "at": "2026-06-01T08:54:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a42597bae658dc83e75898b167bca8218e50c953b4d53a20635fdcc4d883124",
+          "at": "2026-06-01T08:56:18Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
+          "at": "2026-06-01T08:53:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
+          "at": "2026-06-01T08:55:57Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Skipping `NotFound` here bypasses `refresh_one_layer`'s existing track-directory validation. If `track_dir` is missing, `track_catalogue_spec_signals` now returns success as long as every enabled catalogue is absent, instead of failing closed on the missing track directory.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 305,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0facc1dea68bc9f8d7658814f258c8ed6564e5eead816bd0b6cdb0b7bf8f5956",
+          "at": "2026-06-01T08:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
+          "at": "2026-06-01T09:04:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
+          "at": "2026-06-01T09:07:17Z"
+        }
+      ]
+    }
+  }
+}

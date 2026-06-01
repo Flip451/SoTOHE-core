@@ -14,6 +14,12 @@ impl CliApp {
     ///
     /// WRITE operation: the current branch must match `track/<track_id>`.
     ///
+    /// When `lenient` is `true`, absent catalogue files are silently skipped
+    /// (pre-commit / gate mode for Phase 0/1 before type catalogues exist).
+    /// When `false`, an absent catalogue is a hard error (user-invoked strict
+    /// mode). The gate (`track-active-gate`) passes `--lenient`; direct
+    /// user invocations omit the flag to stay fail-closed (AC-03/CN-03).
+    ///
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
     pub fn track_type_signals(
@@ -21,6 +27,7 @@ impl CliApp {
         track_id: Option<String>,
         workspace_root: PathBuf,
         layer: Option<String>,
+        lenient: bool,
     ) -> Result<CommandOutcome, String> {
         use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
@@ -53,7 +60,7 @@ impl CliApp {
                 branch,
                 workspace_root,
                 layer,
-                lenient: false,
+                lenient,
             })
             .map_err(|e| e.to_string())?;
 
@@ -234,7 +241,6 @@ impl CliApp {
                 ));
             }
             Ok(_) => {}
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
             Err(e) => {
                 return Err(format!(
                     "symlink guard: cannot stat track directory {}: {e}",
@@ -278,6 +284,36 @@ impl CliApp {
             if !binding.catalogue_spec_signal_enabled() {
                 continue;
             }
+
+            // Absent catalogue file for a layer must be silently skipped (lenient
+            // CI path, AC-01/AC-02). The `sotp track type-signals --lenient` step
+            // already skips absent catalogues; this step does the same so that the
+            // full `track-active-gate` chain (type-signals → catalogue-spec-signals
+            // → views sync) succeeds at Phase 0/1 before any catalogue exists.
+            // When a catalogue IS present it is evaluated normally: a red signal
+            // still blocks (AC-03/CN-02 — no fail-open on present catalogues).
+            let catalogue_path = track_dir.join(binding.catalogue_file());
+            match catalogue_path.symlink_metadata() {
+                Ok(meta) if meta.file_type().is_file() => {
+                    // Catalogue present and is a regular file — proceed to refresh.
+                }
+                Ok(_) => {
+                    // Non-file entry (symlink, directory, etc.) — let refresh_one_layer
+                    // handle it so the caller sees the same error as CI.
+                }
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                    // Catalogue absent — skip silently (Phase 0/1 lenient path).
+                    continue;
+                }
+                Err(e) => {
+                    return Err(format!(
+                        "cannot stat catalogue '{}' for layer '{}': {e}",
+                        catalogue_path.display(),
+                        binding.layer_id(),
+                    ));
+                }
+            }
+
             infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer(
                 &items_dir,
                 &track_dir,
@@ -516,7 +552,13 @@ fn parse_layer_filter_ids(raw: &str) -> Result<Vec<usecase::LayerId>, String> {
 // migration. The parser behavior (CSV split, trim, skip empty, CN-12 LayerId
 // validation) is unchanged, so the coverage is restored here.
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::panic, clippy::indexing_slicing, clippy::expect_used)]
+#[allow(
+    clippy::unwrap_used,
+    clippy::panic,
+    clippy::indexing_slicing,
+    clippy::expect_used,
+    clippy::missing_panics_doc
+)]
 mod tests {
     use super::*;
 
@@ -553,5 +595,192 @@ mod tests {
         // A value starting with a digit is rejected by LayerId::try_new (CN-12).
         let result = parse_layer_filter_ids("1layer");
         assert!(result.is_err(), "layer id starting with digit must be rejected");
+    }
+
+    // ── T003: catalogue-spec-signals absent-catalogue lenient path ───────────
+
+    /// Helper: create a minimal git repo on `track/<track_id>` branch.
+    fn init_git_repo_on_track_branch(root: &std::path::Path, track_id: &str) {
+        let branch_name = format!("track/{track_id}");
+        let run_git = |args: &[&str]| {
+            let status = std::process::Command::new("git")
+                .args(args)
+                .current_dir(root)
+                .status()
+                .expect("git command failed to spawn");
+            assert!(status.success(), "git {} exited with status {status}", args.join(" "));
+        };
+        run_git(&["init", "-q"]);
+        run_git(&["config", "user.email", "test@example.com"]);
+        run_git(&["config", "user.name", "Test"]);
+        run_git(&["config", "commit.gpgsign", "false"]);
+        run_git(&["commit", "--allow-empty", "-q", "-m", "init", "--no-gpg-sign"]);
+        run_git(&["branch", "-m", &branch_name]);
+    }
+
+    fn minimal_active_metadata_json(track_id: &str) -> String {
+        format!(
+            r#"{{
+  "schema_version": 5,
+  "id": "{track_id}",
+  "branch": "track/{track_id}",
+  "title": "Test Track",
+  "created_at": "2026-04-15T00:00:00Z",
+  "updated_at": "2026-04-15T00:00:00Z"
+}}
+"#
+        )
+    }
+
+    fn minimal_impl_plan_json() -> &'static str {
+        r#"{"schema_version":1,"tasks":[],"plan":{"summary":[],"sections":[]}}"#
+    }
+
+    /// AC-01/AC-02: `catalogue-spec-signals` gate at Phase 0 (no catalogue file) succeeds.
+    ///
+    /// The gate (`track-active-gate`) calls `sotp track catalogue-spec-signals` after
+    /// `sotp track type-signals --lenient`. When no catalogue exists, both commands
+    /// must exit zero so the full gate chain succeeds at Phase 0/1.
+    #[test]
+    fn test_track_catalogue_spec_signals_absent_catalogue_returns_ok() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
+
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+
+        // Layer with catalogue_spec_signal enabled.
+        // No domain-types.json written — catalogue is absent.
+        let rules_json = r#"{
+          "layers": [{
+            "crate": "domain",
+            "tddd": {
+              "enabled": true,
+              "catalogue_file": "domain-types.json",
+              "catalogue_spec_signal": { "enabled": true }
+            }
+          }]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        let app = CliApp::new();
+        let result = app.track_catalogue_spec_signals(
+            items_dir,
+            Some("test-track".to_owned()),
+            dir.path().to_path_buf(),
+            None,
+        );
+        assert!(
+            result.is_ok(),
+            "absent catalogue in catalogue-spec-signals gate must return Ok (Phase 0 lenient), \
+             got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_track_catalogue_spec_signals_missing_track_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
+
+        let items_dir = dir.path().join("track/items");
+        std::fs::create_dir_all(&items_dir).unwrap();
+
+        let rules_json = r#"{
+          "layers": [{
+            "crate": "domain",
+            "tddd": {
+              "enabled": true,
+              "catalogue_file": "domain-types.json",
+              "catalogue_spec_signal": { "enabled": true }
+            }
+          }]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        let app = CliApp::new();
+        let result = app.track_catalogue_spec_signals(
+            items_dir,
+            Some("test-track".to_owned()),
+            dir.path().to_path_buf(),
+            None,
+        );
+
+        assert!(
+            result.is_err(),
+            "missing track directory must not be hidden by absent-catalogue leniency"
+        );
+    }
+
+    /// CN-02/AC-03: `catalogue-spec-signals` with a PRESENT catalogue does NOT silently
+    /// skip — it evaluates normally. The absent-catalogue skip must only apply when the
+    /// file is genuinely absent (no fail-open on present catalogues).
+    #[test]
+    fn test_track_catalogue_spec_signals_present_catalogue_is_evaluated_not_skipped() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
+
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+
+        // Write a minimal v3 catalogue with a Red-signal entry.
+        let v3_catalogue = r#"{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "RedType": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        std::fs::write(track_dir.join("domain-types.json"), v3_catalogue).unwrap();
+
+        let rules_json = r#"{
+          "layers": [{
+            "crate": "domain",
+            "tddd": {
+              "enabled": true,
+              "catalogue_file": "domain-types.json",
+              "catalogue_spec_signal": { "enabled": true }
+            }
+          }]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        let app = CliApp::new();
+        let result = app.track_catalogue_spec_signals(
+            items_dir.clone(),
+            Some("test-track".to_owned()),
+            dir.path().to_path_buf(),
+            None,
+        );
+
+        // A present catalogue with a red signal must still be evaluated (not silently
+        // skipped). The catalogue-spec-signals refresher writes the signals file — it
+        // does NOT block on red signals itself (blocking is the gate's job). The
+        // command must succeed (Ok) because signal computation is a regen, not a gate.
+        // This test confirms the absent-catalogue skip does NOT fire when catalogue IS present.
+        assert!(result.is_ok(), "present catalogue must be evaluated (not skipped): {result:?}");
+
+        // Verify the signal file was written (catalogue was processed, not skipped).
+        let signals_path = track_dir.join("domain-catalogue-spec-signals.json");
+        assert!(
+            signals_path.exists(),
+            "signals file must be written when catalogue IS present (not silently skipped)"
+        );
     }
 }
