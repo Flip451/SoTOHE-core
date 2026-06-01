@@ -7,7 +7,7 @@ This track fixes two independent problems: (1) CI run time ballooned from ~3-4 m
 T001 audits the CI timing baseline before any change is made. T002 acts on those findings, modifying only cache-strategy configuration with no Rust source changes. T003 fixes the gate leniency bug by passing lenient: true on the gate path (the mechanism already exists in TypeSignalsRequest). T004 is the final cargo make ci confirmation gate.
 T002 and T003 are independent and can be committed separately. T001 must precede T002 (discovery first). T004 depends on both T002 and T003 being merged.
 
-## Tasks (2/4 resolved)
+## Tasks (4/4 resolved)
 
 ### S1 — CI cache audit (discovery only)
 
@@ -28,10 +28,10 @@ T002 and T003 are independent and can be committed separately. T001 must precede
 > The root cause is apps/cli-composition/src/track/tddd.rs line 56: lenient: false is hardcoded for the gate path. The fix sets lenient: true for the gate-path invocation so that TypeSignalsInteractor maps it to MissingCataloguePolicy::SkipSilently, matching the existing views sync behaviour for absent inputs.
 > Strict leniency is preserved: the user-facing `sotp track type-signals` command retains lenient: false. New unit tests cover the three required behaviors: (a) absent catalogue skips with warning and exits zero (AC-01, AC-02); (b) present catalogue with red signal blocks (AC-03, CN-02); (c) user-invoked path stays strict. CN-03 (consistency with views sync) and CN-04 (cargo make ci passes) are verified here.
 
-- [~] **T003**: Make track-active-gate lenient on absent catalogues: in apps/cli-composition/src/track/tddd.rs, change the TypeSignalsRequest built for the gate path (called from track-active-gate / track-local-review / track-commit-message) to lenient: true, leaving the user-facing `sotp track type-signals` command at lenient: false. Add unit tests that verify: (a) absent catalogue produces no-op + warning and zero exit; (b) present catalogue with red signal still blocks; (c) user-invoked path remains strict. cargo make ci must pass.
+- [x] **T003**: Make track-active-gate lenient on absent catalogues: in apps/cli-composition/src/track/tddd.rs, change the TypeSignalsRequest built for the gate path (called from track-active-gate / track-local-review / track-commit-message) to lenient: true, leaving the user-facing `sotp track type-signals` command at lenient: false. Add unit tests that verify: (a) absent catalogue produces no-op + warning and zero exit; (b) present catalogue with red signal still blocks; (c) user-invoked path remains strict. cargo make ci must pass. (`b28022c3`)
 
 ### S4 — Final CI gate
 
 > Run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) across the combined T002 + T003 state. Record timing measurements in observations.md to confirm the CI duration target from AC-04 is met. This task produces no source changes; it is the final acceptance checkpoint.
 
-- [ ] **T004**: Final integration gate: run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) against the combined T002 + T003 changes and confirm all checks pass. Document any residual timing measurements in observations.md.
+- [x] **T004**: Final integration gate: run cargo make ci (fmt-check + clippy + nextest + deny + check-layers + verify-*) against the combined T002 + T003 changes and confirm all checks pass. Document any residual timing measurements in observations.md. (`b28022c3`)
