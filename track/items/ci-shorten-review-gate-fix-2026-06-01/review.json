@@ -1,135 +1,56 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:12ba9d0c8ad0e6cf1ccc45f7ce88d34f94ee2dfa4ebd5698f5770a58894fe096",
-          "at": "2026-06-01T10:53:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:67a1f9b50512961eb3b744f9ac67f7b5a6ebf787071d29800410d2b6d725a998",
-          "at": "2026-06-01T13:14:16Z"
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:52:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:67a1f9b50512961eb3b744f9ac67f7b5a6ebf787071d29800410d2b6d725a998",
-          "at": "2026-06-01T13:17:12Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Skipping `NotFound` here bypasses `refresh_one_layer`'s existing track-directory validation. If `track_dir` is missing, `track_catalogue_spec_signals` now returns success as long as every enabled catalogue is absent, instead of failing closed on the missing track directory.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 305,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0facc1dea68bc9f8d7658814f258c8ed6564e5eead816bd0b6cdb0b7bf8f5956",
-          "at": "2026-06-01T08:56:25Z"
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:54:13Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
-          "at": "2026-06-01T09:04:25Z"
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T10:54:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:13:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
-          "at": "2026-06-01T09:07:17Z"
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:15:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
-          "at": "2026-06-01T09:32:03Z"
+          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
+          "at": "2026-06-01T21:02:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
-          "at": "2026-06-01T09:33:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:122a2e099fdca24d20ed96007e9abb5a8c041a57c00ba966ff94803a9e3218db",
-          "at": "2026-06-01T10:54:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
-          "at": "2026-06-01T13:14:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
-          "at": "2026-06-01T13:15:47Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
-          "at": "2026-06-01T09:49:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
-          "at": "2026-06-01T09:52:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c3d71fd1f01735b76eff278d5e913c828b348ef70a968d4fc0e371140e219f3",
-          "at": "2026-06-01T10:53:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
-          "at": "2026-06-01T13:17:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
-          "at": "2026-06-01T13:20:47Z"
+          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
+          "at": "2026-06-01T21:04:14Z"
         }
       ]
     },
@@ -237,6 +158,163 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
+          "at": "2026-06-01T09:49:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
+          "at": "2026-06-01T09:52:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c3d71fd1f01735b76eff278d5e913c828b348ef70a968d4fc0e371140e219f3",
+          "at": "2026-06-01T10:53:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
+          "at": "2026-06-01T13:17:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
+          "at": "2026-06-01T13:20:47Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12ba9d0c8ad0e6cf1ccc45f7ce88d34f94ee2dfa4ebd5698f5770a58894fe096",
+          "at": "2026-06-01T10:53:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67a1f9b50512961eb3b744f9ac67f7b5a6ebf787071d29800410d2b6d725a998",
+          "at": "2026-06-01T13:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67a1f9b50512961eb3b744f9ac67f7b5a6ebf787071d29800410d2b6d725a998",
+          "at": "2026-06-01T13:17:12Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83fda4ac722760d0932752a1c2aa82135c2aac665ca914a493c7871e7c5e67b5",
+          "at": "2026-06-01T10:53:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
+          "at": "2026-06-01T13:14:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
+          "at": "2026-06-01T13:17:06Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Skipping `NotFound` here bypasses `refresh_one_layer`'s existing track-directory validation. If `track_dir` is missing, `track_catalogue_spec_signals` now returns success as long as every enabled catalogue is absent, instead of failing closed on the missing track directory.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 305,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0facc1dea68bc9f8d7658814f258c8ed6564e5eead816bd0b6cdb0b7bf8f5956",
+          "at": "2026-06-01T08:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
+          "at": "2026-06-01T09:04:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
+          "at": "2026-06-01T09:07:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
+          "at": "2026-06-01T09:32:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
+          "at": "2026-06-01T09:33:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:122a2e099fdca24d20ed96007e9abb5a8c041a57c00ba966ff94803a9e3218db",
+          "at": "2026-06-01T10:54:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
+          "at": "2026-06-01T13:14:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
+          "at": "2026-06-01T13:15:47Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -295,70 +373,6 @@
           "findings": [],
           "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
           "at": "2026-06-01T13:17:29Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83fda4ac722760d0932752a1c2aa82135c2aac665ca914a493c7871e7c5e67b5",
-          "at": "2026-06-01T10:53:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
-          "at": "2026-06-01T13:14:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
-          "at": "2026-06-01T13:17:06Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:52:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:54:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T10:54:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T13:13:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T13:15:03Z"
         }
       ]
     }

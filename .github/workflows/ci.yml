@@ -27,9 +27,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.SCCACHE_HOST_DIR }}
-          key: ${{ runner.os }}-sccache-v2-${{ hashFiles('Dockerfile', '**/Cargo.lock') }}
+          # Rolling key: the run-id suffix makes the key unique per run so the cache
+          # is always saved at job end, and restore-keys restores the most recent
+          # prior cache for warm incremental reuse. A static key is immutable once
+          # written (actions/cache never overwrites an existing key), which froze the
+          # persisted sccache dir at its first save and left every later run at 0%
+          # Rust hit -> full recompile.
+          key: ${{ runner.os }}-sccache-v3-${{ hashFiles('Dockerfile', '**/Cargo.lock') }}-${{ github.run_id }}
           restore-keys: |
-            ${{ runner.os }}-sccache-v2-
+            ${{ runner.os }}-sccache-v3-${{ hashFiles('Dockerfile', '**/Cargo.lock') }}-
+            ${{ runner.os }}-sccache-v3-
 
       - name: Prepare sccache directory
         run: mkdir -p ${{ env.SCCACHE_HOST_DIR }}
