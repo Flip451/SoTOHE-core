@@ -53,9 +53,18 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Seed ci-target volume from image
+        run: |
+          docker volume create ci-target
+          docker run --rm \
+            --user 0 \
+            -v ci-target:/workspace/target \
+            rust-sdd-template-tools:latest \
+            chown -R "${HOST_UID}:${HOST_GID}" /workspace/target
+
       - name: Start CI container
         run: |
-          docker compose run -d \
+          docker compose -f compose.yml -f compose.ci.yml run -d \
             --name ci-runner \
             tools tail -f /dev/null
 
