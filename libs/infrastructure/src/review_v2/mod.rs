@@ -7,6 +7,7 @@ pub mod codex_reviewer;
 pub mod diff_getter;
 pub mod hasher;
 pub mod persistence;
+pub mod review_fix_runner;
 pub mod scope_config_loader;
 
 pub use claude_reviewer::ClaudeReviewer;
@@ -14,4 +15,5 @@ pub use codex_reviewer::CodexReviewer;
 pub use diff_getter::GitDiffGetter;
 pub use hasher::SystemReviewHasher;
 pub use persistence::{FsCommitHashStore, FsReviewStore};
+pub use review_fix_runner::CodexReviewFixRunner;
 pub use scope_config_loader::load_v2_scope_config;

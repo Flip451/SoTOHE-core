@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "review-fix-codex-rustify-2026-05-31",
+  "title": "Codex review-fix-lead wrapper の Rust 化 — cargo make 流出ロジックを Rust 層へ移設",
+  "branch": "track/review-fix-codex-rustify-2026-05-31",
+  "created_at": "2026-05-31T04:59:27Z",
+  "updated_at": "2026-05-31T04:59:27Z"
+}

@@ -44,6 +44,80 @@ fn strip_leading_separator(raw_args: &[String]) -> Vec<String> {
     words.into_iter().skip_while(|s| s == "--").collect()
 }
 
+fn strip_leading_separator_shell(raw_args: &[String]) -> Result<Vec<String>, String> {
+    let words = raw_args_to_shell_words(raw_args)?;
+    Ok(words.into_iter().skip_while(|s| s == "--").collect())
+}
+
+fn raw_args_to_shell_words(raw_args: &[String]) -> Result<Vec<String>, String> {
+    if raw_args.len() == 1 {
+        let single =
+            raw_args.first().ok_or_else(|| "internal error: missing raw argument".to_owned())?;
+        split_shell_words(single)
+    } else {
+        Ok(raw_args.to_vec())
+    }
+}
+
+fn split_shell_words(input: &str) -> Result<Vec<String>, String> {
+    let mut words = Vec::new();
+    let mut current = String::new();
+    let mut quote: Option<char> = None;
+    let mut in_word = false;
+    let mut chars = input.chars();
+
+    while let Some(ch) = chars.next() {
+        match (quote, ch) {
+            (None, c) if c.is_whitespace() => {
+                if in_word {
+                    words.push(std::mem::take(&mut current));
+                    in_word = false;
+                }
+            }
+            (None, '\'' | '"') => {
+                quote = Some(ch);
+                in_word = true;
+            }
+            (None, '\\') => {
+                if let Some(next) = chars.next() {
+                    current.push(next);
+                } else {
+                    current.push(ch);
+                }
+                in_word = true;
+            }
+            (Some('"'), '\\') => {
+                if let Some(next) = chars.next() {
+                    if matches!(next, '$' | '`' | '"' | '\\' | '\n') {
+                        current.push(next);
+                    } else {
+                        current.push(ch);
+                        current.push(next);
+                    }
+                } else {
+                    current.push(ch);
+                }
+                in_word = true;
+            }
+            (Some(q), c) if c == q => {
+                quote = None;
+            }
+            (_, c) => {
+                current.push(c);
+                in_word = true;
+            }
+        }
+    }
+
+    if quote.is_some() {
+        return Err("error: unterminated quoted argument".to_owned());
+    }
+    if in_word {
+        words.push(current);
+    }
+    Ok(words)
+}
+
 /// Build the sotp argv for a forwarding dispatcher: `prefix` tokens followed by
 /// user args with any leading `"--"` separator stripped.
 ///
@@ -390,6 +464,25 @@ impl CliApp {
         run_sotp(&args)
     }
 
+    /// Run the review-fix-lead fixer via `sotp review fix-local`.
+    ///
+    /// Forwards all user-supplied arguments to `sotp review fix-local`.
+    /// Provider resolution and smoke-tests are handled by the `fix-local`
+    /// subcommand (Rust). Mirrors `make_track_local_review` in structure.
+    ///
+    /// # Errors
+    /// Returns `Err` when the fixer invocation fails.
+    pub fn make_track_local_review_fix_codex(
+        &self,
+        raw_args: Vec<String>,
+    ) -> Result<CommandOutcome, String> {
+        let words = strip_leading_separator_shell(&raw_args)?;
+        let mut args: Vec<&str> = vec!["review", "fix-local"];
+        let word_refs: Vec<&str> = words.iter().map(String::as_str).collect();
+        args.extend_from_slice(&word_refs);
+        run_sotp(&args)
+    }
+
     /// Show per-scope review results.
     ///
     /// # Errors
@@ -603,7 +696,36 @@ fn run_sotp(args: &[&str]) -> Result<CommandOutcome, String> {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use super::{build_forwarded_args, build_set_override_args, strip_leading_separator};
+    use std::fs;
+
+    use super::{
+        build_forwarded_args, build_set_override_args, strip_leading_separator,
+        strip_leading_separator_shell,
+    };
+
+    struct CwdGuard(std::path::PathBuf);
+    impl Drop for CwdGuard {
+        fn drop(&mut self) {
+            let _ = std::env::set_current_dir(&self.0);
+        }
+    }
+
+    #[cfg(unix)]
+    fn make_executable(script: &std::path::Path) {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = fs::metadata(script).unwrap().permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(script, perms).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn write_fake_sotp(root: &std::path::Path) {
+        let bin_dir = root.join("bin");
+        fs::create_dir_all(&bin_dir).unwrap();
+        let script = bin_dir.join("sotp");
+        fs::write(&script, "#!/bin/sh\nprintf '%s\\n' \"$@\" > sotp-args.txt\nexit 0\n").unwrap();
+        make_executable(&script);
+    }
 
     // --- build_forwarded_args tests ---
 
@@ -628,6 +750,52 @@ mod tests {
         let raw: Vec<String> = vec![];
         let args = build_forwarded_args(&["review", "check-approved"], &raw);
         assert_eq!(args, vec!["review", "check-approved"]);
+    }
+
+    #[test]
+    fn test_review_fix_passthrough_preserves_quoted_paths() {
+        let raw = vec!["-- --briefing-file '/tmp/a b.md' --scope-files 'apps/x y.rs'".to_owned()];
+        let words = strip_leading_separator_shell(&raw).unwrap();
+        assert_eq!(words, vec!["--briefing-file", "/tmp/a b.md", "--scope-files", "apps/x y.rs"]);
+    }
+
+    #[test]
+    fn test_review_fix_passthrough_preserves_backslash_in_double_quotes() {
+        let raw = vec!["--briefing-file \"tmp/a\\b.md\"".to_owned()];
+        let words = strip_leading_separator_shell(&raw).unwrap();
+        assert_eq!(words, vec!["--briefing-file", "tmp/a\\b.md"]);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_make_track_local_review_fix_codex_forwards_shell_words_to_sotp() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let dir = tempfile::tempdir().unwrap();
+        write_fake_sotp(dir.path());
+        let _cwd_guard = CwdGuard(std::env::current_dir().unwrap());
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let outcome = crate::CliApp::new()
+            .make_track_local_review_fix_codex(vec![
+                "-- --briefing-file 'tmp/a b.md' --scope cli_composition".to_owned(),
+            ])
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let recorded = fs::read_to_string(dir.path().join("sotp-args.txt")).unwrap();
+        let args: Vec<&str> = recorded.lines().collect();
+        assert_eq!(
+            args,
+            vec![
+                "review",
+                "fix-local",
+                "--briefing-file",
+                "tmp/a b.md",
+                "--scope",
+                "cli_composition"
+            ]
+        );
     }
 
     // --- pr_push / pr_ensure guard logic tests ---

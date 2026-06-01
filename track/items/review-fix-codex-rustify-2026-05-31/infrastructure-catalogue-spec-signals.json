@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e293e1a2ea8da786d4fd12e2c3bec6bbef7cb23b5901b1735d49b1cf875d3044",
+  "signals": [
+    {
+      "type_name": "CodexReviewFixRunner",
+      "signal": "blue"
+    }
+  ]
+}

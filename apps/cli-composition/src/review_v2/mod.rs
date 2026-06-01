@@ -7,11 +7,13 @@ mod inputs;
 pub(crate) mod null_reviewer;
 pub(crate) mod results;
 pub(crate) mod run;
+mod run_fix;
 pub(crate) mod scope;
 pub(crate) mod shared;
 
 pub use inputs::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
+    RunReviewFixLocalInput,
 };
 
 // Public re-exports: only items consumed by external crates (e.g. apps/cli).
@@ -248,6 +250,23 @@ impl CliApp {
         };
 
         outcome_to_command_outcome(outcome)
+    }
+
+    /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
+    ///
+    /// Resolves the `review-fix-lead` capability from `agent-profiles.json` at the
+    /// repo root. Supports only `"codex"` provider — constructs `CodexReviewFixRunner`
+    /// and runs it through `RunReviewFixInteractor`. Unknown or unsupported providers
+    /// return a clear error (mirrors `review_run_local` provider rejection).
+    ///
+    /// # Errors
+    /// Returns `Err` when profile loading, provider resolution, arg validation,
+    /// or the fix runner fails.
+    pub fn review_run_fix_local(
+        &self,
+        input: RunReviewFixLocalInput,
+    ) -> Result<CommandOutcome, String> {
+        run_fix::run_fix_local(input)
     }
 
     /// Check if the review state is approved and code hash is current.
@@ -660,17 +679,16 @@ fn validate_all_paths(paths: &[String]) -> Result<(), String> {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use std::ffi::OsString;
     use std::fs;
     use std::path::PathBuf;
     use std::process::Command;
-    use std::sync::{Mutex, OnceLock};
 
     /// Serializes tests in this module that mutate the process CWD.
     /// Note: nextest runs each test in its own process, so this lock guards
     /// against races only when tests run in a shared process (e.g., `cargo test`).
-    fn cwd_lock() -> &'static Mutex<()> {
-        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
-        LOCK.get_or_init(|| Mutex::new(()))
+    fn cwd_lock() -> &'static std::sync::Mutex<()> {
+        crate::test_support::process_env_lock()
     }
 
     /// RAII guard: restores the process CWD to `saved` when dropped, even on panic.
@@ -681,9 +699,129 @@ mod tests {
         }
     }
 
+    struct EnvGuard {
+        key: &'static str,
+        value: Option<OsString>,
+    }
+    impl EnvGuard {
+        fn set(key: &'static str, value: OsString) -> Self {
+            let previous = std::env::var_os(key);
+            // Safety: tests that mutate process environment hold process_env_lock
+            // for the full guard lifetime, so this mutation is serialized with
+            // the other cwd/env-mutating tests in this crate.
+            unsafe {
+                std::env::set_var(key, value);
+            }
+            Self { key, value: previous }
+        }
+
+        fn remove(key: &'static str) -> Self {
+            let previous = std::env::var_os(key);
+            // Safety: see EnvGuard::set; the same process-wide lock is held while
+            // removing and later restoring this variable.
+            unsafe {
+                std::env::remove_var(key);
+            }
+            Self { key, value: previous }
+        }
+    }
+    impl Drop for EnvGuard {
+        fn drop(&mut self) {
+            // Safety: see EnvGuard::set; the guard is dropped before releasing
+            // the process-wide env/cwd lock.
+            unsafe {
+                match &self.value {
+                    Some(value) => std::env::set_var(self.key, value),
+                    None => std::env::remove_var(self.key),
+                }
+            }
+        }
+    }
+
     fn run_git(root: &std::path::Path, args: &[&str]) {
         let status = Command::new("git").args(args).current_dir(root).status().unwrap();
         assert!(status.success(), "git command failed: git {}", args.join(" "));
+    }
+
+    #[cfg(unix)]
+    fn make_executable(script: &std::path::Path) {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = std::fs::metadata(script).unwrap().permissions();
+        perms.set_mode(0o755);
+        std::fs::set_permissions(script, perms).unwrap();
+    }
+
+    fn write_agent_profiles(root: &std::path::Path, provider: &str) {
+        let config_dir = root.join(".harness/config");
+        fs::create_dir_all(&config_dir).unwrap();
+        let content = format!(
+            r#"{{
+  "schema_version": 1,
+  "providers": {{
+    "codex": {{ "label": "Codex" }},
+    "{provider}": {{ "label": "Test Provider" }}
+  }},
+  "capabilities": {{
+    "review-fix-lead": {{
+      "provider": "{provider}",
+      "model": "gpt-final",
+      "fast_provider": "{provider}",
+      "fast_model": "gpt-fast"
+    }}
+  }}
+}}
+"#
+        );
+        fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn write_fake_codex_bin(bin_dir: &std::path::Path) {
+        fs::create_dir_all(bin_dir).unwrap();
+        let codex = bin_dir.join("codex");
+        let script = r#"#!/bin/sh
+if [ "$1" = "--version" ]; then
+  echo "codex 0.125.0"
+  exit 0
+fi
+
+out=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --output-last-message)
+      out="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+if [ -z "$out" ]; then
+  echo "missing output-last-message" >&2
+  exit 9
+fi
+
+cat >/dev/null
+printf 'REVIEW_FIX_STATUS: completed\n' > "$out"
+printf 'fake stdout\n'
+exit 0
+"#;
+        fs::write(&codex, script).unwrap();
+        make_executable(&codex);
+    }
+
+    fn run_review_fix_input(briefing_file: PathBuf) -> crate::review_v2::RunReviewFixLocalInput {
+        crate::review_v2::RunReviewFixLocalInput {
+            scope: "cli_composition".to_owned(),
+            briefing_file,
+            track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
+            round_type: "fast".to_owned(),
+            reviewer_model: "gpt-5.4-mini".to_owned(),
+            model: Some("gpt-5.5".to_owned()),
+            scope_files: vec![PathBuf::from("apps/cli-composition/src/review_v2/mod.rs")],
+        }
     }
 
     /// Pin the regression: `resolve_track_id_from_branch` must anchor git discovery
@@ -729,6 +867,60 @@ mod tests {
         let result = super::resolve_track_id_from_branch(std::path::Path::new("track/items"));
 
         assert_eq!(result.unwrap(), "test-track");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn review_run_fix_local_codex_completed_status_returns_command_outcome() {
+        let _lock = cwd_lock().lock().unwrap();
+
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init", "-b", "main"]);
+        write_agent_profiles(dir.path(), "codex");
+        let briefing = dir.path().join("briefing.md");
+        fs::write(&briefing, "# Briefing\n").unwrap();
+
+        let bin_dir = dir.path().join("bin-test");
+        write_fake_codex_bin(&bin_dir);
+        let previous_path = std::env::var_os("PATH").unwrap_or_default();
+        let mut test_path = bin_dir.as_os_str().to_os_string();
+        test_path.push(":");
+        test_path.push(previous_path);
+        let _path_guard = EnvGuard::set("PATH", test_path);
+        let _sandbox_guard = EnvGuard::remove("CODEX_SANDBOX");
+
+        let _cwd_guard = CwdGuard(std::env::current_dir().unwrap());
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let outcome =
+            crate::CliApp::new().review_run_fix_local(run_review_fix_input(briefing)).unwrap();
+
+        assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(outcome.exit_code, 0);
+    }
+
+    #[test]
+    fn review_run_fix_local_unsupported_provider_returns_error() {
+        let _lock = cwd_lock().lock().unwrap();
+
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init", "-b", "main"]);
+        write_agent_profiles(dir.path(), "claude");
+        let briefing = dir.path().join("briefing.md");
+        fs::write(&briefing, "# Briefing\n").unwrap();
+
+        let _cwd_guard = CwdGuard(std::env::current_dir().unwrap());
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let result = crate::CliApp::new().review_run_fix_local(run_review_fix_input(briefing));
+
+        assert!(result.is_err(), "expected unsupported provider error, got: {result:?}");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("unsupported review-fix-lead provider 'claude'"),
+            "expected unsupported provider error, got: {msg}"
+        );
     }
 
     /// Pin that `resolve_track_id_from_branch` returns an error for a relative

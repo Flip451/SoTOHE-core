@@ -17,6 +17,7 @@ mod classify;
 mod claude_local;
 mod codex_local;
 mod files;
+mod fix_local;
 mod local;
 mod results;
 #[cfg(test)]
@@ -26,6 +27,7 @@ use classify::{ClassifyArgs, execute_classify};
 use claude_local::execute_claude_local;
 use codex_local::execute_codex_local;
 use files::{FilesArgs, execute_files};
+use fix_local::{FixLocalArgs, execute_fix_local};
 use local::{LocalArgs, execute_local};
 use results::execute_results;
 
@@ -46,6 +48,14 @@ pub enum ReviewCommand {
     ClaudeLocal(ClaudeLocalArgs),
     /// Run the local reviewer with provider auto-resolved from agent-profiles.json.
     Local(LocalArgs),
+    /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
+    ///
+    /// Resolves `review-fix-lead` capability from agent-profiles.json, constructs
+    /// the fixer (currently Codex only), and executes the fix cycle. The 7-flag
+    /// interface (`--scope` / `--briefing-file` / `--track-id` / `--round-type` /
+    /// `--reviewer-model` / `--model` / `--scope-files`) replaces the former
+    /// `track-local-review-fix-codex` Makefile bash script.
+    FixLocal(FixLocalArgs),
     /// Check if review is approved for commit.
     CheckApproved(CheckApprovedArgs),
     /// Show review results: per-scope state summary, optional round history, and a commit hint.
@@ -372,6 +382,7 @@ pub fn execute(cmd: ReviewCommand) -> ExitCode {
         ReviewCommand::CodexLocal(args) => execute_codex_local(&args),
         ReviewCommand::ClaudeLocal(args) => execute_claude_local(&args),
         ReviewCommand::Local(args) => execute_local(&args),
+        ReviewCommand::FixLocal(args) => execute_fix_local(&args),
         ReviewCommand::CheckApproved(args) => execute_check_approved(&args),
         ReviewCommand::Results(args) => execute_results(&args),
         ReviewCommand::Classify(args) => execute_classify(&args),

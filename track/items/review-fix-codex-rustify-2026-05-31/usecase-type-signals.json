@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-01T02:48:48Z",
+  "declaration_hash": "b8c7afc39235ab2ba68504bdb42c0533573e7fefafcff773b48c560d50a5ac18",
+  "signals": [
+    {
+      "type_name": "ReviewFixRunner",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewFixRunnerError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RunReviewFixCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RunReviewFixInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "RunReviewFixService"
+      ]
+    },
+    {
+      "type_name": "RunReviewFixOutput",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RunReviewFixService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
