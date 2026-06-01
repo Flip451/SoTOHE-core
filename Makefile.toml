@@ -247,7 +247,7 @@ script_runner = "@shell"
 script = ['''
 WORKER_ENV=""
 if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+  WORKER_ENV="-e CARGO_TARGET_DIR=/cargo-target/${WORKER_ID}"
 fi
 docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private fmt-local
 ''']
@@ -259,7 +259,7 @@ script_runner = "@shell"
 script = ['''
 WORKER_ENV=""
 if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+  WORKER_ENV="-e CARGO_TARGET_DIR=/cargo-target/${WORKER_ID}"
 fi
 docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private clippy-local
 ''']
@@ -271,7 +271,7 @@ script_runner = "@shell"
 script = ['''
 WORKER_ENV=""
 if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+  WORKER_ENV="-e CARGO_TARGET_DIR=/cargo-target/${WORKER_ID}"
 fi
 docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private test-local
 ''']
@@ -283,7 +283,7 @@ script_runner = "@shell"
 script = ['''
 WORKER_ENV=""
 if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+  WORKER_ENV="-e CARGO_TARGET_DIR=/cargo-target/${WORKER_ID}"
 fi
 docker compose exec -T $WORKER_ENV tools-daemon cargo nextest run --locked "$CARGO_MAKE_TASK_ARGS"
 ''']
@@ -295,7 +295,7 @@ script_runner = "@shell"
 script = ['''
 WORKER_ENV=""
 if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+  WORKER_ENV="-e CARGO_TARGET_DIR=/cargo-target/${WORKER_ID}"
 fi
 docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private check-local
 ''']
@@ -307,7 +307,7 @@ script_runner = "@shell"
 script = ['''
 WORKER_ENV=""
 if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+  WORKER_ENV="-e CARGO_TARGET_DIR=/cargo-target/${WORKER_ID}"
 fi
 docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private machete-local
 ''']
@@ -319,7 +319,7 @@ script_runner = "@shell"
 script = ['''
 WORKER_ENV=""
 if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+  WORKER_ENV="-e CARGO_TARGET_DIR=/cargo-target/${WORKER_ID}"
 fi
 docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private deny-local
 ''']
@@ -331,7 +331,7 @@ script_runner = "@shell"
 script = ['''
 WORKER_ENV=""
 if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
+  WORKER_ENV="-e CARGO_TARGET_DIR=/cargo-target/${WORKER_ID}"
 fi
 docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private llvm-cov-local
 ''']

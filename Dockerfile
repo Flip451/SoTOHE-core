@@ -9,8 +9,12 @@ ARG CARGO_CHEF_VERSION=0.1.77
 FROM lukemathwalker/cargo-chef:latest-rust-${RUST_VERSION} AS chef
 ARG CARGO_CHEF_VERSION
 WORKDIR /workspace
+# CARGO_TARGET_DIR is placed outside the /workspace bind-mount so that a named
+# Docker volume at /cargo-target is not shadowed by the host bind-mount.
+# This prevents GHA from getting an empty /cargo-target (which would force a full
+# dependency rebuild) even though the image already has cook-baked deps there.
 ENV CARGO_HOME=/usr/local/cargo \
-    CARGO_TARGET_DIR=/workspace/target \
+    CARGO_TARGET_DIR=/cargo-target \
     PATH=/usr/local/cargo/bin:$PATH
 
 ARG UV_VERSION=0.7.12
@@ -33,7 +37,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
     --mount=type=cache,target=${CARGO_HOME}/git,sharing=locked \
-    --mount=type=cache,target=${CARGO_TARGET_DIR},sharing=locked \
+    --mount=type=cache,target=/cargo-target,sharing=locked \
     cargo install --locked cargo-chef --version ${CARGO_CHEF_VERSION} --force
 
 # Python deps from requirements-python.txt (SSoT for ruff version).
@@ -80,7 +84,7 @@ COPY --from=planner /workspace/recipe.json recipe.json
 COPY vendor/ vendor/
 RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
     --mount=type=cache,target=${CARGO_HOME}/git,sharing=locked \
-    --mount=type=cache,target=/workspace/target,sharing=locked \
+    --mount=type=cache,target=/cargo-target,sharing=locked \
     --mount=type=cache,target=/opt/sccache,sharing=shared \
     cargo chef cook --release --recipe-path recipe.json
 
@@ -99,18 +103,25 @@ FROM dev-base-build AS dev-base-local
 COPY vendor/ vendor/
 RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
     --mount=type=cache,target=${CARGO_HOME}/git,sharing=locked \
-    --mount=type=cache,target=/workspace/target,sharing=locked \
+    --mount=type=cache,target=/cargo-target,sharing=locked \
     --mount=type=cache,target=/opt/sccache,sharing=shared \
     cargo chef cook --recipe-path recipe.json --all-targets --all-features
+# dev-base-local cooks into a BuildKit cache mount (not the image layer), so the
+# named volume at /cargo-target initialises from an empty dir. Make it
+# world-writable so the non-root runtime user can write the build target.
+RUN mkdir -p /cargo-target && chmod -R a+rwX /cargo-target
 
-# CI: persist deps in image layers
+# CI: persist deps in image layers (no BuildKit cache mount on /cargo-target so
+# artifacts are baked into the image layer and survive as named-volume initial
+# content when Docker initialises cargo_target_cache:/cargo-target at first run).
 FROM dev-base-build AS dev-base-ci
 ENV CARGO_PROFILE_DEV_DEBUG=0 \
     CARGO_PROFILE_TEST_DEBUG=0
 COPY vendor/ vendor/
 RUN --mount=type=cache,target=/opt/sccache,sharing=shared \
     cargo chef cook --check --recipe-path recipe.json --all-targets --all-features && \
-    cargo chef cook --recipe-path recipe.json --all-targets --all-features
+    cargo chef cook --recipe-path recipe.json --all-targets --all-features && \
+    chmod -R a+rwX /cargo-target
 
 FROM dev-base-${BUILD_ENV} AS dev-base
 
@@ -120,10 +131,10 @@ ARG APP_BIN=server
 COPY . .
 RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
     --mount=type=cache,target=${CARGO_HOME}/git,sharing=locked \
-    --mount=type=cache,target=${CARGO_TARGET_DIR},sharing=locked \
+    --mount=type=cache,target=/cargo-target,sharing=locked \
     --mount=type=cache,target=/opt/sccache,sharing=shared \
     cargo build --release -p ${APP_BIN} && \
-    cp ${CARGO_TARGET_DIR}/release/${APP_BIN} /bin/server
+    cp /cargo-target/release/${APP_BIN} /bin/server
 
 # 6. Dev watcher image for the optional compose.dev overlay
 FROM dev-base AS dev
