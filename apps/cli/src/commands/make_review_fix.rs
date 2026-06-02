@@ -123,8 +123,7 @@ mod tests {
     fn test_build_track_local_review_fix_codex_args_preserves_quoted_paths() {
         let raw = vec![
             "--scope cli --briefing-file \"tmp/reviewer runtime/briefing cli.md\" \
-             --track-id review-fix --round-type fast --reviewer-model gpt-5.4-mini \
-             --scope-files \"apps/cli/src/commands/review/fix local.rs,apps/cli/src/commands/make.rs\""
+             --track-id review-fix --round-type fast"
                 .to_owned(),
         ];
 
@@ -143,10 +142,6 @@ mod tests {
                 "review-fix",
                 "--round-type",
                 "fast",
-                "--reviewer-model",
-                "gpt-5.4-mini",
-                "--scope-files",
-                "apps/cli/src/commands/review/fix local.rs,apps/cli/src/commands/make.rs"
             ]
         );
     }

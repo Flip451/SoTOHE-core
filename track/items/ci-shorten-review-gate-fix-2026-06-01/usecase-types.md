@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| RunReviewFixError | error_type | modify | InvalidScope, InvalidTrackId, InvalidRoundType, SmokeTestFailed, FixRunnerFailed | 🟡 | 🔵 |
+| RunReviewFixError | error_type | modify | InvalidScope, InvalidTrackId, InvalidRoundType, SmokeTestFailed, FixRunnerFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -17,6 +17,6 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BaselineCaptureRequest | command | modify | — | 🔵 | 🔵 |
-| RunReviewFixCommand | command | modify | — | 🟡 | 🔵 |
+| RunReviewFixCommand | command | modify | — | 🔵 | 🔵 |
 | TypeSignalsRequest | command | modify | — | 🔵 | 🔵 |
 

@@ -51,10 +51,10 @@ pub enum ReviewCommand {
     /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
     ///
     /// Resolves `review-fix-lead` capability from agent-profiles.json, constructs
-    /// the fixer (currently Codex only), and executes the fix cycle. The 7-flag
-    /// interface (`--scope` / `--briefing-file` / `--track-id` / `--round-type` /
-    /// `--reviewer-model` / `--model` / `--scope-files`) replaces the former
-    /// `track-local-review-fix-codex` Makefile bash script.
+    /// the fixer (currently Codex only), and executes the fix cycle. Accepts
+    /// `--scope` / `--briefing-file` / `--track-id` / `--round-type` (required)
+    /// and an optional `--model` override. The reviewer model and scope boundary
+    /// are self-resolved by the fixer skill (ADR 2026-06-01-2300 D1/D3).
     FixLocal(FixLocalArgs),
     /// Check if review is approved for commit.
     CheckApproved(CheckApprovedArgs),

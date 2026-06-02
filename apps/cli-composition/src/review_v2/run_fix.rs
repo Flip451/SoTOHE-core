@@ -72,7 +72,6 @@ pub(crate) fn run_fix_local(input: RunReviewFixLocalInput) -> Result<CommandOutc
                 model.clone(),
                 scope.clone(),
                 input.briefing_file.clone(),
-                input.scope_files.clone(),
             );
             let runner_arc = Arc::new(runner);
             let run_fn = Arc::new(
@@ -104,9 +103,7 @@ pub(crate) fn run_fix_local(input: RunReviewFixLocalInput) -> Result<CommandOutc
                 briefing_file: input.briefing_file,
                 track_id,
                 round_type: input.round_type,
-                reviewer_model: input.reviewer_model,
                 model,
-                scope_files: input.scope_files,
             };
             match interactor.run(command) {
                 Ok(output) => Ok(CommandOutcome {
@@ -164,9 +161,7 @@ mod tests {
             briefing_file: std::path::PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: "test-track".to_owned(),
             round_type: "fast".to_owned(),
-            reviewer_model: "gpt-5.4-mini".to_owned(),
             model: "gpt-5.5".to_owned(),
-            scope_files: vec![std::path::PathBuf::from("apps/cli/src/lib.rs")],
         };
         // The interactor propagates SmokeTestFailed as Err — simulate what
         // run_fix_local does when it receives this typed variant.
@@ -211,9 +206,7 @@ mod tests {
             briefing_file: std::path::PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: "test-track".to_owned(),
             round_type: "fast".to_owned(),
-            reviewer_model: "gpt-5.4-mini".to_owned(),
             model: "gpt-5.5".to_owned(),
-            scope_files: vec![std::path::PathBuf::from("apps/cli/src/lib.rs")],
         };
         let result = interactor.run(command);
         // Generic errors must NOT match the SmokeTestFailed arm.

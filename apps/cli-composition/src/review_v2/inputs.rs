@@ -43,9 +43,13 @@ pub struct ReviewRunLocalInput {
 
 /// Input DTO for `review_run_fix_local` (`sotp review fix-local`).
 ///
-/// Maps to the 7 CLI flags: `--scope` / `--briefing-file` / `--track-id` /
-/// `--round-type` / `--reviewer-model` / `--model` / `--scope-files`.
-/// Carries stdlib-typed fields only — no domain or infrastructure types (CN-02).
+/// Maps to the 4 required CLI flags plus the optional model override:
+/// `--scope` / `--briefing-file` / `--track-id` / `--round-type` / `--model`.
+/// `--reviewer-model` and `--scope-files` are removed: the fixer skill
+/// self-resolves the reviewer model from `agent-profiles.json` and the scope
+/// boundary via `bin/sotp review files --scope <scope>` (ADR 2026-06-01-2300
+/// D1/D3). Carries stdlib-typed fields only — no domain or infrastructure types
+/// (CN-02).
 #[derive(Debug, Clone)]
 pub struct RunReviewFixLocalInput {
     /// Scope name (e.g., `"cli"`, `"infrastructure"`).
@@ -56,14 +60,10 @@ pub struct RunReviewFixLocalInput {
     pub track_id: String,
     /// Round type: `"fast"` or `"final"`.
     pub round_type: String,
-    /// Model for the nested reviewer subprocess.
-    pub reviewer_model: String,
     /// Model for the fixer (Codex) subprocess.
     /// `None` means "use the model from `agent-profiles.json`".
     /// An explicit value overrides the profile model.
     pub model: Option<String>,
-    /// Files the fixer may modify (modification boundary).
-    pub scope_files: Vec<std::path::PathBuf>,
 }
 
 /// Input DTO for `review_results`.

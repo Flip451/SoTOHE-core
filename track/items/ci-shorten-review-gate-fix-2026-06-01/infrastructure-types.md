@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CodexReviewFixRunner | secondary_adapter | modify | impl ReviewFixRunner | 🟡 | 🔵 |
+| CodexReviewFixRunner | secondary_adapter | modify | impl ReviewFixRunner | 🔵 | 🔵 |
 
 ## Free Functions
 

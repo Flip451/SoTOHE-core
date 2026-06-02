@@ -4,8 +4,8 @@
 //! Resolves the `review-fix-lead` capability for the given round type and
 //! dispatches to the infrastructure adapter (currently: `codex` only) via
 //! `CliApp.review_run_fix_local` (CN-02 / CN-03 / AC-03 / AC-04).
-//! The 7-flag interface mirrors the current `track-local-review-fix-codex`
-//! Makefile bash arguments (CN-04).
+//! The CLI accepts the 4 required fixer flags plus optional `--model`; the
+//! reviewer model and scope boundary are self-resolved by the fixer skill.
 
 use std::io::{self, Write};
 use std::path::PathBuf;
@@ -35,19 +35,11 @@ pub struct FixLocalArgs {
     #[arg(long, value_enum)]
     pub(super) round_type: CodexRoundTypeArg,
 
-    /// Model for the nested reviewer subprocess.
-    #[arg(long)]
-    pub(super) reviewer_model: String,
-
     /// Model for the fixer (Codex) subprocess.
     /// When omitted the model is resolved from `agent-profiles.json`
     /// `review-fix-lead.model` (or `fast_model` for fast round).
     #[arg(long)]
     pub(super) model: Option<String>,
-
-    /// Comma-separated list of files the fixer may modify (modification boundary).
-    #[arg(long, value_delimiter = ',', num_args = 0..)]
-    pub(super) scope_files: Vec<PathBuf>,
 }
 
 pub(super) fn execute_fix_local(args: &FixLocalArgs) -> ExitCode {
@@ -84,9 +76,7 @@ fn build_run_review_fix_local_input(args: &FixLocalArgs) -> RunReviewFixLocalInp
         briefing_file: args.briefing_file.clone(),
         track_id: args.track_id.clone(),
         round_type,
-        reviewer_model: args.reviewer_model.clone(),
         model: args.model.clone(),
-        scope_files: args.scope_files.clone(),
     }
 }
 
@@ -131,12 +121,8 @@ mod tests {
             "review-fix",
             "--round-type",
             "fast",
-            "--reviewer-model",
-            "gpt-5.4-mini",
             "--model",
             "gpt-5.5",
-            "--scope-files",
-            "apps/cli/src/commands/make.rs,apps/cli/src/commands/review/fix_local.rs",
         ]);
 
         let input = build_run_review_fix_local_input(&cli.args);
@@ -145,15 +131,7 @@ mod tests {
         assert_eq!(input.briefing_file, PathBuf::from("tmp/reviewer runtime/briefing cli.md"));
         assert_eq!(input.track_id, "review-fix");
         assert_eq!(input.round_type, "fast");
-        assert_eq!(input.reviewer_model, "gpt-5.4-mini");
         assert_eq!(input.model, Some("gpt-5.5".to_owned()));
-        assert_eq!(
-            input.scope_files,
-            vec![
-                PathBuf::from("apps/cli/src/commands/make.rs"),
-                PathBuf::from("apps/cli/src/commands/review/fix_local.rs")
-            ]
-        );
     }
 
     #[test]
@@ -168,15 +146,12 @@ mod tests {
             "review-fix",
             "--round-type",
             "final",
-            "--reviewer-model",
-            "gpt-5.4-mini",
         ]);
 
         let input = build_run_review_fix_local_input(&cli.args);
 
         assert_eq!(input.round_type, "final");
         assert_eq!(input.model, None);
-        assert!(input.scope_files.is_empty());
     }
 
     #[test]
@@ -212,7 +187,7 @@ mod tests {
         assert!(emit_fix_local_outcome(&outcome).is_ok());
     }
 
-    /// Finding 2: when --model is omitted, `model` is `None` (profile model will
+    /// When --model is omitted, `model` is `None` (profile model will
     /// be used as the default in run_fix.rs).
     #[test]
     fn test_model_absent_maps_to_none_in_input() {
@@ -226,8 +201,6 @@ mod tests {
             "review-fix",
             "--round-type",
             "fast",
-            "--reviewer-model",
-            "gpt-5.4-mini",
         ]);
 
         let input = build_run_review_fix_local_input(&cli.args);
@@ -238,7 +211,7 @@ mod tests {
         );
     }
 
-    /// Finding 2: when --model is explicitly provided, it is forwarded in `input.model`
+    /// When --model is explicitly provided, it is forwarded in `input.model`
     /// so run_fix.rs can honor the override over the profile model.
     #[test]
     fn test_explicit_model_is_forwarded_to_input() {
@@ -252,8 +225,6 @@ mod tests {
             "review-fix",
             "--round-type",
             "fast",
-            "--reviewer-model",
-            "gpt-5.4-mini",
             "--model",
             "my-override-model",
         ]);
@@ -279,8 +250,6 @@ mod tests {
             "review-fix",
             "--round-type",
             "fast",
-            "--reviewer-model",
-            "gpt-5.4-mini",
         ]);
 
         assert!(err.is_err(), "missing --briefing-file must be rejected by clap");
