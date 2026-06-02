@@ -158,6 +158,9 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
         // are always evaluated; no fail-open).
         if binding.targets.len() > 1 {
             // Apply symlink guard on track directory before catalogue-presence check.
+            // ADR 2026-06-01-0406 D1: the absent-catalogue skip is scoped to "track dir
+            // exists AND catalogue file is missing". A missing track dir is a structural
+            // anomaly and must fail-closed (not be treated as "absent catalogue").
             let track_dir = items_dir.join(valid_track_id.as_ref());
             match track_dir.symlink_metadata() {
                 Ok(meta) if meta.file_type().is_symlink() => {
@@ -166,8 +169,14 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
                         track_dir.display()
                     )));
                 }
-                Ok(_) | Err(_) => {
-                    // Directory is real (or absent) — continue to catalogue check.
+                Ok(_) => {
+                    // Directory is real — continue to catalogue check.
+                }
+                Err(e) => {
+                    return Err(TypeSignalsExecutionError(format!(
+                        "track directory '{}' is missing or unstattable: {e}",
+                        track_dir.display()
+                    )));
                 }
             }
 
@@ -227,6 +236,10 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
         // track directory whose target lacks the catalogue file would be
         // silently accepted instead of reaching the strict reject_symlinks_below
         // guard inside `execute_type_signals_for_layer`.
+        //
+        // ADR 2026-06-01-0406 D1: the absent-catalogue skip is scoped to "track dir
+        // exists AND catalogue file is missing". A missing track dir is a structural
+        // anomaly and must fail-closed (not be treated as "absent catalogue").
         let track_dir = items_dir.join(valid_track_id.as_ref());
         match track_dir.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
@@ -235,8 +248,14 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
                     track_dir.display()
                 )));
             }
-            Ok(_) | Err(_) => {
-                // Directory is real (or absent) — continue to catalogue check.
+            Ok(_) => {
+                // Directory is real — continue to catalogue check.
+            }
+            Err(e) => {
+                return Err(TypeSignalsExecutionError(format!(
+                    "track directory '{}' is missing or unstattable: {e}",
+                    track_dir.display()
+                )));
             }
         }
 
@@ -364,5 +383,60 @@ mod tests {
         );
         let msg = result.unwrap_err().to_string();
         assert!(msg.contains("multi-target"), "error must mention multi-target, got: {msg}");
+    }
+
+    #[test]
+    fn test_evaluate_layer_missing_track_dir_returns_error() {
+        // ADR 2026-06-01-0406 D1: a missing track dir is a structural anomaly and
+        // must fail-closed. Only an EXISTING track dir with an absent catalogue file
+        // is a sanctioned skip scenario.
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        // Create items_dir but do NOT create the track subdirectory.
+        std::fs::create_dir_all(&items_dir).unwrap();
+        // track_dir is intentionally absent.
+
+        let adapter = TypeSignalsExecutorAdapter::new();
+        let result =
+            adapter.evaluate_layer(&items_dir, "my-track", dir.path(), &domain_binding("domain"));
+        assert!(
+            result.is_err(),
+            "missing track dir must return Err (fail-closed per ADR 2026-06-01-0406 D1)"
+        );
+        let msg = result.unwrap_err().to_string();
+        assert!(
+            msg.contains("missing or unstattable"),
+            "error must mention missing/unstattable track directory, got: {msg}"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_layer_multi_target_missing_track_dir_returns_error() {
+        // ADR 2026-06-01-0406 D1: same fail-closed requirement for multi-target bindings.
+        // A missing track dir must not be silently treated as "absent catalogue".
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track/items");
+        // Create items_dir but do NOT create the track subdirectory.
+        std::fs::create_dir_all(&items_dir).unwrap();
+        // track_dir is intentionally absent.
+
+        let multi_binding = DomainTdddLayerBinding {
+            layer_id: "my-layer".to_owned(),
+            catalogue_file: "my-layer-types.json".to_owned(),
+            baseline_file: "my-layer-types-baseline.json".to_owned(),
+            targets: vec!["crate-a".to_owned(), "crate-b".to_owned()],
+        };
+
+        let adapter = TypeSignalsExecutorAdapter::new();
+        let result = adapter.evaluate_layer(&items_dir, "my-track", dir.path(), &multi_binding);
+        assert!(
+            result.is_err(),
+            "multi-target + missing track dir must return Err (fail-closed per ADR 2026-06-01-0406 D1)"
+        );
+        let msg = result.unwrap_err().to_string();
+        assert!(
+            msg.contains("missing or unstattable"),
+            "error must mention missing/unstattable track directory, got: {msg}"
+        );
     }
 }
