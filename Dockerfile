@@ -2,15 +2,21 @@
 ARG RUST_VERSION=1.94.0
 ARG BUILD_ENV=local
 ARG CARGO_CHEF_VERSION=0.1.77
+# CARGO_TARGET_DIR for the image build. Local builds keep it inside /workspace
+# (the default). The CI build overrides it to a path OUTSIDE the /workspace bind
+# mount (e.g. /cargo-target) so the cook-baked deps in the image layer are not
+# shadowed by the runtime bind mount and can be reused instead of recompiled.
+ARG IMAGE_CARGO_TARGET_DIR=/workspace/target
 
 # 1. Base image with cargo-chef
 # For production: pin with @sha256:<digest> after RUST_VERSION for reproducibility.
 # Template keeps tag-only so RUST_VERSION ARG remains functional.
 FROM lukemathwalker/cargo-chef:latest-rust-${RUST_VERSION} AS chef
 ARG CARGO_CHEF_VERSION
+ARG IMAGE_CARGO_TARGET_DIR
 WORKDIR /workspace
 ENV CARGO_HOME=/usr/local/cargo \
-    CARGO_TARGET_DIR=/workspace/target \
+    CARGO_TARGET_DIR=${IMAGE_CARGO_TARGET_DIR} \
     PATH=/usr/local/cargo/bin:$PATH
 
 ARG UV_VERSION=0.7.12
@@ -103,14 +109,24 @@ RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
     --mount=type=cache,target=/opt/sccache,sharing=shared \
     cargo chef cook --recipe-path recipe.json --all-targets --all-features
 
-# CI: persist deps in image layers
+# CI: persist deps in image layers. The cook runs with no target/registry cache
+# mount (only sccache), so the registry under CARGO_HOME (/usr/local/cargo) and the
+# compiled deps under CARGO_TARGET_DIR (set outside /workspace via
+# IMAGE_CARGO_TARGET_DIR) are baked into the image layer. chown them to the CI
+# runtime UID/GID (the host UID/GID the CI container runs as) so the non-root CI
+# user can reuse and write the baked artifacts. chmod alone is insufficient:
+# root-owned files make cargo build scripts (e.g. zstd-sys fs::copy) hit EPERM
+# when they set permissions on a destination the non-root user does not own.
 FROM dev-base-build AS dev-base-ci
+ARG CI_UID=1000
+ARG CI_GID=1000
 ENV CARGO_PROFILE_DEV_DEBUG=0 \
     CARGO_PROFILE_TEST_DEBUG=0
 COPY vendor/ vendor/
 RUN --mount=type=cache,target=/opt/sccache,sharing=shared \
     cargo chef cook --check --recipe-path recipe.json --all-targets --all-features && \
-    cargo chef cook --recipe-path recipe.json --all-targets --all-features
+    cargo chef cook --recipe-path recipe.json --all-targets --all-features && \
+    chown -R ${CI_UID}:${CI_GID} ${CARGO_HOME} ${CARGO_TARGET_DIR}
 
 FROM dev-base-${BUILD_ENV} AS dev-base
 

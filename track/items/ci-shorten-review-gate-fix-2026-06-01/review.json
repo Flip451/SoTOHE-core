@@ -1,6 +1,135 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
+          "at": "2026-06-01T08:53:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
+          "at": "2026-06-01T08:55:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test still asserts `Err` when `domain-types.json` is absent, but the new type-signals behavior skips missing catalogues unconditionally. With the fixture as written, `execute_type_signals(...)` will return `Ok`, so this test will fail and no longer matches the intended contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 128,
+              "category": "testing"
+            },
+            {
+              "message": "This `--layer usecase` regression test is still expecting an error even though the fixture omits `usecase-types.json`, and absent catalogues are now always skipped. The command will return `Ok` here, so the test no longer validates layer dispatch and will fail as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 199,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d1bd6420726650106d7192ca71af73420dd9da9ba13e196d2a335328e77d2bac",
+          "at": "2026-06-01T10:54:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8136f5502e672d58ae17f213419485c573ba2d4814121052f82ff7c4dff1c3cd",
+          "at": "2026-06-01T10:58:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
+          "at": "2026-06-01T13:15:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
+          "at": "2026-06-01T13:17:29Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Skipping `NotFound` here bypasses `refresh_one_layer`'s existing track-directory validation. If `track_dir` is missing, `track_catalogue_spec_signals` now returns success as long as every enabled catalogue is absent, instead of failing closed on the missing track directory.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 305,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0facc1dea68bc9f8d7658814f258c8ed6564e5eead816bd0b6cdb0b7bf8f5956",
+          "at": "2026-06-01T08:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
+          "at": "2026-06-01T09:04:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
+          "at": "2026-06-01T09:07:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
+          "at": "2026-06-01T09:32:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
+          "at": "2026-06-01T09:33:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:122a2e099fdca24d20ed96007e9abb5a8c041a57c00ba966ff94803a9e3218db",
+          "at": "2026-06-01T10:54:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
+          "at": "2026-06-01T13:14:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
+          "at": "2026-06-01T13:15:47Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -37,6 +166,167 @@
           "findings": [],
           "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
           "at": "2026-06-01T13:20:47Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:52:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:54:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T10:54:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:13:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
+          "at": "2026-06-01T21:02:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
+          "at": "2026-06-01T21:04:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`WORKER_ID` now rewrites `CARGO_TARGET_DIR` to `/cargo-target-${WORKER_ID}`, but the `tools` service only mounts `/cargo-target`. Because the container runs as a non-root user, `/cargo-target-*` is a sibling of the mounted volume and is not writable, so every `*-exec` task breaks as soon as parallel execution is enabled.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 250,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:fdce8d927bb5ad4e54297ef42a18a1bfcd5e362f90094c6f3689c669b2edd24e",
+          "at": "2026-06-01T22:36:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:44:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:46:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:53:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T23:04:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
+          "at": "2026-06-02T00:23:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
+          "at": "2026-06-02T00:25:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This changes the `docker exec` command shape enough to break the repo's workflow snapshot test (`scripts/test_verify_scripts.py::test_ci_uses_host_uid_gid_without_forcing_track_template_dev` still asserts the exact substring `docker exec ci-runner cargo make ci-container`). CI will fail until that test is updated in lockstep.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 78,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e99b8c9f434fea6cdd6c9eeb791fa599b356278d264384b94252a49d4a37b0a2",
+          "at": "2026-06-02T01:06:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87d30af18685c1d7796f322aa0b42f636ea44a8a59c8b40cf9edae9742203acb",
+          "at": "2026-06-02T01:42:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The build args use `${{ env.HOST_UID }}` / `${{ env.HOST_GID }}`, but these values are only created by the prior `GITHUB_ENV` write at runtime. GitHub evaluates expressions for action inputs before runner-generated environment values are available, so these expand empty rather than to the host UID/GID. That means Docker receives empty `CI_UID`/`CI_GID` values and the `chown -R ${CI_UID}:${CI_GID} ...` step can fail or avoid assigning ownership to the runtime user, breaking the CI image build or the baked dependency reuse this change is meant to enable. Pass these through step outputs or another mechanism available to expressions.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 61,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:87d30af18685c1d7796f322aa0b42f636ea44a8a59c8b40cf9edae9742203acb",
+          "at": "2026-06-02T01:45:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2514bfeca6b2e24b4c2594fb921aac18f2d6160689a98f3741fe77c56611e8dd",
+          "at": "2026-06-02T01:54:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2514bfeca6b2e24b4c2594fb921aac18f2d6160689a98f3741fe77c56611e8dd",
+          "at": "2026-06-02T01:56:20Z"
         }
       ]
     },
@@ -209,116 +499,6 @@
         }
       ]
     },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:52:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:54:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T10:54:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T13:13:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T13:15:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
-          "at": "2026-06-01T21:02:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
-          "at": "2026-06-01T21:04:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`WORKER_ID` now rewrites `CARGO_TARGET_DIR` to `/cargo-target-${WORKER_ID}`, but the `tools` service only mounts `/cargo-target`. Because the container runs as a non-root user, `/cargo-target-*` is a sibling of the mounted volume and is not writable, so every `*-exec` task breaks as soon as parallel execution is enabled.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 250,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:fdce8d927bb5ad4e54297ef42a18a1bfcd5e362f90094c6f3689c669b2edd24e",
-          "at": "2026-06-01T22:36:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:44:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:46:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:53:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T23:04:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
-          "at": "2026-06-02T00:23:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
-          "at": "2026-06-02T00:25:13Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -341,135 +521,6 @@
           "findings": [],
           "hash": "rvw1:sha256:67a1f9b50512961eb3b744f9ac67f7b5a6ebf787071d29800410d2b6d725a998",
           "at": "2026-06-01T13:17:12Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
-          "at": "2026-06-01T08:53:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
-          "at": "2026-06-01T08:55:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This test still asserts `Err` when `domain-types.json` is absent, but the new type-signals behavior skips missing catalogues unconditionally. With the fixture as written, `execute_type_signals(...)` will return `Ok`, so this test will fail and no longer matches the intended contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 128,
-              "category": "testing"
-            },
-            {
-              "message": "This `--layer usecase` regression test is still expecting an error even though the fixture omits `usecase-types.json`, and absent catalogues are now always skipped. The command will return `Ok` here, so the test no longer validates layer dispatch and will fail as written.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 199,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:d1bd6420726650106d7192ca71af73420dd9da9ba13e196d2a335328e77d2bac",
-          "at": "2026-06-01T10:54:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8136f5502e672d58ae17f213419485c573ba2d4814121052f82ff7c4dff1c3cd",
-          "at": "2026-06-01T10:58:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
-          "at": "2026-06-01T13:15:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
-          "at": "2026-06-01T13:17:29Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Skipping `NotFound` here bypasses `refresh_one_layer`'s existing track-directory validation. If `track_dir` is missing, `track_catalogue_spec_signals` now returns success as long as every enabled catalogue is absent, instead of failing closed on the missing track directory.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 305,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0facc1dea68bc9f8d7658814f258c8ed6564e5eead816bd0b6cdb0b7bf8f5956",
-          "at": "2026-06-01T08:56:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
-          "at": "2026-06-01T09:04:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
-          "at": "2026-06-01T09:07:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
-          "at": "2026-06-01T09:32:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
-          "at": "2026-06-01T09:33:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:122a2e099fdca24d20ed96007e9abb5a8c041a57c00ba966ff94803a9e3218db",
-          "at": "2026-06-01T10:54:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
-          "at": "2026-06-01T13:14:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
-          "at": "2026-06-01T13:15:47Z"
         }
       ]
     },
