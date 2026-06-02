@@ -2,7 +2,31 @@
   "schema_version": 3,
   "crate_name": "infrastructure",
   "layer": "infrastructure",
-  "types": {},
+  "types": {
+    "CodexReviewFixRunner": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_fix_runner",
+      "docs": "Modified in ADR 2026-06-01-2300 D1: scope_files parameter removed from new(); the prompt builder no longer embeds a scope file list since fixer skill self-resolves scope boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "IN-06",
+          "hash": "b05dc2e440d4c70d1dd35f593c2b224f1056298409beaa0069be896c05e832b0"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "traits": {},
   "functions": {
     "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer": {
@@ -29,6 +53,32 @@
       "informal_grounds": []
     }
   },
-  "inherent_impls": [],
-  "trait_impls": []
+  "inherent_impls": [
+    {
+      "type_name": "CodexReviewFixRunner",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "model", "ty": "String" },
+            { "name": "_scope", "ty": "String" },
+            { "name": "_briefing_file", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner",
+      "for_type": "CodexReviewFixRunner"
+    }
+  ]
 }

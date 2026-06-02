@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "version": "1.1",
-  "title": "CI 所要時間の短縮(キャッシュ戦略)+ review/commit ゲートのカタログ未生成耐性 + --lenient / --force 実行経路の撤去",
+  "version": "1.2",
+  "title": "CI 所要時間の短縮(キャッシュ戦略)+ review/commit ゲートのカタログ未生成耐性 + --lenient / --force 実行経路の撤去 + review fixer の引数最小化(--scope-files / --reviewer-model 廃止)",
   "goal": [
     {
       "id": "GO-01",
@@ -34,6 +34,24 @@
         {
           "file": "knowledge/adr/2026-06-01-1206-remove-lenient-and-force-flag-paths.md",
           "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-04",
+      "text": "review fixer（`sotp review fix-local`）が orchestrator から受け取る引数を `--scope` / `--briefing-file` / `--track-id` / `--round-type` の4つに最小化する。`--scope-files`（修正対象ファイル一覧）は fixer skill 内の正規コマンド（`bin/sotp review files --scope <scope>`）による自己解決に切り替え、`--reviewer-model`（入れ子 reviewer の model 指定）は reviewer 起動コマンドの自己解決（`agent-profiles.json` から round-type 別に取得）に任せる。これにより orchestrator 側のスコープ分類の複製と、`.github` を含むファイルパスが `block-direct-git-ops` フックに当たる footgun を解消する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D3"
         }
       ]
     }
@@ -81,6 +99,40 @@
           {
             "file": "knowledge/adr/2026-06-01-1206-remove-lenient-and-force-flag-paths.md",
             "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "review-fix-lead skill（`review-fix-lead.md` 等）に、正規スコープ分類コマンド（`bin/sotp review files --scope <scope>`）を skill 自身が実行して修正対象ファイル一覧（modification boundary）を得る指示を書く。これにより `--scope-files` の外部受領なしで境界を解決できるようにする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`sotp review fix-local` の `--scope-files` フラグと `EmptyScopeFiles` guard（空拒否チェック）を撤去する。`/track:review` skill からスコープファイル一覧を導出・付与する指示を削除し、fixer 起動コマンドから `--scope-files` を外す",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "`sotp review fix-local` の `--reviewer-model` フラグを撤去する。fixer が入れ子で起動する reviewer コマンド（`cargo make track-local-review` = `sotp review local`）は `agent-profiles.json` の `reviewer` capability から round-type 別に model を自己解決するため、外部から model を渡す必要はなく、`--reviewer-model` の受け渡し指示を skill / skill 起動コマンドの両側から取り除く",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+            "anchor": "D3"
           }
         ]
       }
@@ -169,6 +221,26 @@
             "anchor": "D2"
           }
         ]
+      },
+      {
+        "id": "OS-09",
+        "text": "`--scope-files` の optional 化（未指定時のみ自己解決する二重経路）: フラグを残すと orchestrator 経由と skill 自己解決の二重経路が残り、footgun が完全には消えず境界解決の出所が一本化しない。ADR Rejected Alternative B として却下されている",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-10",
+        "text": "reviewer model の型契約変更（cli / cli-composition / usecase / infrastructure の複数層にわたる public 型のフィールド削除）のメソッドシグネチャ・具体的な型の選択: `reviewer_model` フィールドを持つ `FixLocalArgs` / `RunReviewFixLocalInput` / `RunReviewFixCommand` および `review_fix_runner` の prompt / コマンド組み立て部分の具体的な型・シグネチャ変更は Phase 2（type-design）が catalogue で宣言する契約レベルの事項であり、本 spec は振る舞い契約のみを記述する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+            "anchor": "D3"
+          }
+        ]
       }
     ]
   },
@@ -224,6 +296,26 @@
         {
           "file": "knowledge/adr/2026-06-01-1206-remove-lenient-and-force-flag-paths.md",
           "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "スコープ境界の解決は skill 内の正規コマンド（`bin/sotp review files --scope <scope>`）による一本化とする。orchestrator がファイルパスをコマンド文字列に乗せる経路（`--scope-files` 経由）を残さない。Rust 側に新たなスコープ分類 port を追加するのではなく、フラグと guard を撤去するだけ（純減）の変更とする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "reviewer 起動コマンド（`sotp review local`）は `agent-profiles.json` の `reviewer` capability から model を round-type 別に自己解決する（fast round は `fast_model`、final round は `model`）。fixer は reviewer の model を外部から受け取らず、reviewer 起動コマンドに `--model` を明示的に渡さない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D3"
         }
       ]
     }
@@ -308,6 +400,54 @@
           "anchor": "D2"
         }
       ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`sotp review fix-local` を `--scope-files` なしで呼び出せる。`--scope-files` が必須だったときに出ていた `EmptyScopeFiles` guard のエラーが発生しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "review-fix-lead skill が `bin/sotp review files --scope <scope>` を実行してファイル一覧を取得する。orchestrator が `--scope-files` でファイルパスを fixer 起動コマンドに埋め込む指示が skill / `/track:review` から削除されている",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "`sotp review fix-local` を `--reviewer-model` なしで呼び出せる。fixer が入れ子で起動する reviewer コマンドは `--model` 指定なしで動作し、`agent-profiles.json` から round-type 別に model を自己解決する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "fixer 起動コマンドの引数が `--scope` / `--briefing-file` / `--track-id` / `--round-type` の4つに収まる（fixer 自身の `--model` は既存の省略可能フラグで変更なし）。`.github` 等のパスを含むファイルリストが Bash コマンド文字列に埋め込まれない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+          "anchor": "D3"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -329,7 +469,7 @@
     }
   ],
   "signals": {
-    "blue": 28,
+    "blue": 40,
     "yellow": 0,
     "red": 0
   }

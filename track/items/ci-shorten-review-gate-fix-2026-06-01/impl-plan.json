@@ -28,20 +28,35 @@
     {
       "id": "T005",
       "description": "Remove the --lenient flag and the gate-vs-direct call-site distinction from type-signals: delete MissingCataloguePolicy enum from domain (libs/), remove the policy parameter from TypeSignalsExecutorPort::evaluate_layer, remove the lenient field from TypeSignalsRequest in usecase (libs/), and update apps/cli-composition to pass no policy argument on either the gate path or the direct user-invoked path. Both call sites now receive the same unconditional absent-skip behaviour. Update or add unit tests to confirm: (a) absent catalogue skips with warning on the direct user-invoked path (AC-06); (b) present catalogue with red signal still blocks (CN-02 preserved); (c) cargo make ci passes.",
-      "status": "todo"
+      "status": "todo",
+      "commit_hash": null
     },
     {
       "id": "T006",
       "description": "Remove the --force flag and the overwrite execution path from baseline-capture: remove the force field from BaselineCaptureRequest in usecase (libs/), remove the force parameter from RustdocBaselineCapturePort::capture in domain (libs/), delete the force_capture_rustdoc_baseline_for_layer free function from infrastructure (libs/), remove the --force CLI flag from apps/cli-composition, and remove the overwrite branch in the infrastructure adapter. Verify that (a) running baseline-capture when a baseline already exists is a no-op (AC-07); (b) baseline-capture --source-workspace continues to work (AC-08); (c) cargo make ci passes.",
-      "status": "todo"
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "Remove reviewer_model and scope_files from all Rust layers in one atomic commit: (usecase) delete reviewer_model and scope_files fields from RunReviewFixCommand, remove the EmptyScopeFiles variant from RunReviewFixError, delete the scope_files empty-check guard from RunReviewFixInteractor, and update all tests in run_review_fix.rs (drop the fields from make_valid_command, remove the empty-scope-files test, update the nonempty-scope-files test); (cli) remove reviewer_model and scope_files from FixLocalArgs and build_run_review_fix_local_input, update fix_local.rs tests to drop those flags; (cli-composition inputs) remove reviewer_model and scope_files from RunReviewFixLocalInput; (cli-composition run_fix) remove scope_files from the CodexReviewFixRunner::new() call and remove reviewer_model from the RunReviewFixCommand construction, update run_fix.rs tests to drop those fields from command construction; (infrastructure prompt) remove the scope_files parameter from build_prompt, remove the scope_files_lines / scope_files_section blocks and the Scope File List section from the generated prompt, remove the reviewer_model field read and the Reviewer model line from the prompt, remove the --model {reviewer_model} from the reviewer_invocation string, update prompt.rs tests accordingly; (infrastructure mod) update make_command() and make_runner() test helpers to drop reviewer_model and scope_files, remove scope_files from CodexReviewFixRunner::new() call in make_runner. All layers compiled together in a single cargo make ci-passing commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "Update non-Rust skill and command docs to reflect the minimized fixer interface: (skill) add an instruction to .agents/skills/review-fix-lead/SKILL.md that the agent self-resolves its modification boundary via bin/sotp review files --scope <scope> (ADR 2300 D1), removing the assumption that scope files are supplied by the orchestrator; (command) remove the reviewer-model resolution and --reviewer-model passing instruction from .claude/commands/track/review.md Step 1 (ADR 2300 D3), and remove the scope-files derivation instruction and --scope-files from the cargo make track-local-review-fix-codex invocation strings in Step 4 and Step 5 (ADR 2300 D2). cargo make ci must pass (verify-* checks include command file validation).",
+      "status": "todo",
+      "commit_hash": null
     }
   ],
   "plan": {
     "summary": [
-      "This track fixes two independent problems: (1) CI run time ballooned from ~3-4 min to 14-16 min after heavy native dependencies were added; (2) track-active-gate fails hard when type catalogues are absent, blocking the standard Phase 0/1 review and commit flow. ADR 2026-06-01-1206 further extends the fix by removing the --lenient and --force execution paths entirely, making signal evaluation and baseline capture uniformly simple.",
+      "This track fixes two independent problems: (1) CI run time ballooned from ~3-4 min to 14-16 min after heavy native dependencies were added; (2) track-active-gate fails hard when type catalogues are absent, blocking the standard Phase 0/1 review and commit flow. ADR 2026-06-01-1206 further extends the fix by removing the --lenient and --force execution paths entirely, making signal evaluation and baseline capture uniformly simple. ADR 2026-06-01-2300 further reduces the fixer's orchestrator-facing arguments to four (--scope / --briefing-file / --track-id / --round-type) by removing --scope-files and --reviewer-model.",
       "T001 audits the CI timing baseline before any change is made. T002 acts on those findings, modifying only cache-strategy configuration with no Rust source changes. T003 fixes the gate leniency bug by passing lenient: true on the gate path (the mechanism already exists in TypeSignalsRequest). T004 is the final cargo make ci confirmation gate for the T002+T003 work.",
       "T005 removes the --lenient flag entirely so that both the gate path and the direct user-invoked type-signals path share the same unconditional absent-skip behaviour (ADR 2026-06-01-1206 D1). T006 removes the --force flag and the overwrite branch from baseline-capture so that capture is always idempotent (ADR 2026-06-01-1206 D2).",
-      "T005 and T006 supersede the partial fix in T003 for their respective concerns: T003 addressed only the gate path, while T005 removes the distinction altogether. T005 and T006 are independent of each other and can be committed separately. T001 must precede T002. T004 depends on T002 and T003. T005 and T006 may be committed after T003."
+      "T005 and T006 supersede the partial fix in T003 for their respective concerns: T003 addressed only the gate path, while T005 removes the distinction altogether. T005 and T006 are independent of each other and can be committed separately. T001 must precede T002. T004 depends on T002 and T003. T005 and T006 may be committed after T003.",
+      "T007 removes reviewer_model and scope_files from all Rust layers (usecase, cli, cli-composition, infrastructure) in a single atomic commit. Because RunReviewFixCommand is a public type shared across all four layers and prompt.rs reads both fields in the same build_prompt call, splitting the two field removals across separate tasks would produce a non-compiling intermediate state; they are therefore combined into one task. T008 updates the non-Rust skill and command docs (no compile dependency) and can be committed independently of T007."
     ],
     "sections": [
       {
@@ -96,6 +111,24 @@
           "After this task, re-capture requires deleting the baseline file first, then running capture again (2-step operation). The --source-workspace flag is unaffected and continues to work for main-worktree baseline capture (AC-08). Unit tests verify idempotent behaviour (AC-07) and --source-workspace operation (AC-08)."
         ],
         "task_ids": ["T006"]
+      },
+      {
+        "id": "S7",
+        "title": "Remove reviewer_model and scope_files from all Rust layers — atomic cross-layer commit",
+        "description": [
+          "ADR 2300 D1/D3 removes two fields from the fixer interface. Because RunReviewFixCommand is a public struct shared across usecase / cli / cli-composition / infrastructure, and because prompt.rs reads both reviewer_model and scope_files in the same build_prompt function, removing the two fields in separate commits would leave the workspace in a non-compiling state between commits. Both removals are therefore grouped into one task.",
+          "Change surface: usecase run_review_fix.rs (remove reviewer_model and scope_files from RunReviewFixCommand, remove EmptyScopeFiles from RunReviewFixError, remove the scope_files empty-check guard from the interactor, update tests); cli fix_local.rs (remove reviewer_model and scope_files from FixLocalArgs, update build_run_review_fix_local_input and tests); cli-composition inputs.rs (remove reviewer_model and scope_files from RunReviewFixLocalInput); cli-composition run_fix.rs (remove reviewer_model from RunReviewFixCommand construction, remove scope_files from CodexReviewFixRunner::new() call, update tests); infrastructure prompt.rs (remove scope_files param from build_prompt, remove Scope File List section from prompt, remove reviewer_model read and Reviewer model line, remove --model {reviewer_model} from reviewer_invocation, update tests); infrastructure mod.rs (update make_command() and make_runner() test helpers, update CodexReviewFixRunner::new() call). Commit must pass cargo make ci."
+        ],
+        "task_ids": ["T007"]
+      },
+      {
+        "id": "S8",
+        "title": "Update skill and command docs — remove scope-files and reviewer-model passing instructions",
+        "description": [
+          "ADR 2300 D1/D2/D3 require corresponding updates to the non-Rust agent skill and orchestrator command files. These are pure documentation changes with no compile dependency and can be committed independently of T007.",
+          "Change surface: .agents/skills/review-fix-lead/SKILL.md — add instruction that the agent self-resolves modification boundary by running bin/sotp review files --scope <scope>, replacing the assumption that scope files arrive via the orchestrator prompt; .claude/commands/track/review.md — remove the --reviewer-model resolution and passing instruction from Step 1, remove the scope-files derivation instruction from Step 4/Step 5, remove --scope-files and --reviewer-model from the cargo make track-local-review-fix-codex invocation strings. cargo make ci must pass."
+        ],
+        "task_ids": ["T008"]
       }
     ]
   }

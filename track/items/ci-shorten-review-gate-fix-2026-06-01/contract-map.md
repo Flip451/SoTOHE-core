@@ -48,6 +48,27 @@ subgraph usecase["usecase"]
     T38_usecase_usecase_BaselineCaptureRequest__self[BaselineCaptureRequest]
   end
   end
+  subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
+    direction TB
+  subgraph T35_usecase_usecase_RunReviewFixCommand["review_v2::run_review_fix::RunReviewFixCommand"]
+    direction TB
+    T35_usecase_usecase_RunReviewFixCommand__self[RunReviewFixCommand]
+  end
+  subgraph T33_usecase_usecase_RunReviewFixError["review_v2::run_review_fix::RunReviewFixError"]
+    direction TB
+    T33_usecase_usecase_RunReviewFixError__self[RunReviewFixError]
+    T33_usecase_usecase_RunReviewFixError_InvalidScope[InvalidScope]
+    T33_usecase_usecase_RunReviewFixError_InvalidTrackId[InvalidTrackId]
+    T33_usecase_usecase_RunReviewFixError_InvalidRoundType[InvalidRoundType]
+    T33_usecase_usecase_RunReviewFixError_SmokeTestFailed[SmokeTestFailed]
+    T33_usecase_usecase_RunReviewFixError_FixRunnerFailed[FixRunnerFailed]
+  end
+  subgraph R31_usecase_usecase_ReviewFixRunner["review_v2::run_review_fix::ReviewFixRunner"]
+    direction TB
+    R31_usecase_usecase_ReviewFixRunner__self[ReviewFixRunner]
+    R31_usecase_usecase_ReviewFixRunner_run_fix([run_fix])
+  end
+  end
   subgraph usecase_usecase_module_type_signals["usecase::type_signals"]
     direction TB
   subgraph T34_usecase_usecase_TypeSignalsRequest["type_signals::service::TypeSignalsRequest"]
@@ -58,11 +79,33 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_review_v2["infrastructure::review_v2"]
+    direction TB
+  subgraph T50_infrastructure_infrastructure_CodexReviewFixRunner["review_v2::review_fix_runner::CodexReviewFixRunner"]
+    direction TB
+    T50_infrastructure_infrastructure_CodexReviewFixRunner__self[CodexReviewFixRunner]
+    T50_infrastructure_infrastructure_CodexReviewFixRunner_new([new])
+  end
+  end
 end
+R31_usecase_usecase_ReviewFixRunner_run_fix --o T35_usecase_usecase_RunReviewFixCommand__self
+T50_infrastructure_infrastructure_CodexReviewFixRunner_new --> T50_infrastructure_infrastructure_CodexReviewFixRunner__self
+T50_infrastructure_infrastructure_CodexReviewFixRunner__self -.impl.-> R31_usecase_usecase_ReviewFixRunner__self
 class R40_domain_domain_RustdocBaselineCapturePort_capture method_node
 class R40_domain_domain_RustdocBaselineCapturePort__self secondary_port
 class R37_domain_domain_TypeSignalsExecutorPort_evaluate_layer method_node
 class R37_domain_domain_TypeSignalsExecutorPort__self secondary_port
 class T38_usecase_usecase_BaselineCaptureRequest__self command
+class T35_usecase_usecase_RunReviewFixCommand__self command
+class T33_usecase_usecase_RunReviewFixError_InvalidScope variant_node
+class T33_usecase_usecase_RunReviewFixError_InvalidTrackId variant_node
+class T33_usecase_usecase_RunReviewFixError_InvalidRoundType variant_node
+class T33_usecase_usecase_RunReviewFixError_SmokeTestFailed variant_node
+class T33_usecase_usecase_RunReviewFixError_FixRunnerFailed variant_node
+class T33_usecase_usecase_RunReviewFixError__self error_type
+class R31_usecase_usecase_ReviewFixRunner_run_fix method_node
+class R31_usecase_usecase_ReviewFixRunner__self secondary_port
 class T34_usecase_usecase_TypeSignalsRequest__self command
+class T50_infrastructure_infrastructure_CodexReviewFixRunner_new method_node
+class T50_infrastructure_infrastructure_CodexReviewFixRunner__self secondary_adapter
 ```

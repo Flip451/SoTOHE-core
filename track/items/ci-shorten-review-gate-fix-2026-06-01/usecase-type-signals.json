@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-02T01:57:34Z",
-  "declaration_hash": "5e3f24c7b402808ab0805eb65d443b154d6ab8824c8619a8aa218a80fd452ede",
+  "generated_at": "2026-06-02T04:00:03Z",
+  "declaration_hash": "f4e87fe2b29b4153e512688f2c3244fbab1ff9c9dae3d126e6fedfde486e1b69",
   "signals": [
     {
       "type_name": "BaselineCaptureRequest",
@@ -14,8 +14,31 @@
       ]
     },
     {
+      "type_name": "RunReviewFixCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
       "type_name": "TypeSignalsRequest",
       "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewFixRunner",
+      "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
     }
