@@ -40,12 +40,14 @@
     {
       "id": "T007",
       "description": "Remove reviewer_model and scope_files from all Rust layers in one atomic commit: (usecase) delete reviewer_model and scope_files fields from RunReviewFixCommand, remove the EmptyScopeFiles variant from RunReviewFixError, delete the scope_files empty-check guard from RunReviewFixInteractor, and update all tests in run_review_fix.rs (drop the fields from make_valid_command, remove the empty-scope-files test, update the nonempty-scope-files test); (cli) remove reviewer_model and scope_files from FixLocalArgs and build_run_review_fix_local_input, update fix_local.rs tests to drop those flags; (cli-composition inputs) remove reviewer_model and scope_files from RunReviewFixLocalInput; (cli-composition run_fix) remove scope_files from the CodexReviewFixRunner::new() call and remove reviewer_model from the RunReviewFixCommand construction, update run_fix.rs tests to drop those fields from command construction; (infrastructure prompt) remove the scope_files parameter from build_prompt, remove the scope_files_lines / scope_files_section blocks and the Scope File List section from the generated prompt, remove the reviewer_model field read and the Reviewer model line from the prompt, remove the --model {reviewer_model} from the reviewer_invocation string, update prompt.rs tests accordingly; (infrastructure mod) update make_command() and make_runner() test helpers to drop reviewer_model and scope_files, remove scope_files from CodexReviewFixRunner::new() call in make_runner. All layers compiled together in a single cargo make ci-passing commit.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0a70aea1495ec64b9bf98cfe93dcb7da78e073a9"
     },
     {
       "id": "T008",
       "description": "Update non-Rust skill and command docs to reflect the minimized fixer interface: (skill) add an instruction to .agents/skills/review-fix-lead/SKILL.md that the agent self-resolves its modification boundary via bin/sotp review files --scope <scope> (ADR 2300 D1), removing the assumption that scope files are supplied by the orchestrator; (command) remove the reviewer-model resolution and --reviewer-model passing instruction from .claude/commands/track/review.md Step 1 (ADR 2300 D3), and remove the scope-files derivation instruction and --scope-files from the cargo make track-local-review-fix-codex invocation strings in Step 4 and Step 5 (ADR 2300 D2). cargo make ci must pass (verify-* checks include command file validation).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0a70aea1495ec64b9bf98cfe93dcb7da78e073a9"
     }
   ],
   "plan": {

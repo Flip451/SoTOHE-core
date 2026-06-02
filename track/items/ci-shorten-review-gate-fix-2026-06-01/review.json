@@ -129,92 +129,265 @@
         }
       ]
     },
-    "cli_composition": {
+    "domain": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83fda4ac722760d0932752a1c2aa82135c2aac665ca914a493c7871e7c5e67b5",
+          "at": "2026-06-01T10:53:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
+          "at": "2026-06-01T13:14:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
+          "at": "2026-06-01T13:17:06Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:52:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:54:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T10:54:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:13:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
+          "at": "2026-06-01T21:02:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
+          "at": "2026-06-01T21:04:14Z"
+        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Skipping `NotFound` here bypasses `refresh_one_layer`'s existing track-directory validation. If `track_dir` is missing, `track_catalogue_spec_signals` now returns success as long as every enabled catalogue is absent, instead of failing closed on the missing track directory.",
+              "message": "`WORKER_ID` now rewrites `CARGO_TARGET_DIR` to `/cargo-target-${WORKER_ID}`, but the `tools` service only mounts `/cargo-target`. Because the container runs as a non-root user, `/cargo-target-*` is a sibling of the mounted volume and is not writable, so every `*-exec` task breaks as soon as parallel execution is enabled.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/track/tddd.rs",
-              "line": 305,
-              "category": "correctness"
+              "file": "Makefile.toml",
+              "line": 250,
+              "category": "infeasibility"
             }
           ],
-          "hash": "rvw1:sha256:0facc1dea68bc9f8d7658814f258c8ed6564e5eead816bd0b6cdb0b7bf8f5956",
-          "at": "2026-06-01T08:56:25Z"
+          "hash": "rvw1:sha256:fdce8d927bb5ad4e54297ef42a18a1bfcd5e362f90094c6f3689c669b2edd24e",
+          "at": "2026-06-01T22:36:57Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
-          "at": "2026-06-01T09:04:25Z"
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:44:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
-          "at": "2026-06-01T09:07:17Z"
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:46:33Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
-          "at": "2026-06-01T09:32:03Z"
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:53:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
-          "at": "2026-06-01T09:33:54Z"
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T23:04:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:122a2e099fdca24d20ed96007e9abb5a8c041a57c00ba966ff94803a9e3218db",
-          "at": "2026-06-01T10:54:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
-          "at": "2026-06-01T13:14:10Z"
+          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
+          "at": "2026-06-02T00:23:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
-          "at": "2026-06-01T13:15:47Z"
+          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
+          "at": "2026-06-02T00:25:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This changes the `docker exec` command shape enough to break the repo's workflow snapshot test (`scripts/test_verify_scripts.py::test_ci_uses_host_uid_gid_without_forcing_track_template_dev` still asserts the exact substring `docker exec ci-runner cargo make ci-container`). CI will fail until that test is updated in lockstep.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 78,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e99b8c9f434fea6cdd6c9eeb791fa599b356278d264384b94252a49d4a37b0a2",
+          "at": "2026-06-02T01:06:52Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33e7058e3adbb6c84ce6b407ca929c83d7cd81ba4a1241b798e6d2af134b7aff",
-          "at": "2026-06-02T05:17:06Z"
+          "hash": "rvw1:sha256:87d30af18685c1d7796f322aa0b42f636ea44a8a59c8b40cf9edae9742203acb",
+          "at": "2026-06-02T01:42:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The build args use `${{ env.HOST_UID }}` / `${{ env.HOST_GID }}`, but these values are only created by the prior `GITHUB_ENV` write at runtime. GitHub evaluates expressions for action inputs before runner-generated environment values are available, so these expand empty rather than to the host UID/GID. That means Docker receives empty `CI_UID`/`CI_GID` values and the `chown -R ${CI_UID}:${CI_GID} ...` step can fail or avoid assigning ownership to the runtime user, breaking the CI image build or the baked dependency reuse this change is meant to enable. Pass these through step outputs or another mechanism available to expressions.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 61,
+              "category": "ci"
+            }
+          ],
+          "hash": "rvw1:sha256:87d30af18685c1d7796f322aa0b42f636ea44a8a59c8b40cf9edae9742203acb",
+          "at": "2026-06-02T01:45:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33e7058e3adbb6c84ce6b407ca929c83d7cd81ba4a1241b798e6d2af134b7aff",
-          "at": "2026-06-02T05:31:18Z"
+          "hash": "rvw1:sha256:2514bfeca6b2e24b4c2594fb921aac18f2d6160689a98f3741fe77c56611e8dd",
+          "at": "2026-06-02T01:54:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33e7058e3adbb6c84ce6b407ca929c83d7cd81ba4a1241b798e6d2af134b7aff",
-          "at": "2026-06-02T05:33:20Z"
+          "hash": "rvw1:sha256:2514bfeca6b2e24b4c2594fb921aac18f2d6160689a98f3741fe77c56611e8dd",
+          "at": "2026-06-02T01:56:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1a5a8034554506a052fdf93012cd1f23daf577a2c5645dfee5363947753db5e",
+          "at": "2026-06-02T05:16:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1a5a8034554506a052fdf93012cd1f23daf577a2c5645dfee5363947753db5e",
+          "at": "2026-06-02T05:29:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The mandatory rule still says to obtain the verdict by running the \"canonical command below\", but the new pre-step now places `bin/sotp review files --scope <scope>` as the first concrete command below that text. That command is only for resolving the modification boundary and explicitly must not be used as the verdict source, so this is a broken/ambiguous reference in the core reviewer protocol. Reword this to point to the Reviewer invocation in step 1 instead of \"below\".",
+              "severity": "P1",
+              "file": ".agents/skills/review-fix-lead/SKILL.md",
+              "line": 15,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:f1a5a8034554506a052fdf93012cd1f23daf577a2c5645dfee5363947753db5e",
+          "at": "2026-06-02T05:32:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bdfdf0a5382ba56fbe90006aa4f04ba7cd27374d6da95bdf924067a85073444",
+          "at": "2026-06-02T05:39:10Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83d9866f45b81609e83d85a18db67d4ca2a273659bf024a03594a4e85400c1ad",
+          "at": "2026-06-02T05:17:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee24c6e3da200bc87b915bd0c5d20336de464f0de46957a1be066e95eae3baa0",
+          "at": "2026-06-02T05:30:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Claude fixer agent still instructs itself to run `cargo make track-local-review` with “the assigned model”, but the updated contract immediately above says the reviewer model is auto-resolved and no reviewer model is passed by the orchestrator. This leaves the Claude path with contradictory operational instructions and can cause the fixer to add a stale model argument or look for an input it no longer receives.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 91,
+              "category": "inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:ee24c6e3da200bc87b915bd0c5d20336de464f0de46957a1be066e95eae3baa0",
+          "at": "2026-06-02T05:33:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b99e11c72650179f7811e8618fc6b022dcb7abe408cefe26f4a4f5e3af4e4c91",
+          "at": "2026-06-02T05:35:35Z"
         }
       ]
     },
@@ -441,6 +614,20 @@
           "findings": [],
           "hash": "rvw1:sha256:98ee3bd407499b390f044a1ad8e77e9e49155191509daf876d84d093c622447f",
           "at": "2026-06-02T05:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c0242158603d7d68d4c3868c51fc8acea22f029dd32a1b2cb90264ee1caa5cc",
+          "at": "2026-06-02T06:06:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c0242158603d7d68d4c3868c51fc8acea22f029dd32a1b2cb90264ee1caa5cc",
+          "at": "2026-06-02T06:08:19Z"
         }
       ]
     },
@@ -534,265 +721,92 @@
         }
       ]
     },
-    "harness-policy": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83d9866f45b81609e83d85a18db67d4ca2a273659bf024a03594a4e85400c1ad",
-          "at": "2026-06-02T05:17:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ee24c6e3da200bc87b915bd0c5d20336de464f0de46957a1be066e95eae3baa0",
-          "at": "2026-06-02T05:30:58Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The Claude fixer agent still instructs itself to run `cargo make track-local-review` with “the assigned model”, but the updated contract immediately above says the reviewer model is auto-resolved and no reviewer model is passed by the orchestrator. This leaves the Claude path with contradictory operational instructions and can cause the fixer to add a stale model argument or look for an input it no longer receives.",
+              "message": "Skipping `NotFound` here bypasses `refresh_one_layer`'s existing track-directory validation. If `track_dir` is missing, `track_catalogue_spec_signals` now returns success as long as every enabled catalogue is absent, instead of failing closed on the missing track directory.",
               "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 91,
-              "category": "inconsistency"
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 305,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:ee24c6e3da200bc87b915bd0c5d20336de464f0de46957a1be066e95eae3baa0",
-          "at": "2026-06-02T05:33:04Z"
+          "hash": "rvw1:sha256:0facc1dea68bc9f8d7658814f258c8ed6564e5eead816bd0b6cdb0b7bf8f5956",
+          "at": "2026-06-01T08:56:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
+          "at": "2026-06-01T09:04:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b99e11c72650179f7811e8618fc6b022dcb7abe408cefe26f4a4f5e3af4e4c91",
-          "at": "2026-06-02T05:35:35Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83fda4ac722760d0932752a1c2aa82135c2aac665ca914a493c7871e7c5e67b5",
-          "at": "2026-06-01T10:53:35Z"
+          "hash": "rvw1:sha256:ee8b18995527260ba235de584cadfa999158f57de505d1c0f80a2ec15a55b290",
+          "at": "2026-06-01T09:07:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
-          "at": "2026-06-01T13:14:29Z"
+          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
+          "at": "2026-06-01T09:32:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
-          "at": "2026-06-01T13:17:06Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+          "hash": "rvw1:sha256:1c11b064ffe1cd70cc188d31d836649c1baf6c90cd4e66b1dd5aade181a8bc4d",
+          "at": "2026-06-01T09:33:54Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:52:33Z"
+          "hash": "rvw1:sha256:122a2e099fdca24d20ed96007e9abb5a8c041a57c00ba966ff94803a9e3218db",
+          "at": "2026-06-01T10:54:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
+          "at": "2026-06-01T13:14:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:54:13Z"
+          "hash": "rvw1:sha256:47388106e286b4df1ba06c473e4db59dd62fa780cf622c6d9d13de4139d31216",
+          "at": "2026-06-01T13:15:47Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T10:54:17Z"
+          "hash": "rvw1:sha256:33e7058e3adbb6c84ce6b407ca929c83d7cd81ba4a1241b798e6d2af134b7aff",
+          "at": "2026-06-02T05:17:06Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T13:13:26Z"
+          "hash": "rvw1:sha256:33e7058e3adbb6c84ce6b407ca929c83d7cd81ba4a1241b798e6d2af134b7aff",
+          "at": "2026-06-02T05:31:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T13:15:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
-          "at": "2026-06-01T21:02:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
-          "at": "2026-06-01T21:04:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`WORKER_ID` now rewrites `CARGO_TARGET_DIR` to `/cargo-target-${WORKER_ID}`, but the `tools` service only mounts `/cargo-target`. Because the container runs as a non-root user, `/cargo-target-*` is a sibling of the mounted volume and is not writable, so every `*-exec` task breaks as soon as parallel execution is enabled.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 250,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:fdce8d927bb5ad4e54297ef42a18a1bfcd5e362f90094c6f3689c669b2edd24e",
-          "at": "2026-06-01T22:36:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:44:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:46:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:53:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T23:04:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
-          "at": "2026-06-02T00:23:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
-          "at": "2026-06-02T00:25:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This changes the `docker exec` command shape enough to break the repo's workflow snapshot test (`scripts/test_verify_scripts.py::test_ci_uses_host_uid_gid_without_forcing_track_template_dev` still asserts the exact substring `docker exec ci-runner cargo make ci-container`). CI will fail until that test is updated in lockstep.",
-              "severity": "P1",
-              "file": ".github/workflows/ci.yml",
-              "line": 78,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:e99b8c9f434fea6cdd6c9eeb791fa599b356278d264384b94252a49d4a37b0a2",
-          "at": "2026-06-02T01:06:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87d30af18685c1d7796f322aa0b42f636ea44a8a59c8b40cf9edae9742203acb",
-          "at": "2026-06-02T01:42:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The build args use `${{ env.HOST_UID }}` / `${{ env.HOST_GID }}`, but these values are only created by the prior `GITHUB_ENV` write at runtime. GitHub evaluates expressions for action inputs before runner-generated environment values are available, so these expand empty rather than to the host UID/GID. That means Docker receives empty `CI_UID`/`CI_GID` values and the `chown -R ${CI_UID}:${CI_GID} ...` step can fail or avoid assigning ownership to the runtime user, breaking the CI image build or the baked dependency reuse this change is meant to enable. Pass these through step outputs or another mechanism available to expressions.",
-              "severity": "P1",
-              "file": ".github/workflows/ci.yml",
-              "line": 61,
-              "category": "ci"
-            }
-          ],
-          "hash": "rvw1:sha256:87d30af18685c1d7796f322aa0b42f636ea44a8a59c8b40cf9edae9742203acb",
-          "at": "2026-06-02T01:45:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2514bfeca6b2e24b4c2594fb921aac18f2d6160689a98f3741fe77c56611e8dd",
-          "at": "2026-06-02T01:54:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2514bfeca6b2e24b4c2594fb921aac18f2d6160689a98f3741fe77c56611e8dd",
-          "at": "2026-06-02T01:56:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f1a5a8034554506a052fdf93012cd1f23daf577a2c5645dfee5363947753db5e",
-          "at": "2026-06-02T05:16:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f1a5a8034554506a052fdf93012cd1f23daf577a2c5645dfee5363947753db5e",
-          "at": "2026-06-02T05:29:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The mandatory rule still says to obtain the verdict by running the \"canonical command below\", but the new pre-step now places `bin/sotp review files --scope <scope>` as the first concrete command below that text. That command is only for resolving the modification boundary and explicitly must not be used as the verdict source, so this is a broken/ambiguous reference in the core reviewer protocol. Reword this to point to the Reviewer invocation in step 1 instead of \"below\".",
-              "severity": "P1",
-              "file": ".agents/skills/review-fix-lead/SKILL.md",
-              "line": 15,
-              "category": "broken_ref"
-            }
-          ],
-          "hash": "rvw1:sha256:f1a5a8034554506a052fdf93012cd1f23daf577a2c5645dfee5363947753db5e",
-          "at": "2026-06-02T05:32:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bdfdf0a5382ba56fbe90006aa4f04ba7cd27374d6da95bdf924067a85073444",
-          "at": "2026-06-02T05:39:10Z"
+          "hash": "rvw1:sha256:33e7058e3adbb6c84ce6b407ca929c83d7cd81ba4a1241b798e6d2af134b7aff",
+          "at": "2026-06-02T05:33:20Z"
         }
       ]
     }
