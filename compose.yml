@@ -10,10 +10,6 @@ services:
       - .:/workspace
       - ./.git:/workspace/.git:ro
       - ${SCCACHE_HOST_DIR:-./.cache/sccache}:/workspace/.cache/sccache
-      # /cargo-target is outside the /workspace bind-mount so the named volume is
-      # initialised from the image's cook-baked deps on first run and is never
-      # shadowed by the host bind-mount.  This prevents full dep recompilation in GHA.
-      - cargo_target_cache:/cargo-target
     tmpfs:
       - /workspace/private:size=1m
       - /workspace/config/secrets:size=1m
@@ -21,15 +17,10 @@ services:
       CARGO_TERM_COLOR: always
       HOME: /workspace/.cache/home
       CARGO_HOME: /workspace/.cache/cargo
-      # CARGO_TARGET_DIR matches CARGO_TARGET_DIR in the Dockerfile so that the
-      # cook-baked deps (image layer) are used by the named volume on first start.
-      CARGO_TARGET_DIR: /cargo-target
+      CARGO_TARGET_DIR: /workspace/${CARGO_TARGET_DIR_RELATIVE:-target}
       SCCACHE_DIR: /workspace/.cache/sccache
 
   tools-daemon:
     extends:
       service: tools
     command: sleep infinity
-
-volumes:
-  cargo_target_cache:

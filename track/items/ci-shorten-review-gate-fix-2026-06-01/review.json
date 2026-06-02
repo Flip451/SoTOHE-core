@@ -1,99 +1,42 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:52:33Z"
+          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
+          "at": "2026-06-01T09:49:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
-          "at": "2026-06-01T08:54:13Z"
+          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
+          "at": "2026-06-01T09:52:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T10:54:17Z"
+          "hash": "rvw1:sha256:2c3d71fd1f01735b76eff278d5e913c828b348ef70a968d4fc0e371140e219f3",
+          "at": "2026-06-01T10:53:44Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T13:13:26Z"
+          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
+          "at": "2026-06-01T13:17:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
-          "at": "2026-06-01T13:15:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
-          "at": "2026-06-01T21:02:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
-          "at": "2026-06-01T21:04:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`WORKER_ID` now rewrites `CARGO_TARGET_DIR` to `/cargo-target-${WORKER_ID}`, but the `tools` service only mounts `/cargo-target`. Because the container runs as a non-root user, `/cargo-target-*` is a sibling of the mounted volume and is not writable, so every `*-exec` task breaks as soon as parallel execution is enabled.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 250,
-              "category": "infeasibility"
-            }
-          ],
-          "hash": "rvw1:sha256:fdce8d927bb5ad4e54297ef42a18a1bfcd5e362f90094c6f3689c669b2edd24e",
-          "at": "2026-06-01T22:36:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:44:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:46:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T22:53:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
-          "at": "2026-06-01T23:04:39Z"
+          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
+          "at": "2026-06-01T13:20:47Z"
         }
       ]
     },
@@ -266,6 +209,116 @@
         }
       ]
     },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:52:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a51743c0de805a5a5b2f4ef7a3abbb74f3633bba8f215c9a948fd70f23a2808",
+          "at": "2026-06-01T08:54:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T10:54:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:13:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:810cc4da0e61d02d3e1da6fc7d80f71e4cfc18186fe54a9421fe03220f521d56",
+          "at": "2026-06-01T13:15:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
+          "at": "2026-06-01T21:02:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6afb6b9afabe7ad87010acd021f669962133612f50582fdea1e9ed54851665",
+          "at": "2026-06-01T21:04:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`WORKER_ID` now rewrites `CARGO_TARGET_DIR` to `/cargo-target-${WORKER_ID}`, but the `tools` service only mounts `/cargo-target`. Because the container runs as a non-root user, `/cargo-target-*` is a sibling of the mounted volume and is not writable, so every `*-exec` task breaks as soon as parallel execution is enabled.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 250,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:fdce8d927bb5ad4e54297ef42a18a1bfcd5e362f90094c6f3689c669b2edd24e",
+          "at": "2026-06-01T22:36:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:44:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:46:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T22:53:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6e86646131e422fcb7e75c99b2a7e517c4ae2168cb82f7bf1a839cfb48711577",
+          "at": "2026-06-01T23:04:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
+          "at": "2026-06-02T00:23:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4f738c1b2b2005b61f49282ab662ad56f6a41cc01eaf23f0cab9da24876fb8d",
+          "at": "2026-06-02T00:25:13Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -291,28 +344,64 @@
         }
       ]
     },
-    "domain": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:83fda4ac722760d0932752a1c2aa82135c2aac665ca914a493c7871e7c5e67b5",
-          "at": "2026-06-01T10:53:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
-          "at": "2026-06-01T13:14:29Z"
+          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
+          "at": "2026-06-01T08:53:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
-          "at": "2026-06-01T13:17:06Z"
+          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
+          "at": "2026-06-01T08:55:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This test still asserts `Err` when `domain-types.json` is absent, but the new type-signals behavior skips missing catalogues unconditionally. With the fixture as written, `execute_type_signals(...)` will return `Ok`, so this test will fail and no longer matches the intended contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 128,
+              "category": "testing"
+            },
+            {
+              "message": "This `--layer usecase` regression test is still expecting an error even though the fixture omits `usecase-types.json`, and absent catalogues are now always skipped. The command will return `Ok` here, so the test no longer validates layer dispatch and will fail as written.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "line": 199,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:d1bd6420726650106d7192ca71af73420dd9da9ba13e196d2a335328e77d2bac",
+          "at": "2026-06-01T10:54:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8136f5502e672d58ae17f213419485c573ba2d4814121052f82ff7c4dff1c3cd",
+          "at": "2026-06-01T10:58:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
+          "at": "2026-06-01T13:15:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
+          "at": "2026-06-01T13:17:29Z"
         }
       ]
     },
@@ -384,103 +473,28 @@
         }
       ]
     },
-    "infrastructure": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
-          "at": "2026-06-01T09:49:33Z"
+          "hash": "rvw1:sha256:83fda4ac722760d0932752a1c2aa82135c2aac665ca914a493c7871e7c5e67b5",
+          "at": "2026-06-01T10:53:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
+          "at": "2026-06-01T13:14:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9f8880a6c86726c10ac6ebadc858bbe68d85da557f82755c8d2e87cef84f9b4a",
-          "at": "2026-06-01T09:52:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c3d71fd1f01735b76eff278d5e913c828b348ef70a968d4fc0e371140e219f3",
-          "at": "2026-06-01T10:53:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
-          "at": "2026-06-01T13:17:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5e480820546e90d37ab0e44bdd4b28900634b909cfbf2ee876242ffebbdd76e",
-          "at": "2026-06-01T13:20:47Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
-          "at": "2026-06-01T08:53:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ad304bfac4684231d5e4517b3da3e3805e6a4459c72af994c4e252fb3952710",
-          "at": "2026-06-01T08:55:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This test still asserts `Err` when `domain-types.json` is absent, but the new type-signals behavior skips missing catalogues unconditionally. With the fixture as written, `execute_type_signals(...)` will return `Ok`, so this test will fail and no longer matches the intended contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 128,
-              "category": "testing"
-            },
-            {
-              "message": "This `--layer usecase` regression test is still expecting an error even though the fixture omits `usecase-types.json`, and absent catalogues are now always skipped. The command will return `Ok` here, so the test no longer validates layer dispatch and will fail as written.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
-              "line": 199,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:d1bd6420726650106d7192ca71af73420dd9da9ba13e196d2a335328e77d2bac",
-          "at": "2026-06-01T10:54:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8136f5502e672d58ae17f213419485c573ba2d4814121052f82ff7c4dff1c3cd",
-          "at": "2026-06-01T10:58:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
-          "at": "2026-06-01T13:15:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03d322b1ac43915e8c4c6a0f1e1101bee96f01825a2d35bb6700609b7d365fe4",
-          "at": "2026-06-01T13:17:29Z"
+          "hash": "rvw1:sha256:3db3c07d64a3ba6e0986a7980c078f7582931f77b64948aae265cb079da2be7c",
+          "at": "2026-06-01T13:17:06Z"
         }
       ]
     }
