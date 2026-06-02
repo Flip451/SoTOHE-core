@@ -1,0 +1,157 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "BaselineCaptureRequest": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "source_workspace", "ty": "Option<std::path::PathBuf>" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "baseline_capture::service",
+      "docs": "Modified in ADR 2026-06-01-1206 D2: force field removed; baseline-capture is now always idempotent.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "OS-06",
+          "hash": "a99201d67af5063e8efccff4f6f9250cf06127a9ba5de1cc5f84d7cfc2f2d464"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsRequest": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "branch", "ty": "String" },
+            { "name": "workspace_root", "ty": "std::path::PathBuf" },
+            { "name": "layer", "ty": "Option<String>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "type_signals::service",
+      "docs": "Modified in ADR 2026-06-01-1206 D1: lenient field removed; type-signals now unconditionally skips absent catalogues regardless of call site.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "OS-06",
+          "hash": "a99201d67af5063e8efccff4f6f9250cf06127a9ba5de1cc5f84d7cfc2f2d464"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixCommand": {
+      "action": "modify",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "scope", "ty": "String" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "round_type", "ty": "String" },
+            { "name": "model", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Modified in ADR 2026-06-01-2300 D1/D3: reviewer_model and scope_files fields removed. Fixer receives only scope/briefing_file/track_id/round_type/model.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "IN-06",
+          "hash": "b05dc2e440d4c70d1dd35f593c2b224f1056298409beaa0069be896c05e832b0"
+        },
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "IN-07",
+          "hash": "34293c5052f24baf0018b8eb4e78db6233f8388eda3e9ebf8908b1b287bee38c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RunReviewFixError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidScope",    "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidTrackId",  "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "InvalidRoundType","payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "SmokeTestFailed", "payload": { "kind": "tuple", "fields": ["String"] } },
+          { "name": "FixRunnerFailed", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Modified in ADR 2026-06-01-2300 D1: EmptyScopeFiles variant removed; scope_files guard is eliminated as fixer now self-resolves scope boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "IN-06",
+          "hash": "b05dc2e440d4c70d1dd35f593c2b224f1056298409beaa0069be896c05e832b0"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "ReviewFixRunner": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "run_fix",
+          "receiver": "&self",
+          "params": [
+            { "name": "command", "ty": "RunReviewFixCommand" }
+          ],
+          "returns": "Result<RunReviewFixOutput, ReviewFixRunnerError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "review_v2::run_review_fix",
+      "docs": "Secondary port for the review-fix-lead fixer. Referenced so CodexReviewFixRunner impl edge is visible in the contract-map.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "BaselineCaptureRequest" },
+    { "action": "modify", "trait_ref": "core::clone::Clone", "for_type": "BaselineCaptureRequest" },
+    { "action": "modify", "trait_ref": "core::fmt::Debug", "for_type": "RunReviewFixError" },
+    { "action": "modify", "trait_ref": "core::fmt::Display", "for_type": "RunReviewFixError" },
+    { "action": "modify", "trait_ref": "core::error::Error", "for_type": "RunReviewFixError" }
+  ]
+}

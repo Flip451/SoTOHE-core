@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-02T06:37:23Z",
+  "declaration_hash": "f8fdbf347357001b12abb342f7a498dcfb0fc1461d86769f7a8354cfecf44f50",
+  "signals": [
+    {
+      "type_name": "RustdocBaselineCapturePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MissingCataloguePolicy",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

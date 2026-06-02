@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-02T06:37:26Z",
+  "declaration_hash": "308b01668c79a0003aeaf618e6dabdff69d91ac2c5bed70470bd760f5e4887f3",
+  "signals": [
+    {
+      "type_name": "CodexReviewFixRunner",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ReviewFixRunner"
+      ]
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

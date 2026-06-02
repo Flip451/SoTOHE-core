@@ -18,8 +18,10 @@ review → fix → verify → re-review until the reviewer reports `zero_finding
 - Track ID and scope name
 - Briefing file path (`tmp/reviewer-runtime/briefing-{scope}.md`)
 - Round type (`fast` or `final`) — single value, fixed for the agent's lifetime
-- Reviewer model name for that round
-- Scope file list (files this agent is allowed to modify)
+
+The reviewer model is auto-resolved by `cargo make track-local-review` from `agent-profiles.json`;
+the orchestrator does not pass it. The modification boundary is self-resolved by this agent
+(see Scope Ownership) — the orchestrator does not pass a scope file list.
 
 ### Output (structured status in final message)
 
@@ -32,9 +34,13 @@ Report one of the following statuses:
 
 ### Scope Ownership (CRITICAL)
 
-- This agent may ONLY modify files within its assigned scope (e.g., `libs/domain/**` for
-  the domain scope). See `track/review-scope.json` for group definitions.
-- If a finding requires changes to files outside the scope, do NOT modify them.
+- **Self-resolve your modification boundary** by running `bin/sotp review files --scope <scope>`
+  for your assigned `<scope>`. Those files are the ones you may modify. The orchestrator does NOT
+  pass a scope file list. If the command returns an empty list or
+  fails, make no edits and return `failed` with the reason.
+- This agent may ONLY modify files within that self-resolved boundary. See `track/review-scope.json`
+  for the group glob definitions the command applies.
+- If a finding requires changes to files outside the boundary, do NOT modify them.
   Return `blocked_cross_scope` with the file list so the orchestrator can re-partition.
 - Cross-scope edits are fail-closed: silent out-of-scope modifications are prohibited.
 
@@ -82,7 +88,7 @@ right form when you just need to confirm `required (stale hash)` /
 § "track-review-results flag reference" for common flags; run
 `cargo make track-review-results -- --help` for the complete option list.
 
-1. **Review**: Run `cargo make track-local-review` with the provided briefing, the assigned model, and the assigned `--round-type` (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other).
+1. **Review**: Run `cargo make track-local-review` with the provided briefing and the assigned `--round-type` (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other).
 2. **Parse verdict**: Read the verdict from command output.
    - `zero_findings` → proceed to step 2.5 (verify via canonical API).
    - `findings_remain` → proceed to fix phase.

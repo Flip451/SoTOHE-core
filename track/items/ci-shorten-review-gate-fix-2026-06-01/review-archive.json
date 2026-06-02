@@ -1,0 +1,152 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `ci-target` volume is mounted under the existing `/workspace` bind mount, so Docker will seed it from the bind-mounted `/workspace/target` visible in the checkout, not from the image-layer `/workspace/target` baked by `dev-base-ci`. That leaves the target volume empty on CI and defeats the cache-reuse change the workflow is trying to add.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/compose.ci.yml",
+              "line": 31,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:50ad60ed811b0653bc44fd5315cd147c94b2d962010ff268dda9f248747cd2a0",
+          "at": "2026-06-01T06:18:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ci-target` is declared as a normal Compose-managed volume, so `docker compose` will namespace it as `<project>_ci-target` unless the volume sets `name: ci-target` (or is marked `external: true`). The workflow seeds a literal `ci-target` Docker volume, so the CI container ends up mounting a different empty volume and never sees the pre-populated `/workspace/target` cache.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/compose.ci.yml",
+              "line": 35,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c8c29c19ac14ce984093045e17b30544b86b2138c7681ab0fb5a84f25acd2b0b",
+          "at": "2026-06-01T06:24:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow seeds a literal Docker volume named `ci-target`, but this Compose declaration will be project-scoped as `<project>_ci-target` unless you set `name: ci-target` (or `external: true`). When `docker compose -f compose.yml -f compose.ci.yml run ...` starts `ci-runner`, it will mount a different empty volume, so the pre-populated `/workspace/target` cache is never used.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/compose.ci.yml",
+              "line": 35,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c8c29c19ac14ce984093045e17b30544b86b2138c7681ab0fb5a84f25acd2b0b",
+          "at": "2026-06-01T06:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40c01505195bd1d328ea54ad7b41f9dddb0f6330e498c6c8a6f552e36f884728",
+          "at": "2026-06-01T06:49:53Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09d2d86bbb5ce3f498f27ef0c86b2f6fddcac4eb2b5cbf2214f5d9a19b34d020",
+          "at": "2026-06-01T05:02:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`IN-02` requires `bin/sotp track type-signals` itself to skip missing catalogues and exit zero, but the implementation plan for T003 says the user-facing `sotp track type-signals` path must remain strict while only the gate-path invocation becomes lenient. These two artifacts define opposite behavior for the direct command, so implementers cannot satisfy both the spec and plan as written.",
+              "severity": "P1",
+              "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+              "line": 41,
+              "category": "contradiction"
+            },
+            {
+              "message": "`OS-01` declares source-code changes out of scope, but T003 requires changing `apps/cli-composition/src/track/tddd.rs` to implement the review-gate fix. Because this is a combined track where the second ADR necessarily needs a CLI source change, the out-of-scope item currently conflicts with the implementation plan unless it is scoped explicitly to the CI-cache work only.",
+              "severity": "P1",
+              "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+              "line": 63,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:09d2d86bbb5ce3f498f27ef0c86b2f6fddcac4eb2b5cbf2214f5d9a19b34d020",
+          "at": "2026-06-01T05:05:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2646890a50bd14e1d2d834b16e5b0e14112023e092fd34898ceea99e0c4c13d5",
+          "at": "2026-06-01T05:09:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`S2` narrows T002 to `.github/workflows/` cache settings and `Makefile.toml`, but `observations.md` records the implemented fix as adding a new `compose.ci.yml` and a `docker exec --user 0 ... chown` step in the workflow. The plan artifacts disagree on the allowed T002 surface, so this track is internally inconsistent.",
+              "severity": "P1",
+              "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/plan.md",
+              "line": 21,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dedaa7337946dad4224a9aa59e2cc9ef5ee518979e2a1e6ce9e1b698b97737b3",
+          "at": "2026-06-01T06:15:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c176493122459abbae07937ca229e2766b96973eab9a0e3ae016e7e5a6aa72cd",
+          "at": "2026-06-01T06:17:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6281d76681b11696cb072a4e813630648aa820b015b8667d39e52fe96c12d6b3",
+          "at": "2026-06-01T06:46:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T002 notes are stale about how the CI target volume is populated and owned. They say the workflow adds a `docker exec --user 0 ci-runner chown ...` step after starting `ci-runner`, and later keep the overlapping bind-mount volume-seeding concern as a PR-deferred risk. The current workflow instead has a pre-start `Seed ci-target volume from image` step that mounts only `ci-target` into `rust-sdd-template-tools:latest` and performs the chown there, which directly addresses that seed ambiguity. As written, the artifact gives reviewers the wrong implementation model and the wrong fallback diagnosis for a slow PR run.",
+              "severity": "P1",
+              "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/observations.md",
+              "line": 53,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:6281d76681b11696cb072a4e813630648aa820b015b8667d39e52fe96c12d6b3",
+          "at": "2026-06-01T06:49:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6051eae7cb97793ce0494619f7ecdac27a1b883d7f32348921e9929b0d4b199c",
+          "at": "2026-06-01T06:52:00Z"
+        }
+      ]
+    }
+  }
+}

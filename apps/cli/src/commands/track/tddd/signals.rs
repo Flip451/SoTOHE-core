@@ -13,6 +13,9 @@ use crate::CliError;
 ///
 /// Thin CLI adapter: delegates all orchestration to [`cli_composition::CliApp`].
 ///
+/// Absent catalogue files are always skipped unconditionally. Present catalogues
+/// are always evaluated strictly.
+///
 /// # Errors
 ///
 /// Returns `CliError` when the underlying `CliApp` composition fails.
@@ -122,29 +125,6 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_type_signals_with_missing_domain_types_json_returns_error() {
-        // T008: the old evaluator is removed and returns an error stub regardless of
-        // whether domain-types.json is present. This test verifies the command is
-        // fail-closed (returns Err) when invoked on a track without a catalogue file.
-        let dir = tempfile::tempdir().unwrap();
-        let items_dir = dir.path().join("track/items");
-        let track_dir = items_dir.join("test-track");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
-            .unwrap();
-        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
-        // architecture-rules.json is required by FsTdddLayerBindingsAdapter::new()
-        // (fail-closed). Without it the interactor fails on layer-bindings load
-        // rather than on the missing catalogue path this test exercises.
-        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
-        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
-        let workspace_root = dir.path().to_path_buf();
-
-        let result = execute_type_signals("test-track".to_owned(), workspace_root, None);
-        assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
-    }
-
-    #[test]
     fn test_execute_type_signals_with_malformed_domain_types_json_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         let (workspace_root, track_id) = setup_track(dir.path(), "{not valid json}");
@@ -194,16 +174,22 @@ mod tests {
 
     #[test]
     fn test_execute_type_signals_with_usecase_layer_dispatches_to_usecase_catalogue() {
-        // T008: the old evaluator is removed. This test verifies the command is fail-closed
-        // (returns Err) when invoked with --layer usecase. The evaluator stub error is
-        // returned regardless of which layer is targeted.
+        // Verify that --layer usecase reaches strict evaluation for the usecase catalogue.
+        // The catalogue is present, so the absent-catalogue skip path must not apply.
         let dir = tempfile::tempdir().unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
+
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("test-track");
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
             .unwrap();
         std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        std::fs::write(
+            track_dir.join("usecase-types.json"),
+            r#"{"schema_version":2,"type_definitions":[]}"#,
+        )
+        .unwrap();
 
         let rules_json = r#"{
           "layers": [
@@ -226,8 +212,12 @@ mod tests {
             Some("usecase".to_owned()),
         );
 
-        // T008: evaluator stub always returns Err — just verify fail-closed.
-        assert!(result.is_err(), "type-signals must return error (evaluator removed in T008)");
+        let err = result.expect_err("present usecase catalogue must be evaluated strictly");
+        let msg = format!("{err}");
+        assert!(
+            msg.contains("usecase-types-baseline.json") || msg.contains("evaluation failed"),
+            "error must come from strict usecase evaluation, got: {msg}"
+        );
     }
 
     // --- Integration test: execute_type_signals CN-07 branch guard ---
@@ -387,6 +377,36 @@ mod tests {
                 );
             }
         }
+    }
+
+    // ── Absent-catalogue skip tests ─────────────────────────────────────────
+
+    /// AC-01/AC-02: absent catalogue → Ok (gate mode at Phase 0/1).
+    ///
+    /// When the catalogue file does not exist, the command must exit zero and
+    /// produce no error unconditionally. This is the Phase 0 scenario where
+    /// `track-active-gate` runs before any type catalogues have been created.
+    #[test]
+    fn test_execute_type_signals_absent_catalogue_returns_ok() {
+        let dir = tempfile::tempdir().unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
+
+        let items_dir = dir.path().join("track/items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), minimal_active_metadata_json("test-track"))
+            .unwrap();
+        std::fs::write(track_dir.join("impl-plan.json"), minimal_impl_plan_json()).unwrap();
+        // No domain-types.json written — catalogue is absent.
+        let rules_json = r#"{"layers":[{"crate":"domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+
+        // Absent catalogue is always skipped unconditionally → Ok
+        let result = execute_type_signals("test-track".to_owned(), dir.path().to_path_buf(), None);
+        assert!(
+            result.is_ok(),
+            "absent catalogue must always return Ok (unconditional skip), got: {result:?}"
+        );
     }
 
     /// Success-path integration test.  Requires nightly toolchain for `cargo +nightly rustdoc`.

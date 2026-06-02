@@ -25,8 +25,6 @@ pub struct BaselineCaptureRequest {
     /// Optional layer filter (matches `layers[].crate` in `architecture-rules.json`).
     /// When `None`, all TDDD-enabled layers are processed.
     pub layer: Option<String>,
-    /// When `true`, overwrite any existing baseline file unconditionally.
-    pub force: bool,
 }
 
 // ---------------------------------------------------------------------------

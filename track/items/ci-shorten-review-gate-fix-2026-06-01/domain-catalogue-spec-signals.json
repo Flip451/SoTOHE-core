@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "f8fdbf347357001b12abb342f7a498dcfb0fc1461d86769f7a8354cfecf44f50",
+  "signals": [
+    {
+      "type_name": "MissingCataloguePolicy",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RustdocBaselineCapturePort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "signal": "blue"
+    }
+  ]
+}

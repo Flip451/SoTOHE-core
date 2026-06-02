@@ -108,6 +108,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型シグネチャ codec の generic param 名前衝突の恒久対策](2026-05-25-0423-tddd-codec-generic-name-collision-fix.md) | Proposed | 2026-05-25 |
 | [完了済みトラック保護を frozen から現在ブランチ紐付きバリデーションへ置換](2026-05-26-0518-active-track-write-guard.md) | Proposed | 2026-05-26 |
 | [typestate は struct 形状と直交配置する — 全 struct 形状を typestate 状態にする](2026-05-26-1002-typestate-struct-kind-orthogonal.md) | Proposed | 2026-05-26 |
+| [`--lenient` と `--force` の実行経路を削除する](2026-06-01-1206-remove-lenient-and-force-flag-paths.md) | — | 2026-06-01 |
 
 ### トラック・ワークフロー
 
@@ -120,6 +121,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [verify チェーンを file 存在ベースの phase 責務分離に揃える](2026-04-27-0324-phase-aware-verify-gates.md) | — | 2026-04-27 |
 | [plan-only / activate ワークフローレーンの削除](2026-05-26-1123-remove-plan-only-activate-lane.md) | Proposed | 2026-05-26 |
 | [track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする](2026-05-26-1813-track-id-default-active-track.md) | Proposed | 2026-05-26 |
+| [review / commit ゲートを型カタログ未生成の段階でも通す — active-gate のシグナル評価を欠損入力に寛容にする](2026-06-01-0406-review-gate-tolerate-missing-catalogue.md) | — | 2026-06-01 |
 
 ### ADR 運用
 
@@ -179,6 +181,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [`cargo make llvm-cov` を nextest 経路に統一する](2026-04-27-0124-llvm-cov-nextest-harness-alignment.md) | — | 2026-04-27 |
 | [コード意味重複検出による DRY 防止（discoverability + soft gate）](2026-05-29-1118-semantic-dup-detection-discoverability-gate.md) | — | 2026-05-29 |
+| [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 
 ### Review コマンド / API
 
@@ -187,3 +190,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [`sotp review results` で review.json 直読みを置き換える](2026-04-28-1905-review-results-command.md) | — | 2026-04-28 |
 | [scope 分類ロジックの CLI 公開 (classify / files)](2026-04-29-1547-review-scope-lookup-commands.md) | — | 2026-04-29 |
 | [PR レビュー結果を解釈せず最新ラウンドのコメントを agent に渡す](2026-05-29-0526-pr-review-comment-passthrough.md) | — | 2026-05-29 |
+| [review fixer がスコープ境界を自己解決する — `--scope-files` 廃止](2026-06-01-2300-review-fixer-self-resolve-scope-files.md) | — | 2026-06-01 |

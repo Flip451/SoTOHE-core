@@ -1,0 +1,98 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MissingCataloguePolicy": {
+      "action": "delete",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "FailClosed", "payload": { "kind": "unit" } },
+          { "name": "SkipSilently", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "docs": "Deleted in ADR 2026-06-01-1206 D1: type-signals now unconditionally skips absent catalogues; the gate-vs-direct policy distinction is removed.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "OS-06",
+          "hash": "a99201d67af5063e8efccff4f6f9250cf06127a9ba5de1cc5f84d7cfc2f2d464"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "RustdocBaselineCapturePort": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "capture",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "rustdoc_workspace", "ty": "&std::path::Path" },
+            { "name": "binding", "ty": "&TdddLayerBinding" }
+          ],
+          "returns": "Result<(), BaselineCaptureIoError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "docs": "Modified in ADR 2026-06-01-1206 D2: force argument removed from capture; capture is now always idempotent.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "OS-06",
+          "hash": "a99201d67af5063e8efccff4f6f9250cf06127a9ba5de1cc5f84d7cfc2f2d464"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TypeSignalsExecutorPort": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "evaluate_layer",
+          "receiver": "&self",
+          "params": [
+            { "name": "items_dir", "ty": "&std::path::Path" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "workspace_root", "ty": "&std::path::Path" },
+            { "name": "binding", "ty": "&TdddLayerBinding" }
+          ],
+          "returns": "Result<(), TypeSignalsExecutionError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "docs": "Modified in ADR 2026-06-01-1206 D1: policy (MissingCataloguePolicy) argument removed from evaluate_layer; absent catalogue is now unconditionally skipped.",
+      "spec_refs": [
+        {
+          "file": "track/items/ci-shorten-review-gate-fix-2026-06-01/spec.json",
+          "anchor": "OS-06",
+          "hash": "a99201d67af5063e8efccff4f6f9250cf06127a9ba5de1cc5f84d7cfc2f2d464"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

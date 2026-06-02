@@ -14,21 +14,21 @@ use thiserror::Error;
 /// CQRS command for the run-review-fix use case (`sotp review fix-local`).
 ///
 /// Carries stdlib-typed fields only (String, PathBuf — no domain / infrastructure
-/// types) per AC-01 and CN-01. Maps to the 7 CLI flags:
-/// `--scope` / `--briefing-file` / `--track-id` / `--round-type` /
-/// `--reviewer-model` / `--model` / `--scope-files`.
-/// `round_type` is a plain `String` (converted to `ReviewRoundType` internally
-/// by the interactor). The 7-flag shape mirrors the current `Makefile.toml`
-/// `track-local-review-fix-codex` bash arguments.
+/// types) per AC-01 and CN-01. Maps to the 4 CLI flags:
+/// `--scope` / `--briefing-file` / `--track-id` / `--round-type`.
+/// `--reviewer-model` and `--scope-files` are removed: the fixer skill
+/// self-resolves the reviewer model from `agent-profiles.json` and the scope
+/// boundary via `bin/sotp review files --scope <scope>` (ADR 2026-06-01-2300
+/// D1/D3). `round_type` is a plain `String` (converted to `ReviewRoundType`
+/// internally by the interactor). The `model` field covers the fixer's own
+/// model override (optional).
 pub struct RunReviewFixCommand {
     pub scope: String,
     /// Path to the briefing file passed to the fixer. Required.
     pub briefing_file: PathBuf,
     pub track_id: String,
     pub round_type: String,
-    pub reviewer_model: String,
     pub model: String,
-    pub scope_files: Vec<PathBuf>,
 }
 
 // ── RunReviewFixOutput ────────────────────────────────────────────────────────
@@ -71,11 +71,12 @@ pub enum ReviewFixRunnerError {
 
 /// Error type for [`RunReviewFixService`].
 ///
-/// `InvalidScope` / `InvalidTrackId` / `InvalidRoundType` / `EmptyScopeFiles`
-/// cover argument validation failures. `SmokeTestFailed` covers forbidden
-/// sandbox flag detection or codex version range failure per CN-04.
-/// `FixRunnerFailed` wraps the [`ReviewFixRunnerError`] from the port without
-/// leaking infrastructure types.
+/// `InvalidScope` / `InvalidTrackId` / `InvalidRoundType` cover argument
+/// validation failures. `SmokeTestFailed` covers forbidden sandbox flag
+/// detection or codex version range failure per CN-04. `FixRunnerFailed`
+/// wraps the [`ReviewFixRunnerError`] from the port without leaking
+/// infrastructure types. `EmptyScopeFiles` is removed — the fixer skill
+/// self-resolves the scope boundary (ADR 2026-06-01-2300 D1).
 #[derive(Debug, Error)]
 pub enum RunReviewFixError {
     #[error("invalid scope: {0}")]
@@ -84,8 +85,6 @@ pub enum RunReviewFixError {
     InvalidTrackId(String),
     #[error("invalid round type: {0}")]
     InvalidRoundType(String),
-    #[error("empty scope_files: {0}")]
-    EmptyScopeFiles(String),
     #[error("smoke test failed: {0}")]
     SmokeTestFailed(String),
     #[error("fix runner failed: {0}")]
@@ -178,18 +177,6 @@ impl RunReviewFixService for RunReviewFixInteractor {
                 )));
             }
         }
-        // Validate scope_files (must not be empty — an empty boundary is fail-open:
-        // the workspace-write fixer would retain full repo write access with only a
-        // prompt-level instruction as the sole constraint, which is not a safety
-        // boundary.  Reject early so all callers are protected regardless of
-        // transport (CLI, test, or future API).
-        if command.scope_files.is_empty() {
-            return Err(RunReviewFixError::EmptyScopeFiles(
-                "scope_files must not be empty: launching a workspace-write fixer without \
-                 a concrete file boundary is fail-open (pass --scope-files)"
-                    .to_owned(),
-            ));
-        }
         let out = (self.run_fn)(command)?;
         // Validate the returned DTO: status must be one of the three sentinels,
         // and exit_code must match the canonical mapping (completed=0,
@@ -229,9 +216,7 @@ mod tests {
             briefing_file: std::path::PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: "my-track-2026-05-31".to_owned(),
             round_type: "fast".to_owned(),
-            reviewer_model: "o4-mini".to_owned(),
             model: "o4-mini".to_owned(),
-            scope_files: vec![std::path::PathBuf::from("libs/domain/src/lib.rs")],
         }
     }
 
@@ -265,12 +250,6 @@ mod tests {
     fn test_run_review_fix_error_fix_runner_failed_variant_exists() {
         let e = RunReviewFixError::FixRunnerFailed("reason".to_owned());
         assert!(matches!(e, RunReviewFixError::FixRunnerFailed(_)));
-    }
-
-    #[test]
-    fn test_run_review_fix_error_empty_scope_files_variant_exists() {
-        let e = RunReviewFixError::EmptyScopeFiles("no files".to_owned());
-        assert!(matches!(e, RunReviewFixError::EmptyScopeFiles(_)));
     }
 
     // ── ReviewFixRunnerError variants ─────────────────────────────────────────
@@ -341,33 +320,6 @@ mod tests {
             Err(e) => assert!(matches!(e, RunReviewFixError::InvalidRoundType(_))),
             Ok(_) => panic!("expected Err(InvalidRoundType), got Ok"),
         }
-    }
-
-    #[test]
-    fn test_run_review_fix_interactor_empty_scope_files_returns_empty_scope_files_error() {
-        // Empty scope_files must be rejected: launching a workspace-write fixer
-        // without a concrete file boundary is fail-open (CN-03 / Finding 3).
-        let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0 })
-        });
-        let interactor = RunReviewFixInteractor::new(run_fn);
-        let mut cmd = make_valid_command();
-        cmd.scope_files = vec![];
-        match interactor.run(cmd) {
-            Err(e) => assert!(matches!(e, RunReviewFixError::EmptyScopeFiles(_))),
-            Ok(_) => panic!("expected Err(EmptyScopeFiles), got Ok"),
-        }
-    }
-
-    #[test]
-    fn test_run_review_fix_interactor_nonempty_scope_files_is_accepted() {
-        // A command with a non-empty scope_files must pass the boundary validation.
-        let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0 })
-        });
-        let interactor = RunReviewFixInteractor::new(run_fn);
-        let out = interactor.run(make_valid_command()).unwrap();
-        assert_eq!(out.status, "completed");
     }
 
     // ── Interactor delegation: completed scenario ─────────────────────────────

@@ -6,8 +6,8 @@ use std::path::Path;
 use std::sync::Arc;
 
 use domain::tddd::catalogue_v2::{
-    MissingCataloguePolicy, TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
-    TypeSignalsExecutionError, TypeSignalsExecutorPort,
+    TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort, TypeSignalsExecutionError,
+    TypeSignalsExecutorPort,
 };
 
 use super::super::service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};
@@ -48,7 +48,6 @@ impl TypeSignalsExecutorPort for SuccessExecutor {
         _track_id: &str,
         _workspace_root: &Path,
         _binding: &TdddLayerBinding,
-        _policy: MissingCataloguePolicy,
     ) -> Result<(), TypeSignalsExecutionError> {
         Ok(())
     }
@@ -63,7 +62,6 @@ impl TypeSignalsExecutorPort for FailingExecutor {
         _track_id: &str,
         _workspace_root: &Path,
         _binding: &TdddLayerBinding,
-        _policy: MissingCataloguePolicy,
     ) -> Result<(), TypeSignalsExecutionError> {
         Err(TypeSignalsExecutionError("evaluation failed: nightly not installed".to_owned()))
     }
@@ -92,7 +90,6 @@ fn valid_request(tmp: &std::path::Path) -> TypeSignalsRequest {
         branch: "track/test-track-2026-01-01".to_owned(),
         workspace_root: tmp.to_path_buf(),
         layer: None,
-        lenient: false,
     }
 }
 
@@ -119,7 +116,6 @@ fn test_run_with_dot_workspace_root_and_relative_items_dir_succeeds() {
         branch: "track/test-track-2026-01-01".to_owned(),
         workspace_root: std::path::PathBuf::from("."),
         layer: None,
-        lenient: false,
     };
 
     let result = interactor.run(req);
@@ -160,7 +156,6 @@ fn test_run_rejects_non_track_branch() {
         branch: "main".to_owned(),
         workspace_root: tmp.path().to_path_buf(),
         layer: None,
-        lenient: false,
     };
 
     let err = interactor.run(req).unwrap_err();
@@ -184,7 +179,6 @@ fn test_run_rejects_branch_track_id_mismatch() {
         branch: "track/other-track".to_owned(),
         workspace_root: tmp.path().to_path_buf(),
         layer: None,
-        lenient: false,
     };
 
     let err = interactor.run(req).unwrap_err();
@@ -272,7 +266,6 @@ fn test_run_with_multiple_layers_processes_all() {
             _track_id: &str,
             _workspace_root: &Path,
             _binding: &TdddLayerBinding,
-            _policy: MissingCataloguePolicy,
         ) -> Result<(), TypeSignalsExecutionError> {
             self.0.fetch_add(1, Ordering::SeqCst);
             Ok(())
@@ -291,84 +284,4 @@ fn test_run_with_multiple_layers_processes_all() {
 
     interactor.run(req).unwrap();
     assert_eq!(count.load(Ordering::SeqCst), 2, "both layers must be processed");
-}
-
-#[test]
-fn test_run_lenient_mode_passes_skip_silently_policy() {
-    use std::sync::Mutex;
-
-    struct PolicyCapture(Arc<Mutex<Vec<MissingCataloguePolicy>>>);
-
-    impl TypeSignalsExecutorPort for PolicyCapture {
-        fn evaluate_layer(
-            &self,
-            _items_dir: &Path,
-            _track_id: &str,
-            _workspace_root: &Path,
-            _binding: &TdddLayerBinding,
-            policy: MissingCataloguePolicy,
-        ) -> Result<(), TypeSignalsExecutionError> {
-            self.0.lock().unwrap().push(policy);
-            Ok(())
-        }
-    }
-
-    let policies: Arc<Mutex<Vec<MissingCataloguePolicy>>> = Arc::new(Mutex::new(Vec::new()));
-    let interactor = build_interactor(
-        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
-        Arc::new(PolicyCapture(Arc::clone(&policies))),
-    );
-    let tmp = tempfile::tempdir().unwrap();
-    let mut req = valid_request(tmp.path());
-    req.lenient = true;
-
-    interactor.run(req).unwrap();
-
-    let captured = policies.lock().unwrap();
-    assert_eq!(captured.len(), 1);
-    assert_eq!(
-        captured.first().expect("one policy must be recorded"),
-        &MissingCataloguePolicy::SkipSilently,
-        "lenient mode must pass SkipSilently policy"
-    );
-}
-
-#[test]
-fn test_run_strict_mode_passes_fail_closed_policy() {
-    use std::sync::Mutex;
-
-    struct PolicyCapture(Arc<Mutex<Vec<MissingCataloguePolicy>>>);
-
-    impl TypeSignalsExecutorPort for PolicyCapture {
-        fn evaluate_layer(
-            &self,
-            _items_dir: &Path,
-            _track_id: &str,
-            _workspace_root: &Path,
-            _binding: &TdddLayerBinding,
-            policy: MissingCataloguePolicy,
-        ) -> Result<(), TypeSignalsExecutionError> {
-            self.0.lock().unwrap().push(policy);
-            Ok(())
-        }
-    }
-
-    let policies: Arc<Mutex<Vec<MissingCataloguePolicy>>> = Arc::new(Mutex::new(Vec::new()));
-    let interactor = build_interactor(
-        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
-        Arc::new(PolicyCapture(Arc::clone(&policies))),
-    );
-    let tmp = tempfile::tempdir().unwrap();
-    let mut req = valid_request(tmp.path());
-    req.lenient = false;
-
-    interactor.run(req).unwrap();
-
-    let captured = policies.lock().unwrap();
-    assert_eq!(captured.len(), 1);
-    assert_eq!(
-        captured.first().expect("one policy must be recorded"),
-        &MissingCataloguePolicy::FailClosed,
-        "strict mode must pass FailClosed policy"
-    );
 }

@@ -24,9 +24,6 @@ pub struct TypeSignalsRequest {
     /// Optional layer filter (`--layer`). When `None`, all TDDD-enabled layers
     /// are processed.
     pub layer: Option<String>,
-    /// When `true`, absent catalogue files are silently skipped instead of
-    /// failing (pre-commit lenient mode).
-    pub lenient: bool,
 }
 
 /// Error variants for [`TypeSignalsService::run`].
@@ -94,7 +91,7 @@ pub enum TypeSignalsError {
 /// 1. Track-ID validation.
 /// 2. Track-status guard (active-track check).
 /// 3. Layer-bindings resolution.
-/// 4. Per-layer signal evaluation (strict or lenient).
+/// 4. Per-layer signal evaluation (absent catalogue always skipped, present always strict).
 pub trait TypeSignalsService: Send + Sync {
     /// Runs the type-signals evaluation for the given request.
     ///

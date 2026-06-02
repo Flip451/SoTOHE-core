@@ -7,7 +7,7 @@
 use std::sync::Arc;
 
 use domain::tddd::catalogue_v2::{
-    MissingCataloguePolicy, TdddLayerBindingsError, TdddLayerBindingsPort, TypeSignalsExecutorPort,
+    TdddLayerBindingsError, TdddLayerBindingsPort, TypeSignalsExecutorPort,
 };
 
 use super::service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};
@@ -111,19 +111,15 @@ impl TypeSignalsService for TypeSignalsInteractor {
     /// 3. Derive `items_dir = workspace_root/track/items`.
     /// 4. Resolve layer bindings; fail-closed when no layers found.
     /// 5. For each layer, call `TypeSignalsExecutorPort::evaluate_layer`.
+    ///    Absent catalogue files are always skipped unconditionally;
+    ///    present catalogues are always evaluated strictly.
     ///
     /// # Errors
     ///
     /// Returns [`TypeSignalsError`] on any failure.
     fn run(&self, request: TypeSignalsRequest) -> Result<(), TypeSignalsError> {
-        let TypeSignalsRequest {
-            items_dir: _items_dir,
-            track_id,
-            branch,
-            workspace_root,
-            layer,
-            lenient,
-        } = request;
+        let TypeSignalsRequest { items_dir: _items_dir, track_id, branch, workspace_root, layer } =
+            request;
 
         // Step 1: validate track_id.
         validate_track_id(&track_id)?;
@@ -171,20 +167,13 @@ impl TypeSignalsService for TypeSignalsInteractor {
         }
 
         // Step 4: per-layer signal evaluation.
-        let policy = if lenient {
-            MissingCataloguePolicy::SkipSilently
-        } else {
-            MissingCataloguePolicy::FailClosed
-        };
-
+        // Absent catalogue files are always skipped unconditionally (no gate-vs-direct
+        // distinction). Present catalogues are always evaluated strictly.
         for binding in &bindings {
             let layer_id = binding.layer_id.clone();
-            self.executor
-                .evaluate_layer(&items_dir, &track_id, &workspace_root, binding, policy)
-                .map_err(|e| TypeSignalsError::EvaluationFailed {
-                    layer_id,
-                    reason: e.to_string(),
-                })?;
+            self.executor.evaluate_layer(&items_dir, &track_id, &workspace_root, binding).map_err(
+                |e| TypeSignalsError::EvaluationFailed { layer_id, reason: e.to_string() },
+            )?;
         }
 
         Ok(())

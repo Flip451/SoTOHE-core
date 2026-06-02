@@ -32,7 +32,8 @@ impl std::fmt::Display for CaptureBaselineError {
 ///
 /// Writes the raw `rustdoc_types::Crate` JSON produced by `cargo +nightly rustdoc`
 /// to `<track_dir>/<layer>-types-baseline.json`.  If the file already exists the
-/// function returns `Ok(())` immediately (idempotent).
+/// function returns `Ok(())` immediately (idempotent). To re-capture, delete the
+/// baseline file first.
 ///
 /// `workspace_root` is the Cargo workspace from which rustdoc is invoked.
 /// It may differ from the workspace that contains `items_dir`; this is the
@@ -84,77 +85,6 @@ pub fn capture_rustdoc_baseline_for_layer(
         }
     }
 
-    capture_rustdoc_baseline_for_layer_inner(items_dir, track_id, workspace_root, binding, false)
-}
-
-/// Force-capture the rustdoc-format baseline, overwriting any existing file.
-///
-/// Identical to [`capture_rustdoc_baseline_for_layer`] except that the
-/// idempotency check is skipped: an existing baseline file is overwritten.
-///
-/// # Errors
-///
-/// Returns [`CaptureBaselineError`] when security guards reject the path, the
-/// track directory does not exist, the rustdoc export fails, or the write fails.
-pub fn force_capture_rustdoc_baseline_for_layer(
-    items_dir: &Path,
-    track_id: &str,
-    workspace_root: &Path,
-    binding: &TdddLayerBinding,
-) -> Result<(), CaptureBaselineError> {
-    let err = |s: String| CaptureBaselineError(s);
-
-    // Security: guard root directories.
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(err(format!(
-                "symlink guard: refusing to use symlinked items_dir: {}",
-                items_dir.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(err(format!(
-                "symlink guard: cannot stat items_dir {}: {e}",
-                items_dir.display()
-            )));
-        }
-    }
-    match workspace_root.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(err(format!(
-                "symlink guard: refusing to use symlinked workspace_root: {}",
-                workspace_root.display()
-            )));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(err(format!(
-                "symlink guard: cannot stat workspace_root {}: {e}",
-                workspace_root.display()
-            )));
-        }
-    }
-
-    capture_rustdoc_baseline_for_layer_inner(
-        items_dir,
-        track_id,
-        workspace_root,
-        binding,
-        true, // force — skip idempotency check
-    )
-}
-
-/// Inner implementation shared by the two public capture functions.
-fn capture_rustdoc_baseline_for_layer_inner(
-    items_dir: &Path,
-    track_id: &str,
-    workspace_root: &Path,
-    binding: &TdddLayerBinding,
-    force: bool,
-) -> Result<(), CaptureBaselineError> {
-    let err = |s: String| CaptureBaselineError(s);
-
     let baseline_filename = binding.baseline_file();
 
     // Security: validate track_id.
@@ -168,20 +98,20 @@ fn capture_rustdoc_baseline_for_layer_inner(
     reject_symlinks_below(&baseline_path, items_dir)
         .map_err(|e| err(format!("symlink guard: {e}")))?;
 
-    // Idempotent: skip if baseline already exists as a regular file (unless force).
-    // Before returning early, validate the existing file's `format_version` to detect
-    // legacy `TypeBaseline` JSON files left over from before the rustdoc migration.
-    // Such files will fail `BaselineRustdocCodec::load` at signal-evaluation time,
-    // leaving the track stuck. We surface a clear error here instead so the user
-    // knows to delete the stale file or rerun with `--force`.
-    if !force && baseline_path.is_file() {
+    // Idempotent: skip if baseline already exists as a regular file.
+    // Validate the existing file's `format_version` to detect legacy `TypeBaseline`
+    // JSON files left over from before the rustdoc migration. Such files will fail
+    // `BaselineRustdocCodec::load` at signal-evaluation time, leaving the track
+    // stuck. Surface a clear error here instead so the user knows to delete the
+    // stale file and re-run.
+    if baseline_path.is_file() {
         let existing = std::fs::read_to_string(&baseline_path).map_err(|e| {
             err(format!("cannot read existing baseline at {}: {e}", baseline_path.display()))
         })?;
         if let Err(e) = BaselineRustdocCodec::from_json(&existing) {
             return Err(err(format!(
                 "{}: existing baseline failed rustdoc format validation: {e}. \
-                 Delete the file and re-run, or use `--force` to overwrite it.",
+                 Delete the file and re-run to re-capture.",
                 baseline_path.display()
             )));
         }
@@ -241,15 +171,7 @@ fn capture_rustdoc_baseline_for_layer_inner(
     atomic_write_file(&baseline_path, json_content.as_bytes())
         .map_err(|e| err(format!("cannot write {}: {e}", baseline_path.display())))?;
 
-    if force {
-        println!(
-            "[OK] baseline-capture (rustdoc): overwrote {baseline_filename} for layer '{layer_id}'"
-        );
-    } else {
-        println!(
-            "[OK] baseline-capture (rustdoc): wrote {baseline_filename} for layer '{layer_id}'"
-        );
-    }
+    println!("[OK] baseline-capture (rustdoc): wrote {baseline_filename} for layer '{layer_id}'");
 
     Ok(())
 }

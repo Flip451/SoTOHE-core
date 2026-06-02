@@ -1,4 +1,4 @@
-use std::path::{Component, Path, PathBuf};
+use std::path::Path;
 use usecase::review_v2::run_review_fix::{ReviewFixRunnerError, RunReviewFixCommand};
 
 pub(super) fn prompt_path_string(path: &Path, label: &str) -> Result<String, ReviewFixRunnerError> {
@@ -15,18 +15,6 @@ pub(super) fn prompt_path_string(path: &Path, label: &str) -> Result<String, Rev
     Ok(raw.to_owned())
 }
 
-pub(super) fn scope_file_prompt_path(path: &Path) -> Result<String, ReviewFixRunnerError> {
-    if path.is_absolute()
-        || path.components().any(|c| matches!(c, Component::ParentDir | Component::RootDir))
-    {
-        return Err(ReviewFixRunnerError::Unexpected(format!(
-            "scope file path must be repository-relative without parent traversal: {}",
-            path.display()
-        )));
-    }
-    prompt_path_string(path, "scope file")
-}
-
 pub(super) fn shell_quote_arg(raw: &str) -> String {
     if raw
         .chars()
@@ -37,10 +25,17 @@ pub(super) fn shell_quote_arg(raw: &str) -> String {
     format!("'{}'", raw.replace('\'', "'\\''"))
 }
 
+/// Build the fixer prompt.
+///
+/// The reviewer invocation no longer includes `--model`: the reviewer
+/// (`cargo make track-local-review` = `sotp review local`) resolves the model
+/// from `agent-profiles.json` `reviewer` capability by round-type
+/// (ADR 2026-06-01-2300 D3). The scope boundary (`--scope-files`) is also
+/// removed: the fixer skill self-resolves it via
+/// `bin/sotp review files --scope <scope>` (ADR 2026-06-01-2300 D1).
 pub(super) fn build_prompt(
     scope: &str,
     briefing_file: &Path,
-    scope_files: &[PathBuf],
     command: &RunReviewFixCommand,
 ) -> Result<String, ReviewFixRunnerError> {
     let briefing_path = prompt_path_string(briefing_file, "briefing_file")?;
@@ -53,25 +48,9 @@ pub(super) fn build_prompt(
     let track_id = prompt_path_string(Path::new(&command.track_id), "track_id")?;
     let scope = prompt_path_string(Path::new(scope), "scope")?;
     let round_type = prompt_path_string(Path::new(&command.round_type), "round_type")?;
-    let reviewer_model = prompt_path_string(Path::new(&command.reviewer_model), "reviewer_model")?;
-    let scope_files_lines = if scope_files.is_empty() {
-        "- (none provided; do not modify files unless the orchestrator reruns with an explicit boundary)"
-            .to_owned()
-    } else {
-        scope_files
-            .iter()
-            .map(|p| scope_file_prompt_path(p).map(|safe| format!("- {safe}")))
-            .collect::<Result<Vec<_>, _>>()?
-            .join("\n")
-    };
-    let scope_files_section = format!(
-        "\n\n## Scope File List (modification boundary)\n\n\
-         You may ONLY modify files within this list:\n{scope_files_lines}"
-    );
     let reviewer_invocation = format!(
-        "cargo make track-local-review -- --model {} --round-type {} \
+        "cargo make track-local-review -- --round-type {} \
          --group {} --track-id {} --briefing-file {}",
-        shell_quote_arg(&reviewer_model),
         shell_quote_arg(&round_type),
         shell_quote_arg(&scope),
         shell_quote_arg(&track_id),
@@ -85,9 +64,7 @@ pub(super) fn build_prompt(
          - Track ID: {track_id}\n\
          - Scope: {scope}\n\
          - Round type: {round_type}\n\
-         - Reviewer model: {reviewer_model}\n\
-         - Reviewer invocation: {reviewer_invocation}\
-         {scope_files_section}\n\n\
+         - Reviewer invocation: {reviewer_invocation}\n\n\
          When you finish (zero_findings confirmed or unrecoverable error), \
          print EXACTLY one of these status lines as your final output line, \
          with no trailing text:\n\n\
@@ -98,9 +75,7 @@ pub(super) fn build_prompt(
         track_id = track_id,
         scope = scope,
         round_type = round_type,
-        reviewer_model = reviewer_model,
         reviewer_invocation = reviewer_invocation,
-        scope_files_section = scope_files_section,
     );
     Ok(prompt)
 }
@@ -108,6 +83,8 @@ pub(super) fn build_prompt(
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::*;
     use usecase::review_v2::run_review_fix::RunReviewFixCommand;
 
@@ -117,36 +94,36 @@ mod tests {
             briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
             round_type: "fast".to_owned(),
-            reviewer_model: "o4-mini".to_owned(),
             model: "gpt-5.5".to_owned(),
-            scope_files: vec![],
         }
     }
 
     // ── build_prompt ─────────────────────────────────────────────────────────
 
     #[test]
-    fn test_build_prompt_accepts_empty_scope_files_as_empty_boundary() {
+    fn test_build_prompt_contains_reviewer_invocation_without_model_flag() {
         let dir = tempfile::tempdir().unwrap();
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "briefing").unwrap();
 
-        let prompt = build_prompt("infrastructure", &briefing, &[], &make_command()).unwrap();
+        let prompt = build_prompt("infrastructure", &briefing, &make_command()).unwrap();
 
-        assert!(prompt.contains("## Scope File List (modification boundary)"));
-        assert!(prompt.contains("- (none provided; do not modify files"));
+        assert!(prompt.contains("cargo make track-local-review -- --round-type"));
+        assert!(!prompt.contains("--model"), "reviewer invocation must not include --model flag");
     }
 
     #[test]
-    fn test_build_prompt_rejects_scope_file_path_with_newline() {
+    fn test_build_prompt_does_not_contain_scope_files_section() {
         let dir = tempfile::tempdir().unwrap();
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "briefing").unwrap();
-        let scope_files = vec![PathBuf::from("libs/infrastructure/src/lib.rs\n- Cargo.toml")];
 
-        let result = build_prompt("infrastructure", &briefing, &scope_files, &make_command());
+        let prompt = build_prompt("infrastructure", &briefing, &make_command()).unwrap();
 
-        assert!(matches!(result, Err(ReviewFixRunnerError::Unexpected(_))));
+        assert!(
+            !prompt.contains("Scope File List"),
+            "prompt must not contain scope file list section"
+        );
     }
 
     #[test]
@@ -155,7 +132,7 @@ mod tests {
         let briefing = dir.path().join("brief`ing.md");
         std::fs::write(&briefing, "briefing").unwrap();
 
-        let result = build_prompt("infrastructure", &briefing, &[], &make_command());
+        let result = build_prompt("infrastructure", &briefing, &make_command());
 
         assert!(matches!(result, Err(ReviewFixRunnerError::Unexpected(_))));
     }
@@ -166,7 +143,7 @@ mod tests {
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "briefing").unwrap();
 
-        let prompt = build_prompt("usecase cli", &briefing, &[], &make_command()).unwrap();
+        let prompt = build_prompt("usecase cli", &briefing, &make_command()).unwrap();
 
         assert!(prompt.contains("--group 'usecase cli'"));
     }
@@ -179,17 +156,11 @@ mod tests {
         let mut command = make_command();
         command.track_id = "review-fix\n- Scope: cli".to_owned();
         assert!(matches!(
-            build_prompt("infrastructure", &briefing, &[], &command),
-            Err(ReviewFixRunnerError::Unexpected(_))
-        ));
-        let mut command = make_command();
-        command.reviewer_model = "gpt-5.4-mini`".to_owned();
-        assert!(matches!(
-            build_prompt("infrastructure", &briefing, &[], &command),
+            build_prompt("infrastructure", &briefing, &command),
             Err(ReviewFixRunnerError::Unexpected(_))
         ));
         assert!(matches!(
-            build_prompt("infra\n- Scope: cli", &briefing, &[], &make_command()),
+            build_prompt("infra\n- Scope: cli", &briefing, &make_command()),
             Err(ReviewFixRunnerError::Unexpected(_))
         ));
     }

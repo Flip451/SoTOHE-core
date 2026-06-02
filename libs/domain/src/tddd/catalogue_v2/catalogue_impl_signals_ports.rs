@@ -347,9 +347,9 @@ impl std::error::Error for BaselineCaptureIoError {}
 /// Implementations run `cargo +nightly rustdoc` against `rustdoc_workspace`,
 /// read the output JSON, validate `format_version`, and write the result to
 /// `<items_dir>/<track_id>/<layer>-types-baseline.json`. The operation is
-/// idempotent by default: if the file already exists and passes format
-/// validation, `capture` returns `Ok(())` immediately. When `force` is `true`,
-/// the existing file is overwritten unconditionally.
+/// always idempotent: if the file already exists and passes format validation,
+/// `capture` returns `Ok(())` immediately without overwriting it. To
+/// re-capture, delete the baseline file first and then call `capture` again.
 ///
 /// Injected into `BaselineCaptureInteractor` so the usecase layer never
 /// calls infrastructure code directly.
@@ -364,7 +364,6 @@ pub trait RustdocBaselineCapturePort: Send + Sync {
     ///   May differ from the workspace that contains `items_dir` (git-worktree
     ///   capture flow).
     /// * `binding` — the TDDD layer binding resolved from `architecture-rules.json`.
-    /// * `force` — when `true`, overwrite an existing baseline unconditionally.
     ///
     /// # Errors
     ///
@@ -377,7 +376,6 @@ pub trait RustdocBaselineCapturePort: Send + Sync {
         track_id: &str,
         rustdoc_workspace: &std::path::Path,
         binding: &TdddLayerBinding,
-        force: bool,
     ) -> Result<(), BaselineCaptureIoError>;
 }
 
@@ -435,24 +433,15 @@ impl fmt::Display for TypeSignalsExecutionError {
 
 impl std::error::Error for TypeSignalsExecutionError {}
 
-/// How to handle a catalogue file that is absent for a layer.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MissingCataloguePolicy {
-    /// Absent catalogue is a fatal error (strict mode — user invoked evaluation).
-    FailClosed,
-    /// Absent catalogue is silently skipped (lenient mode — automated pre-commit).
-    SkipSilently,
-}
-
 /// Secondary port for evaluating type signals for a single TDDD-enabled layer.
 ///
 /// Implementations run the three-way signal evaluation pipeline (catalogue A,
 /// baseline B, live rustdoc C) and write the result to
 /// `<items_dir>/<track_id>/<layer>-type-signals.json`.
 ///
-/// The `policy` argument controls how an absent catalogue file is handled:
-/// `FailClosed` causes an error (user-invoked `type-signals`); `SkipSilently`
-/// allows the loop to continue (pre-commit automated path).
+/// An absent catalogue file is always silently skipped (no-op + warning, non-zero
+/// exit is not triggered). A present catalogue is always evaluated strictly:
+/// a Red signal causes a non-zero exit (no fail-open).
 ///
 /// Injected into `TypeSignalsInteractor` so the usecase layer never calls
 /// infrastructure functions directly.
@@ -461,14 +450,13 @@ pub trait TypeSignalsExecutorPort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`TypeSignalsExecutionError`] on any pipeline failure except
-    /// `MissingCataloguePolicy::SkipSilently` + absent catalogue (which returns `Ok(())`).
+    /// Returns [`TypeSignalsExecutionError`] on any pipeline failure.
+    /// An absent catalogue file returns `Ok(())` (unconditional skip).
     fn evaluate_layer(
         &self,
         items_dir: &Path,
         track_id: &str,
         workspace_root: &Path,
         binding: &TdddLayerBinding,
-        policy: MissingCataloguePolicy,
     ) -> Result<(), TypeSignalsExecutionError>;
 }

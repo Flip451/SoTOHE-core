@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "308b01668c79a0003aeaf618e6dabdff69d91ac2c5bed70470bd760f5e4887f3",
+  "signals": [
+    {
+      "type_name": "CodexReviewFixRunner",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::tddd::baseline_capture::force_capture_rustdoc_baseline_for_layer",
+      "signal": "blue"
+    }
+  ]
+}

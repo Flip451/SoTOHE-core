@@ -337,7 +337,14 @@ const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
     (
         ".claude/commands/track/review.md",
         "track review model resolution",
-        &["capabilities.reviewer.model", "capabilities.reviewer.fast_model"],
+        // ADR 2300 D3: the orchestrator no longer resolves or passes the reviewer model;
+        // `sotp review local` self-resolves it from `capabilities.reviewer` in
+        // agent-profiles.json. review.md must keep documenting that capability-centric
+        // source (and must never reintroduce provider-centric resolution, below).
+        &[
+            "reads `capabilities.reviewer` from `.harness/config/agent-profiles.json`",
+            "the orchestrator does not pass a reviewer model",
+        ],
         &[
             "providers.<reviewer_provider>.fast_model",
             "providers.<reviewer_provider>.default_model",

@@ -319,10 +319,8 @@ pub enum TrackCommand {
 
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
     ///
-    /// Idempotent by default: if the baseline file already exists it is kept as-is.
-    /// Re-capturing the baseline after implementation has started pollutes the
-    /// pre-implementation snapshot. Use `--force` only when explicitly migrating
-    /// from an older baseline format (e.g. TypeBaseline JSON v2 → rustdoc JSON).
+    /// Always idempotent: if the baseline file already exists it is kept as-is.
+    /// To re-capture, delete the baseline file first and then run this command again.
     ///
     /// `--source-workspace` lets you capture the API from a different Cargo
     /// workspace (e.g. a git worktree at `main`) while writing the baseline files
@@ -352,11 +350,6 @@ pub enum TrackCommand {
         /// the specified layer id must be `tddd.enabled=true`.
         #[arg(long)]
         layer: Option<String>,
-
-        /// Overwrite existing baseline files. Use only when migrating from an
-        /// older baseline format.
-        #[arg(long)]
-        force: bool,
     },
 
     /// Run catalogue lint rules against a layer catalogue and report violations.
@@ -560,13 +553,7 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 tddd::spec_element_hash::execute_spec_element_hash(items_dir, tid, anchor)
             })
         }
-        TrackCommand::BaselineCapture {
-            track_id,
-            workspace_root,
-            source_workspace,
-            layer,
-            force,
-        } => {
+        TrackCommand::BaselineCapture { track_id, workspace_root, source_workspace, layer } => {
             let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
                 .map_err(CliError::Message);
             resolved.and_then(|tid| {
@@ -575,7 +562,6 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                     workspace_root,
                     source_workspace,
                     layer,
-                    force,
                 )
             })
         }
