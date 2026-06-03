@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5dccc03ccfea11d79e1c651b4457935f6bb9ba2db53f0c9edf2eb7c95b7ef554",
+  "catalogue_declaration_hash": "223b3d2e2f3d5859a2e903e51a8e6aaa118c407687fe6e670080bc1de71574a6",
   "signals": [
     {
       "type_name": "CodeFragment",
@@ -96,6 +96,18 @@
     },
     {
       "type_name": "RefactorProposalError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticDupError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SimilarityScore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SimilarityThreshold",
       "signal": "blue"
     },
     {

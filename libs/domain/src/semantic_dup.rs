@@ -28,6 +28,20 @@ pub enum SemanticDupError {
     },
     /// A [`CodeFragment`] was constructed with an empty content string.
     EmptyContent,
+    /// A [`CodeFragment`] was constructed with `start_line == 0` or `end_line == 0`.
+    InvalidFragmentSpanZeroLine {
+        /// The rejected start line.
+        start_line: u32,
+        /// The rejected end line.
+        end_line: u32,
+    },
+    /// A [`CodeFragment`] was constructed with `start_line > end_line`.
+    InvalidFragmentSpanOrder {
+        /// The rejected start line.
+        start_line: u32,
+        /// The rejected end line.
+        end_line: u32,
+    },
 }
 
 impl fmt::Display for SemanticDupError {
@@ -51,6 +65,18 @@ impl fmt::Display for SemanticDupError {
             Self::EmptyContent => {
                 write!(f, "code fragment content must be non-empty")
             }
+            Self::InvalidFragmentSpanZeroLine { start_line, end_line } => {
+                write!(
+                    f,
+                    "code fragment span [{start_line}, {end_line}] is invalid; line numbers must be >= 1"
+                )
+            }
+            Self::InvalidFragmentSpanOrder { start_line, end_line } => {
+                write!(
+                    f,
+                    "code fragment span [{start_line}, {end_line}] is invalid; start_line must be <= end_line"
+                )
+            }
         }
     }
 }
@@ -66,7 +92,10 @@ impl std::error::Error for SemanticDupError {}
 /// adapter before constructing a `SimilarityScore` (e.g., via clamping negative
 /// values to `0.0`, since the Jina v2 base code model produces near-zero negative
 /// similarities in practice).
-#[derive(Debug, Clone, Copy)]
+///
+/// `PartialEq` is derived for value comparison. `Eq` is not derived because `f32`
+/// does not implement `Eq` (NaN != NaN).
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SimilarityScore(f32);
 
 impl SimilarityScore {
@@ -117,7 +146,10 @@ impl TopK {
 /// Cosine similarity threshold for the soft-gate duplicate check.
 ///
 /// Must be in `[0.0, 1.0]`.
-#[derive(Debug, Clone, Copy)]
+///
+/// `PartialEq` is derived for value comparison. `Eq` is not derived because `f32`
+/// does not implement `Eq` (NaN != NaN).
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SimilarityThreshold(f32);
 
 impl SimilarityThreshold {
@@ -143,12 +175,17 @@ impl SimilarityThreshold {
 
 // ── CodeFragment ──────────────────────────────────────────────────────────────
 
-/// A code fragment with its text content and an associated path.
+/// A code fragment with its text content, source path, and 1-indexed inclusive
+/// line span `[start_line, end_line]` within the source file.
 ///
 /// For fragments extracted from source files, `source_path` is the originating
 /// file path. For query fragments provided via CLI (e.g., `sotp find-similar`),
 /// `source_path` is set to a sentinel value (`PathBuf::from("<query>")`) since
 /// there is no originating file.
+///
+/// For ad-hoc query fragments (`source_path = "<query>"`), use `start_line = 1`
+/// and `end_line = u32::MAX` as a sentinel so query fragments are never excluded
+/// by hunk filtering.
 ///
 /// Content must be non-empty.
 #[derive(Debug, Clone)]
@@ -158,6 +195,10 @@ pub struct CodeFragment {
     pub source_path: PathBuf,
     /// The text content of the fragment. Always non-empty.
     content: String,
+    /// 1-indexed start line of the fragment within `source_path` (inclusive).
+    start_line: u32,
+    /// 1-indexed end line of the fragment within `source_path` (inclusive).
+    end_line: u32,
 }
 
 impl CodeFragment {
@@ -166,11 +207,26 @@ impl CodeFragment {
     /// # Errors
     ///
     /// Returns [`SemanticDupError::EmptyContent`] when `content` is empty.
-    pub fn new(source_path: PathBuf, content: String) -> Result<Self, SemanticDupError> {
+    /// Returns [`SemanticDupError::InvalidFragmentSpanZeroLine`] when either
+    /// line number is 0.
+    /// Returns [`SemanticDupError::InvalidFragmentSpanOrder`] when
+    /// `start_line > end_line`.
+    pub fn new(
+        source_path: PathBuf,
+        content: String,
+        start_line: u32,
+        end_line: u32,
+    ) -> Result<Self, SemanticDupError> {
         if content.is_empty() {
             return Err(SemanticDupError::EmptyContent);
         }
-        Ok(Self { source_path, content })
+        if start_line == 0 || end_line == 0 {
+            return Err(SemanticDupError::InvalidFragmentSpanZeroLine { start_line, end_line });
+        }
+        if start_line > end_line {
+            return Err(SemanticDupError::InvalidFragmentSpanOrder { start_line, end_line });
+        }
+        Ok(Self { source_path, content, start_line, end_line })
     }
 
     /// Return the text content of this fragment.
@@ -178,6 +234,16 @@ impl CodeFragment {
     /// The returned string is always non-empty (enforced at construction).
     pub fn content(&self) -> &str {
         &self.content
+    }
+
+    /// Return the 1-indexed start line of this fragment (inclusive).
+    pub fn start_line(&self) -> u32 {
+        self.start_line
+    }
+
+    /// Return the 1-indexed end line of this fragment (inclusive).
+    pub fn end_line(&self) -> u32 {
+        self.end_line
     }
 }
 
@@ -207,24 +273,53 @@ mod tests {
 
     #[test]
     fn test_code_fragment_new_with_valid_content_succeeds() {
-        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned());
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned(), 1, 1);
         assert!(result.is_ok());
         let frag = result.unwrap();
         assert_eq!(frag.content(), "fn foo() {}");
         assert_eq!(frag.source_path, PathBuf::from("src/lib.rs"));
+        assert_eq!(frag.start_line(), 1);
+        assert_eq!(frag.end_line(), 1);
     }
 
     #[test]
     fn test_code_fragment_new_with_empty_content_returns_empty_content_error() {
-        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), String::new());
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), String::new(), 1, 1);
         assert!(matches!(result, Err(SemanticDupError::EmptyContent)));
+    }
+
+    #[test]
+    fn test_code_fragment_new_with_start_line_zero_returns_invalid_span_error() {
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned(), 0, 1);
+        assert!(matches!(
+            result,
+            Err(SemanticDupError::InvalidFragmentSpanZeroLine { start_line: 0, end_line: 1 })
+        ));
+    }
+
+    #[test]
+    fn test_code_fragment_new_with_end_line_zero_returns_invalid_span_error() {
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned(), 1, 0);
+        assert!(matches!(
+            result,
+            Err(SemanticDupError::InvalidFragmentSpanZeroLine { start_line: 1, end_line: 0 })
+        ));
+    }
+
+    #[test]
+    fn test_code_fragment_new_with_start_line_after_end_line_returns_invalid_span_error() {
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned(), 5, 4);
+        assert!(matches!(
+            result,
+            Err(SemanticDupError::InvalidFragmentSpanOrder { start_line: 5, end_line: 4 })
+        ));
     }
 
     #[test]
     fn test_code_fragment_new_with_whitespace_only_content_succeeds() {
         // Whitespace is technically non-empty; the invariant only rejects
         // zero-length strings.
-        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "   ".to_owned());
+        let result = CodeFragment::new(PathBuf::from("src/lib.rs"), "   ".to_owned(), 1, 1);
         assert!(result.is_ok());
     }
 
@@ -337,6 +432,18 @@ mod tests {
     #[test]
     fn test_semantic_dup_error_display_empty_content_is_non_empty_string() {
         let err = SemanticDupError::EmptyContent;
+        assert!(!err.to_string().is_empty());
+    }
+
+    #[test]
+    fn test_semantic_dup_error_display_invalid_fragment_span_zero_line_is_non_empty_string() {
+        let err = SemanticDupError::InvalidFragmentSpanZeroLine { start_line: 0, end_line: 1 };
+        assert!(!err.to_string().is_empty());
+    }
+
+    #[test]
+    fn test_semantic_dup_error_display_invalid_fragment_span_order_is_non_empty_string() {
+        let err = SemanticDupError::InvalidFragmentSpanOrder { start_line: 5, end_line: 4 };
         assert!(!err.to_string().is_empty());
     }
 }

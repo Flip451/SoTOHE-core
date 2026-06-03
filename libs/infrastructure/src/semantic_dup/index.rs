@@ -457,12 +457,14 @@ fn extract_similar_fragments(
             SemanticIndexError::SearchFailed { source: format!("score normalization error: {e}") }
         })?;
 
+        // Line span is not stored in the LanceDB index; use sentinel values
+        // (start=1, end=u32::MAX) so retrieved fragments always overlap any
+        // hunk if filtered by fragments_overlapping_hunks.
         let fragment =
-            CodeFragment::new(PathBuf::from(path_str), content_str.to_owned()).map_err(|e| {
-                SemanticIndexError::SearchFailed {
+            CodeFragment::new(PathBuf::from(path_str), content_str.to_owned(), 1, u32::MAX)
+                .map_err(|e| SemanticIndexError::SearchFailed {
                     source: format!("invalid fragment from index: {e}"),
-                }
-            })?;
+                })?;
 
         fragments.push(SimilarFragment { fragment, score });
     }

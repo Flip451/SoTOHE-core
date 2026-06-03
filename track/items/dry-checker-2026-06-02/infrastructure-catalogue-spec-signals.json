@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "84fc8d15bd0d21a0fdfc8ef920dbcef817f38964d30a55ba821e105bbf6e8a12",
+  "catalogue_declaration_hash": "406c3c3489ddfa3e2d1bae5c74cd9ee5bdbf853d0a5d2dde318bf7d564ceb8a1",
   "signals": [
     {
       "type_name": "CodexDryChecker",

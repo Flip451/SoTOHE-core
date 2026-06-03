@@ -4,6 +4,7 @@
 pub mod adr_decision;
 pub mod auto_phase;
 mod decision;
+pub mod dry_check;
 mod error;
 pub mod git_ref;
 pub mod guard;
@@ -35,6 +36,14 @@ pub use adr_decision::{
     evaluate_adr_decision,
 };
 pub use decision::Decision;
+pub use dry_check::{
+    DiffFileHunks, DiffFileHunksError, DiffHunkRange, DiffHunkRangeError, DryCheckApprovalVerdict,
+    DryCheckEntry, DryCheckEntryError, DryCheckFinding, DryCheckFindingError, DryCheckPairKey,
+    DryCheckPairKeyError, DryCheckReader, DryCheckReaderError, DryCheckRecord, DryCheckRecordError,
+    DryCheckVerdict, DryCheckWriter, DryCheckWriterError, FragmentContentHash,
+    FragmentContentHashError, FragmentRef, Rationale, RationaleError, RefactorProposal,
+    RefactorProposalError, VerdictFilter, fragments_overlapping_hunks,
+};
 pub use error::{
     DomainError, RepositoryError, TrackReadError, TrackWriteError, TransitionError,
     ValidationError, WorktreeError,

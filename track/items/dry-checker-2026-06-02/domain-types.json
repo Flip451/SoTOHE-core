@@ -80,8 +80,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["String"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -140,7 +140,7 @@
       },
       "methods": [],
       "module_path": "timestamp",
-      "docs": "Pre-existing domain::timestamp::Timestamp — a validated RFC 3339 / ISO 8601 UTC timestamp type. Carried as a reference entry so that DryCheckRecord.recorded_at typed as Timestamp is visible in the contract-map. The constructor Timestamp::new(value: impl Into<String>) -> Result<Self, ValidationError> validates the string using chrono RFC 3339 parsing; invalid strings (including empty strings) produce Err(ValidationError::InvalidTimestamp). Two Timestamp values are equal if they represent the same instant (DateTime-based equality, not string equality). DryCheckRecord.recorded_at is typed as Timestamp to make an invalid recorded_at unrepresentable — the infra adapter (FsDryCheckStore::append_record) stamps Timestamp::new(infrastructure::timestamp_now()) at write time; the interactor never produces a Timestamp.",
+      "docs": "Pre-existing domain::timestamp::Timestamp — a validated RFC 3339 / ISO 8601 UTC timestamp type. Carried as a reference entry so that DryCheckRecord.recorded_at typed as Timestamp is visible in the contract-map. The constructor Timestamp::new(value: impl Into<String>) -> Result<Self, ValidationError> validates the string using chrono RFC 3339 parsing; invalid strings (including empty strings) produce Err(ValidationError::InvalidTimestamp). Two Timestamp values are equal if they represent the same instant (DateTime-based equality, not string equality). DryCheckRecord.recorded_at is typed as Timestamp to make an invalid recorded_at unrepresentable — the infra adapter (FsDryCheckStore::append_record) obtains a Timestamp by calling infrastructure::timestamp_now() (which directly returns Result<Timestamp, ValidationError>) and propagating the error via ? or map_err into DryCheckWriterError; the interactor never produces a Timestamp.",
       "spec_refs": [
         {
           "file": "track/items/dry-checker-2026-06-02/spec.json",
@@ -162,8 +162,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["String"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -222,7 +222,7 @@
       },
       "methods": [],
       "module_path": "dry_check",
-      "docs": "Write-input type for the dry-check persistence path (Finding 3 / write-read separation). Carries the 7 fields the interactor knows at verdict time: pair_key, changed_path, verdict, similarity_score, threshold, base_commit, and rationale. Does NOT carry recorded_at — the interactor cannot know the write timestamp, and an empty placeholder for recorded_at would temporarily admit an invalid domain record before persistence. DryCheckWriter::append_record receives &DryCheckEntry; the infra adapter (FsDryCheckStore) stamps Timestamp::new(infrastructure::timestamp_now()) to produce a DryCheckRecord before writing. The constructor DryCheckEntry::new(pair_key, changed_path, verdict, similarity_score, threshold, base_commit, rationale: Rationale) -> Result<DryCheckEntry, DryCheckEntryError> validates that changed_path is either pair_key.low().path() or pair_key.high().path() (DryCheckEntryError::ChangedPathOutsidePair); rationale is already validated non-empty by the Rationale newtype. Private fields, accessors: pair_key() -> &DryCheckPairKey, changed_path() -> &FilePath, verdict() -> &DryCheckVerdict, similarity_score() -> &SimilarityScore, threshold() -> &SimilarityThreshold, base_commit() -> &CommitHash, rationale() -> &Rationale.",
+      "docs": "Write-input type for the dry-check persistence path (Finding 3 / write-read separation). Carries the 7 fields the interactor knows at verdict time: pair_key, changed_path, verdict, similarity_score, threshold, base_commit, and rationale. Does NOT carry recorded_at — the interactor cannot know the write timestamp, and an empty placeholder for recorded_at would temporarily admit an invalid domain record before persistence. DryCheckWriter::append_record receives &DryCheckEntry; the infra adapter (FsDryCheckStore) calls infrastructure::timestamp_now() (which directly returns Result<Timestamp, ValidationError>) to obtain a Timestamp, propagating any error via map_err into DryCheckWriterError, then constructs a DryCheckRecord from DryCheckEntry + Timestamp before writing. The constructor DryCheckEntry::new(pair_key, changed_path, verdict, similarity_score, threshold, base_commit, rationale: Rationale) -> Result<DryCheckEntry, DryCheckEntryError> validates that changed_path is either pair_key.low().path() or pair_key.high().path() (DryCheckEntryError::ChangedPathOutsidePair); rationale is already validated non-empty by the Rationale newtype. Private fields, accessors: pair_key() -> &DryCheckPairKey, changed_path() -> &FilePath, verdict() -> &DryCheckVerdict, similarity_score() -> &SimilarityScore, threshold() -> &SimilarityThreshold, base_commit() -> &CommitHash, rationale() -> &Rationale.",
       "spec_refs": [
         {
           "file": "track/items/dry-checker-2026-06-02/spec.json",
@@ -382,12 +382,8 @@
         "kind": "struct",
         "shape": {
           "kind": "plain",
-          "fields": [
-            { "name": "changed_fragment_ref",   "ty": "FragmentRef" },
-            { "name": "candidate_fragment_ref",  "ty": "FragmentRef" },
-            { "name": "refactor_proposal",        "ty": "RefactorProposal" }
-          ],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -414,8 +410,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["String"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [],
@@ -763,6 +759,105 @@
         }
       ],
       "informal_grounds": []
+    },
+    "SimilarityScore": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Pre-existing domain::semantic_dup::SimilarityScore — cosine similarity score in [0.0, 1.0]. Modified by this track: PartialEq is added (#[derive(Debug, Clone, Copy, PartialEq)]) so that DryCheckEntry and DryCheckRecord (which embed SimilarityScore) can derive PartialEq. Eq is not derived because f32 does not implement Eq (NaN != NaN). Carried as a modify entry so that the extra PartialEq impl (visible in rustdoc) does not produce a Red signal.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SimilarityThreshold": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Pre-existing domain::semantic_dup::SimilarityThreshold — cosine similarity threshold in [0.0, 1.0]. Modified by this track: PartialEq is added (#[derive(Debug, Clone, Copy, PartialEq)]) so that DryCheckEntry and DryCheckRecord (which embed SimilarityThreshold) can derive PartialEq. Eq is not derived because f32 does not implement Eq (NaN != NaN). Carried as a modify entry so that the extra PartialEq impl (visible in rustdoc) does not produce a Red signal.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticDupError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidScore",
+            "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "f32" }] }
+          },
+          {
+            "name": "InvalidTopK",
+            "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "usize" }] }
+          },
+          {
+            "name": "InvalidThreshold",
+            "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "f32" }] }
+          },
+          { "name": "EmptyContent", "payload": { "kind": "unit" } },
+          {
+            "name": "InvalidFragmentSpanZeroLine",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "start_line", "ty": "u32" },
+                { "name": "end_line",   "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidFragmentSpanOrder",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "start_line", "ty": "u32" },
+                { "name": "end_line",   "ty": "u32" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Domain-level errors for semantic duplicate detection value object invariant violations. Baseline had 4 variants (InvalidScore, InvalidTopK, InvalidThreshold, EmptyContent). This track adds 2 variants (InvalidFragmentSpanZeroLine, InvalidFragmentSpanOrder) for the CodeFragment line span validation introduced in T001. Only #[derive(Debug)] — Display and Error are hand-written impls.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        }
+      ],
+      "informal_grounds": []
     }
   },
   "traits": {
@@ -817,7 +912,7 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "dry_check",
-      "docs": "Write port for dry-check.json persistence. Receives a DryCheckEntry (the 7 fields the interactor knows at verdict time: pair_key, changed_path, verdict, similarity_score, threshold, base_commit, rationale). The adapter (FsDryCheckStore) stamps a Timestamp (Timestamp::new(infrastructure::timestamp_now())) to produce a DryCheckRecord before writing — the interactor never produces a Timestamp. This separation ensures that recorded_at is always a valid ISO-8601 UTC value owned by the infra adapter, making the 'empty placeholder recorded_at' path structurally impossible (Finding 3). init-on-first-write: if dry-check.json is absent the implementation creates a fresh envelope before appending. CLI is the sole caller (D11). Persistence port — defined in domain layer (mirrors ReviewWriter).",
+      "docs": "Write port for dry-check.json persistence. Receives a DryCheckEntry (the 7 fields the interactor knows at verdict time: pair_key, changed_path, verdict, similarity_score, threshold, base_commit, rationale). The adapter (FsDryCheckStore) calls infrastructure::timestamp_now() (which directly returns Result<Timestamp, ValidationError>) to obtain a Timestamp — propagating the error via map_err into DryCheckWriterError — then constructs a DryCheckRecord from DryCheckEntry + Timestamp before writing; the interactor never produces a Timestamp. This separation ensures that recorded_at is always a valid ISO-8601 UTC value owned by the infra adapter, making the 'empty placeholder recorded_at' path structurally impossible (Finding 3). init-on-first-write: if dry-check.json is absent the implementation creates a fresh envelope before appending. CLI is the sole caller (D11). Persistence port — defined in domain layer (mirrors ReviewWriter).",
       "spec_refs": [
         {
           "file": "track/items/dry-checker-2026-06-02/spec.json",
@@ -879,7 +974,7 @@
           "name": "new",
           "receiver": null,
           "params": [{ "name": "s", "ty": "impl Into<String>" }],
-          "returns": "Result<RefactorProposal, RefactorProposalError>",
+          "returns": "Result<Self, RefactorProposalError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -904,7 +999,7 @@
           "name": "new",
           "receiver": null,
           "params": [{ "name": "s", "ty": "impl Into<String>" }],
-          "returns": "Result<Rationale, RationaleError>",
+          "returns": "Result<Self, RationaleError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -1018,6 +1113,19 @@
     {
       "type_name": "DryCheckRecord",
       "methods": [
+        {
+          "name": "from_entry_and_timestamp",
+          "receiver": null,
+          "params": [
+            { "name": "entry",       "ty": "DryCheckEntry" },
+            { "name": "recorded_at", "ty": "Timestamp" }
+          ],
+          "returns": "Result<DryCheckRecord, DryCheckRecordError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
         {
           "name": "pair_key",
           "receiver": "&self",
@@ -1226,7 +1334,7 @@
             { "name": "start_line",  "ty": "u32" },
             { "name": "end_line",    "ty": "u32" }
           ],
-          "returns": "Result<domain::semantic_dup::CodeFragment, domain::semantic_dup::SemanticDupError>",
+          "returns": "Result<Self, SemanticDupError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -1320,7 +1428,7 @@
           "name": "new",
           "receiver": null,
           "params": [{ "name": "s", "ty": "impl Into<String>" }],
-          "returns": "Result<FragmentContentHash, FragmentContentHashError>",
+          "returns": "Result<Self, FragmentContentHashError>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -1331,6 +1439,56 @@
           "receiver": "&self",
           "params": [],
           "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "SimilarityScore",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "f32" }],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "f32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "SimilarityThreshold",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "f32" }],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "f32",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -1515,11 +1673,6 @@
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "DryCheckEntry"
-    },
-    {
-      "action": "add",
       "trait_ref": "core::fmt::Debug",
       "for_type": "DryCheckEntryError"
     },
@@ -1726,11 +1879,6 @@
     {
       "action": "add",
       "trait_ref": "core::cmp::PartialEq",
-      "for_type": "DryCheckRecord"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
       "for_type": "DryCheckRecord"
     },
     {
@@ -1952,6 +2100,61 @@
       "action": "add",
       "trait_ref": "core::error::Error",
       "for_type": "DryCheckWriterError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "domain::semantic_dup::SimilarityScore"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "domain::semantic_dup::SimilarityScore"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "domain::semantic_dup::SimilarityScore"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "domain::semantic_dup::SimilarityScore"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "domain::semantic_dup::SimilarityThreshold"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "domain::semantic_dup::SimilarityThreshold"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "domain::semantic_dup::SimilarityThreshold"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "domain::semantic_dup::SimilarityThreshold"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "domain::semantic_dup::SemanticDupError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "domain::semantic_dup::SemanticDupError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "domain::semantic_dup::SemanticDupError"
     }
   ]
 }
