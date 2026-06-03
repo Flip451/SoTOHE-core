@@ -4,16 +4,19 @@
 //! types, and query result structs for the dry-check feature
 //! (ADR 2026-06-02-0716-dry-checker).
 //!
-//! Interactor implementations (`DryCheckInteractor`, `DryCheckResultsInteractor`,
-//! `DryCheckApprovalInteractor`) live in T004/T005.
+//! Interactor implementations:
+//! - `DryCheckInteractor` (T004) — write path
+//! - `DryCheckResultsInteractor`, `DryCheckApprovalInteractor` (T005) — read/gate paths
 
 mod errors;
+mod interactor;
 mod judgment;
 mod ports;
 mod results;
 mod services;
 
 pub use errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
+pub use interactor::DryCheckInteractor;
 pub use judgment::DryCheckAgentJudgment;
 pub use ports::{DryCheckAgentPort, DryCheckDiffSource};
 pub use results::DryCheckResults;

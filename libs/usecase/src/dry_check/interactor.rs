@@ -1,0 +1,1095 @@
+//! [`DryCheckInteractor`] — implementation of [`DryCheckService`].
+//!
+//! Orchestrates: full-codebase index build (EmbeddingPort + SemanticIndexPort
+//! from corpus_fragments) + diff fragment query at threshold + DryCheckAgentPort
+//! verification + DryCheckWriter verdict persistence.
+
+use std::collections::BTreeMap;
+use std::sync::Arc;
+
+use sha2::Digest as _;
+
+use domain::CommitHash;
+use domain::dry_check::{
+    DryCheckEntry, DryCheckEntryError, DryCheckFinding, DryCheckPairKey, DryCheckPairKeyError,
+    DryCheckReader, DryCheckVerdict, DryCheckWriter, FragmentContentHash, FragmentRef, Rationale,
+};
+use domain::review_v2::types::FilePath;
+use domain::semantic_dup::{CodeFragment, SimilarityScore, SimilarityThreshold, TopK};
+
+use super::errors::DryCheckCycleError;
+use super::judgment::DryCheckAgentJudgment;
+use super::ports::DryCheckAgentPort;
+use super::services::DryCheckService;
+use crate::semantic_dup::{EmbeddingPort, SemanticIndexError, SemanticIndexPort};
+
+// ── helper: SHA-256 content hash ─────────────────────────────────────────────
+
+/// Compute the SHA-256 of `content` and return a validated [`FragmentContentHash`].
+///
+/// # Errors
+///
+/// Returns a [`String`] error description when [`FragmentContentHash::new`] rejects
+/// the hex string (should not happen in practice for a well-formed SHA-256 digest,
+/// but propagated as an error to keep production code panic-free).
+fn content_hash_of(content: &str) -> Result<FragmentContentHash, String> {
+    let digest = sha2::Sha256::digest(content.as_bytes());
+    let hex = format!("{digest:x}");
+    FragmentContentHash::new(hex).map_err(|e| format!("content hash: {e}"))
+}
+
+/// Build a [`FragmentRef`] from a [`CodeFragment`].
+///
+/// Computes the SHA-256 of `fragment.content()` to produce the
+/// [`FragmentContentHash`].  The path comes from `fragment.source_path` (via
+/// `to_string_lossy` — the same convention used throughout the workspace).
+///
+/// # Errors
+///
+/// Returns a [`String`] error description when `FilePath::new` rejects the
+/// path (e.g., absolute path or traversal) or when `content_hash_of` fails.
+fn fragment_ref_of(fragment: &CodeFragment) -> Result<FragmentRef, String> {
+    let path_str = fragment.source_path.to_string_lossy().into_owned();
+    let file_path = FilePath::new(path_str).map_err(|e| format!("invalid source_path: {e}"))?;
+    let content_hash = content_hash_of(fragment.content())?;
+    Ok(FragmentRef::new(file_path, content_hash))
+}
+
+// ── DryCheckInteractor ────────────────────────────────────────────────────────
+
+/// Interactor implementing [`DryCheckService`].
+///
+/// Orchestrates: full-codebase index build (`EmbeddingPort` + `SemanticIndexPort`
+/// from `corpus_fragments`) + diff fragment query at threshold +
+/// `DryCheckAgentPort` verification + `DryCheckWriter.append_record` verdict
+/// persistence.
+///
+/// The constructor return type is written as `DryCheckInteractor` (not `Self`)
+/// so the ③ evaluator exact-string match succeeds.
+pub struct DryCheckInteractor {
+    embedding_port: Arc<dyn EmbeddingPort>,
+    index_port: Arc<dyn SemanticIndexPort>,
+    agent_port: Arc<dyn DryCheckAgentPort>,
+    dry_check_writer: Arc<dyn DryCheckWriter>,
+    dry_check_reader: Arc<dyn DryCheckReader>,
+}
+
+impl DryCheckInteractor {
+    /// Create a new [`DryCheckInteractor`].
+    ///
+    /// `diff_source` is NOT injected — the CLI resolves diff fragments and
+    /// passes them in as `diff_fragments` (CN-01/IN-02).
+    #[must_use]
+    pub fn new(
+        embedding_port: Arc<dyn EmbeddingPort>,
+        index_port: Arc<dyn SemanticIndexPort>,
+        agent_port: Arc<dyn DryCheckAgentPort>,
+        dry_check_writer: Arc<dyn DryCheckWriter>,
+        dry_check_reader: Arc<dyn DryCheckReader>,
+    ) -> DryCheckInteractor {
+        DryCheckInteractor {
+            embedding_port,
+            index_port,
+            agent_port,
+            dry_check_writer,
+            dry_check_reader,
+        }
+    }
+}
+
+impl DryCheckService for DryCheckInteractor {
+    /// Run the dry-check write cycle.
+    ///
+    /// # Algorithm
+    ///
+    /// 1. Read history and build a verified-pair set (`BTreeMap<DryCheckPairKey, ()>`)
+    ///    seeded from existing records (CN-07 identifier matching).
+    /// 2. Build a fresh whole-codebase index from `corpus_fragments` (IN-02/D4).
+    /// 3. For each `diff_fragment`, run the growing-k threshold-boundary loop
+    ///    (k, 2k, 4k, …) to enumerate above-threshold candidates (IN-06).
+    /// 4. Per candidate: build pair key (skip self-match via `DryCheckPairKey::new`),
+    ///    skip verified pairs, call agent, build entry, persist.
+    /// 5. Return collected `DryCheckFinding`s from `Violation` judgments.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DryCheckCycleError`] on embedding, index, agent, reader,
+    /// writer, or entry construction failures.
+    fn run_dry_check(
+        &self,
+        corpus_fragments: Vec<CodeFragment>,
+        diff_fragments: Vec<CodeFragment>,
+        threshold: SimilarityThreshold,
+        base_commit: CommitHash,
+    ) -> Result<Vec<DryCheckFinding>, DryCheckCycleError> {
+        // ── Step 1: Build the verified-pair set from history ──────────────────
+        //
+        // CN-07: identifier matching — when content changes, content_hash
+        // changes, so FragmentRef changes, so DryCheckPairKey changes → no
+        // match → re-verified.  No separate hash-comparison step.
+        let records = self.dry_check_reader.read_records().map_err(DryCheckCycleError::Reader)?;
+
+        let mut verified_set: BTreeMap<DryCheckPairKey, ()> = BTreeMap::new();
+        for record in records {
+            verified_set.insert(record.pair_key().clone(), ());
+        }
+
+        // ── Step 2: Build whole-codebase index from corpus_fragments ──────────
+        //
+        // Fresh per call (IN-02/D4): do NOT persist index between calls.
+        for fragment in &corpus_fragments {
+            let embedding =
+                self.embedding_port.embed(fragment).map_err(DryCheckCycleError::Embedding)?;
+            self.index_port.insert(fragment, &embedding).map_err(DryCheckCycleError::Index)?;
+        }
+
+        // ── Steps 3–5: Per diff_fragment loop ─────────────────────────────────
+        let mut findings: Vec<DryCheckFinding> = Vec::new();
+
+        for diff_fragment in &diff_fragments {
+            // CN-04: diff_fragments are already hunk-filtered by the CLI.
+            // The interactor does NOT perform additional hunk filtering.
+
+            let changed_ref = fragment_ref_of(diff_fragment).map_err(|e| {
+                DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                    source: format!("changed_fragment path error: {e}"),
+                })
+            })?;
+
+            let query_embedding =
+                self.embedding_port.embed(diff_fragment).map_err(DryCheckCycleError::Embedding)?;
+
+            // ── Growing-k threshold-boundary loop ─────────────────────────────
+            //
+            // Mirror of SemanticDupInteractor pattern (IN-06/D8).
+            // k, 2k, 4k, … — stop when:
+            //   (a) the returned batch contains at least one score < threshold
+            //       (threshold boundary crossed); or
+            //   (b) batch is empty; or
+            //   (c) fewer than k results returned (index exhausted).
+            //
+            // Stopping when "all are already verified" is explicitly NOT a
+            // termination condition (impl-plan T004 D8 note).
+            let initial_k: usize = 10;
+            let mut k = initial_k;
+            let mut above_threshold_candidates: Vec<(CodeFragment, SimilarityScore)> = Vec::new();
+
+            loop {
+                let top_k = match TopK::new(k) {
+                    Ok(v) => v,
+                    Err(_) => {
+                        // k >= 1 always (started at 10, doubled), so this is
+                        // unreachable — but we map it gracefully to avoid panic.
+                        return Err(DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                            source: "internal: k overflowed usize".to_owned(),
+                        }));
+                    }
+                };
+
+                let batch = self
+                    .index_port
+                    .search(&query_embedding, top_k)
+                    .map_err(DryCheckCycleError::Index)?;
+
+                // Empty batch → index exhausted.
+                if batch.is_empty() {
+                    break;
+                }
+
+                let returned_count = batch.len();
+                let mut found_boundary = false;
+
+                for similar in batch {
+                    let score = similar.score;
+                    let candidate = similar.fragment;
+
+                    if score.value() < threshold.value() {
+                        found_boundary = true;
+                        // Below threshold — do not add to candidates.
+                        continue;
+                    }
+
+                    above_threshold_candidates.push((candidate, score));
+                }
+
+                // Threshold boundary crossed → all above-threshold candidates collected.
+                if found_boundary {
+                    break;
+                }
+
+                // Fewer than k returned → index exhausted.
+                if returned_count < k {
+                    break;
+                }
+
+                // Double k for next iteration.
+                k = k.saturating_mul(2);
+            }
+
+            // ── Step 4: Per candidate ─────────────────────────────────────────
+            for (candidate_fragment, similarity_score) in above_threshold_candidates {
+                let candidate_ref = fragment_ref_of(&candidate_fragment).map_err(|e| {
+                    DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                        source: format!("candidate_fragment path error: {e}"),
+                    })
+                })?;
+
+                // Single self-match guard: DryCheckPairKey::new is the sole
+                // rejection point (both path AND content_hash equal).
+                // No string-equality pre-check.
+                let pair_key = match DryCheckPairKey::new(changed_ref.clone(), candidate_ref) {
+                    Err(DryCheckPairKeyError::SelfMatch) => continue,
+                    Ok(k) => k,
+                };
+
+                // Skip already-verified pairs (CN-07 identifier matching).
+                if verified_set.contains_key(&pair_key) {
+                    continue;
+                }
+
+                // Call agent for unverified candidate.
+                let judgment = self
+                    .agent_port
+                    .judge(diff_fragment, &candidate_fragment)
+                    .map_err(DryCheckCycleError::Agent)?;
+
+                // ── Step 5: Per judgment ──────────────────────────────────────
+                let (rationale, verdict, maybe_finding) = extract_judgment(judgment);
+
+                let changed_path =
+                    FilePath::new(diff_fragment.source_path.to_string_lossy().into_owned())
+                        .map_err(|e| {
+                            DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
+                                source: format!("changed_path error: {e}"),
+                            })
+                        })?;
+
+                let entry = DryCheckEntry::new(
+                    pair_key.clone(),
+                    changed_path,
+                    verdict,
+                    similarity_score,
+                    threshold,
+                    base_commit.clone(),
+                    rationale,
+                )
+                .map_err(|e: DryCheckEntryError| DryCheckCycleError::Entry(e))?;
+
+                self.dry_check_writer.append_record(&entry).map_err(DryCheckCycleError::Writer)?;
+
+                // Add to verified set for this run.
+                verified_set.insert(pair_key, ());
+
+                // Collect finding if the judgment was a Violation.
+                if let Some(finding) = maybe_finding {
+                    findings.push(finding);
+                }
+            }
+        }
+
+        Ok(findings)
+    }
+}
+
+// ── Internal helpers ──────────────────────────────────────────────────────────
+
+/// Decompose a [`DryCheckAgentJudgment`] into:
+/// - the [`Rationale`] (present on every variant)
+/// - the [`DryCheckVerdict`] for persistence
+/// - an optional [`DryCheckFinding`] (only for `Violation`)
+fn extract_judgment(
+    judgment: DryCheckAgentJudgment,
+) -> (Rationale, DryCheckVerdict, Option<DryCheckFinding>) {
+    match judgment {
+        DryCheckAgentJudgment::NotAViolation { rationale } => {
+            (rationale, DryCheckVerdict::NotAViolation, None)
+        }
+        DryCheckAgentJudgment::Accepted { rationale } => {
+            (rationale, DryCheckVerdict::Accepted, None)
+        }
+        DryCheckAgentJudgment::Violation { rationale, finding } => {
+            let verdict = DryCheckVerdict::Violation {
+                refactor_proposal: finding.refactor_proposal().clone(),
+            };
+            (rationale, verdict, Some(finding))
+        }
+    }
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+#[allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::indexing_slicing,
+    clippy::type_complexity
+)]
+mod tests {
+    use std::path::PathBuf;
+    use std::sync::{Arc, Mutex};
+
+    use domain::dry_check::{
+        DryCheckEntry, DryCheckFinding, DryCheckPairKey, DryCheckReaderError, DryCheckRecord,
+        DryCheckVerdict, DryCheckWriterError, FragmentRef, Rationale,
+    };
+    use domain::review_v2::types::FilePath;
+    use domain::semantic_dup::{
+        CodeFragment, SimilarFragment, SimilarityScore, SimilarityThreshold,
+    };
+    use domain::{CommitHash, Timestamp};
+    use mockall::mock;
+
+    use super::*;
+    use crate::dry_check::errors::DryCheckAgentError;
+    use crate::semantic_dup::{EmbeddingError, SemanticIndexError};
+
+    // ── Mock port definitions ─────────────────────────────────────────────────
+
+    mock! {
+        pub MockEmbeddingPort {}
+        impl EmbeddingPort for MockEmbeddingPort {
+            fn embed(&self, fragment: &CodeFragment) -> Result<Vec<f32>, EmbeddingError>;
+        }
+    }
+
+    mock! {
+        pub MockSemanticIndexPort {}
+        impl SemanticIndexPort for MockSemanticIndexPort {
+            fn insert(
+                &self,
+                fragment: &CodeFragment,
+                embedding: &[f32],
+            ) -> Result<(), SemanticIndexError>;
+
+            fn search(
+                &self,
+                embedding: &[f32],
+                top_k: domain::semantic_dup::TopK,
+            ) -> Result<Vec<SimilarFragment>, SemanticIndexError>;
+        }
+    }
+
+    mock! {
+        pub MockDryCheckAgentPort {}
+        impl DryCheckAgentPort for MockDryCheckAgentPort {
+            fn judge(
+                &self,
+                changed_fragment: &CodeFragment,
+                candidate_fragment: &CodeFragment,
+            ) -> Result<DryCheckAgentJudgment, DryCheckAgentError>;
+        }
+    }
+
+    // ── Hand-rolled writer/reader stubs ───────────────────────────────────────
+
+    /// Stub writer that collects appended entries.
+    #[derive(Default)]
+    struct StubWriter {
+        entries: Mutex<Vec<DryCheckEntry>>,
+    }
+
+    impl domain::dry_check::DryCheckWriter for StubWriter {
+        fn append_record(&self, entry: &DryCheckEntry) -> Result<(), DryCheckWriterError> {
+            self.entries.lock().unwrap().push(entry.clone());
+            Ok(())
+        }
+    }
+
+    /// Stub reader that returns a fixed set of records.
+    struct StubReader {
+        records: Vec<DryCheckRecord>,
+    }
+
+    impl StubReader {
+        fn with_records(records: Vec<DryCheckRecord>) -> Self {
+            Self { records }
+        }
+    }
+
+    impl domain::dry_check::DryCheckReader for StubReader {
+        fn read_records(&self) -> Result<Vec<DryCheckRecord>, DryCheckReaderError> {
+            Ok(self.records.clone())
+        }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    fn make_fragment(path: &str, content: &str) -> CodeFragment {
+        CodeFragment::new(PathBuf::from(path), content.to_owned(), 1, 1).unwrap()
+    }
+
+    fn make_score(v: f32) -> SimilarityScore {
+        SimilarityScore::new(v).unwrap()
+    }
+
+    fn make_threshold(v: f32) -> SimilarityThreshold {
+        SimilarityThreshold::new(v).unwrap()
+    }
+
+    fn make_commit() -> CommitHash {
+        CommitHash::try_new("a".repeat(40)).unwrap()
+    }
+
+    fn make_rationale(s: &str) -> Rationale {
+        Rationale::new(s).unwrap()
+    }
+
+    fn make_similar_fragment(path: &str, content: &str, score: f32) -> SimilarFragment {
+        SimilarFragment { fragment: make_fragment(path, content), score: make_score(score) }
+    }
+
+    fn make_dry_check_record(
+        low_path: &str,
+        low_content: &str,
+        high_path: &str,
+        high_content: &str,
+        changed_path: &str,
+    ) -> DryCheckRecord {
+        let low_hash = content_hash_of(low_content).unwrap();
+        let high_hash = content_hash_of(high_content).unwrap();
+        let low_ref = FragmentRef::new(FilePath::new(low_path).unwrap(), low_hash);
+        let high_ref = FragmentRef::new(FilePath::new(high_path).unwrap(), high_hash);
+        let pair_key = DryCheckPairKey::new(low_ref, high_ref).unwrap();
+        let changed = FilePath::new(changed_path).unwrap();
+        let verdict = DryCheckVerdict::NotAViolation;
+        let entry = DryCheckEntry::new(
+            pair_key,
+            changed,
+            verdict,
+            SimilarityScore::new(0.9).unwrap(),
+            SimilarityThreshold::new(0.8).unwrap(),
+            make_commit(),
+            make_rationale("prior run rationale"),
+        )
+        .unwrap();
+        DryCheckRecord::from_entry_and_timestamp(
+            entry,
+            Timestamp::new("2026-06-02T00:00:00Z").unwrap(),
+        )
+        .unwrap()
+    }
+
+    fn make_interactor(
+        embed: MockMockEmbeddingPort,
+        index: MockMockSemanticIndexPort,
+        agent: MockMockDryCheckAgentPort,
+        writer: Arc<StubWriter>,
+        records: Vec<DryCheckRecord>,
+    ) -> DryCheckInteractor {
+        DryCheckInteractor::new(
+            Arc::new(embed),
+            Arc::new(index),
+            Arc::new(agent),
+            writer,
+            Arc::new(StubReader::with_records(records)),
+        )
+    }
+
+    fn make_interactor_empty_history(
+        embed: MockMockEmbeddingPort,
+        index: MockMockSemanticIndexPort,
+        agent: MockMockDryCheckAgentPort,
+        writer: Arc<StubWriter>,
+    ) -> DryCheckInteractor {
+        make_interactor(embed, index, agent, writer, vec![])
+    }
+
+    // ── (a) pair cache skips already-verified pair ────────────────────────────
+
+    #[test]
+    fn test_pair_cache_skips_already_verified_pair_with_same_path_and_hash() {
+        // Record a prior result for (src/a.rs, src/b.rs) with the SAME content.
+        let diff_content = "fn shared() {}";
+        let cand_content = "fn shared_candidate() {}";
+        let prior_record =
+            make_dry_check_record("src/a.rs", diff_content, "src/b.rs", cand_content, "src/a.rs");
+
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        // embed called for corpus insert (0 corpus) + diff query
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        // Search returns the candidate above threshold.
+        let results = vec![make_similar_fragment("src/b.rs", cand_content, 0.9)];
+        index.expect_search().returning(move |_, _| Ok(results.clone()));
+
+        // Agent must NOT be called — pair is already verified.
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().never();
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor =
+            make_interactor(embed, index, agent, Arc::clone(&writer), vec![prior_record]);
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty(), "already-verified pair must not produce findings");
+        assert!(
+            writer.entries.lock().unwrap().is_empty(),
+            "no new record should be written for verified pair"
+        );
+    }
+
+    // ── (b) cache invalidated on content change ───────────────────────────────
+
+    #[test]
+    fn test_pair_cache_invalidated_when_content_changes() {
+        // Prior record has old content; new diff has different content → new pair_key.
+        let old_diff_content = "fn old_impl() {}";
+        let cand_content = "fn candidate() {}";
+        let new_diff_content = "fn new_impl() {}"; // different → new hash → new pair_key
+
+        let prior_record = make_dry_check_record(
+            "src/a.rs",
+            old_diff_content,
+            "src/b.rs",
+            cand_content,
+            "src/a.rs",
+        );
+
+        let diff_frag = make_fragment("src/a.rs", new_diff_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        let results = vec![make_similar_fragment("src/b.rs", cand_content, 0.9)];
+        index.expect_search().returning(move |_, _| Ok(results.clone()));
+
+        // Agent IS called — new hash → new pair_key → not in verified set.
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("different content, not a violation").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor =
+            make_interactor(embed, index, agent, Arc::clone(&writer), vec![prior_record]);
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty());
+        assert_eq!(
+            writer.entries.lock().unwrap().len(),
+            1,
+            "new record written for invalidated pair"
+        );
+    }
+
+    // ── (c) self-match excluded via Err(SelfMatch); same-path-diff-hash is valid ─
+
+    #[test]
+    fn test_self_match_excluded_via_err_self_match_agent_not_called() {
+        // Diff fragment and candidate share BOTH path AND content → self-match.
+        let content = "fn self_fn() {}";
+        let diff_frag = make_fragment("src/a.rs", content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        // Candidate is literally the same fragment.
+        let results = vec![make_similar_fragment("src/a.rs", content, 1.0)];
+        index.expect_search().returning(move |_, _| Ok(results.clone()));
+
+        // Agent must NOT be called for self-match.
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().never();
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty());
+        assert!(writer.entries.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_same_path_different_hash_is_valid_pair_agent_called() {
+        // Same path but DIFFERENT content → valid pair (NOT a self-match).
+        let diff_content = "fn impl_a() {}";
+        let cand_content = "fn impl_b() {}"; // different content → different hash
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        // Same path, different content.
+        let results = vec![make_similar_fragment("src/a.rs", cand_content, 0.9)];
+        index.expect_search().returning(move |_, _| Ok(results.clone()));
+
+        // Agent IS called (not a self-match).
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("intra-file, not a DRY violation").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty());
+        assert_eq!(writer.entries.lock().unwrap().len(), 1);
+    }
+
+    // ── (d) genuine violation found when k grows ──────────────────────────────
+
+    #[test]
+    fn test_genuine_violation_found_when_k_grows() {
+        // First batch of k=10 returns 10 results all above threshold (no boundary).
+        // Second batch of k=20 returns fewer than 20 (index exhausted) but one
+        // above-threshold entry triggers Violation.
+        let diff_content = "fn duplicated_logic() {}";
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.5_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+
+        // First search (k=10): returns exactly 10 above-threshold items — all
+        // from "src/x0.rs" .. "src/x9.rs".  No boundary → grow k.
+        // Second search (k=20): returns 1 item (index exhausted) above threshold.
+        let mut call_count = 0u32;
+        index.expect_search().returning(move |_, top_k| {
+            call_count += 1;
+            if call_count == 1 {
+                assert_eq!(top_k.value(), 10);
+                let results: Vec<SimilarFragment> = (0..10)
+                    .map(|i| {
+                        make_similar_fragment(
+                            &format!("src/x{i}.rs"),
+                            &format!("fn x{i}() {{}}"),
+                            0.9,
+                        )
+                    })
+                    .collect();
+                Ok(results)
+            } else {
+                // k=20, but only 1 result — index exhausted, above threshold.
+                assert_eq!(top_k.value(), 20);
+                Ok(vec![make_similar_fragment(
+                    "src/violation.rs",
+                    "fn duplicated_logic() { /* exact copy */ }",
+                    0.91,
+                )])
+            }
+        });
+
+        // Agent called once for the violation candidate.
+        let mut agent = MockMockDryCheckAgentPort::new();
+        // 10 from first batch + 1 from second (x0..x9 + violation), 11 total.
+        // Each gets judged.  We set NotAViolation for the x* ones and Violation
+        // for the last one.
+        agent.expect_judge().returning(move |changed, candidate| {
+            if candidate.source_path == std::path::Path::new("src/violation.rs") {
+                let changed_ref = fragment_ref_of(changed).unwrap();
+                let cand_ref = fragment_ref_of(candidate).unwrap();
+                let finding =
+                    DryCheckFinding::new(changed_ref, cand_ref, "Extract shared logic.").unwrap();
+                Ok(DryCheckAgentJudgment::Violation {
+                    rationale: Rationale::new("genuine duplication").unwrap(),
+                    finding,
+                })
+            } else {
+                Ok(DryCheckAgentJudgment::NotAViolation {
+                    rationale: Rationale::new("not a violation").unwrap(),
+                })
+            }
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert_eq!(result.len(), 1, "one violation finding expected");
+        assert_eq!(result[0].candidate_fragment_ref().path().as_str(), "src/violation.rs");
+    }
+
+    // ── (e) NotAViolation returns empty Vec ───────────────────────────────────
+
+    #[test]
+    fn test_not_a_violation_returns_empty_vec() {
+        let diff_frag = make_fragment("src/a.rs", "fn some_fn() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_search().returning(|_, _| {
+            Ok(vec![make_similar_fragment("src/b.rs", "fn similar_fn() {}", 0.9)])
+        });
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("not a violation").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty(), "NotAViolation should return empty Vec");
+    }
+
+    // ── (f) loop termination on threshold boundary ────────────────────────────
+
+    #[test]
+    fn test_loop_termination_on_threshold_boundary() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        // Return one above-threshold and one below-threshold in the first batch.
+        index.expect_search().times(1).returning(|_, _| {
+            Ok(vec![
+                make_similar_fragment("src/b.rs", "fn above() {}", 0.9),
+                make_similar_fragment("src/c.rs", "fn below() {}", 0.5), // below threshold
+            ])
+        });
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        // Only the above-threshold fragment triggers agent call.
+        agent.expect_judge().times(1).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("not a violation").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty());
+    }
+
+    // ── (g) loop termination on index exhaustion ──────────────────────────────
+
+    #[test]
+    fn test_loop_termination_on_index_exhaustion() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        // Return fewer than k=10 results (exhausted) — all above threshold.
+        index
+            .expect_search()
+            .times(1)
+            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::Accepted {
+                rationale: Rationale::new("acceptable cross-layer mirror").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty());
+    }
+
+    // ── (h) DryCheckEntry built with 7 fields ────────────────────────────────
+
+    #[test]
+    fn test_dry_check_entry_built_with_7_fields() {
+        let diff_content = "fn changed() {}";
+        let cand_content = "fn candidate() {}";
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+        let threshold = make_threshold(0.8);
+        let base_commit = make_commit();
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        let cand_frag_clone = make_fragment("src/b.rs", cand_content);
+        index.expect_search().returning(move |_, _| {
+            Ok(vec![SimilarFragment { fragment: cand_frag_clone.clone(), score: make_score(0.85) }])
+        });
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("entry fields test rationale").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        interactor.run_dry_check(vec![], vec![diff_frag], threshold, base_commit.clone()).unwrap();
+
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 1);
+        let entry = &entries[0];
+
+        // pair_key low/high accessible
+        let low = entry.pair_key().low();
+        let high = entry.pair_key().high();
+        assert!(
+            (low.path().as_str() == "src/a.rs" && high.path().as_str() == "src/b.rs")
+                || (low.path().as_str() == "src/b.rs" && high.path().as_str() == "src/a.rs"),
+            "pair_key must contain both fragment paths"
+        );
+
+        // content_hash accessible via pair_key low/high
+        let expected_diff_hash = content_hash_of(diff_content).unwrap();
+        let expected_cand_hash = content_hash_of(cand_content).unwrap();
+        let hashes =
+            [low.content_hash().as_str().to_owned(), high.content_hash().as_str().to_owned()];
+        assert!(hashes.contains(&expected_diff_hash.as_str().to_owned()));
+        assert!(hashes.contains(&expected_cand_hash.as_str().to_owned()));
+
+        // changed_path is display-only (diff fragment side)
+        assert_eq!(entry.changed_path().as_str(), "src/a.rs");
+        // verdict
+        assert_eq!(entry.verdict(), &DryCheckVerdict::NotAViolation);
+        // similarity_score
+        assert!((entry.similarity_score().value() - 0.85).abs() < 1e-5);
+        // threshold
+        assert!((entry.threshold().value() - 0.8).abs() < 1e-5);
+        // base_commit
+        assert_eq!(entry.base_commit().as_ref(), base_commit.as_ref());
+        // rationale
+        assert_eq!(entry.rationale().as_str(), "entry fields test rationale");
+    }
+
+    // ── (i) rationale is typed Rationale ─────────────────────────────────────
+
+    #[test]
+    fn test_rationale_from_judgment_is_typed_rationale_non_empty_newtype() {
+        let diff_frag = make_fragment("src/a.rs", "fn a() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        index
+            .expect_search()
+            .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        let expected_rationale = "This is the typed rationale";
+        agent.expect_judge().times(1).returning(move |_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new(expected_rationale).unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 1);
+        let rationale: &Rationale = entries[0].rationale();
+        // It's a Rationale (typed non-empty newtype).
+        assert_eq!(rationale.as_str(), expected_rationale);
+    }
+
+    // ── (j) Violation produces DryCheckVerdict::Violation + DryCheckFinding ───
+
+    #[test]
+    fn test_violation_produces_verdict_violation_and_finding_in_result_vec() {
+        let diff_content = "fn duplicated() {}";
+        let cand_content = "fn also_duplicated() {}";
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        let cand_frag = make_fragment("src/b.rs", cand_content);
+        index.expect_search().returning(move |_, _| {
+            Ok(vec![SimilarFragment { fragment: cand_frag.clone(), score: make_score(0.9) }])
+        });
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(move |changed, candidate| {
+            let changed_ref = fragment_ref_of(changed).unwrap();
+            let cand_ref = fragment_ref_of(candidate).unwrap();
+            let finding =
+                DryCheckFinding::new(changed_ref, cand_ref, "Extract into shared trait.").unwrap();
+            Ok(DryCheckAgentJudgment::Violation {
+                rationale: Rationale::new("genuine duplication").unwrap(),
+                finding,
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let findings = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        // DryCheckFinding in returned Vec
+        assert_eq!(findings.len(), 1);
+        let finding = &findings[0];
+        assert_eq!(finding.changed_fragment_ref().path().as_str(), "src/a.rs");
+        assert_eq!(finding.candidate_fragment_ref().path().as_str(), "src/b.rs");
+        assert_eq!(finding.refactor_proposal().as_str(), "Extract into shared trait.");
+
+        // DryCheckVerdict::Violation persisted
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 1);
+        assert!(
+            matches!(entries[0].verdict(), DryCheckVerdict::Violation { .. }),
+            "persisted verdict must be Violation"
+        );
+        if let DryCheckVerdict::Violation { refactor_proposal } = entries[0].verdict() {
+            assert_eq!(refactor_proposal.as_str(), "Extract into shared trait.");
+        }
+    }
+
+    // ── (k) DryCheckPairKey built from FragmentRefs (path + content_hash) ─────
+
+    #[test]
+    fn test_dry_check_pair_key_built_from_fragment_refs_not_path_only() {
+        // Two fragments with same path but DIFFERENT content → valid pair, NOT self-match.
+        let diff_content = "fn path_same_content_a() {}";
+        let cand_content = "fn path_same_content_b() {}"; // same path, different content
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        // Same path, different content.
+        let cand_frag = make_fragment("src/a.rs", cand_content);
+        index.expect_search().returning(move |_, _| {
+            Ok(vec![SimilarFragment { fragment: cand_frag.clone(), score: make_score(0.85) }])
+        });
+
+        // Agent IS called (different content_hash → not self-match).
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::NotAViolation {
+                rationale: Rationale::new("intra-file pair, not a violation").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let result = interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        assert!(result.is_empty());
+        // Verify a record was persisted → pair was judged (not a self-match).
+        assert_eq!(writer.entries.lock().unwrap().len(), 1);
+    }
+
+    // ── (l) content_hash accessible via pair_key().low()/.high().content_hash()
+
+    #[test]
+    fn test_content_hash_accessible_via_pair_key_low_high_content_hash() {
+        let diff_content = "fn a_impl() {}";
+        let cand_content = "fn b_impl() {}";
+        let diff_frag = make_fragment("src/a.rs", diff_content);
+        let cand_frag_for_search = make_fragment("src/b.rs", cand_content);
+
+        let mut embed = MockMockEmbeddingPort::new();
+        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_search().returning(move |_, _| {
+            Ok(vec![SimilarFragment {
+                fragment: cand_frag_for_search.clone(),
+                score: make_score(0.9),
+            }])
+        });
+
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().times(1).returning(|_, _| {
+            Ok(DryCheckAgentJudgment::Accepted {
+                rationale: Rationale::new("accepted duplication").unwrap(),
+            })
+        });
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        interactor
+            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
+            .unwrap();
+
+        let entries = writer.entries.lock().unwrap();
+        assert_eq!(entries.len(), 1);
+        let entry = &entries[0];
+
+        // content_hash accessible via pair_key().low().content_hash() and .high().content_hash()
+        let low_hash = entry.pair_key().low().content_hash().as_str().to_owned();
+        let high_hash = entry.pair_key().high().content_hash().as_str().to_owned();
+
+        let expected_a_hash = content_hash_of(diff_content).unwrap().as_str().to_owned();
+        let expected_b_hash = content_hash_of(cand_content).unwrap().as_str().to_owned();
+
+        assert!(
+            (low_hash == expected_a_hash && high_hash == expected_b_hash)
+                || (low_hash == expected_b_hash && high_hash == expected_a_hash),
+            "pair_key must contain both content hashes: got low={low_hash} high={high_hash}"
+        );
+
+        // No separate low_hash/high_hash fields — access is via pair_key().low()/.high()
+        assert_eq!(low_hash.len(), 64, "content hash must be 64-char hex");
+        assert_eq!(high_hash.len(), 64, "content hash must be 64-char hex");
+    }
+}
