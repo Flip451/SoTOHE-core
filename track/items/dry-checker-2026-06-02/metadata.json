@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "dry-checker-2026-06-02",
+  "title": "semantic-dup を活用した DRY 違反の自動検出 capability",
+  "branch": "track/dry-checker-2026-06-02",
+  "created_at": "2026-06-02T07:27:17Z",
+  "updated_at": "2026-06-02T07:27:17Z"
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "10bdec40e6a88cc0ce42da66af355aa94ad379b8fa5510433454f55053ba573f",
+  "signals": [
+    {
+      "type_name": "DryCheckAgentError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckAgentJudgment",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckApprovalInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckCycleError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckDiffError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckResults",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckResultsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckAgentPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckApprovalService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckDiffSource",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckResultsService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckService",
+      "signal": "blue"
+    }
+  ]
+}

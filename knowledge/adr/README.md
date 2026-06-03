@@ -181,6 +181,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [`cargo make llvm-cov` を nextest 経路に統一する](2026-04-27-0124-llvm-cov-nextest-harness-alignment.md) | — | 2026-04-27 |
 | [コード意味重複検出による DRY 防止（discoverability + soft gate）](2026-05-29-1118-semantic-dup-detection-discoverability-gate.md) | — | 2026-05-29 |
+| [semantic-dup を活用した DRY 違反の自動検出 capability](2026-06-02-0716-dry-checker.md) | Proposed | 2026-06-02 |
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 
 ### Review コマンド / API

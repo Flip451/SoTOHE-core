@@ -1,0 +1,582 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_dry_check["domain::dry_check"]
+    direction TB
+  subgraph T27_domain_domain_DiffFileHunks["dry_check::DiffFileHunks"]
+    direction TB
+    T27_domain_domain_DiffFileHunks__self[DiffFileHunks]
+    T27_domain_domain_DiffFileHunks_new([new])
+    T27_domain_domain_DiffFileHunks_path([path])
+    T27_domain_domain_DiffFileHunks_hunks([hunks])
+  end
+  subgraph T32_domain_domain_DiffFileHunksError["dry_check::DiffFileHunksError"]
+    direction TB
+    T32_domain_domain_DiffFileHunksError__self[DiffFileHunksError]
+    T32_domain_domain_DiffFileHunksError_EmptyHunks[EmptyHunks]
+  end
+  subgraph T27_domain_domain_DiffHunkRange["dry_check::DiffHunkRange"]
+    direction TB
+    T27_domain_domain_DiffHunkRange__self[DiffHunkRange]
+    T27_domain_domain_DiffHunkRange_new([new])
+    T27_domain_domain_DiffHunkRange_start_line([start_line])
+    T27_domain_domain_DiffHunkRange_end_line([end_line])
+  end
+  subgraph T32_domain_domain_DiffHunkRangeError["dry_check::DiffHunkRangeError"]
+    direction TB
+    T32_domain_domain_DiffHunkRangeError__self[DiffHunkRangeError]
+    T32_domain_domain_DiffHunkRangeError_StartExceedsEnd[StartExceedsEnd]
+    T32_domain_domain_DiffHunkRangeError_ZeroLine[ZeroLine]
+  end
+  subgraph T37_domain_domain_DryCheckApprovalVerdict["dry_check::DryCheckApprovalVerdict"]
+    direction TB
+    T37_domain_domain_DryCheckApprovalVerdict__self[DryCheckApprovalVerdict]
+    T37_domain_domain_DryCheckApprovalVerdict_Approved[Approved]
+    T37_domain_domain_DryCheckApprovalVerdict_Blocked[Blocked]
+  end
+  subgraph T27_domain_domain_DryCheckEntry["dry_check::DryCheckEntry"]
+    direction TB
+    T27_domain_domain_DryCheckEntry__self[DryCheckEntry]
+    T27_domain_domain_DryCheckEntry_new([new])
+    T27_domain_domain_DryCheckEntry_pair_key([pair_key])
+    T27_domain_domain_DryCheckEntry_changed_path([changed_path])
+    T27_domain_domain_DryCheckEntry_verdict([verdict])
+    T27_domain_domain_DryCheckEntry_similarity_score([similarity_score])
+    T27_domain_domain_DryCheckEntry_threshold([threshold])
+    T27_domain_domain_DryCheckEntry_base_commit([base_commit])
+    T27_domain_domain_DryCheckEntry_rationale([rationale])
+  end
+  subgraph T32_domain_domain_DryCheckEntryError["dry_check::DryCheckEntryError"]
+    direction TB
+    T32_domain_domain_DryCheckEntryError__self[DryCheckEntryError]
+    T32_domain_domain_DryCheckEntryError_ChangedPathOutsidePair[ChangedPathOutsidePair]
+  end
+  subgraph T29_domain_domain_DryCheckFinding["dry_check::DryCheckFinding"]
+    direction TB
+    T29_domain_domain_DryCheckFinding__self[DryCheckFinding]
+    T29_domain_domain_DryCheckFinding_new([new])
+    T29_domain_domain_DryCheckFinding_changed_fragment_ref([changed_fragment_ref])
+    T29_domain_domain_DryCheckFinding_candidate_fragment_ref([candidate_fragment_ref])
+    T29_domain_domain_DryCheckFinding_refactor_proposal([refactor_proposal])
+  end
+  subgraph T34_domain_domain_DryCheckFindingError["dry_check::DryCheckFindingError"]
+    direction TB
+    T34_domain_domain_DryCheckFindingError__self[DryCheckFindingError]
+    T34_domain_domain_DryCheckFindingError_EmptyProposal[EmptyProposal]
+  end
+  subgraph T29_domain_domain_DryCheckPairKey["dry_check::DryCheckPairKey"]
+    direction TB
+    T29_domain_domain_DryCheckPairKey__self[DryCheckPairKey]
+    T29_domain_domain_DryCheckPairKey_new([new])
+    T29_domain_domain_DryCheckPairKey_low([low])
+    T29_domain_domain_DryCheckPairKey_high([high])
+  end
+  subgraph T34_domain_domain_DryCheckPairKeyError["dry_check::DryCheckPairKeyError"]
+    direction TB
+    T34_domain_domain_DryCheckPairKeyError__self[DryCheckPairKeyError]
+    T34_domain_domain_DryCheckPairKeyError_SelfMatch[SelfMatch]
+  end
+  subgraph T33_domain_domain_DryCheckReaderError["dry_check::DryCheckReaderError"]
+    direction TB
+    T33_domain_domain_DryCheckReaderError__self[DryCheckReaderError]
+    T33_domain_domain_DryCheckReaderError_Io[Io]
+    T33_domain_domain_DryCheckReaderError_SymlinkDetected[SymlinkDetected]
+    T33_domain_domain_DryCheckReaderError_Codec[Codec]
+    T33_domain_domain_DryCheckReaderError_InvalidData[InvalidData]
+    T33_domain_domain_DryCheckReaderError_IncompatibleSchema[IncompatibleSchema]
+  end
+  subgraph T28_domain_domain_DryCheckRecord["dry_check::DryCheckRecord"]
+    direction TB
+    T28_domain_domain_DryCheckRecord__self[DryCheckRecord]
+    T28_domain_domain_DryCheckRecord_pair_key([pair_key])
+    T28_domain_domain_DryCheckRecord_changed_path([changed_path])
+    T28_domain_domain_DryCheckRecord_verdict([verdict])
+    T28_domain_domain_DryCheckRecord_similarity_score([similarity_score])
+    T28_domain_domain_DryCheckRecord_threshold([threshold])
+    T28_domain_domain_DryCheckRecord_base_commit([base_commit])
+    T28_domain_domain_DryCheckRecord_rationale([rationale])
+    T28_domain_domain_DryCheckRecord_recorded_at([recorded_at])
+  end
+  subgraph T33_domain_domain_DryCheckRecordError["dry_check::DryCheckRecordError"]
+    direction TB
+    T33_domain_domain_DryCheckRecordError__self[DryCheckRecordError]
+    T33_domain_domain_DryCheckRecordError_ChangedPathOutsidePair[ChangedPathOutsidePair]
+  end
+  subgraph T29_domain_domain_DryCheckVerdict["dry_check::DryCheckVerdict"]
+    direction TB
+    T29_domain_domain_DryCheckVerdict__self[DryCheckVerdict]
+    T29_domain_domain_DryCheckVerdict_NotAViolation[NotAViolation]
+    T29_domain_domain_DryCheckVerdict_Accepted[Accepted]
+    T29_domain_domain_DryCheckVerdict_Violation[Violation]
+  end
+  subgraph T33_domain_domain_DryCheckWriterError["dry_check::DryCheckWriterError"]
+    direction TB
+    T33_domain_domain_DryCheckWriterError__self[DryCheckWriterError]
+    T33_domain_domain_DryCheckWriterError_Io[Io]
+    T33_domain_domain_DryCheckWriterError_SymlinkDetected[SymlinkDetected]
+    T33_domain_domain_DryCheckWriterError_Codec[Codec]
+    T33_domain_domain_DryCheckWriterError_IncompatibleSchema[IncompatibleSchema]
+  end
+  subgraph T33_domain_domain_FragmentContentHash["dry_check::FragmentContentHash"]
+    direction TB
+    T33_domain_domain_FragmentContentHash__self[FragmentContentHash]
+    T33_domain_domain_FragmentContentHash_new([new])
+    T33_domain_domain_FragmentContentHash_as_str([as_str])
+  end
+  subgraph T38_domain_domain_FragmentContentHashError["dry_check::FragmentContentHashError"]
+    direction TB
+    T38_domain_domain_FragmentContentHashError__self[FragmentContentHashError]
+    T38_domain_domain_FragmentContentHashError_InvalidFormat[InvalidFormat]
+  end
+  subgraph T25_domain_domain_FragmentRef["dry_check::FragmentRef"]
+    direction TB
+    T25_domain_domain_FragmentRef__self[FragmentRef]
+    T25_domain_domain_FragmentRef_new([new])
+    T25_domain_domain_FragmentRef_path([path])
+    T25_domain_domain_FragmentRef_content_hash([content_hash])
+  end
+  subgraph T23_domain_domain_Rationale["dry_check::Rationale"]
+    direction TB
+    T23_domain_domain_Rationale__self[Rationale]
+    T23_domain_domain_Rationale_new([new])
+    T23_domain_domain_Rationale_as_str([as_str])
+  end
+  subgraph T28_domain_domain_RationaleError["dry_check::RationaleError"]
+    direction TB
+    T28_domain_domain_RationaleError__self[RationaleError]
+    T28_domain_domain_RationaleError_Empty[Empty]
+  end
+  subgraph T30_domain_domain_RefactorProposal["dry_check::RefactorProposal"]
+    direction TB
+    T30_domain_domain_RefactorProposal__self[RefactorProposal]
+    T30_domain_domain_RefactorProposal_new([new])
+    T30_domain_domain_RefactorProposal_as_str([as_str])
+  end
+  subgraph T35_domain_domain_RefactorProposalError["dry_check::RefactorProposalError"]
+    direction TB
+    T35_domain_domain_RefactorProposalError__self[RefactorProposalError]
+    T35_domain_domain_RefactorProposalError_Empty[Empty]
+  end
+  subgraph T27_domain_domain_VerdictFilter["dry_check::VerdictFilter"]
+    direction TB
+    T27_domain_domain_VerdictFilter__self[VerdictFilter]
+    T27_domain_domain_VerdictFilter_All[All]
+    T27_domain_domain_VerdictFilter_NotAViolation[NotAViolation]
+    T27_domain_domain_VerdictFilter_Accepted[Accepted]
+    T27_domain_domain_VerdictFilter_Violation[Violation]
+  end
+  subgraph R28_domain_domain_DryCheckReader["dry_check::DryCheckReader"]
+    direction TB
+    R28_domain_domain_DryCheckReader__self[DryCheckReader]
+    R28_domain_domain_DryCheckReader_read_records([read_records])
+  end
+  subgraph R28_domain_domain_DryCheckWriter["dry_check::DryCheckWriter"]
+    direction TB
+    R28_domain_domain_DryCheckWriter__self[DryCheckWriter]
+    R28_domain_domain_DryCheckWriter_append_record([append_record])
+  end
+  F60_domain_domain_domain__dry_check__fragments_overlapping_hunks[[fragments_overlapping_hunks]]
+  end
+  subgraph domain_domain_module_semantic_dup["domain::semantic_dup"]
+    direction TB
+  subgraph T26_domain_domain_CodeFragment["semantic_dup::CodeFragment"]
+    direction TB
+    T26_domain_domain_CodeFragment__self[CodeFragment]
+    T26_domain_domain_CodeFragment_new([new])
+    T26_domain_domain_CodeFragment_content([content])
+    T26_domain_domain_CodeFragment_start_line([start_line])
+    T26_domain_domain_CodeFragment_end_line([end_line])
+  end
+  end
+  subgraph domain_domain_module_timestamp["domain::timestamp"]
+    direction TB
+  subgraph T23_domain_domain_Timestamp["timestamp::Timestamp"]
+    direction TB
+    T23_domain_domain_Timestamp__self[Timestamp]
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_dry_check["usecase::dry_check"]
+    direction TB
+  subgraph T34_usecase_usecase_DryCheckAgentError["dry_check::DryCheckAgentError"]
+    direction TB
+    T34_usecase_usecase_DryCheckAgentError__self[DryCheckAgentError]
+    T34_usecase_usecase_DryCheckAgentError_UserAbort[UserAbort]
+    T34_usecase_usecase_DryCheckAgentError_AgentAbort[AgentAbort]
+    T34_usecase_usecase_DryCheckAgentError_Timeout[Timeout]
+    T34_usecase_usecase_DryCheckAgentError_IllegalOutput[IllegalOutput]
+    T34_usecase_usecase_DryCheckAgentError_Unexpected[Unexpected]
+  end
+  subgraph T37_usecase_usecase_DryCheckAgentJudgment["dry_check::DryCheckAgentJudgment"]
+    direction TB
+    T37_usecase_usecase_DryCheckAgentJudgment__self[DryCheckAgentJudgment]
+    T37_usecase_usecase_DryCheckAgentJudgment_NotAViolation[NotAViolation]
+    T37_usecase_usecase_DryCheckAgentJudgment_Accepted[Accepted]
+    T37_usecase_usecase_DryCheckAgentJudgment_Violation[Violation]
+  end
+  subgraph T42_usecase_usecase_DryCheckApprovalInteractor["dry_check::DryCheckApprovalInteractor"]
+    direction TB
+    T42_usecase_usecase_DryCheckApprovalInteractor__self[DryCheckApprovalInteractor]
+    T42_usecase_usecase_DryCheckApprovalInteractor_new([new])
+  end
+  subgraph T34_usecase_usecase_DryCheckCycleError["dry_check::DryCheckCycleError"]
+    direction TB
+    T34_usecase_usecase_DryCheckCycleError__self[DryCheckCycleError]
+    T34_usecase_usecase_DryCheckCycleError_Embedding[Embedding]
+    T34_usecase_usecase_DryCheckCycleError_Index[Index]
+    T34_usecase_usecase_DryCheckCycleError_Agent[Agent]
+    T34_usecase_usecase_DryCheckCycleError_Reader[Reader]
+    T34_usecase_usecase_DryCheckCycleError_Writer[Writer]
+    T34_usecase_usecase_DryCheckCycleError_Diff[Diff]
+    T34_usecase_usecase_DryCheckCycleError_Entry[Entry]
+  end
+  subgraph T33_usecase_usecase_DryCheckDiffError["dry_check::DryCheckDiffError"]
+    direction TB
+    T33_usecase_usecase_DryCheckDiffError__self[DryCheckDiffError]
+    T33_usecase_usecase_DryCheckDiffError_Failed[Failed]
+  end
+  subgraph T34_usecase_usecase_DryCheckInteractor["dry_check::DryCheckInteractor"]
+    direction TB
+    T34_usecase_usecase_DryCheckInteractor__self[DryCheckInteractor]
+    T34_usecase_usecase_DryCheckInteractor_new([new])
+  end
+  subgraph T31_usecase_usecase_DryCheckResults["dry_check::DryCheckResults"]
+    direction TB
+    T31_usecase_usecase_DryCheckResults__self[DryCheckResults]
+  end
+  subgraph T41_usecase_usecase_DryCheckResultsInteractor["dry_check::DryCheckResultsInteractor"]
+    direction TB
+    T41_usecase_usecase_DryCheckResultsInteractor__self[DryCheckResultsInteractor]
+    T41_usecase_usecase_DryCheckResultsInteractor_new([new])
+  end
+  subgraph R33_usecase_usecase_DryCheckAgentPort["dry_check::DryCheckAgentPort"]
+    direction TB
+    R33_usecase_usecase_DryCheckAgentPort__self[DryCheckAgentPort]
+    R33_usecase_usecase_DryCheckAgentPort_judge([judge])
+  end
+  subgraph R39_usecase_usecase_DryCheckApprovalService["dry_check::DryCheckApprovalService"]
+    direction TB
+    R39_usecase_usecase_DryCheckApprovalService__self[DryCheckApprovalService]
+    R39_usecase_usecase_DryCheckApprovalService_check_approved([check_approved])
+  end
+  subgraph R34_usecase_usecase_DryCheckDiffSource["dry_check::DryCheckDiffSource"]
+    direction TB
+    R34_usecase_usecase_DryCheckDiffSource__self[DryCheckDiffSource]
+    R34_usecase_usecase_DryCheckDiffSource_list_changed_hunks([list_changed_hunks])
+  end
+  subgraph R38_usecase_usecase_DryCheckResultsService["dry_check::DryCheckResultsService"]
+    direction TB
+    R38_usecase_usecase_DryCheckResultsService__self[DryCheckResultsService]
+    R38_usecase_usecase_DryCheckResultsService_get_results([get_results])
+  end
+  subgraph R31_usecase_usecase_DryCheckService["dry_check::DryCheckService"]
+    direction TB
+    R31_usecase_usecase_DryCheckService__self[DryCheckService]
+    R31_usecase_usecase_DryCheckService_run_dry_check([run_dry_check])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
+    direction TB
+  subgraph T45_infrastructure_infrastructure_CodexDryChecker["dry_check::CodexDryChecker"]
+    direction TB
+    T45_infrastructure_infrastructure_CodexDryChecker__self[CodexDryChecker]
+    T45_infrastructure_infrastructure_CodexDryChecker_new([new])
+  end
+  subgraph T53_infrastructure_infrastructure_DryCheckCommitHashError["dry_check::DryCheckCommitHashError"]
+    direction TB
+    T53_infrastructure_infrastructure_DryCheckCommitHashError__self[DryCheckCommitHashError]
+    T53_infrastructure_infrastructure_DryCheckCommitHashError_Io[Io]
+    T53_infrastructure_infrastructure_DryCheckCommitHashError_SymlinkDetected[SymlinkDetected]
+    T53_infrastructure_infrastructure_DryCheckCommitHashError_Format[Format]
+  end
+  subgraph T55_infrastructure_infrastructure_FsDryCheckCommitHashStore["dry_check::FsDryCheckCommitHashStore"]
+    direction TB
+    T55_infrastructure_infrastructure_FsDryCheckCommitHashStore__self[FsDryCheckCommitHashStore]
+    T55_infrastructure_infrastructure_FsDryCheckCommitHashStore_new([new])
+    T55_infrastructure_infrastructure_FsDryCheckCommitHashStore_read([read])
+  end
+  subgraph T45_infrastructure_infrastructure_FsDryCheckStore["dry_check::FsDryCheckStore"]
+    direction TB
+    T45_infrastructure_infrastructure_FsDryCheckStore__self[FsDryCheckStore]
+    T45_infrastructure_infrastructure_FsDryCheckStore_new([new])
+  end
+  subgraph T51_infrastructure_infrastructure_GitDryCheckDiffGetter["dry_check::GitDryCheckDiffGetter"]
+    direction TB
+    T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self[GitDryCheckDiffGetter]
+  end
+  end
+end
+T27_domain_domain_DiffFileHunks_new --o T27_domain_domain_DiffHunkRange__self
+T27_domain_domain_DiffFileHunks_new --> T27_domain_domain_DiffFileHunks__self
+T27_domain_domain_DiffFileHunks_new --> T32_domain_domain_DiffFileHunksError__self
+T27_domain_domain_DiffFileHunks_hunks --> T27_domain_domain_DiffHunkRange__self
+T27_domain_domain_DiffHunkRange_new --> T27_domain_domain_DiffHunkRange__self
+T27_domain_domain_DiffHunkRange_new --> T32_domain_domain_DiffHunkRangeError__self
+T27_domain_domain_DryCheckEntry_new --o T29_domain_domain_DryCheckPairKey__self
+T27_domain_domain_DryCheckEntry_new --o T29_domain_domain_DryCheckVerdict__self
+T27_domain_domain_DryCheckEntry_new --o T23_domain_domain_Rationale__self
+T27_domain_domain_DryCheckEntry_new --> T27_domain_domain_DryCheckEntry__self
+T27_domain_domain_DryCheckEntry_new --> T32_domain_domain_DryCheckEntryError__self
+T27_domain_domain_DryCheckEntry_pair_key --> T29_domain_domain_DryCheckPairKey__self
+T27_domain_domain_DryCheckEntry_verdict --> T29_domain_domain_DryCheckVerdict__self
+T27_domain_domain_DryCheckEntry_rationale --> T23_domain_domain_Rationale__self
+T29_domain_domain_DryCheckFinding_new --o T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckFinding_new --o T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckFinding_new --> T29_domain_domain_DryCheckFinding__self
+T29_domain_domain_DryCheckFinding_new --> T34_domain_domain_DryCheckFindingError__self
+T29_domain_domain_DryCheckFinding_changed_fragment_ref --> T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckFinding_candidate_fragment_ref --> T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckFinding_refactor_proposal --> T30_domain_domain_RefactorProposal__self
+T29_domain_domain_DryCheckFinding__self --o|changed_fragment_ref| T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckFinding__self --o|candidate_fragment_ref| T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckFinding__self --o|refactor_proposal| T30_domain_domain_RefactorProposal__self
+T29_domain_domain_DryCheckPairKey_new --o T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckPairKey_new --o T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckPairKey_new --> T29_domain_domain_DryCheckPairKey__self
+T29_domain_domain_DryCheckPairKey_new --> T34_domain_domain_DryCheckPairKeyError__self
+T29_domain_domain_DryCheckPairKey_low --> T25_domain_domain_FragmentRef__self
+T29_domain_domain_DryCheckPairKey_high --> T25_domain_domain_FragmentRef__self
+T28_domain_domain_DryCheckRecord_pair_key --> T29_domain_domain_DryCheckPairKey__self
+T28_domain_domain_DryCheckRecord_verdict --> T29_domain_domain_DryCheckVerdict__self
+T28_domain_domain_DryCheckRecord_rationale --> T23_domain_domain_Rationale__self
+T28_domain_domain_DryCheckRecord_recorded_at --> T23_domain_domain_Timestamp__self
+T29_domain_domain_DryCheckVerdict_Violation --o|refactor_proposal| T30_domain_domain_RefactorProposal__self
+T33_domain_domain_FragmentContentHash_new --> T33_domain_domain_FragmentContentHash__self
+T33_domain_domain_FragmentContentHash_new --> T38_domain_domain_FragmentContentHashError__self
+T25_domain_domain_FragmentRef_new --o T33_domain_domain_FragmentContentHash__self
+T25_domain_domain_FragmentRef_new --> T25_domain_domain_FragmentRef__self
+T25_domain_domain_FragmentRef_content_hash --> T33_domain_domain_FragmentContentHash__self
+T23_domain_domain_Rationale_new --> T23_domain_domain_Rationale__self
+T23_domain_domain_Rationale_new --> T28_domain_domain_RationaleError__self
+T30_domain_domain_RefactorProposal_new --> T30_domain_domain_RefactorProposal__self
+T30_domain_domain_RefactorProposal_new --> T35_domain_domain_RefactorProposalError__self
+R28_domain_domain_DryCheckReader_read_records --> T33_domain_domain_DryCheckReaderError__self
+R28_domain_domain_DryCheckReader_read_records --> T28_domain_domain_DryCheckRecord__self
+R28_domain_domain_DryCheckWriter_append_record --o T27_domain_domain_DryCheckEntry__self
+R28_domain_domain_DryCheckWriter_append_record --> T33_domain_domain_DryCheckWriterError__self
+F60_domain_domain_domain__dry_check__fragments_overlapping_hunks --o T26_domain_domain_CodeFragment__self
+F60_domain_domain_domain__dry_check__fragments_overlapping_hunks --o T27_domain_domain_DiffFileHunks__self
+F60_domain_domain_domain__dry_check__fragments_overlapping_hunks --> T26_domain_domain_CodeFragment__self
+T26_domain_domain_CodeFragment_new --> T26_domain_domain_CodeFragment__self
+T37_usecase_usecase_DryCheckAgentJudgment_NotAViolation --o|rationale| T23_domain_domain_Rationale__self
+T37_usecase_usecase_DryCheckAgentJudgment_Accepted --o|rationale| T23_domain_domain_Rationale__self
+T37_usecase_usecase_DryCheckAgentJudgment_Violation --o|rationale| T23_domain_domain_Rationale__self
+T37_usecase_usecase_DryCheckAgentJudgment_Violation --o|finding| T29_domain_domain_DryCheckFinding__self
+T42_usecase_usecase_DryCheckApprovalInteractor_new --> T42_usecase_usecase_DryCheckApprovalInteractor__self
+T34_usecase_usecase_DryCheckCycleError_Agent --o T34_usecase_usecase_DryCheckAgentError__self
+T34_usecase_usecase_DryCheckCycleError_Reader --o T33_domain_domain_DryCheckReaderError__self
+T34_usecase_usecase_DryCheckCycleError_Writer --o T33_domain_domain_DryCheckWriterError__self
+T34_usecase_usecase_DryCheckCycleError_Diff --o T33_usecase_usecase_DryCheckDiffError__self
+T34_usecase_usecase_DryCheckCycleError_Entry --o T32_domain_domain_DryCheckEntryError__self
+T34_usecase_usecase_DryCheckInteractor_new --> T34_usecase_usecase_DryCheckInteractor__self
+T31_usecase_usecase_DryCheckResults__self --o|records| T28_domain_domain_DryCheckRecord__self
+T41_usecase_usecase_DryCheckResultsInteractor_new --> T41_usecase_usecase_DryCheckResultsInteractor__self
+R33_usecase_usecase_DryCheckAgentPort_judge --o T26_domain_domain_CodeFragment__self
+R33_usecase_usecase_DryCheckAgentPort_judge --o T26_domain_domain_CodeFragment__self
+R33_usecase_usecase_DryCheckAgentPort_judge --> T34_usecase_usecase_DryCheckAgentError__self
+R33_usecase_usecase_DryCheckAgentPort_judge --> T37_usecase_usecase_DryCheckAgentJudgment__self
+R39_usecase_usecase_DryCheckApprovalService_check_approved --o T26_domain_domain_CodeFragment__self
+R39_usecase_usecase_DryCheckApprovalService_check_approved --o T26_domain_domain_CodeFragment__self
+R39_usecase_usecase_DryCheckApprovalService_check_approved --> T34_usecase_usecase_DryCheckCycleError__self
+R39_usecase_usecase_DryCheckApprovalService_check_approved --> T37_domain_domain_DryCheckApprovalVerdict__self
+R34_usecase_usecase_DryCheckDiffSource_list_changed_hunks --> T33_usecase_usecase_DryCheckDiffError__self
+R34_usecase_usecase_DryCheckDiffSource_list_changed_hunks --> T27_domain_domain_DiffFileHunks__self
+R38_usecase_usecase_DryCheckResultsService_get_results --o T27_domain_domain_VerdictFilter__self
+R38_usecase_usecase_DryCheckResultsService_get_results --> T31_usecase_usecase_DryCheckResults__self
+R38_usecase_usecase_DryCheckResultsService_get_results --> T33_domain_domain_DryCheckReaderError__self
+R31_usecase_usecase_DryCheckService_run_dry_check --o T26_domain_domain_CodeFragment__self
+R31_usecase_usecase_DryCheckService_run_dry_check --o T26_domain_domain_CodeFragment__self
+R31_usecase_usecase_DryCheckService_run_dry_check --> T34_usecase_usecase_DryCheckCycleError__self
+R31_usecase_usecase_DryCheckService_run_dry_check --> T29_domain_domain_DryCheckFinding__self
+T34_usecase_usecase_DryCheckInteractor__self -.impl.-> R31_usecase_usecase_DryCheckService__self
+T41_usecase_usecase_DryCheckResultsInteractor__self -.impl.-> R38_usecase_usecase_DryCheckResultsService__self
+T42_usecase_usecase_DryCheckApprovalInteractor__self -.impl.-> R39_usecase_usecase_DryCheckApprovalService__self
+T45_infrastructure_infrastructure_CodexDryChecker_new --> T45_infrastructure_infrastructure_CodexDryChecker__self
+T55_infrastructure_infrastructure_FsDryCheckCommitHashStore_new --> T55_infrastructure_infrastructure_FsDryCheckCommitHashStore__self
+T55_infrastructure_infrastructure_FsDryCheckCommitHashStore_read --> T53_infrastructure_infrastructure_DryCheckCommitHashError__self
+T45_infrastructure_infrastructure_FsDryCheckStore_new --> T45_infrastructure_infrastructure_FsDryCheckStore__self
+T45_infrastructure_infrastructure_FsDryCheckStore__self -.impl.-> R28_domain_domain_DryCheckReader__self
+T45_infrastructure_infrastructure_FsDryCheckStore__self -.impl.-> R28_domain_domain_DryCheckWriter__self
+T45_infrastructure_infrastructure_CodexDryChecker__self -.impl.-> R33_usecase_usecase_DryCheckAgentPort__self
+T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self -.impl.-> R34_usecase_usecase_DryCheckDiffSource__self
+class T27_domain_domain_DiffFileHunks_new method_node
+class T27_domain_domain_DiffFileHunks_path method_node
+class T27_domain_domain_DiffFileHunks_hunks method_node
+class T27_domain_domain_DiffFileHunks__self value_object
+class T32_domain_domain_DiffFileHunksError_EmptyHunks variant_node
+class T32_domain_domain_DiffFileHunksError__self error_type
+class T27_domain_domain_DiffHunkRange_new method_node
+class T27_domain_domain_DiffHunkRange_start_line method_node
+class T27_domain_domain_DiffHunkRange_end_line method_node
+class T27_domain_domain_DiffHunkRange__self value_object
+class T32_domain_domain_DiffHunkRangeError_StartExceedsEnd variant_node
+class T32_domain_domain_DiffHunkRangeError_ZeroLine variant_node
+class T32_domain_domain_DiffHunkRangeError__self error_type
+class T37_domain_domain_DryCheckApprovalVerdict_Approved variant_node
+class T37_domain_domain_DryCheckApprovalVerdict_Blocked variant_node
+class T37_domain_domain_DryCheckApprovalVerdict__self value_object
+class T27_domain_domain_DryCheckEntry_new method_node
+class T27_domain_domain_DryCheckEntry_pair_key method_node
+class T27_domain_domain_DryCheckEntry_changed_path method_node
+class T27_domain_domain_DryCheckEntry_verdict method_node
+class T27_domain_domain_DryCheckEntry_similarity_score method_node
+class T27_domain_domain_DryCheckEntry_threshold method_node
+class T27_domain_domain_DryCheckEntry_base_commit method_node
+class T27_domain_domain_DryCheckEntry_rationale method_node
+class T27_domain_domain_DryCheckEntry__self value_object
+class T32_domain_domain_DryCheckEntryError_ChangedPathOutsidePair variant_node
+class T32_domain_domain_DryCheckEntryError__self error_type
+class T29_domain_domain_DryCheckFinding_new method_node
+class T29_domain_domain_DryCheckFinding_changed_fragment_ref method_node
+class T29_domain_domain_DryCheckFinding_candidate_fragment_ref method_node
+class T29_domain_domain_DryCheckFinding_refactor_proposal method_node
+class T29_domain_domain_DryCheckFinding__self value_object
+class T34_domain_domain_DryCheckFindingError_EmptyProposal variant_node
+class T34_domain_domain_DryCheckFindingError__self error_type
+class T29_domain_domain_DryCheckPairKey_new method_node
+class T29_domain_domain_DryCheckPairKey_low method_node
+class T29_domain_domain_DryCheckPairKey_high method_node
+class T29_domain_domain_DryCheckPairKey__self value_object
+class T34_domain_domain_DryCheckPairKeyError_SelfMatch variant_node
+class T34_domain_domain_DryCheckPairKeyError__self error_type
+class T33_domain_domain_DryCheckReaderError_Io variant_node
+class T33_domain_domain_DryCheckReaderError_SymlinkDetected variant_node
+class T33_domain_domain_DryCheckReaderError_Codec variant_node
+class T33_domain_domain_DryCheckReaderError_InvalidData variant_node
+class T33_domain_domain_DryCheckReaderError_IncompatibleSchema variant_node
+class T33_domain_domain_DryCheckReaderError__self error_type
+class T28_domain_domain_DryCheckRecord_pair_key method_node
+class T28_domain_domain_DryCheckRecord_changed_path method_node
+class T28_domain_domain_DryCheckRecord_verdict method_node
+class T28_domain_domain_DryCheckRecord_similarity_score method_node
+class T28_domain_domain_DryCheckRecord_threshold method_node
+class T28_domain_domain_DryCheckRecord_base_commit method_node
+class T28_domain_domain_DryCheckRecord_rationale method_node
+class T28_domain_domain_DryCheckRecord_recorded_at method_node
+class T28_domain_domain_DryCheckRecord__self value_object
+class T33_domain_domain_DryCheckRecordError_ChangedPathOutsidePair variant_node
+class T33_domain_domain_DryCheckRecordError__self error_type
+class T29_domain_domain_DryCheckVerdict_NotAViolation variant_node
+class T29_domain_domain_DryCheckVerdict_Accepted variant_node
+class T29_domain_domain_DryCheckVerdict_Violation variant_node
+class T29_domain_domain_DryCheckVerdict__self value_object
+class T33_domain_domain_DryCheckWriterError_Io variant_node
+class T33_domain_domain_DryCheckWriterError_SymlinkDetected variant_node
+class T33_domain_domain_DryCheckWriterError_Codec variant_node
+class T33_domain_domain_DryCheckWriterError_IncompatibleSchema variant_node
+class T33_domain_domain_DryCheckWriterError__self error_type
+class T33_domain_domain_FragmentContentHash_new method_node
+class T33_domain_domain_FragmentContentHash_as_str method_node
+class T33_domain_domain_FragmentContentHash__self value_object
+class T38_domain_domain_FragmentContentHashError_InvalidFormat variant_node
+class T38_domain_domain_FragmentContentHashError__self error_type
+class T25_domain_domain_FragmentRef_new method_node
+class T25_domain_domain_FragmentRef_path method_node
+class T25_domain_domain_FragmentRef_content_hash method_node
+class T25_domain_domain_FragmentRef__self value_object
+class T23_domain_domain_Rationale_new method_node
+class T23_domain_domain_Rationale_as_str method_node
+class T23_domain_domain_Rationale__self value_object
+class T28_domain_domain_RationaleError_Empty variant_node
+class T28_domain_domain_RationaleError__self error_type
+class T30_domain_domain_RefactorProposal_new method_node
+class T30_domain_domain_RefactorProposal_as_str method_node
+class T30_domain_domain_RefactorProposal__self value_object
+class T35_domain_domain_RefactorProposalError_Empty variant_node
+class T35_domain_domain_RefactorProposalError__self error_type
+class T27_domain_domain_VerdictFilter_All variant_node
+class T27_domain_domain_VerdictFilter_NotAViolation variant_node
+class T27_domain_domain_VerdictFilter_Accepted variant_node
+class T27_domain_domain_VerdictFilter_Violation variant_node
+class T27_domain_domain_VerdictFilter__self value_object
+class R28_domain_domain_DryCheckReader_read_records method_node
+class R28_domain_domain_DryCheckReader__self secondary_port
+class R28_domain_domain_DryCheckWriter_append_record method_node
+class R28_domain_domain_DryCheckWriter__self secondary_port
+class F60_domain_domain_domain__dry_check__fragments_overlapping_hunks free_function
+class F60_domain_domain_domain__dry_check__fragments_overlapping_hunks function_node
+class T26_domain_domain_CodeFragment_new method_node
+class T26_domain_domain_CodeFragment_content method_node
+class T26_domain_domain_CodeFragment_start_line method_node
+class T26_domain_domain_CodeFragment_end_line method_node
+class T26_domain_domain_CodeFragment__self value_object
+class T23_domain_domain_Timestamp__self value_object
+class T34_usecase_usecase_DryCheckAgentError_UserAbort variant_node
+class T34_usecase_usecase_DryCheckAgentError_AgentAbort variant_node
+class T34_usecase_usecase_DryCheckAgentError_Timeout variant_node
+class T34_usecase_usecase_DryCheckAgentError_IllegalOutput variant_node
+class T34_usecase_usecase_DryCheckAgentError_Unexpected variant_node
+class T34_usecase_usecase_DryCheckAgentError__self error_type
+class T37_usecase_usecase_DryCheckAgentJudgment_NotAViolation variant_node
+class T37_usecase_usecase_DryCheckAgentJudgment_Accepted variant_node
+class T37_usecase_usecase_DryCheckAgentJudgment_Violation variant_node
+class T37_usecase_usecase_DryCheckAgentJudgment__self value_object
+class T42_usecase_usecase_DryCheckApprovalInteractor_new method_node
+class T42_usecase_usecase_DryCheckApprovalInteractor__self interactor
+class T34_usecase_usecase_DryCheckCycleError_Embedding variant_node
+class T34_usecase_usecase_DryCheckCycleError_Index variant_node
+class T34_usecase_usecase_DryCheckCycleError_Agent variant_node
+class T34_usecase_usecase_DryCheckCycleError_Reader variant_node
+class T34_usecase_usecase_DryCheckCycleError_Writer variant_node
+class T34_usecase_usecase_DryCheckCycleError_Diff variant_node
+class T34_usecase_usecase_DryCheckCycleError_Entry variant_node
+class T34_usecase_usecase_DryCheckCycleError__self error_type
+class T33_usecase_usecase_DryCheckDiffError_Failed variant_node
+class T33_usecase_usecase_DryCheckDiffError__self error_type
+class T34_usecase_usecase_DryCheckInteractor_new method_node
+class T34_usecase_usecase_DryCheckInteractor__self interactor
+class T31_usecase_usecase_DryCheckResults__self query
+class T41_usecase_usecase_DryCheckResultsInteractor_new method_node
+class T41_usecase_usecase_DryCheckResultsInteractor__self interactor
+class R33_usecase_usecase_DryCheckAgentPort_judge method_node
+class R33_usecase_usecase_DryCheckAgentPort__self secondary_port
+class R39_usecase_usecase_DryCheckApprovalService_check_approved method_node
+class R39_usecase_usecase_DryCheckApprovalService__self app_service
+class R34_usecase_usecase_DryCheckDiffSource_list_changed_hunks method_node
+class R34_usecase_usecase_DryCheckDiffSource__self secondary_port
+class R38_usecase_usecase_DryCheckResultsService_get_results method_node
+class R38_usecase_usecase_DryCheckResultsService__self app_service
+class R31_usecase_usecase_DryCheckService_run_dry_check method_node
+class R31_usecase_usecase_DryCheckService__self app_service
+class T45_infrastructure_infrastructure_CodexDryChecker_new method_node
+class T45_infrastructure_infrastructure_CodexDryChecker__self secondary_adapter
+class T53_infrastructure_infrastructure_DryCheckCommitHashError_Io variant_node
+class T53_infrastructure_infrastructure_DryCheckCommitHashError_SymlinkDetected variant_node
+class T53_infrastructure_infrastructure_DryCheckCommitHashError_Format variant_node
+class T53_infrastructure_infrastructure_DryCheckCommitHashError__self error_type
+class T55_infrastructure_infrastructure_FsDryCheckCommitHashStore_new method_node
+class T55_infrastructure_infrastructure_FsDryCheckCommitHashStore_read method_node
+class T55_infrastructure_infrastructure_FsDryCheckCommitHashStore__self secondary_adapter
+class T45_infrastructure_infrastructure_FsDryCheckStore_new method_node
+class T45_infrastructure_infrastructure_FsDryCheckStore__self secondary_adapter
+class T51_infrastructure_infrastructure_GitDryCheckDiffGetter__self secondary_adapter
+```

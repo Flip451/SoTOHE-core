@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-03T06:07:15Z",
+  "declaration_hash": "84fc8d15bd0d21a0fdfc8ef920dbcef817f38964d30a55ba821e105bbf6e8a12",
+  "signals": [
+    {
+      "type_name": "CodexDryChecker",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "DryCheckAgentPort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckCommitHashError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "FsDryCheckCommitHashStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsDryCheckStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "DryCheckReader",
+        "DryCheckWriter",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "GitDryCheckDiffGetter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "DryCheckDiffSource",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}

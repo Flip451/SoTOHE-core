@@ -1,0 +1,275 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "FsDryCheckStore": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Filesystem adapter implementing DryCheckReader and DryCheckWriter for dry-check.json. The on-disk format is a schema-versioned envelope object { schema_version: u32, records: Vec<DryCheckRecord> } — a private serde DTO (DryCheckJsonV1) internal to the infrastructure module, mirroring ReviewJsonV2 { schema_version, scopes } from FsReviewStore. Uses atomic write and fs4 file locking (mirrors FsReviewStore). DryCheckReader.read_records() parses the envelope and returns the records Vec (returns empty Vec if file absent, mirroring FsReviewStore.read_doc returning ReviewJsonV2::empty() on NotFound). DryCheckWriter.append_record(entry: &DryCheckEntry) acquires an exclusive lock, reads the envelope under lock (returning an empty envelope if the file is absent — init-on-first-write, matching FsReviewStore.append_round calling read_doc_for_write which returns ReviewJsonV2::empty() on NotFound), stamps Timestamp::new(infrastructure::timestamp_now()), constructs DryCheckRecord from DryCheckEntry + Timestamp, appends it to the records Vec, and writes the updated envelope back atomically. The interactor passes DryCheckEntry (7 fields, no recorded_at) — the adapter is the sole owner of recorded_at stamping, ensuring recorded_at is always a valid non-empty ISO-8601 UTC Timestamp (Finding 3). No separate init() method is needed: the first append creates the file. History is append-only at the records level; latest-per-pair wins by array position. Sole writer of dry-check.json — enforces D11 schema-constrained verdict ingestion.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-09",
+          "hash": "a59190fffc13f2ac277bda7ddeb540e8b74c366daf69034ee01a8a6449429e29"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-08",
+          "hash": "bca70eb83ee1d45aa7b5f0dd615ae9060d3b280f3441520e855d7a299e1470f6"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "GO-03",
+          "hash": "364194b41e2a12be6e263dcccf56145b54fd12eeae2fa95e01e026408a2adb35"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CodexDryChecker": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Infrastructure adapter implementing DryCheckAgentPort via Codex CLI with --output-schema (structured verdict output). Invokes the dry-checker capability for a (changed-fragment, candidate-fragment) pair. Analogous to CodexReviewer.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-01",
+          "hash": "7c8190cf80ae2662d31c229f3151b073644d3784b64b2989e41986d8133fe343"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-08",
+          "hash": "bca70eb83ee1d45aa7b5f0dd615ae9060d3b280f3441520e855d7a299e1470f6"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCommitHashError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Io",             "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }, { "name": "detail", "ty": "String" }] } },
+          { "name": "SymlinkDetected","payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }] } },
+          { "name": "Format",         "payload": { "kind": "tuple",  "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error from FsDryCheckCommitHashStore.read(). CN-01: independent of domain::review_v2::CommitHashError (review gate interface). Three failure modes: I/O error reading the file, symlink detected below trusted_root, or invalid commit hash format. An absent file returns Ok(None) so NotFound is not an error variant.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "GitDryCheckDiffGetter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Infrastructure adapter implementing DryCheckDiffSource (dry-check's own diff-source port, method list_changed_hunks). CN-01: this is NOT GitDiffGetter from review_v2 — it is a dry-check-owned adapter. Returns Vec<DiffFileHunks>, each carrying a FilePath and a non-empty Vec<DiffHunkRange> of added/changed hunk line ranges (D4 hunk-scope). Behavior mirrors GitDiffGetter (merge-base + 4-source union via SystemGitRepo: committed diff merge-base..HEAD, staged, unstaged, untracked), but uses git diff --unified=0 (or equivalent) to extract hunk-level line ranges. SystemGitRepo is neutral git plumbing (not a gate interface) and is shared. Uses domain::review_v2::FilePath (shared domain value object, not a gate interface).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FsDryCheckCommitHashStore": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Infrastructure adapter for reading the per-track .commit_hash file to resolve the diff base for dry-check. CN-01: this is NOT FsCommitHashStore from review_v2 — it is a dry-check-owned adapter. Behavior mirrors FsCommitHashStore.read(): reads the file, validates it as a CommitHash via CommitHash::try_new(), then uses SystemGitRepo (merge-base --is-ancestor) to check ancestry. Three outcomes: (1) file absent → Ok(None) (main-tip fallback); (2) stored content is an invalid hash format → Err(DryCheckCommitHashError::Format) (propagated from CommitHash::try_new()); (3) hash is not an ancestor of HEAD → Ok(None) (fail-closed, main-tip fallback). Used at composition level by the CLI to resolve base_commit before calling DryCheckService.run_dry_check(). Not wired through a usecase port — the CLI calls it directly and passes the resolved CommitHash as a parameter.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-02",
+          "hash": "acd422b8d8d8a89e785ad5e051e981e312140f9185c6f730f9df5bfc030e5f56"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-04",
+          "hash": "5b6c9bf097b59eecbfcea1ba66f271aaadab1a97489e1dff4a8f21d297fef10a"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "FsDryCheckStore",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "path",         "ty": "std::path::PathBuf" },
+            { "name": "trusted_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "FsDryCheckStore",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "CodexDryChecker",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "model",            "ty": "String" },
+            { "name": "capability_name",  "ty": "String" }
+          ],
+          "returns": "CodexDryChecker",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "FsDryCheckCommitHashStore",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "path",         "ty": "std::path::PathBuf" },
+            { "name": "trusted_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "FsDryCheckCommitHashStore",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Option<domain::CommitHash>, DryCheckCommitHashError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "domain::dry_check::DryCheckReader",
+      "for_type": "FsDryCheckStore"
+    },
+    {
+      "action": "add",
+      "trait_ref": "domain::dry_check::DryCheckWriter",
+      "for_type": "FsDryCheckStore"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::dry_check::DryCheckAgentPort",
+      "for_type": "CodexDryChecker"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::dry_check::DryCheckDiffSource",
+      "for_type": "GitDryCheckDiffGetter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsDryCheckStore"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CodexDryChecker"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "GitDryCheckDiffGetter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsDryCheckCommitHashStore"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckCommitHashError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckCommitHashError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckCommitHashError"
+    }
+  ]
+}
