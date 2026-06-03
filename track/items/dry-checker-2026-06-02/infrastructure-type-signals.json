@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-03T10:59:40Z",
+  "generated_at": "2026-06-03T11:39:02Z",
   "declaration_hash": "406c3c3489ddfa3e2d1bae5c74cd9ee5bdbf853d0a5d2dde318bf7d564ceb8a1",
   "signals": [
     {
       "type_name": "CodexDryChecker",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "DryCheckAgentPort",
         "core::fmt::Debug"
       ]

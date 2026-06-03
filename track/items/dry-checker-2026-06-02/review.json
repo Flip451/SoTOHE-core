@@ -19,6 +19,208 @@
         }
       ]
     },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
+          "at": "2026-06-03T07:15:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_into_fragments` records spans from the untrimmed accumulator but stores `current.trim()` as the fragment content. Separator or leading blank lines trimmed out of `text` are still included in `start_line`/`end_line`; for example `fn a() {}\\n\\nfn b() {}` yields the first fragment as lines 1..=2 even though its content is only line 1. Hunk filtering can then treat edits to blank lines between items as overlapping the previous fragment, so the span no longer corresponds to the fragment body required by the change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/extractor.rs",
+              "line": 199,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
+          "at": "2026-06-03T07:19:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:569721a667441dc75758a2f5941fb2e2f2c019c55e605542716f4550217c2a99",
+          "at": "2026-06-03T07:24:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckVerdictDto` is serialized with an internal `type` tag, so the unit variants write as `{ \"type\": \"NotAViolation\" }` / `{ \"type\": \"Accepted\" }` and `Violation` also carries a `type` field. That does not match the required dry-check.json schema described in the brief, which expects bare string verdicts for the unit cases and a nested `violation` object, so this adapter will not round-trip the documented on-disk format.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codec.rs",
+              "line": 18,
+              "category": "schema"
+            },
+            {
+              "message": "`collect_hunk_ranges` and `collect_untracked_files` both treat non-success git exits as success in common cases, returning `Ok(())` instead of `DryCheckDiffError::Failed`. That can silently drop changed hunks or untracked files and make `GitDryCheckDiffGetter::list_changed_hunks` report an incomplete diff set when git fails.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 169,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:cee6f502f0e6a1d6391c1de794448ea637e0dee3f5f884c06a8bce761e7ab2f8",
+          "at": "2026-06-03T09:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The hunk parser treats any added diff line starting with `+++ ` as a file header, so legitimate source lines like `++ foo` can reset `current_file` and silently drop or misattribute hunks. That can make `list_changed_hunks()` miss changed fragments.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 121,
+              "category": "correctness"
+            },
+            {
+              "message": "The only test for `GitDryCheckDiffGetter::list_changed_hunks()` never reaches the method: `CommitHash::try_new(\"HEAD\")` always fails and the test returns early. The new public API has no real happy-path/error-path coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 286,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8a7757b1df084453f254b9bfd2ff384f8e17069558af6085fd791bfe0d215900",
+          "at": "2026-06-03T09:11:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_records` now contains a fairly deep DTO→domain validation pipeline (`FragmentContentHash`, `DryCheckPairKey`, `Timestamp`, `SimilarityScore`, `RefactorProposal`), but this module only exercises round-trip success. There is no test that malformed on-disk data is rejected as `DryCheckReaderError::InvalidData` or that a future `schema_version` is rejected, so regressions in the new persistence/compatibility path would slip through.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 241,
+              "category": "test coverage"
+            },
+            {
+              "message": "`list_changed_hunks` is only covered by a single simple modified-file case plus merge-base failure. The untracked-file source and the 4-source union path are untested, so regressions in the `u32::MAX` whole-file sentinel or multi-source accumulation can ship unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 33,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:443308fd9bd670e4c670dbd9b2ed3d53fafd574222b036d628cf4623b2f8cb3d",
+          "at": "2026-06-03T09:20:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6bba9282d62299ada11847fae1562c9aa943b41eecdd8e191fe1272df7a6248",
+          "at": "2026-06-03T09:29:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Production code splits the hunk header with direct string slicing. This violates the scope's no slice-indexing rule and the workspace has `clippy::indexing_slicing = \"deny\"`, so `ci-rust`/clippy will reject the new adapter. Use `split_once(',')` or checked `get` ranges instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 207,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:c6bba9282d62299ada11847fae1562c9aa943b41eecdd8e191fe1272df7a6248",
+          "at": "2026-06-03T09:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dto_to_domain` casts persisted `similarity_score` and `threshold` from `f64` to `f32` before validation. That lossy conversion can make out-of-schema JSON values pass the domain checks, e.g. a tiny negative value rounds to `-0.0` or a value just above `1.0` rounds to `1.0`, so `read_records()` can accept invalid dry-check.json data instead of returning `DryCheckReaderError::InvalidData`. Validate finiteness and the `[0, 1]` range while the values are still `f64` before casting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 296,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:6eb1d5686dfbaaa6e94aa44886913bb998ca8012ec19b20ec294497a6d8a9a9c",
+          "at": "2026-06-03T09:40:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c800893bd5a37265fb018147df7343dcb65456627c202ee242fe2689b2ac4a7",
+          "at": "2026-06-03T09:45:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckAgentOutputDto` accepts unknown JSON keys because it is deserialized with plain `serde::Deserialize` and no `#[serde(deny_unknown_fields)]`. That lets malformed agent output with extra fields pass parsing even though the schema in this file sets `additionalProperties: false` and the adapter is supposed to reject nonconforming output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 69,
+              "category": "schema validation"
+            }
+          ],
+          "hash": "rvw1:sha256:57ff19aa3464e2a27b8a5b20e5432ac3832d46da7c9aad182790b6f26a207b20",
+          "at": "2026-06-03T11:14:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_ref_from_code_fragment` converts `CodeFragment::source_path` directly into `FilePath`, but `FilePath::new` rejects absolute paths. In the dry-check pipeline, fragments are built from workspace scans and semantic-index reads using absolute paths, so any real `Violation` verdict will fail here with `DryCheckAgentError::Unexpected` instead of producing a `DryCheckFinding`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 227,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5616df4e6ed97ed5884f2d0e35beb3fbe9e34c46e10892cc496678c31220dd05",
+          "at": "2026-06-03T11:19:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`source_path` is converted with `to_string_lossy()` before building `FilePath`, which can silently change the fragment identity for non-UTF-8 paths and keeps OS-native separators (for example, backslashes on Windows). That means `FragmentRef` can be lossy or platform-specific instead of representing the real repo-relative path, leading to identifier collisions or mismatches. Reject non-UTF-8 paths here and canonicalize to a stable repo-relative form instead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 227,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5f0ede85413cad337cc178d3824e249763e6338df3dbf990c6e0d0fa6f953fc4",
+          "at": "2026-06-03T11:27:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a26fb3e285f058b67d686b4799350fa586b625f1dff67cecb58291fe91d5da0",
+          "at": "2026-06-03T11:33:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a26fb3e285f058b67d686b4799350fa586b625f1dff67cecb58291fe91d5da0",
+          "at": "2026-06-03T11:37:57Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -85,6 +287,128 @@
           "findings": [],
           "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
           "at": "2026-06-03T09:00:52Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:15:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:19:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
+          "at": "2026-06-03T08:17:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
+          "at": "2026-06-03T08:21:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
+          "at": "2026-06-03T10:14:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
+          "at": "2026-06-03T10:18:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`above_threshold_candidates` is appended across successive growing-`k` searches without any seen-pair deduplication, so the same unresolved pair can be counted multiple times when the search window expands. That inflates `Blocked { unresolved_pair_count }` and violates the distinct-pair count contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "line": 138,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:312db1f01188c40194fbe76ac39ba75781a47e8648a3175037482de9a5bd2f73",
+          "at": "2026-06-03T10:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `check_approved` API has success and reader-failure coverage, but it does not test the `Embedding`/`Index` error branches (`map_err(DryCheckCycleError::Embedding/Index)` in the method body). That leaves regressions in those required error paths unguarded.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "line": 397,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c74cffd10a04ae5aca3d3f0f864b0568ec47fc237b9d4b4afd5db7b0a52c88ad",
+          "at": "2026-06-03T10:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:53:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:57:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:58:31Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
+          "at": "2026-06-03T07:14:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
+          "at": "2026-06-03T07:17:09Z"
         }
       ]
     },
@@ -934,271 +1258,20 @@
           "findings": [],
           "hash": "rvw1:sha256:f89195ed1d68a0ad2b9ff91e83a7f62e394313b69412a3b66000e1c54c7e828a",
           "at": "2026-06-03T10:40:29Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
-          "at": "2026-06-03T07:14:38Z"
+          "hash": "rvw1:sha256:1267851b4661c02df2cd5093511e55db5f653326e55781e8c376a6c45dfd397c",
+          "at": "2026-06-03T11:12:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
-          "at": "2026-06-03T07:17:09Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
-          "at": "2026-06-03T07:15:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`split_into_fragments` records spans from the untrimmed accumulator but stores `current.trim()` as the fragment content. Separator or leading blank lines trimmed out of `text` are still included in `start_line`/`end_line`; for example `fn a() {}\\n\\nfn b() {}` yields the first fragment as lines 1..=2 even though its content is only line 1. Hunk filtering can then treat edits to blank lines between items as overlapping the previous fragment, so the span no longer corresponds to the fragment body required by the change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/extractor.rs",
-              "line": 199,
-              "category": "logic_error"
-            }
-          ],
-          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
-          "at": "2026-06-03T07:19:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:569721a667441dc75758a2f5941fb2e2f2c019c55e605542716f4550217c2a99",
-          "at": "2026-06-03T07:24:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`DryCheckVerdictDto` is serialized with an internal `type` tag, so the unit variants write as `{ \"type\": \"NotAViolation\" }` / `{ \"type\": \"Accepted\" }` and `Violation` also carries a `type` field. That does not match the required dry-check.json schema described in the brief, which expects bare string verdicts for the unit cases and a nested `violation` object, so this adapter will not round-trip the documented on-disk format.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/codec.rs",
-              "line": 18,
-              "category": "schema"
-            },
-            {
-              "message": "`collect_hunk_ranges` and `collect_untracked_files` both treat non-success git exits as success in common cases, returning `Ok(())` instead of `DryCheckDiffError::Failed`. That can silently drop changed hunks or untracked files and make `GitDryCheckDiffGetter::list_changed_hunks` report an incomplete diff set when git fails.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
-              "line": 169,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:cee6f502f0e6a1d6391c1de794448ea637e0dee3f5f884c06a8bce761e7ab2f8",
-          "at": "2026-06-03T09:03:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The hunk parser treats any added diff line starting with `+++ ` as a file header, so legitimate source lines like `++ foo` can reset `current_file` and silently drop or misattribute hunks. That can make `list_changed_hunks()` miss changed fragments.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
-              "line": 121,
-              "category": "correctness"
-            },
-            {
-              "message": "The only test for `GitDryCheckDiffGetter::list_changed_hunks()` never reaches the method: `CommitHash::try_new(\"HEAD\")` always fails and the test returns early. The new public API has no real happy-path/error-path coverage.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
-              "line": 286,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:8a7757b1df084453f254b9bfd2ff384f8e17069558af6085fd791bfe0d215900",
-          "at": "2026-06-03T09:11:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_records` now contains a fairly deep DTO→domain validation pipeline (`FragmentContentHash`, `DryCheckPairKey`, `Timestamp`, `SimilarityScore`, `RefactorProposal`), but this module only exercises round-trip success. There is no test that malformed on-disk data is rejected as `DryCheckReaderError::InvalidData` or that a future `schema_version` is rejected, so regressions in the new persistence/compatibility path would slip through.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/store.rs",
-              "line": 241,
-              "category": "test coverage"
-            },
-            {
-              "message": "`list_changed_hunks` is only covered by a single simple modified-file case plus merge-base failure. The untracked-file source and the 4-source union path are untested, so regressions in the `u32::MAX` whole-file sentinel or multi-source accumulation can ship unnoticed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
-              "line": 33,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:443308fd9bd670e4c670dbd9b2ed3d53fafd574222b036d628cf4623b2f8cb3d",
-          "at": "2026-06-03T09:20:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c6bba9282d62299ada11847fae1562c9aa943b41eecdd8e191fe1272df7a6248",
-          "at": "2026-06-03T09:29:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Production code splits the hunk header with direct string slicing. This violates the scope's no slice-indexing rule and the workspace has `clippy::indexing_slicing = \"deny\"`, so `ci-rust`/clippy will reject the new adapter. Use `split_once(',')` or checked `get` ranges instead.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
-              "line": 207,
-              "category": "build"
-            }
-          ],
-          "hash": "rvw1:sha256:c6bba9282d62299ada11847fae1562c9aa943b41eecdd8e191fe1272df7a6248",
-          "at": "2026-06-03T09:34:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dto_to_domain` casts persisted `similarity_score` and `threshold` from `f64` to `f32` before validation. That lossy conversion can make out-of-schema JSON values pass the domain checks, e.g. a tiny negative value rounds to `-0.0` or a value just above `1.0` rounds to `1.0`, so `read_records()` can accept invalid dry-check.json data instead of returning `DryCheckReaderError::InvalidData`. Validate finiteness and the `[0, 1]` range while the values are still `f64` before casting.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/store.rs",
-              "line": 296,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:6eb1d5686dfbaaa6e94aa44886913bb998ca8012ec19b20ec294497a6d8a9a9c",
-          "at": "2026-06-03T09:40:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c800893bd5a37265fb018147df7343dcb65456627c202ee242fe2689b2ac4a7",
-          "at": "2026-06-03T09:45:57Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:15:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:16:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:19:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
-          "at": "2026-06-03T08:17:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
-          "at": "2026-06-03T08:21:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
-          "at": "2026-06-03T10:14:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
-          "at": "2026-06-03T10:18:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`above_threshold_candidates` is appended across successive growing-`k` searches without any seen-pair deduplication, so the same unresolved pair can be counted multiple times when the search window expands. That inflates `Blocked { unresolved_pair_count }` and violates the distinct-pair count contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
-              "line": 138,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:312db1f01188c40194fbe76ac39ba75781a47e8648a3175037482de9a5bd2f73",
-          "at": "2026-06-03T10:40:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The public `check_approved` API has success and reader-failure coverage, but it does not test the `Embedding`/`Index` error branches (`map_err(DryCheckCycleError::Embedding/Index)` in the method body). That leaves regressions in those required error paths unguarded.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
-              "line": 397,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:c74cffd10a04ae5aca3d3f0f864b0568ec47fc237b9d4b4afd5db7b0a52c88ad",
-          "at": "2026-06-03T10:49:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
-          "at": "2026-06-03T10:53:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
-          "at": "2026-06-03T10:57:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
-          "at": "2026-06-03T10:58:31Z"
+          "hash": "rvw1:sha256:1267851b4661c02df2cd5093511e55db5f653326e55781e8c376a6c45dfd397c",
+          "at": "2026-06-03T11:14:24Z"
         }
       ]
     }
