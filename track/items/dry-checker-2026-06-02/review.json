@@ -1,65 +1,215 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
+          "at": "2026-06-03T07:14:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
+          "at": "2026-06-03T07:17:09Z"
+        },
+        {
+          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
+              "message": "`build_diff_and_corpus_fragments` compares `extract_code_fragments` output directly against repo-relative hunk paths, but it never normalizes `source_path` into repo-relative form before the `changed_paths` filter / `fragments_overlapping_hunks` call. If `--workspace-root` is absolute or otherwise not already repo-relative, this can make `candidate_fragments` empty and cause `write`/`check-approved` to miss the diff scope silently.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
-              "line": 91,
-              "category": "correctness"
-            },
-            {
-              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:123-144`, `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
-              "line": 129,
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 196,
               "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:8f4ef6b67d3326653bb4e28f4a52f27f51c40676f019eb187cbeb0c19bc0775c",
-          "at": "2026-06-03T13:17:23Z"
+          "hash": "rvw1:sha256:c84593a1943090d823097e9adda7fdcf2ee2412376c19529ba93e1aaddf419f9",
+          "at": "2026-06-03T12:01:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`candidate_fragments` compares `PathBuf::to_string_lossy()` output against slash-separated git hunk paths as raw strings. On Windows the extracted paths stringify with backslashes (`src\\\\foo.rs`), so every changed fragment is filtered out and both `dry_write` and `dry_check_approved` can run against an empty diff scope.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 230,
+              "category": "correctness"
+            },
+            {
+              "message": "The new public `CliApp::dry_*` entry points are not exercised by any happy-path or error-path tests; the module only covers helper functions and DTO fields. That leaves the main composition wiring (base resolution, adapter construction, exit-code mapping, and the path-normalization path above) unverified.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 319,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:2c80a0aa9f50021fe63ffcd4441fb5d030852b7e92ffeb9ab38f08a0ab5aafb8",
+          "at": "2026-06-03T12:19:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_diff_and_corpus_fragments` strips `workspace_root` from fragment paths and then compares the result to repo-relative git hunk paths. That only works when `workspace_root` is exactly the repository root; any valid subdirectory root makes `candidate_fragments` incomplete/empty, so `sotp dry write` and `sotp dry check-approved` can silently miss changed fragments. The paths need to be normalized against the git root, or non-root workspaces must be rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 217,
+              "category": "correctness"
+            },
+            {
+              "message": "The three `dry_*` entry points accept `items_dir` as-is and never verify that the resulting track directory stays under the discovered repository root before constructing `FsDryCheckStore` / `FsDryCheckCommitHashStore`. Because the infrastructure guard only rejects symlinks, an absolute path or `..`-escaped `items_dir` can make `sotp dry` read and write `dry-check.json` outside the repository tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 338,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:cf0cc0554f63979f1ffc7744f07f00d43074b3aa4f7bc062e14e8cc241f45de9",
+          "at": "2026-06-03T12:26:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`input.track_id` is joined directly onto `items_dir_abs` in all three `dry_*` entry points, so a malicious `--track-id` value like `../outside` or an absolute path can escape the repository root and make `dry_write` / `dry_results` / `dry_check_approved` read or write `dry-check.json` outside the repo tree. `items_dir` is validated, but `track_id` itself is not.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 370,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7ec657985c78d998ecb7906ae2145b8c2cfef36f60917e324066afa2cccc5881",
+          "at": "2026-06-03T12:35:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public command methods `dry_write` and `dry_check_approved` are not exercised directly by any success-path or failure-path tests. The current tests only cover helper functions and manually constructed `CommandOutcome` values, so regressions in adapter wiring, path validation, or verdict-to-exit mapping would not be caught. Add direct tests for both public APIs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 362,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:3f7be0730d683f5fd1717b9c5e889bb473618305aa2e76b657db2d10d0041db3",
+          "at": "2026-06-03T12:42:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_write` rejects a missing `track_id` directory before it reaches `FsDryCheckStore`, and `dry_check_approved` repeats the same guard later in this file. That breaks the intended first-run behavior: `FsDryCheckStore::append_record` already creates parent directories on demand, and `read_doc()` treats a missing `dry-check.json` as empty history. As written, a new track cannot be written without pre-creating the directory, and the gate cannot run against an empty history.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 401,
+              "category": "correctness"
+            },
+            {
+              "message": "The write summary only reports `findings.len()` plus per-finding details. The brief requires stdout to include both `pairs checked` and `records appended`, but those counts are never computed or printed here, so callers cannot tell how much of the diff was processed or persisted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 452,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ae364908f172235411813e309b8ddeb0d52ccd2a7c17bcde92149aad669c8504",
+          "at": "2026-06-03T12:50:28Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
-          "at": "2026-06-03T13:20:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workflow now says capability routing and model/CLI selection are determined by `.harness/config/agent-profiles.json`, and lists `dry-checker` as Codex. However `sotp dry write` does not load agent-profiles at all: its CLI args define `--model` with default `codex` and `--capability-name` with default `dry-checker`, then pass those directly to `CodexDryChecker::new`. As a result the new `.harness/config/agent-profiles.json` entry `dry-checker.model = gpt-5.5` has no effect on the documented `sotp dry write` path, so the docs/config describe a routing behavior the implementation does not provide.",
-              "severity": "P1",
-              "file": "DEVELOPER_AI_WORKFLOW.md",
-              "line": 363,
-              "category": "docs"
-            },
-            {
-              "message": "The documented `sotp dry` command surfaces are incomplete relative to the implemented clap args. `write` also accepts `--items-dir`, `--model`, and `--capability-name`; `results` and `check-approved` also accept `--items-dir`. Because this convention is the command reference for DFP/RFP operation and already lists other optional flags, omitting these flags makes the documented argument surface disagree with the actual T007-T009 CLI, especially the model/capability overrides that currently control dry-checker execution.",
-              "severity": "P1",
-              "file": "knowledge/conventions/dry-check-workflow.md",
-              "line": 53,
-              "category": "docs"
-            }
-          ],
-          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
-          "at": "2026-06-03T13:24:39Z"
+          "hash": "rvw1:sha256:afcd2f2e8ed9547fe76630baad041119ac6c537203a0102cb745ba7b09159f9f",
+          "at": "2026-06-03T12:57:27Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ff5385a3b4d8c08cfb0f6f4d71bd85fbbcdd221d1336ddf8b3d6dac3f15026e1",
-          "at": "2026-06-03T13:28:26Z"
+          "hash": "rvw1:sha256:afcd2f2e8ed9547fe76630baad041119ac6c537203a0102cb745ba7b09159f9f",
+          "at": "2026-06-03T13:02:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tempdir_in` is anchored to `input.db_path.parent().unwrap_or(&input.db_path)`, so when the caller uses the documented default `.semantic_index` (or any db path without an existing parent directory) the command now depends on a directory that may not exist yet and can fail before LanceDB opens. That regresses first-run behavior for both `dry_write` and `dry_check_approved` (same pattern at line 632). The added tests do not catch this because they pass an invalid `base_commit` and return before the tempdir code runs.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 468,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:66c358f849755322f6e988f333d45a0b738eb32998a8e6023508eb0468b3cf87",
+          "at": "2026-06-03T22:56:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fresh-index tests never reach `create_ephemeral_index_dir()` or `LanceDbSemanticIndexAdapter::new()`: they all pass `base_commit: Some(\"not-a-hash\")`, so `resolve_dry_diff_base()` fails first. As written, these tests only revalidate the existing base-commit error path and leave the new ephemeral-index behavior in both `dry_write` and `dry_check_approved` untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1346,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e641eaf44a4f96b92c716f0f299111c4da00aa65e90b056e46ab119d2dddbcad",
+          "at": "2026-06-03T23:02:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2af5286486985ab50d7f53cfc2fc2a99ea9a418a49c4aff05e7396148ba3dfa0",
+          "at": "2026-06-03T23:07:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2af5286486985ab50d7f53cfc2fc2a99ea9a418a49c4aff05e7396148ba3dfa0",
+          "at": "2026-06-03T23:11:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2af5286486985ab50d7f53cfc2fc2a99ea9a418a49c4aff05e7396148ba3dfa0",
+          "at": "2026-06-03T23:11:47Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
+          "at": "2026-06-03T10:14:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
+          "at": "2026-06-03T10:16:04Z"
         }
       ]
     },
@@ -1031,236 +1181,20 @@
           "findings": [],
           "hash": "rvw1:sha256:fe2f7c39846b47bca80538574eaf58a804e9a228400cb185866734010f25974f",
           "at": "2026-06-03T22:44:34Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
-              "severity": "P1",
-              "file": "libs/domain/src/dry_check.rs",
-              "line": 801,
-              "category": "correctness"
-            },
-            {
-              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/semantic_dup.rs",
-              "line": 184,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
-          "at": "2026-06-03T07:16:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
-              "line": 821,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
-          "at": "2026-06-03T07:24:18Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
-          "at": "2026-06-03T07:34:32Z"
+          "hash": "rvw1:sha256:8c3921982c0294e4e81345c11deda2bfaeb2938710826e77423a05528b283f90",
+          "at": "2026-06-03T22:54:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
-          "at": "2026-06-03T07:37:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
-          "at": "2026-06-03T08:59:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
-          "at": "2026-06-03T09:00:52Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
-          "at": "2026-06-03T07:14:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
-          "at": "2026-06-03T07:17:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_diff_and_corpus_fragments` compares `extract_code_fragments` output directly against repo-relative hunk paths, but it never normalizes `source_path` into repo-relative form before the `changed_paths` filter / `fragments_overlapping_hunks` call. If `--workspace-root` is absolute or otherwise not already repo-relative, this can make `candidate_fragments` empty and cause `write`/`check-approved` to miss the diff scope silently.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 196,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c84593a1943090d823097e9adda7fdcf2ee2412376c19529ba93e1aaddf419f9",
-          "at": "2026-06-03T12:01:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`candidate_fragments` compares `PathBuf::to_string_lossy()` output against slash-separated git hunk paths as raw strings. On Windows the extracted paths stringify with backslashes (`src\\\\foo.rs`), so every changed fragment is filtered out and both `dry_write` and `dry_check_approved` can run against an empty diff scope.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 230,
-              "category": "correctness"
-            },
-            {
-              "message": "The new public `CliApp::dry_*` entry points are not exercised by any happy-path or error-path tests; the module only covers helper functions and DTO fields. That leaves the main composition wiring (base resolution, adapter construction, exit-code mapping, and the path-normalization path above) unverified.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 319,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:2c80a0aa9f50021fe63ffcd4441fb5d030852b7e92ffeb9ab38f08a0ab5aafb8",
-          "at": "2026-06-03T12:19:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_diff_and_corpus_fragments` strips `workspace_root` from fragment paths and then compares the result to repo-relative git hunk paths. That only works when `workspace_root` is exactly the repository root; any valid subdirectory root makes `candidate_fragments` incomplete/empty, so `sotp dry write` and `sotp dry check-approved` can silently miss changed fragments. The paths need to be normalized against the git root, or non-root workspaces must be rejected.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 217,
-              "category": "correctness"
-            },
-            {
-              "message": "The three `dry_*` entry points accept `items_dir` as-is and never verify that the resulting track directory stays under the discovered repository root before constructing `FsDryCheckStore` / `FsDryCheckCommitHashStore`. Because the infrastructure guard only rejects symlinks, an absolute path or `..`-escaped `items_dir` can make `sotp dry` read and write `dry-check.json` outside the repository tree.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 338,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:cf0cc0554f63979f1ffc7744f07f00d43074b3aa4f7bc062e14e8cc241f45de9",
-          "at": "2026-06-03T12:26:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`input.track_id` is joined directly onto `items_dir_abs` in all three `dry_*` entry points, so a malicious `--track-id` value like `../outside` or an absolute path can escape the repository root and make `dry_write` / `dry_results` / `dry_check_approved` read or write `dry-check.json` outside the repo tree. `items_dir` is validated, but `track_id` itself is not.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 370,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:7ec657985c78d998ecb7906ae2145b8c2cfef36f60917e324066afa2cccc5881",
-          "at": "2026-06-03T12:35:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public command methods `dry_write` and `dry_check_approved` are not exercised directly by any success-path or failure-path tests. The current tests only cover helper functions and manually constructed `CommandOutcome` values, so regressions in adapter wiring, path validation, or verdict-to-exit mapping would not be caught. Add direct tests for both public APIs.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 362,
-              "category": "tests"
-            }
-          ],
-          "hash": "rvw1:sha256:3f7be0730d683f5fd1717b9c5e889bb473618305aa2e76b657db2d10d0041db3",
-          "at": "2026-06-03T12:42:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry_write` rejects a missing `track_id` directory before it reaches `FsDryCheckStore`, and `dry_check_approved` repeats the same guard later in this file. That breaks the intended first-run behavior: `FsDryCheckStore::append_record` already creates parent directories on demand, and `read_doc()` treats a missing `dry-check.json` as empty history. As written, a new track cannot be written without pre-creating the directory, and the gate cannot run against an empty history.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 401,
-              "category": "correctness"
-            },
-            {
-              "message": "The write summary only reports `findings.len()` plus per-finding details. The brief requires stdout to include both `pairs checked` and `records appended`, but those counts are never computed or printed here, so callers cannot tell how much of the diff was processed or persisted.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 452,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ae364908f172235411813e309b8ddeb0d52ccd2a7c17bcde92149aad669c8504",
-          "at": "2026-06-03T12:50:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:afcd2f2e8ed9547fe76630baad041119ac6c537203a0102cb745ba7b09159f9f",
-          "at": "2026-06-03T12:57:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:afcd2f2e8ed9547fe76630baad041119ac6c537203a0102cb745ba7b09159f9f",
-          "at": "2026-06-03T13:02:06Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
-          "at": "2026-06-03T10:14:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
-          "at": "2026-06-03T10:16:04Z"
+          "hash": "rvw1:sha256:8c3921982c0294e4e81345c11deda2bfaeb2938710826e77423a05528b283f90",
+          "at": "2026-06-03T22:56:15Z"
         }
       ]
     },
@@ -1466,6 +1400,68 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "line": 91,
+              "category": "correctness"
+            },
+            {
+              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:123-144`, `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "line": 129,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f4ef6b67d3326653bb4e28f4a52f27f51c40676f019eb187cbeb0c19bc0775c",
+          "at": "2026-06-03T13:17:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
+          "at": "2026-06-03T13:20:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow now says capability routing and model/CLI selection are determined by `.harness/config/agent-profiles.json`, and lists `dry-checker` as Codex. However `sotp dry write` does not load agent-profiles at all: its CLI args define `--model` with default `codex` and `--capability-name` with default `dry-checker`, then pass those directly to `CodexDryChecker::new`. As a result the new `.harness/config/agent-profiles.json` entry `dry-checker.model = gpt-5.5` has no effect on the documented `sotp dry write` path, so the docs/config describe a routing behavior the implementation does not provide.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 363,
+              "category": "docs"
+            },
+            {
+              "message": "The documented `sotp dry` command surfaces are incomplete relative to the implemented clap args. `write` also accepts `--items-dir`, `--model`, and `--capability-name`; `results` and `check-approved` also accept `--items-dir`. Because this convention is the command reference for DFP/RFP operation and already lists other optional flags, omitting these flags makes the documented argument surface disagree with the actual T007-T009 CLI, especially the model/capability overrides that currently control dry-checker execution.",
+              "severity": "P1",
+              "file": "knowledge/conventions/dry-check-workflow.md",
+              "line": 53,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
+          "at": "2026-06-03T13:24:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff5385a3b4d8c08cfb0f6f4d71bd85fbbcdd221d1336ddf8b3d6dac3f15026e1",
+          "at": "2026-06-03T13:28:26Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -1567,6 +1563,75 @@
           "findings": [],
           "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
           "at": "2026-06-03T10:58:31Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
+              "severity": "P1",
+              "file": "libs/domain/src/dry_check.rs",
+              "line": 801,
+              "category": "correctness"
+            },
+            {
+              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 184,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
+          "at": "2026-06-03T07:16:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
+              "line": 821,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
+          "at": "2026-06-03T07:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:34:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:37:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T08:59:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T09:00:52Z"
         }
       ]
     },

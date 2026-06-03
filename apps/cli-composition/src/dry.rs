@@ -393,6 +393,38 @@ fn dry_write_outcome(
     CommandOutcome::success(Some(output_lines.join("\n")))
 }
 
+fn ephemeral_index_parent(db_path: &Path, fallback_parent: &Path) -> PathBuf {
+    match db_path.parent() {
+        Some(parent) if !parent.as_os_str().is_empty() && parent.is_dir() => parent.to_path_buf(),
+        _ => fallback_parent.to_path_buf(),
+    }
+}
+
+fn create_ephemeral_index_dir(
+    db_path: &Path,
+    fallback_parent: &Path,
+) -> Result<tempfile::TempDir, String> {
+    let parent = ephemeral_index_parent(db_path, fallback_parent);
+    tempfile::Builder::new()
+        .prefix("sotp-dry-index-")
+        .tempdir_in(&parent)
+        .map_err(|e| format!("failed to create ephemeral index dir: {e}"))
+}
+
+fn create_ephemeral_index_adapter(
+    db_path: &Path,
+    fallback_parent: &Path,
+) -> Result<(tempfile::TempDir, LanceDbSemanticIndexAdapter), String> {
+    let temp_index_dir = create_ephemeral_index_dir(db_path, fallback_parent)?;
+    let ephemeral_db_path = temp_index_dir.path().to_path_buf();
+    let index_adapter =
+        LanceDbSemanticIndexAdapter::new(ephemeral_db_path.clone()).map_err(|e| {
+            format!("failed to open ephemeral index at {}: {e}", ephemeral_db_path.display())
+        })?;
+
+    Ok((temp_index_dir, index_adapter))
+}
+
 // ── CliApp impl — dry write ───────────────────────────────────────────────────
 
 impl CliApp {
@@ -459,10 +491,14 @@ impl CliApp {
         let embedding_port = Arc::new(
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
-        let index_port =
-            Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
-                format!("failed to open index at {}: {e}", input.db_path.display())
-            })?);
+
+        // IN-02/D4: Use a fresh ephemeral index for each invocation so that stale
+        // fragments from prior runs never accumulate in a persistent LanceDB.
+        // `_temp_index_dir` is bound here to ensure drop (and auto-cleanup) happens
+        // at method return, not before.
+        let (_temp_index_dir, index_adapter) =
+            create_ephemeral_index_adapter(&input.db_path, &canonical_root)?;
+        let index_port = Arc::new(index_adapter);
 
         // Construct interactor (5-param; diff_source NOT injected).
         let interactor = DryCheckInteractor::new(
@@ -609,10 +645,14 @@ impl CliApp {
         let embedding_port = Arc::new(
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
-        let index_port =
-            Arc::new(LanceDbSemanticIndexAdapter::new(input.db_path.clone()).map_err(|e| {
-                format!("failed to open index at {}: {e}", input.db_path.display())
-            })?);
+
+        // IN-02/D4: Use a fresh ephemeral index for each invocation so that stale
+        // fragments from prior runs never accumulate in a persistent LanceDB.
+        // `_temp_index_dir` is bound here to ensure drop (and auto-cleanup) happens
+        // at method return, not before.
+        let (_temp_index_dir, index_adapter) =
+            create_ephemeral_index_adapter(&input.db_path, &canonical_root)?;
+        let index_port = Arc::new(index_adapter);
 
         // Construct interactor (reader + index + embedding).
         let interactor = DryCheckApprovalInteractor::new(store, index_port, embedding_port);
@@ -1191,6 +1231,58 @@ mod tests {
         assert!(input.base_commit.is_none());
     }
 
+    // ── Ephemeral index parent selection ─────────────────────────────────────
+
+    #[test]
+    fn test_ephemeral_index_parent_bare_db_path_returns_fallback_parent() {
+        let fallback = tempfile::tempdir().unwrap();
+
+        let parent = ephemeral_index_parent(Path::new(".semantic_index"), fallback.path());
+
+        assert_eq!(parent, fallback.path().to_path_buf());
+    }
+
+    #[test]
+    fn test_ephemeral_index_parent_existing_parent_hint_returns_hint() {
+        let fallback = tempfile::tempdir().unwrap();
+        let hinted_parent = tempfile::tempdir().unwrap();
+        let db_path = hinted_parent.path().join("semantic-index");
+
+        let parent = ephemeral_index_parent(&db_path, fallback.path());
+
+        assert_eq!(parent, hinted_parent.path().to_path_buf());
+    }
+
+    #[test]
+    fn test_ephemeral_index_parent_missing_parent_hint_returns_fallback_parent() {
+        let fallback = tempfile::tempdir().unwrap();
+        let missing_parent = fallback.path().join("missing");
+        let db_path = missing_parent.join("semantic-index");
+
+        let parent = ephemeral_index_parent(&db_path, fallback.path());
+
+        assert_eq!(parent, fallback.path().to_path_buf());
+        assert!(!missing_parent.exists(), "parent selection must not create the hint directory");
+    }
+
+    #[test]
+    fn test_create_ephemeral_index_dir_bare_db_path_creates_temp_under_fallback_parent() {
+        let fallback = tempfile::tempdir().unwrap();
+
+        let temp_index_dir =
+            create_ephemeral_index_dir(Path::new(".semantic_index"), fallback.path()).unwrap();
+        let temp_index_path = temp_index_dir.path().to_path_buf();
+
+        assert!(temp_index_path.starts_with(fallback.path()));
+        assert!(
+            temp_index_path.file_name().unwrap().to_string_lossy().starts_with("sotp-dry-index-")
+        );
+
+        drop(temp_index_dir);
+
+        assert!(!temp_index_path.exists(), "ephemeral index dir must be removed on drop");
+    }
+
     // ── Approved/Blocked exit-code semantics ─────────────────────────────────
 
     #[test]
@@ -1237,5 +1329,74 @@ mod tests {
         // convention (success() sets exit_code = 0).
         let outcome = CommandOutcome::success(Some("dry results: 0 record(s)".to_owned()));
         assert_eq!(outcome.exit_code, 0, "dry results must always exit 0 on success");
+    }
+
+    // ── Ephemeral index adapter (IN-02/AC-02) ────────────────────────────────
+
+    #[test]
+    fn test_create_ephemeral_index_adapter_bare_db_path_opens_temp_index_under_fallback_parent() {
+        let fallback = tempfile::tempdir().unwrap();
+
+        let (temp_index_dir, index_adapter) =
+            create_ephemeral_index_adapter(Path::new(".semantic_index"), fallback.path()).unwrap();
+        let temp_index_path = temp_index_dir.path().to_path_buf();
+
+        assert!(temp_index_path.starts_with(fallback.path()));
+        assert!(temp_index_path.exists());
+        assert!(
+            temp_index_path.file_name().unwrap().to_string_lossy().starts_with("sotp-dry-index-")
+        );
+
+        drop(index_adapter);
+        drop(temp_index_dir);
+
+        assert!(!temp_index_path.exists(), "ephemeral index dir must be removed on drop");
+    }
+
+    #[test]
+    fn test_create_ephemeral_index_adapter_same_db_path_returns_distinct_temp_paths() {
+        let fallback = tempfile::tempdir().unwrap();
+        let hinted_parent = tempfile::tempdir().unwrap();
+        let db_path = hinted_parent.path().join("persistent.db");
+
+        let (first_temp_dir, first_adapter) =
+            create_ephemeral_index_adapter(&db_path, fallback.path()).unwrap();
+        let first_path = first_temp_dir.path().to_path_buf();
+        let (second_temp_dir, second_adapter) =
+            create_ephemeral_index_adapter(&db_path, fallback.path()).unwrap();
+        let second_path = second_temp_dir.path().to_path_buf();
+
+        assert_ne!(first_path, second_path);
+        assert!(first_path.starts_with(hinted_parent.path()));
+        assert!(second_path.starts_with(hinted_parent.path()));
+        assert!(!db_path.exists(), "persistent db_path must not be opened or created");
+
+        drop(first_adapter);
+        drop(second_adapter);
+        drop(first_temp_dir);
+        drop(second_temp_dir);
+
+        assert!(!first_path.exists());
+        assert!(!second_path.exists());
+    }
+
+    #[test]
+    fn test_create_ephemeral_index_adapter_missing_parent_hint_uses_fallback_parent() {
+        let fallback = tempfile::tempdir().unwrap();
+        let missing_parent = fallback.path().join("missing");
+        let db_path = missing_parent.join("semantic-index");
+
+        let (temp_index_dir, index_adapter) =
+            create_ephemeral_index_adapter(&db_path, fallback.path()).unwrap();
+        let temp_index_path = temp_index_dir.path().to_path_buf();
+
+        assert!(temp_index_path.starts_with(fallback.path()));
+        assert!(!missing_parent.exists(), "missing parent hint must not be created");
+        assert!(!db_path.exists(), "persistent db_path must not be opened or created");
+
+        drop(index_adapter);
+        drop(temp_index_dir);
+
+        assert!(!temp_index_path.exists(), "ephemeral index dir must be removed on drop");
     }
 }
