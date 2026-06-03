@@ -1,6 +1,275 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
+          "at": "2026-06-03T07:14:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
+          "at": "2026-06-03T07:17:09Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
+              "severity": "P1",
+              "file": "libs/domain/src/dry_check.rs",
+              "line": 801,
+              "category": "correctness"
+            },
+            {
+              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 184,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
+          "at": "2026-06-03T07:16:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
+              "line": 821,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
+          "at": "2026-06-03T07:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:34:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:37:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T08:59:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T09:00:52Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
+          "at": "2026-06-03T07:15:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_into_fragments` records spans from the untrimmed accumulator but stores `current.trim()` as the fragment content. Separator or leading blank lines trimmed out of `text` are still included in `start_line`/`end_line`; for example `fn a() {}\\n\\nfn b() {}` yields the first fragment as lines 1..=2 even though its content is only line 1. Hunk filtering can then treat edits to blank lines between items as overlapping the previous fragment, so the span no longer corresponds to the fragment body required by the change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/extractor.rs",
+              "line": 199,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
+          "at": "2026-06-03T07:19:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:569721a667441dc75758a2f5941fb2e2f2c019c55e605542716f4550217c2a99",
+          "at": "2026-06-03T07:24:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckVerdictDto` is serialized with an internal `type` tag, so the unit variants write as `{ \"type\": \"NotAViolation\" }` / `{ \"type\": \"Accepted\" }` and `Violation` also carries a `type` field. That does not match the required dry-check.json schema described in the brief, which expects bare string verdicts for the unit cases and a nested `violation` object, so this adapter will not round-trip the documented on-disk format.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codec.rs",
+              "line": 18,
+              "category": "schema"
+            },
+            {
+              "message": "`collect_hunk_ranges` and `collect_untracked_files` both treat non-success git exits as success in common cases, returning `Ok(())` instead of `DryCheckDiffError::Failed`. That can silently drop changed hunks or untracked files and make `GitDryCheckDiffGetter::list_changed_hunks` report an incomplete diff set when git fails.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 169,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:cee6f502f0e6a1d6391c1de794448ea637e0dee3f5f884c06a8bce761e7ab2f8",
+          "at": "2026-06-03T09:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The hunk parser treats any added diff line starting with `+++ ` as a file header, so legitimate source lines like `++ foo` can reset `current_file` and silently drop or misattribute hunks. That can make `list_changed_hunks()` miss changed fragments.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 121,
+              "category": "correctness"
+            },
+            {
+              "message": "The only test for `GitDryCheckDiffGetter::list_changed_hunks()` never reaches the method: `CommitHash::try_new(\"HEAD\")` always fails and the test returns early. The new public API has no real happy-path/error-path coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 286,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8a7757b1df084453f254b9bfd2ff384f8e17069558af6085fd791bfe0d215900",
+          "at": "2026-06-03T09:11:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_records` now contains a fairly deep DTO→domain validation pipeline (`FragmentContentHash`, `DryCheckPairKey`, `Timestamp`, `SimilarityScore`, `RefactorProposal`), but this module only exercises round-trip success. There is no test that malformed on-disk data is rejected as `DryCheckReaderError::InvalidData` or that a future `schema_version` is rejected, so regressions in the new persistence/compatibility path would slip through.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 241,
+              "category": "test coverage"
+            },
+            {
+              "message": "`list_changed_hunks` is only covered by a single simple modified-file case plus merge-base failure. The untracked-file source and the 4-source union path are untested, so regressions in the `u32::MAX` whole-file sentinel or multi-source accumulation can ship unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 33,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:443308fd9bd670e4c670dbd9b2ed3d53fafd574222b036d628cf4623b2f8cb3d",
+          "at": "2026-06-03T09:20:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6bba9282d62299ada11847fae1562c9aa943b41eecdd8e191fe1272df7a6248",
+          "at": "2026-06-03T09:29:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Production code splits the hunk header with direct string slicing. This violates the scope's no slice-indexing rule and the workspace has `clippy::indexing_slicing = \"deny\"`, so `ci-rust`/clippy will reject the new adapter. Use `split_once(',')` or checked `get` ranges instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 207,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:c6bba9282d62299ada11847fae1562c9aa943b41eecdd8e191fe1272df7a6248",
+          "at": "2026-06-03T09:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dto_to_domain` casts persisted `similarity_score` and `threshold` from `f64` to `f32` before validation. That lossy conversion can make out-of-schema JSON values pass the domain checks, e.g. a tiny negative value rounds to `-0.0` or a value just above `1.0` rounds to `1.0`, so `read_records()` can accept invalid dry-check.json data instead of returning `DryCheckReaderError::InvalidData`. Validate finiteness and the `[0, 1]` range while the values are still `f64` before casting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 296,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:6eb1d5686dfbaaa6e94aa44886913bb998ca8012ec19b20ec294497a6d8a9a9c",
+          "at": "2026-06-03T09:40:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c800893bd5a37265fb018147df7343dcb65456627c202ee242fe2689b2ac4a7",
+          "at": "2026-06-03T09:45:57Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:15:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:19:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
+          "at": "2026-06-03T08:17:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
+          "at": "2026-06-03T08:21:20Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -805,151 +1074,20 @@
           "findings": [],
           "hash": "rvw1:sha256:e8f6cdb4214e124aaa56c1800b984b3b7547ebbc1e4f9381a581b2dab13aa9f2",
           "at": "2026-06-03T08:26:05Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
-          "at": "2026-06-03T07:15:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`split_into_fragments` records spans from the untrimmed accumulator but stores `current.trim()` as the fragment content. Separator or leading blank lines trimmed out of `text` are still included in `start_line`/`end_line`; for example `fn a() {}\\n\\nfn b() {}` yields the first fragment as lines 1..=2 even though its content is only line 1. Hunk filtering can then treat edits to blank lines between items as overlapping the previous fragment, so the span no longer corresponds to the fragment body required by the change.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/extractor.rs",
-              "line": 199,
-              "category": "logic_error"
-            }
-          ],
-          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
-          "at": "2026-06-03T07:19:45Z"
+          "hash": "rvw1:sha256:76ca2e2959eb5ad670e0ae67d776e36e23c436a61456671abf6bd3b7c51df509",
+          "at": "2026-06-03T08:59:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:569721a667441dc75758a2f5941fb2e2f2c019c55e605542716f4550217c2a99",
-          "at": "2026-06-03T07:24:10Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:15:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:16:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:19:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
-          "at": "2026-06-03T08:17:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
-          "at": "2026-06-03T08:21:20Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
-          "at": "2026-06-03T07:14:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
-          "at": "2026-06-03T07:17:09Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
-              "severity": "P1",
-              "file": "libs/domain/src/dry_check.rs",
-              "line": 801,
-              "category": "correctness"
-            },
-            {
-              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/semantic_dup.rs",
-              "line": 184,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
-          "at": "2026-06-03T07:16:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
-              "line": 821,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
-          "at": "2026-06-03T07:24:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
-          "at": "2026-06-03T07:34:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
-          "at": "2026-06-03T07:37:48Z"
+          "hash": "rvw1:sha256:76ca2e2959eb5ad670e0ae67d776e36e23c436a61456671abf6bd3b7c51df509",
+          "at": "2026-06-03T09:01:29Z"
         }
       ]
     }

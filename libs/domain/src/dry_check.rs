@@ -764,8 +764,10 @@ pub trait DryCheckReader: Send + Sync {
 pub trait DryCheckWriter: Send + Sync {
     /// Append a verdict record for the given entry.
     ///
-    /// The infra adapter stamps `Timestamp::new(infrastructure::timestamp_now())`
-    /// internally — the interactor never produces a `Timestamp`.
+    /// The infra adapter calls `infrastructure::timestamp_now()?` to obtain a
+    /// `Timestamp` directly — no `Timestamp::new` re-wrap is needed because
+    /// `timestamp_now()` already returns `Result<Timestamp, ValidationError>`.
+    /// The interactor never produces a `Timestamp`.
     ///
     /// # Errors
     ///
