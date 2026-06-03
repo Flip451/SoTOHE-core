@@ -57,6 +57,7 @@
 <!-- convention-docs:start -->
 - `adr.md`: Convention: Architecture Decision Records (ADR)
 - `bash-write-guard.md`: Bash File-Write Guard (CON-07)
+- `dry-check-workflow.md`: DRY Check Workflow Convention
 - `enforce-by-mechanism.md`: Enforce by Mechanism Convention
 - `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
 - `hexagonal-architecture.md`: Hexagonal Architecture Convention

@@ -356,9 +356,20 @@ cargo make bacon-test  # テスト寄りの継続チェック
   - `researcher`: 最新バージョン調査、外部ライブラリ調査、広範囲分析
   - `implementer`: 難易度の高いRust実装、リファクタリング
   - `reviewer`: 実装レビュー、正確性確認
+  - `dry-checker`: DRY 違反の判定役（`sotp dry write` が `CodexDryChecker` として起動、codex）
+  - `dry-fix-lead`（dfl）: DFP（DRY fix phase）で DRY 違反のみを修正する修正役（codex）
+  - `review-fix-lead`（rfl）: RFP（review fix phase）でレビュー指摘のみを修正する修正役（codex）
 - provider resolution:
-  - 実際にどの model / CLI が各 capability を担当するかは `.harness/config/agent-profiles.json` で決まる
+  - `.harness/config/agent-profiles.json` は capability ごとの provider / model 方針を宣言する
+  - `reviewer` / `review-fix-lead` など profile self-resolution を持つ導線では、実際の model / CLI は `.harness/config/agent-profiles.json` から解決される
   - 既定は `orchestrator` / `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` / `implementer` = Claude Code、`reviewer` = Codex、`researcher` = Gemini
+  - `dry-checker` / `dry-fix-lead` / `review-fix-lead` はいずれも Codex 方針。なお `sotp dry write` は現行実装では `agent-profiles.json` を読まず、`--model`（default: `codex`）と `--capability-name`（default: `dry-checker`）を `CodexDryChecker` に渡す
+- DFP → RFP の 2 フェーズ実行順序（DRY check + review）:
+  - **DFP 先行**: `sotp dry check-approved` exit 0 になるまで dfl が DRY 違反を修正する
+  - **RFP 後続**: DFP 通過後に rfl が scope ごとに並列レビューを回す
+  - **back-edge**: RFP 中に DRY 違反が出たら rfl は即停止して DFP へ戻る（rfl は DRY を修正しない）
+  - **fixpoint**: DRY gate + 全 review scope が同時に green になった時点でのみコミット可
+  - 詳細は `knowledge/conventions/dry-check-workflow.md` を参照
 - Agent Teams（サブエージェント）:
   - 並列実装（`/track:implement`）・並列レビュー（`/track:review`）
   - ユーザーが途中で判断を挟む対話型実装
