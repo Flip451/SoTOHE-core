@@ -5,6 +5,7 @@ use std::process::ExitCode;
 use cli_composition::CommandOutcome;
 
 pub mod domain;
+pub mod dry;
 pub mod file;
 pub mod git;
 pub mod guard;
