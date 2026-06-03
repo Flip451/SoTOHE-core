@@ -16,6 +16,7 @@ pub mod catalogue_spec_refs;
 pub mod catalogue_spec_signals;
 pub mod commit_hash_persistence;
 pub mod contract_map_workflow;
+pub mod dry_check;
 pub mod export_schema;
 pub mod git_workflow;
 pub mod guard;
