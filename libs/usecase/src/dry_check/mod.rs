@@ -8,18 +8,23 @@
 //! - `DryCheckInteractor` (T004) — write path
 //! - `DryCheckResultsInteractor`, `DryCheckApprovalInteractor` (T005) — read/gate paths
 
+mod approval_interactor;
 mod errors;
 mod interactor;
 mod judgment;
 mod ports;
 mod results;
+mod results_interactor;
 mod services;
+pub(crate) mod shared;
 
+pub use approval_interactor::DryCheckApprovalInteractor;
 pub use errors::{DryCheckAgentError, DryCheckCycleError, DryCheckDiffError};
 pub use interactor::DryCheckInteractor;
 pub use judgment::DryCheckAgentJudgment;
 pub use ports::{DryCheckAgentPort, DryCheckDiffSource};
 pub use results::DryCheckResults;
+pub use results_interactor::DryCheckResultsInteractor;
 pub use services::{DryCheckApprovalService, DryCheckResultsService, DryCheckService};
 
 #[cfg(test)]

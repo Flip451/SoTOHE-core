@@ -33,9 +33,9 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| DryCheckApprovalInteractor | interactor | — | — | 🟡 | 🔵 |
+| DryCheckApprovalInteractor | interactor | — | — | 🔵 | 🔵 |
 | DryCheckInteractor | interactor | — | — | 🔵 | 🔵 |
-| DryCheckResultsInteractor | interactor | — | — | 🟡 | 🔵 |
+| DryCheckResultsInteractor | interactor | — | — | 🔵 | 🔵 |
 
 ## Queries
 

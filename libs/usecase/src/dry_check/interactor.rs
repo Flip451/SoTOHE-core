@@ -7,12 +7,10 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use sha2::Digest as _;
-
 use domain::CommitHash;
 use domain::dry_check::{
     DryCheckEntry, DryCheckEntryError, DryCheckFinding, DryCheckPairKey, DryCheckPairKeyError,
-    DryCheckReader, DryCheckVerdict, DryCheckWriter, FragmentContentHash, FragmentRef, Rationale,
+    DryCheckReader, DryCheckVerdict, DryCheckWriter, Rationale,
 };
 use domain::review_v2::types::FilePath;
 use domain::semantic_dup::{CodeFragment, SimilarityScore, SimilarityThreshold, TopK};
@@ -21,39 +19,8 @@ use super::errors::DryCheckCycleError;
 use super::judgment::DryCheckAgentJudgment;
 use super::ports::DryCheckAgentPort;
 use super::services::DryCheckService;
+use super::shared::fragment_ref_of;
 use crate::semantic_dup::{EmbeddingPort, SemanticIndexError, SemanticIndexPort};
-
-// ── helper: SHA-256 content hash ─────────────────────────────────────────────
-
-/// Compute the SHA-256 of `content` and return a validated [`FragmentContentHash`].
-///
-/// # Errors
-///
-/// Returns a [`String`] error description when [`FragmentContentHash::new`] rejects
-/// the hex string (should not happen in practice for a well-formed SHA-256 digest,
-/// but propagated as an error to keep production code panic-free).
-fn content_hash_of(content: &str) -> Result<FragmentContentHash, String> {
-    let digest = sha2::Sha256::digest(content.as_bytes());
-    let hex = format!("{digest:x}");
-    FragmentContentHash::new(hex).map_err(|e| format!("content hash: {e}"))
-}
-
-/// Build a [`FragmentRef`] from a [`CodeFragment`].
-///
-/// Computes the SHA-256 of `fragment.content()` to produce the
-/// [`FragmentContentHash`].  The path comes from `fragment.source_path` (via
-/// `to_string_lossy` — the same convention used throughout the workspace).
-///
-/// # Errors
-///
-/// Returns a [`String`] error description when `FilePath::new` rejects the
-/// path (e.g., absolute path or traversal) or when `content_hash_of` fails.
-fn fragment_ref_of(fragment: &CodeFragment) -> Result<FragmentRef, String> {
-    let path_str = fragment.source_path.to_string_lossy().into_owned();
-    let file_path = FilePath::new(path_str).map_err(|e| format!("invalid source_path: {e}"))?;
-    let content_hash = content_hash_of(fragment.content())?;
-    Ok(FragmentRef::new(file_path, content_hash))
-}
 
 // ── DryCheckInteractor ────────────────────────────────────────────────────────
 
@@ -343,6 +310,7 @@ mod tests {
 
     use super::*;
     use crate::dry_check::errors::DryCheckAgentError;
+    use crate::dry_check::shared::{content_hash_of, fragment_ref_of};
     use crate::semantic_dup::{EmbeddingError, SemanticIndexError};
 
     // ── Mock port definitions ─────────────────────────────────────────────────
