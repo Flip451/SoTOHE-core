@@ -511,105 +511,21 @@ fn dispatch_note(raw_args: &[String]) -> Result<ExitCode, CliError> {
     run_command("git", &["notes", "add", "-f", "-m", &note_text, "HEAD"])
 }
 
+/// Delegate to `CliApp::make_track_commit_message`, which is the single authoritative
+/// implementation. The full gate sequence is: stage → CI → review check-approved →
+/// **DRY check-approved** (AC-11) → git commit-from-file → persist .commit_hash.
+///
+/// # Errors
+///
+/// Propagates any I/O error from the underlying `CliApp` call as a `CliError::Message`.
 fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
-    std::fs::create_dir_all("tmp")
-        .map_err(|e| CliError::Message(format!("mkdir tmp failed: {e}")))?;
-
-    // D4 (bare-chain): regen (type-signals → catalogue-spec-signals → views sync) is
-    // handled by the `track-active-gate` Makefile dependency that ran before this
-    // command. Stage the regen outputs and any other modified tracked files so they
-    // are included in the subsequent commit (CN-12: this staging step replaces the
-    // per-step inline git-add from the pre-D4 implementation; the strict ci +
-    // check-approved gates that follow are unchanged).
-    eprintln!("[track-commit-message] Pre-commit: staging working tree...");
-    let add_result = run_sotp(&["git", "add-all"])?;
-    if add_result != ExitCode::SUCCESS {
-        eprintln!("[track-commit-message] BLOCKED: git add-all failed");
-        return Ok(add_result);
-    }
-
-    eprintln!("[track-commit-message] Running CI...");
-    let log_file = std::fs::File::create("tmp/ci-output.log")
-        .map_err(|e| CliError::Message(format!("failed to create tmp/ci-output.log: {e}")))?;
-    let log_file_err = log_file
-        .try_clone()
-        .map_err(|e| CliError::Message(format!("failed to clone log file handle: {e}")))?;
-    let ci_status = std::process::Command::new("cargo")
-        .args(["make", "ci"])
-        .stdout(log_file)
-        .stderr(log_file_err)
-        .status()?;
-
-    if !ci_status.success() {
-        let ci_exit = ci_status.code().unwrap_or(1);
-        eprintln!("[track-commit-message] CI FAILED (exit {ci_exit}). Last 20 lines:");
-        // Read last 20 lines from ci-output.log
-        if let Ok(content) = std::fs::read_to_string("tmp/ci-output.log") {
-            let lines: Vec<&str> = content.lines().collect();
-            let start = lines.len().saturating_sub(20);
-            for line in lines.get(start..).unwrap_or_default() {
-                eprintln!("{line}");
-            }
-        }
-        // Propagate the actual CI exit code instead of always returning 1
-        return Ok(ExitCode::from(u8::try_from(ci_exit).unwrap_or(1)));
-    }
-    eprintln!("[track-commit-message] CI PASSED");
-
-    // Review guard: check review.status == approved with current code hash.
-    // Resolve track ID from current branch (track/<id>).
-    // CN-12 / D1 fail-closed: if the current branch is not a track branch (main,
-    // detached HEAD, or any non-track/<id> branch), block the commit with an
-    // explicit error. Silently skipping the check-approved gate is forbidden.
-    let track_id = current_branch_track_id_strict()?.ok_or_else(|| {
-        CliError::Message(
-            "[track-commit-message] BLOCKED: not on a track/<id> branch; \
-             check-approved guard requires a track branch. \
-             Switch to your track branch."
-                .to_owned(),
-        )
-    })?;
-    eprintln!("[track-commit-message] Checking review approval for track '{track_id}'...");
-    let guard_result = run_sotp(&[
-        "review",
-        "check-approved",
-        "--items-dir",
-        "track/items",
-        "--track-id",
-        &track_id,
-    ])?;
-    if guard_result != ExitCode::SUCCESS {
-        eprintln!("[track-commit-message] BLOCKED: review guard rejected commit");
-        return Ok(guard_result);
-    }
-    eprintln!("[track-commit-message] Review approved");
-
-    let commit_result =
-        run_sotp(&["git", "commit-from-file", "tmp/track-commit/commit-message.txt", "--cleanup"])?;
-    if commit_result != ExitCode::SUCCESS {
-        return Ok(commit_result);
-    }
-
-    // Post-commit: persist HEAD SHA to .commit_hash for incremental review scope.
-    let mut post_commit_failed = false;
-    if let Some(ref track_id) = current_branch_track_id_strict()? {
-        if let Err(msg) = persist_commit_hash_v2(track_id) {
-            eprintln!("[track-commit-message] WARNING: .commit_hash persistence failed: {msg}");
-            eprintln!(
-                "[track-commit-message] Recovery: run `bin/sotp make track-set-commit-hash \
-                 {track_id}` to set the v2 diff base manually."
-            );
-            post_commit_failed = true;
+    match CliApp::new().make_track_commit_message(vec![]) {
+        Ok(outcome) => Ok(ExitCode::from(outcome.exit_code)),
+        Err(msg) => {
+            eprintln!("{msg}");
+            Ok(ExitCode::FAILURE)
         }
     }
-
-    if post_commit_failed {
-        // Exit code 3 distinguishes "commit succeeded but post-commit step failed" from
-        // a real commit failure (exit 1). Automation must not retry the commit on exit 3.
-        eprintln!("[track-commit-message] COMMIT_OK but post-commit steps failed (see above)");
-        return Ok(ExitCode::from(3));
-    }
-    Ok(ExitCode::SUCCESS)
 }
 
 fn dispatch_set_commit_hash(raw_args: &[String]) -> Result<ExitCode, CliError> {
@@ -636,19 +552,6 @@ fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
     let head_sha = cli_composition::review_v2::persist_commit_hash_for_track(track_id)?;
     eprintln!("[track-commit-message] Recorded .commit_hash: {head_sha}");
     Ok(())
-}
-
-/// Resolves the track ID from the current git branch (strict mode).
-///
-/// Returns `Ok(Some(id))` only when the branch matches `track/<id>` and the
-/// id passes [`TrackId`] validation. Non-track branches (e.g. `main`) and
-/// git failures resolve to `Ok(None)`.
-///
-/// Returns `Err` when the branch matches `track/<id>` but the `<id>` fails
-/// validation: in that case the callers must not silently skip the review
-/// guard (fail-closed).
-fn current_branch_track_id_strict() -> Result<Option<String>, CliError> {
-    CliApp::new().current_branch_track_id_strict().map_err(CliError::Message)
 }
 
 // --- Phase 4: Exec dispatcher ---
