@@ -1,4 +1,4 @@
-//! `sotp dry` subcommand group: `write`, `results`, `check-approved`.
+//! `sotp dry` subcommand group: `write`, `results`, `check-approved`, `fix-local`.
 //!
 //! Delegates argument parsing to clap, constructs the corresponding
 //! `cli_composition` input DTOs, and calls the matching `CliApp` method.
@@ -8,11 +8,14 @@
 //! No domain types are imported here (CN-02). The `filter` arg is passed as
 //! a string to `DryResultsInput`; cli-composition parses it to `VerdictFilter`.
 
+use std::io::{self, Write};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand, ValueEnum};
-use cli_composition::{CliApp, DryCheckApprovedInput, DryResultsInput, DryWriteInput};
+use cli_composition::{
+    CliApp, DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput,
+};
 
 use crate::commands::outcome_to_exit;
 
@@ -28,6 +31,14 @@ pub enum DryCommand {
     Results(DryResultsArgs),
     /// Gate: exit 0 when all above-threshold pairs are verified; non-zero otherwise.
     CheckApproved(DryCheckApprovedArgs),
+    /// Run the dry-fix-lead fixer with provider auto-resolved from agent-profiles.json.
+    ///
+    /// Resolves `dry-fix-lead` capability from agent-profiles.json, constructs
+    /// the fixer (currently Codex only), and executes the DRY fix cycle.
+    /// Accepts `--track-id` / `--briefing-file` (required) and an optional
+    /// `--model` override. Prints exactly one terminal status line:
+    /// `completed`, `blocked`, or `failed`.
+    FixLocal(DryFixLocalArgs),
 }
 
 // ── sotp dry write ────────────────────────────────────────────────────────────
@@ -192,6 +203,58 @@ pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
     }))
 }
 
+// ── sotp dry fix-local ────────────────────────────────────────────────────────
+
+/// Arguments for `sotp dry fix-local`.
+#[derive(Debug, Args)]
+pub struct DryFixLocalArgs {
+    /// Track ID (required; used to identify the active track and locate dry-check.json).
+    #[arg(long)]
+    pub track_id: String,
+
+    /// Path to the briefing file that the dry-fix-lead fixer should read.
+    #[arg(long)]
+    pub briefing_file: PathBuf,
+
+    /// Model for the fixer (Codex) subprocess.
+    /// When omitted the model is resolved from `agent-profiles.json`
+    /// `dry-fix-lead.model`.
+    #[arg(long)]
+    pub model: Option<String>,
+}
+
+/// Execute `sotp dry fix-local`.
+///
+/// Launches the dry-fix-lead Codex agent, which runs the
+/// `sotp dry write` → fix → `sotp dry check-approved` loop until
+/// the DRY gate passes, the loop is exhausted, or a tooling error occurs.
+/// Emits exactly one of: `completed`, `blocked`, or `failed`.
+pub fn execute_dry_fix_local(args: DryFixLocalArgs) -> ExitCode {
+    let input = RunDryFixLocalInput {
+        track_id: args.track_id,
+        briefing_file: args.briefing_file,
+        model: args.model,
+    };
+    match CliApp::new().dry_run_fix_local(input) {
+        Ok(outcome) => {
+            if let Some(msg) = &outcome.stderr {
+                eprintln!("{msg}");
+            }
+            if let Some(line) = &outcome.stdout {
+                if let Err(e) = writeln!(io::stdout(), "{line}") {
+                    eprintln!("failed to write stdout: {e}");
+                    return ExitCode::from(1);
+                }
+            }
+            ExitCode::from(outcome.exit_code)
+        }
+        Err(msg) => {
+            eprintln!("{msg}");
+            ExitCode::from(1)
+        }
+    }
+}
+
 // ── Dispatch ──────────────────────────────────────────────────────────────────
 
 /// Execute `sotp dry <subcommand>`.
@@ -200,6 +263,7 @@ pub fn execute(cmd: DryCommand) -> ExitCode {
         DryCommand::Write(args) => execute_dry_write(args),
         DryCommand::Results(args) => execute_dry_results(args),
         DryCommand::CheckApproved(args) => execute_dry_check_approved(args),
+        DryCommand::FixLocal(args) => execute_dry_fix_local(args),
     }
 }
 
@@ -364,6 +428,61 @@ mod tests {
         assert_eq!(VerdictFilterArg::NotAViolation.as_filter_str(), "not-a-violation");
         assert_eq!(VerdictFilterArg::Accepted.as_filter_str(), "accepted");
         assert_eq!(VerdictFilterArg::Violation.as_filter_str(), "violation");
+    }
+
+    // ── sotp dry fix-local: arg parsing ──────────────────────────────────────
+
+    #[test]
+    fn test_dry_fix_local_required_args_parse_correctly() {
+        let cmd = parse_dry(&[
+            "dry",
+            "fix-local",
+            "--track-id",
+            "my-track",
+            "--briefing-file",
+            "tmp/briefing.md",
+        ]);
+        match cmd {
+            DryCommand::FixLocal(args) => {
+                assert_eq!(args.track_id, "my-track");
+                assert_eq!(args.briefing_file, PathBuf::from("tmp/briefing.md"));
+                assert!(args.model.is_none(), "model must be absent by default");
+            }
+            other => panic!("expected FixLocal, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_dry_fix_local_optional_model_parses_when_given() {
+        let cmd = parse_dry(&[
+            "dry",
+            "fix-local",
+            "--track-id",
+            "my-track",
+            "--briefing-file",
+            "tmp/briefing.md",
+            "--model",
+            "gpt-5.5",
+        ]);
+        match cmd {
+            DryCommand::FixLocal(args) => {
+                assert_eq!(args.model.as_deref(), Some("gpt-5.5"));
+            }
+            other => panic!("expected FixLocal, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_dry_fix_local_missing_track_id_is_rejected() {
+        let result =
+            TestCli::try_parse_from(["dry", "fix-local", "--briefing-file", "tmp/briefing.md"]);
+        assert!(result.is_err(), "missing --track-id must be rejected by clap");
+    }
+
+    #[test]
+    fn test_dry_fix_local_missing_briefing_file_is_rejected() {
+        let result = TestCli::try_parse_from(["dry", "fix-local", "--track-id", "my-track"]);
+        assert!(result.is_err(), "missing --briefing-file must be rejected by clap");
     }
 
     // ── --filter: invalid token rejection (P1 gap) ────────────────────────────

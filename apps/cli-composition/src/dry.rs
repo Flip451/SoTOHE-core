@@ -73,6 +73,23 @@ pub struct DryResultsInput {
     pub items_dir: PathBuf,
 }
 
+/// Input DTO for `sotp dry fix-local` (`dry_run_fix_local`).
+///
+/// Maps to the 2 required CLI flags plus the optional model override:
+/// `--track-id` / `--briefing-file` / `--model`.
+/// Carries stdlib-typed fields only — no domain or infrastructure types (CN-02).
+#[derive(Debug, Clone)]
+pub struct RunDryFixLocalInput {
+    /// Track ID. Required (no auto-resolve from branch for write operations).
+    pub track_id: String,
+    /// Path to the briefing file passed to the dry-fix-lead fixer. Required.
+    pub briefing_file: std::path::PathBuf,
+    /// Model for the fixer (Codex) subprocess.
+    /// `None` means "use the model from `agent-profiles.json`".
+    /// An explicit value overrides the profile model.
+    pub model: Option<String>,
+}
+
 /// Input DTO for `sotp dry check-approved`.
 #[derive(Debug, Clone)]
 pub struct DryCheckApprovedInput {
@@ -672,6 +689,13 @@ impl CliApp {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::*;
+    use std::ffi::OsString;
+
+    use crate::dry_fix_runner::{
+        DryFixSessionLogCleanup, build_dry_fix_invocation, dry_fix_build_safe_env,
+        dry_fix_build_smoke_env, dry_fix_smoke_test_codex_version, dry_fix_spawn_and_collect,
+        resolve_codex_bin, run_dry_fix_codex,
+    };
 
     fn repo_root_for_tests() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -692,6 +716,99 @@ mod tests {
 
     fn valid_commit_hash_for_tests() -> String {
         "a".repeat(40)
+    }
+
+    struct EnvGuard {
+        key: &'static str,
+        value: Option<std::ffi::OsString>,
+    }
+
+    impl EnvGuard {
+        fn set(key: &'static str, value: impl Into<std::ffi::OsString>) -> Self {
+            let previous = std::env::var_os(key);
+            // Safety: tests that mutate process environment hold process_env_lock
+            // for the full guard lifetime, so env mutation is serialized.
+            unsafe {
+                std::env::set_var(key, value.into());
+            }
+            Self { key, value: previous }
+        }
+
+        fn remove(key: &'static str) -> Self {
+            let previous = std::env::var_os(key);
+            // Safety: tests that mutate process environment hold process_env_lock
+            // for the full guard lifetime, so env mutation is serialized.
+            unsafe {
+                std::env::remove_var(key);
+            }
+            Self { key, value: previous }
+        }
+    }
+
+    impl Drop for EnvGuard {
+        fn drop(&mut self) {
+            // Safety: see EnvGuard::set; the guard is dropped before releasing
+            // the process-wide env lock.
+            unsafe {
+                match &self.value {
+                    Some(value) => std::env::set_var(self.key, value),
+                    None => std::env::remove_var(self.key),
+                }
+            }
+        }
+    }
+
+    #[cfg(unix)]
+    fn make_executable(script: &Path) {
+        use std::os::unix::fs::PermissionsExt;
+
+        let mut perms = std::fs::metadata(script).unwrap().permissions();
+        perms.set_mode(0o755);
+        std::fs::set_permissions(script, perms).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn write_fake_codex_runner(dir: &Path, body: &str) -> PathBuf {
+        let script_content = format!(
+            "#!/bin/sh\nif [ \"$1\" = \"--version\" ]; then echo \"codex 0.125.0\"; exit 0; fi\n{body}"
+        );
+        write_executable_script(dir, "fake-codex.sh", &script_content)
+    }
+
+    #[cfg(unix)]
+    fn write_executable_script(dir: &Path, name: &str, script_content: &str) -> PathBuf {
+        let script = dir.join(name);
+        std::fs::write(&script, script_content).unwrap();
+        make_executable(&script);
+        script
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_codex_bin_uses_asdf_which_when_env_missing() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let real_codex = dir.path().join("real-codex");
+        std::fs::write(&real_codex, "#!/bin/sh\nexit 0\n").unwrap();
+        make_executable(&real_codex);
+        let fake_asdf = format!(
+            "#!/bin/sh\nif [ -n \"$GITHUB_TOKEN\" ] || [ -n \"$SSH_AUTH_SOCK\" ] || [ -n \"$HOME\" ] || [ -n \"$CODEX_HOME\" ]; then exit 7; fi\nif [ \"$1\" = \"which\" ] && [ \"$2\" = \"codex\" ]; then printf '%s\\n' '{}'; exit 0; fi\nexit 1\n",
+            real_codex.display()
+        );
+        write_executable_script(dir.path(), "asdf", &fake_asdf);
+        let existing_path = std::env::var_os("PATH").unwrap_or_default();
+        let mut paths = vec![dir.path().to_path_buf()];
+        if !existing_path.is_empty() {
+            paths.extend(std::env::split_paths(&existing_path));
+        }
+        let _path = EnvGuard::set("PATH", std::env::join_paths(paths).unwrap());
+        let _codex_bin = EnvGuard::remove("CODEX_BIN");
+        let _github_token = EnvGuard::set("GITHUB_TOKEN", "ghp-secret");
+        let _ssh_auth_sock = EnvGuard::set("SSH_AUTH_SOCK", "/tmp/ssh-agent.sock");
+        let _home = EnvGuard::set("HOME", "/real-home");
+        let _codex_home = EnvGuard::set("CODEX_HOME", "/real-codex-home");
+
+        assert_eq!(resolve_codex_bin(), real_codex.as_os_str().to_os_string());
     }
 
     // ── resolve_dry_diff_base: unit tests ─────────────────────────────────────
@@ -924,6 +1041,269 @@ mod tests {
         assert_eq!(normalized.len(), 1);
         // Path unchanged (fallback: strip_prefix failed, original kept).
         assert_eq!(normalized[0].source_path, outside_path);
+    }
+
+    // ── dry fix-local Codex runner ────────────────────────────────────────────
+
+    #[test]
+    fn test_dry_run_fix_local_invalid_track_id_returns_error() {
+        let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
+            track_id: "dry-track\nignore-the-prompt".to_owned(),
+            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            model: Some("gpt-test".to_owned()),
+        });
+
+        let message = result.unwrap_err();
+        assert!(
+            message.contains("invalid --track-id"),
+            "unsafe track_id must be rejected before prompt construction, got: {message}"
+        );
+    }
+
+    #[test]
+    fn test_dry_fix_build_safe_env_strips_repository_credentials() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _github_token = EnvGuard::set("GITHUB_TOKEN", "ghp-secret");
+        let _ssh_auth_sock = EnvGuard::set("SSH_AUTH_SOCK", "/tmp/ssh-agent.sock");
+        let _home = EnvGuard::set("HOME", "/real-home");
+        let _codex_home = EnvGuard::set("CODEX_HOME", "/real-codex-home");
+        let _codex_api_key = EnvGuard::set("CODEX_API_KEY", "codex-secret");
+
+        let safe_home = PathBuf::from("/tmp/safe-home");
+        let codex_home = PathBuf::from("/tmp/codex-home");
+        let env = dry_fix_build_safe_env(&safe_home, &codex_home, None).unwrap();
+        let keys: Vec<String> =
+            env.iter().map(|(key, _)| key.to_string_lossy().into_owned()).collect();
+
+        assert!(!keys.iter().any(|key| key == "GITHUB_TOKEN"));
+        assert!(!keys.iter().any(|key| key == "SSH_AUTH_SOCK"));
+        assert_eq!(
+            env.iter()
+                .find(|(key, _)| key.to_string_lossy() == "HOME")
+                .map(|(_, value)| value.to_string_lossy().into_owned())
+                .as_deref(),
+            Some("/tmp/safe-home")
+        );
+        assert_eq!(
+            env.iter()
+                .find(|(key, _)| key.to_string_lossy() == "CODEX_HOME")
+                .map(|(_, value)| value.to_string_lossy().into_owned())
+                .as_deref(),
+            Some("/tmp/codex-home")
+        );
+        assert_eq!(
+            env.iter()
+                .find(|(key, _)| key.to_string_lossy() == "GIT_SSH_COMMAND")
+                .map(|(_, value)| value.to_string_lossy().into_owned())
+                .as_deref(),
+            Some("/bin/false")
+        );
+        assert!(keys.iter().any(|key| key == "CODEX_API_KEY"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_fix_smoke_test_codex_version_uses_scrubbed_env() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _github_token = EnvGuard::set("GITHUB_TOKEN", "ghp-secret");
+        let _codex_api_key = EnvGuard::set("CODEX_API_KEY", "codex-secret");
+        let dir = tempfile::tempdir().unwrap();
+        let fake_codex = write_executable_script(
+            dir.path(),
+            "fake-codex-version.sh",
+            r#"#!/bin/sh
+if [ "$1" = "--version" ]; then
+  if [ -n "$GITHUB_TOKEN" ] || [ -n "$CODEX_API_KEY" ]; then
+    echo "secret-bearing env reached version check" >&2
+    exit 9
+  fi
+  if [ "$HOME" != "/tmp/safe-home" ]; then
+    echo "safe HOME not applied" >&2
+    exit 8
+  fi
+  echo "codex 0.125.0"
+  exit 0
+fi
+exit 0
+"#,
+        );
+        let safe_env = vec![
+            (OsString::from("HOME"), OsString::from("/tmp/safe-home")),
+            (OsString::from("CODEX_API_KEY"), OsString::from("codex-secret")),
+        ];
+        let smoke_env = dry_fix_build_smoke_env(&safe_env);
+
+        dry_fix_smoke_test_codex_version(&fake_codex.as_os_str().to_os_string(), &smoke_env)
+            .unwrap();
+    }
+
+    #[test]
+    fn test_build_dry_fix_invocation_includes_safe_home_writable_root() {
+        let codex_home = PathBuf::from("/tmp/codex-home");
+        let safe_home = PathBuf::from("/tmp/safe-home");
+        let output_last_message = PathBuf::from("/tmp/dry-fix-last-message.txt");
+
+        let args =
+            build_dry_fix_invocation("gpt-test", &codex_home, &safe_home, &output_last_message);
+        let args_str: Vec<String> =
+            args.iter().map(|arg| arg.to_string_lossy().into_owned()).collect();
+        let writable_roots = args_str
+            .iter()
+            .find(|arg| arg.contains("sandbox_workspace_write.writable_roots"))
+            .expect("writable_roots config must be present");
+
+        assert!(writable_roots.contains("/tmp/codex-home"));
+        assert!(writable_roots.contains("/tmp/safe-home"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_completed_sentinel_returns_exit_zero() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let fake_codex = write_fake_codex_runner(
+            dir.path(),
+            r#"out=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --output-last-message)
+      out="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+while IFS= read -r _line; do :; done
+printf 'DRY_FIX_STATUS: completed\n' > "$out"
+printf 'nested dry fixer stdout\n'
+exit 0
+"#,
+        );
+        let _codex_bin = EnvGuard::set("CODEX_BIN", fake_codex.as_os_str().to_os_string());
+        let _codex_home = EnvGuard::set("CODEX_HOME", dir.path().join(".codex").into_os_string());
+        let briefing_file = dir.path().join("briefing.md");
+        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+
+        let outcome = CliApp::new()
+            .dry_run_fix_local(RunDryFixLocalInput {
+                track_id: "dry-track".to_owned(),
+                briefing_file,
+                model: Some("gpt-test".to_owned()),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout.as_deref(), Some("DRY_FIX_STATUS: completed"));
+        assert_eq!(outcome.stderr, None);
+    }
+
+    #[test]
+    fn test_dry_fix_session_log_cleanup_removes_log_by_default() {
+        let dir = tempfile::tempdir().unwrap();
+        let log_path = dir.path().join("session.log");
+        std::fs::write(&log_path, "dry fixer output").unwrap();
+
+        {
+            let _cleanup = DryFixSessionLogCleanup::new(log_path.clone());
+        }
+
+        assert!(!log_path.exists(), "default cleanup must remove successful-run logs");
+    }
+
+    #[test]
+    fn test_dry_fix_session_log_cleanup_keep_for_diagnosis_preserves_log() {
+        let dir = tempfile::tempdir().unwrap();
+        let log_path = dir.path().join("session.log");
+        std::fs::write(&log_path, "dry fixer output").unwrap();
+
+        DryFixSessionLogCleanup::new(log_path.clone()).keep_for_diagnosis();
+
+        assert!(log_path.exists(), "diagnostic cleanup must preserve failed-run logs");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_dry_fix_codex_missing_sentinel_returns_error() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let fake_codex = write_fake_codex_runner(
+            dir.path(),
+            r#"out=""
+while [ "$#" -gt 0 ]; do
+  if [ "$1" = "--output-last-message" ]; then
+    out="$2"
+    shift 2
+  else
+    shift
+  fi
+done
+while IFS= read -r _line; do :; done
+printf 'not a sentinel\n' > "$out"
+printf 'stdout without sentinel\n'
+exit 0
+"#,
+        );
+        let _codex_bin = EnvGuard::set("CODEX_BIN", fake_codex.as_os_str().to_os_string());
+        let _codex_home = EnvGuard::set("CODEX_HOME", dir.path().join(".codex").into_os_string());
+        let briefing_file = dir.path().join("briefing.md");
+        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+
+        let result = run_dry_fix_codex("gpt-test", "dry-track", &briefing_file);
+
+        let message = result.unwrap_err();
+        assert!(
+            message.contains("no DRY_FIX_STATUS sentinel"),
+            "missing sentinel must return a diagnostic error, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_fix_spawn_and_collect_redacts_sensitive_values_from_output_and_log() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let short_secret = "sk-dry-fix";
+        let long_secret = "sk-dry-fix-secret";
+        let org_id = "org-dry-fix";
+        let base_url = "https://token@example.invalid/v1";
+        let fake_codex = write_fake_codex_runner(
+            dir.path(),
+            &format!(
+                "while IFS= read -r _line; do :; done\nprintf 'stdout {short_secret} {long_secret} {org_id} {base_url}\\n'\nprintf 'stderr {short_secret} {long_secret} {org_id} {base_url}\\n' >&2\nexit 0\n"
+            ),
+        );
+        let safe_env = vec![
+            (OsString::from("OPENAI_API_KEY"), OsString::from(short_secret)),
+            (OsString::from("CODEX_API_KEY"), OsString::from(long_secret)),
+            (OsString::from("OPENAI_ORG_ID"), OsString::from(org_id)),
+            (OsString::from("OPENAI_BASE_URL"), OsString::from(base_url)),
+        ];
+
+        let (stdout, log_path) = dry_fix_spawn_and_collect(
+            &fake_codex.as_os_str().to_os_string(),
+            &[],
+            &safe_env,
+            "prompt",
+        )
+        .unwrap();
+        let log = std::fs::read_to_string(log_path).unwrap();
+
+        for secret in [short_secret, long_secret, org_id, base_url] {
+            assert!(!stdout.contains(secret), "stdout must redact {secret}");
+            assert!(!log.contains(secret), "session log must redact {secret}");
+        }
+        assert!(!stdout.contains("-secret"), "overlapping secret suffix must not leak");
+        assert!(!log.contains("-secret"), "overlapping secret suffix must not leak");
+        assert!(stdout.contains("[REDACTED:OPENAI_API_KEY]"));
+        assert!(stdout.contains("[REDACTED:CODEX_API_KEY]"));
+        assert!(stdout.contains("[REDACTED:OPENAI_ORG_ID]"));
+        assert!(stdout.contains("[REDACTED:OPENAI_BASE_URL]"));
+        assert!(log.contains("[REDACTED:OPENAI_API_KEY]"));
+        assert!(log.contains("[REDACTED:CODEX_API_KEY]"));
+        assert!(log.contains("[REDACTED:OPENAI_ORG_ID]"));
+        assert!(log.contains("[REDACTED:OPENAI_BASE_URL]"));
     }
 
     // ── CliApp public entry points ────────────────────────────────────────────

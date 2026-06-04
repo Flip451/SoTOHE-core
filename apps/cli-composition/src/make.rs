@@ -464,12 +464,7 @@ impl CliApp {
         run_sotp(&args)
     }
 
-    /// Run the review-fix-lead fixer via `sotp review fix-local`.
-    ///
-    /// Forwards all user-supplied arguments to `sotp review fix-local`.
-    /// Provider resolution and smoke-tests are handled by the `fix-local`
-    /// subcommand (Rust). Mirrors `make_track_local_review` in structure.
-    ///
+    /// Forward args to `sotp review fix-local`.
     /// # Errors
     /// Returns `Err` when the fixer invocation fails.
     pub fn make_track_local_review_fix_codex(
@@ -478,6 +473,20 @@ impl CliApp {
     ) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator_shell(&raw_args)?;
         let mut args: Vec<&str> = vec!["review", "fix-local"];
+        let word_refs: Vec<&str> = words.iter().map(String::as_str).collect();
+        args.extend_from_slice(&word_refs);
+        run_sotp(&args)
+    }
+
+    /// Forward args to `sotp dry fix-local`.
+    /// # Errors
+    /// Returns `Err` when the fixer invocation fails.
+    pub fn make_track_local_dry_fix(
+        &self,
+        raw_args: Vec<String>,
+    ) -> Result<CommandOutcome, String> {
+        let words = strip_leading_separator_shell(&raw_args)?;
+        let mut args: Vec<&str> = vec!["dry", "fix-local"];
         let word_refs: Vec<&str> = words.iter().map(String::as_str).collect();
         args.extend_from_slice(&word_refs);
         run_sotp(&args)
@@ -670,10 +679,6 @@ impl CliApp {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Subprocess helpers
-// ---------------------------------------------------------------------------
-
 /// Run an external command and return a CommandOutcome.
 fn run_command(program: &str, args: &[&str]) -> Result<CommandOutcome, String> {
     let status = std::process::Command::new(program)
@@ -688,10 +693,6 @@ fn run_command(program: &str, args: &[&str]) -> Result<CommandOutcome, String> {
 fn run_sotp(args: &[&str]) -> Result<CommandOutcome, String> {
     run_command("bin/sotp", args)
 }
-
-// ---------------------------------------------------------------------------
-// Unit tests
-// ---------------------------------------------------------------------------
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
@@ -795,6 +796,31 @@ mod tests {
                 "--scope",
                 "cli_composition"
             ]
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_make_track_local_dry_fix_forwards_shell_words_to_sotp() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+
+        let dir = tempfile::tempdir().unwrap();
+        write_fake_sotp(dir.path());
+        let _cwd_guard = CwdGuard(std::env::current_dir().unwrap());
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let outcome = crate::CliApp::new()
+            .make_track_local_dry_fix(vec![
+                "-- --briefing-file 'tmp/a b.md' --track-id dry-track".to_owned(),
+            ])
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let recorded = fs::read_to_string(dir.path().join("sotp-args.txt")).unwrap();
+        let args: Vec<&str> = recorded.lines().collect();
+        assert_eq!(
+            args,
+            vec!["dry", "fix-local", "--briefing-file", "tmp/a b.md", "--track-id", "dry-track"]
         );
     }
 

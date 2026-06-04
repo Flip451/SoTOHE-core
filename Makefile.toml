@@ -805,6 +805,11 @@ description = "[wrapper] Launch a Codex review-fix-lead fixer via `sotp review f
 script_runner = "@shell"
 script = ['CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp make track-local-review-fix-codex "$@"']
 
+[tasks.track-local-dry-fix]
+description = "[wrapper] Launch a Codex dry-fix-lead fixer via `sotp dry fix-local`. Resolves CODEX_BIN (absolute real-binary path) so the sanitized fixer env can launch codex regardless of toolchain manager. Performs smoke-tests (sandbox assertion + version check) and credential isolation (strips GITHUB_TOKEN, SSH credentials). Parses Codex output for `completed`/`blocked`/`failed` and prints the result. Usage: cargo make track-local-dry-fix -- --track-id <id> --briefing-file <path> [--model <model>]"
+script_runner = "@shell"
+script = ['CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp make track-local-dry-fix "$@"']
+
 [tasks.track-set-commit-hash]
 description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"
 script_runner = "@shell"

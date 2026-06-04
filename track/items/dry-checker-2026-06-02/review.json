@@ -1,6 +1,75 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
+              "severity": "P1",
+              "file": "libs/domain/src/dry_check.rs",
+              "line": 801,
+              "category": "correctness"
+            },
+            {
+              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 184,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
+          "at": "2026-06-03T07:16:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
+              "line": 821,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
+          "at": "2026-06-03T07:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:34:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:37:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T08:59:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T09:00:52Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -997,93 +1066,20 @@
           "findings": [],
           "hash": "rvw1:sha256:8ac02e44df7f9a750913051de94c76f8229fcdc5e4565b240e381d4c0863bb5f",
           "at": "2026-06-03T23:37:54Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
-          "at": "2026-06-03T10:14:07Z"
+          "hash": "rvw1:sha256:66c6681166efa69fd9650000177e0ab44baf44189a44800eb60c42605106434b",
+          "at": "2026-06-04T00:06:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
-          "at": "2026-06-03T10:16:04Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
-              "severity": "P1",
-              "file": "libs/domain/src/dry_check.rs",
-              "line": 801,
-              "category": "correctness"
-            },
-            {
-              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/semantic_dup.rs",
-              "line": 184,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
-          "at": "2026-06-03T07:16:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
-              "line": 821,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
-          "at": "2026-06-03T07:24:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
-          "at": "2026-06-03T07:34:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
-          "at": "2026-06-03T07:37:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
-          "at": "2026-06-03T08:59:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
-          "at": "2026-06-03T09:00:52Z"
+          "hash": "rvw1:sha256:66c6681166efa69fd9650000177e0ab44baf44189a44800eb60c42605106434b",
+          "at": "2026-06-04T00:08:46Z"
         }
       ]
     },
@@ -1278,68 +1274,243 @@
           "findings": [],
           "hash": "rvw1:sha256:2af5286486985ab50d7f53cfc2fc2a99ea9a418a49c4aff05e7396148ba3dfa0",
           "at": "2026-06-03T23:11:47Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
-          "at": "2026-06-03T12:02:30Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new `--filter` parser only has positive-path coverage. There is no test that an invalid value is rejected, so a future `ValueEnum` change could silently accept or mis-handle an unsupported filter token on this public CLI surface.",
+              "message": "`dry_fix_spawn_and_collect` streams child stderr straight to the parent terminal and persists it verbatim in the session log. Because `dry_fix_build_safe_env` passes through `OPENAI_API_KEY`, `OPENAI_ORG_ID`, `OPENAI_BASE_URL`, and `CODEX_API_KEY`, any nested Codex diagnostic that prints env/config data will leak secrets into `stderr` and `tmp/reviewer-runtime/*.log`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/dry.rs",
-              "line": 127,
-              "category": "test coverage gap"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1156,
+              "category": "security"
             },
             {
-              "message": "The `CliCommand::Dry` dispatch arm is not covered by any test. If this match arm is dropped or misrouted later, `sotp dry` would stop working even though the parser-focused tests in `dry.rs` would still pass.",
+              "message": "`dry_run_fix_local` only trims `--track-id` and checks it for emptiness, then `build_dry_fix_prompt` inserts it directly into the prompt. A value containing newlines or markdown can inject instructions into the nested fixer; validate or escape `track_id` before building the prompt.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 111,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
-          "at": "2026-06-03T12:04:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 712,
+              "category": "security"
+            },
             {
-              "message": "These tests only prove clap parses `sotp dry ...` into `CliCommand::Dry`; they never execute `main()` or `commands::dry::execute`, so the new dispatch arm and exit-code path can still be deleted or misrouted without failing the suite. That leaves the new public CLI entrypoint untested.",
+              "message": "The new public entry points `CliApp::dry_run_fix_local` and `CliApp::make_track_local_dry_fix` have no direct happy-path or error-path tests in this scope. That leaves provider resolution, smoke-test failures, env sanitization, and sentinel handling unguarded from regressions.",
               "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 149,
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 702,
               "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:ce18f1b57842d930baface85effc064dacfcf8674a714a0df2c11fbd2c555dc9",
-          "at": "2026-06-03T12:17:20Z"
+          "hash": "rvw1:sha256:24cb800a2791f0250d32210bef11f88420068e67cd08d5c5c23a0a52b3b36ff3",
+          "at": "2026-06-04T00:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_dry_fix_codex()` performs the `CODEX_BIN --version` smoke test before building the scrubbed environment, so that subprocess runs with the caller's full credential-bearing env (`OPENAI_*`, SSH, HOME, etc.). A custom or compromised `CODEX_BIN` can read/exfiltrate those secrets before the isolation boundary is applied. The version check needs the same sanitized env as the real fixer invocation, or it should not execute an untrusted binary here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 771,
+              "category": "security"
+            },
+            {
+              "message": "`build_dry_fix_invocation()` grants write access only to `codex_home`, but `dry_fix_build_safe_env()` sets `HOME` to the separately created `safe_home`. If `sandbox_workspace_write.writable_roots` is an allow-list, the fixer cannot write to the HOME directory it is explicitly told to use, so Codex session/config writes will fail. Include `safe_home` in the writable roots or move HOME under an already-writable root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1047,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:679a26b032d0c51b5cdc9a8478b70a98505e22d83729f93895b162f0c4cbaa75",
+          "at": "2026-06-04T00:23:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_fix_redaction_values` only redacts `OPENAI_API_KEY` and `CODEX_API_KEY`, so `OPENAI_ORG_ID` and `OPENAI_BASE_URL` can still be echoed to stderr and persisted in `tmp/reviewer-runtime/*.log`. Because the replacement pass is also applied in insertion order, overlapping secrets can be only partially redacted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 741,
+              "category": "security"
+            },
+            {
+              "message": "`resolve_codex_bin()` falls back to bare `codex`, but both the version smoke-test and the real spawn run under `env_clear()`. On asdf-managed installs, the shim loses the bootstrap state it needs to locate the real binary, so `sotp dry fix-local` can fail even when Codex is installed unless the caller pre-populates `CODEX_BIN`. The public entry point should not depend on the Makefile wrapper for this.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 821,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bfa219c611c0dc71f83ee6b85d432e6af61b14d9e014ea8a430b04b245bfa1d0",
+          "at": "2026-06-04T00:31:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_fix_spawn_and_collect` always writes `tmp/reviewer-runtime/dry-fix-codex-session-*.log` and there is no cleanup guard to delete it on success. That leaves a permanent record of nested Codex stdout/stderr on disk, so any sensitive repo content or credentials that escape the limited redaction pass remain readable after normal successful runs; the review-fix runner deletes these logs unless it needs them for diagnosis.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 1251,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:e08606479c804820540ecf366e10905d2dc696a792cc1cdf27163e739609a484",
+          "at": "2026-06-04T00:41:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry.rs` now contains about 1,390 lines of production code before the test module starts, which exceeds the repo's 700-line cap for production modules. This security-sensitive env/sandbox logic is too large to review and maintain safely in one file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1393,
+              "category": "architecture"
+            },
+            {
+              "message": "`dry_fix_spawn_and_collect` writes the session log only after both collector threads join successfully. If either collector panics or returns an I/O error, the function returns before `write_dry_fix_log`, so the failure path loses the only diagnostic artifact. The review-fix runner writes the log first and then surfaces collector errors.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1255,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a02e165b4b8b7719ff74ce2e84a97d2832f3a3572c11b971d33e61460f229f3c",
+          "at": "2026-06-04T00:48:26Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
-          "at": "2026-06-03T12:21:34Z"
+          "hash": "rvw1:sha256:8d2c218a33b15d017cf00c6619a3f453ab17e580af6861cd131eb0978ba8c024",
+          "at": "2026-06-04T01:01:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_codex_bin()` runs `asdf which codex` before the credential-scrubbed environment is built, and `Command::new(\"asdf\")` inherits the full parent environment. That means repository credentials the runner is explicitly supposed to strip, such as `GITHUB_TOKEN` and `SSH_AUTH_SOCK`, are exposed to the `asdf` subprocess before Codex is launched. Run this lookup with an allowlisted/scrubbed environment or avoid spawning `asdf` in the pre-scrub path.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/lib.rs",
+              "line": 139,
+              "category": "security"
+            },
+            {
+              "message": "The added `make_track_local_dry_fix` wrapper pushes `apps/cli-composition/src/make.rs` to 714 production lines before the `#[cfg(test)]` block at line 715, exceeding the AGENTS.md 700-line production-code module cap. Split the dry-fix make wrapper or related helpers into a submodule so this module stays within the enforced boundary.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 494,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:8d2c218a33b15d017cf00c6619a3f453ab17e580af6861cd131eb0978ba8c024",
+          "at": "2026-06-04T01:05:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
-          "at": "2026-06-03T12:24:17Z"
+          "hash": "rvw1:sha256:a5cb3dab31a79c00daa415938f8d0d84297634944e449211f1580fd5eeb52f8b",
+          "at": "2026-06-04T01:11:41Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "line": 91,
+              "category": "correctness"
+            },
+            {
+              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:123-144`, `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "line": 129,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f4ef6b67d3326653bb4e28f4a52f27f51c40676f019eb187cbeb0c19bc0775c",
+          "at": "2026-06-03T13:17:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
+          "at": "2026-06-03T13:20:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow now says capability routing and model/CLI selection are determined by `.harness/config/agent-profiles.json`, and lists `dry-checker` as Codex. However `sotp dry write` does not load agent-profiles at all: its CLI args define `--model` with default `codex` and `--capability-name` with default `dry-checker`, then pass those directly to `CodexDryChecker::new`. As a result the new `.harness/config/agent-profiles.json` entry `dry-checker.model = gpt-5.5` has no effect on the documented `sotp dry write` path, so the docs/config describe a routing behavior the implementation does not provide.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 363,
+              "category": "docs"
+            },
+            {
+              "message": "The documented `sotp dry` command surfaces are incomplete relative to the implemented clap args. `write` also accepts `--items-dir`, `--model`, and `--capability-name`; `results` and `check-approved` also accept `--items-dir`. Because this convention is the command reference for DFP/RFP operation and already lists other optional flags, omitting these flags makes the documented argument surface disagree with the actual T007-T009 CLI, especially the model/capability overrides that currently control dry-checker execution.",
+              "severity": "P1",
+              "file": "knowledge/conventions/dry-check-workflow.md",
+              "line": 53,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
+          "at": "2026-06-03T13:24:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff5385a3b4d8c08cfb0f6f4d71bd85fbbcdd221d1336ddf8b3d6dac3f15026e1",
+          "at": "2026-06-03T13:28:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
+          "at": "2026-06-03T23:36:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The contract says the Codex model for the `dry-checker` agent is resolved from `capabilities.dry-fix-lead`, but `.harness/config/agent-profiles.json` defines `dry-checker` and `dry-fix-lead` as separate capabilities. For this dfl agent this should refer to the dry-fix-lead agent/capability, or if discussing `sotp dry write`, to `capabilities.dry-checker`; as written the model-resolution contract is inconsistent with the capability split.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 22,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
+          "at": "2026-06-03T23:40:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:070a7273511175737a3763471a227667f5064143fe87fc04ba9b1a418e7d9ed2",
+          "at": "2026-06-03T23:43:10Z"
         }
       ]
     },
@@ -1559,94 +1730,35 @@
         }
       ]
     },
-    "harness-policy": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
-              "line": 91,
-              "category": "correctness"
-            },
-            {
-              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:123-144`, `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
-              "line": 129,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8f4ef6b67d3326653bb4e28f4a52f27f51c40676f019eb187cbeb0c19bc0775c",
-          "at": "2026-06-03T13:17:23Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
+          "at": "2026-06-03T10:14:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
+          "at": "2026-06-03T10:16:04Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
-          "at": "2026-06-03T13:20:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workflow now says capability routing and model/CLI selection are determined by `.harness/config/agent-profiles.json`, and lists `dry-checker` as Codex. However `sotp dry write` does not load agent-profiles at all: its CLI args define `--model` with default `codex` and `--capability-name` with default `dry-checker`, then pass those directly to `CodexDryChecker::new`. As a result the new `.harness/config/agent-profiles.json` entry `dry-checker.model = gpt-5.5` has no effect on the documented `sotp dry write` path, so the docs/config describe a routing behavior the implementation does not provide.",
-              "severity": "P1",
-              "file": "DEVELOPER_AI_WORKFLOW.md",
-              "line": 363,
-              "category": "docs"
-            },
-            {
-              "message": "The documented `sotp dry` command surfaces are incomplete relative to the implemented clap args. `write` also accepts `--items-dir`, `--model`, and `--capability-name`; `results` and `check-approved` also accept `--items-dir`. Because this convention is the command reference for DFP/RFP operation and already lists other optional flags, omitting these flags makes the documented argument surface disagree with the actual T007-T009 CLI, especially the model/capability overrides that currently control dry-checker execution.",
-              "severity": "P1",
-              "file": "knowledge/conventions/dry-check-workflow.md",
-              "line": 53,
-              "category": "docs"
-            }
-          ],
-          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
-          "at": "2026-06-03T13:24:39Z"
+          "hash": "rvw1:sha256:abb34b89429a8dfe31dafd850a8b7f2ec4904eaddb50db5e513917e17b3b5bf3",
+          "at": "2026-06-04T00:06:55Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ff5385a3b4d8c08cfb0f6f4d71bd85fbbcdd221d1336ddf8b3d6dac3f15026e1",
-          "at": "2026-06-03T13:28:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
-          "at": "2026-06-03T23:36:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The contract says the Codex model for the `dry-checker` agent is resolved from `capabilities.dry-fix-lead`, but `.harness/config/agent-profiles.json` defines `dry-checker` and `dry-fix-lead` as separate capabilities. For this dfl agent this should refer to the dry-fix-lead agent/capability, or if discussing `sotp dry write`, to `capabilities.dry-checker`; as written the model-resolution contract is inconsistent with the capability split.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 22,
-              "category": "consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
-          "at": "2026-06-03T23:40:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:070a7273511175737a3763471a227667f5064143fe87fc04ba9b1a418e7d9ed2",
-          "at": "2026-06-03T23:43:10Z"
+          "hash": "rvw1:sha256:abb34b89429a8dfe31dafd850a8b7f2ec4904eaddb50db5e513917e17b3b5bf3",
+          "at": "2026-06-04T00:09:04Z"
         }
       ]
     },
@@ -1751,6 +1863,82 @@
           "findings": [],
           "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
           "at": "2026-06-03T10:58:31Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
+          "at": "2026-06-03T12:02:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--filter` parser only has positive-path coverage. There is no test that an invalid value is rejected, so a future `ValueEnum` change could silently accept or mis-handle an unsupported filter token on this public CLI surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/dry.rs",
+              "line": 127,
+              "category": "test coverage gap"
+            },
+            {
+              "message": "The `CliCommand::Dry` dispatch arm is not covered by any test. If this match arm is dropped or misrouted later, `sotp dry` would stop working even though the parser-focused tests in `dry.rs` would still pass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 111,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
+          "at": "2026-06-03T12:04:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These tests only prove clap parses `sotp dry ...` into `CliCommand::Dry`; they never execute `main()` or `commands::dry::execute`, so the new dispatch arm and exit-code path can still be deleted or misrouted without failing the suite. That leaves the new public CLI entrypoint untested.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 149,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:ce18f1b57842d930baface85effc064dacfcf8674a714a0df2c11fbd2c555dc9",
+          "at": "2026-06-03T12:17:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
+          "at": "2026-06-03T12:21:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
+          "at": "2026-06-03T12:24:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:004340612125d982eea14297d58e84368c1236b8b4a87a02ef886fcda05ad325",
+          "at": "2026-06-04T00:10:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:004340612125d982eea14297d58e84368c1236b8b4a87a02ef886fcda05ad325",
+          "at": "2026-06-04T00:14:50Z"
         }
       ]
     }

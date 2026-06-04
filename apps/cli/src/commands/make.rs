@@ -63,6 +63,8 @@ pub enum MakeTask {
     TrackLocalReview,
     /// Run the review-fix-lead fixer via `sotp review fix-local`.
     TrackLocalReviewFixCodex,
+    /// Run the dry-fix-lead fixer via `sotp dry fix-local`.
+    TrackLocalDryFix,
     /// Show per-scope review results (state summary by default).
     TrackReviewResults,
     /// Check that the review state is approved and code hash is current.
@@ -174,6 +176,7 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::TrackLocalPlan => dispatch_track_local_plan(&args.raw_args),
         MakeTask::TrackLocalReview => dispatch_track_local_review(&args.raw_args),
         MakeTask::TrackLocalReviewFixCodex => dispatch_track_local_review_fix_codex(&args.raw_args),
+        MakeTask::TrackLocalDryFix => dispatch_track_local_dry_fix(&args.raw_args),
         MakeTask::TrackReviewResults => dispatch_track_review_results(&args.raw_args),
         MakeTask::TrackCheckApproved => dispatch_track_check_approved(&args.raw_args),
         MakeTask::Commit => dispatch_commit(&args.raw_args),
@@ -459,6 +462,10 @@ fn dispatch_track_local_review_fix_codex(raw_args: &[String]) -> Result<ExitCode
     review_fix::dispatch_track_local_review_fix_codex(raw_args)
 }
 
+fn dispatch_track_local_dry_fix(raw_args: &[String]) -> Result<ExitCode, CliError> {
+    dry_fix::dispatch_track_local_dry_fix(raw_args)
+}
+
 /// Build the sotp argv for a forwarding dispatcher: prefix + user args (with leading "--" stripped).
 ///
 /// Uses `raw_args_to_words` (same as other dispatchers) which handles both
@@ -679,6 +686,9 @@ fn dispatch_exec(raw_args: &[String]) -> Result<ExitCode, CliError> {
 
 #[path = "make_review_fix.rs"]
 mod review_fix;
+
+#[path = "make_dry_fix.rs"]
+mod dry_fix;
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
