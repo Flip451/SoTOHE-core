@@ -64,12 +64,13 @@ flowchart TD
     IMPL -->|"対話型"| F["/track:implement"]
     IMPL -->|"自律型"| FC["/track:full-cycle &lt;task&gt;"]
     F --> G["実装完了"]
-    FC --> G
-    G --> H{レビュー方法を選ぶ}
+    G --> D["/track:dry-check"]
+    D --> H{レビュー方法を選ぶ}
     H -->|"ローカル"| I["/track:review"]
     I --> J["/track:ci"]
     J --> K["/track:commit &lt;message&gt;"]
     K --> L["/track:pr"]
+    FC --> L
     L --> M["/track:merge &lt;pr&gt;"]
     H -->|"GitHub PR"| J2["/track:ci"]
     J2 --> K2["/track:commit &lt;message&gt;"]
@@ -90,6 +91,7 @@ flowchart TD
 | `/track:type-design` | TDDD: 全 TDDD 有効レイヤーの `<layer>-types.json` に型を宣言（`domain-types.json`・`usecase-types.json` 等） | TDDD フロー（plan → design → implement）での型宣言時 |
 | `/track:full-cycle <task>` | 自律実装（TDDD 使用時は事前に `/track:type-design` 推奨） | タスクを自律的に進めたい時 |
 | `/track:implement` | 対話型並列実装 | 実装中に途中判断を挟みたい時 |
+| `/track:dry-check` | DFP（DRY fix phase）: 全コードベースの DRY ゲートを dfl で通過させる（`/track:review` は呼ばない、D1/OS-01） | 重複違反を解消したい時・`/track:full-cycle` が per-task で自動実行 |
 | `/track:review` | 計画・実装レビュー（ローカル） | 計画 artifact や実装内容を確認したい時 |
 | `/track:pr-review` | GitHub PR レビュー（Codex Cloud） | PR 上で非同期レビューしたい時（要: Codex Cloud GitHub App） |
 | `/track:revert` | 直近変更の安全な取り消し計画 | 変更を戻す前に影響を整理したい時 |
@@ -369,6 +371,13 @@ cargo make bacon-test  # テスト寄りの継続チェック
   - **RFP 後続**: DFP 通過後に rfl が scope ごとに並列レビューを回す
   - **back-edge**: RFP 中に DRY 違反が出たら rfl は即停止して DFP へ戻る（rfl は DRY を修正しない）
   - **fixpoint**: DRY gate + 全 review scope が同時に green になった時点でのみコミット可
+  - **DFP 専用コマンド**: `/track:dry-check`（DFP のホストコマンド）。`/track:review` を invoke しない（D1/OS-01 疎結合）。DFP と RFP は別コマンドで、`/track:full-cycle` または利用者が順序づける
+  - **`/track:full-cycle` への組み込み**: per-task ループで Implement（Step 1）の直後・Review（Step 2）の前に DFP（Step 1b = `/track:dry-check`）を実行する。Review（RFP）が `zero_findings` に達したら DFP を再実行し、DRY gate と全 review scope が同時に green になる fixpoint までループしてからコミットする
+  - **dfl の 3 終端状態（相互排他。`blocked` と `failed` を 1 つの分岐にまとめない）**:
+    - `completed` — DRY gate が Approved。Review（Step 2）へ進む
+    - `blocked` — dfl が自律解決できない DRY 違反が残存（ループが修正試行を使い切った）。**tooling error ではなく DRY ゲートの結果**。per-task ループを即停止し、未解決ペアを surface し、Review にもコミットにも進まない（手動解決へエスカレーション）
+    - `failed` — 実行／ツーリングエラーでループが回らなかった。停止して報告
+  - コミットゲート（`cargo make track-commit-message`）は `sotp dry check-approved` を hard precondition として実行し、DRY gate が Blocked の間はコミットメッセージを生成しない（`blocked` な DFP はコミットを通せない）
   - 詳細は `knowledge/conventions/dry-check-workflow.md` を参照
 - Agent Teams（サブエージェント）:
   - 並列実装（`/track:implement`）・並列レビュー（`/track:review`）
