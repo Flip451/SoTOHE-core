@@ -9,6 +9,7 @@
 - `type-designer.md`: authors TDDD catalogue entries — picks `TypeDefinitionKind` variants and kind-specific fields (`/track:design` = Phase 2)
 - `adr-editor.md`: edits existing ADRs in the working tree when a downstream SoT Chain signal turns 🔴 (back-and-forth escalation invoked by `/track:plan`; write scope limited to `knowledge/adr/`)
 - `review-fix-lead.md`: runs the autonomous fix+review loop owned by a single review scope (`/track:review`)
+- `dry-fix-lead.md`: runs the autonomous DFP (DRY fix phase) loop over the whole codebase — `sotp dry write` → fix DRY violations → `sotp dry check-approved` until the gate passes (`/track:dry-check`)
 
 ## Capability correspondence
 
@@ -23,4 +24,6 @@ Subagents aligned with the Claude-provider capabilities in `.harness/config/agen
 | orchestrator | — | handled directly by the Claude Code main session (no subagent needed) |
 | implementer | — | main session or ad-hoc delegation |
 | reviewer | — (provider: codex) | `review-fix-lead.md` owns the loop and invokes Codex CLI |
+| dry-fix-lead | `dry-fix-lead.md` (provider: codex) | `dry-fix-lead.md` owns the DFP loop and invokes Codex CLI (`/track:dry-check`) |
+| dry-checker | — (provider: codex) | invoked by the `sotp dry` CLI (CodexDryChecker adapter), not as a subagent |
 | researcher | — (provider: gemini) | Gemini CLI is invoked directly from the main session |

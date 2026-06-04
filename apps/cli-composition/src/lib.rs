@@ -11,6 +11,7 @@
 
 mod demo;
 mod domain;
+pub mod dry;
 mod file;
 mod git;
 mod guard;
@@ -21,6 +22,8 @@ pub mod review_v2;
 mod semantic_dup;
 mod track;
 mod verify;
+
+mod dry_fix_runner;
 
 #[cfg(test)]
 pub(crate) mod test_support {
@@ -37,6 +40,7 @@ pub(crate) mod test_support {
 // ---------------------------------------------------------------------------
 
 pub use domain::ExportSchemaInput;
+pub use dry::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput};
 pub use review_v2::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
     RunReviewFixLocalInput,

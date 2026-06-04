@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "406c3c3489ddfa3e2d1bae5c74cd9ee5bdbf853d0a5d2dde318bf7d564ceb8a1",
+  "signals": [
+    {
+      "type_name": "CodexDryChecker",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckCommitHashError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsDryCheckCommitHashStore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FsDryCheckStore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "GitDryCheckDiffGetter",
+      "signal": "blue"
+    }
+  ]
+}

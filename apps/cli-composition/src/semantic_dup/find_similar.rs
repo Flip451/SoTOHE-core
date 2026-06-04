@@ -83,8 +83,11 @@ impl CliApp {
     ) -> Result<CommandOutcome, String> {
         let top_k = TopK::new(input.top_k).map_err(|e| format!("invalid --top-k value: {e}"))?;
 
-        let fragment = CodeFragment::new(PathBuf::from("<query>"), input.fragment_text.clone())
-            .map_err(|e| format!("invalid query fragment: {e}"))?;
+        // Query fragments use start_line=1 / end_line=u32::MAX as a sentinel
+        // so they are never excluded by hunk-level filtering.
+        let fragment =
+            CodeFragment::new(PathBuf::from("<query>"), input.fragment_text.clone(), 1, u32::MAX)
+                .map_err(|e| format!("invalid query fragment: {e}"))?;
 
         // Validate that the semantic index exists and is recognizable BEFORE
         // constructing the embedding or index adapters.  An absent or typo'd
@@ -138,7 +141,7 @@ mod tests {
     // ── format_find_similar_results (pure formatter) ──────────────────────────
 
     fn make_fragment(path: &str, content: &str) -> CodeFragment {
-        CodeFragment::new(PathBuf::from(path), content.to_owned()).unwrap()
+        CodeFragment::new(PathBuf::from(path), content.to_owned(), 1, 1).unwrap()
     }
 
     fn make_score(v: f32) -> SimilarityScore {

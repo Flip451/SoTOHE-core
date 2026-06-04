@@ -157,9 +157,10 @@ fn extract_from_file(file_path: &Path) -> Result<Vec<CodeFragment>, ExtractError
     let fragments = split_into_fragments(&source);
     let mut result = Vec::with_capacity(fragments.len());
 
-    for text in fragments {
+    for (text, start_line, end_line) in fragments {
         // CodeFragment::new rejects empty content; skip silently.
-        if let Ok(fragment) = CodeFragment::new(file_path.to_path_buf(), text) {
+        if let Ok(fragment) = CodeFragment::new(file_path.to_path_buf(), text, start_line, end_line)
+        {
             result.push(fragment);
         }
     }
@@ -167,31 +168,35 @@ fn extract_from_file(file_path: &Path) -> Result<Vec<CodeFragment>, ExtractError
     Ok(result)
 }
 
-/// Split `source` text into item-level fragment strings.
+/// Split `source` text into item-level fragment strings with their 1-indexed
+/// line spans.
 ///
-/// Each element in the returned `Vec` corresponds to the lines from one
-/// item-headed block (identified by [`is_item_boundary`]) up to (but not
-/// including) the next boundary line.  Lines before the first boundary form
-/// a leading fragment (module-level attributes, `use` declarations, etc.)
-/// that is included only if it is non-empty.
+/// Each element in the returned `Vec` is a tuple of `(text, start_line, end_line)`
+/// where `start_line` and `end_line` are 1-indexed inclusive line numbers within
+/// the source file.  Lines before the first boundary form a leading fragment
+/// (module-level attributes, `use` declarations, etc.) that is included only if
+/// it is non-empty.
 ///
 /// The split is line-oriented and does not parse Rust syntax, so nested
 /// functions (inside `impl` blocks or closures) are included in the outer
 /// fragment's text rather than being extracted separately.  This is intentional:
 /// item-level granularity captures the semantic unit most likely to be
 /// duplicated.
-fn split_into_fragments(source: &str) -> Vec<String> {
-    let mut fragments: Vec<String> = Vec::new();
+fn split_into_fragments(source: &str) -> Vec<(String, u32, u32)> {
+    let mut fragments: Vec<(String, u32, u32)> = Vec::new();
     let mut current = String::new();
+    // 1-indexed line number of the first line in `current`.
+    let mut current_start: u32 = 1;
 
-    for line in source.lines() {
+    for (line_idx, line) in source.lines().enumerate() {
+        // line_idx is 0-indexed; convert to 1-indexed.
+        let line_no = line_idx as u32 + 1;
+
         if is_item_boundary(line) {
             // Flush the accumulated lines as a fragment.
-            let trimmed = current.trim().to_owned();
-            if !trimmed.is_empty() {
-                fragments.push(trimmed);
-            }
+            push_trimmed_fragment(&mut fragments, &current, current_start);
             current = String::new();
+            current_start = line_no;
         }
         // Append the line (including newline) to the current fragment.
         current.push_str(line);
@@ -199,12 +204,36 @@ fn split_into_fragments(source: &str) -> Vec<String> {
     }
 
     // Flush the last fragment.
-    let trimmed = current.trim().to_owned();
-    if !trimmed.is_empty() {
-        fragments.push(trimmed);
-    }
+    push_trimmed_fragment(&mut fragments, &current, current_start);
 
     fragments
+}
+
+fn push_trimmed_fragment(
+    fragments: &mut Vec<(String, u32, u32)>,
+    current: &str,
+    current_start: u32,
+) {
+    let trimmed = current.trim().to_owned();
+    if trimmed.is_empty() {
+        return;
+    }
+
+    let mut start_line = None;
+    let mut end_line = None;
+    for (line_idx, line) in current.lines().enumerate() {
+        if !line.trim().is_empty() {
+            let line_no = current_start.saturating_add(line_idx as u32);
+            if start_line.is_none() {
+                start_line = Some(line_no);
+            }
+            end_line = Some(line_no);
+        }
+    }
+
+    if let (Some(start_line), Some(end_line)) = (start_line, end_line) {
+        fragments.push((trimmed, start_line, end_line));
+    }
 }
 
 /// Return `true` when `line` starts a Rust item boundary.
@@ -473,6 +502,32 @@ mod tests {
         assert!(!is_item_boundary("   "));
     }
 
+    // ── split_into_fragments ───────────────────────────────────────────────────
+
+    #[test]
+    fn test_split_into_fragments_separator_blank_lines_not_included_in_previous_span() {
+        let fragments = split_into_fragments("fn a() {}\n\nfn b() {}\n");
+
+        assert_eq!(
+            fragments,
+            vec![("fn a() {}".to_owned(), 1, 1), ("fn b() {}".to_owned(), 3, 3),]
+        );
+    }
+
+    #[test]
+    fn test_split_into_fragments_edge_blank_lines_not_included_in_body_spans() {
+        let fragments =
+            split_into_fragments("\n\nuse std::fmt;\n\nfn a() {\n    do_work();\n}\n\n");
+
+        assert_eq!(
+            fragments,
+            vec![
+                ("use std::fmt;".to_owned(), 3, 3),
+                ("fn a() {\n    do_work();\n}".to_owned(), 5, 7),
+            ]
+        );
+    }
+
     // ── is_excluded_dir ───────────────────────────────────────────────────────
 
     #[test]
@@ -546,6 +601,12 @@ mod tests {
                 root_path.join("real_source.rs"),
                 "unexpected fragment from excluded path: {}",
                 fragment.source_path.display()
+            );
+            // Verify that start_line and end_line are valid (non-zero, start <= end).
+            assert!(fragment.start_line() >= 1, "start_line must be >= 1");
+            assert!(
+                fragment.start_line() <= fragment.end_line(),
+                "start_line must not exceed end_line"
             );
         }
     }

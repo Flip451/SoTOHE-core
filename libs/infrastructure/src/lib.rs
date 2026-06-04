@@ -5,6 +5,7 @@ pub mod adr_decision;
 pub mod agent_profiles;
 pub mod code_profile_builder;
 pub mod demo;
+pub mod dry_check;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod impl_plan_codec;

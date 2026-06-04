@@ -1,0 +1,630 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "DryCheckAgentJudgment": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotAViolation",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "rationale", "ty": "domain::dry_check::Rationale" }
+              ]
+            }
+          },
+          {
+            "name": "Accepted",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "rationale", "ty": "domain::dry_check::Rationale" }
+              ]
+            }
+          },
+          {
+            "name": "Violation",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "rationale", "ty": "domain::dry_check::Rationale" },
+                { "name": "finding",   "ty": "domain::dry_check::DryCheckFinding" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "The dry-checker agent's judgment output. Makes illegal states unrepresentable: a genuine Violation always carries both a DryCheckFinding (with RefactorProposal and the changed/candidate FragmentRefs) and a Rationale; NotAViolation and Accepted carry a Rationale but no finding. Every verdict carries a required Rationale (validated non-empty by domain::dry_check::Rationale newtype) so DryCheckEntry.rationale can always be populated (D9/AC-06 mandate rationale on all records). The interactor extracts rationale from the judgment to build DryCheckEntry, and extracts finding.refactor_proposal (RefactorProposal) from Violation variants to build DryCheckVerdict::Violation { refactor_proposal } for persistence (enum-first D9), and surfaces findings from Violation variants to the caller (IN-03/AC-03). Pair identity (DryCheckPairKey) for all verdicts (NotAViolation, Accepted, Violation) is derived by the interactor from the actual CodeFragment values of the judged pair (FragmentRef computed via SHA-256 of content()) — not from finding.changed_fragment_ref or finding.candidate_fragment_ref, which are Violation-only informational live-output fields.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-03",
+          "hash": "cc61e2d1f14289ce4aea7886512a7fe51da429ef0a3d4785e4d4601764aaf06a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckAgentError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "UserAbort",      "payload": { "kind": "unit" } },
+          { "name": "AgentAbort",     "payload": { "kind": "unit" } },
+          { "name": "Timeout",        "payload": { "kind": "unit" } },
+          { "name": "IllegalOutput",  "payload": { "kind": "unit" } },
+          { "name": "Unexpected",     "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Errors from the DryCheckAgentPort usecase port (mirrors ReviewerError). Covers agent abort, timeout, illegal schema output, and unexpected failures.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckCycleError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Embedding",     "payload": { "kind": "tuple", "fields": ["usecase::semantic_dup::errors::EmbeddingError"] } },
+          { "name": "Index",         "payload": { "kind": "tuple", "fields": ["usecase::semantic_dup::errors::SemanticIndexError"] } },
+          { "name": "Agent",         "payload": { "kind": "tuple", "fields": ["DryCheckAgentError"] } },
+          { "name": "Reader",        "payload": { "kind": "tuple", "fields": ["domain::dry_check::DryCheckReaderError"] } },
+          { "name": "Writer",        "payload": { "kind": "tuple", "fields": ["domain::dry_check::DryCheckWriterError"] } },
+          { "name": "Diff",          "payload": { "kind": "tuple", "fields": ["DryCheckDiffError"] } },
+          { "name": "Entry",         "payload": { "kind": "tuple", "fields": ["domain::dry_check::DryCheckEntryError"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Composite error for the dry-check use case cycle (covers embedding, index, agent, persistence, diff, and entry construction errors). No PairKey variant: self-match (DryCheckPairKey::new returning Err(SelfMatch) when both path AND content_hash are equal) is a control-flow skip signal — the interactor skips that candidate pair and proceeds to the next; it is not a cycle-fatal error and is never wrapped here. Entry wraps DryCheckEntryError (changed_path-outside-pair rejection from DryCheckEntry::new), which is an internal invariant violation (interactor bug) and is abort-worthy. The interactor builds DryCheckEntry (not DryCheckRecord) and passes it to DryCheckWriter.append_record — so this error wraps DryCheckEntryError, not DryCheckRecordError. Uses dry-check's own DryCheckDiffError (not review_v2's DiffGetError) per CN-01 loose coupling.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Interactor implementing DryCheckService. Orchestrates: full-codebase index build (EmbeddingPort + SemanticIndexPort from corpus_fragments) + diff fragment query at threshold + DryCheckAgentPort verification + DryCheckWriter.append_record verdict persistence. For each agent judgment, extracts the rationale (Rationale newtype) from DryCheckAgentJudgment (present on every variant: NotAViolation, Accepted, Violation). Derives the FragmentRefs from the two CodeFragment values: for each CodeFragment, computes FragmentContentHash from SHA-256 of content(), pairs it with FilePath(source_path) to get FragmentRef::new(path, content_hash). Constructs DryCheckPairKey::new(changed_ref, candidate_ref) — sorts the two FragmentRefs lexicographically by (path, content_hash) into (low, high). If DryCheckPairKey::new returns Err(SelfMatch) (path AND content_hash both equal — genuine self-match), skips the pair without recording. changed_path for the entry is the diff fragment's FilePath. For Violation judgments, constructs DryCheckVerdict::Violation { refactor_proposal } from DryCheckFinding.refactor_proposal (RefactorProposal newtype, enum-first D9). Constructs DryCheckEntry::new(pair_key, changed_path, verdict, similarity_score, threshold, base_commit, rationale) and calls DryCheckWriter.append_record(&entry) — the interactor does NOT produce a Timestamp. FsDryCheckStore.append_record stamps Timestamp (recorded_at) at write time and builds DryCheckRecord internally before writing. Applies per-pair cache (D8/CN-07: only unverified or content-changed pairs are re-checked — invalidation is identifier matching: current (path, content_hash) vs the pair_key in each record; if the DryCheckPairKey built from current FragmentRefs matches an existing record's pair_key, the pair is verified). corpus_fragments and threshold are passed per-call so every check starts from a fresh whole-codebase index (IN-02/spec D4). Reads existing history via DryCheckReader.read_records() to derive the latest-per-pair verdicts before deciding which pairs to re-verify. diff_fragments are received as a parameter (resolved by the CLI via GitDryCheckDiffGetter before calling run_dry_check) — the interactor does NOT own diff acquisition and does NOT inject DryCheckDiffSource.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "39314cd8d8ea7db5b8911ad04302e048eff2e705b0ce0ffe0d14d80defa3a934"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckResultsInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Interactor implementing DryCheckResultsService. Reads the full history array via DryCheckReader.read_records(), applies the VerdictFilter to select the latest-per-pair records matching the requested classification, and returns DryCheckResults carrying the filtered record list. No direct dry-check.json read (D10). For the gate check, see DryCheckApprovalInteractor (AC-04). Violation records now expose refactor_proposal via DryCheckVerdict::Violation { refactor_proposal } for display in sotp dry results (AC-07/IN-08).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-07",
+          "hash": "7f98b9b99f39a9758e2091fc2fb6d6697aff97ac727156e44fd36760cb403292"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-08",
+          "hash": "01772a23d21e673ea123a475616259771c8f18e19d1696c9de36a17bfe123a1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovalInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Interactor implementing DryCheckApprovalService. Evaluates the gate: builds a fresh full-codebase index from corpus_fragments at the given threshold, queries each diff fragment, then reads all history records via DryCheckReader.read_records(), derives the latest-per-pair verdicts, and returns Approved only when all above-threshold pairs are verified as not-a-violation or accepted (AC-04/D7/D10 gate operation). Pair identity check: for each (diff_fragment, candidate_fragment) pair, computes FragmentRefs from their CodeFragment values (FragmentContentHash from SHA-256 of content()) and constructs DryCheckPairKey::new(changed_ref, candidate_ref). If the resulting pair_key matches an existing record's pair_key, the pair is verified; otherwise it is unverified (CN-07 identifier matching). corpus_fragments and threshold are passed per-call (consistent with DryCheckService). The gate reads only — it does not record new verdicts and does not need base_commit.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-04",
+          "hash": "5b6c9bf097b59eecbfcea1ba66f271aaadab1a97489e1dff4a8f21d297fef10a"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-05",
+          "hash": "530b1484c0094d7c14e8e37a843d7767d612a4e64026087e69fa48b3d1e7b6ca"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckResults": {
+      "action": "add",
+      "role": "Query",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "records", "ty": "Vec<domain::dry_check::DryCheckRecord>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Informational query output from DryCheckResultsService (AC-07/D10 read path). Carries the list of DryCheckRecord entries that passed the VerdictFilter applied by get_results(). Each record uses the canonical sorted model: pair_key holds two FragmentRefs (path, content_hash) sorted lexicographically by (path, content_hash) order (low <= high); changed_path is a display-only field (diff fragment side); verdict (enum-first: Violation { refactor_proposal } / NotAViolation / Accepted); similarity_score, threshold, base_commit, rationale, and recorded_at. For VerdictFilter::All the list is the latest-per-pair records from the full history; for a specific filter variant (NotAViolation / Accepted / Violation) only matching records are included. The CLI read command surfaces refactor_proposal for Violation records by matching on DryCheckVerdict::Violation { refactor_proposal } — no separate field required. The authoritative current-scope gate is DryCheckApprovalService.check_approved (AC-04), which takes corpus_fragments + diff_fragments + threshold. The write path (DryCheckService.run_dry_check) surfaces live DryCheckFinding proposals to dfl — that is a separate concern.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-07",
+          "hash": "7f98b9b99f39a9758e2091fc2fb6d6697aff97ac727156e44fd36760cb403292"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-08",
+          "hash": "01772a23d21e673ea123a475616259771c8f18e19d1696c9de36a17bfe123a1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckDiffError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Failed", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error type for DryCheckDiffSource — dry-check's own diff-source port error. CN-01: mirrors DiffGetError semantics but is dry-check's independent type, not review_v2's DiffGetError. Kept structurally simple: a single Failed variant carrying the underlying git / I/O message.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "DryCheckAgentPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "judge",
+          "receiver": "&self",
+          "params": [
+            { "name": "changed_fragment",    "ty": "&domain::semantic_dup::CodeFragment" },
+            { "name": "candidate_fragment",  "ty": "&domain::semantic_dup::CodeFragment" }
+          ],
+          "returns": "Result<DryCheckAgentJudgment, DryCheckAgentError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_check",
+      "docs": "Usecase port for the dry-checker agent capability. The agent reads both code fragments, applies precision judgment (rejects self-match, acceptable similarity, out-of-scope dup), and returns a DryCheckAgentJudgment. Every variant of the judgment carries a required rationale (domain::dry_check::Rationale — validated non-empty newtype). A Violation judgment additionally carries a DryCheckFinding with RefactorProposal and the changed/candidate FragmentRefs (IN-03/AC-03). The interactor converts the judgment to DryCheckVerdict for persistence: Violation maps to DryCheckVerdict::Violation { refactor_proposal } (enum-first D9), extracting finding.refactor_proposal (already a RefactorProposal); NotAViolation/Accepted map to their respective unit variants. Rationale is extracted for DryCheckEntry.rationale. The interactor computes FragmentContentHash from each CodeFragment.content() to build the FragmentRefs for DryCheckPairKey — the agent receives CodeFragment directly. Analogous to Reviewer. Placed in usecase because agent invocation is an infrastructure capability with no domain entity semantics.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-03",
+          "hash": "cc61e2d1f14289ce4aea7886512a7fe51da429ef0a3d4785e4d4601764aaf06a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "run_dry_check",
+          "receiver": "&self",
+          "params": [
+            { "name": "corpus_fragments", "ty": "Vec<domain::semantic_dup::CodeFragment>" },
+            { "name": "diff_fragments",   "ty": "Vec<domain::semantic_dup::CodeFragment>" },
+            { "name": "threshold",        "ty": "domain::semantic_dup::SimilarityThreshold" },
+            { "name": "base_commit",      "ty": "domain::CommitHash" }
+          ],
+          "returns": "Result<Vec<domain::dry_check::DryCheckFinding>, DryCheckCycleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "dry_check",
+      "docs": "Application service for the dry-check use case (write path, D10). Receives the full workspace corpus (corpus_fragments — all Rust source fragments extracted by the CLI, needed to build the single whole-codebase index per IN-02/D4/spec OS-03) plus the diff fragments to query, the similarity threshold, and the git base commit the diff was computed against (base_commit — resolved by the CLI via the per-track .commit_hash mechanism, ancestor-checked with main-tip fallback, with --base-commit as optional override; IN-02/AC-02). Orchestrates index build from corpus, diff fragment query at threshold, agent judgment, and verdict persistence via DryCheckWriter.append_record. Each persisted DryCheckRecord carries: pair_key (two FragmentRefs sorted by (path, content_hash); each FragmentRef = FilePath + FragmentContentHash computed from SHA-256 of CodeFragment.content()); changed_path = diff fragment source_path (display-only); similarity_score from SimilarFragment.score; threshold from the param; base_commit from the param; rationale from DryCheckAgentJudgment (all variants carry it); recorded_at stamped by FsDryCheckStore.append_record() at write time. Invalidation is identifier-based: if a fragment's content changes, its FragmentContentHash changes, so the FragmentRef changes, so the DryCheckPairKey changes, so no existing record matches — the interactor re-verifies (CN-07, no separate hash-comparison step). Returns the findings (with refactor proposals and FragmentRefs) for any genuine violations discovered in this run (IN-03/AC-03), so dfl can act on them. An empty Vec means no unresolved violations were found. Implemented by DryCheckInteractor.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "39314cd8d8ea7db5b8911ad04302e048eff2e705b0ce0ffe0d14d80defa3a934"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckResultsService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "get_results",
+          "receiver": "&self",
+          "params": [
+            { "name": "filter", "ty": "domain::dry_check::VerdictFilter" }
+          ],
+          "returns": "Result<DryCheckResults, domain::dry_check::DryCheckReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "dry_check",
+      "docs": "Application service for the dry-check results read path (D10 read operation, AC-07). Accepts a VerdictFilter to restrict results to a specific classification (All / NotAViolation / Accepted / Violation). Returns DryCheckResults carrying the matching latest-per-pair DryCheckRecord list from dry-check.json. No direct dry-check.json read — implemented by DryCheckResultsInteractor via DryCheckReader port. The authoritative current-scope gate is DryCheckApprovalService.check_approved (AC-04) which takes corpus_fragments + diff_fragments + threshold. For the Violation filter, matching is by DryCheckVerdict::Violation { .. } struct variant — the refactor_proposal is accessible from the record.verdict field.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-07",
+          "hash": "7f98b9b99f39a9758e2091fc2fb6d6697aff97ac727156e44fd36760cb403292"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-08",
+          "hash": "01772a23d21e673ea123a475616259771c8f18e19d1696c9de36a17bfe123a1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovalService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "check_approved",
+          "receiver": "&self",
+          "params": [
+            { "name": "corpus_fragments", "ty": "Vec<domain::semantic_dup::CodeFragment>" },
+            { "name": "diff_fragments",   "ty": "&[domain::semantic_dup::CodeFragment]" },
+            { "name": "threshold",        "ty": "domain::semantic_dup::SimilarityThreshold" }
+          ],
+          "returns": "Result<domain::dry_check::DryCheckApprovalVerdict, DryCheckCycleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "dry_check",
+      "docs": "Application service for the dry-check gate (D10 gate operation, AC-04). Receives the full workspace corpus (corpus_fragments) plus diff fragments and threshold. Builds a fresh whole-codebase index from corpus_fragments, queries each diff fragment at threshold, then reads all history via DryCheckReader.read_records(), derives the latest-per-pair verdicts by computing FragmentRefs (SHA-256 of content()) for each pair and building DryCheckPairKey for identity matching (CN-07 identifier-based invalidation: if the DryCheckPairKey built from current fragments matches an existing record's pair_key, the pair is verified), and returns Approved only when all above-threshold pairs are verified as not-a-violation or accepted. Blocks otherwise. Does NOT record new verdicts — no base_commit param needed. Implemented by DryCheckApprovalInteractor.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-04",
+          "hash": "5b6c9bf097b59eecbfcea1ba66f271aaadab1a97489e1dff4a8f21d297fef10a"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-06",
+          "hash": "abbe7956ac8e82a1031b0dee900d8cc50e27cb3bbd63410ba19edd4f81fc7159"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckDiffSource": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "list_changed_hunks",
+          "receiver": "&self",
+          "params": [{ "name": "base", "ty": "&domain::CommitHash" }],
+          "returns": "Result<Vec<domain::dry_check::DiffFileHunks>, DryCheckDiffError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_check",
+      "docs": "Dry-check's own secondary port for retrieving changed file paths with their added/changed hunk line ranges, relative to a base commit. CN-01: this is an independent interface for the DRY gate — it is NOT review_v2's DiffGetter. Returns Vec<DiffFileHunks> (each element carries a FilePath and a non-empty Vec<DiffHunkRange>) instead of bare Vec<FilePath>, enabling hunk-level overlap detection (D4 hunk-scope). Only files with at least one added/changed hunk appear in the result (deletion-only files and unmodified-but-staged files are excluded structurally by DiffFileHunks::new rejecting empty hunk lists). Behavior mirrors GitDiffGetter's 4-source union (merge-base..HEAD + staged + unstaged + untracked) but owned by dry-check so both gates evolve independently. Implemented by infrastructure::GitDryCheckDiffGetter.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-01",
+          "hash": "5ef4546147a78d0323b135a51efae20aff8193b9bcf2fd0d2047a9d105347d2c"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-04",
+          "hash": "7995798d1b971ac587b7abc7f1c237edd7630c9d5524138a2b416aeca5851f21"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-02",
+          "hash": "acd422b8d8d8a89e785ad5e051e981e312140f9185c6f730f9df5bfc030e5f56"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "DryCheckInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "embedding_port",   "ty": "std::sync::Arc<dyn usecase::semantic_dup::ports::EmbeddingPort>" },
+            { "name": "index_port",       "ty": "std::sync::Arc<dyn usecase::semantic_dup::ports::SemanticIndexPort>" },
+            { "name": "agent_port",       "ty": "std::sync::Arc<dyn DryCheckAgentPort>" },
+            { "name": "dry_check_writer", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckWriter>" },
+            { "name": "dry_check_reader", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" }
+          ],
+          "returns": "DryCheckInteractor",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckResultsInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "reader", "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" }
+          ],
+          "returns": "DryCheckResultsInteractor",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckApprovalInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "reader",         "ty": "std::sync::Arc<dyn domain::dry_check::DryCheckReader>" },
+            { "name": "index_port",     "ty": "std::sync::Arc<dyn usecase::semantic_dup::ports::SemanticIndexPort>" },
+            { "name": "embedding_port", "ty": "std::sync::Arc<dyn usecase::semantic_dup::ports::EmbeddingPort>" }
+          ],
+          "returns": "DryCheckApprovalInteractor",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckAgentJudgment"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckAgentJudgment"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DryCheckAgentJudgment"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DryCheckAgentJudgment"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckAgentError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckAgentError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckAgentError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckCycleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckCycleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckCycleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckResults"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckResults"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckDiffError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckDiffError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckDiffError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "DryCheckService",
+      "for_type": "DryCheckInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "DryCheckResultsService",
+      "for_type": "DryCheckResultsInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "DryCheckApprovalService",
+      "for_type": "DryCheckApprovalInteractor"
+    }
+  ]
+}

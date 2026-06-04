@@ -116,8 +116,9 @@ mod tests {
     #[test]
     fn test_noop_semantic_index_port_insert_returns_ok() {
         let port = NoopSemanticIndexPort;
-        let fragment = CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned())
-            .expect("valid fragment");
+        let fragment =
+            CodeFragment::new(PathBuf::from("src/lib.rs"), "fn foo() {}".to_owned(), 1, 1)
+                .expect("valid fragment");
         let embedding = vec![0.1_f32, 0.2, 0.3];
         let result = port.insert(&fragment, &embedding);
         assert!(result.is_ok(), "NoopSemanticIndexPort::insert must always return Ok");

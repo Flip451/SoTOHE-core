@@ -100,7 +100,11 @@ impl CliApp {
         for path in &input.fragment_files {
             let content = std::fs::read_to_string(path)
                 .map_err(|e| format!("cannot read fragment file {}: {e}", path.display()))?;
-            let fragment = CodeFragment::new(path.clone(), content)
+            // Fragments loaded from files for dup-check do not have line-span
+            // information (dup-check operates on whole-file fragments from CLI
+            // arguments). Use start_line=1 / end_line=u32::MAX as a sentinel
+            // so these fragments always overlap any hunk if needed.
+            let fragment = CodeFragment::new(path.clone(), content, 1, u32::MAX)
                 .map_err(|e| format!("invalid fragment in {}: {e}", path.display()))?;
             fragments.push(fragment);
         }

@@ -21,6 +21,7 @@ const AGENTS_DIR: &str = ".claude/agents";
 
 const REQUIRED_AGENT_FILES: &[&str] = &[
     "review-fix-lead.md",
+    "dry-fix-lead.md",
     "spec-designer.md",
     "impl-planner.md",
     "type-designer.md",

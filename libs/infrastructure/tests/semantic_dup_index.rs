@@ -15,7 +15,7 @@ use usecase::semantic_dup::SemanticIndexPort as _;
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 fn make_fragment(path: &str, content: &str) -> CodeFragment {
-    CodeFragment::new(PathBuf::from(path), content.to_owned()).unwrap()
+    CodeFragment::new(PathBuf::from(path), content.to_owned(), 1, 1).unwrap()
 }
 
 /// Build a synthetic unit vector with a `1.0` at `hot_dim` and `0.0` elsewhere.

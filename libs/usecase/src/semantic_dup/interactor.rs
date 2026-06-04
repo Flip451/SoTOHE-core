@@ -747,7 +747,7 @@ mod tests {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     fn make_fragment(path: &str, content: &str) -> CodeFragment {
-        CodeFragment::new(PathBuf::from(path), content.to_owned()).unwrap()
+        CodeFragment::new(PathBuf::from(path), content.to_owned(), 1, 1).unwrap()
     }
 
     fn make_score(v: f32) -> SimilarityScore {

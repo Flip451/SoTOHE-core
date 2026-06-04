@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "223b3d2e2f3d5859a2e903e51a8e6aaa118c407687fe6e670080bc1de71574a6",
+  "signals": [
+    {
+      "type_name": "CodeFragment",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DiffFileHunks",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DiffFileHunksError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DiffHunkRange",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DiffHunkRangeError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckApprovalVerdict",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckEntryError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckFinding",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckFindingError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckPairKey",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckPairKeyError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckReaderError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckRecord",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckRecordError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckVerdict",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckWriterError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FragmentContentHash",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FragmentContentHashError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FragmentRef",
+      "signal": "blue"
+    },
+    {
+      "type_name": "Rationale",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RationaleError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefactorProposal",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefactorProposalError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticDupError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SimilarityScore",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SimilarityThreshold",
+      "signal": "blue"
+    },
+    {
+      "type_name": "Timestamp",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerdictFilter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckReader",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DryCheckWriter",
+      "signal": "blue"
+    },
+    {
+      "type_name": "domain::dry_check::fragments_overlapping_hunks",
+      "signal": "blue"
+    }
+  ]
+}

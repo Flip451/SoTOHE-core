@@ -1,0 +1,2195 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
+          "at": "2026-06-03T10:14:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d81f48a5cede899b194420aa1d5dca12db0e2f04b39cda29af5a8f76989c5b2",
+          "at": "2026-06-03T10:16:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abb34b89429a8dfe31dafd850a8b7f2ec4904eaddb50db5e513917e17b3b5bf3",
+          "at": "2026-06-04T00:06:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abb34b89429a8dfe31dafd850a8b7f2ec4904eaddb50db5e513917e17b3b5bf3",
+          "at": "2026-06-04T00:09:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6d1b6889d0d5f9dc0d568cac1951e0401bb9a1fb8db34c242238144812c80a",
+          "at": "2026-06-04T02:28:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d6d1b6889d0d5f9dc0d568cac1951e0401bb9a1fb8db34c242238144812c80a",
+          "at": "2026-06-04T02:31:21Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 requires the embedding model to be fetched online on first use and then cached, but the same ADR says the model must already be prepositioned for offline / network-isolated CI execution. That dependency order makes the proposed DRY checker unexecutable in the environments this design targets.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-02-0716-dry-checker.md",
+              "line": 109,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:38b1e648c119e0cb4b5a1f75725411b0684208d7007d048be2a585d330288d11",
+          "at": "2026-06-02T07:33:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a875c7f3e01973c16f773bc28ab1ce585afa7c57d384ac5548a6468213faffa3",
+          "at": "2026-06-02T07:46:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a875c7f3e01973c16f773bc28ab1ce585afa7c57d384ac5548a6468213faffa3",
+          "at": "2026-06-02T07:48:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bf418bcb87950f2760e6e95e85bb70422d77da791872a57d4311590a7768fe6",
+          "at": "2026-06-02T08:33:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "usecase-types.json entry `DryCheckAgentPort` and impl-plan task `T006` reduce the dry-checker agent output to `DryCheckVerdict` only, while spec `IN-03`/`AC-03` requires genuine DRY violations to be emitted as findings with refactor proposals. With only the enum verdict persisted/read (`DryCheckVerdict` in domain-types.json), the planned API has no place to carry the required finding/proposal data, so the implementation cannot satisfy AC-03 as written.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/usecase-types.json",
+              "line": 205,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7bf418bcb87950f2760e6e95e85bb70422d77da791872a57d4311590a7768fe6",
+          "at": "2026-06-02T08:37:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 invokes `DryCheckApprovalService::check_approved(diff_fragments)` but never specifies how the CLI obtains `diff_fragments` (unlike T007, which explicitly resolves them from `DiffGetter`). As written, the gate command has an unresolved input dependency and is not implementable end-to-end.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 54,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:bc6a1b5239d758a53f31c342522740f9c25dece4ac99bf01df0cbd9ea1ca2241",
+          "at": "2026-06-02T09:36:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c014d61daf7a5185dff5838d70148089f42282b48dfe01720b2d3c5492bbf3a5",
+          "at": "2026-06-02T09:44:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "impl-plan.json T004 implements the D8/IN-06 loop by querying top-k candidates and only then skipping already verified pairs. That does not exclude verified pairs from the suggestion set: if the current top-k are already verified false positives, lower-ranked but still above-threshold unverified candidates can remain buried, so the loop can stop or repeat without ever surfacing them. This makes T004 unable to satisfy IN-06/AC-05 and D8's core requirement.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:c014d61daf7a5185dff5838d70148089f42282b48dfe01720b2d3c5492bbf3a5",
+          "at": "2026-06-02T09:49:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The growing-k loop in T004/T005 can terminate too early: stopping when the current query returns only already-verified above-threshold candidates does not prove that lower-ranked unverified above-threshold pairs do not exist beyond the current `k`. As written, the plan can miss genuine DRY violations and make the gate incorrectly pass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "line": 39,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:18365cd5bacea688f736ee921f11b7567fd7f83519933f52b781ff9e9d5a5ded",
+          "at": "2026-06-02T09:59:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 infeasibility: the plan parses `--threshold` in the CLI tasks, but the usecase APIs that receive the CLI data do not carry any threshold parameter (`DryCheckService.run_dry_check(diff_fragments)` and `DryCheckApprovalService.check_approved(diff_fragments)`). As written, the parsed threshold has nowhere to flow into the threshold-boundary loop, so the CLI contract and the service signatures are inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "line": 54,
+              "category": "infeasibility"
+            },
+            {
+              "message": "P1 infeasibility: T004/T005 require rebuilding a whole-codebase index on every DRY check, but the plan only supplies `diff_fragments` to the use case and only resolves changed-file paths through `DiffGetter` in the CLI tasks. There is no task or port that provides the full workspace fragment corpus needed to embed and insert all existing code, so the index-rebuild step cannot actually be implemented from the listed dependencies.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "line": 39,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:dd7e256c3df67257531c525c7687f4bab5574c62ab280b589f21f9059856818e",
+          "at": "2026-06-02T10:10:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9b13f66ed2c462013e6f41c4ddde1b42d605382d7722f6f7672a82e22e9513f",
+          "at": "2026-06-02T10:43:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005/T008 make the read path count every persisted `Violation` entry as `unresolved_violation_count` and make `sotp dry results` exit non-zero when any remain. That contradicts the ADR's content-hash invalidation model: when either fragment changes, the old pair key is stale and the current gate is evaluated from the current above-threshold pairs. A fixed DRY violation can therefore leave an old `Violation` record in `dry-check.json`, causing `results` to keep failing even though `check-approved` can pass. The plan needs current-scope filtering/pruning, or the read path must not treat all historical `Violation` records as currently unresolved.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f9b13f66ed2c462013e6f41c4ddde1b42d605382d7722f6f7672a82e22e9513f",
+          "at": "2026-06-02T10:48:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sotp dry results` is defined as a historical-only summary (`recorded_violation_count` over persisted `Violation` entries) and explicitly does not re-evaluate current above-threshold pairs, but AC-07 / D10 say the read path should expose the presence of unresolved violations. As written, a violation that has since been fixed will still be counted as \"on record\", so the command cannot faithfully report the current unresolved DRY state.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 48,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:dc767e0666a50f115d496e700af5d9af7ad11d4cc8e5f08c8d09754a2c1600dd",
+          "at": "2026-06-02T11:05:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001/T002 describe `dry-check.json` as a bare append-only JSON array whose reader returns the full array, but they also require a `schema_version` gate and an `empty JSON array file with schema_version=1 header`. Those representations are mutually exclusive, so the persistence format is underspecified and cannot be implemented consistently as written. Choose either an envelope object with `schema_version` plus records, or a pure array format without schema gating.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4d240be12068d851d209be99fdd6017f1f8d377bd830d1a52705f47e5ace0d61",
+          "at": "2026-06-02T11:48:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryCheckStore` is described as reading and writing a bare JSON array of `DryCheckRecord`, but the rest of the plan/ADR defines `dry-check.json` as a schema-versioned envelope object with `{ schema_version, records }`. That storage shape must be made consistent before implementation, otherwise the infrastructure adapter will not match the planned codec or schema gate behavior.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/infrastructure-types.json",
+              "line": 19,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:45ab271c7f651b38ded8853b9bbb49b582af49b3a27bde25852ad574673a0022",
+          "at": "2026-06-02T11:55:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says `DryCheckWriter::init` creates an empty schema-v1 array file, but T002 defines the on-disk format as a schema-versioned envelope object and says `init` writes that envelope with `schema_version=1` plus an empty `records` array. Those contracts conflict, so the writer and reader would disagree on the file shape.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
+              "line": 20,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f0f03269cc131b3a3bdb1487525866b0b4402d26cf7ad083121e8fc6925272b2",
+          "at": "2026-06-02T12:04:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T009` cannot be executed as written: it calls `DiffGetter::list_diff_files`, but the command intentionally omits any concrete source for the `base` commit. The note about a \"conventional HEAD or separately-provided reference\" is not wired into the task, so the gate has no defined way to derive `diff_fragments` before it can evaluate approval.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
+              "line": 58,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:67fe0b496098dfa14469a0965c01f879baaea77189725f4a8ae22b8b455af6c7",
+          "at": "2026-06-02T12:45:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[track/items/dry-checker-2026-06-02/plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md#L49) maps every non-zero Codex subprocess failure to `DryCheckAgentError::IllegalOutput`, but the declared error taxonomy in T003 explicitly distinguishes `UserAbort`, `AgentAbort`, and `Timeout`. That makes the dedicated variants unreachable and loses the adapter behavior already used by the reviewer implementation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "line": 49,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:7932e7c27dd7573760c29b24fb35dd8e55bab82b705fc4a6212af7a35a8abdf2",
+          "at": "2026-06-02T12:52:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DiffGetError` is being reused from `usecase::review_v2` in the dry-check usecase (`plan.md` line 33), but CN-01 explicitly requires the DRY gate and review gate to stay loosely coupled and not share interfaces. This makes the dry-check usecase depend on the review_v2 interface surface, which is a cross-gate coupling violation rather than an isolated dry-check type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3117564d7cb2532c059da096ceeea471d6d66aee2c321750b8b11efc1e750987",
+          "at": "2026-06-02T13:18:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3e802d22226378c600bc857ff5f831116fe803461a1dbd2069278bcf5fd6e7a6",
+          "at": "2026-06-02T13:51:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The persisted record key field is named inconsistently across the plan artifacts. ADR D9 and spec AC-06 define the dry-check.json schema with `hash_pair { low, high }`, but the domain catalogue makes the on-disk `DryCheckRecord` field `pair_key`, and the implementation plan serializes `records: Vec<DryCheckRecord>` without specifying a DTO/serde rename back to `hash_pair`. That leaves implementers with two incompatible on-disk schemas for the same record identifier, so the SoT should align the Rust field/codec with the D9 `hash_pair` schema or explicitly rename it at persistence time.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.json",
+              "line": 71,
+              "category": "contradiction"
+            },
+            {
+              "message": "D9 says a `violation` record's required `rationale` contains both the reason and the refactor proposal, but the implementation plan says `DryCheckFinding` proposals are returned live and are not persisted in dry-check.json. As written, a recorded `violation` can lose the refactor proposal that D9 requires to be part of the persisted record rationale, so the plan needs to either persist the proposal through `rationale` or update D9/spec to make proposals live-only.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 69,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3e802d22226378c600bc857ff5f831116fe803461a1dbd2069278bcf5fd6e7a6",
+          "at": "2026-06-02T13:55:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1dd5327680c6ef37ecde479d9f276d2fb65ca7fd61f5df249e8a71f2b64d91c",
+          "at": "2026-06-02T14:35:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 / FsDryCheckCommitHashStore is internally contradictory about invalid `.commit_hash` contents. The task text says `read()` returns `None` when the file contains an invalid hash, but the same T002 test requirements expect `Format` errors, and `DryCheckCommitHashError` separately defines invalid format as an error. Implementers cannot tell whether an invalid stored hash should fail over to `main` or fail the command.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "T002 requires `DryCheckReader::read_records` to return an `IncompatibleSchema` error for future schema versions, but `DryCheckReaderError` has no `IncompatibleSchema` variant; that variant exists only on `DryCheckWriterError`. The read-path schema gate is therefore not implementable as specified without changing the domain error catalogue or contradicting the task.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.json",
+              "line": 282,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:b1dd5327680c6ef37ecde479d9f276d2fb65ca7fd61f5df249e8a71f2b64d91c",
+          "at": "2026-06-02T14:35:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryCheckCommitHashStore` has conflicting invalid `.commit_hash` behavior. The adapter docs say `read()` returns `None` when the file contains an invalid hash, causing main-tip fallback, and impl-plan section S2/T002 repeats `Returns None when ... invalid format`. But `DryCheckCommitHashError` simultaneously defines `Format` as the invalid commit hash format failure mode. This leaves implementers with two incompatible outcomes for the same malformed `.commit_hash` case: fallback vs error. SoT entries involved: `infrastructure-types.json` entries `FsDryCheckCommitHashStore` / `DryCheckCommitHashError`, and `impl-plan.json` task `T002` / section `S2`.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/infrastructure-types.json",
+              "line": 129,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b1dd5327680c6ef37ecde479d9f276d2fb65ca7fd61f5df249e8a71f2b64d91c",
+          "at": "2026-06-02T14:40:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DryCheckWriter defines an `init()` bootstrap method, but the write-path plan never calls it: T007/T009 go straight from diff-base resolution to `run_dry_check`, and T002 only describes appending to an existing envelope. As written, a fresh track has no defined way to create the initial `dry-check.json`, so the first dry-check run is infeasible unless `append_record` silently creates the file, which the plan never says.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/domain-types.md",
+              "line": 34,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`DryCheckInteractor` is documented as using `DryCheckDiffSource`, but the CLI layer already resolves `diff_fragments` with `GitDryCheckDiffGetter` and passes them into `run_dry_check`. That makes diff acquisition owned by both layers at once and leaves the injected diff-source dependency contradictory/redundant, so the write-path boundary is internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/usecase-types.json",
+              "line": 133,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:60bf572cb4fb765826470fa153d9de89848c53ccab5cd8131a88f2130a09ea3b",
+          "at": "2026-06-02T14:52:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d73fc6c21e9a51edc174e27eda8a979fbc6af6705d7fa9280b777012f9428ae6",
+          "at": "2026-06-02T15:09:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 makes self-match rejections indistinguishable from exact duplicate candidates. The plan builds `hash_pair` only from the sorted content hashes, persists every agent judgment, adds that key to the verified set, and explicitly tests that self-match candidates are sent to the agent for rejection. For a changed fragment with content hash H, both `(changed, itself)` and `(changed, different exact-copy candidate)` produce the same key `(H,H)`. Once the self-match is recorded as `NotAViolation`, later exact duplicate candidates with the same content hash are filtered as already verified, and `check-approved` can pass without judging the real duplicate. The plan needs to exclude self-matches before persistence or make the cache key distinguish fragment identity from exact-copy duplicates.",
+              "severity": "P0",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d73fc6c21e9a51edc174e27eda8a979fbc6af6705d7fa9280b777012f9428ae6",
+          "at": "2026-06-02T15:14:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckResults` is documented as if each record still had a `hash_pair` field, but the rest of the plan artifacts define the record identity as (`changed_path`, `candidate_path`) and explicitly say there is no `hash_pair` field. That makes the usecase catalogue inconsistent with the spec/plan and would mislead implementation of the read path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/usecase-types.json",
+              "line": 234,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:09d5f3cca5a435a0cc55813014428b535c75fe6fb0423da513d2ed8acd72373c",
+          "at": "2026-06-02T21:35:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckPairKey` is defined as an order-insensitive normalized path pair, but the persisted invalidation state is still stored as ordered `changed_hash` / `candidate_hash` fields. That makes the cache key and the invalidation rule disagree whenever the same logical pair is encountered in the opposite orientation: the pair collides, but the stored hashes no longer correspond to the current roles, so the plan cannot reliably decide whether the prior verdict is still valid. Canonicalize both the paths and the hashes, or make the invalidation check explicitly order-independent.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e52bd04e4ecb23fb145b2acaa7db6f5e21d92758bfc06e520678f03de7802906",
+          "at": "2026-06-02T21:40:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-06/T004/T005 describe an order-independent cache using a normalized path-pair key plus stored `(changed_hash, candidate_hash)`, but the invalidation check still compares the current `changed_path` against `changed_hash` and `candidate_path` against `candidate_hash`. When the same logical pair is later seen with the roles swapped, those hashes belong to the opposite paths, so the cache will revalidate or misclassify unchanged pairs instead of reusing the verdict. The design needs to keep the stored path association or normalize the stored hashes by path order.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "line": 42,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:d36f89bcc6dfe7cc9a9aefcd86c580d9921bab4acd50e750ef840a3db7ff5567",
+          "at": "2026-06-02T21:53:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81d2fd6e8eb57357819f554e065af7912665efcef19fadaaa8b5a3387391a7a6",
+          "at": "2026-06-02T22:28:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckRecord` is specified as a plain value object with separate `low_path`/`high_path` fields, and T001 defines an infallible `DryCheckRecord::new` that accepts all 11 fields as-is while leaving self-match exclusion and sort-order correctness to the interactor. That contradicts IN-07/AC-06's design that the sorted path pair is the record identity (`DryCheckPairKey`) and the coding principle to make illegal states unrepresentable: callers can construct records with `low_path > high_path`, `low_path == high_path`, mismatched low/high hashes, or a `changed_path` outside the pair, and T002 then persists/reads those records as valid. This can make cache invalidation and gate approval reason over invalid pair identities. The SoT should change the domain entry/T001 plan so record construction is fallible or structurally based on `DryCheckPairKey` plus validated sort-aligned hashes/display path.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.json",
+              "line": 71,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:81d2fd6e8eb57357819f554e065af7912665efcef19fadaaa8b5a3387391a7a6",
+          "at": "2026-06-02T22:30:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This description says the dry-check file is a schema-versioned envelope object `{ schema_version, records }`, but then says the on-disk JSON schema is unchanged from the previous flat layout. Those statements conflict: the top-level envelope is itself a schema change, so the baseline format is not flat anymore.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 12,
+              "category": "contradiction"
+            },
+            {
+              "message": "The interactor flow says `DryCheckPairKey::new(diff_path, candidate_path)?` and also says `Err(SelfMatch)` silently skips the pair. Using `?` would abort the whole cycle on the first self-match instead of skipping just that candidate, so the control flow as written is impossible.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 109,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6dfb1c0d80cafe1f06d24523cf6270dd2362e140bbb1a3c3daef2717d10d3f4d",
+          "at": "2026-06-02T22:58:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-05/CN-06 require an explicit ack path for tolerated duplicates, and D9 maps that ack to an `accepted` verdict, but the implementation plan only defines `sotp dry write`, `sotp dry results`, and `sotp dry check-approved` while also forbidding direct edits to `dry-check.json`. T006/T004 can persist `Accepted` only as a dry-checker judgment, not as an explicit user/dfl acceptance action, so a legitimate violation that should be allowed cannot be moved from `violation` to `accepted`; `check-approved` remains blocked. SoT elements: spec IN-05/CN-06 and impl-plan T006-T009.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 70,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:132dcafac65fa61b49c41ef8458a1f784b0a4289846abc6d6e3836fb9f5bdaf1",
+          "at": "2026-06-02T23:11:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DryCheckVerdict defines Accepted as an intentional duplicate \"ack'd by operator\", but spec IN-05 and ADR D7 state that accepted verdicts are produced by the dry-checker agent and that there is no human/dfl ack path or ad-hoc override. This contradicts the agent-owned acceptance model and could lead implementation toward the explicitly rejected human-ack behavior. SoT entry: domain-types.json / DryCheckVerdict.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.json",
+              "line": 27,
+              "category": "contradiction"
+            },
+            {
+              "message": "The source of low_hash/high_hash is contradictory. T004 says DryCheckInteractor populates them from the current CodeFragment content, while T006 and the DryCheckFinding catalogue say the interactor uses DryCheckFinding.changed_fragment_hash/candidate_fragment_hash from the agent output without recomputing. These are different trust/data-flow requirements for the persisted invalidation hashes, so the implementation plan is ambiguous. SoT entries: impl-plan.json / T004,T006 and domain-types.json / DryCheckFinding.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d002e968c60af4170cef5dc9f6518701ae62a8292aee8b3e5ce812a7cd1a34f3",
+          "at": "2026-06-02T23:35:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "impl-plan summary entry claims T003 depends on `DryCheckRecord with all 11 fields`, but the same source file defines the canonical domain record as a 10-field `DryCheckRecord` in `plan.summary[1]` and the T001/T004/T005 task descriptions. This is a plan-artifact contradiction in the SoT summary and should be corrected by the impl-plan writer to keep the record shape unambiguous.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 71,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cf7aca9bf2b729197c64ef1f37b566dab081e9fa1d177e47132738fd100f2092",
+          "at": "2026-06-02T23:49:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 specifies a private DryCheckJsonV1 with records: Vec<DryCheckRecord> for serde while also requiring the on-disk record layout to remain flat low_path/high_path fields. That conflicts with the domain DryCheckRecord shape, which embeds pair_key: DryCheckPairKey; serializing Vec<DryCheckRecord> cannot preserve the required flat wire schema without a per-record DTO or custom domain serde, so the FsDryCheckStore plan is not executable as written.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T002 requires DryCheckReader::read_records to reject future schema versions with IncompatibleSchema, but DryCheckReaderError only declares Io, SymlinkDetected, Codec, and InvalidData; IncompatibleSchema exists only on DryCheckWriterError. The read path therefore has no declared error variant for its required schema-version gate.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.json",
+              "line": 345,
+              "category": "contradiction"
+            },
+            {
+              "message": "T005 says the approval latest-per-path-pair map stores only (record.low_hash, record.high_hash), then later requires checking the cached verdict against NotAViolation/Accepted. Without storing the latest DryCheckVerdict or full DryCheckRecord in that map, check-approved cannot distinguish an approved cached pair from a cached Violation and cannot implement AC-04/CN-06 correctly.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 30,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The plan repeatedly depends on DryCheckPairKey low()/high() accessors for invalidation, record construction, and results display, but the DryCheckPairKey catalogue declares only new. Since DryCheckRecord embeds pair_key rather than exposing low_path/high_path domain fields, the catalogue is missing required public API for the planned T004/T005/T008/T010 behavior.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.json",
+              "line": 529,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6d26a3214180259cfc2792a5b373553b348c83f84ad8a5bb18e8260b7dd0bb4b",
+          "at": "2026-06-02T23:57:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan requires IN-03/CN-04/D5 behavior where dry-checker rejects existing debt that this change did not introduce or worsen, including touched-only files. But the planned agent port only receives the current changed and candidate CodeFragments, and T007/T009 derive diff_fragments from changed file paths/current fragments rather than passing patch hunks or baseline content. With file-level fragments, the agent cannot distinguish an old duplicate in a touched file from a newly introduced duplicate, so the blocking gate can block on pre-existing debt contrary to the spec. SoT entries: usecase-types.json DryCheckAgentPort / DryCheckService, impl-plan.json T004/T007/T009.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/usecase-types.json",
+              "line": 286,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:c656a5986335f06dbdf3e39cc7ed55f6557a6619c6c9ef90092d3aae0bf43163",
+          "at": "2026-06-03T00:21:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "impl-plan.json task T003 still defines `DryCheckDiffSource` as `list_diff_files(base) -> Result<Vec<FilePath>, DryCheckDiffError>`, but the same artifact's S3 section, usecase-types, spec IN-02/CN-04/AC-02, and ADR D4 require `list_changed_hunks(base) -> Result<Vec<DiffFileHunks>, DryCheckDiffError>` so the CLI can enforce hunk-scoped filtering. If T003 is implemented from the task description, the port cannot carry added/changed hunk ranges and CN-04 becomes unimplementable.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:46d0167847dddc46e3c0d0a4971b692a145fb00035d8a9a006547f7f5855ea9c",
+          "at": "2026-06-03T01:12:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Unfixable plan-artifact finding: IN-06/IN-07 define the cache identity as only the sorted file path pair and then drop every pair where low_path == high_path. Because CodeFragment is explicitly a function/block-level fragment, this path-only key cannot represent distinct fragment pairs in the same file, so same-file DRY violations are never judged. It also collapses multiple different fragment pairs between the same two files into one latest-per-path-pair record; the latest record can validate only one pair's low_hash/high_hash, so another above-threshold pair between those files becomes invalidated/unverified again. That makes the write/check-approved loop unable to reach a stable approved state for ordinary cases with multiple duplicated fragments between the same file pair.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/spec.json",
+              "line": 107,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:7611c421a28d855ffc2b9e26592f912bbbe73672abd9477e9c895cb08042c776",
+          "at": "2026-06-03T01:17:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is declared independent from T001/T003 in the plan summary, but T002's own task requires the domain dry_check types/traits from T001 and implements usecase::dry_check::DryCheckDiffSource/DryCheckDiffError, which are introduced by T003. That dependency order is physically unexecutable as written; T002 must depend on T001 and the usecase port definitions from T003, or the port definitions must move earlier.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 71,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cccc9d6d4873fbdeb510c7d3e9a8ef91a3715501a777046afab90d7eb19126",
+          "at": "2026-06-03T04:30:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Entry T006 says the CodexDryChecker JSON schema supplies `changed_fragment_ref`/`candidate_fragment_ref` and that the interactor uses those agent-provided refs to derive the DryCheckPairKey for the persisted record. That contradicts T004 and the plan summary, which derive the pair key from the actual `CodeFragment` contents before invoking the agent. This matters because the D8/D9 identity and CN-07 invalidation contract depend on persisted keys being computed from the actual candidate pair, not from agent output.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:64fd87c7f54468b8b063e409a286abf7579cfe8fe8374a695b9a0291780f5017",
+          "at": "2026-06-03T04:36:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 creates `DryCheckRecord` with `recorded_at` as an empty placeholder while T002 says the DTO writer reads `recorded_at()` from the domain record and also says `append_record` stamps `recorded_at` itself. This gives two conflicting owners for the timestamp and permits an empty/non-ISO `recorded_at` despite AC-06/D9 requiring an ISO-8601 UTC timestamp on every record.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
+              "line": 42,
+              "category": "contradiction"
+            },
+            {
+              "message": "The plan states that T002 depends on T003 for the `DryCheckDiffSource` port, but the task order/sections place T002 before T003. Following the published task order leaves T002 unable to implement `GitDryCheckDiffGetter: DryCheckDiffSource` until a later task defines that trait.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
+              "line": 10,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:82be8045e2f94efd3dd32f5557b42958c6522a6e61611f7f4dffc9cb4a69a871",
+          "at": "2026-06-03T04:43:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR D11 says the dry-checker agent's schema-constrained JSON includes the sorted fragment pair identity (`path`, `content_hash`) alongside the verdict, but T006/plan requires the agent JSON to omit fragment identity and have `CodexDryChecker` compute `FragmentRef`s from the actual `CodeFragment` arguments. That is a semantic contradiction in the authority for fragment identity: one path trusts model output for identity, the other deliberately derives identity from source content. Align ADR D11 or T006 before implementation so the write path has one authoritative identity contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-02-0716-dry-checker.md",
+              "line": 207,
+              "category": "contradiction"
+            },
+            {
+              "message": "`DryCheckVerdict::Violation` stores `refactor_proposal` as a plain `String` while the docs claim this makes 'violation without a proposal' unrepresentable. A `String` still permits an empty proposal unless wrapped in a validated value object or constructed through a fallible API, so the type catalogue contradicts the enum-first invariant required by D9/AC-06.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.json",
+              "line": 19,
+              "category": "contradiction"
+            },
+            {
+              "message": "`DryCheckRecord` declares `rationale` and `recorded_at` as plain `String` fields while documenting `recorded_at` as an ISO-8601 UTC timestamp and `rationale` as required/non-null; T004 then instructs the interactor to pass an empty string placeholder for `recorded_at`. This contradicts the stated record invariant and creates an invalid domain record before persistence, rather than making the mandatory timestamp state unrepresentable.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.json",
+              "line": 123,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e56ee8c280d103c7126b11c68161d3f61cdda4cab836754a2ff6c0d25c27a3c6",
+          "at": "2026-06-03T04:53:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 references `sotp dry check` as the command whose diff-base behavior `sotp dry check-approved` must match, but the ADR/impl plan define the three DRY operations as `sotp dry write`, `sotp dry results`, and `sotp dry check-approved`; no `sotp dry check` command is otherwise planned. This is a narrative-level broken command reference in the SoT acceptance criteria and leaves the gate contract ambiguous unless the element is aligned to `sotp dry write` or a `check` alias is explicitly specified.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/spec.json",
+              "line": 422,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:5734d633249eb38a1351aa2dbab98301479a196e94e230b5d95d8ec591b48d8c",
+          "at": "2026-06-03T05:35:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003/T007 specify that an invalid `.commit_hash` format becomes `Err(DryCheckCommitHashError::Format)` and T007 propagates that as a CLI error. This contradicts ADR D4 / spec IN-02's requirement that dry-check resolve the diff base with review-equivalent fail-closed behavior, falling back to `main` when the stored base is unusable so the diff range broadens instead of aborting. As planned, `sotp dry write` / `check-approved` can fail before checking anything on a malformed `.commit_hash`, breaking the required gate behavior.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 42,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:041427b98862391105f85a5c9ad04eedcf0f5e9044a8bdcdd38c303025933bbc",
+          "at": "2026-06-03T05:46:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Unfixable plan-artifact finding: `DryCheckAgentJudgment` explicitly gives `NotAViolation` and `Accepted` only a `Rationale` and no `DryCheckFinding`, but the same entry says the interactor uses `finding.changed_fragment_ref` / `finding.candidate_fragment_ref` to derive the `DryCheckPairKey` for the record. `domain-types.json` repeats this by saying `DryCheckFinding` exists only for `Violation` but that its refs derive the pair key for all verdicts. This conflicts with T004/T006, where pair identity is derived from the actual `CodeFragment` arguments before/around judgment and the agent schema omits identity. As written, the SoT gives two incompatible identity sources and makes non-violation/accepted record persistence impossible if implemented from the finding-based text; align the catalogue docs so all verdict records derive the pair key from the judged `CodeFragment` pair, while `DryCheckFinding` refs remain violation-only live output.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/usecase-types.json",
+              "line": 44,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0e87adb8ac747de3b8214a6ddd8623416b7f25098ed886b24ab50291e349de26",
+          "at": "2026-06-03T05:56:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:097ccf4e3b2e4a2f679dbfb9a12dcd49fe8fd03ae967e0192f2db278758a3933",
+          "at": "2026-06-03T06:03:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsDryCheckStore` is specified to stamp records with `Timestamp::new(infrastructure::timestamp_now())`, but `timestamp_now()` already returns `Result<domain::Timestamp, ValidationError>` in `libs/infrastructure/src/lib.rs:34`, so this composition is type-invalid and cannot be implemented as written. The same wording is repeated in `track/items/dry-checker-2026-06-02/domain-types.json:322`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "line": 32,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:39be1b8b1ca859f84e659aca3156c31e5eb58c19cd3e0dfb26117ca3e2c336bb",
+          "at": "2026-06-03T07:15:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac5a4ebbc906506b728dd414dd96bf13ee433d59f114abfaf9cd65db6b50c233",
+          "at": "2026-06-03T07:22:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac5a4ebbc906506b728dd414dd96bf13ee433d59f114abfaf9cd65db6b50c233",
+          "at": "2026-06-03T07:25:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7f145324172b782e9c32111645b302706b10bb1bba82eeb707ee7644e72751f",
+          "at": "2026-06-03T07:52:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7f145324172b782e9c32111645b302706b10bb1bba82eeb707ee7644e72751f",
+          "at": "2026-06-03T07:55:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8f6cdb4214e124aaa56c1800b984b3b7547ebbc1e4f9381a581b2dab13aa9f2",
+          "at": "2026-06-03T08:15:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase-types.md` marks the T002 usecase contracts as 🔵 on rows such as `DryCheckAgentJudgment`, even though `plan.md` still reports T002 as `[~]` and only T001 is resolved. Since the local convention defines Yellow as WIP declaration and Blue as implemented/finalized, these rows now semantically contradict the plan progress state and prematurely mark unimplemented T002 artifacts as complete.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/usecase-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e8f6cdb4214e124aaa56c1800b984b3b7547ebbc1e4f9381a581b2dab13aa9f2",
+          "at": "2026-06-03T08:18:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8f6cdb4214e124aaa56c1800b984b3b7547ebbc1e4f9381a581b2dab13aa9f2",
+          "at": "2026-06-03T08:23:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8f6cdb4214e124aaa56c1800b984b3b7547ebbc1e4f9381a581b2dab13aa9f2",
+          "at": "2026-06-03T08:26:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76ca2e2959eb5ad670e0ae67d776e36e23c436a61456671abf6bd3b7c51df509",
+          "at": "2026-06-03T08:59:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76ca2e2959eb5ad670e0ae67d776e36e23c436a61456671abf6bd3b7c51df509",
+          "at": "2026-06-03T09:01:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac0d67d8386c319722f78b3b10866788adfd6af5f70d56992a083368f9d5386",
+          "at": "2026-06-03T10:12:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bac0d67d8386c319722f78b3b10866788adfd6af5f70d56992a083368f9d5386",
+          "at": "2026-06-03T10:14:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f89195ed1d68a0ad2b9ff91e83a7f62e394313b69412a3b66000e1c54c7e828a",
+          "at": "2026-06-03T10:38:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f89195ed1d68a0ad2b9ff91e83a7f62e394313b69412a3b66000e1c54c7e828a",
+          "at": "2026-06-03T10:40:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1267851b4661c02df2cd5093511e55db5f653326e55781e8c376a6c45dfd397c",
+          "at": "2026-06-03T11:12:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1267851b4661c02df2cd5093511e55db5f653326e55781e8c376a6c45dfd397c",
+          "at": "2026-06-03T11:14:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a891040ee562a54e4f43523008ea1c89ff1e2b58cddc2c8480835f606bdc89c1",
+          "at": "2026-06-03T11:57:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a891040ee562a54e4f43523008ea1c89ff1e2b58cddc2c8480835f606bdc89c1",
+          "at": "2026-06-03T11:59:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf11614695beb18378ae40b04b00026d80529c2911f0cc0839cab15720b9bf01",
+          "at": "2026-06-03T13:15:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf11614695beb18378ae40b04b00026d80529c2911f0cc0839cab15720b9bf01",
+          "at": "2026-06-03T13:17:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:full-cycle` only branches on `completed` and `failed` after the DFP step, but T012 and T016 define `blocked` as a first-class DFP outcome. As written, a blocked dry-fix run would be collapsed into a generic failure in the full-cycle orchestrator instead of being surfaced distinctly, which conflicts with the phase contract.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 78,
+              "category": "contradiction"
+            },
+            {
+              "message": "The codex DFP wrapper is described as printing only `completed/failed`, even though T012/T016 require `blocked` to be observable. Because T016 delegates provider=codex runs to this wrapper, codex-based DFP execution cannot distinguish a blocked DRY gate from an execution error, which is inconsistent with the stated DFP status contract.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/impl-plan.json",
+              "line": 84,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:98ab1b72e4fbd5a51a6498935fef24bf19cef3ea70d1389d68ce02d0e3244a28",
+          "at": "2026-06-03T22:16:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf8a4508d47cc4a9e215fb84c4d4d9926a3dc85a9d9ead8bca368efc93011e79",
+          "at": "2026-06-03T22:25:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T015 has contradictory fallback semantics: the plan summary says the 0.85 threshold fallback is for absent or empty dry-check.json, but the task body also includes unreadable dry-check.json. That changes the commit-gate behavior for corrupt/unreadable state, so the artifact should align on whether unreadable state is fail-open fallback or an error.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
+              "line": 79,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bf8a4508d47cc4a9e215fb84c4d4d9926a3dc85a9d9ead8bca368efc93011e79",
+          "at": "2026-06-03T22:29:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The summary still says the plan is decomposed/executed only through T010, but S8 later adds T011-T016. That leaves the top-level summary stale and internally inconsistent with the rest of the plan.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "CN-11 is mapped only to T010/T013/T016, but the whole-codebase single-scope guarantee is introduced in T012's dfl scope-ownership section. The coverage table misses the task that actually establishes the constraint.",
+              "severity": "P1",
+              "file": "track/items/dry-checker-2026-06-02/task-coverage.json",
+              "line": 28,
+              "category": "coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:7d750929e61d0c7ce142e48647033b187329c104dabfc1bd13546ff720eb0e8a",
+          "at": "2026-06-03T22:35:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe2f7c39846b47bca80538574eaf58a804e9a228400cb185866734010f25974f",
+          "at": "2026-06-03T22:41:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe2f7c39846b47bca80538574eaf58a804e9a228400cb185866734010f25974f",
+          "at": "2026-06-03T22:44:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c3921982c0294e4e81345c11deda2bfaeb2938710826e77423a05528b283f90",
+          "at": "2026-06-03T22:54:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c3921982c0294e4e81345c11deda2bfaeb2938710826e77423a05528b283f90",
+          "at": "2026-06-03T22:56:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ac02e44df7f9a750913051de94c76f8229fcdc5e4565b240e381d4c0863bb5f",
+          "at": "2026-06-03T23:35:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ac02e44df7f9a750913051de94c76f8229fcdc5e4565b240e381d4c0863bb5f",
+          "at": "2026-06-03T23:37:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66c6681166efa69fd9650000177e0ab44baf44189a44800eb60c42605106434b",
+          "at": "2026-06-04T00:06:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66c6681166efa69fd9650000177e0ab44baf44189a44800eb60c42605106434b",
+          "at": "2026-06-04T00:08:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdc9c4dabb898e0844d644fecc20407749ba1f979ff48eb868ca989f4d4281a0",
+          "at": "2026-06-04T01:21:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdc9c4dabb898e0844d644fecc20407749ba1f979ff48eb868ca989f4d4281a0",
+          "at": "2026-06-04T01:24:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5ad381e2ed82bddbc464078dc13ef502c585c4aa1e48439ae5765e998b9a1c4",
+          "at": "2026-06-04T02:10:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5ad381e2ed82bddbc464078dc13ef502c585c4aa1e48439ae5765e998b9a1c4",
+          "at": "2026-06-04T02:13:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:377d8c97e793c1df4ff797f435190727f577c2029a4a68435679a2dc3f1b0346",
+          "at": "2026-06-04T02:28:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:377d8c97e793c1df4ff797f435190727f577c2029a4a68435679a2dc3f1b0346",
+          "at": "2026-06-04T02:31:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f98b524fd3f8338b88569bc11e9c6465917c85777a5ff5e38babbd30b7f69e9",
+          "at": "2026-06-04T02:48:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f98b524fd3f8338b88569bc11e9c6465917c85777a5ff5e38babbd30b7f69e9",
+          "at": "2026-06-04T02:50:03Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
+          "at": "2026-06-03T07:14:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab1374dbb9a34107715e0291d5d42cc3beba4545920ef13dd4703da7e88d17a7",
+          "at": "2026-06-03T07:17:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_diff_and_corpus_fragments` compares `extract_code_fragments` output directly against repo-relative hunk paths, but it never normalizes `source_path` into repo-relative form before the `changed_paths` filter / `fragments_overlapping_hunks` call. If `--workspace-root` is absolute or otherwise not already repo-relative, this can make `candidate_fragments` empty and cause `write`/`check-approved` to miss the diff scope silently.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 196,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c84593a1943090d823097e9adda7fdcf2ee2412376c19529ba93e1aaddf419f9",
+          "at": "2026-06-03T12:01:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`candidate_fragments` compares `PathBuf::to_string_lossy()` output against slash-separated git hunk paths as raw strings. On Windows the extracted paths stringify with backslashes (`src\\\\foo.rs`), so every changed fragment is filtered out and both `dry_write` and `dry_check_approved` can run against an empty diff scope.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 230,
+              "category": "correctness"
+            },
+            {
+              "message": "The new public `CliApp::dry_*` entry points are not exercised by any happy-path or error-path tests; the module only covers helper functions and DTO fields. That leaves the main composition wiring (base resolution, adapter construction, exit-code mapping, and the path-normalization path above) unverified.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 319,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:2c80a0aa9f50021fe63ffcd4441fb5d030852b7e92ffeb9ab38f08a0ab5aafb8",
+          "at": "2026-06-03T12:19:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_diff_and_corpus_fragments` strips `workspace_root` from fragment paths and then compares the result to repo-relative git hunk paths. That only works when `workspace_root` is exactly the repository root; any valid subdirectory root makes `candidate_fragments` incomplete/empty, so `sotp dry write` and `sotp dry check-approved` can silently miss changed fragments. The paths need to be normalized against the git root, or non-root workspaces must be rejected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 217,
+              "category": "correctness"
+            },
+            {
+              "message": "The three `dry_*` entry points accept `items_dir` as-is and never verify that the resulting track directory stays under the discovered repository root before constructing `FsDryCheckStore` / `FsDryCheckCommitHashStore`. Because the infrastructure guard only rejects symlinks, an absolute path or `..`-escaped `items_dir` can make `sotp dry` read and write `dry-check.json` outside the repository tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 338,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:cf0cc0554f63979f1ffc7744f07f00d43074b3aa4f7bc062e14e8cc241f45de9",
+          "at": "2026-06-03T12:26:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`input.track_id` is joined directly onto `items_dir_abs` in all three `dry_*` entry points, so a malicious `--track-id` value like `../outside` or an absolute path can escape the repository root and make `dry_write` / `dry_results` / `dry_check_approved` read or write `dry-check.json` outside the repo tree. `items_dir` is validated, but `track_id` itself is not.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 370,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:7ec657985c78d998ecb7906ae2145b8c2cfef36f60917e324066afa2cccc5881",
+          "at": "2026-06-03T12:35:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public command methods `dry_write` and `dry_check_approved` are not exercised directly by any success-path or failure-path tests. The current tests only cover helper functions and manually constructed `CommandOutcome` values, so regressions in adapter wiring, path validation, or verdict-to-exit mapping would not be caught. Add direct tests for both public APIs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 362,
+              "category": "tests"
+            }
+          ],
+          "hash": "rvw1:sha256:3f7be0730d683f5fd1717b9c5e889bb473618305aa2e76b657db2d10d0041db3",
+          "at": "2026-06-03T12:42:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_write` rejects a missing `track_id` directory before it reaches `FsDryCheckStore`, and `dry_check_approved` repeats the same guard later in this file. That breaks the intended first-run behavior: `FsDryCheckStore::append_record` already creates parent directories on demand, and `read_doc()` treats a missing `dry-check.json` as empty history. As written, a new track cannot be written without pre-creating the directory, and the gate cannot run against an empty history.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 401,
+              "category": "correctness"
+            },
+            {
+              "message": "The write summary only reports `findings.len()` plus per-finding details. The brief requires stdout to include both `pairs checked` and `records appended`, but those counts are never computed or printed here, so callers cannot tell how much of the diff was processed or persisted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 452,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ae364908f172235411813e309b8ddeb0d52ccd2a7c17bcde92149aad669c8504",
+          "at": "2026-06-03T12:50:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:afcd2f2e8ed9547fe76630baad041119ac6c537203a0102cb745ba7b09159f9f",
+          "at": "2026-06-03T12:57:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:afcd2f2e8ed9547fe76630baad041119ac6c537203a0102cb745ba7b09159f9f",
+          "at": "2026-06-03T13:02:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tempdir_in` is anchored to `input.db_path.parent().unwrap_or(&input.db_path)`, so when the caller uses the documented default `.semantic_index` (or any db path without an existing parent directory) the command now depends on a directory that may not exist yet and can fail before LanceDB opens. That regresses first-run behavior for both `dry_write` and `dry_check_approved` (same pattern at line 632). The added tests do not catch this because they pass an invalid `base_commit` and return before the tempdir code runs.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 468,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:66c358f849755322f6e988f333d45a0b738eb32998a8e6023508eb0468b3cf87",
+          "at": "2026-06-03T22:56:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fresh-index tests never reach `create_ephemeral_index_dir()` or `LanceDbSemanticIndexAdapter::new()`: they all pass `base_commit: Some(\"not-a-hash\")`, so `resolve_dry_diff_base()` fails first. As written, these tests only revalidate the existing base-commit error path and leave the new ephemeral-index behavior in both `dry_write` and `dry_check_approved` untested.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1346,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e641eaf44a4f96b92c716f0f299111c4da00aa65e90b056e46ab119d2dddbcad",
+          "at": "2026-06-03T23:02:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2af5286486985ab50d7f53cfc2fc2a99ea9a418a49c4aff05e7396148ba3dfa0",
+          "at": "2026-06-03T23:07:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2af5286486985ab50d7f53cfc2fc2a99ea9a418a49c4aff05e7396148ba3dfa0",
+          "at": "2026-06-03T23:11:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2af5286486985ab50d7f53cfc2fc2a99ea9a418a49c4aff05e7396148ba3dfa0",
+          "at": "2026-06-03T23:11:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_fix_spawn_and_collect` streams child stderr straight to the parent terminal and persists it verbatim in the session log. Because `dry_fix_build_safe_env` passes through `OPENAI_API_KEY`, `OPENAI_ORG_ID`, `OPENAI_BASE_URL`, and `CODEX_API_KEY`, any nested Codex diagnostic that prints env/config data will leak secrets into `stderr` and `tmp/reviewer-runtime/*.log`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1156,
+              "category": "security"
+            },
+            {
+              "message": "`dry_run_fix_local` only trims `--track-id` and checks it for emptiness, then `build_dry_fix_prompt` inserts it directly into the prompt. A value containing newlines or markdown can inject instructions into the nested fixer; validate or escape `track_id` before building the prompt.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 712,
+              "category": "security"
+            },
+            {
+              "message": "The new public entry points `CliApp::dry_run_fix_local` and `CliApp::make_track_local_dry_fix` have no direct happy-path or error-path tests in this scope. That leaves provider resolution, smoke-test failures, env sanitization, and sentinel handling unguarded from regressions.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 702,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:24cb800a2791f0250d32210bef11f88420068e67cd08d5c5c23a0a52b3b36ff3",
+          "at": "2026-06-04T00:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_dry_fix_codex()` performs the `CODEX_BIN --version` smoke test before building the scrubbed environment, so that subprocess runs with the caller's full credential-bearing env (`OPENAI_*`, SSH, HOME, etc.). A custom or compromised `CODEX_BIN` can read/exfiltrate those secrets before the isolation boundary is applied. The version check needs the same sanitized env as the real fixer invocation, or it should not execute an untrusted binary here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 771,
+              "category": "security"
+            },
+            {
+              "message": "`build_dry_fix_invocation()` grants write access only to `codex_home`, but `dry_fix_build_safe_env()` sets `HOME` to the separately created `safe_home`. If `sandbox_workspace_write.writable_roots` is an allow-list, the fixer cannot write to the HOME directory it is explicitly told to use, so Codex session/config writes will fail. Include `safe_home` in the writable roots or move HOME under an already-writable root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1047,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:679a26b032d0c51b5cdc9a8478b70a98505e22d83729f93895b162f0c4cbaa75",
+          "at": "2026-06-04T00:23:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_fix_redaction_values` only redacts `OPENAI_API_KEY` and `CODEX_API_KEY`, so `OPENAI_ORG_ID` and `OPENAI_BASE_URL` can still be echoed to stderr and persisted in `tmp/reviewer-runtime/*.log`. Because the replacement pass is also applied in insertion order, overlapping secrets can be only partially redacted.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 741,
+              "category": "security"
+            },
+            {
+              "message": "`resolve_codex_bin()` falls back to bare `codex`, but both the version smoke-test and the real spawn run under `env_clear()`. On asdf-managed installs, the shim loses the bootstrap state it needs to locate the real binary, so `sotp dry fix-local` can fail even when Codex is installed unless the caller pre-populates `CODEX_BIN`. The public entry point should not depend on the Makefile wrapper for this.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 821,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bfa219c611c0dc71f83ee6b85d432e6af61b14d9e014ea8a430b04b245bfa1d0",
+          "at": "2026-06-04T00:31:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_fix_spawn_and_collect` always writes `tmp/reviewer-runtime/dry-fix-codex-session-*.log` and there is no cleanup guard to delete it on success. That leaves a permanent record of nested Codex stdout/stderr on disk, so any sensitive repo content or credentials that escape the limited redaction pass remain readable after normal successful runs; the review-fix runner deletes these logs unless it needs them for diagnosis.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 1251,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:e08606479c804820540ecf366e10905d2dc696a792cc1cdf27163e739609a484",
+          "at": "2026-06-04T00:41:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry.rs` now contains about 1,390 lines of production code before the test module starts, which exceeds the repo's 700-line cap for production modules. This security-sensitive env/sandbox logic is too large to review and maintain safely in one file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1393,
+              "category": "architecture"
+            },
+            {
+              "message": "`dry_fix_spawn_and_collect` writes the session log only after both collector threads join successfully. If either collector panics or returns an I/O error, the function returns before `write_dry_fix_log`, so the failure path loses the only diagnostic artifact. The review-fix runner writes the log first and then surfaces collector errors.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1255,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a02e165b4b8b7719ff74ce2e84a97d2832f3a3572c11b971d33e61460f229f3c",
+          "at": "2026-06-04T00:48:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d2c218a33b15d017cf00c6619a3f453ab17e580af6861cd131eb0978ba8c024",
+          "at": "2026-06-04T01:01:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_codex_bin()` runs `asdf which codex` before the credential-scrubbed environment is built, and `Command::new(\"asdf\")` inherits the full parent environment. That means repository credentials the runner is explicitly supposed to strip, such as `GITHUB_TOKEN` and `SSH_AUTH_SOCK`, are exposed to the `asdf` subprocess before Codex is launched. Run this lookup with an allowlisted/scrubbed environment or avoid spawning `asdf` in the pre-scrub path.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/lib.rs",
+              "line": 139,
+              "category": "security"
+            },
+            {
+              "message": "The added `make_track_local_dry_fix` wrapper pushes `apps/cli-composition/src/make.rs` to 714 production lines before the `#[cfg(test)]` block at line 715, exceeding the AGENTS.md 700-line production-code module cap. Split the dry-fix make wrapper or related helpers into a submodule so this module stays within the enforced boundary.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 494,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:8d2c218a33b15d017cf00c6619a3f453ab17e580af6861cd131eb0978ba8c024",
+          "at": "2026-06-04T01:05:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5cb3dab31a79c00daa415938f8d0d84297634944e449211f1580fd5eeb52f8b",
+          "at": "2026-06-04T01:11:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry_check_path` is left relative to the current working directory, but `FsDryCheckStore` is anchored with the canonical repo root. If `make track-commit-message` runs from a subdirectory, `read_records()` can inspect the wrong `dry-check.json` or fail open to the default 0.85 threshold instead of the latest recorded threshold, so the DRY gate becomes CWD-dependent. Resolve this path under `canonical_root` the same way `dry_check_approved` does.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 325,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:34d6d1440d86d35e40dba4660ca492919949bf74db4afc583ed4dadb17f76f15",
+          "at": "2026-06-04T02:30:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:175838bfb0d53ec80ef43b4ffa68e454e06a1c3e067f8c3d446fa7e2ac63bf00",
+          "at": "2026-06-04T02:34:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This change pushes the production portion of `make.rs` from 696 lines to 760 lines before `#[cfg(test)]`, exceeding the repository's 700-line module cap. Move the new DRY threshold/gate code into a smaller module or helper instead of growing this module further.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/make.rs",
+              "line": 14,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:175838bfb0d53ec80ef43b4ffa68e454e06a1c3e067f8c3d446fa7e2ac63bf00",
+          "at": "2026-06-04T02:37:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca2b1ec645874b79daf84c05ecc61ce79de6f71cd1f61d2698e9a0b8f19b0618",
+          "at": "2026-06-04T02:44:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31127fc6c37d84c7c692aac068c1c4ebb8aa5707bbac3a616059fd616dcfe11c",
+          "at": "2026-06-04T04:16:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31127fc6c37d84c7c692aac068c1c4ebb8aa5707bbac3a616059fd616dcfe11c",
+          "at": "2026-06-04T04:21:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31127fc6c37d84c7c692aac068c1c4ebb8aa5707bbac3a616059fd616dcfe11c",
+          "at": "2026-06-04T04:22:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31127fc6c37d84c7c692aac068c1c4ebb8aa5707bbac3a616059fd616dcfe11c",
+          "at": "2026-06-04T04:25:17Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
+          "at": "2026-06-03T12:02:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--filter` parser only has positive-path coverage. There is no test that an invalid value is rejected, so a future `ValueEnum` change could silently accept or mis-handle an unsupported filter token on this public CLI surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/dry.rs",
+              "line": 127,
+              "category": "test coverage gap"
+            },
+            {
+              "message": "The `CliCommand::Dry` dispatch arm is not covered by any test. If this match arm is dropped or misrouted later, `sotp dry` would stop working even though the parser-focused tests in `dry.rs` would still pass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 111,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
+          "at": "2026-06-03T12:04:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These tests only prove clap parses `sotp dry ...` into `CliCommand::Dry`; they never execute `main()` or `commands::dry::execute`, so the new dispatch arm and exit-code path can still be deleted or misrouted without failing the suite. That leaves the new public CLI entrypoint untested.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 149,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:ce18f1b57842d930baface85effc064dacfcf8674a714a0df2c11fbd2c555dc9",
+          "at": "2026-06-03T12:17:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
+          "at": "2026-06-03T12:21:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
+          "at": "2026-06-03T12:24:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:004340612125d982eea14297d58e84368c1236b8b4a87a02ef886fcda05ad325",
+          "at": "2026-06-04T00:10:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:004340612125d982eea14297d58e84368c1236b8b4a87a02ef886fcda05ad325",
+          "at": "2026-06-04T00:14:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e43622932fe8eafd77a044ea7e243830e706a5d51707694bc73a137dc3b32a1a",
+          "at": "2026-06-04T03:49:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e43622932fe8eafd77a044ea7e243830e706a5d51707694bc73a137dc3b32a1a",
+          "at": "2026-06-04T03:53:21Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
+          "at": "2026-06-03T07:15:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`split_into_fragments` records spans from the untrimmed accumulator but stores `current.trim()` as the fragment content. Separator or leading blank lines trimmed out of `text` are still included in `start_line`/`end_line`; for example `fn a() {}\\n\\nfn b() {}` yields the first fragment as lines 1..=2 even though its content is only line 1. Hunk filtering can then treat edits to blank lines between items as overlapping the previous fragment, so the span no longer corresponds to the fragment body required by the change.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/extractor.rs",
+              "line": 199,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:b214b73541472ed8928503209d04b750ec8de4342e9523e9dc14f9c535013e6e",
+          "at": "2026-06-03T07:19:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:569721a667441dc75758a2f5941fb2e2f2c019c55e605542716f4550217c2a99",
+          "at": "2026-06-03T07:24:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckVerdictDto` is serialized with an internal `type` tag, so the unit variants write as `{ \"type\": \"NotAViolation\" }` / `{ \"type\": \"Accepted\" }` and `Violation` also carries a `type` field. That does not match the required dry-check.json schema described in the brief, which expects bare string verdicts for the unit cases and a nested `violation` object, so this adapter will not round-trip the documented on-disk format.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codec.rs",
+              "line": 18,
+              "category": "schema"
+            },
+            {
+              "message": "`collect_hunk_ranges` and `collect_untracked_files` both treat non-success git exits as success in common cases, returning `Ok(())` instead of `DryCheckDiffError::Failed`. That can silently drop changed hunks or untracked files and make `GitDryCheckDiffGetter::list_changed_hunks` report an incomplete diff set when git fails.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 169,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:cee6f502f0e6a1d6391c1de794448ea637e0dee3f5f884c06a8bce761e7ab2f8",
+          "at": "2026-06-03T09:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The hunk parser treats any added diff line starting with `+++ ` as a file header, so legitimate source lines like `++ foo` can reset `current_file` and silently drop or misattribute hunks. That can make `list_changed_hunks()` miss changed fragments.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 121,
+              "category": "correctness"
+            },
+            {
+              "message": "The only test for `GitDryCheckDiffGetter::list_changed_hunks()` never reaches the method: `CommitHash::try_new(\"HEAD\")` always fails and the test returns early. The new public API has no real happy-path/error-path coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 286,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:8a7757b1df084453f254b9bfd2ff384f8e17069558af6085fd791bfe0d215900",
+          "at": "2026-06-03T09:11:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_records` now contains a fairly deep DTO→domain validation pipeline (`FragmentContentHash`, `DryCheckPairKey`, `Timestamp`, `SimilarityScore`, `RefactorProposal`), but this module only exercises round-trip success. There is no test that malformed on-disk data is rejected as `DryCheckReaderError::InvalidData` or that a future `schema_version` is rejected, so regressions in the new persistence/compatibility path would slip through.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 241,
+              "category": "test coverage"
+            },
+            {
+              "message": "`list_changed_hunks` is only covered by a single simple modified-file case plus merge-base failure. The untracked-file source and the 4-source union path are untested, so regressions in the `u32::MAX` whole-file sentinel or multi-source accumulation can ship unnoticed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 33,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:443308fd9bd670e4c670dbd9b2ed3d53fafd574222b036d628cf4623b2f8cb3d",
+          "at": "2026-06-03T09:20:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6bba9282d62299ada11847fae1562c9aa943b41eecdd8e191fe1272df7a6248",
+          "at": "2026-06-03T09:29:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Production code splits the hunk header with direct string slicing. This violates the scope's no slice-indexing rule and the workspace has `clippy::indexing_slicing = \"deny\"`, so `ci-rust`/clippy will reject the new adapter. Use `split_once(',')` or checked `get` ranges instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/diff_getter.rs",
+              "line": 207,
+              "category": "build"
+            }
+          ],
+          "hash": "rvw1:sha256:c6bba9282d62299ada11847fae1562c9aa943b41eecdd8e191fe1272df7a6248",
+          "at": "2026-06-03T09:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dto_to_domain` casts persisted `similarity_score` and `threshold` from `f64` to `f32` before validation. That lossy conversion can make out-of-schema JSON values pass the domain checks, e.g. a tiny negative value rounds to `-0.0` or a value just above `1.0` rounds to `1.0`, so `read_records()` can accept invalid dry-check.json data instead of returning `DryCheckReaderError::InvalidData`. Validate finiteness and the `[0, 1]` range while the values are still `f64` before casting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 296,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:6eb1d5686dfbaaa6e94aa44886913bb998ca8012ec19b20ec294497a6d8a9a9c",
+          "at": "2026-06-03T09:40:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c800893bd5a37265fb018147df7343dcb65456627c202ee242fe2689b2ac4a7",
+          "at": "2026-06-03T09:45:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`DryCheckAgentOutputDto` accepts unknown JSON keys because it is deserialized with plain `serde::Deserialize` and no `#[serde(deny_unknown_fields)]`. That lets malformed agent output with extra fields pass parsing even though the schema in this file sets `additionalProperties: false` and the adapter is supposed to reject nonconforming output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 69,
+              "category": "schema validation"
+            }
+          ],
+          "hash": "rvw1:sha256:57ff19aa3464e2a27b8a5b20e5432ac3832d46da7c9aad182790b6f26a207b20",
+          "at": "2026-06-03T11:14:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_ref_from_code_fragment` converts `CodeFragment::source_path` directly into `FilePath`, but `FilePath::new` rejects absolute paths. In the dry-check pipeline, fragments are built from workspace scans and semantic-index reads using absolute paths, so any real `Violation` verdict will fail here with `DryCheckAgentError::Unexpected` instead of producing a `DryCheckFinding`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 227,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5616df4e6ed97ed5884f2d0e35beb3fbe9e34c46e10892cc496678c31220dd05",
+          "at": "2026-06-03T11:19:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`source_path` is converted with `to_string_lossy()` before building `FilePath`, which can silently change the fragment identity for non-UTF-8 paths and keeps OS-native separators (for example, backslashes on Windows). That means `FragmentRef` can be lossy or platform-specific instead of representing the real repo-relative path, leading to identifier collisions or mismatches. Reject non-UTF-8 paths here and canonicalize to a stable repo-relative form instead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 227,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5f0ede85413cad337cc178d3824e249763e6338df3dbf990c6e0d0fa6f953fc4",
+          "at": "2026-06-03T11:27:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a26fb3e285f058b67d686b4799350fa586b625f1dff67cecb58291fe91d5da0",
+          "at": "2026-06-03T11:33:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a26fb3e285f058b67d686b4799350fa586b625f1dff67cecb58291fe91d5da0",
+          "at": "2026-06-03T11:37:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c665a42b2fb44a22ec080b75fa3b09b9a76e26d11f80a60c8e087ff2369ce06",
+          "at": "2026-06-03T23:35:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c665a42b2fb44a22ec080b75fa3b09b9a76e26d11f80a60c8e087ff2369ce06",
+          "at": "2026-06-03T23:37:55Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
+              "severity": "P1",
+              "file": "libs/domain/src/dry_check.rs",
+              "line": 801,
+              "category": "correctness"
+            },
+            {
+              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 184,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
+          "at": "2026-06-03T07:16:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
+              "line": 821,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
+          "at": "2026-06-03T07:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:34:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:37:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T08:59:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T09:00:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b95691ad505054fe4a4199494801b8208cdff70d76c1be5b6cb132c832ad99",
+          "at": "2026-06-04T03:11:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2d782b14162faba0a7c5f242ec09da866741a6d270deb7ac62ddf685b34a422",
+          "at": "2026-06-04T03:26:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2d782b14162faba0a7c5f242ec09da866741a6d270deb7ac62ddf685b34a422",
+          "at": "2026-06-04T03:29:52Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:15:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:19:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
+          "at": "2026-06-03T08:17:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
+          "at": "2026-06-03T08:21:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
+          "at": "2026-06-03T10:14:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
+          "at": "2026-06-03T10:18:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`above_threshold_candidates` is appended across successive growing-`k` searches without any seen-pair deduplication, so the same unresolved pair can be counted multiple times when the search window expands. That inflates `Blocked { unresolved_pair_count }` and violates the distinct-pair count contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "line": 138,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:312db1f01188c40194fbe76ac39ba75781a47e8648a3175037482de9a5bd2f73",
+          "at": "2026-06-03T10:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `check_approved` API has success and reader-failure coverage, but it does not test the `Embedding`/`Index` error branches (`map_err(DryCheckCycleError::Embedding/Index)` in the method body). That leaves regressions in those required error paths unguarded.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "line": 397,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c74cffd10a04ae5aca3d3f0f864b0568ec47fc237b9d4b4afd5db7b0a52c88ad",
+          "at": "2026-06-03T10:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:53:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:57:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:58:31Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "line": 91,
+              "category": "correctness"
+            },
+            {
+              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:123-144`, `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "line": 129,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f4ef6b67d3326653bb4e28f4a52f27f51c40676f019eb187cbeb0c19bc0775c",
+          "at": "2026-06-03T13:17:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
+          "at": "2026-06-03T13:20:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow now says capability routing and model/CLI selection are determined by `.harness/config/agent-profiles.json`, and lists `dry-checker` as Codex. However `sotp dry write` does not load agent-profiles at all: its CLI args define `--model` with default `codex` and `--capability-name` with default `dry-checker`, then pass those directly to `CodexDryChecker::new`. As a result the new `.harness/config/agent-profiles.json` entry `dry-checker.model = gpt-5.5` has no effect on the documented `sotp dry write` path, so the docs/config describe a routing behavior the implementation does not provide.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 363,
+              "category": "docs"
+            },
+            {
+              "message": "The documented `sotp dry` command surfaces are incomplete relative to the implemented clap args. `write` also accepts `--items-dir`, `--model`, and `--capability-name`; `results` and `check-approved` also accept `--items-dir`. Because this convention is the command reference for DFP/RFP operation and already lists other optional flags, omitting these flags makes the documented argument surface disagree with the actual T007-T009 CLI, especially the model/capability overrides that currently control dry-checker execution.",
+              "severity": "P1",
+              "file": "knowledge/conventions/dry-check-workflow.md",
+              "line": 53,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
+          "at": "2026-06-03T13:24:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff5385a3b4d8c08cfb0f6f4d71bd85fbbcdd221d1336ddf8b3d6dac3f15026e1",
+          "at": "2026-06-03T13:28:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
+          "at": "2026-06-03T23:36:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The contract says the Codex model for the `dry-checker` agent is resolved from `capabilities.dry-fix-lead`, but `.harness/config/agent-profiles.json` defines `dry-checker` and `dry-fix-lead` as separate capabilities. For this dfl agent this should refer to the dry-fix-lead agent/capability, or if discussing `sotp dry write`, to `capabilities.dry-checker`; as written the model-resolution contract is inconsistent with the capability split.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 22,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
+          "at": "2026-06-03T23:40:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:070a7273511175737a3763471a227667f5064143fe87fc04ba9b1a418e7d9ed2",
+          "at": "2026-06-03T23:43:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19a215df4c1fbed7d3f6da3701515d3b070bc92f9ceb1a2358040cd0f7594d35",
+          "at": "2026-06-04T01:22:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19a215df4c1fbed7d3f6da3701515d3b070bc92f9ceb1a2358040cd0f7594d35",
+          "at": "2026-06-04T01:27:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36b668cb24d0832fdd47f270e39fbc13fd5f22aa1c0ccf3c419132bd878fef65",
+          "at": "2026-06-04T01:39:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The execution-state bullets still say `todo`/`in_progress` runs `implement → review → commit`, and the `done` with null `commit_hash` path runs only steps 2-3. With Step 1b now carrying the DRY gate, an orchestrator following this summary can skip `/track:dry-check` before review, especially on resumed done/uncommitted tasks, which contradicts the new DFP-before-RFP contract and fixpoint requirement.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 31,
+              "category": "harness-policy"
+            },
+            {
+              "message": "The basic workflow diagram still routes interactive implementation completion directly to `/track:review` and then CI/commit, with no `/track:dry-check` before the local review path. That conflicts with the new DFP -> RFP guidance in the same document and leaves the primary user-facing flow documenting a DRY-gate bypass outside `/track:full-cycle`.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 68,
+              "category": "harness-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:36b668cb24d0832fdd47f270e39fbc13fd5f22aa1c0ccf3c419132bd878fef65",
+          "at": "2026-06-04T01:42:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The basic-flow diagram now routes the `/track:full-cycle` branch into `/track:dry-check` as a follow-up command, then onward to review/commit. That contradicts the full-cycle contract documented in this change, where `/track:full-cycle` itself runs Implement -> DFP -> review/DFP fixpoint -> commit per task, and can lead users to rerun gates or commits after an already-completed full-cycle run. Split the autonomous `/track:full-cycle` path from the manual post-implementation path or end it after full-cycle completion.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 68,
+              "category": "workflow_contract"
+            },
+            {
+              "message": "The post-loop recommendation still says to run `/track:review` -> `/track:commit` for verification changes, skipping the newly required DFP gate. This contradicts Step 1b and the RFP->DFP fixpoint contract above, and gives users a recovery path that bypasses `/track:dry-check` before review/commit. Update the recommendation to include `/track:dry-check` and the DFP/RFP fixpoint before commit.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 82,
+              "category": "workflow_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:85dc26fc95f5f905cca8580a55b4b954bba049c4b0621077d0943d47a93eea66",
+          "at": "2026-06-04T01:46:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7905d53d07641d9da121563e119def5da9566f5eb0f24acbc9e25d1622ffc17d",
+          "at": "2026-06-04T01:48:50Z"
+        }
+      ]
+    }
+  }
+}

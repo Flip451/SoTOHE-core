@@ -1,0 +1,2160 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "DryCheckVerdict": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "NotAViolation", "payload": { "kind": "unit" } },
+          { "name": "Accepted",      "payload": { "kind": "unit" } },
+          {
+            "name": "Violation",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "refactor_proposal", "ty": "RefactorProposal" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Per-pair DRY check verdict stored in dry-check.json. NotAViolation = false positive rejected by agent; Accepted = agent-determined acceptable duplication (a genuine dup the agent judges as acceptable and records as accepted — no separate human ack command or override); Violation = genuine DRY violation (carrying the mandatory refactor_proposal as a validated non-empty RefactorProposal). Enum-first design (D9): 'violation' is the only variant that structurally carries a refactor_proposal, making 'violation without a proposal' and 'non-violation with a proposal' unrepresentable. NotAViolation and Accepted are bare unit variants with no proposal field. The use of RefactorProposal (non-empty newtype) means an empty refactor_proposal is unrepresentable at the type level — making the empty-string violation state illegal in addition to the structural enum constraint (D9/AC-06). No separate flat ack-file is maintained — accepted verdicts are unified into this enum (D9). This is the persisted form — the agent's richer DryCheckAgentJudgment is converted to this before persistence.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-06",
+          "hash": "bce942ebda713c95c6b4c4acaf82e5194913b245ab956e0676eaf785b484b905"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "GO-03",
+          "hash": "364194b41e2a12be6e263dcccf56145b54fd12eeae2fa95e01e026408a2adb35"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "VerdictFilter": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "All",            "payload": { "kind": "unit" } },
+          { "name": "NotAViolation",  "payload": { "kind": "unit" } },
+          { "name": "Accepted",       "payload": { "kind": "unit" } },
+          { "name": "Violation",      "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Classification filter for the dry-check read path (D10 read operation, AC-07). Passed to DryCheckResultsService.get_results() to limit results to a specific verdict class or return all records. The Violation variant matches records whose verdict is DryCheckVerdict::Violation { .. } (struct variant with refactor_proposal).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-08",
+          "hash": "01772a23d21e673ea123a475616259771c8f18e19d1696c9de36a17bfe123a1b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-07",
+          "hash": "7f98b9b99f39a9758e2091fc2fb6d6697aff97ac727156e44fd36760cb403292"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefactorProposal": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Validated non-empty refactor proposal text produced by the dry-checker agent for a genuine DRY violation (D9/IN-03/AC-03). The constructor RefactorProposal::new(s: impl Into<String>) -> Result<RefactorProposal, RefactorProposalError> rejects an empty string with Err(RefactorProposalError::Empty). This makes 'violation without a proposal' structurally unrepresentable at the type level: DryCheckVerdict::Violation { refactor_proposal: RefactorProposal } can only be constructed with a non-empty proposal, and DryCheckFinding::refactor_proposal is also typed RefactorProposal. The empty-proposal invariant is now enforced by the type system rather than by fallible construction at the finding level. Accessor: as_str() -> &str.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-03",
+          "hash": "cc61e2d1f14289ce4aea7886512a7fe51da429ef0a3d4785e4d4601764aaf06a"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "GO-03",
+          "hash": "364194b41e2a12be6e263dcccf56145b54fd12eeae2fa95e01e026408a2adb35"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefactorProposalError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Empty", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error returned by RefactorProposal::new() when the input string is empty. An empty refactor proposal is structurally unrepresentable in DryCheckVerdict::Violation and DryCheckFinding — the Violation variant and finding field both carry RefactorProposal, not String.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "Timestamp": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "timestamp",
+      "docs": "Pre-existing domain::timestamp::Timestamp — a validated RFC 3339 / ISO 8601 UTC timestamp type. Carried as a reference entry so that DryCheckRecord.recorded_at typed as Timestamp is visible in the contract-map. The constructor Timestamp::new(value: impl Into<String>) -> Result<Self, ValidationError> validates the string using chrono RFC 3339 parsing; invalid strings (including empty strings) produce Err(ValidationError::InvalidTimestamp). Two Timestamp values are equal if they represent the same instant (DateTime-based equality, not string equality). DryCheckRecord.recorded_at is typed as Timestamp to make an invalid recorded_at unrepresentable — the infra adapter (FsDryCheckStore::append_record) obtains a Timestamp by calling infrastructure::timestamp_now() (which directly returns Result<Timestamp, ValidationError>) and propagating the error via ? or map_err into DryCheckWriterError; the interactor never produces a Timestamp.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "GO-03",
+          "hash": "364194b41e2a12be6e263dcccf56145b54fd12eeae2fa95e01e026408a2adb35"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "Rationale": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Validated non-empty rationale text (agent judgment reason). The constructor Rationale::new(s: impl Into<String>) -> Result<Rationale, RationaleError> rejects an empty string with Err(RationaleError::Empty). Used in DryCheckEntry.rationale to ensure the mandatory judgment reason is non-null and non-empty (D9/AC-06: rationale required on all records, non-null). Accessor: as_str() -> &str.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-06",
+          "hash": "bce942ebda713c95c6b4c4acaf82e5194913b245ab956e0676eaf785b484b905"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "GO-03",
+          "hash": "364194b41e2a12be6e263dcccf56145b54fd12eeae2fa95e01e026408a2adb35"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RationaleError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Empty", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error returned by Rationale::new() when the input string is empty. An empty rationale is illegal — the D9 schema mandates a non-null judgment reason on every record (all verdicts: violation, not-a-violation, accepted).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckEntry": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Write-input type for the dry-check persistence path (Finding 3 / write-read separation). Carries the 7 fields the interactor knows at verdict time: pair_key, changed_path, verdict, similarity_score, threshold, base_commit, and rationale. Does NOT carry recorded_at — the interactor cannot know the write timestamp, and an empty placeholder for recorded_at would temporarily admit an invalid domain record before persistence. DryCheckWriter::append_record receives &DryCheckEntry; the infra adapter (FsDryCheckStore) calls infrastructure::timestamp_now() (which directly returns Result<Timestamp, ValidationError>) to obtain a Timestamp, propagating any error via map_err into DryCheckWriterError, then constructs a DryCheckRecord from DryCheckEntry + Timestamp before writing. The constructor DryCheckEntry::new(pair_key, changed_path, verdict, similarity_score, threshold, base_commit, rationale: Rationale) -> Result<DryCheckEntry, DryCheckEntryError> validates that changed_path is either pair_key.low().path() or pair_key.high().path() (DryCheckEntryError::ChangedPathOutsidePair); rationale is already validated non-empty by the Rationale newtype. Private fields, accessors: pair_key() -> &DryCheckPairKey, changed_path() -> &FilePath, verdict() -> &DryCheckVerdict, similarity_score() -> &SimilarityScore, threshold() -> &SimilarityThreshold, base_commit() -> &CommitHash, rationale() -> &Rationale.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-06",
+          "hash": "bce942ebda713c95c6b4c4acaf82e5194913b245ab956e0676eaf785b484b905"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "GO-03",
+          "hash": "364194b41e2a12be6e263dcccf56145b54fd12eeae2fa95e01e026408a2adb35"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-09",
+          "hash": "a59190fffc13f2ac277bda7ddeb540e8b74c366daf69034ee01a8a6449429e29"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckEntryError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ChangedPathOutsidePair", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error returned by DryCheckEntry::new() when the changed_path argument is neither pair_key.low().path() nor pair_key.high().path(). Replaces DryCheckRecordError::ChangedPathOutsidePair — the validation has moved from DryCheckRecord::new to DryCheckEntry::new because the interactor now constructs DryCheckEntry (not DryCheckRecord). DryCheckRecord is constructed by the infra adapter (FsDryCheckStore::append_record) using data from DryCheckEntry plus a stamped Timestamp, so the changed_path validation remains at the entry point.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FragmentRef": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Fragment identifier: the pair (repo-relative path, content_hash) uniquely identifies a code fragment by both location and content (D8/IN-06/CN-07). Two FragmentRefs are equal iff both path AND content_hash match — this is the basis for self-match detection in DryCheckPairKey::new(). Fields are private; accessors: path() -> &FilePath, content_hash() -> &FragmentContentHash. Ord is implemented as lexicographic (path, content_hash) order so DryCheckPairKey::new() can sort two FragmentRefs into (low, high) deterministically. constructor: FragmentRef::new(path: FilePath, content_hash: FragmentContentHash) -> FragmentRef (infallible — both components are already validated value objects).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "39314cd8d8ea7db5b8911ad04302e048eff2e705b0ce0ffe0d14d80defa3a934"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-07",
+          "hash": "612efa4aa48ad2bf1c66554b4760a0b0ef6032095b36e3562d13383990ee691d"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-08",
+          "hash": "ff4293c976f31a9dbbff95dc9df8e3cfcacd3deeb527d3482b38bb10cf310d1f"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckRecord": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "A single entry in the dry-check.json history array (D9/AC-06/GO-03). This is the read/persistent form — it is constructed exclusively by FsDryCheckStore::append_record (the sole owner of recorded_at). The interactor constructs DryCheckEntry (which lacks recorded_at) and passes it to DryCheckWriter::append_record; the infra adapter stamps a Timestamp and builds DryCheckRecord. Illegal states are unrepresentable: (1) pair_key.low > pair_key.high is impossible because DryCheckPairKey::new() sorts by (path, content_hash) order; (2) self-match (low == high on both path AND content_hash) is impossible because DryCheckPairKey::new() rejects equal FragmentRefs; (3) changed_path outside the pair is impossible because DryCheckEntry::new() validates that changed_path equals pair_key.low().path() or pair_key.high().path(); (4) recorded_at is always a valid non-empty ISO-8601 UTC string because it is typed as Timestamp; (5) rationale is always non-empty because it is typed as Rationale; (6) refactor_proposal in Violation variant is always non-empty because it is typed as RefactorProposal. Private fields; accessors mirror DryCheckEntry plus recorded_at(): pair_key() -> &DryCheckPairKey, changed_path() -> &FilePath, verdict() -> &DryCheckVerdict, similarity_score() -> &SimilarityScore, threshold() -> &SimilarityThreshold, base_commit() -> &CommitHash, rationale() -> &Rationale, recorded_at() -> &Timestamp. FsDryCheckStore constructs DryCheckRecord internally (not part of the domain public API — private constructor via from_entry_and_timestamp or equivalent).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-06",
+          "hash": "bce942ebda713c95c6b4c4acaf82e5194913b245ab956e0676eaf785b484b905"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "GO-03",
+          "hash": "364194b41e2a12be6e263dcccf56145b54fd12eeae2fa95e01e026408a2adb35"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "39314cd8d8ea7db5b8911ad04302e048eff2e705b0ce0ffe0d14d80defa3a934"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-07",
+          "hash": "612efa4aa48ad2bf1c66554b4760a0b0ef6032095b36e3562d13383990ee691d"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-08",
+          "hash": "ff4293c976f31a9dbbff95dc9df8e3cfcacd3deeb527d3482b38bb10cf310d1f"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckRecordError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "ChangedPathOutsidePair", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error returned by DryCheckRecord::from_entry_and_timestamp() (infra-internal constructor) when the entry's changed_path is neither pair_key.low().path() nor pair_key.high().path(). This error type is retained for completeness of the record construction contract in the infra layer — in practice the validation is already enforced by DryCheckEntry::new() (returning DryCheckEntryError::ChangedPathOutsidePair), so this variant should be unreachable in correct usage. Maps to DryCheckReaderError::InvalidData when encountered during deserialization.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckFinding": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "A genuine DRY violation finding produced by the dry-checker agent, carrying a validated non-empty refactor proposal (IN-03/AC-03). This is the live write-path finding returned to dfl. Illegal states are unrepresentable: a finding only exists when the agent verdict is Violation — NotAViolation and Accepted carry no finding. The interactor maps refactor_proposal to DryCheckVerdict::Violation { refactor_proposal } for persistence (enum-first D9). refactor_proposal is a RefactorProposal (non-empty validated newtype) — the empty-proposal state is structurally unrepresentable. The empty-proposal validation previously in DryCheckFinding::new (DryCheckFindingError::EmptyProposal) is now subsumed by RefactorProposal::new (RefactorProposalError::Empty). changed_fragment_ref / candidate_fragment_ref are the full FragmentRef (path, content_hash) identifiers of the fragments from the agent call perspective (changed = diff side, candidate = retrieval side); these are informational live-output fields on the Violation finding, returned to dfl. They are NOT the source for DryCheckPairKey derivation. Pair identity (DryCheckPairKey) is derived by the interactor from the actual CodeFragment values of the judged pair (FragmentRef computed via SHA-256 of content()) for all verdicts (NotAViolation, Accepted, Violation) — not from finding refs.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-03",
+          "hash": "cc61e2d1f14289ce4aea7886512a7fe51da429ef0a3d4785e4d4601764aaf06a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FragmentContentHash": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Validated SHA-256 content hash of a code fragment (function/block unit). Format: 64 lowercase hex chars. Part of FragmentRef — the pair (FilePath, FragmentContentHash) is the fragment identifier (D8/D9/CN-07/IN-06/IN-07). Two FragmentRefs with different content_hashes represent the same path at different content states. When content changes, content_hash changes, so the FragmentRef changes, so the DryCheckPairKey changes, so past records no longer match — invalidation is implicit in the identifier (no separate hash-comparison step needed, CN-07).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "39314cd8d8ea7db5b8911ad04302e048eff2e705b0ce0ffe0d14d80defa3a934"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-07",
+          "hash": "612efa4aa48ad2bf1c66554b4760a0b0ef6032095b36e3562d13383990ee691d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "FragmentContentHashError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "InvalidFormat", "payload": { "kind": "tuple", "fields": ["String"] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error returned by FragmentContentHash constructor when the input is not a valid 64-char lowercase hex SHA-256 string.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckPairKey": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Normalized (sorted) pair of FragmentRefs used as the dry-check dedup/cache key (pair identity). A FragmentRef encapsulates both a repo-relative file path and the content_hash of the fragment (D8). low <= high by (path, content_hash) lexicographic order, ensuring (X,Y) and (Y,X) produce the same key (CN-08). FALLIBLE constructor: DryCheckPairKey::new(a, b) sorts two FragmentRefs into (low, high) automatically and rejects self-match (a == b on BOTH path AND content_hash) with DryCheckPairKeyError::SelfMatch — a key where both the path and content_hash of low and high are equal is structurally unrepresentable (paths different but hashes same → two distinct complete-copy files → different pair, valid). Fields are private (sorted invariant enforced by constructor only); accessors low() / high() return &FragmentRef. Each FragmentRef exposes path() -> &FilePath and content_hash() -> &FragmentContentHash. Invalidation: when a fragment's content changes, its content_hash changes, so the FragmentRef changes, so the DryCheckPairKey changes, so no existing record matches — the pair is treated as unverified (CN-07). No separate hash-comparison step is needed.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-08",
+          "hash": "ff4293c976f31a9dbbff95dc9df8e3cfcacd3deeb527d3482b38bb10cf310d1f"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "39314cd8d8ea7db5b8911ad04302e048eff2e705b0ce0ffe0d14d80defa3a934"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckPairKeyError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "SelfMatch", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error returned by DryCheckPairKey::new() when both FragmentRef arguments are equal (path AND content_hash both match — self-match). Self-matches must not be recorded per D9/IN-06/AC-05. Note: paths different but content_hash equal (complete copies in different files) is NOT a self-match and produces a valid DryCheckPairKey. The fallible constructor makes the path+hash-equal self-match illegal state unrepresentable at the key level.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-06",
+          "hash": "39314cd8d8ea7db5b8911ad04302e048eff2e705b0ce0ffe0d14d80defa3a934"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-05",
+          "hash": "4ea7a46ebcba67925a7c2f7f3199e9efce54b6dc1d981d9ec9c4363c151d4bc4"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckApprovalVerdict": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Approved", "payload": { "kind": "unit" } },
+          {
+            "name": "Blocked",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "unresolved_pair_count", "ty": "usize" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Domain verdict for the dry-check gate. Approved = all above-threshold pairs verified as not-a-violation or accepted; Blocked = unresolved violations or unverified pairs remain (D7/D10).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-04",
+          "hash": "5b6c9bf097b59eecbfcea1ba66f271aaadab1a97489e1dff4a8f21d297fef10a"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-05",
+          "hash": "530b1484c0094d7c14e8e37a843d7767d612a4e64026087e69fa48b3d1e7b6ca"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckFindingError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "EmptyProposal", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error returned when constructing a DryCheckFinding where the refactor_proposal (now a RefactorProposal newtype) is empty. In practice this error propagates from RefactorProposal::new() (RefactorProposalError::Empty) which is called within DryCheckFinding::new() to build the RefactorProposal field. The constructor DryCheckFinding::new(changed_fragment_ref, candidate_fragment_ref, refactor_proposal: impl Into<String>) -> Result<DryCheckFinding, DryCheckFindingError> calls RefactorProposal::new on the proposal string and returns Err(EmptyProposal) on failure, keeping the old error surface stable for callers.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-03",
+          "hash": "83429a4ef4dabb33ba63c31e184a1bbb9374a738cbb03281bcdffa7da174496b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckReaderError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Io",                 "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }, { "name": "detail", "ty": "String" }] } },
+          { "name": "SymlinkDetected",    "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }] } },
+          { "name": "Codec",              "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }, { "name": "detail", "ty": "String" }] } },
+          { "name": "InvalidData",        "payload": { "kind": "tuple",  "fields": ["String"] } },
+          { "name": "IncompatibleSchema", "payload": { "kind": "struct", "fields": [{ "name": "version", "ty": "u64" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Errors from DryCheckReader port operations (mirrors ReviewReaderError). IncompatibleSchema is returned by read_records when the on-disk envelope has a future schema_version that this implementation does not know how to read (mirrors DryCheckWriterError::IncompatibleSchema on the write path).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-08",
+          "hash": "01772a23d21e673ea123a475616259771c8f18e19d1696c9de36a17bfe123a1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckWriterError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Io",                 "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }, { "name": "detail", "ty": "String" }] } },
+          { "name": "SymlinkDetected",    "payload": { "kind": "struct", "fields": [{ "name": "path", "ty": "String" }] } },
+          { "name": "Codec",              "payload": { "kind": "struct", "fields": [{ "name": "detail", "ty": "String" }] } },
+          { "name": "IncompatibleSchema", "payload": { "kind": "struct", "fields": [{ "name": "version", "ty": "u64" }] } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Errors from DryCheckWriter port operations (mirrors ReviewWriterError).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-08",
+          "hash": "01772a23d21e673ea123a475616259771c8f18e19d1696c9de36a17bfe123a1b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-09",
+          "hash": "a59190fffc13f2ac277bda7ddeb540e8b74c366daf69034ee01a8a6449429e29"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DiffHunkRange": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "A 1-indexed inclusive line range [start_line, end_line] for a single added/changed hunk from git diff. start_line and end_line are private (invariant: start <= end, both >= 1 enforced in constructor). Accessors: start_line() -> u32, end_line() -> u32. Used by DiffFileHunks to record the line ranges of added/changed hunks in a file, enabling hunk-level overlap with CodeFragment spans (D4 / ADR 2026-06-02-0716-dry-checker). The invariant 'start <= end' makes the empty-range illegal state unrepresentable at construction time.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-04",
+          "hash": "7995798d1b971ac587b7abc7f1c237edd7630c9d5524138a2b416aeca5851f21"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DiffHunkRangeError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "StartExceedsEnd", "payload": { "kind": "struct", "fields": [{ "name": "start", "ty": "u32" }, { "name": "end", "ty": "u32" }] } },
+          { "name": "ZeroLine",        "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error from DiffHunkRange constructor. StartExceedsEnd: start > end (empty/inverted range is unrepresentable). ZeroLine: start or end is 0 (line numbers are 1-indexed).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DiffFileHunks": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "A changed file path together with its non-empty list of added/changed hunk line ranges. Returned by DryCheckDiffSource.list_changed_hunks(). The 'hunks non-empty' invariant is enforced in the constructor: a file with no added/changed hunks (e.g. a deletion-only diff) is structurally absent from the result. Accessors: path() -> &FilePath, hunks() -> &[DiffHunkRange]. Used by fragments_overlapping_hunks() to find CodeFragments that overlap any of the file's changed hunks (D4/CN-04).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-04",
+          "hash": "7995798d1b971ac587b7abc7f1c237edd7630c9d5524138a2b416aeca5851f21"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-02",
+          "hash": "acd422b8d8d8a89e785ad5e051e981e312140f9185c6f730f9df5bfc030e5f56"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DiffFileHunksError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "EmptyHunks", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Error from DiffFileHunks constructor. EmptyHunks: the supplied hunk list is empty (a file with no added/changed hunks cannot be represented as a DiffFileHunks — the caller should simply omit such files from the result Vec).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CodeFragment": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "source_path", "ty": "std::path::PathBuf" }
+          ],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "A code fragment with its text content, source path, and 1-indexed inclusive line span [start_line, end_line] within the source file. The line span is added by this track (D4 hunk-scope: fragments_overlapping_hunks needs start_line / end_line to detect overlap with DiffHunkRange). source_path is pub; content (String), start_line (u32), and end_line (u32) are private with accessors. start_line and end_line are set by the extractor at extraction time and are always valid (start <= end >= 1). For ad-hoc query fragments (source_path = '<query>'), start_line=1 / end_line=u32::MAX is used as a sentinel ('always overlaps') so query fragments are never excluded by hunk filtering. Content must be non-empty (enforced by CodeFragment::new — SemanticDupError::EmptyContent). The FragmentContentHash (SHA-256 of content) is computed by the interactor from content() at DryCheckPairKey construction time — it is not stored in CodeFragment itself.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-04",
+          "hash": "7995798d1b971ac587b7abc7f1c237edd7630c9d5524138a2b416aeca5851f21"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SimilarityScore": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Pre-existing domain::semantic_dup::SimilarityScore — cosine similarity score in [0.0, 1.0]. Modified by this track: PartialEq is added (#[derive(Debug, Clone, Copy, PartialEq)]) so that DryCheckEntry and DryCheckRecord (which embed SimilarityScore) can derive PartialEq. Eq is not derived because f32 does not implement Eq (NaN != NaN). Carried as a modify entry so that the extra PartialEq impl (visible in rustdoc) does not produce a Red signal.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SimilarityThreshold": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Pre-existing domain::semantic_dup::SimilarityThreshold — cosine similarity threshold in [0.0, 1.0]. Modified by this track: PartialEq is added (#[derive(Debug, Clone, Copy, PartialEq)]) so that DryCheckEntry and DryCheckRecord (which embed SimilarityThreshold) can derive PartialEq. Eq is not derived because f32 does not implement Eq (NaN != NaN). Carried as a modify entry so that the extra PartialEq impl (visible in rustdoc) does not produce a Red signal.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-07",
+          "hash": "7fa1e3d521143008ca32bc907014fb7d944fcc6b147d76cd9286ca8f06da5b89"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticDupError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidScore",
+            "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "f32" }] }
+          },
+          {
+            "name": "InvalidTopK",
+            "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "usize" }] }
+          },
+          {
+            "name": "InvalidThreshold",
+            "payload": { "kind": "struct", "fields": [{ "name": "value", "ty": "f32" }] }
+          },
+          { "name": "EmptyContent", "payload": { "kind": "unit" } },
+          {
+            "name": "InvalidFragmentSpanZeroLine",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "start_line", "ty": "u32" },
+                { "name": "end_line",   "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidFragmentSpanOrder",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "start_line", "ty": "u32" },
+                { "name": "end_line",   "ty": "u32" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Domain-level errors for semantic duplicate detection value object invariant violations. Baseline had 4 variants (InvalidScore, InvalidTopK, InvalidThreshold, EmptyContent). This track adds 2 variants (InvalidFragmentSpanZeroLine, InvalidFragmentSpanOrder) for the CodeFragment line span validation introduced in T001. Only #[derive(Debug)] — Display and Error are hand-written impls.",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "DryCheckReader": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read_records",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Result<Vec<DryCheckRecord>, DryCheckReaderError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_check",
+      "docs": "Read-only port for dry-check.json retrieval. Returns the full history array of DryCheckRecord entries. Each record uses the canonical sorted model: pair_key holds two FragmentRefs (path, content_hash) sorted lexicographically (low <= high); changed_path is a display-only field (diff fragment side, validated at DryCheckEntry construction time as either pair_key.low().path() or pair_key.high().path()); verdict (enum-first: Violation { refactor_proposal: RefactorProposal } / NotAViolation / Accepted); rationale is typed Rationale (non-empty); recorded_at is typed Timestamp (non-empty valid ISO-8601 UTC). Invalidation is identifier-based: if a fragment's content changes, its content_hash changes, so the FragmentRef changes, so the DryCheckPairKey changes, so no existing record matches — no separate hash-comparison step (CN-07). The caller is responsible for latest-per-pair derivation. Persistence port — defined in domain layer (mirrors ReviewReader).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-08",
+          "hash": "01772a23d21e673ea123a475616259771c8f18e19d1696c9de36a17bfe123a1b"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-07",
+          "hash": "7f98b9b99f39a9758e2091fc2fb6d6697aff97ac727156e44fd36760cb403292"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckWriter": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "append_record",
+          "receiver": "&self",
+          "params": [
+            { "name": "entry", "ty": "&DryCheckEntry" }
+          ],
+          "returns": "Result<(), DryCheckWriterError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "dry_check",
+      "docs": "Write port for dry-check.json persistence. Receives a DryCheckEntry (the 7 fields the interactor knows at verdict time: pair_key, changed_path, verdict, similarity_score, threshold, base_commit, rationale). The adapter (FsDryCheckStore) calls infrastructure::timestamp_now() (which directly returns Result<Timestamp, ValidationError>) to obtain a Timestamp — propagating the error via map_err into DryCheckWriterError — then constructs a DryCheckRecord from DryCheckEntry + Timestamp before writing; the interactor never produces a Timestamp. This separation ensures that recorded_at is always a valid ISO-8601 UTC value owned by the infra adapter, making the 'empty placeholder recorded_at' path structurally impossible (Finding 3). init-on-first-write: if dry-check.json is absent the implementation creates a fresh envelope before appending. CLI is the sole caller (D11). Persistence port — defined in domain layer (mirrors ReviewWriter).",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-09",
+          "hash": "a59190fffc13f2ac277bda7ddeb540e8b74c366daf69034ee01a8a6449429e29"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-08",
+          "hash": "bca70eb83ee1d45aa7b5f0dd615ae9060d3b280f3441520e855d7a299e1470f6"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "GO-03",
+          "hash": "364194b41e2a12be6e263dcccf56145b54fd12eeae2fa95e01e026408a2adb35"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {
+    "domain::dry_check::fragments_overlapping_hunks": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "fragments", "ty": "&[domain::semantic_dup::CodeFragment]" },
+        { "name": "changed_hunks", "ty": "&[DiffFileHunks]" }
+      ],
+      "returns": "Vec<domain::semantic_dup::CodeFragment>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Filter a slice of CodeFragments to those whose source span overlaps any added/changed hunk in changed_hunks. A fragment overlaps a hunk when: (a) fragment.source_path matches the DiffFileHunks.path, and (b) the fragment's [start_line..=end_line] range shares at least one line with a DiffHunkRange [start_line..=end_line]. Fragments from files not appearing in changed_hunks are excluded. Fragments from changed files that don't overlap any hunk (e.g. unchanged functions in a partially-modified file) are also excluded. This is the core mechanism that makes CN-04 (unchanged fragments structurally excluded from the query) deterministic without LLM involvement (D4). Pure function — no I/O, no side effects. Called by the CLI composition (T007/T009) to compute diff_fragments before invoking DryCheckService.run_dry_check().",
+      "spec_refs": [
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "IN-02",
+          "hash": "bd1c154ed4a6db281d068610a37bcfcad501013f7f5d7c7668039a689dc2ae12"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "CN-04",
+          "hash": "7995798d1b971ac587b7abc7f1c237edd7630c9d5524138a2b416aeca5851f21"
+        },
+        {
+          "file": "track/items/dry-checker-2026-06-02/spec.json",
+          "anchor": "AC-02",
+          "hash": "acd422b8d8d8a89e785ad5e051e981e312140f9185c6f730f9df5bfc030e5f56"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "RefactorProposal",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "s", "ty": "impl Into<String>" }],
+          "returns": "Result<Self, RefactorProposalError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "Rationale",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "s", "ty": "impl Into<String>" }],
+          "returns": "Result<Self, RationaleError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckEntry",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "pair_key",         "ty": "DryCheckPairKey" },
+            { "name": "changed_path",     "ty": "FilePath" },
+            { "name": "verdict",          "ty": "DryCheckVerdict" },
+            { "name": "similarity_score", "ty": "SimilarityScore" },
+            { "name": "threshold",        "ty": "SimilarityThreshold" },
+            { "name": "base_commit",      "ty": "CommitHash" },
+            { "name": "rationale",        "ty": "Rationale" }
+          ],
+          "returns": "Result<DryCheckEntry, DryCheckEntryError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "pair_key",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckPairKey",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "changed_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FilePath",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verdict",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckVerdict",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "similarity_score",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SimilarityScore",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SimilarityThreshold",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "base_commit",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&CommitHash",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "rationale",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Rationale",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckRecord",
+      "methods": [
+        {
+          "name": "from_entry_and_timestamp",
+          "receiver": null,
+          "params": [
+            { "name": "entry",       "ty": "DryCheckEntry" },
+            { "name": "recorded_at", "ty": "Timestamp" }
+          ],
+          "returns": "Result<DryCheckRecord, DryCheckRecordError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "pair_key",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckPairKey",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "changed_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FilePath",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "verdict",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&DryCheckVerdict",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "similarity_score",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SimilarityScore",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&SimilarityThreshold",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "base_commit",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&CommitHash",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "rationale",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Rationale",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "recorded_at",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&Timestamp",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "FragmentRef",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "path",         "ty": "FilePath" },
+            { "name": "content_hash", "ty": "FragmentContentHash" }
+          ],
+          "returns": "FragmentRef",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FilePath",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "content_hash",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FragmentContentHash",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DiffHunkRange",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "start_line", "ty": "u32" },
+            { "name": "end_line",   "ty": "u32" }
+          ],
+          "returns": "Result<DiffHunkRange, DiffHunkRangeError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "start_line",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "end_line",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DiffFileHunks",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "path",  "ty": "FilePath" },
+            { "name": "hunks", "ty": "Vec<DiffHunkRange>" }
+          ],
+          "returns": "Result<DiffFileHunks, DiffFileHunksError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FilePath",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "hunks",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[DiffHunkRange]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "CodeFragment",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "source_path", "ty": "std::path::PathBuf" },
+            { "name": "content",     "ty": "String" },
+            { "name": "start_line",  "ty": "u32" },
+            { "name": "end_line",    "ty": "u32" }
+          ],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "content",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "start_line",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "end_line",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckFinding",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "changed_fragment_ref",   "ty": "FragmentRef" },
+            { "name": "candidate_fragment_ref",  "ty": "FragmentRef" },
+            { "name": "refactor_proposal",        "ty": "impl Into<String>" }
+          ],
+          "returns": "Result<DryCheckFinding, DryCheckFindingError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "changed_fragment_ref",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FragmentRef",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "candidate_fragment_ref",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FragmentRef",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "refactor_proposal",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&RefactorProposal",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "FragmentContentHash",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "s", "ty": "impl Into<String>" }],
+          "returns": "Result<Self, FragmentContentHashError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "SimilarityScore",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "f32" }],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "f32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "SimilarityThreshold",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "f32" }],
+          "returns": "Result<Self, SemanticDupError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "f32",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "DryCheckPairKey",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "a", "ty": "FragmentRef" },
+            { "name": "b", "ty": "FragmentRef" }
+          ],
+          "returns": "Result<DryCheckPairKey, DryCheckPairKeyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "low",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FragmentRef",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "high",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&FragmentRef",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "domain::semantic_dup::CodeFragment"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "domain::semantic_dup::CodeFragment"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefactorProposal"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RefactorProposal"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RefactorProposal"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RefactorProposal"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RefactorProposal"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefactorProposalError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RefactorProposalError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RefactorProposalError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RefactorProposalError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RefactorProposalError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "RefactorProposalError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "Rationale"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "Rationale"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "Rationale"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "Rationale"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "Rationale"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RationaleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RationaleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RationaleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RationaleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RationaleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "RationaleError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DryCheckEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckEntryError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckEntryError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckEntryError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FragmentRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FragmentRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "FragmentRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "FragmentRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialOrd",
+      "for_type": "FragmentRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Ord",
+      "for_type": "FragmentRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "FragmentRef"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DiffHunkRange"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DiffHunkRange"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DiffHunkRange"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DiffHunkRange"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DiffHunkRangeError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DiffHunkRangeError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DiffHunkRangeError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DiffHunkRangeError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DiffHunkRangeError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DiffHunkRangeError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DiffFileHunks"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DiffFileHunks"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DiffFileHunks"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DiffFileHunks"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DiffFileHunksError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DiffFileHunksError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DiffFileHunksError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DiffFileHunksError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DiffFileHunksError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DiffFileHunksError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DryCheckVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DryCheckVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "VerdictFilter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "VerdictFilter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "VerdictFilter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "VerdictFilter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckRecord"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckRecord"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DryCheckRecord"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckRecordError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckRecordError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckRecordError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckFinding"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckFinding"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DryCheckFinding"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DryCheckFinding"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FragmentContentHash"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FragmentContentHash"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "FragmentContentHash"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "FragmentContentHash"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialOrd",
+      "for_type": "FragmentContentHash"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Ord",
+      "for_type": "FragmentContentHash"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "FragmentContentHash"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "FragmentContentHash"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FragmentContentHashError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FragmentContentHashError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "FragmentContentHashError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "FragmentContentHashError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "FragmentContentHashError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "FragmentContentHashError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckPairKey"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckPairKey"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DryCheckPairKey"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DryCheckPairKey"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialOrd",
+      "for_type": "DryCheckPairKey"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Ord",
+      "for_type": "DryCheckPairKey"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "DryCheckPairKey"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckPairKeyError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckPairKeyError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckPairKeyError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckApprovalVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "DryCheckApprovalVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "DryCheckApprovalVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "DryCheckApprovalVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckFindingError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckFindingError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckFindingError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckReaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckReaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckReaderError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckWriterError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckWriterError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckWriterError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "domain::semantic_dup::SimilarityScore"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "domain::semantic_dup::SimilarityScore"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "domain::semantic_dup::SimilarityScore"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "domain::semantic_dup::SimilarityScore"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "domain::semantic_dup::SimilarityThreshold"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "domain::semantic_dup::SimilarityThreshold"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::marker::Copy",
+      "for_type": "domain::semantic_dup::SimilarityThreshold"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "domain::semantic_dup::SimilarityThreshold"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "domain::semantic_dup::SemanticDupError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "domain::semantic_dup::SemanticDupError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "domain::semantic_dup::SemanticDupError"
+    }
+  ]
+}
