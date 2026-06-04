@@ -1,15 +1,30 @@
 //! `make` command family — CliApp impl methods.
-//!
-//! Each method receives `raw_args: Vec<String>` forwarded from cargo-make and
-//! forwards them to the real `sotp` binary via `run_sotp`.  This matches the
-//! baseline `apps/cli/src/commands/make.rs` dispatch_* pattern exactly, so
-//! clap (via the subprocess) owns all argument parsing, validation and defaults.
 
 use std::path::PathBuf;
 
+use domain::dry_check::{DryCheckReaderError, DryCheckRecord};
+
 use crate::{CliApp, CommandOutcome};
 
-/// Join raw args into a single string (same semantics as `apps/cli/src/commands/make.rs`).
+/// Resolve the DRY similarity threshold from a `read_records` result.
+pub(crate) fn resolve_commit_dry_threshold(
+    records_result: Result<Vec<DryCheckRecord>, DryCheckReaderError>,
+) -> f32 {
+    const DEFAULT_THRESHOLD: f32 = 0.85;
+
+    match records_result {
+        Ok(records) if records.is_empty() => DEFAULT_THRESHOLD,
+        Ok(records) => records.last().map(|r| r.threshold().value()).unwrap_or(DEFAULT_THRESHOLD),
+        Err(_) => {
+            eprintln!(
+                "[track-commit-message] WARN: dry-check.json unreadable, \
+                 using default threshold 0.85"
+            );
+            DEFAULT_THRESHOLD
+        }
+    }
+}
+
 fn raw_args_to_single(raw_args: &[String]) -> Result<String, String> {
     let joined = raw_args.join(" ");
     let trimmed = joined.trim();
@@ -19,11 +34,6 @@ fn raw_args_to_single(raw_args: &[String]) -> Result<String, String> {
     Ok(trimmed.to_owned())
 }
 
-/// Split raw args into individual words.
-///
-/// When cargo-make passes `${@}` as a single string element, this function
-/// splits it on whitespace.  When called directly with multiple args (already
-/// properly split by the shell), they are returned as-is to preserve quoting.
 fn raw_args_to_words(raw_args: &[String]) -> Vec<String> {
     if raw_args.len() == 1 {
         raw_args
@@ -35,10 +45,6 @@ fn raw_args_to_words(raw_args: &[String]) -> Vec<String> {
     }
 }
 
-/// Strip a leading `"--"` separator and return the remaining words.
-///
-/// Equivalent to the `skip_while(|s| *s == "--")` step inside `build_forwarded_args`
-/// in the baseline `apps/cli/src/commands/make.rs`.
 fn strip_leading_separator(raw_args: &[String]) -> Vec<String> {
     let words = raw_args_to_words(raw_args);
     words.into_iter().skip_while(|s| s == "--").collect()
@@ -118,10 +124,6 @@ fn split_shell_words(input: &str) -> Result<Vec<String>, String> {
     Ok(words)
 }
 
-/// Build the sotp argv for a forwarding dispatcher: `prefix` tokens followed by
-/// user args with any leading `"--"` separator stripped.
-///
-/// Mirrors `build_forwarded_args` in the baseline `apps/cli/src/commands/make.rs`.
 fn build_forwarded_args(prefix: &[&str], raw_args: &[String]) -> Vec<String> {
     let filtered = strip_leading_separator(raw_args);
     let mut args: Vec<String> = prefix.iter().map(|s| (*s).to_owned()).collect();
@@ -129,21 +131,6 @@ fn build_forwarded_args(prefix: &[&str], raw_args: &[String]) -> Vec<String> {
     args
 }
 
-/// Build the sotp argv for `track-set-override` / `track-clear-override`.
-///
-/// Finds the first positional (non-flag, non-flag-value) word in `raw_args` as
-/// the status, then routes:
-/// - `"clear"` → `["track", "clear-override", "--items-dir", "track/items", <rest>]`
-/// - other     → `["track", "set-override",   "--items-dir", "track/items", status, <rest>]`
-///
-/// Only **value-taking** flags (`--track-id`, `--reason`) consume the next token as their
-/// value.  All other flags are treated as boolean flags.  The status word is removed by
-/// **index** (not by value), so a flag value that happens to equal the status string is
-/// never silently dropped.
-///
-/// # Errors
-///
-/// Returns `Err` if no positional word is found (missing status argument).
 fn build_set_override_args(raw_args: &[String]) -> Result<Vec<String>, String> {
     let words = raw_args_to_words(raw_args);
     let filtered: Vec<&str> = words.iter().map(|s| s.as_str()).skip_while(|s| *s == "--").collect();
@@ -192,10 +179,6 @@ fn build_set_override_args(raw_args: &[String]) -> Result<Vec<String>, String> {
 }
 
 impl CliApp {
-    /// Run CI then commit with the given message.
-    ///
-    /// # Errors
-    /// Returns `Err` when the CI or commit step fails.
     pub fn make_commit(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let message = raw_args_to_single(&raw_args)
             .map_err(|_| "error: commit message required".to_owned())?;
@@ -207,20 +190,12 @@ impl CliApp {
         run_command("git", &["commit", "-m", &message])
     }
 
-    /// Attach a git note to HEAD.
-    ///
-    /// # Errors
-    /// Returns `Err` when the git notes command fails.
     pub fn make_note(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let note_text =
             raw_args_to_single(&raw_args).map_err(|_| "error: note text required".to_owned())?;
         run_command("git", &["notes", "add", "-f", "-m", &note_text, "HEAD"])
     }
 
-    /// Run CI then commit using tmp/track-commit/commit-message.txt.
-    ///
-    /// # Errors
-    /// Returns `Err` when the CI, review guard, or commit step fails.
     pub fn make_track_commit_message(
         &self,
         _raw_args: Vec<String>,
@@ -279,6 +254,39 @@ impl CliApp {
         }
         eprintln!("[track-commit-message] Review approved");
 
+        // DRY gate: resolve threshold from the latest dry-check.json record for
+        // this track (three-case fallback), then run `sotp dry check-approved`.
+        eprintln!("[track-commit-message] Checking DRY gate for track '{track_id}'...");
+        let threshold = {
+            use domain::dry_check::DryCheckReader as _;
+            use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+
+            let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
+            let root = git.root().to_path_buf();
+            let canonical_root = root
+                .canonicalize()
+                .map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
+            let dry_check_path =
+                canonical_root.join("track/items").join(&track_id).join("dry-check.json");
+            let store =
+                infrastructure::dry_check::FsDryCheckStore::new(dry_check_path, canonical_root);
+            resolve_commit_dry_threshold(store.read_records())
+        };
+        let dry_input = crate::dry::DryCheckApprovedInput {
+            track_id: track_id.clone(),
+            base_commit: None,
+            db_path: PathBuf::from(".semantic_index"),
+            threshold,
+            workspace_root: PathBuf::from("."),
+            items_dir: PathBuf::from("track/items"),
+        };
+        let dry_result = self.dry_check_approved(dry_input)?;
+        if dry_result.exit_code != 0 {
+            eprintln!("[track-commit-message] BLOCKED: DRY gate rejected commit");
+            return Ok(dry_result);
+        }
+        eprintln!("[track-commit-message] DRY gate approved");
+
         let commit_result = self.git_commit_from_file(
             PathBuf::from("tmp/track-commit/commit-message.txt"),
             true,
@@ -308,10 +316,6 @@ impl CliApp {
         Ok(CommandOutcome::success(None))
     }
 
-    /// Create a track branch from main.
-    ///
-    /// # Errors
-    /// Returns `Err` when branch creation fails.
     pub fn make_track_branch_create(
         &self,
         raw_args: Vec<String>,
@@ -321,10 +325,6 @@ impl CliApp {
         run_sotp(&["track", "branch", "create", "--items-dir", "track/items", &track_id])
     }
 
-    /// Switch to an existing track branch.
-    ///
-    /// # Errors
-    /// Returns `Err` when branch switching fails.
     pub fn make_track_branch_switch(
         &self,
         raw_args: Vec<String>,
@@ -334,20 +334,12 @@ impl CliApp {
         run_sotp(&["track", "branch", "switch", "--items-dir", "track/items", &track_id])
     }
 
-    /// Resolve current track phase.
-    ///
-    /// # Errors
-    /// Returns `Err` when track resolution fails.
     pub fn make_track_resolve(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args = build_forwarded_args(&["track", "resolve"], &raw_args);
         let refs: Vec<&str> = args.iter().map(String::as_str).collect();
         run_sotp(&refs)
     }
 
-    /// Push current track/plan branch to origin.
-    ///
-    /// # Errors
-    /// Returns `Err` when push fails.
     pub fn make_track_pr_push(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
         let mut args: Vec<&str> = vec!["pr", "push"];
@@ -369,10 +361,6 @@ impl CliApp {
         run_sotp(&args)
     }
 
-    /// Create or reuse a PR for the current branch.
-    ///
-    /// # Errors
-    /// Returns `Err` when the `sotp pr ensure-pr` invocation fails.
     pub fn make_track_pr_ensure(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
         let mut args: Vec<&str> = vec!["pr", "ensure-pr"];
@@ -394,10 +382,6 @@ impl CliApp {
         run_sotp(&args)
     }
 
-    /// Push + ensure PR in one step.
-    ///
-    /// # Errors
-    /// Returns `Err` when push or PR creation fails.
     pub fn make_track_pr(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         // push + ensure-pr in one step
         let push_result = self.make_track_pr_push(raw_args.clone())?;
@@ -407,20 +391,12 @@ impl CliApp {
         self.make_track_pr_ensure(raw_args)
     }
 
-    /// Run full PR review cycle.
-    ///
-    /// # Errors
-    /// Returns `Err` when the review cycle fails.
     pub fn make_track_pr_review(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args = build_forwarded_args(&["pr", "review-cycle"], &raw_args);
         let refs: Vec<&str> = args.iter().map(String::as_str).collect();
         run_sotp(&refs)
     }
 
-    /// Wait for PR checks then merge.
-    ///
-    /// # Errors
-    /// Returns `Err` when the `sotp pr wait-and-merge` invocation fails.
     pub fn make_track_pr_merge(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
         let mut args: Vec<&str> = vec!["pr", "wait-and-merge"];
@@ -430,20 +406,12 @@ impl CliApp {
         run_sotp(&args)
     }
 
-    /// Show PR check status.
-    ///
-    /// # Errors
-    /// Returns `Err` when status retrieval fails.
     pub fn make_track_pr_status(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args = build_forwarded_args(&["pr", "status"], &raw_args);
         let refs: Vec<&str> = args.iter().map(String::as_str).collect();
         run_sotp(&refs)
     }
 
-    /// Run the local Codex planner.
-    ///
-    /// # Errors
-    /// Returns `Err` when the planner invocation fails.
     pub fn make_track_local_plan(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
         let mut args: Vec<&str> = vec!["plan", "codex-local"];
@@ -452,10 +420,6 @@ impl CliApp {
         run_sotp(&args)
     }
 
-    /// Run the local Codex reviewer.
-    ///
-    /// # Errors
-    /// Returns `Err` when the reviewer invocation fails.
     pub fn make_track_local_review(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = strip_leading_separator(&raw_args);
         let mut args: Vec<&str> = vec!["review", "local"];
@@ -464,9 +428,6 @@ impl CliApp {
         run_sotp(&args)
     }
 
-    /// Forward args to `sotp review fix-local`.
-    /// # Errors
-    /// Returns `Err` when the fixer invocation fails.
     pub fn make_track_local_review_fix_codex(
         &self,
         raw_args: Vec<String>,
@@ -478,9 +439,6 @@ impl CliApp {
         run_sotp(&args)
     }
 
-    /// Forward args to `sotp dry fix-local`.
-    /// # Errors
-    /// Returns `Err` when the fixer invocation fails.
     pub fn make_track_local_dry_fix(
         &self,
         raw_args: Vec<String>,
@@ -492,10 +450,6 @@ impl CliApp {
         run_sotp(&args)
     }
 
-    /// Show per-scope review results.
-    ///
-    /// # Errors
-    /// Returns `Err` when results retrieval fails.
     pub fn make_track_review_results(
         &self,
         raw_args: Vec<String>,
@@ -505,10 +459,6 @@ impl CliApp {
         run_sotp(&refs)
     }
 
-    /// Check that the review state is approved and code hash is current.
-    ///
-    /// # Errors
-    /// Returns `Err` when the approval check fails.
     pub fn make_track_check_approved(
         &self,
         raw_args: Vec<String>,
@@ -518,26 +468,14 @@ impl CliApp {
         run_sotp(&refs)
     }
 
-    /// Switch to main branch and pull latest.
-    ///
-    /// # Errors
-    /// Returns `Err` when switching or pulling fails.
     pub fn make_track_switch_main(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         run_sotp(&["git", "switch-and-pull", "main"])
     }
 
-    /// Stage paths from tmp/track-commit/add-paths.txt.
-    ///
-    /// # Errors
-    /// Returns `Err` when staging fails.
     pub fn make_track_add_paths(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         run_sotp(&["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"])
     }
 
-    /// Transition a task status.
-    ///
-    /// # Errors
-    /// Returns `Err` when the transition fails.
     pub fn make_track_transition(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args =
             build_forwarded_args(&["track", "transition", "--items-dir", "track/items"], &raw_args);
@@ -545,10 +483,6 @@ impl CliApp {
         run_sotp(&refs)
     }
 
-    /// Add a new task to a track.
-    ///
-    /// # Errors
-    /// Returns `Err` when the add-task operation fails.
     pub fn make_track_add_task(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args =
             build_forwarded_args(&["track", "add-task", "--items-dir", "track/items"], &raw_args);
@@ -556,10 +490,6 @@ impl CliApp {
         run_sotp(&refs)
     }
 
-    /// Show the next open task (JSON).
-    ///
-    /// # Errors
-    /// Returns `Err` when task retrieval fails.
     pub fn make_track_next_task(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args =
             build_forwarded_args(&["track", "next-task", "--items-dir", "track/items"], &raw_args);
@@ -567,10 +497,6 @@ impl CliApp {
         run_sotp(&refs)
     }
 
-    /// Show task status counts (JSON).
-    ///
-    /// # Errors
-    /// Returns `Err` when counts retrieval fails.
     pub fn make_track_task_counts(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args = build_forwarded_args(
             &["track", "task-counts", "--items-dir", "track/items"],
@@ -580,20 +506,12 @@ impl CliApp {
         run_sotp(&refs)
     }
 
-    /// Set or clear a status override.
-    ///
-    /// # Errors
-    /// Returns `Err` when the override operation fails.
     pub fn make_track_set_override(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args = build_set_override_args(&raw_args)?;
         let refs: Vec<&str> = args.iter().map(String::as_str).collect();
         run_sotp(&refs)
     }
 
-    /// Render plan.md and registry.md from metadata.json.
-    ///
-    /// # Errors
-    /// Returns `Err` when the sync-views operation fails.
     pub fn make_track_sync_views(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let args =
             build_forwarded_args(&["track", "views", "sync", "--project-root", "."], &raw_args);
@@ -601,18 +519,10 @@ impl CliApp {
         run_sotp(&refs)
     }
 
-    /// Attach git note from tmp/track-commit/note.md.
-    ///
-    /// # Errors
-    /// Returns `Err` when the note attachment fails.
     pub fn make_track_note(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         run_sotp(&["git", "note-from-file", "tmp/track-commit/note.md", "--cleanup"])
     }
 
-    /// Write current HEAD SHA to .commit_hash (set v2 diff base).
-    ///
-    /// # Errors
-    /// Returns `Err` when writing the commit hash fails.
     pub fn make_track_set_commit_hash(
         &self,
         raw_args: Vec<String>,
@@ -625,18 +535,10 @@ impl CliApp {
         }
     }
 
-    /// Stage all worktree changes.
-    ///
-    /// # Errors
-    /// Returns `Err` when staging fails.
     pub fn make_add_all(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         run_sotp(&["git", "add-all"])
     }
 
-    /// Unstage paths (remove from index without discarding worktree changes).
-    ///
-    /// # Errors
-    /// Returns `Err` when unstaging fails.
     pub fn make_unstage(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         if raw_args.is_empty() {
             return Err("error: at least one path required".to_owned());
@@ -647,10 +549,6 @@ impl CliApp {
         run_sotp(&sotp_args)
     }
 
-    /// Run a cargo make task via tools-daemon exec with WORKER_ID isolation.
-    ///
-    /// # Errors
-    /// Returns `Err` when the exec invocation fails.
     pub fn make_exec(&self, raw_args: Vec<String>) -> Result<CommandOutcome, String> {
         let words = raw_args_to_words(&raw_args);
         if words.is_empty() {
@@ -679,7 +577,6 @@ impl CliApp {
     }
 }
 
-/// Run an external command and return a CommandOutcome.
 fn run_command(program: &str, args: &[&str]) -> Result<CommandOutcome, String> {
     let status = std::process::Command::new(program)
         .args(args)
@@ -689,7 +586,6 @@ fn run_command(program: &str, args: &[&str]) -> Result<CommandOutcome, String> {
     Ok(CommandOutcome { stdout: None, stderr: None, exit_code: code })
 }
 
-/// Run the sotp binary with the given args.
 fn run_sotp(args: &[&str]) -> Result<CommandOutcome, String> {
     run_command("bin/sotp", args)
 }
@@ -995,5 +891,104 @@ mod tests {
             args,
             vec!["track", "set-override", "--items-dir", "track/items", "blocked", "--verbose"]
         );
+    }
+
+    // --- resolve_commit_dry_threshold tests ---
+
+    /// Build a minimal `DryCheckRecord` for use in threshold-resolution tests.
+    ///
+    /// Uses only public domain constructors so these tests are hermetic (no LanceDB
+    /// or embedding model required).
+    #[allow(clippy::expect_used)]
+    fn make_dry_record_with_threshold(threshold_value: f32) -> domain::dry_check::DryCheckRecord {
+        use domain::CommitHash;
+        use domain::Timestamp;
+        use domain::dry_check::{
+            DryCheckEntry, DryCheckPairKey, DryCheckRecord, DryCheckVerdict, FragmentContentHash,
+            FragmentRef, Rationale,
+        };
+        use domain::review_v2::FilePath;
+        use domain::semantic_dup::{SimilarityScore, SimilarityThreshold};
+
+        let low_hash = FragmentContentHash::new("a".repeat(64)).expect("valid hash");
+        let low_path = FilePath::new("src/a.rs").expect("valid path");
+        let low_ref = FragmentRef::new(low_path, low_hash);
+
+        let high_hash = FragmentContentHash::new("b".repeat(64)).expect("valid hash");
+        let high_path = FilePath::new("src/b.rs").expect("valid path");
+        let high_ref = FragmentRef::new(high_path, high_hash);
+
+        let pair_key = DryCheckPairKey::new(low_ref, high_ref).expect("valid pair key");
+        let changed_path = FilePath::new("src/a.rs").expect("valid path");
+        let rationale = Rationale::new("acceptable").expect("valid rationale");
+        let score = SimilarityScore::new(0.9).expect("valid score");
+        let threshold = SimilarityThreshold::new(threshold_value).expect("valid threshold");
+        let commit = CommitHash::try_new("abcdef1234567").expect("valid commit");
+
+        let entry = DryCheckEntry::new(
+            pair_key,
+            changed_path,
+            DryCheckVerdict::Accepted,
+            score,
+            threshold,
+            commit,
+            rationale,
+        )
+        .expect("valid entry");
+
+        let ts = Timestamp::new("2026-06-02T07:16:00Z").expect("valid timestamp");
+        DryCheckRecord::from_entry_and_timestamp(entry, ts).expect("valid record")
+    }
+
+    #[test]
+    fn test_resolve_commit_dry_threshold_returns_default_when_records_empty() {
+        // Case 1: Ok(empty) — no prior dry run → 0.85 silently.
+        let result: Result<
+            Vec<domain::dry_check::DryCheckRecord>,
+            domain::dry_check::DryCheckReaderError,
+        > = Ok(vec![]);
+        let threshold = super::resolve_commit_dry_threshold(result);
+        assert!((threshold - 0.85_f32).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn test_resolve_commit_dry_threshold_returns_default_when_read_error() {
+        // Case 2: Err(_) — unreadable / corrupt → 0.85 (warning emitted to stderr).
+        let err = domain::dry_check::DryCheckReaderError::Io {
+            path: "track/items/test/dry-check.json".to_owned(),
+            detail: "file not found".to_owned(),
+        };
+        let result: Result<
+            Vec<domain::dry_check::DryCheckRecord>,
+            domain::dry_check::DryCheckReaderError,
+        > = Err(err);
+        let threshold = super::resolve_commit_dry_threshold(result);
+        assert!((threshold - 0.85_f32).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn test_resolve_commit_dry_threshold_uses_most_recent_record_threshold() {
+        // Case 3: Ok(non-empty) — use last record's threshold.
+        let earlier = make_dry_record_with_threshold(0.70);
+        let later = make_dry_record_with_threshold(0.92);
+        let result: Result<
+            Vec<domain::dry_check::DryCheckRecord>,
+            domain::dry_check::DryCheckReaderError,
+        > = Ok(vec![earlier, later]);
+        let threshold = super::resolve_commit_dry_threshold(result);
+        assert!((threshold - 0.92_f32).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn test_resolve_commit_dry_threshold_last_wins_ordering_with_two_records() {
+        // Case 3 (ordering variant): two records — the later one's threshold wins.
+        let first = make_dry_record_with_threshold(0.80);
+        let second = make_dry_record_with_threshold(0.95);
+        let result: Result<
+            Vec<domain::dry_check::DryCheckRecord>,
+            domain::dry_check::DryCheckReaderError,
+        > = Ok(vec![first, second]);
+        let threshold = super::resolve_commit_dry_threshold(result);
+        assert!((threshold - 0.95_f32).abs() < f32::EPSILON);
     }
 }

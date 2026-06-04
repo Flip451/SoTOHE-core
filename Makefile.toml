@@ -851,7 +851,7 @@ command = "bin/sotp"
 args = ["make", "commit", "${@}"]
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the strict commit gate: stage working tree, full cargo make ci, check-approved (review not approved → BLOCK), commit from tmp/track-commit/commit-message.txt. The regen sequence is shared with track-local-review via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the strict commit gate: stage working tree, full cargo make ci, check-approved (review not approved → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt. The regen sequence is shared with track-local-review via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]
 command = "bin/sotp"
 args = ["make", "track-commit-message"]
