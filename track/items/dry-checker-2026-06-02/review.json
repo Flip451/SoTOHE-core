@@ -385,82 +385,6 @@
         }
       ]
     },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
-          "at": "2026-06-03T12:02:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `--filter` parser only has positive-path coverage. There is no test that an invalid value is rejected, so a future `ValueEnum` change could silently accept or mis-handle an unsupported filter token on this public CLI surface.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/dry.rs",
-              "line": 127,
-              "category": "test coverage gap"
-            },
-            {
-              "message": "The `CliCommand::Dry` dispatch arm is not covered by any test. If this match arm is dropped or misrouted later, `sotp dry` would stop working even though the parser-focused tests in `dry.rs` would still pass.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 111,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
-          "at": "2026-06-03T12:04:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "These tests only prove clap parses `sotp dry ...` into `CliCommand::Dry`; they never execute `main()` or `commands::dry::execute`, so the new dispatch arm and exit-code path can still be deleted or misrouted without failing the suite. That leaves the new public CLI entrypoint untested.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 149,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:ce18f1b57842d930baface85effc064dacfcf8674a714a0df2c11fbd2c555dc9",
-          "at": "2026-06-03T12:17:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
-          "at": "2026-06-03T12:21:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
-          "at": "2026-06-03T12:24:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:004340612125d982eea14297d58e84368c1236b8b4a87a02ef886fcda05ad325",
-          "at": "2026-06-04T00:10:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:004340612125d982eea14297d58e84368c1236b8b4a87a02ef886fcda05ad325",
-          "at": "2026-06-04T00:14:50Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -504,6 +428,110 @@
           "findings": [],
           "hash": "rvw1:sha256:5d6d1b6889d0d5f9dc0d568cac1951e0401bb9a1fb8db34c242238144812c80a",
           "at": "2026-06-04T02:31:21Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:15:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
+          "at": "2026-06-03T07:19:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
+          "at": "2026-06-03T08:17:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
+          "at": "2026-06-03T08:21:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
+          "at": "2026-06-03T10:14:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
+          "at": "2026-06-03T10:18:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`above_threshold_candidates` is appended across successive growing-`k` searches without any seen-pair deduplication, so the same unresolved pair can be counted multiple times when the search window expands. That inflates `Blocked { unresolved_pair_count }` and violates the distinct-pair count contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "line": 138,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:312db1f01188c40194fbe76ac39ba75781a47e8648a3175037482de9a5bd2f73",
+          "at": "2026-06-03T10:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The public `check_approved` API has success and reader-failure coverage, but it does not test the `Embedding`/`Index` error branches (`map_err(DryCheckCycleError::Embedding/Index)` in the method body). That leaves regressions in those required error paths unguarded.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "line": 397,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c74cffd10a04ae5aca3d3f0f864b0568ec47fc237b9d4b4afd5db7b0a52c88ad",
+          "at": "2026-06-03T10:49:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:53:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:57:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
+          "at": "2026-06-03T10:58:31Z"
         }
       ]
     },
@@ -1559,6 +1587,328 @@
           "findings": [],
           "hash": "rvw1:sha256:377d8c97e793c1df4ff797f435190727f577c2029a4a68435679a2dc3f1b0346",
           "at": "2026-06-04T02:31:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f98b524fd3f8338b88569bc11e9c6465917c85777a5ff5e38babbd30b7f69e9",
+          "at": "2026-06-04T02:48:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f98b524fd3f8338b88569bc11e9c6465917c85777a5ff5e38babbd30b7f69e9",
+          "at": "2026-06-04T02:50:03Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
+              "severity": "P1",
+              "file": "libs/domain/src/dry_check.rs",
+              "line": 801,
+              "category": "correctness"
+            },
+            {
+              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/semantic_dup.rs",
+              "line": 184,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
+          "at": "2026-06-03T07:16:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
+              "line": 821,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
+          "at": "2026-06-03T07:24:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:34:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
+          "at": "2026-06-03T07:37:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T08:59:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
+          "at": "2026-06-03T09:00:52Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
+          "at": "2026-06-03T12:02:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `--filter` parser only has positive-path coverage. There is no test that an invalid value is rejected, so a future `ValueEnum` change could silently accept or mis-handle an unsupported filter token on this public CLI surface.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/dry.rs",
+              "line": 127,
+              "category": "test coverage gap"
+            },
+            {
+              "message": "The `CliCommand::Dry` dispatch arm is not covered by any test. If this match arm is dropped or misrouted later, `sotp dry` would stop working even though the parser-focused tests in `dry.rs` would still pass.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 111,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:2c8ceb82c761c5402246131125e8108deea1c602561237dfa340029ce5859fbd",
+          "at": "2026-06-03T12:04:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These tests only prove clap parses `sotp dry ...` into `CliCommand::Dry`; they never execute `main()` or `commands::dry::execute`, so the new dispatch arm and exit-code path can still be deleted or misrouted without failing the suite. That leaves the new public CLI entrypoint untested.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 149,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:ce18f1b57842d930baface85effc064dacfcf8674a714a0df2c11fbd2c555dc9",
+          "at": "2026-06-03T12:17:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
+          "at": "2026-06-03T12:21:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b17262d1c9dfdd34b50542cee5d2320d4fa9280441e1fa956740be80ef306ce6",
+          "at": "2026-06-03T12:24:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:004340612125d982eea14297d58e84368c1236b8b4a87a02ef886fcda05ad325",
+          "at": "2026-06-04T00:10:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:004340612125d982eea14297d58e84368c1236b8b4a87a02ef886fcda05ad325",
+          "at": "2026-06-04T00:14:50Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "line": 91,
+              "category": "correctness"
+            },
+            {
+              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:123-144`, `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "line": 129,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8f4ef6b67d3326653bb4e28f4a52f27f51c40676f019eb187cbeb0c19bc0775c",
+          "at": "2026-06-03T13:17:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
+          "at": "2026-06-03T13:20:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow now says capability routing and model/CLI selection are determined by `.harness/config/agent-profiles.json`, and lists `dry-checker` as Codex. However `sotp dry write` does not load agent-profiles at all: its CLI args define `--model` with default `codex` and `--capability-name` with default `dry-checker`, then pass those directly to `CodexDryChecker::new`. As a result the new `.harness/config/agent-profiles.json` entry `dry-checker.model = gpt-5.5` has no effect on the documented `sotp dry write` path, so the docs/config describe a routing behavior the implementation does not provide.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 363,
+              "category": "docs"
+            },
+            {
+              "message": "The documented `sotp dry` command surfaces are incomplete relative to the implemented clap args. `write` also accepts `--items-dir`, `--model`, and `--capability-name`; `results` and `check-approved` also accept `--items-dir`. Because this convention is the command reference for DFP/RFP operation and already lists other optional flags, omitting these flags makes the documented argument surface disagree with the actual T007-T009 CLI, especially the model/capability overrides that currently control dry-checker execution.",
+              "severity": "P1",
+              "file": "knowledge/conventions/dry-check-workflow.md",
+              "line": 53,
+              "category": "docs"
+            }
+          ],
+          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
+          "at": "2026-06-03T13:24:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff5385a3b4d8c08cfb0f6f4d71bd85fbbcdd221d1336ddf8b3d6dac3f15026e1",
+          "at": "2026-06-03T13:28:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
+          "at": "2026-06-03T23:36:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The contract says the Codex model for the `dry-checker` agent is resolved from `capabilities.dry-fix-lead`, but `.harness/config/agent-profiles.json` defines `dry-checker` and `dry-fix-lead` as separate capabilities. For this dfl agent this should refer to the dry-fix-lead agent/capability, or if discussing `sotp dry write`, to `capabilities.dry-checker`; as written the model-resolution contract is inconsistent with the capability split.",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 22,
+              "category": "consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
+          "at": "2026-06-03T23:40:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:070a7273511175737a3763471a227667f5064143fe87fc04ba9b1a418e7d9ed2",
+          "at": "2026-06-03T23:43:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19a215df4c1fbed7d3f6da3701515d3b070bc92f9ceb1a2358040cd0f7594d35",
+          "at": "2026-06-04T01:22:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19a215df4c1fbed7d3f6da3701515d3b070bc92f9ceb1a2358040cd0f7594d35",
+          "at": "2026-06-04T01:27:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36b668cb24d0832fdd47f270e39fbc13fd5f22aa1c0ccf3c419132bd878fef65",
+          "at": "2026-06-04T01:39:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The execution-state bullets still say `todo`/`in_progress` runs `implement → review → commit`, and the `done` with null `commit_hash` path runs only steps 2-3. With Step 1b now carrying the DRY gate, an orchestrator following this summary can skip `/track:dry-check` before review, especially on resumed done/uncommitted tasks, which contradicts the new DFP-before-RFP contract and fixpoint requirement.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 31,
+              "category": "harness-policy"
+            },
+            {
+              "message": "The basic workflow diagram still routes interactive implementation completion directly to `/track:review` and then CI/commit, with no `/track:dry-check` before the local review path. That conflicts with the new DFP -> RFP guidance in the same document and leaves the primary user-facing flow documenting a DRY-gate bypass outside `/track:full-cycle`.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 68,
+              "category": "harness-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:36b668cb24d0832fdd47f270e39fbc13fd5f22aa1c0ccf3c419132bd878fef65",
+          "at": "2026-06-04T01:42:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The basic-flow diagram now routes the `/track:full-cycle` branch into `/track:dry-check` as a follow-up command, then onward to review/commit. That contradicts the full-cycle contract documented in this change, where `/track:full-cycle` itself runs Implement -> DFP -> review/DFP fixpoint -> commit per task, and can lead users to rerun gates or commits after an already-completed full-cycle run. Split the autonomous `/track:full-cycle` path from the manual post-implementation path or end it after full-cycle completion.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 68,
+              "category": "workflow_contract"
+            },
+            {
+              "message": "The post-loop recommendation still says to run `/track:review` -> `/track:commit` for verification changes, skipping the newly required DFP gate. This contradicts Step 1b and the RFP->DFP fixpoint contract above, and gives users a recovery path that bypasses `/track:dry-check` before review/commit. Update the recommendation to include `/track:dry-check` and the DFP/RFP fixpoint before commit.",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 82,
+              "category": "workflow_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:85dc26fc95f5f905cca8580a55b4b954bba049c4b0621077d0943d47a93eea66",
+          "at": "2026-06-04T01:46:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7905d53d07641d9da121563e119def5da9566f5eb0f24acbc9e25d1622ffc17d",
+          "at": "2026-06-04T01:48:50Z"
         }
       ]
     },
@@ -1775,342 +2125,6 @@
           "findings": [],
           "hash": "rvw1:sha256:2c665a42b2fb44a22ec080b75fa3b09b9a76e26d11f80a60c8e087ff2369ce06",
           "at": "2026-06-03T23:37:55Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:15:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:16:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a1be3861633e34f14fba70b1b3b49ad44791ee69f06d24ef1736ffa52c6ceba",
-          "at": "2026-06-03T07:19:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
-          "at": "2026-06-03T08:17:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df8f1f6fc9f0b725a8e07bea3ea19efc35e43501c4a257aa9aaad0e983e12c11",
-          "at": "2026-06-03T08:21:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
-          "at": "2026-06-03T10:14:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed036785a83f6b1a82dee54171e1a52a6c5a751f61f53ec4f890a28d046ea738",
-          "at": "2026-06-03T10:18:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`above_threshold_candidates` is appended across successive growing-`k` searches without any seen-pair deduplication, so the same unresolved pair can be counted multiple times when the search window expands. That inflates `Blocked { unresolved_pair_count }` and violates the distinct-pair count contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
-              "line": 138,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:312db1f01188c40194fbe76ac39ba75781a47e8648a3175037482de9a5bd2f73",
-          "at": "2026-06-03T10:40:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The public `check_approved` API has success and reader-failure coverage, but it does not test the `Embedding`/`Index` error branches (`map_err(DryCheckCycleError::Embedding/Index)` in the method body). That leaves regressions in those required error paths unguarded.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
-              "line": 397,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:c74cffd10a04ae5aca3d3f0f864b0568ec47fc237b9d4b4afd5db7b0a52c88ad",
-          "at": "2026-06-03T10:49:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
-          "at": "2026-06-03T10:53:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
-          "at": "2026-06-03T10:57:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c96e52fa89c0a43ee860c4464e57f8316c357bbca440d3d51e5ed8cec4b7c36",
-          "at": "2026-06-03T10:58:31Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragments_overlapping_hunks` compares `CodeFragment.source_path` directly against repo-relative `DiffFileHunks.path()`, but production fragments come from the semantic-dup extractor/index with absolute filesystem paths. In real runs this path check will miss every candidate, so overlap filtering will drop all extracted fragments. Normalize both sides to the same path form before comparing.",
-              "severity": "P1",
-              "file": "libs/domain/src/dry_check.rs",
-              "line": 801,
-              "category": "correctness"
-            },
-            {
-              "message": "`CodeFragment::new` accepts `start_line`/`end_line` without enforcing the documented 1-indexed inclusive span invariant. That leaves `start_line == 0` and inverted ranges constructible, which can make the new hunk-overlap logic silently misclassify fragments. Validate `start_line >= 1` and `start_line <= end_line` in the constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/semantic_dup.rs",
-              "line": 184,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:0b01073167242721991f9175c6c9b4ea56dc30eaa7dd5717d6f86e7df325ecb0",
-          "at": "2026-06-03T07:16:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
-              "line": 821,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6c174624a6a7b7096eeee73a08d7b19337316028e87924e598c56d1b185351a0",
-          "at": "2026-06-03T07:24:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
-          "at": "2026-06-03T07:34:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b8e777e447693f3d1297d199d8c43f325cb211ccfcb696cd4611e4ea1204e2e4",
-          "at": "2026-06-03T07:37:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
-          "at": "2026-06-03T08:59:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff91f166db63d11d96f6d97858ac2351a9f3de09744351b91661bc1d74fdac6f",
-          "at": "2026-06-03T09:00:52Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
-              "line": 91,
-              "category": "correctness"
-            },
-            {
-              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:123-144`, `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
-              "line": 129,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8f4ef6b67d3326653bb4e28f4a52f27f51c40676f019eb187cbeb0c19bc0775c",
-          "at": "2026-06-03T13:17:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
-          "at": "2026-06-03T13:20:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workflow now says capability routing and model/CLI selection are determined by `.harness/config/agent-profiles.json`, and lists `dry-checker` as Codex. However `sotp dry write` does not load agent-profiles at all: its CLI args define `--model` with default `codex` and `--capability-name` with default `dry-checker`, then pass those directly to `CodexDryChecker::new`. As a result the new `.harness/config/agent-profiles.json` entry `dry-checker.model = gpt-5.5` has no effect on the documented `sotp dry write` path, so the docs/config describe a routing behavior the implementation does not provide.",
-              "severity": "P1",
-              "file": "DEVELOPER_AI_WORKFLOW.md",
-              "line": 363,
-              "category": "docs"
-            },
-            {
-              "message": "The documented `sotp dry` command surfaces are incomplete relative to the implemented clap args. `write` also accepts `--items-dir`, `--model`, and `--capability-name`; `results` and `check-approved` also accept `--items-dir`. Because this convention is the command reference for DFP/RFP operation and already lists other optional flags, omitting these flags makes the documented argument surface disagree with the actual T007-T009 CLI, especially the model/capability overrides that currently control dry-checker execution.",
-              "severity": "P1",
-              "file": "knowledge/conventions/dry-check-workflow.md",
-              "line": 53,
-              "category": "docs"
-            }
-          ],
-          "hash": "rvw1:sha256:9cff3e96c046ab3d538d6192c067697963588df9e025f9a3df8a5e9c14c2da59",
-          "at": "2026-06-03T13:24:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff5385a3b4d8c08cfb0f6f4d71bd85fbbcdd221d1336ddf8b3d6dac3f15026e1",
-          "at": "2026-06-03T13:28:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
-          "at": "2026-06-03T23:36:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The contract says the Codex model for the `dry-checker` agent is resolved from `capabilities.dry-fix-lead`, but `.harness/config/agent-profiles.json` defines `dry-checker` and `dry-fix-lead` as separate capabilities. For this dfl agent this should refer to the dry-fix-lead agent/capability, or if discussing `sotp dry write`, to `capabilities.dry-checker`; as written the model-resolution contract is inconsistent with the capability split.",
-              "severity": "P1",
-              "file": ".claude/agents/dry-fix-lead.md",
-              "line": 22,
-              "category": "consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:7010239fc2abd9eaed0e3ecd1547637f87df2789b02e2e81a84a5ff9d0a3ed32",
-          "at": "2026-06-03T23:40:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:070a7273511175737a3763471a227667f5064143fe87fc04ba9b1a418e7d9ed2",
-          "at": "2026-06-03T23:43:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19a215df4c1fbed7d3f6da3701515d3b070bc92f9ceb1a2358040cd0f7594d35",
-          "at": "2026-06-04T01:22:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19a215df4c1fbed7d3f6da3701515d3b070bc92f9ceb1a2358040cd0f7594d35",
-          "at": "2026-06-04T01:27:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:36b668cb24d0832fdd47f270e39fbc13fd5f22aa1c0ccf3c419132bd878fef65",
-          "at": "2026-06-04T01:39:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The execution-state bullets still say `todo`/`in_progress` runs `implement → review → commit`, and the `done` with null `commit_hash` path runs only steps 2-3. With Step 1b now carrying the DRY gate, an orchestrator following this summary can skip `/track:dry-check` before review, especially on resumed done/uncommitted tasks, which contradicts the new DFP-before-RFP contract and fixpoint requirement.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 31,
-              "category": "harness-policy"
-            },
-            {
-              "message": "The basic workflow diagram still routes interactive implementation completion directly to `/track:review` and then CI/commit, with no `/track:dry-check` before the local review path. That conflicts with the new DFP -> RFP guidance in the same document and leaves the primary user-facing flow documenting a DRY-gate bypass outside `/track:full-cycle`.",
-              "severity": "P1",
-              "file": "DEVELOPER_AI_WORKFLOW.md",
-              "line": 68,
-              "category": "harness-policy"
-            }
-          ],
-          "hash": "rvw1:sha256:36b668cb24d0832fdd47f270e39fbc13fd5f22aa1c0ccf3c419132bd878fef65",
-          "at": "2026-06-04T01:42:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The basic-flow diagram now routes the `/track:full-cycle` branch into `/track:dry-check` as a follow-up command, then onward to review/commit. That contradicts the full-cycle contract documented in this change, where `/track:full-cycle` itself runs Implement -> DFP -> review/DFP fixpoint -> commit per task, and can lead users to rerun gates or commits after an already-completed full-cycle run. Split the autonomous `/track:full-cycle` path from the manual post-implementation path or end it after full-cycle completion.",
-              "severity": "P1",
-              "file": "DEVELOPER_AI_WORKFLOW.md",
-              "line": 68,
-              "category": "workflow_contract"
-            },
-            {
-              "message": "The post-loop recommendation still says to run `/track:review` -> `/track:commit` for verification changes, skipping the newly required DFP gate. This contradicts Step 1b and the RFP->DFP fixpoint contract above, and gives users a recovery path that bypasses `/track:dry-check` before review/commit. Update the recommendation to include `/track:dry-check` and the DFP/RFP fixpoint before commit.",
-              "severity": "P1",
-              "file": ".claude/commands/track/full-cycle.md",
-              "line": 82,
-              "category": "workflow_contract"
-            }
-          ],
-          "hash": "rvw1:sha256:85dc26fc95f5f905cca8580a55b4b954bba049c4b0621077d0943d47a93eea66",
-          "at": "2026-06-04T01:46:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7905d53d07641d9da121563e119def5da9566f5eb0f24acbc9e25d1622ffc17d",
-          "at": "2026-06-04T01:48:50Z"
         }
       ]
     }
