@@ -1,61 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `spec.json`-only test does not actually verify the new behavior: it accepts both `ExitCode::SUCCESS` and `ExitCode::FAILURE`, so a regression in the track-branch path would still pass this test. That leaves the Phase 0 fallback effectively unprotected.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
-              "line": 1204,
-              "category": "test coverage"
-            },
-            {
-              "message": "These tests create and delete fixtures under the real checkout's `track/items/` tree instead of an isolated temp repo, so they mutate shared state during `cargo test` and can interfere with other tests or leave residue if cleanup does not run. That breaks test independence.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
-              "line": 1131,
-              "category": "test isolation"
-            }
-          ],
-          "hash": "rvw1:sha256:d51ab1a951d27cfaaf904a5c6298ab9823328e354ee1231933d539af31304d1f",
-          "at": "2026-06-04T17:09:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `spec.md`-present test only asserts `ExitCode::SUCCESS`, which does not distinguish a real verification run from the `[SKIP]` path (also exit 0). If the branch regresses to skip whenever `spec.md` exists, this test will still pass. Capture stdout and assert the skip marker is absent, or otherwise assert that verification actually ran.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
-              "line": 1141,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:448dc9d3bbe3232387ff57a842f38a2fe9d5d7456b6e6e899f8245353ae21f7a",
-          "at": "2026-06-04T17:17:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3025bfc97c4f06edc1eecd85461f663fbc265fede4ca03a1290128f9cd1a915c",
-          "at": "2026-06-04T17:20:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3025bfc97c4f06edc1eecd85461f663fbc265fede4ca03a1290128f9cd1a915c",
-          "at": "2026-06-04T17:25:45Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -114,6 +59,61 @@
           "findings": [],
           "hash": "rvw1:sha256:ee8d59b5c75b8d3faf9e5c74a93160fca8f442f9e3d2639c2b99a9d0d6ee9129",
           "at": "2026-06-05T04:25:23Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `spec.json`-only test does not actually verify the new behavior: it accepts both `ExitCode::SUCCESS` and `ExitCode::FAILURE`, so a regression in the track-branch path would still pass this test. That leaves the Phase 0 fallback effectively unprotected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "line": 1204,
+              "category": "test coverage"
+            },
+            {
+              "message": "These tests create and delete fixtures under the real checkout's `track/items/` tree instead of an isolated temp repo, so they mutate shared state during `cargo test` and can interfere with other tests or leave residue if cleanup does not run. That breaks test independence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "line": 1131,
+              "category": "test isolation"
+            }
+          ],
+          "hash": "rvw1:sha256:d51ab1a951d27cfaaf904a5c6298ab9823328e354ee1231933d539af31304d1f",
+          "at": "2026-06-04T17:09:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `spec.md`-present test only asserts `ExitCode::SUCCESS`, which does not distinguish a real verification run from the `[SKIP]` path (also exit 0). If the branch regresses to skip whenever `spec.md` exists, this test will still pass. Capture stdout and assert the skip marker is absent, or otherwise assert that verification actually ran.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "line": 1141,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:448dc9d3bbe3232387ff57a842f38a2fe9d5d7456b6e6e899f8245353ae21f7a",
+          "at": "2026-06-04T17:17:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3025bfc97c4f06edc1eecd85461f663fbc265fede4ca03a1290128f9cd1a915c",
+          "at": "2026-06-04T17:20:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3025bfc97c4f06edc1eecd85461f663fbc265fede4ca03a1290128f9cd1a915c",
+          "at": "2026-06-04T17:25:45Z"
         }
       ]
     },
@@ -314,6 +314,188 @@
           "findings": [],
           "hash": "rvw1:sha256:4200c3b9c606fad5fc204edc8a5c9fe3dca0b285aad0f7de3149901256f333bc",
           "at": "2026-06-05T05:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f4eba62e97a01a44312758e9fec4891d97458e175cbb35eadd0add278ef612b",
+          "at": "2026-06-05T05:35:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f4eba62e97a01a44312758e9fec4891d97458e175cbb35eadd0add278ef612b",
+          "at": "2026-06-05T05:37:07Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`insert_batch` infers the vector dimension from only the first item and never validates the rest. `FixedSizeListArray::from_iter_primitive` asserts that the flattened child length is a multiple of `dim`, so any mixed-dimension batch will panic inside infrastructure code instead of returning `SemanticIndexError::InsertFailed`.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 377,
+              "category": "panic"
+            },
+            {
+              "message": "The new empty-slice test never calls `embed_batch`; it only asserts that adapter construction fails when the cache directory is empty. That means it cannot catch regressions in the zero-fragment fast path you added.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 628,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:760b80a04f714cce95053d966416f385e6175c8d923ed1b615c49c3de45cac1c",
+          "at": "2026-06-04T17:09:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`embed_batch` is new public behavior, but the only direct test here covers the empty-slice fast path. There is no direct test that a non-empty batch is forwarded to the model in one call or that model failures are surfaced, so a regression in the batching path would slip through.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 319,
+              "category": "test coverage"
+            },
+            {
+              "message": "`insert_batch` rejects non-UTF-8 `source_path`s, but this error branch is not covered by `semantic_dup_index.rs`. `CodeFragment` can carry non-UTF-8 paths on Unix, so this documented failure mode can regress undetected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 371,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9badca96110048e99d263335d4eb3984d8424c0bb31257bdf4586bcfb048e822",
+          "at": "2026-06-04T17:19:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`refactor_proposal` is now mandatory in the schema, but this DTO still treats it as an optional `Option<String>`, so JSON that omits the field can still deserialize successfully for `accepted`/`not_a_violation`. That leaves the new strict-output contract only partially enforced.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 75,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:ce47c0671188405e3becba9cae833eb950dae7c64cc66a7ac9dd9bc4c3ccd6c4",
+          "at": "2026-06-04T17:26:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a9dcb7d7aa6e1019da34240e235e1204f5e7aba26baa61c0ea57ee28f1f6ed5",
+          "at": "2026-06-04T17:34:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a9dcb7d7aa6e1019da34240e235e1204f5e7aba26baa61c0ea57ee28f1f6ed5",
+          "at": "2026-06-04T17:38:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `SemanticIndexPort::delete_by_source_path` implementation in `libs/infrastructure/src/semantic_dup/index.rs:460` has no corresponding happy-path or error-path coverage in `libs/infrastructure/tests/semantic_dup_index.rs`. That leaves the SQL predicate construction and UTF-8 rejection logic unverified, so a regression here could silently break incremental index cleanup.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 460,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6be68b47804e06690699f524063ae53aca2079fa6adfd06986d2015edc436bc3",
+          "at": "2026-06-05T03:06:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36486315eeb72ec055c29c63e6b417be8980ecff5017940150b5286fe3af1989",
+          "at": "2026-06-05T03:13:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The missing-refactor-proposal regression test claims to cover all verdicts, but the table only includes `not_a_violation` and `violation`; `accepted` is not exercised. D2 requires missing `refactor_proposal` to be rejected for every verdict, so an accepted-verdict regression would pass this scoped test suite. Add the `accepted` case to this table.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 793,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:36486315eeb72ec055c29c63e6b417be8980ecff5017940150b5286fe3af1989",
+          "at": "2026-06-05T03:17:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2d36c1834128c3785428cdb11f6d5754aee999394dbbd5aabab9e31a0ca5939",
+          "at": "2026-06-05T03:22:05Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_corpus_index` zips `corpus_fragments` with the returned embeddings without validating that `embed_batch` produced one vector per fragment. If a batch embedder returns too few or too many embeddings, the extra items are silently dropped and the corpus is only partially indexed, which can make both dry-check flows miss real matches instead of failing fast.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/shared.rs",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9363085aa3196210bc1f19e75f6c125001cbb45d92a6a763e035e27515676cb3",
+          "at": "2026-06-04T17:10:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea737b58ec4017314a0f2ecaaa0f58f83eb12a6c964f8f44dabf88da7feb5104",
+          "at": "2026-06-04T17:15:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea737b58ec4017314a0f2ecaaa0f58f83eb12a6c964f8f44dabf88da7feb5104",
+          "at": "2026-06-04T17:19:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f81f84fc13811b0b0bda23ed5613734e64bc965310a1ee451bbda4637fd2ccac",
+          "at": "2026-06-05T03:04:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f81f84fc13811b0b0bda23ed5613734e64bc965310a1ee451bbda4637fd2ccac",
+          "at": "2026-06-05T03:08:50Z"
         }
       ]
     },
@@ -602,174 +784,6 @@
           "findings": [],
           "hash": "rvw1:sha256:c34803fc08e5854cc56fe0c120fcd9c19272265ea0d56fe24939230f3d715bb7",
           "at": "2026-06-05T05:17:22Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_corpus_index` zips `corpus_fragments` with the returned embeddings without validating that `embed_batch` produced one vector per fragment. If a batch embedder returns too few or too many embeddings, the extra items are silently dropped and the corpus is only partially indexed, which can make both dry-check flows miss real matches instead of failing fast.",
-              "severity": "P1",
-              "file": "libs/usecase/src/dry_check/shared.rs",
-              "line": 71,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:9363085aa3196210bc1f19e75f6c125001cbb45d92a6a763e035e27515676cb3",
-          "at": "2026-06-04T17:10:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ea737b58ec4017314a0f2ecaaa0f58f83eb12a6c964f8f44dabf88da7feb5104",
-          "at": "2026-06-04T17:15:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ea737b58ec4017314a0f2ecaaa0f58f83eb12a6c964f8f44dabf88da7feb5104",
-          "at": "2026-06-04T17:19:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f81f84fc13811b0b0bda23ed5613734e64bc965310a1ee451bbda4637fd2ccac",
-          "at": "2026-06-05T03:04:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f81f84fc13811b0b0bda23ed5613734e64bc965310a1ee451bbda4637fd2ccac",
-          "at": "2026-06-05T03:08:50Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`insert_batch` infers the vector dimension from only the first item and never validates the rest. `FixedSizeListArray::from_iter_primitive` asserts that the flattened child length is a multiple of `dim`, so any mixed-dimension batch will panic inside infrastructure code instead of returning `SemanticIndexError::InsertFailed`.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 377,
-              "category": "panic"
-            },
-            {
-              "message": "The new empty-slice test never calls `embed_batch`; it only asserts that adapter construction fails when the cache directory is empty. That means it cannot catch regressions in the zero-fragment fast path you added.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 628,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:760b80a04f714cce95053d966416f385e6175c8d923ed1b615c49c3de45cac1c",
-          "at": "2026-06-04T17:09:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`embed_batch` is new public behavior, but the only direct test here covers the empty-slice fast path. There is no direct test that a non-empty batch is forwarded to the model in one call or that model failures are surfaced, so a regression in the batching path would slip through.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
-              "line": 319,
-              "category": "test coverage"
-            },
-            {
-              "message": "`insert_batch` rejects non-UTF-8 `source_path`s, but this error branch is not covered by `semantic_dup_index.rs`. `CodeFragment` can carry non-UTF-8 paths on Unix, so this documented failure mode can regress undetected.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 371,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:9badca96110048e99d263335d4eb3984d8424c0bb31257bdf4586bcfb048e822",
-          "at": "2026-06-04T17:19:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`refactor_proposal` is now mandatory in the schema, but this DTO still treats it as an optional `Option<String>`, so JSON that omits the field can still deserialize successfully for `accepted`/`not_a_violation`. That leaves the new strict-output contract only partially enforced.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
-              "line": 75,
-              "category": "validation"
-            }
-          ],
-          "hash": "rvw1:sha256:ce47c0671188405e3becba9cae833eb950dae7c64cc66a7ac9dd9bc4c3ccd6c4",
-          "at": "2026-06-04T17:26:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a9dcb7d7aa6e1019da34240e235e1204f5e7aba26baa61c0ea57ee28f1f6ed5",
-          "at": "2026-06-04T17:34:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a9dcb7d7aa6e1019da34240e235e1204f5e7aba26baa61c0ea57ee28f1f6ed5",
-          "at": "2026-06-04T17:38:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `SemanticIndexPort::delete_by_source_path` implementation in `libs/infrastructure/src/semantic_dup/index.rs:460` has no corresponding happy-path or error-path coverage in `libs/infrastructure/tests/semantic_dup_index.rs`. That leaves the SQL predicate construction and UTF-8 rejection logic unverified, so a regression here could silently break incremental index cleanup.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/semantic_dup/index.rs",
-              "line": 460,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6be68b47804e06690699f524063ae53aca2079fa6adfd06986d2015edc436bc3",
-          "at": "2026-06-05T03:06:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:36486315eeb72ec055c29c63e6b417be8980ecff5017940150b5286fe3af1989",
-          "at": "2026-06-05T03:13:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The missing-refactor-proposal regression test claims to cover all verdicts, but the table only includes `not_a_violation` and `violation`; `accepted` is not exercised. D2 requires missing `refactor_proposal` to be rejected for every verdict, so an accepted-verdict regression would pass this scoped test suite. Add the `accepted` case to this table.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
-              "line": 793,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:36486315eeb72ec055c29c63e6b417be8980ecff5017940150b5286fe3af1989",
-          "at": "2026-06-05T03:17:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2d36c1834128c3785428cdb11f6d5754aee999394dbbd5aabab9e31a0ca5939",
-          "at": "2026-06-05T03:22:05Z"
         }
       ]
     }
