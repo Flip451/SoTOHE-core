@@ -1,0 +1,791 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86fddd25b2a32728e1c94a7eb50a471b2086ce82f159bcec45ba8916a1508824",
+          "at": "2026-06-04T17:09:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ignore block covers `.semantic_index/` and `sotp-dry-index-*`, but the D6 implementation writes the default fingerprint sidecar as `.semantic_index.fingerprint` (`{db_path}.fingerprint`). That file is currently unignored (`git check-ignore` does not match it and `git status` shows `?? .semantic_index.fingerprint`), so a normal `git add .` can commit a generated local cache artifact despite the D3 requirement that DRY semantic index artifacts never be version-controlled. Ignore the sidecar as well, including its temporary form, or keep it inside an ignored directory.",
+              "severity": "P1",
+              "file": ".gitignore",
+              "line": 20,
+              "category": "artifact_hygiene"
+            }
+          ],
+          "hash": "rvw1:sha256:86fddd25b2a32728e1c94a7eb50a471b2086ce82f159bcec45ba8916a1508824",
+          "at": "2026-06-04T17:14:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:804cf995cb244e7565cc1cfc00814a6f27b8c65a988de2cf2f6e5f924a956a31",
+          "at": "2026-06-04T17:16:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87b8daf709675565b17d0cd018f627a4244773b0c65951a7ce23b5c6f8408413",
+          "at": "2026-06-05T03:00:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87b8daf709675565b17d0cd018f627a4244773b0c65951a7ce23b5c6f8408413",
+          "at": "2026-06-05T03:03:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8d59b5c75b8d3faf9e5c74a93160fca8f442f9e3d2639c2b99a9d0d6ee9129",
+          "at": "2026-06-05T04:23:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8d59b5c75b8d3faf9e5c74a93160fca8f442f9e3d2639c2b99a9d0d6ee9129",
+          "at": "2026-06-05T04:25:23Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `spec.json`-only test does not actually verify the new behavior: it accepts both `ExitCode::SUCCESS` and `ExitCode::FAILURE`, so a regression in the track-branch path would still pass this test. That leaves the Phase 0 fallback effectively unprotected.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "line": 1204,
+              "category": "test coverage"
+            },
+            {
+              "message": "These tests create and delete fixtures under the real checkout's `track/items/` tree instead of an isolated temp repo, so they mutate shared state during `cargo test` and can interfere with other tests or leave residue if cleanup does not run. That breaks test independence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "line": 1131,
+              "category": "test isolation"
+            }
+          ],
+          "hash": "rvw1:sha256:d51ab1a951d27cfaaf904a5c6298ab9823328e354ee1231933d539af31304d1f",
+          "at": "2026-06-04T17:09:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `spec.md`-present test only asserts `ExitCode::SUCCESS`, which does not distinguish a real verification run from the `[SKIP]` path (also exit 0). If the branch regresses to skip whenever `spec.md` exists, this test will still pass. Capture stdout and assert the skip marker is absent, or otherwise assert that verification actually ran.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "line": 1141,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:448dc9d3bbe3232387ff57a842f38a2fe9d5d7456b6e6e899f8245353ae21f7a",
+          "at": "2026-06-04T17:17:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3025bfc97c4f06edc1eecd85461f663fbc265fede4ca03a1290128f9cd1a915c",
+          "at": "2026-06-04T17:20:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3025bfc97c4f06edc1eecd85461f663fbc265fede4ca03a1290128f9cd1a915c",
+          "at": "2026-06-04T17:25:45Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:663439c856cdfd0652e2ac18c243f51d868fb8b948b0aaf941a787b985b68208",
+          "at": "2026-06-04T05:24:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:663439c856cdfd0652e2ac18c243f51d868fb8b948b0aaf941a787b985b68208",
+          "at": "2026-06-04T05:27:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:597be73cb23d0b3c0c8d4f6c83dd1e6dca26ff3763d056043b487c41d5439f21",
+          "at": "2026-06-04T05:41:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:597be73cb23d0b3c0c8d4f6c83dd1e6dca26ff3763d056043b487c41d5439f21",
+          "at": "2026-06-04T05:45:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The S2 summary says \"Five operability fixes\", but the same section immediately enumerates D1-D6 and the task description below calls them \"Six cohesive changes\". The document undercounts its own scope, so this section is self-contradictory.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/plan.md",
+              "line": 16,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f1cef6f67f34bc59076eb1f5b5f27ff54cc532a502c31ae54a741f9311393b72",
+          "at": "2026-06-04T17:08:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The dry-checker scope summary is internally inconsistent: this line says the track only covers model resolution, schema alignment, gitignore, and insert batching, but the same spec also brings `embed_batch` and corpus/index reuse into scope (IN-08/IN-09, AC-10/AC-11). That makes the out-of-scope summary narrower than the actual plan.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.md",
+              "line": 35,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d01a97fb46f723936c18afce4f8abd529138b5455e0dc9bb523f537cedf85a78",
+          "at": "2026-06-04T17:15:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e6f56efc403743ee17dd3f911b35484f160f1582404d2013fd7f3a167c87156",
+          "at": "2026-06-04T17:18:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e6f56efc403743ee17dd3f911b35484f160f1582404d2013fd7f3a167c87156",
+          "at": "2026-06-04T17:24:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58fe667dcfd207b4ed5409a6248d158e01f2d4cc6af36f20363cbebe870bb2b9",
+          "at": "2026-06-05T03:01:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-06/AC-08 only require ignoring `.semantic_index/` and `sotp-dry-index-*/`, but the same plan introduces persistent index sidecars for D6/D7 (marker/lock/manifest alongside the default `.semantic_index` path). Those sidecars are not covered by the documented ignore requirement, so the acceptance criterion can pass while `.semantic_index.lock`, `.semantic_index.sotp-cache`, or `.semantic_index.manifest` still get staged. Expand the D3/IN-06/AC-08 plan language to cover the sidecar pattern as well.",
+              "severity": "P1",
+              "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+              "line": 81,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:58fe667dcfd207b4ed5409a6248d158e01f2d4cc6af36f20363cbebe870bb2b9",
+          "at": "2026-06-05T03:05:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:897b296d4b4b8f40159527bf244f568f7f0f06b72e216d420e0b964959a6dd3f",
+          "at": "2026-06-05T04:24:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002's D3 plan only tells the implementer to ignore `.semantic_index/` and `sotp-dry-index-*/`, but the spec and ADR require the `.semantic_index.*` sidecars (`.semantic_index.sotp-cache`, `.semantic_index.lock`, `.semantic_index.manifest`) to be covered as well via `.semantic_index*`. Following this plan literally leaves the sidecars stageable and violates AC-08/D3, so the T002 D3 text should include the sidecar glob.",
+              "severity": "P1",
+              "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/plan.md",
+              "line": 19,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:897b296d4b4b8f40159527bf244f568f7f0f06b72e216d420e0b964959a6dd3f",
+          "at": "2026-06-05T04:28:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 requires a regression test to confirm that sending the schema to the OpenAI structured outputs API no longer returns 400. That makes the acceptance criterion depend on a live external API/network/credentials, while the implementation plan only describes a local invariant test (`required` covering all `properties`) and the repo testing rules require external APIs to be mocked. As written, the AC is not reliably executable in CI and contradicts the planned local regression; it should require local strict-schema validation instead of a live API call.",
+              "severity": "P1",
+              "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+              "line": 376,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T003 prescribes deleting LanceDB rows with a SQL predicate shaped as `DELETE WHERE source_path = '...'`. Since `source_path` is a filesystem path, valid paths can contain quotes or other predicate-significant characters; following this plan literally would either fail to delete stale fragments or risk matching the wrong rows, and it violates the repository rule against interpolated SQL. The plan needs to require parameter binding or an explicitly escaped/safe predicate construction for `delete_by_source_path`.",
+              "severity": "P1",
+              "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/impl-plan.json",
+              "line": 18,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:93a5b5ef728b56a48996f5db0d1e4a5fade5f60e790cf360bc24f9abef6dc003",
+          "at": "2026-06-05T04:35:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 says to preserve the “D6 marker/lock safety mechanisms,” and IN-09 assigns those marker/lock safety mechanisms to T002/D6, but the actual T002/D6 task only implements persistent index + corpus-fingerprint reuse and never creates the cache marker or filesystem lock. As written, the plan can complete T002 without the safety mechanisms that T003 is instructed to rely on, so the dependency is semantically inconsistent.",
+              "severity": "P1",
+              "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/plan.md",
+              "line": 34,
+              "category": "contradiction"
+            },
+            {
+              "message": "This consequence is stale after D7: it still describes the final tradeoff as single corpus-fingerprint management and full rebuild on mismatch, while D7 replaces that mechanism with a per-file manifest and incremental dirty/deleted/unchanged updates. The ADR now states two different final cache strategies, which can mislead implementation and review of the intended behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+              "line": 158,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:813cf02e78b10bc1877bc9c41bf70908e9bc6c4aeb81693382ebf9accd988e25",
+          "at": "2026-06-05T04:40:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 describes the whole dry-checker operability goal: model resolution, strict schema, gitignore, batch insert/embed, persistence, and incremental maintenance. Its only ADR reference is `2026-06-04-1042...#D1`, but D1 covers only model resolution; D2-D7 are the decisions for the other parts. This makes the cross-document grounding semantically misleading. Add the relevant D2-D7 refs or narrow GO-02 to the D1-only claim.",
+              "severity": "P1",
+              "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+              "line": 18,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:5b356e13d792ccd3ed470e2eb3d2f9d1271afad1f53cf69685d3914aca466ed9",
+          "at": "2026-06-05T04:46:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f2e783a7891158c4490d5dce4e62367735b2bc2c1d469e95b7048e3cd653ad5",
+          "at": "2026-06-05T04:49:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4200c3b9c606fad5fc204edc8a5c9fe3dca0b285aad0f7de3149901256f333bc",
+          "at": "2026-06-05T05:16:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4200c3b9c606fad5fc204edc8a5c9fe3dca0b285aad0f7de3149901256f333bc",
+          "at": "2026-06-05T05:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f4eba62e97a01a44312758e9fec4891d97458e175cbb35eadd0add278ef612b",
+          "at": "2026-06-05T05:35:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f4eba62e97a01a44312758e9fec4891d97458e175cbb35eadd0add278ef612b",
+          "at": "2026-06-05T05:37:07Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`insert_batch` infers the vector dimension from only the first item and never validates the rest. `FixedSizeListArray::from_iter_primitive` asserts that the flattened child length is a multiple of `dim`, so any mixed-dimension batch will panic inside infrastructure code instead of returning `SemanticIndexError::InsertFailed`.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 377,
+              "category": "panic"
+            },
+            {
+              "message": "The new empty-slice test never calls `embed_batch`; it only asserts that adapter construction fails when the cache directory is empty. That means it cannot catch regressions in the zero-fragment fast path you added.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 628,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:760b80a04f714cce95053d966416f385e6175c8d923ed1b615c49c3de45cac1c",
+          "at": "2026-06-04T17:09:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`embed_batch` is new public behavior, but the only direct test here covers the empty-slice fast path. There is no direct test that a non-empty batch is forwarded to the model in one call or that model failures are surfaced, so a regression in the batching path would slip through.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
+              "line": 319,
+              "category": "test coverage"
+            },
+            {
+              "message": "`insert_batch` rejects non-UTF-8 `source_path`s, but this error branch is not covered by `semantic_dup_index.rs`. `CodeFragment` can carry non-UTF-8 paths on Unix, so this documented failure mode can regress undetected.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 371,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9badca96110048e99d263335d4eb3984d8424c0bb31257bdf4586bcfb048e822",
+          "at": "2026-06-04T17:19:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`refactor_proposal` is now mandatory in the schema, but this DTO still treats it as an optional `Option<String>`, so JSON that omits the field can still deserialize successfully for `accepted`/`not_a_violation`. That leaves the new strict-output contract only partially enforced.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 75,
+              "category": "validation"
+            }
+          ],
+          "hash": "rvw1:sha256:ce47c0671188405e3becba9cae833eb950dae7c64cc66a7ac9dd9bc4c3ccd6c4",
+          "at": "2026-06-04T17:26:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a9dcb7d7aa6e1019da34240e235e1204f5e7aba26baa61c0ea57ee28f1f6ed5",
+          "at": "2026-06-04T17:34:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a9dcb7d7aa6e1019da34240e235e1204f5e7aba26baa61c0ea57ee28f1f6ed5",
+          "at": "2026-06-04T17:38:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `SemanticIndexPort::delete_by_source_path` implementation in `libs/infrastructure/src/semantic_dup/index.rs:460` has no corresponding happy-path or error-path coverage in `libs/infrastructure/tests/semantic_dup_index.rs`. That leaves the SQL predicate construction and UTF-8 rejection logic unverified, so a regression here could silently break incremental index cleanup.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
+              "line": 460,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6be68b47804e06690699f524063ae53aca2079fa6adfd06986d2015edc436bc3",
+          "at": "2026-06-05T03:06:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36486315eeb72ec055c29c63e6b417be8980ecff5017940150b5286fe3af1989",
+          "at": "2026-06-05T03:13:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The missing-refactor-proposal regression test claims to cover all verdicts, but the table only includes `not_a_violation` and `violation`; `accepted` is not exercised. D2 requires missing `refactor_proposal` to be rejected for every verdict, so an accepted-verdict regression would pass this scoped test suite. Add the `accepted` case to this table.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "line": 793,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:36486315eeb72ec055c29c63e6b417be8980ecff5017940150b5286fe3af1989",
+          "at": "2026-06-05T03:17:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2d36c1834128c3785428cdb11f6d5754aee999394dbbd5aabab9e31a0ca5939",
+          "at": "2026-06-05T03:22:05Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_corpus_index` zips `corpus_fragments` with the returned embeddings without validating that `embed_batch` produced one vector per fragment. If a batch embedder returns too few or too many embeddings, the extra items are silently dropped and the corpus is only partially indexed, which can make both dry-check flows miss real matches instead of failing fast.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check/shared.rs",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9363085aa3196210bc1f19e75f6c125001cbb45d92a6a763e035e27515676cb3",
+          "at": "2026-06-04T17:10:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea737b58ec4017314a0f2ecaaa0f58f83eb12a6c964f8f44dabf88da7feb5104",
+          "at": "2026-06-04T17:15:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea737b58ec4017314a0f2ecaaa0f58f83eb12a6c964f8f44dabf88da7feb5104",
+          "at": "2026-06-04T17:19:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f81f84fc13811b0b0bda23ed5613734e64bc965310a1ee451bbda4637fd2ccac",
+          "at": "2026-06-05T03:04:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f81f84fc13811b0b0bda23ed5613734e64bc965310a1ee451bbda4637fd2ccac",
+          "at": "2026-06-05T03:08:50Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rebuild path can poison the persistent index cache: if `embed_batch`, `insert_batch`, or the fingerprint write fails after `LanceDbSemanticIndexAdapter::new`, the previous matching `.fingerprint` file is left behind and the next invocation will take the reuse branch against the partially built database directory. That can make `dry write` / `check-approved` query an incomplete index and miss violations.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 598,
+              "category": "correctness"
+            },
+            {
+              "message": "`Path::exists()` collapses filesystem errors into \"absent\" here. If either `spec.json` or `spec.md` exists but is inaccessible (permissions, broken metadata, other I/O failure), this returns `Ok(None)` and `verify_spec_states` emits a SKIP instead of failing closed, which can mask a broken verify gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "line": 97,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e1d318638367fdb42c537849674fbf801f7901e91e46b87c18cffc5331ee63eb",
+          "at": "2026-06-04T17:10:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_and_persist_corpus` reimplements `build_corpus_index` but drops the embeddings/fragments length check. If `embed_batch` returns the wrong count, `zip(...)` silently truncates the corpus, then the code writes the fingerprint sidecar as if the index were complete. That can leave missing fragments in the persistent cache and cause false negatives on later runs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 667,
+              "category": "correctness"
+            },
+            {
+              "message": "`symlink_metadata` treats any symlink node as \"present\", even when the target is missing. That diverges from the CLI mirror (`Path::exists()`), so a dangling `spec.json`/`spec.md` will suppress the new Phase-0 SKIP path and fall through to a hard error instead of no-op success.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "line": 106,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d760ca856aaadc4bbc97b21be8fee6e5709f72677620e65e80f75882fbf5c810",
+          "at": "2026-06-04T17:20:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`try_exists()` treats a dangling `spec.json`/`spec.md` symlink as `false`, so this path returns `Ok(None)` and `verify_spec_states` SKIPs instead of running the symlink guard and failing closed. A broken artifact entry can therefore bypass the spec-state gate entirely.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/verify.rs",
+              "line": 97,
+              "category": "security"
+            },
+            {
+              "message": "The persistent semantic index cache is rebuilt in place with no lock or atomic swap. Two concurrent `dry write`/`check-approved` runs against the same `--db-path` can both clear and rewrite the same LanceDB directory/sidecar, causing nondeterministic search results or a corrupted cache.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 620,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:94e7c1dcd1ba5ea9d366663a55ce5966cf681a4ad1031c9aa15ffe620ccfdd62",
+          "at": "2026-06-04T17:29:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rebuild path deletes `db_path` recursively on any fingerprint mismatch (`remove_dir_all(db_path)`), but `db_path` comes directly from CLI input and is never constrained to a dedicated cache directory. A typo or hostile invocation such as `--db-path /tmp` can therefore wipe arbitrary directories when the fingerprint changes, which is a data-loss bug.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 557,
+              "category": "safety"
+            },
+            {
+              "message": "This phase-0 skip helper treats any `NotFound` from `build_spec_path_from_track_id` as a skip, so a missing `track/items/<track_id>` directory is silently skipped instead of failing closed. That lets a broken track resolution or deleted track directory bypass `verify spec states`; the helper should only skip when the track directory exists and both spec artifacts are legitimately absent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "line": 97,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a7280b2014e9c8100f8f4c4677002b9b05df2b689d9f68c505bd1702a63825",
+          "at": "2026-06-04T17:41:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `write_persistent_index_marker` fails after `create_dir_all(db_path)` has already created the cache directory, this path returns with an unmarked directory. The next run will treat that directory as unsafe and refuse to rebuild it, so a transient marker-write failure leaves `--db-path` stuck until manual deletion.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 752,
+              "category": "correctness"
+            },
+            {
+              "message": "This test does not actually trigger a metadata error: `not_dir.join(\"spec.json\")` is just a missing child path, so `spec_artifact_entry_exists` returns `Ok(false)`. `unwrap_err()` will panic, so the new error-case coverage will fail CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "line": 629,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:80aee35ae374f47fc4080addfed3f43fb1838a584b2df341b075fe0f03c975c6",
+          "at": "2026-06-04T17:51:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Track-resolution spec-states still hard-fails when `track/items/<track_id>` is missing, because `ensure_track_artifact_dir_exists()` returns `Err` before the new `Ok(None)` skip path is reached. A phase-0 track branch with no generated artifacts can therefore still block the gate instead of skipping.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/verify.rs",
+              "line": 95,
+              "category": "correctness"
+            },
+            {
+              "message": "Cache reuse is gated on the `.sotp-cache` marker in addition to the fingerprint match. If the fingerprint matches and the LanceDB directory exists but the marker was lost or never created, this path returns an error instead of rebuilding the cache, which breaks the advertised reuse/rebuild behavior on a recoverable state.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 801,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9fecbb2b90ab3dccbd25164ed56e3da83cea8545046ea14f5745a46fc7ed56fc",
+          "at": "2026-06-04T17:57:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27477275773528f031040fca049fa31550f38c538f73713c07b9960c027639dd",
+          "at": "2026-06-04T18:05:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27477275773528f031040fca049fa31550f38c538f73713c07b9960c027639dd",
+          "at": "2026-06-04T18:11:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `write_manifest()` fails here, the cleanup result from `clear_persistent_index_dir()` is ignored. That can leave an already-created `--db-path` on disk without the cache marker, and the next rebuild will fail on \"unmarked semantic index directory\" instead of recovering.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1114,
+              "category": "missing_error_handling"
+            },
+            {
+              "message": "This Phase-0 skip now fires when the resolved `track/items/<id>` directory is missing, not just when `spec.json`/`spec.md` are absent. A broken track resolution therefore becomes a SKIP instead of an error, which can false-green the spec-states gate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "line": 95,
+              "category": "logic_error"
+            }
+          ],
+          "hash": "rvw1:sha256:62f93f6111c168420d420e6041852ae7f8fc8d33a67345d92a1845dd1b8c536a",
+          "at": "2026-06-05T03:05:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`open_persistent_index_with_corpus` mutates the persistent index before the whole incremental update is known to succeed: it deletes dirty/deleted rows, then re-embeds and reinserts, and only writes the manifest at the end. Any later error (`delete_by_source_path`, `embed_batch`, `insert_batch`, or manifest write) returns `Err` without rollback or cleanup, leaving the on-disk index partially updated and the manifest stale.",
+              "severity": "high",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 986,
+              "category": "data corruption"
+            }
+          ],
+          "hash": "rvw1:sha256:c4a37411a9821b9335be94e44a0610befd653c55b57207488d7425f28833f7be",
+          "at": "2026-06-05T03:15:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Incremental index updates do not verify that `db_path` carries the `.sotp-cache` ownership marker before mutating the LanceDB table. `validate_existing_persistent_index_dir` only checks for a directory, so a pre-existing or corrupted index without the marker will still be deleted/reinserted in place, and any later cleanup will refuse to remove it. That bypasses the safety mechanism this change is meant to enforce.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 946,
+              "category": "safety"
+            },
+            {
+              "message": "`spec_artifact_entry_exists` treats any non-symlink path as an existing spec artifact. A directory or FIFO named `spec.json` therefore counts as \"present\", so `build_spec_path_from_track_id` can proceed instead of failing closed on a malformed artifact. That weakens the phase-0 skip logic and can let a bad `spec.json` fall through to markdown-based verification.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "line": 129,
+              "category": "bug"
+            }
+          ],
+          "hash": "rvw1:sha256:10ee0758a4a40069fb46388f2ff79b31e335c0515ded1da25ef9da5a9d977a2e",
+          "at": "2026-06-05T03:25:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:603649c63695f4a5a5666c5d42b07721e65b19363850886c6150c8484ca33db2",
+          "at": "2026-06-05T03:38:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new persistent-index and manifest orchestration keeps all production code in `dry.rs`; the first `#[cfg(test)]` block now starts at line 1446, leaving roughly 1,445 production lines in this module. That is over twice the repository's 700-line production-module maximum, so this change violates the module-size architecture rule. Split the persistent index/manifest/lock/proxy logic into focused cli-composition submodules before landing.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 455,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:603649c63695f4a5a5666c5d42b07721e65b19363850886c6150c8484ca33db2",
+          "at": "2026-06-05T03:43:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abfc2cc843a5c8f025e0d9facaecb2cfaa153169c46fc1ce86f9506f3284049f",
+          "at": "2026-06-05T03:57:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`persistent_index_marker_matches` trusts `<db_path>.sotp-cache` as plain text without rejecting symlinks. That lets a planted symlink spoof a valid marker, so `clear_persistent_index_dir` can be tricked into deleting an unmarked directory instead of failing closed.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/persistent_index.rs",
+              "line": 127,
+              "category": "security"
+            },
+            {
+              "message": "When the manifest diff is empty, `open_persistent_index_with_corpus` returns a proxy without verifying that the LanceDB table still exists. If the table was removed or corrupted but the manifest/marker still match, subsequent searches silently return an empty index instead of rebuilding or erroring, which can produce false negatives.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry/persistent_index.rs",
+              "line": 410,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:76be8ac39ef850cde028701582cd99a16315411b5b994cce5f71e159d7128df0",
+          "at": "2026-06-05T04:27:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2225f2b684945d6b174649413e76f30d52dee2feac4740f0917dc228aa3b1bf6",
+          "at": "2026-06-05T04:40:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2225f2b684945d6b174649413e76f30d52dee2feac4740f0917dc228aa3b1bf6",
+          "at": "2026-06-05T04:46:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c34803fc08e5854cc56fe0c120fcd9c19272265ea0d56fe24939230f3d715bb7",
+          "at": "2026-06-05T05:09:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c34803fc08e5854cc56fe0c120fcd9c19272265ea0d56fe24939230f3d715bb7",
+          "at": "2026-06-05T05:17:22Z"
+        }
+      ]
+    }
+  }
+}

@@ -10,7 +10,7 @@ use std::path::PathBuf;
 
 use domain::semantic_dup::{CodeFragment, TopK};
 use infrastructure::semantic_dup::index::LanceDbSemanticIndexAdapter;
-use usecase::semantic_dup::SemanticIndexPort as _;
+use usecase::semantic_dup::{SemanticIndexError, SemanticIndexPort as _};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -122,6 +122,177 @@ fn test_lance_db_adapter_single_insert_top1_search_returns_the_fragment() {
         results[0].score.value() > 0.9,
         "expected similarity > 0.9 for exact vector match, got {}",
         results[0].score.value()
+    );
+}
+
+/// Insert a batch of fragments via [`SemanticIndexPort::insert_batch`] and
+/// verify that all items are searchable and return the expected top result.
+///
+/// Confirms that the single-transaction batch insert produces identical results
+/// to the per-fragment `insert` path.
+#[test]
+fn test_lance_db_adapter_insert_batch_all_items_searchable() {
+    let dir = tempfile::tempdir().unwrap();
+    let adapter = LanceDbSemanticIndexAdapter::new(dir.path().to_path_buf()).unwrap();
+
+    let frag_a = make_fragment("src/a.rs", "fn a() {}");
+    let frag_b = make_fragment("src/b.rs", "fn b() {}");
+    let frag_c = make_fragment("src/c.rs", "fn c() {}");
+
+    // Three orthogonal 4-dimensional unit vectors.
+    let emb_a = unit_vec(4, 0); // [1, 0, 0, 0]
+    let emb_b = unit_vec(4, 1); // [0, 1, 0, 0]
+    let emb_c = unit_vec(4, 2); // [0, 0, 1, 0]
+
+    let items = vec![
+        (frag_a.clone(), emb_a.clone()),
+        (frag_b.clone(), emb_b.clone()),
+        (frag_c.clone(), emb_c.clone()),
+    ];
+    adapter.insert_batch(&items).unwrap();
+
+    // Search with emb_a — frag_a should be the top result.
+    let top_k = TopK::new(3).unwrap();
+    let results = adapter.search(&emb_a, top_k).unwrap();
+    assert_eq!(results.len(), 3, "all three fragments should be in the index");
+    assert_eq!(
+        results[0].fragment.source_path,
+        PathBuf::from("src/a.rs"),
+        "frag_a should be the top result when queried with emb_a"
+    );
+    assert!(
+        results[0].score.value() > results[1].score.value(),
+        "top result should have higher score than second result"
+    );
+
+    // Search with emb_b — frag_b should be the top result.
+    let top_k = TopK::new(3).unwrap();
+    let results = adapter.search(&emb_b, top_k).unwrap();
+    assert_eq!(
+        results[0].fragment.source_path,
+        PathBuf::from("src/b.rs"),
+        "frag_b should be the top result when queried with emb_b"
+    );
+
+    // Search with emb_c — frag_c should be the top result.
+    let top_k = TopK::new(3).unwrap();
+    let results = adapter.search(&emb_c, top_k).unwrap();
+    assert_eq!(
+        results[0].fragment.source_path,
+        PathBuf::from("src/c.rs"),
+        "frag_c should be the top result when queried with emb_c"
+    );
+}
+
+/// An empty [`insert_batch`] call is a no-op and returns `Ok(())`.
+#[test]
+fn test_lance_db_adapter_insert_batch_empty_is_noop() {
+    let dir = tempfile::tempdir().unwrap();
+    let adapter = LanceDbSemanticIndexAdapter::new(dir.path().to_path_buf()).unwrap();
+
+    // Empty batch must not error.
+    adapter.insert_batch(&[]).unwrap();
+
+    // Index is still empty; search should return no results.
+    let top_k = TopK::new(5).unwrap();
+    let results = adapter.search(&unit_vec(4, 0), top_k).unwrap();
+    assert!(results.is_empty(), "index must be empty after an empty insert_batch");
+}
+
+/// Mixed embedding dimensions are invalid and must return an infrastructure
+/// error before Arrow builds a fixed-size list array.
+#[test]
+fn test_lance_db_adapter_insert_batch_mixed_dimensions_returns_error() {
+    let dir = tempfile::tempdir().unwrap();
+    let adapter = LanceDbSemanticIndexAdapter::new(dir.path().to_path_buf()).unwrap();
+
+    let frag_a = make_fragment("src/a.rs", "fn a() {}");
+    let frag_b = make_fragment("src/b.rs", "fn b() {}");
+    let items = vec![(frag_a, vec![1.0_f32, 0.0, 0.0, 0.0]), (frag_b, vec![1.0_f32, 0.0, 0.0])];
+
+    let result = adapter.insert_batch(&items);
+
+    assert!(
+        matches!(result, Err(SemanticIndexError::InsertFailed { .. })),
+        "mixed embedding dimensions must return InsertFailed, got {result:?}"
+    );
+}
+
+/// Non-UTF-8 source paths cannot be represented in the Arrow UTF-8 column and
+/// must be rejected before insertion.
+#[cfg(unix)]
+#[test]
+fn test_lance_db_adapter_insert_batch_non_utf8_source_path_returns_error() {
+    use std::ffi::OsString;
+    use std::os::unix::ffi::OsStringExt;
+
+    let dir = tempfile::tempdir().unwrap();
+    let adapter = LanceDbSemanticIndexAdapter::new(dir.path().to_path_buf()).unwrap();
+    let non_utf8_path =
+        OsString::from_vec(vec![b's', b'r', b'c', b'/', b'n', 0xff, b'.', b'r', b's']);
+    let fragment =
+        CodeFragment::new(PathBuf::from(non_utf8_path), "fn bad() {}".to_owned(), 1, 1).unwrap();
+    let items = vec![(fragment, unit_vec(4, 0))];
+
+    let result = adapter.insert_batch(&items);
+
+    assert!(
+        matches!(result, Err(SemanticIndexError::InsertFailed { .. })),
+        "non-UTF-8 source paths must return InsertFailed, got {result:?}"
+    );
+}
+
+/// Deleting by source path removes every row for that path and preserves rows
+/// from other files. The deleted path contains a single quote to exercise the
+/// SQL predicate escaping used by the adapter.
+#[test]
+fn test_lance_db_adapter_delete_by_source_path_removes_matching_path_and_preserves_others() {
+    let dir = tempfile::tempdir().unwrap();
+    let adapter = LanceDbSemanticIndexAdapter::new(dir.path().to_path_buf()).unwrap();
+
+    let deleted_path = PathBuf::from("src/needs'cleanup.rs");
+    let frag_stale_a = make_fragment("src/needs'cleanup.rs", "fn stale_a() {}");
+    let frag_stale_b = make_fragment("src/needs'cleanup.rs", "fn stale_b() {}");
+    let frag_keep = make_fragment("src/keep.rs", "fn keep() {}");
+
+    let items = vec![
+        (frag_stale_a, unit_vec(4, 0)),
+        (frag_stale_b, vec![0.9_f32, 0.1, 0.0, 0.0]),
+        (frag_keep, unit_vec(4, 1)),
+    ];
+    adapter.insert_batch(&items).unwrap();
+
+    adapter.delete_by_source_path(&deleted_path).unwrap();
+
+    let top_k = TopK::new(3).unwrap();
+    let results = adapter.search(&unit_vec(4, 1), top_k).unwrap();
+
+    assert_eq!(results.len(), 1, "only the non-deleted fragment should remain");
+    assert_eq!(results[0].fragment.source_path, PathBuf::from("src/keep.rs"));
+    assert!(
+        results.iter().all(|result| result.fragment.source_path != deleted_path),
+        "deleted path must not appear in search results: {results:?}"
+    );
+}
+
+/// Non-UTF-8 delete paths cannot be represented in the LanceDB UTF-8 predicate
+/// and must be rejected before executing the delete.
+#[cfg(unix)]
+#[test]
+fn test_lance_db_adapter_delete_by_source_path_non_utf8_source_path_returns_error() {
+    use std::ffi::OsString;
+    use std::os::unix::ffi::OsStringExt;
+
+    let dir = tempfile::tempdir().unwrap();
+    let adapter = LanceDbSemanticIndexAdapter::new(dir.path().to_path_buf()).unwrap();
+    let non_utf8_path =
+        OsString::from_vec(vec![b's', b'r', b'c', b'/', b'n', 0xff, b'.', b'r', b's']);
+
+    let result = adapter.delete_by_source_path(&PathBuf::from(non_utf8_path));
+
+    assert!(
+        matches!(result, Err(SemanticIndexError::DeleteFailed { .. })),
+        "non-UTF-8 source paths must return DeleteFailed, got {result:?}"
     );
 }
 

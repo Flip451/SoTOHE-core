@@ -1,0 +1,412 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "BuildIndexError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Embedding",
+            "payload": { "kind": "tuple", "fields": ["EmbeddingError"] }
+          },
+          {
+            "name": "Index",
+            "payload": { "kind": "tuple", "fields": ["SemanticIndexError"] }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "source", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Carried for edge exposure: From<SemanticIndexError> impl visibility. Baseline-identical; this track does not modify this type.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "DupCheckError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Embedding",
+            "payload": { "kind": "tuple", "fields": ["EmbeddingError"] }
+          },
+          {
+            "name": "Index",
+            "payload": { "kind": "tuple", "fields": ["SemanticIndexError"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Carried for edge exposure: From<SemanticIndexError> impl visibility. Baseline-identical; this track does not modify this type.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "FindSimilarError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Embedding",
+            "payload": { "kind": "tuple", "fields": ["EmbeddingError"] }
+          },
+          {
+            "name": "Index",
+            "payload": { "kind": "tuple", "fields": ["SemanticIndexError"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Carried for edge exposure: From<SemanticIndexError> impl visibility. Baseline-identical; this track does not modify this type.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "MeasureQualityError": {
+      "action": "reference",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Embedding",
+            "payload": { "kind": "tuple", "fields": ["EmbeddingError"] }
+          },
+          {
+            "name": "Index",
+            "payload": { "kind": "tuple", "fields": ["SemanticIndexError"] }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "std::path::PathBuf" },
+                { "name": "source", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Carried for edge exposure: From<SemanticIndexError> impl visibility. Baseline-identical; this track does not modify this type.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "SemanticIndexError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OpenFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          },
+          {
+            "name": "InsertFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          },
+          {
+            "name": "DeleteFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          },
+          {
+            "name": "SearchFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [{ "name": "source", "ty": "String" }]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "semantic_dup",
+      "docs": "Error type for SemanticIndexPort. This track adds DeleteFailed (IN-10/D7): emitted when delete_by_source_path fails or when source_path is not valid UTF-8.",
+      "spec_refs": [
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "IN-10",
+          "hash": "b1fec02e384deb97fdb43a6a0a0087a05346d0db3753564da9ebeb7b6878acee"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "EmbeddingPort": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "embed",
+          "receiver": "&self",
+          "params": [
+            { "name": "fragment", "ty": "&domain::semantic_dup::CodeFragment" }
+          ],
+          "returns": "Result<Vec<f32>, EmbeddingError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "embed_batch",
+          "receiver": "&self",
+          "params": [
+            { "name": "fragments", "ty": "&[domain::semantic_dup::CodeFragment]" }
+          ],
+          "returns": "Result<Vec<Vec<f32>>, EmbeddingError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "semantic_dup",
+      "docs": "Secondary port for embedding computation. This track adds embed_batch (IN-08/AC-10): batch embedding of multiple CodeFragments in a single inference call, eliminating per-fragment CPU inference overhead for large corpora. Single-item embed is retained for other callers (OS-10). NOTE: embed_batch is declared ahead of implementation (catalogue-first TDDD); the type-signal for it will show as declared-not-found until the implementation lands.",
+      "spec_refs": [
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "IN-08",
+          "hash": "b749162214422fb9c4ebf7cea22580bdef3f534c10ac3bd0443280c84f3aca57"
+        },
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "AC-10",
+          "hash": "8056c22660d663b7be1aa0600b07445dd0cc01a8a665f3e861acce145732fd22"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticIndexPort": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "insert",
+          "receiver": "&self",
+          "params": [
+            { "name": "fragment", "ty": "&domain::semantic_dup::CodeFragment" },
+            { "name": "embedding", "ty": "&[f32]" }
+          ],
+          "returns": "Result<(), SemanticIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "insert_batch",
+          "receiver": "&self",
+          "params": [
+            { "name": "items", "ty": "&[(domain::semantic_dup::CodeFragment, Vec<f32>)]" }
+          ],
+          "returns": "Result<(), SemanticIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "delete_by_source_path",
+          "receiver": "&self",
+          "params": [
+            { "name": "source_path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<(), SemanticIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "search",
+          "receiver": "&self",
+          "params": [
+            { "name": "embedding", "ty": "&[f32]" },
+            { "name": "top_k", "ty": "domain::semantic_dup::TopK" }
+          ],
+          "returns": "Result<Vec<domain::semantic_dup::SimilarFragment>, SemanticIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "semantic_dup",
+      "docs": "Secondary port for the local semantic vector index. This track adds insert_batch (IN-07/AC-09) and delete_by_source_path (IN-10/D7): batch insert of (fragment, embedding) pairs in a single transaction, and deletion of all fragments for a given source_path for incremental index maintenance. Single-item insert is retained for other callers (OS-09).",
+      "spec_refs": [
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "IN-07",
+          "hash": "38ec7fd3b264f17def2d59278512ead0f971289d2a29fdb375d31aee52304100"
+        },
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "AC-09",
+          "hash": "506f9ced02ff08bfccde741782e3d00deff4ecdd5d39cce2cfbd25caf9ed91ad"
+        },
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "IN-10",
+          "hash": "b1fec02e384deb97fdb43a6a0a0087a05346d0db3753564da9ebeb7b6878acee"
+        },
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "AC-12",
+          "hash": "c86d8f1cece8b1d6f489528d307ac0dfff218d77c788f3fe0da280de1ab22e70"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticIndexError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SemanticIndexError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "SemanticIndexError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<EmbeddingError>",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<SemanticIndexError>",
+      "for_type": "BuildIndexError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DupCheckError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DupCheckError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "DupCheckError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<EmbeddingError>",
+      "for_type": "DupCheckError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<SemanticIndexError>",
+      "for_type": "DupCheckError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<EmbeddingError>",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<SemanticIndexError>",
+      "for_type": "FindSimilarError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "MeasureQualityError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "MeasureQualityError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::error::Error",
+      "for_type": "MeasureQualityError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<EmbeddingError>",
+      "for_type": "MeasureQualityError"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<SemanticIndexError>",
+      "for_type": "MeasureQualityError"
+    }
+  ]
+}

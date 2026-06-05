@@ -14,29 +14,55 @@
 //! (`FsDryCheckCommitHashStore`, `GitDryCheckDiffGetter`). The `review_v2`
 //! adapters (`FsCommitHashStore`, `GitDiffGetter`) are never imported.
 
-use std::path::{Path, PathBuf};
+#[cfg(test)]
+use std::path::Path;
+use std::path::PathBuf;
 use std::sync::Arc;
 
-use domain::dry_check::{
-    DryCheckApprovalVerdict, DryCheckFinding, DryCheckReader as _, DryCheckVerdict, VerdictFilter,
-    fragments_overlapping_hunks,
-};
-use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
-use domain::{CommitHash, TrackId};
-use infrastructure::dry_check::{
-    CodexDryChecker, DryCheckCommitHashError, FsDryCheckCommitHashStore, FsDryCheckStore,
-    GitDryCheckDiffGetter,
-};
-use infrastructure::semantic_dup::{
-    embedding::FastEmbedAdapter, extractor::extract_code_fragments,
-    index::LanceDbSemanticIndexAdapter,
-};
+use domain::dry_check::{DryCheckFinding, DryCheckReader as _, DryCheckVerdict};
+use domain::semantic_dup::SimilarityThreshold;
+use infrastructure::dry_check::{CodexDryChecker, FsDryCheckStore};
+use infrastructure::semantic_dup::embedding::FastEmbedAdapter;
 use usecase::dry_check::{
     DryCheckApprovalInteractor, DryCheckApprovalService as _, DryCheckInteractor,
     DryCheckResultsInteractor, DryCheckResultsService as _, DryCheckService as _,
 };
 
 use crate::{CliApp, CommandOutcome};
+
+mod manifest;
+mod persistent_index;
+mod shared;
+
+use persistent_index::open_persistent_index_with_corpus;
+use shared::{
+    build_diff_and_corpus_fragments, dry_check_approved_outcome, dry_write_outcome,
+    parse_dry_track_id, parse_verdict_filter, resolve_dry_diff_base,
+    resolve_existing_dir_under_repo,
+};
+#[cfg(test)]
+use shared::{git_diff_path_key, normalize_fragment_paths};
+
+#[cfg(test)]
+use domain::dry_check::{DryCheckApprovalVerdict, VerdictFilter, fragments_overlapping_hunks};
+#[cfg(test)]
+use domain::semantic_dup::CodeFragment;
+#[cfg(test)]
+use infrastructure::semantic_dup::{
+    extractor::extract_code_fragments, index::LanceDbSemanticIndexAdapter,
+};
+#[cfg(test)]
+use manifest::{
+    EMBEDDING_MODEL_ID, IndexManifest, compute_manifest_diff, file_content_hash,
+    manifest_sidecar_path, read_manifest, remove_manifest, write_manifest,
+};
+#[cfg(test)]
+use persistent_index::{
+    NullInsertIndexProxy, acquire_persistent_index_lock, clear_persistent_index_dir,
+    persistent_index_lock_path, persistent_index_marker_path, write_persistent_index_marker,
+};
+#[cfg(test)]
+use usecase::semantic_dup::SemanticIndexPort;
 
 // ── Input DTOs ────────────────────────────────────────────────────────────────
 
@@ -56,7 +82,9 @@ pub struct DryWriteInput {
     /// Path to the track items directory.
     pub items_dir: PathBuf,
     /// Codex model name for the DryCheckAgentPort.
-    pub model: String,
+    /// `None` means "use the model from `agent-profiles.json`".
+    /// An explicit value overrides the profile model.
+    pub model: Option<String>,
     /// Capability name forwarded to CodexDryChecker.
     pub capability_name: String,
 }
@@ -107,309 +135,11 @@ pub struct DryCheckApprovedInput {
     pub items_dir: PathBuf,
 }
 
-// ── Shared helpers ────────────────────────────────────────────────────────────
-
-/// Resolve the diff base commit using the three-branch fail-closed policy.
-///
-/// Branch 1: `FsDryCheckCommitHashStore::read()` → `Ok(Some(hash))` → use it.
-/// Branch 2: `Ok(None)` (file absent or non-ancestor) → fall back to
-///   `git rev-parse main`.
-/// Branch 3: `Err(DryCheckCommitHashError::Format)` → emit `eprintln!` warn
-///   and fall back to `git rev-parse main` (absorbed — must NOT abort the gate).
-///
-/// CN-01: uses dry-check's OWN `FsDryCheckCommitHashStore`, never
-/// `review_v2`'s `FsCommitHashStore`.
-///
-/// When `base_commit_override` is `Some`, the string is parsed to `CommitHash`
-/// and returned directly (skips the store lookup entirely).
-///
-/// # Errors
-///
-/// Returns `Err` only when `base_commit_override` is invalid, or when
-/// `git rev-parse main` fails.
-pub(crate) fn resolve_dry_diff_base(
-    base_commit_override: Option<&str>,
-    commit_hash_path: &Path,
-    trusted_root: &Path,
-) -> Result<CommitHash, String> {
-    // When --base-commit is provided, use it directly.
-    if let Some(s) = base_commit_override {
-        return CommitHash::try_new(s).map_err(|e| format!("invalid --base-commit: {e}"));
-    }
-
-    // Read from dry-check's own FsDryCheckCommitHashStore.
-    let store =
-        FsDryCheckCommitHashStore::new(commit_hash_path.to_path_buf(), trusted_root.to_path_buf());
-    match store.read() {
-        Ok(Some(hash)) => return Ok(hash),
-        Ok(None) => {
-            // File absent or non-ancestor — fall through to main fallback.
-        }
-        Err(DryCheckCommitHashError::Format(detail)) => {
-            eprintln!("[warn] dry-check: malformed .commit_hash ({detail}); falling back to main");
-            // Absorbed — fall through to main fallback.
-        }
-        Err(other) => {
-            eprintln!(
-                "[warn] dry-check: failed to read .commit_hash ({other}); falling back to main"
-            );
-            // Other I/O errors also absorbed — fail-closed.
-        }
-    }
-
-    // Fallback: git rev-parse main.
-    git_rev_parse_main()
-}
-
-/// Run `git rev-parse main` and return the resulting `CommitHash`.
-///
-/// # Errors
-///
-/// Returns `Err` when git cannot be discovered, the command fails, or the
-/// output is not a valid commit hash.
-fn git_rev_parse_main() -> Result<CommitHash, String> {
-    use infrastructure::git_cli::{GitRepository, SystemGitRepo};
-
-    let git = SystemGitRepo::discover().map_err(|e| format!("git discover: {e}"))?;
-    let output =
-        git.output(&["rev-parse", "main"]).map_err(|e| format!("git rev-parse main: {e}"))?;
-    if !output.status.success() {
-        return Err("git rev-parse main failed".to_owned());
-    }
-    let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    CommitHash::try_new(&sha).map_err(|e| format!("invalid main SHA: {e}"))
-}
-
-/// Build `diff_fragments` using the three-step hunk-scope pipeline.
-///
-/// Steps:
-/// 1. `GitDryCheckDiffGetter::list_changed_hunks(base)` → `Vec<DiffFileHunks>`.
-/// 2. `extract_code_fragments(workspace_root)` → all workspace fragments.
-/// 3. Normalize every fragment's `source_path` to **repo-relative** form by
-///    stripping `repo_root` as a prefix (so `source_path` matches the
-///    repo-relative paths that `git diff` emits for hunk paths).
-/// 4. `fragments_overlapping_hunks(candidate_fragments, &changed_hunks)` → diff_fragments.
-///
-/// Returns `(diff_fragments, corpus_fragments)` where:
-/// - `diff_fragments` are hunk-scoped (CN-04).
-/// - `corpus_fragments` are extracted from `workspace_root` with normalized paths.
-///
-/// ## Path normalization contract
-///
-/// `extract_code_fragments` returns fragments rooted at the supplied
-/// `workspace_root`. `git diff` hunk paths are repo-relative (e.g.
-/// `libs/domain/src/foo.rs`). This function strips `repo_root` from every
-/// extracted path so that both sides use the same format, even when
-/// `workspace_root` is a valid subdirectory of the repository. Fragments whose
-/// path cannot be stripped are kept rather than dropped — a conservative
-/// fallback that avoids silently discarding fragments.
-///
-/// Both `corpus_fragments` and `diff_fragments` share the normalized form so that
-/// `DryCheckPairKey` (which pairs a changed-fragment-ref with a corpus-fragment-ref
-/// by their identity) can match across the two sets.
-///
-/// CN-01: uses `GitDryCheckDiffGetter` (dry-check's own adapter), never
-/// `review_v2`'s `GitDiffGetter`.
-///
-/// # Errors
-///
-/// Returns `Err` when diff listing or fragment extraction fails.
-pub(crate) fn build_diff_and_corpus_fragments(
-    base: &CommitHash,
-    workspace_root: &Path,
-    repo_root: &Path,
-) -> Result<(Vec<CodeFragment>, Vec<CodeFragment>), String> {
-    use usecase::dry_check::DryCheckDiffSource as _;
-
-    // Step 1: List changed hunks via dry-check's own diff getter.
-    let getter = GitDryCheckDiffGetter;
-    let changed_hunks =
-        getter.list_changed_hunks(base).map_err(|e| format!("list_changed_hunks failed: {e}"))?;
-
-    // Step 2: Extract fragments from the whole workspace.
-    // Paths are absolute when workspace_root is absolute (entry.path() propagates
-    // the root's absoluteness).
-    let raw_fragments = extract_code_fragments(workspace_root)
-        .map_err(|e| format!("fragment extraction failed: {e}"))?;
-
-    // Step 3: Normalize source_path → repo-relative by stripping repo_root.
-    // This makes fragment paths byte-equal to git-diff hunk paths (e.g. "libs/foo/src/bar.rs").
-    let normalized_fragments = normalize_fragment_paths(raw_fragments, repo_root)
-        .map_err(|e| format!("fragment path normalization failed: {e}"))?;
-
-    // Build the set of changed file paths for quick lookup (repo-relative strings).
-    let changed_paths: std::collections::HashSet<String> =
-        changed_hunks.iter().map(|h| h.path().as_str().to_owned()).collect();
-
-    // Candidate fragments: only those from changed files (repo-relative git path match).
-    let candidate_fragments: Vec<CodeFragment> = normalized_fragments
-        .iter()
-        .filter(|f| {
-            let path_key = git_diff_path_key(&f.source_path);
-            changed_paths.contains(path_key.as_str())
-        })
-        .cloned()
-        .collect();
-
-    // Step 4: Hunk-scope filter — keep only fragments overlapping a changed hunk.
-    let diff_fragments = fragments_overlapping_hunks(&candidate_fragments, &changed_hunks);
-
-    // Corpus: full workspace with normalized paths (no hunk filter).
-    let corpus_fragments = normalized_fragments;
-
-    Ok((diff_fragments, corpus_fragments))
-}
-
-/// Normalize a list of `CodeFragment` values so that each `source_path` is
-/// repo-relative (the `repo_root` prefix stripped).
-///
-/// When a fragment's path starts with `repo_root`, the prefix is removed
-/// (e.g. `/home/user/repo/libs/foo.rs` → `libs/foo.rs`).  The resulting path is
-/// also converted to git-diff style slash separators, so Windows paths match
-/// the slash-separated paths emitted by `git diff`.
-///
-/// Fragments whose path is already relative, or cannot be stripped, are kept as
-/// a conservative fallback after the same separator normalization.
-///
-/// Rebuilds each fragment with `CodeFragment::new` to produce a value-typed
-/// result rather than mutating the `source_path` field in-place.
-///
-/// # Errors
-///
-/// Returns `Err` only when `CodeFragment::new` rejects a rebuilt fragment, which
-/// should never happen in practice because the original fragment was already valid
-/// (same content + same line spans).
-fn normalize_fragment_paths(
-    fragments: Vec<CodeFragment>,
-    repo_root: &Path,
-) -> Result<Vec<CodeFragment>, String> {
-    let mut result = Vec::with_capacity(fragments.len());
-    for frag in fragments {
-        // Strip the repo_root prefix to get the repo-relative path.
-        let rel_path = frag
-            .source_path
-            .strip_prefix(repo_root)
-            .map(|p| p.to_path_buf())
-            .unwrap_or_else(|_| frag.source_path.clone());
-        let rel_path = PathBuf::from(git_diff_path_key(&rel_path));
-        let rebuilt = CodeFragment::new(
-            rel_path,
-            frag.content().to_owned(),
-            frag.start_line(),
-            frag.end_line(),
-        )
-        .map_err(|e| {
-            format!("failed to rebuild fragment from '{}': {e}", frag.source_path.display())
-        })?;
-        result.push(rebuilt);
-    }
-    Ok(result)
-}
-
-/// Convert a path to the slash-separated path format emitted by `git diff`.
-fn git_diff_path_key(path: &Path) -> String {
-    path.to_string_lossy().replace('\\', "/")
-}
-
-/// Resolve an input directory and require it to stay inside the repository root.
-fn resolve_existing_dir_under_repo(
-    input_path: &Path,
-    repo_root: &Path,
-    canonical_root: &Path,
-    label: &str,
-) -> Result<PathBuf, String> {
-    let absolute_path = if input_path.is_absolute() {
-        input_path.to_path_buf()
-    } else {
-        repo_root.join(input_path)
-    };
-    let canonical_path = absolute_path.canonicalize().map_err(|_| {
-        format!(
-            "{label} '{}' must be an existing directory under the repository root",
-            input_path.display()
-        )
-    })?;
-
-    if !canonical_path.is_dir() || !canonical_path.starts_with(canonical_root) {
-        return Err(format!(
-            "{label} '{}' must be an existing directory under the repository root",
-            input_path.display()
-        ));
-    }
-
-    Ok(canonical_path)
-}
-
-fn parse_dry_track_id(raw: &str) -> Result<TrackId, String> {
-    TrackId::try_new(raw).map_err(|e| format!("invalid --track-id: {e}"))
-}
-
-/// Parse a verdict filter string to `VerdictFilter`.
-///
-/// Accepted values (case-insensitive): "all", "not-a-violation", "accepted", "violation".
-///
-/// # Errors
-///
-/// Returns `Err` for unrecognized values.
-fn parse_verdict_filter(s: &str) -> Result<VerdictFilter, String> {
-    match s.to_ascii_lowercase().as_str() {
-        "all" => Ok(VerdictFilter::All),
-        "not-a-violation" => Ok(VerdictFilter::NotAViolation),
-        "accepted" => Ok(VerdictFilter::Accepted),
-        "violation" => Ok(VerdictFilter::Violation),
-        other => Err(format!(
-            "invalid --filter '{other}' (expected: all / not-a-violation / accepted / violation)"
-        )),
-    }
-}
-
-fn dry_check_approved_outcome(verdict: DryCheckApprovalVerdict) -> CommandOutcome {
-    match verdict {
-        DryCheckApprovalVerdict::Approved => CommandOutcome {
-            stdout: Some("dry check-approved: APPROVED — all pairs verified".to_owned()),
-            stderr: None,
-            exit_code: 0,
-        },
-        DryCheckApprovalVerdict::Blocked { unresolved_pair_count } => CommandOutcome {
-            stdout: None,
-            stderr: Some(format!(
-                "dry check-approved: BLOCKED — {unresolved_pair_count} unresolved pair(s); \
-                 run `sotp dry write` to record verdicts"
-            )),
-            exit_code: 1,
-        },
-    }
-}
-
-fn dry_write_outcome(
-    findings: &[DryCheckFinding],
-    pairs_checked: usize,
-    records_appended: usize,
-    diff_fragments_processed: usize,
-) -> CommandOutcome {
-    let mut output_lines: Vec<String> = Vec::new();
-    output_lines.push(format!(
-        "dry write: {pairs_checked} pair(s) checked; {records_appended} record(s) appended; \
-         {} violation(s) found; {diff_fragments_processed} diff fragment(s) processed",
-        findings.len()
-    ));
-    for finding in findings {
-        output_lines.push(format!(
-            "  changed: {} (hash: {})",
-            finding.changed_fragment_ref().path().as_str(),
-            finding.changed_fragment_ref().content_hash().as_str(),
-        ));
-        output_lines.push(format!(
-            "  candidate: {} (hash: {})",
-            finding.candidate_fragment_ref().path().as_str(),
-            finding.candidate_fragment_ref().content_hash().as_str(),
-        ));
-        output_lines.push(format!("  proposal: {}", finding.refactor_proposal().as_str(),));
-    }
-
-    CommandOutcome::success(Some(output_lines.join("\n")))
-}
-
+// These helpers are retained for existing tests that verify ephemeral-index
+// behavior (acceptance tests for the old API).  They are not used in production
+// code paths (which now use the persistent index via
+// `open_persistent_index_with_corpus`), so they are cfg(test) only.
+#[cfg(test)]
 fn ephemeral_index_parent(db_path: &Path, fallback_parent: &Path) -> PathBuf {
     match db_path.parent() {
         Some(parent) if !parent.as_os_str().is_empty() && parent.is_dir() => parent.to_path_buf(),
@@ -417,6 +147,7 @@ fn ephemeral_index_parent(db_path: &Path, fallback_parent: &Path) -> PathBuf {
     }
 }
 
+#[cfg(test)]
 fn create_ephemeral_index_dir(
     db_path: &Path,
     fallback_parent: &Path,
@@ -428,6 +159,7 @@ fn create_ephemeral_index_dir(
         .map_err(|e| format!("failed to create ephemeral index dir: {e}"))
 }
 
+#[cfg(test)]
 fn create_ephemeral_index_adapter(
     db_path: &Path,
     fallback_parent: &Path,
@@ -456,6 +188,7 @@ impl CliApp {
     /// Returns `Err` on arg validation, diff acquisition, fragment extraction,
     /// adapter construction, or interactor failures.
     pub fn dry_write(&self, input: DryWriteInput) -> Result<CommandOutcome, String> {
+        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
         use infrastructure::git_cli::{GitRepository, SystemGitRepo};
 
         // Resolve repo root to anchor paths.
@@ -464,6 +197,33 @@ impl CliApp {
         let canonical_root =
             root.canonicalize().map_err(|e| format!("failed to canonicalize repo root: {e}"))?;
         let track_id = parse_dry_track_id(&input.track_id)?;
+
+        // Resolve the effective model: explicit --model overrides; otherwise read
+        // the `dry-checker` capability model from agent-profiles.json (same pattern
+        // as `dry fix-local` uses for the `dry-fix-lead` capability).
+        let effective_model = match input.model.clone() {
+            Some(m) => m,
+            None => {
+                let profiles_path = root.join(AGENT_PROFILES_PATH);
+                let profiles = AgentProfiles::load(&profiles_path)
+                    .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))?;
+                let resolved = profiles
+                    .resolve_execution(&input.capability_name, RoundType::Final)
+                    .ok_or_else(|| {
+                        format!(
+                            "[ERROR] '{}' capability not defined in agent-profiles.json",
+                            input.capability_name
+                        )
+                    })?;
+                resolved.model.ok_or_else(|| {
+                    format!(
+                        "[ERROR] no model specified: pass --model or set model in \
+                         agent-profiles.json '{}' capability",
+                        input.capability_name
+                    )
+                })?
+            }
+        };
 
         // Locate per-track directory.
         let items_dir_abs =
@@ -503,21 +263,27 @@ impl CliApp {
             .read_records()
             .map_err(|e| format!("dry-check read before write failed: {e}"))?
             .len();
-        let agent =
-            Arc::new(CodexDryChecker::new(input.model.clone(), input.capability_name.clone()));
+        let agent = Arc::new(CodexDryChecker::new(effective_model, input.capability_name.clone()));
         let embedding_port = Arc::new(
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
 
-        // IN-02/D4: Use a fresh ephemeral index for each invocation so that stale
-        // fragments from prior runs never accumulate in a persistent LanceDB.
-        // `_temp_index_dir` is bound here to ensure drop (and auto-cleanup) happens
-        // at method return, not before.
-        let (_temp_index_dir, index_adapter) =
-            create_ephemeral_index_adapter(&input.db_path, &canonical_root)?;
-        let index_port = Arc::new(index_adapter);
+        // D7/IN-10: Open (or incrementally update) the persistent index at
+        // `--db-path` using the file-level content-hash manifest.  Only changed
+        // or new files are re-embedded; unchanged files are reused.  Deleted
+        // files are removed from the index.  The returned adapter is wrapped in
+        // `NullInsertIndexProxy` so that the interactor's unconditional
+        // `build_corpus_index` call is a no-op — corpus is always correct before
+        // the interactor runs.
+        let index_port = open_persistent_index_with_corpus(
+            &input.db_path,
+            corpus_fragments,
+            embedding_port.as_ref(),
+        )?;
 
         // Construct interactor (5-param; diff_source NOT injected).
+        // Pass an empty corpus — the index is already populated above; the
+        // interactor's build_corpus_index call will be a no-op via NullInsertIndexProxy.
         let interactor = DryCheckInteractor::new(
             embedding_port,
             index_port,
@@ -526,9 +292,9 @@ impl CliApp {
             store,         // reader
         );
 
-        // Run the dry-check write cycle.
+        // Run the dry-check write cycle with empty corpus (index pre-built above).
         let findings: Vec<DryCheckFinding> = interactor
-            .run_dry_check(corpus_fragments, diff_fragments, threshold, base)
+            .run_dry_check(vec![], diff_fragments, threshold, base)
             .map_err(|e| format!("dry-check write cycle failed: {e}"))?;
 
         let records_after = store_for_summary
@@ -663,20 +429,20 @@ impl CliApp {
             FastEmbedAdapter::new().map_err(|e| format!("failed to load embedding model: {e}"))?,
         );
 
-        // IN-02/D4: Use a fresh ephemeral index for each invocation so that stale
-        // fragments from prior runs never accumulate in a persistent LanceDB.
-        // `_temp_index_dir` is bound here to ensure drop (and auto-cleanup) happens
-        // at method return, not before.
-        let (_temp_index_dir, index_adapter) =
-            create_ephemeral_index_adapter(&input.db_path, &canonical_root)?;
-        let index_port = Arc::new(index_adapter);
+        // D7/IN-10: Incremental index update (same path as dry_write).
+        let index_port = open_persistent_index_with_corpus(
+            &input.db_path,
+            corpus_fragments,
+            embedding_port.as_ref(),
+        )?;
 
         // Construct interactor (reader + index + embedding).
         let interactor = DryCheckApprovalInteractor::new(store, index_port, embedding_port);
 
-        // Run the gate (3-param; base_commit NOT forwarded — check_approved does not record).
+        // Run the gate with empty corpus — index is pre-built above; the interactor's
+        // build_corpus_index call will be a no-op via NullInsertIndexProxy.
         let verdict = interactor
-            .check_approved(corpus_fragments, &diff_fragments, threshold)
+            .check_approved(vec![], &diff_fragments, threshold)
             .map_err(|e| format!("dry check-approved failed: {e}"))?;
 
         Ok(dry_check_approved_outcome(verdict))
@@ -1385,7 +1151,7 @@ exit 0
             threshold: 0.85,
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
-            model: "codex".to_owned(),
+            model: Some("codex".to_owned()),
             capability_name: "dry-checker".to_owned(),
         });
 
@@ -1406,7 +1172,7 @@ exit 0
             threshold: 0.85,
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
-            model: "codex".to_owned(),
+            model: Some("codex".to_owned()),
             capability_name: "dry-checker".to_owned(),
         });
 
@@ -1427,7 +1193,7 @@ exit 0
             threshold: 0.85,
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
-            model: "codex".to_owned(),
+            model: Some("codex".to_owned()),
             capability_name: "dry-checker".to_owned(),
         });
 
@@ -1449,7 +1215,7 @@ exit 0
             threshold: 1.5,
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
-            model: "codex".to_owned(),
+            model: Some("codex".to_owned()),
             capability_name: "dry-checker".to_owned(),
         });
 
@@ -1578,6 +1344,67 @@ exit 0
         assert!(result.is_err(), "unknown filter must return Err");
     }
 
+    // ── dry_write: model resolution ──────────────────────────────────────────
+
+    /// When an explicit `model: Some(...)` is provided, `dry_write` must use it
+    /// and NOT attempt to load agent-profiles.json at all.  The test verifies this
+    /// by passing a valid track_id and an invalid items_dir (so the call fails at
+    /// the items_dir check, after model resolution but before any agent is spawned).
+    /// The error message must NOT contain an agent-profiles/model error.
+    #[test]
+    fn test_dry_write_explicit_model_bypasses_agent_profiles_resolution() {
+        let dir = tempfile::tempdir().unwrap();
+        // Use a known-valid commit hash so base_commit does not fail first.
+        let result = CliApp::new().dry_write(DryWriteInput {
+            track_id: "my-track".to_owned(),
+            base_commit: Some(valid_commit_hash_for_tests()),
+            db_path: dir.path().join("semantic-index"),
+            threshold: 0.85,
+            workspace_root: PathBuf::from("."),
+            // Outside repo → will fail at items_dir validation, not model resolution.
+            items_dir: dir.path().to_path_buf(),
+            model: Some("gpt-explicit-override".to_owned()),
+            capability_name: "dry-checker".to_owned(),
+        });
+
+        let message = result.unwrap_err();
+        // Must fail at items_dir validation, not at agent-profiles loading.
+        assert!(
+            message.contains("items_dir"),
+            "error must be about items_dir, not model resolution, got: {message}"
+        );
+        assert!(
+            !message.contains("agent-profiles"),
+            "explicit model must skip agent-profiles loading entirely, got: {message}"
+        );
+    }
+
+    /// When `model: None`, `dry_write` must attempt to resolve the model from
+    /// agent-profiles.json.  Passing a nonexistent capability name forces the
+    /// resolution to fail with the "[ERROR] '...' capability not defined" message,
+    /// confirming the agent-profiles path is actually taken.
+    #[test]
+    fn test_dry_write_none_model_resolves_from_agent_profiles_and_fails_on_missing_capability() {
+        let dir = tempfile::tempdir().unwrap();
+        let result = CliApp::new().dry_write(DryWriteInput {
+            track_id: "my-track".to_owned(),
+            base_commit: Some(valid_commit_hash_for_tests()),
+            db_path: dir.path().join("semantic-index"),
+            threshold: 0.85,
+            workspace_root: PathBuf::from("."),
+            items_dir: dir.path().to_path_buf(),
+            model: None,
+            capability_name: "nonexistent-capability-for-test".to_owned(),
+        });
+
+        let message = result.unwrap_err();
+        assert!(
+            message.contains("capability not defined in agent-profiles.json")
+                || message.contains("nonexistent-capability-for-test"),
+            "None model must trigger agent-profiles resolution and report missing capability, got: {message}"
+        );
+    }
+
     // ── DryWriteInput / DryCheckApprovedInput: field round-trip ──────────────
 
     #[test]
@@ -1589,7 +1416,7 @@ exit 0
             threshold: 0.85,
             workspace_root: PathBuf::from("."),
             items_dir: PathBuf::from("track/items"),
-            model: "codex-model".to_owned(),
+            model: Some("codex-model".to_owned()),
             capability_name: "dry-checker".to_owned(),
         };
         assert_eq!(input.track_id, "my-track");
@@ -1778,5 +1605,725 @@ exit 0
         drop(temp_index_dir);
 
         assert!(!temp_index_path.exists(), "ephemeral index dir must be removed on drop");
+    }
+
+    // ── D7/IN-09: persistent index manifest + incremental reuse ─────────────
+
+    fn make_test_fragment(path: &str, content: &str) -> CodeFragment {
+        CodeFragment::new(PathBuf::from(path), content.to_owned(), 1, 1).unwrap()
+    }
+
+    /// Stub embedding port that records how many times embed_batch was called and
+    /// returns a fixed dimension-2 embedding per fragment.
+    struct StubEmbeddingPort {
+        call_count: std::sync::atomic::AtomicU32,
+        /// When `fail` is true, embed_batch returns an error instead of embeddings.
+        fail: bool,
+        embedding_count: Option<usize>,
+    }
+
+    impl StubEmbeddingPort {
+        fn new() -> Self {
+            Self {
+                call_count: std::sync::atomic::AtomicU32::new(0),
+                fail: false,
+                embedding_count: None,
+            }
+        }
+
+        fn never_called() -> Self {
+            Self {
+                call_count: std::sync::atomic::AtomicU32::new(0),
+                fail: false,
+                embedding_count: None,
+            }
+        }
+
+        fn failing() -> Self {
+            Self {
+                call_count: std::sync::atomic::AtomicU32::new(0),
+                fail: true,
+                embedding_count: None,
+            }
+        }
+
+        fn with_embedding_count(embedding_count: usize) -> Self {
+            Self {
+                call_count: std::sync::atomic::AtomicU32::new(0),
+                fail: false,
+                embedding_count: Some(embedding_count),
+            }
+        }
+
+        fn embed_batch_call_count(&self) -> u32 {
+            self.call_count.load(std::sync::atomic::Ordering::SeqCst)
+        }
+    }
+
+    impl usecase::semantic_dup::EmbeddingPort for StubEmbeddingPort {
+        fn embed(
+            &self,
+            _fragment: &CodeFragment,
+        ) -> Result<Vec<f32>, usecase::semantic_dup::EmbeddingError> {
+            Ok(vec![0.5_f32; 2])
+        }
+
+        fn embed_batch(
+            &self,
+            fragments: &[CodeFragment],
+        ) -> Result<Vec<Vec<f32>>, usecase::semantic_dup::EmbeddingError> {
+            if self.fail {
+                return Err(usecase::semantic_dup::EmbeddingError::InferenceFailed {
+                    source: "stub failure".to_owned(),
+                });
+            }
+            self.call_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            let count = self.embedding_count.unwrap_or(fragments.len());
+            Ok((0..count).map(|_| vec![0.5_f32; 2]).collect())
+        }
+    }
+
+    // ── manifest_sidecar_path ────────────────────────────────────────────────
+
+    /// Sidecar path is `{db_path}.manifest`.
+    #[test]
+    fn test_manifest_sidecar_path_appends_manifest_suffix() {
+        let db_path = Path::new(".semantic_index");
+        let sidecar = manifest_sidecar_path(db_path);
+        assert_eq!(
+            sidecar,
+            PathBuf::from(".semantic_index.manifest"),
+            "sidecar must be db_path + '.manifest'"
+        );
+    }
+
+    // ── read_manifest / write_manifest round-trip ────────────────────────────
+
+    /// Absent sidecar returns `Ok(None)` (not an error).
+    #[test]
+    fn test_read_manifest_absent_sidecar_returns_none() {
+        let dir = tempfile::tempdir().unwrap();
+        let sidecar = dir.path().join("absent.manifest");
+        let result = read_manifest(&sidecar).unwrap();
+        assert!(result.is_none(), "absent manifest sidecar must return Ok(None)");
+    }
+
+    /// Write then read round-trips the manifest correctly.
+    #[test]
+    fn test_write_and_read_manifest_round_trips() {
+        let dir = tempfile::tempdir().unwrap();
+        let sidecar = dir.path().join("test.manifest");
+
+        let mut manifest = IndexManifest::empty("model-v1");
+        manifest.files.insert("src/a.rs".to_owned(), "a".repeat(64));
+        manifest.files.insert("src/b.rs".to_owned(), "b".repeat(64));
+
+        write_manifest(&sidecar, &manifest).unwrap();
+        let restored =
+            read_manifest(&sidecar).unwrap().expect("manifest must be readable after write");
+
+        assert_eq!(restored.embedding_model_id, "model-v1");
+        assert_eq!(
+            restored.files.get("src/a.rs").map(|s| s.as_str()),
+            Some("a".repeat(64).as_str())
+        );
+        assert_eq!(
+            restored.files.get("src/b.rs").map(|s| s.as_str()),
+            Some("b".repeat(64).as_str())
+        );
+    }
+
+    /// remove_manifest is idempotent (absent sidecar is not an error).
+    #[test]
+    fn test_remove_manifest_absent_is_ok() {
+        let dir = tempfile::tempdir().unwrap();
+        let sidecar = dir.path().join("absent.manifest");
+        remove_manifest(&sidecar).unwrap();
+    }
+
+    /// remove_manifest removes an existing sidecar.
+    #[test]
+    fn test_remove_manifest_removes_existing_sidecar() {
+        let dir = tempfile::tempdir().unwrap();
+        let sidecar = dir.path().join("test.manifest");
+        write_manifest(&sidecar, &IndexManifest::empty("model-v1")).unwrap();
+        assert!(sidecar.exists());
+        remove_manifest(&sidecar).unwrap();
+        assert!(!sidecar.exists(), "remove_manifest must delete the sidecar file");
+    }
+
+    // ── file_content_hash ────────────────────────────────────────────────────
+
+    /// file_content_hash is stable across fragment ordering.
+    #[test]
+    fn test_file_content_hash_is_order_independent() {
+        let frags_a = [
+            make_test_fragment("src/a.rs", "fn a() {}"),
+            make_test_fragment("src/a.rs", "fn b() {}"),
+        ];
+        let frags_b = [
+            make_test_fragment("src/a.rs", "fn b() {}"),
+            make_test_fragment("src/a.rs", "fn a() {}"),
+        ];
+        let refs_a: Vec<&CodeFragment> = frags_a.iter().collect();
+        let refs_b: Vec<&CodeFragment> = frags_b.iter().collect();
+        let hash_a = file_content_hash(&refs_a);
+        let hash_b = file_content_hash(&refs_b);
+        assert_eq!(hash_a, hash_b, "file_content_hash must be order-independent");
+        assert_eq!(hash_a.len(), 64, "file_content_hash must produce a 64-char hex string");
+    }
+
+    /// Different content produces different hashes.
+    #[test]
+    fn test_file_content_hash_differs_for_different_content() {
+        let frags_a = [make_test_fragment("src/a.rs", "fn a() {}")];
+        let frags_b = [make_test_fragment("src/a.rs", "fn b() {}")];
+        let refs_a: Vec<&CodeFragment> = frags_a.iter().collect();
+        let refs_b: Vec<&CodeFragment> = frags_b.iter().collect();
+        assert_ne!(
+            file_content_hash(&refs_a),
+            file_content_hash(&refs_b),
+            "different content must produce different hashes"
+        );
+    }
+
+    // ── compute_manifest_diff ────────────────────────────────────────────────
+
+    /// No prior manifest → all files dirty, nothing deleted or unchanged.
+    #[test]
+    fn test_compute_manifest_diff_no_manifest_all_dirty() {
+        let corpus = vec![
+            make_test_fragment("src/a.rs", "fn a() {}"),
+            make_test_fragment("src/b.rs", "fn b() {}"),
+        ];
+        let diff = compute_manifest_diff(&corpus, None, "model-v1");
+        let mut dirty = diff.dirty.clone();
+        dirty.sort();
+        assert_eq!(dirty, vec!["src/a.rs", "src/b.rs"]);
+        assert!(diff.deleted.is_empty(), "no deletions when manifest absent");
+        assert!(diff.unchanged.is_empty(), "no unchanged when manifest absent");
+    }
+
+    /// Model mismatch → all files dirty regardless of stored hashes.
+    #[test]
+    fn test_compute_manifest_diff_model_mismatch_all_dirty() {
+        let corpus = vec![make_test_fragment("src/a.rs", "fn a() {}")];
+        let frags_a = [make_test_fragment("src/a.rs", "fn a() {}")];
+        let refs_a: Vec<&CodeFragment> = frags_a.iter().collect();
+        let hash_a = file_content_hash(&refs_a);
+
+        let mut manifest = IndexManifest::empty("model-v1");
+        manifest.files.insert("src/a.rs".to_owned(), hash_a);
+
+        // Different model ID → all dirty.
+        let diff = compute_manifest_diff(&corpus, Some(&manifest), "model-v2");
+        assert_eq!(diff.dirty, vec!["src/a.rs"]);
+        assert!(diff.deleted.is_empty());
+        assert!(diff.unchanged.is_empty());
+    }
+
+    /// Changed file → dirty; deleted file → deleted; unchanged file → unchanged.
+    ///
+    /// This single test covers all three classifications. The unchanged-only
+    /// case is exercised here (src/a.rs same content) alongside dirty/deleted,
+    /// so no separate unchanged-only test is needed.
+    #[test]
+    fn test_compute_manifest_diff_dirty_and_deleted() {
+        // manifest knows about a.rs (unchanged), b.rs (changed), c.rs (deleted)
+        let frag_a_v1 = make_test_fragment("src/a.rs", "fn a() {}");
+        let frag_b_v1 = make_test_fragment("src/b.rs", "fn b_old() {}");
+        let frag_c = make_test_fragment("src/c.rs", "fn c() {}");
+
+        let hash_a = file_content_hash(&[&frag_a_v1]);
+        let hash_b_old = file_content_hash(&[&frag_b_v1]);
+        let hash_c = file_content_hash(&[&frag_c]);
+
+        let mut manifest = IndexManifest::empty("model-v1");
+        manifest.files.insert("src/a.rs".to_owned(), hash_a);
+        manifest.files.insert("src/b.rs".to_owned(), hash_b_old);
+        manifest.files.insert("src/c.rs".to_owned(), hash_c);
+
+        // Corpus now: a.rs (same), b.rs (changed), c.rs (absent → deleted)
+        let corpus = vec![
+            make_test_fragment("src/a.rs", "fn a() {}"),     // same
+            make_test_fragment("src/b.rs", "fn b_new() {}"), // changed
+        ];
+
+        let diff = compute_manifest_diff(&corpus, Some(&manifest), "model-v1");
+        assert_eq!(diff.dirty, vec!["src/b.rs"], "changed file must be dirty");
+        assert_eq!(diff.deleted, vec!["src/c.rs"], "absent file must be deleted");
+        assert_eq!(diff.unchanged, vec!["src/a.rs"], "same file must be unchanged");
+    }
+
+    // ── clear_persistent_index_dir ───────────────────────────────────────────
+
+    /// clear_persistent_index_dir removes the directory.
+    #[test]
+    fn test_clear_persistent_index_dir_removes_existing_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        let index_dir = dir.path().join("the_index");
+        write_persistent_index_marker(&index_dir).unwrap();
+        std::fs::write(index_dir.join("fragment.data"), b"stale data").unwrap();
+
+        clear_persistent_index_dir(&index_dir).unwrap();
+
+        assert!(!index_dir.exists(), "clear must remove the index directory");
+        assert!(
+            !persistent_index_marker_path(&index_dir).exists(),
+            "clear must remove the adjacent cache marker"
+        );
+    }
+
+    /// clear_persistent_index_dir refuses to remove non-empty directories it did
+    /// not mark as an SOTP semantic-index cache.
+    #[test]
+    fn test_clear_persistent_index_dir_unmarked_directory_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        let index_dir = dir.path().join("not_an_index_cache");
+        std::fs::create_dir_all(&index_dir).unwrap();
+        std::fs::write(index_dir.join("user-data.txt"), b"must survive").unwrap();
+
+        let message = clear_persistent_index_dir(&index_dir).unwrap_err();
+
+        assert!(
+            message.contains("refusing to clear unmarked semantic index directory"),
+            "unmarked directory must fail closed, got: {message}"
+        );
+        assert!(
+            index_dir.join("user-data.txt").exists(),
+            "unmarked directory contents must not be deleted"
+        );
+    }
+
+    /// A symlinked cache marker must not be accepted as ownership proof.
+    #[cfg(unix)]
+    #[test]
+    fn test_clear_persistent_index_dir_symlink_marker_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        let index_dir = dir.path().join("not_an_index_cache");
+        std::fs::create_dir_all(&index_dir).unwrap();
+        std::fs::write(index_dir.join("user-data.txt"), b"must survive").unwrap();
+
+        let canonical_index_dir = index_dir.canonicalize().unwrap();
+        let spoof_marker = dir.path().join("spoof-marker");
+        std::fs::write(
+            &spoof_marker,
+            format!("sotp semantic index cache\npath={}\n", canonical_index_dir.display()),
+        )
+        .unwrap();
+        std::os::unix::fs::symlink(&spoof_marker, persistent_index_marker_path(&index_dir))
+            .unwrap();
+
+        let message = clear_persistent_index_dir(&index_dir).unwrap_err();
+
+        assert!(
+            message.contains("index cache marker") && message.contains("symlink"),
+            "symlinked marker must fail closed, got: {message}"
+        );
+        assert!(
+            index_dir.join("user-data.txt").exists(),
+            "symlinked marker must not authorize deleting the directory"
+        );
+    }
+
+    /// If marker writing fails after the helper creates db_path, the newly
+    /// created unmarked db_path is cleaned up so the next run can retry.
+    #[test]
+    fn test_write_persistent_index_marker_failure_removes_created_db_path() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        let marker = persistent_index_marker_path(&db_path);
+        std::fs::create_dir_all(&marker).unwrap();
+
+        let message = write_persistent_index_marker(&db_path).unwrap_err();
+
+        assert!(
+            message.contains("failed to write index cache marker"),
+            "marker write failure must be reported, got: {message}"
+        );
+        assert!(
+            !db_path.exists(),
+            "newly-created unmarked db_path must be removed after marker-write failure"
+        );
+        assert!(marker.exists(), "test-owned marker directory should remain");
+    }
+
+    /// clear_persistent_index_dir is idempotent for a non-existing directory.
+    #[test]
+    fn test_clear_persistent_index_dir_absent_directory_returns_ok() {
+        let dir = tempfile::tempdir().unwrap();
+        let absent = dir.path().join("not_there");
+        // Must not error on a non-existent path.
+        clear_persistent_index_dir(&absent).unwrap();
+    }
+
+    /// Persistent index lock creates and holds a sidecar lock file.
+    #[test]
+    fn test_acquire_persistent_index_lock_creates_lock_sidecar() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        let lock_path = persistent_index_lock_path(&db_path);
+
+        let _lock = acquire_persistent_index_lock(&db_path).unwrap();
+
+        assert!(lock_path.exists(), "lock acquisition must create the lock sidecar");
+    }
+
+    /// NullInsertIndexProxy makes insert_batch a no-op (no panic, Ok returned).
+    #[test]
+    fn test_null_insert_index_proxy_insert_batch_is_noop() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        let real_adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
+        let lock = acquire_persistent_index_lock(&db_path).unwrap();
+        let proxy = NullInsertIndexProxy::new(Arc::clone(&real_adapter), lock);
+
+        // insert_batch with non-empty items must be a no-op (Ok(()), no writes).
+        let frag =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let result = proxy.insert_batch(&[(frag, vec![0.1_f32, 0.2_f32])]);
+        assert!(result.is_ok(), "NullInsertIndexProxy::insert_batch must return Ok(())");
+    }
+
+    /// NullInsertIndexProxy makes insert a no-op.
+    #[test]
+    fn test_null_insert_index_proxy_insert_is_noop() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        let real_adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
+        let lock = acquire_persistent_index_lock(&db_path).unwrap();
+        let proxy = NullInsertIndexProxy::new(Arc::clone(&real_adapter), lock);
+
+        let frag =
+            CodeFragment::new(PathBuf::from("src/a.rs"), "fn a() {}".to_owned(), 1, 1).unwrap();
+        let result = proxy.insert(&frag, &[0.1_f32]);
+        assert!(result.is_ok(), "NullInsertIndexProxy::insert must return Ok(())");
+    }
+
+    /// NullInsertIndexProxy forwards delete_by_source_path to the inner adapter.
+    #[test]
+    fn test_null_insert_index_proxy_delete_by_source_path_forwards_to_inner() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        let real_adapter = Arc::new(LanceDbSemanticIndexAdapter::new(db_path.clone()).unwrap());
+        let lock = acquire_persistent_index_lock(&db_path).unwrap();
+        let proxy = NullInsertIndexProxy::new(Arc::clone(&real_adapter), lock);
+
+        // Deleting from an empty (non-existent) table must succeed (no-op at the DB level,
+        // but the call must be forwarded — not silently swallowed by the proxy).
+        let result = proxy.delete_by_source_path(std::path::Path::new("src/a.rs"));
+        assert!(
+            result.is_ok(),
+            "NullInsertIndexProxy::delete_by_source_path must forward and return Ok(()): {:?}",
+            result.err()
+        );
+    }
+
+    // ── open_persistent_index_with_corpus (D7 manifest-based) ────────────────
+
+    /// No manifest → full rebuild (embed_batch called once), manifest written.
+    #[test]
+    fn test_open_persistent_index_with_corpus_no_manifest_full_rebuild() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        // No sidecar written → no prior manifest → full rebuild.
+
+        let embed = StubEmbeddingPort::new();
+        let corpus = vec![make_test_fragment("src/a.rs", "fn a() {}")];
+        let result = open_persistent_index_with_corpus(&db_path, corpus, &embed);
+
+        assert!(result.is_ok(), "full rebuild must succeed: {:?}", result.err());
+        assert_eq!(
+            embed.embed_batch_call_count(),
+            1,
+            "embed_batch must be called once on full rebuild"
+        );
+
+        // Manifest sidecar must be written after successful rebuild.
+        let sidecar = manifest_sidecar_path(&db_path);
+        let manifest = read_manifest(&sidecar).unwrap();
+        assert!(manifest.is_some(), "manifest sidecar must be written after full rebuild");
+        let manifest = manifest.unwrap();
+        assert!(manifest.files.contains_key("src/a.rs"), "manifest must record the built file");
+    }
+
+    /// Same corpus twice → second run skips embed_batch entirely (all unchanged).
+    #[test]
+    fn test_open_persistent_index_with_corpus_same_corpus_skips_embed_batch() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+
+        // First run: builds from scratch.
+        let embed_a = StubEmbeddingPort::new();
+        let corpus_a = vec![make_test_fragment("src/a.rs", "fn a() {}")];
+        open_persistent_index_with_corpus(&db_path, corpus_a, &embed_a).unwrap();
+        assert_eq!(embed_a.embed_batch_call_count(), 1, "first run must call embed_batch");
+
+        // Second run: identical corpus → all unchanged → no embed_batch.
+        let embed_b = StubEmbeddingPort::never_called();
+        let corpus_b = vec![make_test_fragment("src/a.rs", "fn a() {}")];
+        let result = open_persistent_index_with_corpus(&db_path, corpus_b, &embed_b);
+        assert!(result.is_ok(), "reuse path must succeed: {:?}", result.err());
+        assert_eq!(
+            embed_b.embed_batch_call_count(),
+            0,
+            "embed_batch must NOT be called when all files are unchanged"
+        );
+    }
+
+    /// Matching manifest without the LanceDB fragments table is inconsistent:
+    /// rebuild instead of returning a proxy that would search an empty table.
+    #[test]
+    fn test_open_persistent_index_with_corpus_matching_manifest_missing_table_rebuilds() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        let fragment = make_test_fragment("src/a.rs", "fn a() {}");
+        let sidecar = manifest_sidecar_path(&db_path);
+
+        write_persistent_index_marker(&db_path).unwrap();
+        let mut manifest = IndexManifest::empty(EMBEDDING_MODEL_ID);
+        manifest.files.insert("src/a.rs".to_owned(), file_content_hash(&[&fragment]));
+        write_manifest(&sidecar, &manifest).unwrap();
+        assert!(
+            !db_path.join("fragments.lance").exists(),
+            "test setup must have a manifest but no LanceDB table"
+        );
+
+        let embed = StubEmbeddingPort::new();
+        let result = open_persistent_index_with_corpus(&db_path, vec![fragment], &embed);
+
+        assert!(result.is_ok(), "missing table should trigger rebuild: {:?}", result.err());
+        assert_eq!(
+            embed.embed_batch_call_count(),
+            1,
+            "missing table with matching manifest must rebuild instead of reusing"
+        );
+        assert!(
+            db_path.join("fragments.lance").is_dir(),
+            "rebuild must recreate the LanceDB fragments table"
+        );
+    }
+
+    /// Changed file → only the changed file is re-embedded; unchanged file is not.
+    #[test]
+    fn test_open_persistent_index_with_corpus_changed_file_only_reembeds_dirty_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+
+        // First run: build with a.rs and b.rs.
+        let embed_a = StubEmbeddingPort::new();
+        let corpus_a = vec![
+            make_test_fragment("src/a.rs", "fn a() {}"),
+            make_test_fragment("src/b.rs", "fn b() {}"),
+        ];
+        open_persistent_index_with_corpus(&db_path, corpus_a, &embed_a).unwrap();
+        assert_eq!(embed_a.embed_batch_call_count(), 1, "first run must call embed_batch");
+
+        // Second run: a.rs unchanged, b.rs changed → embed_batch called once for b.rs.
+        let embed_b = StubEmbeddingPort::new();
+        let corpus_b = vec![
+            make_test_fragment("src/a.rs", "fn a() {}"), // unchanged
+            make_test_fragment("src/b.rs", "fn b_new() {}"), // changed
+        ];
+        let result = open_persistent_index_with_corpus(&db_path, corpus_b, &embed_b);
+        assert!(result.is_ok(), "incremental update must succeed: {:?}", result.err());
+        assert_eq!(
+            embed_b.embed_batch_call_count(),
+            1,
+            "embed_batch must be called once for the dirty file"
+        );
+    }
+
+    /// Incremental failure invalidates the manifest and clears the partial index.
+    #[test]
+    fn test_open_persistent_index_with_corpus_incremental_failure_clears_index() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+
+        let embed_a = StubEmbeddingPort::new();
+        let corpus_a = vec![make_test_fragment("src/a.rs", "fn a() {}")];
+        open_persistent_index_with_corpus(&db_path, corpus_a, &embed_a).unwrap();
+
+        let sidecar = manifest_sidecar_path(&db_path);
+        assert!(
+            read_manifest(&sidecar).unwrap().is_some(),
+            "first successful build must write a manifest"
+        );
+
+        let embed_b = StubEmbeddingPort::failing();
+        let corpus_b = vec![make_test_fragment("src/a.rs", "fn a_new() {}")];
+        let result = open_persistent_index_with_corpus(&db_path, corpus_b, &embed_b);
+
+        assert!(result.is_err(), "failing dirty-file embed must fail incremental update");
+        assert!(
+            read_manifest(&sidecar).unwrap().is_none(),
+            "failed incremental update must remove the stale manifest"
+        );
+        assert!(!db_path.exists(), "failed incremental update must clear the partial DB");
+        assert!(
+            !persistent_index_marker_path(&db_path).exists(),
+            "failed incremental update must remove the cache marker"
+        );
+    }
+
+    /// Existing index directories without the SOTP marker must fail before
+    /// any incremental delete/reinsert can mutate user-owned or corrupted data.
+    #[test]
+    fn test_open_persistent_index_with_corpus_unmarked_existing_dir_fails_before_update() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        std::fs::create_dir_all(&db_path).unwrap();
+        std::fs::write(db_path.join("user-data.txt"), b"must survive").unwrap();
+
+        let sidecar = manifest_sidecar_path(&db_path);
+        let mut manifest = IndexManifest::empty(EMBEDDING_MODEL_ID);
+        manifest.files.insert("src/a.rs".to_owned(), "stale-hash".to_owned());
+        write_manifest(&sidecar, &manifest).unwrap();
+
+        let embed = StubEmbeddingPort::never_called();
+        let corpus = vec![make_test_fragment("src/a.rs", "fn a_new() {}")];
+        let result = open_persistent_index_with_corpus(&db_path, corpus, &embed);
+
+        let message = match result {
+            Ok(_) => panic!("unmarked existing index directory must fail closed"),
+            Err(message) => message,
+        };
+        assert!(
+            message.contains("refusing to use unmarked semantic index directory"),
+            "unmarked existing index directory must fail closed before update, got: {message}"
+        );
+        assert_eq!(
+            embed.embed_batch_call_count(),
+            0,
+            "unmarked existing index directory must fail before embedding"
+        );
+        assert!(
+            db_path.join("user-data.txt").exists(),
+            "unmarked directory contents must not be mutated"
+        );
+    }
+
+    /// Deleted file → its fragments are removed from the index (no stale hits).
+    #[test]
+    fn test_open_persistent_index_with_corpus_deleted_file_fragments_removed() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+
+        // First run: build with stale.rs + fresh.rs.
+        let embed_a = StubEmbeddingPort::new();
+        let corpus_a = vec![
+            make_test_fragment("stale.rs", "fn stale() {}"),
+            make_test_fragment("fresh.rs", "fn fresh() {}"),
+        ];
+        let result_a = open_persistent_index_with_corpus(&db_path, corpus_a, &embed_a).unwrap();
+        drop(result_a);
+
+        // Second run: stale.rs removed from corpus.
+        let embed_b = StubEmbeddingPort::never_called();
+        let corpus_b = vec![make_test_fragment("fresh.rs", "fn fresh() {}")];
+        let index_b = open_persistent_index_with_corpus(&db_path, corpus_b, &embed_b).unwrap();
+
+        // Search must NOT return stale.rs.
+        let search_results =
+            index_b.search(&[0.5_f32; 2], domain::semantic_dup::TopK::new(10).unwrap()).unwrap();
+        let found_stale = search_results
+            .iter()
+            .any(|r| r.fragment.source_path.to_string_lossy().contains("stale"));
+        assert!(
+            !found_stale,
+            "deleted file fragments must not survive incremental update; found: {:?}",
+            search_results
+                .iter()
+                .map(|r| r.fragment.source_path.display().to_string())
+                .collect::<Vec<_>>()
+        );
+    }
+
+    /// Full rebuild failure → manifest removed so next run doesn't reuse a partial DB.
+    #[test]
+    fn test_open_persistent_index_with_corpus_rebuild_failure_removes_manifest() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+
+        let embed = StubEmbeddingPort::failing();
+        let corpus = vec![make_test_fragment("src/a.rs", "fn a() {}")];
+        let result = open_persistent_index_with_corpus(&db_path, corpus, &embed);
+
+        assert!(result.is_err(), "failing embed_batch must fail rebuild");
+        let sidecar = manifest_sidecar_path(&db_path);
+        assert!(
+            read_manifest(&sidecar).unwrap().is_none(),
+            "failed rebuild must remove the manifest sidecar"
+        );
+        assert!(!db_path.exists(), "failed rebuild must remove the partial DB directory");
+        assert!(
+            !persistent_index_marker_path(&db_path).exists(),
+            "failed rebuild must remove the cache marker"
+        );
+    }
+
+    /// Embedding count mismatch on full rebuild → error, no manifest written.
+    #[test]
+    fn test_open_persistent_index_with_corpus_embedding_count_mismatch_no_manifest() {
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+        let embed = StubEmbeddingPort::with_embedding_count(0);
+        let corpus = vec![make_test_fragment("src/a.rs", "fn a() {}")];
+
+        let result = open_persistent_index_with_corpus(&db_path, corpus, &embed);
+
+        assert!(result.is_err(), "mismatched embedding count must fail");
+        let message = result.err().unwrap();
+        assert!(
+            message.contains("full rebuild embed_batch returned 0 embeddings for 1 fragments")
+                || message.contains("0 embeddings"),
+            "mismatched embedding count must fail clearly, got: {message}"
+        );
+        let sidecar = manifest_sidecar_path(&db_path);
+        assert!(
+            read_manifest(&sidecar).unwrap().is_none(),
+            "mismatched embedding count must not write a manifest sidecar"
+        );
+    }
+
+    /// Full rebuild clears stale data: second call with a different corpus replaces all fragments.
+    #[test]
+    fn test_open_persistent_index_with_corpus_model_change_triggers_full_rebuild() {
+        // We can't change EMBEDDING_MODEL_ID at runtime, so instead we simulate
+        // a stale manifest with a different model ID by writing it directly.
+        let dir = tempfile::tempdir().unwrap();
+        let db_path = dir.path().join("idx");
+
+        // First run: build with corpus_a.
+        let embed_a = StubEmbeddingPort::new();
+        let corpus_a = vec![make_test_fragment("stale.rs", "fn stale() {}")];
+        open_persistent_index_with_corpus(&db_path, corpus_a, &embed_a).unwrap();
+        assert_eq!(embed_a.embed_batch_call_count(), 1);
+
+        // Tamper the manifest to simulate a different model ID.
+        let sidecar = manifest_sidecar_path(&db_path);
+        let mut tampered = read_manifest(&sidecar).unwrap().unwrap();
+        tampered.embedding_model_id = "old-model-v0".to_owned();
+        write_manifest(&sidecar, &tampered).unwrap();
+
+        // Second run: model mismatch → full rebuild, stale.rs must be gone.
+        let embed_b = StubEmbeddingPort::new();
+        let corpus_b = vec![make_test_fragment("fresh.rs", "fn fresh() {}")];
+        let index_b = open_persistent_index_with_corpus(&db_path, corpus_b, &embed_b).unwrap();
+        assert_eq!(embed_b.embed_batch_call_count(), 1, "model mismatch must trigger full rebuild");
+
+        let search_results =
+            index_b.search(&[0.5_f32; 2], domain::semantic_dup::TopK::new(10).unwrap()).unwrap();
+        let found_stale = search_results
+            .iter()
+            .any(|r| r.fragment.source_path.to_string_lossy().contains("stale"));
+        assert!(
+            !found_stale,
+            "stale fragments must not survive model-change full rebuild; found: {:?}",
+            search_results
+                .iter()
+                .map(|r| r.fragment.source_path.display().to_string())
+                .collect::<Vec<_>>()
+        );
     }
 }

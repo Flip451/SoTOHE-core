@@ -17,6 +17,14 @@ target-*/
 .fastembed_cache/
 **/.fastembed_cache/
 
+# --- DRY-check semantic index (LanceDB; local build artifact, never version-controlled) ---
+# Directory plus every persistent-index sidecar at the default db-path
+# (.fingerprint / .fingerprint.tmp / .lock [fs4 advisory lock] / .sotp-cache [cache marker]).
+.semantic_index/
+**/.semantic_index/
+.semantic_index.*
+sotp-dry-index-*/
+
 # --- Environment / secrets ---
 .env
 .env.*

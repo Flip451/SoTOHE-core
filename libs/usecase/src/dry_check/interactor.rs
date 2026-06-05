@@ -9,17 +9,19 @@ use std::sync::Arc;
 
 use domain::CommitHash;
 use domain::dry_check::{
-    DryCheckEntry, DryCheckEntryError, DryCheckFinding, DryCheckPairKey, DryCheckPairKeyError,
-    DryCheckReader, DryCheckVerdict, DryCheckWriter, Rationale,
+    DryCheckEntry, DryCheckEntryError, DryCheckFinding, DryCheckPairKey, DryCheckReader,
+    DryCheckVerdict, DryCheckWriter, Rationale,
 };
 use domain::review_v2::types::FilePath;
-use domain::semantic_dup::{CodeFragment, SimilarityScore, SimilarityThreshold, TopK};
+use domain::semantic_dup::{CodeFragment, SimilarityThreshold};
 
 use super::errors::DryCheckCycleError;
 use super::judgment::DryCheckAgentJudgment;
 use super::ports::DryCheckAgentPort;
 use super::services::DryCheckService;
-use super::shared::fragment_ref_of;
+use super::shared::{
+    build_corpus_index, candidate_pair_keys_for_diff, collect_above_threshold_candidates,
+};
 use crate::semantic_dup::{EmbeddingPort, SemanticIndexError, SemanticIndexPort};
 
 // ── DryCheckInteractor ────────────────────────────────────────────────────────
@@ -102,13 +104,11 @@ impl DryCheckService for DryCheckInteractor {
         }
 
         // ── Step 2: Build whole-codebase index from corpus_fragments ──────────
-        //
-        // Fresh per call (IN-02/D4): do NOT persist index between calls.
-        for fragment in &corpus_fragments {
-            let embedding =
-                self.embedding_port.embed(fragment).map_err(DryCheckCycleError::Embedding)?;
-            self.index_port.insert(fragment, &embedding).map_err(DryCheckCycleError::Index)?;
-        }
+        build_corpus_index(
+            corpus_fragments,
+            self.embedding_port.as_ref(),
+            self.index_port.as_ref(),
+        )?;
 
         // ── Steps 3–5: Per diff_fragment loop ─────────────────────────────────
         let mut findings: Vec<DryCheckFinding> = Vec::new();
@@ -117,107 +117,26 @@ impl DryCheckService for DryCheckInteractor {
             // CN-04: diff_fragments are already hunk-filtered by the CLI.
             // The interactor does NOT perform additional hunk filtering.
 
-            let changed_ref = fragment_ref_of(diff_fragment).map_err(|e| {
-                DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
-                    source: format!("changed_fragment path error: {e}"),
-                })
-            })?;
-
-            let query_embedding =
-                self.embedding_port.embed(diff_fragment).map_err(DryCheckCycleError::Embedding)?;
-
-            // ── Growing-k threshold-boundary loop ─────────────────────────────
-            //
-            // Mirror of SemanticDupInteractor pattern (IN-06/D8).
-            // k, 2k, 4k, … — stop when:
-            //   (a) the returned batch contains at least one score < threshold
-            //       (threshold boundary crossed); or
-            //   (b) batch is empty; or
-            //   (c) fewer than k results returned (index exhausted).
-            //
-            // Stopping when "all are already verified" is explicitly NOT a
-            // termination condition (impl-plan T004 D8 note).
-            let initial_k: usize = 10;
-            let mut k = initial_k;
-            let mut above_threshold_candidates: Vec<(CodeFragment, SimilarityScore)> = Vec::new();
-
-            loop {
-                let top_k = match TopK::new(k) {
-                    Ok(v) => v,
-                    Err(_) => {
-                        // k >= 1 always (started at 10, doubled), so this is
-                        // unreachable — but we map it gracefully to avoid panic.
-                        return Err(DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
-                            source: "internal: k overflowed usize".to_owned(),
-                        }));
-                    }
-                };
-
-                let batch = self
-                    .index_port
-                    .search(&query_embedding, top_k)
-                    .map_err(DryCheckCycleError::Index)?;
-
-                // Empty batch → index exhausted.
-                if batch.is_empty() {
-                    break;
-                }
-
-                let returned_count = batch.len();
-                let mut found_boundary = false;
-
-                for similar in batch {
-                    let score = similar.score;
-                    let candidate = similar.fragment;
-
-                    if score.value() < threshold.value() {
-                        found_boundary = true;
-                        // Below threshold — do not add to candidates.
-                        continue;
-                    }
-
-                    above_threshold_candidates.push((candidate, score));
-                }
-
-                // Threshold boundary crossed → all above-threshold candidates collected.
-                if found_boundary {
-                    break;
-                }
-
-                // Fewer than k returned → index exhausted.
-                if returned_count < k {
-                    break;
-                }
-
-                // Double k for next iteration.
-                k = k.saturating_mul(2);
-            }
+            let above_threshold_candidates = collect_above_threshold_candidates(
+                diff_fragment,
+                threshold,
+                self.embedding_port.as_ref(),
+                self.index_port.as_ref(),
+            )?;
+            let candidate_pairs =
+                candidate_pair_keys_for_diff(diff_fragment, above_threshold_candidates)?;
 
             // ── Step 4: Per candidate ─────────────────────────────────────────
-            for (candidate_fragment, similarity_score) in above_threshold_candidates {
-                let candidate_ref = fragment_ref_of(&candidate_fragment).map_err(|e| {
-                    DryCheckCycleError::Index(SemanticIndexError::SearchFailed {
-                        source: format!("candidate_fragment path error: {e}"),
-                    })
-                })?;
-
-                // Single self-match guard: DryCheckPairKey::new is the sole
-                // rejection point (both path AND content_hash equal).
-                // No string-equality pre-check.
-                let pair_key = match DryCheckPairKey::new(changed_ref.clone(), candidate_ref) {
-                    Err(DryCheckPairKeyError::SelfMatch) => continue,
-                    Ok(k) => k,
-                };
-
+            for candidate_pair in candidate_pairs {
                 // Skip already-verified pairs (CN-07 identifier matching).
-                if verified_set.contains_key(&pair_key) {
+                if verified_set.contains_key(&candidate_pair.pair_key) {
                     continue;
                 }
 
                 // Call agent for unverified candidate.
                 let judgment = self
                     .agent_port
-                    .judge(diff_fragment, &candidate_fragment)
+                    .judge(diff_fragment, &candidate_pair.candidate_fragment)
                     .map_err(DryCheckCycleError::Agent)?;
 
                 // ── Step 5: Per judgment ──────────────────────────────────────
@@ -232,10 +151,10 @@ impl DryCheckService for DryCheckInteractor {
                         })?;
 
                 let entry = DryCheckEntry::new(
-                    pair_key.clone(),
+                    candidate_pair.pair_key.clone(),
                     changed_path,
                     verdict,
-                    similarity_score,
+                    candidate_pair.similarity_score,
                     threshold,
                     base_commit.clone(),
                     rationale,
@@ -245,7 +164,7 @@ impl DryCheckService for DryCheckInteractor {
                 self.dry_check_writer.append_record(&entry).map_err(DryCheckCycleError::Writer)?;
 
                 // Add to verified set for this run.
-                verified_set.insert(pair_key, ());
+                verified_set.insert(candidate_pair.pair_key, ());
 
                 // Collect finding if the judgment was a Violation.
                 if let Some(finding) = maybe_finding {
@@ -310,34 +229,13 @@ mod tests {
 
     use super::*;
     use crate::dry_check::errors::DryCheckAgentError;
+    use crate::dry_check::shared::test_mocks::{MockMockEmbeddingPort, MockMockSemanticIndexPort};
     use crate::dry_check::shared::{content_hash_of, fragment_ref_of};
-    use crate::semantic_dup::{EmbeddingError, SemanticIndexError};
 
     // ── Mock port definitions ─────────────────────────────────────────────────
-
-    mock! {
-        pub MockEmbeddingPort {}
-        impl EmbeddingPort for MockEmbeddingPort {
-            fn embed(&self, fragment: &CodeFragment) -> Result<Vec<f32>, EmbeddingError>;
-        }
-    }
-
-    mock! {
-        pub MockSemanticIndexPort {}
-        impl SemanticIndexPort for MockSemanticIndexPort {
-            fn insert(
-                &self,
-                fragment: &CodeFragment,
-                embedding: &[f32],
-            ) -> Result<(), SemanticIndexError>;
-
-            fn search(
-                &self,
-                embedding: &[f32],
-                top_k: domain::semantic_dup::TopK,
-            ) -> Result<Vec<SimilarFragment>, SemanticIndexError>;
-        }
-    }
+    //
+    // `MockMockEmbeddingPort` and `MockMockSemanticIndexPort` are defined once in
+    // `crate::dry_check::shared::test_mocks` and imported above.
 
     mock! {
         pub MockDryCheckAgentPort {}
@@ -481,7 +379,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         // Search returns the candidate above threshold.
         let results = vec![make_similar_fragment("src/b.rs", cand_content, 0.9)];
         index.expect_search().returning(move |_, _| Ok(results.clone()));
@@ -528,7 +426,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         let results = vec![make_similar_fragment("src/b.rs", cand_content, 0.9)];
         index.expect_search().returning(move |_, _| Ok(results.clone()));
 
@@ -568,7 +466,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         // Candidate is literally the same fragment.
         let results = vec![make_similar_fragment("src/a.rs", content, 1.0)];
         index.expect_search().returning(move |_, _| Ok(results.clone()));
@@ -599,7 +497,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         // Same path, different content.
         let results = vec![make_similar_fragment("src/a.rs", cand_content, 0.9)];
         index.expect_search().returning(move |_, _| Ok(results.clone()));
@@ -637,7 +535,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.5_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
 
         // First search (k=10): returns exactly 10 above-threshold items — all
         // from "src/x0.rs" .. "src/x9.rs".  No boundary → grow k.
@@ -711,7 +609,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         index.expect_search().returning(|_, _| {
             Ok(vec![make_similar_fragment("src/b.rs", "fn similar_fn() {}", 0.9)])
         });
@@ -743,7 +641,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         // Return one above-threshold and one below-threshold in the first batch.
         index.expect_search().times(1).returning(|_, _| {
             Ok(vec![
@@ -780,7 +678,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         // Return fewer than k=10 results (exhausted) — all above threshold.
         index
             .expect_search()
@@ -818,7 +716,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         let cand_frag_clone = make_fragment("src/b.rs", cand_content);
         index.expect_search().returning(move |_, _| {
             Ok(vec![SimilarFragment { fragment: cand_frag_clone.clone(), score: make_score(0.85) }])
@@ -881,7 +779,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         index
             .expect_search()
             .returning(|_, _| Ok(vec![make_similar_fragment("src/b.rs", "fn b() {}", 0.9)]));
@@ -920,7 +818,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         let cand_frag = make_fragment("src/b.rs", cand_content);
         index.expect_search().returning(move |_, _| {
             Ok(vec![SimilarFragment { fragment: cand_frag.clone(), score: make_score(0.9) }])
@@ -964,47 +862,7 @@ mod tests {
         }
     }
 
-    // ── (k) DryCheckPairKey built from FragmentRefs (path + content_hash) ─────
-
-    #[test]
-    fn test_dry_check_pair_key_built_from_fragment_refs_not_path_only() {
-        // Two fragments with same path but DIFFERENT content → valid pair, NOT self-match.
-        let diff_content = "fn path_same_content_a() {}";
-        let cand_content = "fn path_same_content_b() {}"; // same path, different content
-        let diff_frag = make_fragment("src/a.rs", diff_content);
-
-        let mut embed = MockMockEmbeddingPort::new();
-        embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
-
-        let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
-        // Same path, different content.
-        let cand_frag = make_fragment("src/a.rs", cand_content);
-        index.expect_search().returning(move |_, _| {
-            Ok(vec![SimilarFragment { fragment: cand_frag.clone(), score: make_score(0.85) }])
-        });
-
-        // Agent IS called (different content_hash → not self-match).
-        let mut agent = MockMockDryCheckAgentPort::new();
-        agent.expect_judge().times(1).returning(|_, _| {
-            Ok(DryCheckAgentJudgment::NotAViolation {
-                rationale: Rationale::new("intra-file pair, not a violation").unwrap(),
-            })
-        });
-
-        let writer = Arc::new(StubWriter::default());
-        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
-
-        let result = interactor
-            .run_dry_check(vec![], vec![diff_frag], make_threshold(0.8), make_commit())
-            .unwrap();
-
-        assert!(result.is_empty());
-        // Verify a record was persisted → pair was judged (not a self-match).
-        assert_eq!(writer.entries.lock().unwrap().len(), 1);
-    }
-
-    // ── (l) content_hash accessible via pair_key().low()/.high().content_hash()
+    // ── (k) content_hash accessible via pair_key().low()/.high().content_hash()
 
     #[test]
     fn test_content_hash_accessible_via_pair_key_low_high_content_hash() {
@@ -1017,7 +875,7 @@ mod tests {
         embed.expect_embed().returning(|_| Ok(vec![0.1_f32]));
 
         let mut index = MockMockSemanticIndexPort::new();
-        index.expect_insert().returning(|_, _| Ok(()));
+        index.expect_insert_batch().returning(|_| Ok(()));
         index.expect_search().returning(move |_, _| {
             Ok(vec![SimilarFragment {
                 fragment: cand_frag_for_search.clone(),
@@ -1059,5 +917,54 @@ mod tests {
         // No separate low_hash/high_hash fields — access is via pair_key().low()/.high()
         assert_eq!(low_hash.len(), 64, "content hash must be 64-char hex");
         assert_eq!(high_hash.len(), 64, "content hash must be 64-char hex");
+    }
+
+    // ── (m) corpus batch: embed_batch called once + insert_batch called once ────
+
+    /// Verify that `run_dry_check` calls `embed_batch` exactly once for the
+    /// corpus (not per-fragment `embed`) and `insert_batch` exactly once with
+    /// all corpus items.  The diff fragment query still uses `embed`.
+    #[test]
+    fn test_run_dry_check_calls_embed_batch_once_and_insert_batch_once_with_all_corpus_items() {
+        // Three corpus fragments; one diff fragment.
+        let corpus_a = make_fragment("src/corpus_a.rs", "fn corpus_a() {}");
+        let corpus_b = make_fragment("src/corpus_b.rs", "fn corpus_b() {}");
+        let corpus_c = make_fragment("src/corpus_c.rs", "fn corpus_c() {}");
+        let diff_frag = make_fragment("src/diff.rs", "fn diff() {}");
+
+        let mut embed = MockMockEmbeddingPort::new();
+        // embed_batch called once for the 3 corpus fragments.
+        embed
+            .expect_embed_batch()
+            .times(1)
+            .withf(|frags| frags.len() == 3)
+            .returning(|frags| Ok(frags.iter().map(|_| vec![0.1_f32]).collect()));
+        // embed called once for the diff-fragment query in collect_above_threshold_candidates.
+        embed.expect_embed().times(1).returning(|_| Ok(vec![0.1_f32]));
+
+        let mut index = MockMockSemanticIndexPort::new();
+        // insert_batch must be called exactly once with all 3 corpus items.
+        index.expect_insert_batch().times(1).withf(|items| items.len() == 3).returning(|_| Ok(()));
+        // Search returns empty (no candidates above threshold) so no agent calls.
+        index.expect_search().returning(|_, _| Ok(vec![]));
+
+        // Agent must not be called (no above-threshold candidates).
+        let mut agent = MockMockDryCheckAgentPort::new();
+        agent.expect_judge().never();
+
+        let writer = Arc::new(StubWriter::default());
+        let interactor = make_interactor_empty_history(embed, index, agent, Arc::clone(&writer));
+
+        let result = interactor
+            .run_dry_check(
+                vec![corpus_a, corpus_b, corpus_c],
+                vec![diff_frag],
+                make_threshold(0.8),
+                make_commit(),
+            )
+            .unwrap();
+
+        assert!(result.is_empty());
+        assert!(writer.entries.lock().unwrap().is_empty());
     }
 }

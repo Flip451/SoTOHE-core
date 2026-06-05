@@ -122,6 +122,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [plan-only / activate ワークフローレーンの削除](2026-05-26-1123-remove-plan-only-activate-lane.md) | Proposed | 2026-05-26 |
 | [track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする](2026-05-26-1813-track-id-default-active-track.md) | Proposed | 2026-05-26 |
 | [review / commit ゲートを型カタログ未生成の段階でも通す — active-gate のシグナル評価を欠損入力に寛容にする](2026-06-01-0406-review-gate-tolerate-missing-catalogue.md) | — | 2026-06-01 |
+| [spec-states commit ゲートを spec 成果物未生成の段階でも通す — トラック解決時のシグナル評価を欠損入力に寛容にする](2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md) | Proposed | 2026-06-03 |
 
 ### ADR 運用
 
@@ -182,6 +183,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [`cargo make llvm-cov` を nextest 経路に統一する](2026-04-27-0124-llvm-cov-nextest-harness-alignment.md) | — | 2026-04-27 |
 | [コード意味重複検出による DRY 防止（discoverability + soft gate）](2026-05-29-1118-semantic-dup-detection-discoverability-gate.md) | — | 2026-05-29 |
 | [semantic-dup を活用した DRY 違反の自動検出 capability](2026-06-02-0716-dry-checker.md) | Proposed | 2026-06-02 |
+| [dry-checker(sotp dry)の運用修正 — Codex アカウント対応・スキーマ厳格化・インデックス除外・insert と埋め込みの一括化・インデックス永続化](2026-06-04-1042-dry-checker-operability-and-batch-index.md) | Proposed | 2026-06-04 |
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 
 ### Review コマンド / API

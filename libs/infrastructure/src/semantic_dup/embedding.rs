@@ -96,12 +96,36 @@ const JINA_V2_CODE_REVISION: &str = "main";
 /// In CI, set `FASTEMBED_CACHE_DIR` to a pre-populated volume mount.
 pub struct FastEmbedAdapter {
     /// Wrapped in `Mutex` because `TextEmbedding::embed` takes `&mut self`.
-    model: Mutex<TextEmbedding>,
+    model: Mutex<Box<dyn TextEmbeddingModel>>,
 }
 
 impl std::fmt::Debug for FastEmbedAdapter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("FastEmbedAdapter").finish_non_exhaustive()
+    }
+}
+
+/// Maximum number of fragments fed to a single fastembed inference batch.
+///
+/// fastembed's default batch size (256) runs ONNX inference over all 256
+/// sequences at once; with long code fragments this peaks at ~20 GB RSS and
+/// makes the corpus build unusable as a commit-gate step (it was killed with
+/// exit 137 / timed out in practice). Bounding the per-pass batch caps peak
+/// memory and avoids the OOM kill at a negligible throughput cost. This is an
+/// implementation detail of how `embed_batch` drives the fastembed batch API:
+/// the caller still submits every fragment in one `embed_batch` call
+/// (`knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md`
+/// §D5); only the internal fastembed sub-batching is bounded here.
+const FASTEMBED_INFERENCE_BATCH_SIZE: usize = 16;
+
+trait TextEmbeddingModel: Send {
+    fn embed_texts(&mut self, texts: Vec<&str>) -> Result<Vec<Vec<f32>>, EmbeddingError>;
+}
+
+impl TextEmbeddingModel for TextEmbedding {
+    fn embed_texts(&mut self, texts: Vec<&str>) -> Result<Vec<Vec<f32>>, EmbeddingError> {
+        self.embed(texts, Some(FASTEMBED_INFERENCE_BATCH_SIZE))
+            .map_err(|e| EmbeddingError::InferenceFailed { source: e.to_string() })
     }
 }
 
@@ -265,7 +289,7 @@ impl FastEmbedAdapter {
         )
         .map_err(|e| EmbeddingError::ModelLoadFailed { source: e.to_string() })?;
 
-        Ok(Self { model: Mutex::new(model) })
+        Ok(Self { model: Mutex::new(Box::new(model)) })
     }
 }
 
@@ -286,13 +310,51 @@ impl EmbeddingPort for FastEmbedAdapter {
         })?;
 
         let texts = vec![fragment.content()];
-        let mut results = model
-            .embed(texts, None)
-            .map_err(|e| EmbeddingError::InferenceFailed { source: e.to_string() })?;
+        let mut results = model.embed_texts(texts)?;
 
         results.pop().ok_or_else(|| EmbeddingError::InferenceFailed {
             source: "fastembed returned an empty embedding batch".to_owned(),
         })
+    }
+
+    /// Compute embedding vectors for a batch of code fragments in a single
+    /// fastembed inference call (synchronous, Tokio-independent).
+    ///
+    /// fastembed's `TextEmbedding::embed` is natively batched — all fragment
+    /// contents are passed in one call and the results are returned in the same
+    /// order as the input.  An empty `fragments` slice returns `Ok(vec![])`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`EmbeddingError::InferenceFailed`] if ONNX inference fails,
+    /// if the internal mutex is poisoned, or if fastembed returns a result
+    /// count that does not match the input count.
+    fn embed_batch(
+        &self,
+        fragments: &[domain::semantic_dup::CodeFragment],
+    ) -> Result<Vec<Vec<f32>>, EmbeddingError> {
+        if fragments.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let mut model = self.model.lock().map_err(|e| EmbeddingError::InferenceFailed {
+            source: format!("model mutex poisoned: {e}"),
+        })?;
+
+        let texts: Vec<&str> = fragments.iter().map(|f| f.content()).collect();
+        let results = model.embed_texts(texts)?;
+
+        if results.len() != fragments.len() {
+            return Err(EmbeddingError::InferenceFailed {
+                source: format!(
+                    "fastembed returned {} embeddings for {} fragments",
+                    results.len(),
+                    fragments.len()
+                ),
+            });
+        }
+
+        Ok(results)
     }
 }
 
@@ -301,6 +363,8 @@ impl EmbeddingPort for FastEmbedAdapter {
 #[cfg(test)]
 mod tests {
     #![allow(clippy::unwrap_used)]
+
+    use std::sync::Arc;
 
     use super::*;
 
@@ -569,6 +633,88 @@ mod tests {
         assert!(
             matches!(result, Err(EmbeddingError::ModelLoadFailed { .. })),
             "new_with_cache_dir must return ModelLoadFailed when tokenizer files are absent"
+        );
+    }
+
+    // ── embed_batch: empty-input fast path ────────────────────────────────────
+    //
+    // Full embed_batch behaviour (multiple fragments → model inference → ordered
+    // results) requires the ONNX model weights in the fastembed cache.  Because
+    // CI does not pre-populate the cache, we test only the zero-fragment fast
+    // path here.  The ordering guarantee and count-mismatch error branch are
+    // verified indirectly by the build_corpus_index interactor tests in
+    // `libs/usecase`.
+
+    struct FailingEmbeddingModel;
+
+    impl TextEmbeddingModel for FailingEmbeddingModel {
+        fn embed_texts(&mut self, _texts: Vec<&str>) -> Result<Vec<Vec<f32>>, EmbeddingError> {
+            Err(EmbeddingError::InferenceFailed { source: "simulated model failure".to_owned() })
+        }
+    }
+
+    struct RecordingEmbeddingModel {
+        calls: Arc<Mutex<Vec<Vec<String>>>>,
+        response: Vec<Vec<f32>>,
+    }
+
+    impl TextEmbeddingModel for RecordingEmbeddingModel {
+        fn embed_texts(&mut self, texts: Vec<&str>) -> Result<Vec<Vec<f32>>, EmbeddingError> {
+            let call = texts.into_iter().map(str::to_owned).collect();
+            self.calls.lock().unwrap().push(call);
+            Ok(self.response.clone())
+        }
+    }
+
+    fn make_fragment(path: &str, content: &str) -> domain::semantic_dup::CodeFragment {
+        domain::semantic_dup::CodeFragment::new(
+            std::path::PathBuf::from(path),
+            content.to_owned(),
+            1,
+            1,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn test_embed_batch_with_empty_slice_returns_empty_vec_without_model() {
+        let adapter = FastEmbedAdapter { model: Mutex::new(Box::new(FailingEmbeddingModel)) };
+
+        let embeddings = adapter.embed_batch(&[]).unwrap();
+
+        assert!(embeddings.is_empty(), "empty input must return an empty embedding batch");
+    }
+
+    #[test]
+    fn test_embed_batch_with_non_empty_slice_forwards_single_ordered_model_call() {
+        let calls = Arc::new(Mutex::new(Vec::new()));
+        let response = vec![vec![1.0_f32, 2.0], vec![3.0_f32, 4.0]];
+        let adapter = FastEmbedAdapter {
+            model: Mutex::new(Box::new(RecordingEmbeddingModel {
+                calls: Arc::clone(&calls),
+                response: response.clone(),
+            })),
+        };
+        let fragments =
+            vec![make_fragment("src/a.rs", "fn a() {}"), make_fragment("src/b.rs", "fn b() {}")];
+
+        let embeddings = adapter.embed_batch(&fragments).unwrap();
+
+        assert_eq!(embeddings, response);
+        let expected_calls = vec![vec!["fn a() {}".to_owned(), "fn b() {}".to_owned()]];
+        assert_eq!(&*calls.lock().unwrap(), &expected_calls);
+    }
+
+    #[test]
+    fn test_embed_batch_with_model_error_returns_inference_failed() {
+        let adapter = FastEmbedAdapter { model: Mutex::new(Box::new(FailingEmbeddingModel)) };
+        let fragments = vec![make_fragment("src/a.rs", "fn a() {}")];
+
+        let result = adapter.embed_batch(&fragments);
+
+        assert!(
+            matches!(&result, Err(EmbeddingError::InferenceFailed { source }) if source == "simulated model failure"),
+            "model error must be surfaced as InferenceFailed, got: {result:?}"
         );
     }
 }

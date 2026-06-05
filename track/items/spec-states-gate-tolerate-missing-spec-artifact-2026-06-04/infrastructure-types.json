@@ -1,0 +1,73 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "LanceDbSemanticIndexAdapter": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "semantic_dup::index",
+      "docs": "Infrastructure adapter implementing SemanticIndexPort via LanceDB. This track adds delete_by_source_path (IN-10/D7): deletes all fragments for a given source_path using a LanceDB SQL predicate delete, enabling incremental index maintenance. insert_batch (IN-07/D4) was added in the D4/D5 pass.",
+      "spec_refs": [
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "IN-10",
+          "hash": "b1fec02e384deb97fdb43a6a0a0087a05346d0db3753564da9ebeb7b6878acee"
+        },
+        {
+          "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.json",
+          "anchor": "AC-12",
+          "hash": "c86d8f1cece8b1d6f489528d307ac0dfff218d77c788f3fe0da280de1ab22e70"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "db_path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<Self, usecase::semantic_dup::SemanticIndexError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "usecase::semantic_dup::SemanticIndexPort",
+      "for_type": "LanceDbSemanticIndexAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "LanceDbSemanticIndexAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::ops::drop::Drop",
+      "for_type": "LanceDbSemanticIndexAdapter"
+    }
+  ]
+}

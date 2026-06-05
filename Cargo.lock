@@ -879,7 +879,9 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "domain",
+ "fs4",
  "infrastructure",
+ "mockall",
  "serde",
  "serde_json",
  "sha2",

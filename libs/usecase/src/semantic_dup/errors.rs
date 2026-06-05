@@ -53,6 +53,11 @@ pub enum SemanticIndexError {
         /// Opaque error string from the underlying LanceDB error.
         source: String,
     },
+    /// Deleting fragments by source path from the index failed.
+    DeleteFailed {
+        /// Opaque error string from the underlying LanceDB error.
+        source: String,
+    },
     /// Searching the index failed.
     SearchFailed {
         /// Opaque error string from the underlying LanceDB error.
@@ -68,6 +73,9 @@ impl fmt::Display for SemanticIndexError {
             }
             Self::InsertFailed { source } => {
                 write!(f, "semantic index insert failed: {source}")
+            }
+            Self::DeleteFailed { source } => {
+                write!(f, "semantic index delete failed: {source}")
             }
             Self::SearchFailed { source } => {
                 write!(f, "semantic index search failed: {source}")
