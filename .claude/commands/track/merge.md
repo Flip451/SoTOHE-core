@@ -28,7 +28,7 @@ verbatim in `$ARGUMENTS`.
 Run the merge wrapper:
 
 ```bash
-cargo make track-pr-merge <pr_number> --method <method>
+bin/sotp pr wait-and-merge <pr_number> --method <method>
 ```
 
 This executes `bin/sotp pr wait-and-merge` which:

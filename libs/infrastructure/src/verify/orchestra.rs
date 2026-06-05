@@ -163,11 +163,8 @@ const EXPECTED_CARGO_MAKE_ALLOW: &[(&str, &str)] = &[
     ("Bash(cargo make track-add-paths)", "cargo make track-add-paths permission"),
     ("Bash(cargo make track-commit-message)", "cargo make track-commit-message permission"),
     ("Bash(cargo make track-note)", "cargo make track-note permission"),
-    ("Bash(cargo make track-transition:*)", "cargo make track-transition permission"),
-    ("Bash(cargo make track-sync-views:*)", "cargo make track-sync-views permission"),
     ("Bash(cargo make track-branch-create:*)", "cargo make track-branch-create permission"),
     ("Bash(cargo make track-branch-switch:*)", "cargo make track-branch-switch permission"),
-    ("Bash(cargo make track-resolve:*)", "cargo make track-resolve permission"),
     (
         "Bash(cargo make architecture-rules-workspace-members)",
         "architecture rules workspace-members permission",
@@ -184,12 +181,14 @@ const EXPECTED_CARGO_MAKE_ALLOW: &[(&str, &str)] = &[
     ("Bash(cargo make track-pr)", "cargo make track-pr permission"),
     ("Bash(cargo make track-pr:*)", "cargo make track-pr wildcard permission"),
     ("Bash(cargo make track-pr-push)", "cargo make track-pr-push permission"),
-    ("Bash(cargo make track-pr-ensure)", "cargo make track-pr-ensure permission"),
     ("Bash(cargo make track-pr-review)", "cargo make track-pr-review permission"),
-    ("Bash(cargo make track-pr-merge:*)", "cargo make track-pr-merge permission"),
-    ("Bash(cargo make track-pr-status:*)", "cargo make track-pr-status permission"),
-    ("Bash(cargo make track-local-review:*)", "cargo make track-local-review permission"),
+    ("Bash(cargo make track-set-commit-hash:*)", "cargo make track-set-commit-hash permission"),
     ("Bash(cargo make track-switch-main)", "cargo make track-switch-main permission"),
+    (
+        "Bash(cargo make track-local-review-fix-codex:*)",
+        "cargo make track-local-review-fix-codex permission",
+    ),
+    ("Bash(cargo make track-local-dry-fix:*)", "cargo make track-local-dry-fix permission"),
 ];
 
 const FORBIDDEN_ALLOW: &[&str] = &[
@@ -322,7 +321,7 @@ const MODEL_RESOLUTION_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
     (
         ".claude/commands/track/plan.md",
         "track-plan provider-specific invocation",
-        &["Agent tool", "cargo make track-local-plan"],
+        &["Agent tool", "bin/sotp plan codex-local"],
         &["codex exec --model gpt-5.3-codex --sandbox read-only --full-auto \""],
     ),
     (
@@ -359,7 +358,7 @@ const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
         ".claude/commands/track/review.md",
         "track review wrapper path",
         &[
-            "cargo make track-local-review -- --round-type fast --group",
+            "bin/sotp review local --round-type fast --group",
             "--track-id",
             "--briefing-file tmp/reviewer-runtime/briefing-",
         ],
@@ -372,8 +371,8 @@ const REVIEW_WRAPPER_TARGETS: &[(&str, &str, &[&str], &[&str])] = &[
         ".claude/skills/codex-system/SKILL.md",
         "codex-system reviewer wrapper path",
         &[
-            "cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md",
-            "cargo make track-local-review -- --model {model} --prompt \"",
+            "bin/sotp review local --round-type {round_type} --group {scope} --model {model} --briefing-file tmp/codex-briefing.md",
+            "bin/sotp review local --round-type {round_type} --group {scope} --model {model} --prompt \"",
             "{\"verdict\":\"zero_findings\",\"findings\":[]}",
             "{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"describe the bug\",\"severity\":\"P1\",\"file\":\"path/to/file.rs\",\"line\":123}]}",
             "Every object field is required by the output schema.",

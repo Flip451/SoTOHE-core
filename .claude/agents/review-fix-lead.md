@@ -19,7 +19,7 @@ review → fix → verify → re-review until the reviewer reports `zero_finding
 - Briefing file path (`tmp/reviewer-runtime/briefing-{scope}.md`)
 - Round type (`fast` or `final`) — single value, fixed for the agent's lifetime
 
-The reviewer model is auto-resolved by `cargo make track-local-review` from `agent-profiles.json`;
+The reviewer model is auto-resolved by `bin/sotp review local` from `agent-profiles.json`;
 the orchestrator does not pass it. The modification boundary is self-resolved by this agent
 (see Scope Ownership) — the orchestrator does not pass a scope file list.
 
@@ -54,48 +54,50 @@ cause of over-long review loops.
 
 Do not skip this step even if the briefing path appears to be a known file.
 Always read it fresh — the policy file may have been updated since the last
-review session. The CLI composer (`sotp review codex-local`) appends this
+review session. The CLI composer (`bin/sotp review local`) appends this
 section automatically for any scope whose `briefing_file` is configured in
 `track/review-scope.json`; treat the appended reference as an authoritative
 severity filter for this round.
 
 ## Workflow
 
-**Always invoke review via `cargo make track-local-review` (never `bin/sotp
-review codex-local` directly).** The cargo-make wrapper chains
-`track-sync-views` before the review so the scope hash is computed against
-the up-to-date rendered views (`plan.md`, `contract-map.md`,
-`<layer>-types.md`). Calling the inner `bin/sotp` form directly skips
-sync-views, which surfaces later as "review approved at hash H → later
-`track-sync-views` changes a view → hash H' ≠ H → commit blocked, re-review
-needed" — the recurring pre-commit flap that the ordering rule exists to
-prevent. If a briefing lists the raw `bin/sotp review codex-local` form,
-translate it to `cargo make track-local-review -- ...` before running.
+**Always invoke review via `bin/sotp review local`.** The native subcommand
+auto-resolves the provider and is the canonical entry point for the review cycle.
+Before every review round, run the former `track-active-gate` as separate native
+commands so generated signals and rendered views are fresh:
 
-**Read prior-round findings via `cargo make track-review-results`, never by
+```bash
+bin/sotp track type-signals
+bin/sotp track catalogue-spec-signals
+bin/sotp track views sync
+```
+
+Then run `bin/sotp review local` with the assigned round type and briefing.
+
+**Read prior-round findings via `bin/sotp review results`, never by
 opening `review.json` directly.** The `sotp review results` subcommand is the
 canonical read-only API for review state and round history. Useful invocations
 when you need to inspect what the reviewer said previously for your scope:
 
 - Latest fast-round findings only:
-  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type fast --limit 1`
+  `bin/sotp review results --track-id {track-id} --scope {scope} --round-type fast --limit 1`
 - Latest final-round findings only:
-  `cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type final --limit 1`
+  `bin/sotp review results --track-id {track-id} --scope {scope} --round-type final --limit 1`
 
 `--limit 0` (the default) shows only the per-scope state summary and is the
 right form when you just need to confirm `required (stale hash)` /
 `required (findings remain)` / `approved`. See `.claude/commands/track/review.md`
-§ "track-review-results flag reference" for common flags; run
-`cargo make track-review-results -- --help` for the complete option list.
+§ "sotp review results flag reference" for common flags; run
+`bin/sotp review results --help` for the complete option list.
 
-1. **Review**: Run `cargo make track-local-review` with the provided briefing and the assigned `--round-type` (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other).
+1. **Review**: Run `bin/sotp review local` with the provided briefing and the assigned `--round-type` (`fast` or `final` — value comes from the orchestrator prompt; never substitute the other).
 2. **Parse verdict**: Read the verdict from command output.
    - `zero_findings` → proceed to step 2.5 (verify via canonical API).
    - `findings_remain` → proceed to fix phase.
    - Error → return `failed`.
 2.5. **Verify via canonical API (mandatory before reporting `completed`)**:
    ```
-   cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type {round_type} --limit 1
+   bin/sotp review results --track-id {track-id} --scope {scope} --round-type {round_type} --limit 1
    ```
    `--limit 1` prints the most recent round entry for the assigned round_type as a findings
    block below the state-line.
@@ -122,7 +124,7 @@ right form when you just need to confirm `required (stale hash)` /
 3. **Fix phase**:
    - Verify each finding's factual claims via `Grep` / `Read` before acting.
    - To recall previous-round findings without re-running the reviewer,
-     use `cargo make track-review-results -- --track-id {track-id} --scope {scope} --round-type {round_type} --limit N`
+     use `bin/sotp review results --track-id {track-id} --scope {scope} --round-type {round_type} --limit N`
      (N is a positive integer; `1` returns only the most recent entry — keep N small to avoid context bloat).
    - P3 findings from pre-existing unchanged code: note but do not fix.
    - P0/P1/P2: implement the fix within scope boundaries.

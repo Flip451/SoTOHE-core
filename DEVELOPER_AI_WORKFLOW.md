@@ -268,10 +268,10 @@ cargo make down         # 開発用 compose サービスを停止
 
 ```bash
 cargo make track-pr-push            # 現在の track branch を push
-cargo make track-pr-ensure          # PR を作成または再利用
+bin/sotp pr ensure-pr               # PR を作成または再利用
 cargo make track-pr-review          # PR review helper を実行
-cargo make track-pr-status <pr>     # checks 状態を表示
-cargo make track-pr-merge <pr> --method merge
+bin/sotp pr status <pr>             # checks 状態を表示
+bin/sotp pr wait-and-merge <pr> --method merge
 ```
 
 #### 再現性優先（run --rm）

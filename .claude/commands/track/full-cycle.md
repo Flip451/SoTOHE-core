@@ -59,7 +59,7 @@ Steps:
    The commit message gate (`cargo make track-commit-message`) enforces the DRY gate as a hard
    precondition: it runs `sotp dry check-approved` after the review gate and refuses to emit a
    commit message while the DRY gate is Blocked — so a `blocked` DFP cannot be committed past.
-   After commit, record the hash: `cargo make track-transition -- <task_id> done --commit-hash <hash>`. The active track is resolved from the current branch; pass `--track-id <id>` explicitly only when targeting a different track.
+   After commit, record the hash: `bin/sotp track transition <task_id> done --commit-hash <hash>`. The active track is resolved from the current branch; pass `--track-id <id>` explicitly only when targeting a different track.
 
 If any step fails, stop the loop and report the failure.
 

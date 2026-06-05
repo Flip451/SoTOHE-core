@@ -213,77 +213,12 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertNotIn("verify_orchestra_guardrails.py", task_body)
 
-    def test_track_transition_wrapper_delegates_to_sotp_make(self) -> None:
-        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        task_header = "[tasks.track-transition]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-
-        self.assertIn('command = "bin/sotp"', task_body)
-        self.assertIn('"make"', task_body)
-        self.assertIn('"track-transition"', task_body)
-        self.assertIn('"${@}"', task_body)
-        self.assertNotIn('script_runner', task_body)
-
-    def test_track_state_ops_wrappers_delegate_to_sotp_make(self) -> None:
-        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-
-        # command + args format (single-word positional args only)
-        for task_header, task_name in (
-            ("[tasks.track-next-task]", "track-next-task"),
-            ("[tasks.track-task-counts]", "track-task-counts"),
-        ):
-            with self.subTest(task=task_header):
-                task_start = makefile.index(task_header)
-                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-                task_body = (
-                    makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-                )
-                self.assertIn('command = "bin/sotp"', task_body, f"{task_header} missing command")
-                self.assertIn(f'"{task_name}"', task_body, f"{task_header} missing task name in args")
-                self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
-                self.assertIn('"${@}"', task_body, f"{task_header} missing arg forwarding")
-                self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
-
-        # Shell-based wrappers (multi-word positional args need "$@" quoting)
-        for task_header, task_name in (
-            ("[tasks.track-add-task]", "track-add-task"),
-            ("[tasks.track-set-override]", "track-set-override"),
-        ):
-            with self.subTest(task=task_header):
-                task_start = makefile.index(task_header)
-                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-                task_body = (
-                    makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-                )
-                self.assertIn('script_runner = "@shell"', task_body, f"{task_header} missing script_runner")
-                self.assertIn(f'bin/sotp make {task_name}', task_body, f"{task_header} missing sotp make call")
-                self.assertIn('"$@"', task_body, f"{task_header} missing shell $@ forwarding")
-
-        # Direct bin/sotp subcommand wrappers (not via sotp make)
-        for task_header, expected_call in (
-            ("[tasks.track-signals]", "bin/sotp track signals"),
-        ):
-            with self.subTest(task=task_header):
-                task_start = makefile.index(task_header)
-                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-                task_body = (
-                    makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-                )
-                self.assertIn('script_runner = "@shell"', task_body, f"{task_header} missing script_runner")
-                self.assertIn(expected_call, task_body, f"{task_header} missing {expected_call}")
-                self.assertIn('"$@"', task_body, f"{task_header} missing shell $@ forwarding")
-
     def test_track_branch_ops_delegate_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
         for task_header, task_name in (
             ("[tasks.track-branch-create]", "track-branch-create"),
             ("[tasks.track-branch-switch]", "track-branch-switch"),
-            ("[tasks.track-resolve]", "track-resolve"),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -296,20 +231,6 @@ class MakeWrappersTest(unittest.TestCase):
                 self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
                 self.assertIn('"${@}"', task_body, f"{task_header} missing arg forwarding")
                 self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
-
-    def test_track_sync_views_delegates_to_sotp_make(self) -> None:
-        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        task_header = "[tasks.track-sync-views]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-        self.assertIn('command = "bin/sotp"', task_body)
-        self.assertIn('"make"', task_body)
-        self.assertIn('"track-sync-views"', task_body)
-        self.assertIn('"${@}"', task_body)
-        self.assertNotIn('script_runner', task_body)
 
     def test_track_git_wrappers_delegate_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
@@ -338,11 +259,8 @@ class MakeWrappersTest(unittest.TestCase):
 
         for task_header, task_name in (
             ("[tasks.track-pr-push]", "track-pr-push"),
-            ("[tasks.track-pr-ensure]", "track-pr-ensure"),
             ("[tasks.track-pr]", "track-pr"),
             ("[tasks.track-pr-review]", "track-pr-review"),
-            ("[tasks.track-pr-merge]", "track-pr-merge"),
-            ("[tasks.track-pr-status]", "track-pr-status"),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -357,44 +275,27 @@ class MakeWrappersTest(unittest.TestCase):
                 self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
                 self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
 
-    def test_track_local_plan_wrapper_delegates_to_sotp_make(self) -> None:
+    def test_codex_fix_wrappers_resolve_codex_bin_and_call_native_subcommands(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        task_header = "[tasks.track-local-plan]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
 
-        self.assertIn('script_runner = "@shell"', task_body)
-        self.assertIn('bin/sotp make track-local-plan', task_body)
-        self.assertIn('"$@"', task_body)
-
-    def test_track_local_review_wrapper_delegates_to_sotp_make(self) -> None:
-        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        task_header = "[tasks.track-local-review]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-
-        self.assertIn('script_runner = "@shell"', task_body)
-        self.assertIn('bin/sotp make track-local-review', task_body)
-        self.assertIn('"$@"', task_body)
-
-    def test_track_review_results_wrapper_delegates_to_sotp_make(self) -> None:
-        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        task_header = "[tasks.track-review-results]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-
-        self.assertIn('script_runner = "@shell"', task_body)
-        self.assertIn('bin/sotp make track-review-results', task_body)
-        self.assertIn('"$@"', task_body)
+        for task_header, native_call in (
+            ("[tasks.track-local-review-fix-codex]", "bin/sotp review fix-local"),
+            ("[tasks.track-local-dry-fix]", "bin/sotp dry fix-local"),
+        ):
+            with self.subTest(task=task_header):
+                task_start = makefile.index(task_header)
+                next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+                task_body = (
+                    makefile[task_start:]
+                    if next_task == -1
+                    else makefile[task_start:next_task]
+                )
+                self.assertIn('script_runner = "@shell"', task_body)
+                self.assertIn('CODEX_BIN="${CODEX_BIN:-$(asdf which codex', task_body)
+                self.assertIn("command -v codex", task_body)
+                self.assertIn(native_call, task_body)
+                self.assertIn('"$@"', task_body)
+                self.assertNotIn("bin/sotp make", task_body)
 
     def test_track_set_commit_hash_wrapper_delegates_to_sotp_make(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")

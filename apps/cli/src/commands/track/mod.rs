@@ -25,7 +25,7 @@ pub enum TrackCommand {
     /// Transition a task to a new status (atomic read-modify-write).
     Transition {
         /// Path to the track items root directory (e.g., `track/items`).
-        #[arg(long)]
+        #[arg(long, default_value = "track/items")]
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).

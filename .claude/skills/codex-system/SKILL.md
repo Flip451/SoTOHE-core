@@ -129,10 +129,10 @@ Output:
 
 Embed design intent and change summary directly in the prompt; let Codex read files for details.
 This avoids Codex spending time searching the codebase while keeping the prompt concise.
-For the local reviewer loop, prefer the repo-owned wrapper so timeout and final verdict stay under repo control.
+For the local reviewer loop, prefer the native subcommand so timeout and final verdict stay under repo control.
 
 ```bash
-cargo make track-local-review -- --model {model} --prompt "
+bin/sotp review local --round-type {round_type} --group {scope} --model {model} --prompt "
 Review {feature name}. Report ONLY bugs or logic errors. Be concise.
 
 ## Design
@@ -150,8 +150,8 @@ Check for: logic errors, doc-code inconsistencies, edge cases, security issues.
 
 For larger diffs, use the file-based briefing pattern (see below) instead of inlining.
 
-The local reviewer wrapper passes a machine-readable `--output-schema` automatically. The final
-message must be a single JSON object, and the wrapper additionally rejects semantically
+The local reviewer subcommand passes a machine-readable `--output-schema` automatically. The final
+message must be a single JSON object, and the subcommand additionally rejects semantically
 inconsistent payloads fail-closed:
 
 ```json
@@ -167,7 +167,7 @@ or
 Every object field is required by the output schema. When a finding does not have a concrete
 severity, file, or line, use `null` for that field instead of omitting it.
 `zero_findings` must use an empty `findings` array, and `findings_remain` must include at least
-one finding. The wrapper prints that final JSON payload as the last stdout line.
+one finding. The subcommand prints that final JSON payload as the last stdout line.
 
 ## File-Based Briefing Pattern
 
@@ -191,10 +191,10 @@ Prefer writing content to a file over inline embedding when:
 
 2. **Run Codex with a file reference**
 
-   For the local reviewer loop, use the wrapper:
+   For the local reviewer loop, use the native subcommand:
 
    ```bash
-   cargo make track-local-review -- --model {model} --briefing-file tmp/codex-briefing.md
+   bin/sotp review local --round-type {round_type} --group {scope} --model {model} --briefing-file tmp/codex-briefing.md
    ```
 
    For other read-only Codex consultations, direct `codex exec` is still fine:
@@ -269,7 +269,7 @@ For review-fix-review cycles ("修正→レビュー→修正→…→指摘な�
 ### Round 1 template (hybrid prompt)
 
 ```bash
-cargo make track-local-review -- --model {model} --prompt "
+bin/sotp review local --round-type {round_type} --group {scope} --model {model} --prompt "
 Review {feature}. Report ONLY bugs or logic errors.
 
 ## Design
@@ -279,16 +279,16 @@ Review {feature}. Report ONLY bugs or logic errors.
 {file list}
 
 Check for: {checklist}
-" 2>&1
+"
 ```
 
 ### Round N template (fix verification)
 
 ```bash
-cargo make track-local-review -- --model {model} --prompt "
+bin/sotp review local --round-type {round_type} --group {scope} --model {model} --prompt "
 Previous review found: {finding summary}. Fixed by {fix description}. Test added.
 Verify the fix in {file}:{line range}. Any remaining bugs?
-" 
+"
 ```
 
 ### Tips

@@ -29,7 +29,7 @@ Execution:
 
 ## Step 4: Regenerate rendered views
 
-1. Run `cargo make track-sync-views` to regenerate `plan.md` and `registry.md`.
+1. Run `bin/sotp track views sync` to regenerate `plan.md` and `registry.md`.
 2. Verify the track moved from Active/Completed to the Archived Tracks section in `registry.md`.
 
 ## Step 5: Stage changes
