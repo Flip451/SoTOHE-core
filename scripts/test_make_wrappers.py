@@ -213,12 +213,12 @@ class MakeWrappersTest(unittest.TestCase):
         )
         self.assertNotIn("verify_orchestra_guardrails.py", task_body)
 
-    def test_track_branch_ops_delegate_to_sotp_make(self) -> None:
+    def test_track_branch_ops_delegate_to_sotp_native(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
-        for task_header, task_name in (
-            ("[tasks.track-branch-create]", "track-branch-create"),
-            ("[tasks.track-branch-switch]", "track-branch-switch"),
+        for task_header, expected_sub in (
+            ("[tasks.track-branch-create]", "create"),
+            ("[tasks.track-branch-switch]", "switch"),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -227,19 +227,22 @@ class MakeWrappersTest(unittest.TestCase):
                     makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
                 )
                 self.assertIn('command = "bin/sotp"', task_body, f"{task_header} missing command")
-                self.assertIn(f'"{task_name}"', task_body, f"{task_header} missing task name")
-                self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
+                self.assertIn('"track"', task_body, f"{task_header} missing 'track' in args")
+                self.assertIn('"branch"', task_body, f"{task_header} missing 'branch' in args")
+                self.assertIn(f'"{expected_sub}"', task_body, f"{task_header} missing '{expected_sub}' in args")
                 self.assertIn('"${@}"', task_body, f"{task_header} missing arg forwarding")
+                self.assertNotIn('"make"', task_body, f"{task_header} must not route through 'make'")
                 self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
 
-    def test_track_git_wrappers_delegate_to_sotp_make(self) -> None:
+    def test_track_git_wrappers_delegate_to_sotp_native(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
-        for task_header, task_name in (
-            ("[tasks.track-switch-main]", "track-switch-main"),
-            ("[tasks.track-add-paths]", "track-add-paths"),
-            ("[tasks.track-commit-message]", "track-commit-message"),
-            ("[tasks.track-note]", "track-note"),
+        for task_header, expected_args in (
+            ("[tasks.add-all]", ['"git"', '"add-all"']),
+            ("[tasks.unstage]", ['"git"', '"unstage"']),
+            ("[tasks.track-switch-main]", ['"git"', '"switch-and-pull"', '"main"']),
+            ("[tasks.track-add-paths]", ['"git"', '"add-from-file"']),
+            ("[tasks.track-note]", ['"git"', '"note-from-file"']),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -250,17 +253,29 @@ class MakeWrappersTest(unittest.TestCase):
                     else makefile[task_start:next_task]
                 )
                 self.assertIn('command = "bin/sotp"', task_body, f"{task_header} missing command")
-                self.assertIn(f'"{task_name}"', task_body, f"{task_header} missing task name")
-                self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
+                for arg in expected_args:
+                    self.assertIn(arg, task_body, f"{task_header} missing {arg} in args")
+                self.assertNotIn('"make"', task_body, f"{task_header} must not route through 'make'")
                 self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
 
-    def test_track_pr_wrappers_delegate_to_sotp_make(self) -> None:
+    def test_track_commit_message_still_uses_sotp_make(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+        task_header = "[tasks.track-commit-message]"
+        task_start = makefile.index(task_header)
+        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+        task_body = (
+            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+        )
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"make"', task_body)
+        self.assertIn('"track-commit-message"', task_body)
+
+    def test_track_pr_wrappers_delegate_to_sotp_native(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
-        for task_header, task_name in (
-            ("[tasks.track-pr-push]", "track-pr-push"),
-            ("[tasks.track-pr]", "track-pr"),
-            ("[tasks.track-pr-review]", "track-pr-review"),
+        for task_header, expected_pr_sub in (
+            ("[tasks.track-pr-push]", "push"),
+            ("[tasks.track-pr-review]", "review-cycle"),
         ):
             with self.subTest(task=task_header):
                 task_start = makefile.index(task_header)
@@ -271,9 +286,24 @@ class MakeWrappersTest(unittest.TestCase):
                     else makefile[task_start:next_task]
                 )
                 self.assertIn('command = "bin/sotp"', task_body, f"{task_header} missing command")
-                self.assertIn(f'"{task_name}"', task_body, f"{task_header} missing task name")
-                self.assertIn('"make"', task_body, f"{task_header} missing 'make' in args")
+                self.assertIn('"pr"', task_body, f"{task_header} missing 'pr' in args")
+                self.assertIn(f'"{expected_pr_sub}"', task_body, f"{task_header} missing '{expected_pr_sub}' in args")
+                self.assertNotIn('"make"', task_body, f"{task_header} must not route through 'make'")
                 self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
+
+    def test_track_pr_pushes_then_ensures_pr(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+        task_header = "[tasks.track-pr]"
+        task_start = makefile.index(task_header)
+        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+        task_body = (
+            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+        )
+        self.assertIn('dependencies = ["track-pr-push"]', task_body)
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"pr"', task_body)
+        self.assertIn('"ensure-pr"', task_body)
+        self.assertNotIn('"make"', task_body)
 
     def test_codex_fix_wrappers_resolve_codex_bin_and_call_native_subcommands(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
@@ -367,10 +397,10 @@ class MakeWrappersTest(unittest.TestCase):
                 combined_output = result.stdout + result.stderr
                 self.assertIn("pytest stub:", combined_output)
 
-    def test_git_ops_wrapper_tasks_are_exact_and_file_backed(self) -> None:
+    def test_git_ops_wrapper_tasks_use_native_subcommands(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 
-        # add-all: migrated to sotp make
+        # add-all: native sotp git add-all
         task_header = "[tasks.add-all]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
@@ -378,11 +408,12 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn('command = "bin/sotp"', task_body)
-        self.assertIn('"make"', task_body)
+        self.assertIn('"git"', task_body)
         self.assertIn('"add-all"', task_body)
+        self.assertNotIn('"make"', task_body)
         self.assertNotIn('script_runner', task_body)
 
-        # track-add-paths: migrated to sotp make
+        # track-add-paths: native sotp git add-from-file
         task_header = "[tasks.track-add-paths]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
@@ -390,11 +421,12 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn('command = "bin/sotp"', task_body)
-        self.assertIn('"make"', task_body)
-        self.assertIn('"track-add-paths"', task_body)
+        self.assertIn('"git"', task_body)
+        self.assertIn('"add-from-file"', task_body)
+        self.assertNotIn('"make"', task_body)
         self.assertNotIn('script_runner', task_body)
 
-        # track-commit-message: migrated to sotp make (CI + commit logic handled in Rust)
+        # track-commit-message: still uses sotp make (T008 scope)
         task_header = "[tasks.track-commit-message]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
@@ -406,7 +438,7 @@ class MakeWrappersTest(unittest.TestCase):
         self.assertIn('"track-commit-message"', task_body)
         self.assertNotIn('script_runner', task_body)
 
-        # track-note: migrated to sotp make
+        # track-note: native sotp git note-from-file
         task_header = "[tasks.track-note]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
@@ -414,8 +446,9 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
         self.assertIn('command = "bin/sotp"', task_body)
-        self.assertIn('"make"', task_body)
-        self.assertIn('"track-note"', task_body)
+        self.assertIn('"git"', task_body)
+        self.assertIn('"note-from-file"', task_body)
+        self.assertNotIn('"make"', task_body)
         self.assertNotIn('script_runner', task_body)
 
     def test_ci_container_tasks_exist_and_are_public(self) -> None:

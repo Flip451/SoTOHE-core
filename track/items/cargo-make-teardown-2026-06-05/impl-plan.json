@@ -22,12 +22,13 @@
     {
       "id": "T005",
       "description": "D3/IN-11 non-git passthrough migration + D8 sync (non-git consumer updates): remove non-git passthrough cargo make wrapper tasks from Makefile.toml (track-resolve, track-transition, track-add-task, track-next-task, track-task-counts, track-set-override, track-sync-views, track-review-results, track-check-approved, track-local-plan, track-local-review, track-local-review-fix-codex, track-local-dry-fix, track-signals, track-pr-status, track-pr-merge, track-pr-ensure). Note: track-signals already calls bin/sotp track signals natively (not via bin/sotp make), so its deletion only removes the wrapper task entry; track-baseline-capture is handled as an orphan in T009 because it too already calls bin/sotp track baseline-capture natively and is not a bin/sotp make consumer. Audit native subcommand defaults and add --items-dir default_value where needed so callers need not supply it; update .claude/commands/**, .claude/skills/**, .claude/agents/** to call bin/sotp native directly; update DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, CLAUDE.md references; remove corresponding EXPECTED_CARGO_MAKE_ALLOW entries from orchestra.rs and Bash(cargo make ...) entries from settings.json permissions.allow. After this commit no Makefile.toml task calls bin/sotp make for any non-git passthrough route. CI must pass after this commit.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "41afafbd"
     },
     {
       "id": "T006",
       "description": "D4 git wrapper rewiring: change remaining git-write cargo make tasks (add, add-all, unstage, track-add-paths, track-note, track-switch-main, track-branch-create, track-branch-switch, track-pr-push, track-pr, track-pr-review, note) from command=bin/sotp args=[make, <task>] or script_runner=@shell to command=bin/sotp args=[git, <sub>, ...] or args=[track, branch, <sub>] using command/args array form (no @shell); verify bin/sotp git safety logic (add-all scratch exclusion, commit-from-file branch guard, add-from-file path validation, switch-and-pull) remains intact inside the native commands; update any doc_patterns.rs or orchestra.rs entries that mention the old bin/sotp make forwarding forms. After this commit no Makefile.toml task calls bin/sotp make for any git-write route — every git-write task calls bin/sotp git <sub> directly via command/args. CI must pass after this commit.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T008",

@@ -612,12 +612,12 @@ args = ["add", "${@}"]
 [tasks.add-all]
 description = "[wrapper] Stage all worktree changes except transient automation scratch files"
 command = "bin/sotp"
-args = ["make", "add-all"]
+args = ["git", "add-all"]
 
 [tasks.unstage]
 description = "[wrapper] Unstage paths (remove from index without discarding worktree changes)"
-script_runner = "@shell"
-script = ['bin/sotp make unstage "$@"']
+command = "bin/sotp"
+args = ["git", "unstage", "${@}"]
 
 [tasks.export-schema]
 description = "[host] Export domain crate public API schema as JSON (requires nightly toolchain)"
@@ -632,27 +632,28 @@ args = ["nextest", "run", "--run-ignored", "ignored-only", "-E", "package(infras
 [tasks.track-branch-create]
 description = "[wrapper] Create a track branch from main and switch to it (branch only; no metadata, no commit). (usage: cargo make track-branch-create '<track-id>')"
 command = "bin/sotp"
-args = ["make", "track-branch-create", "${@}"]
+args = ["track", "branch", "create", "--items-dir", "track/items", "${@}"]
 
 [tasks.track-branch-switch]
 description = "[wrapper] Materialize branch metadata if needed, then switch to an existing track branch (usage: cargo make track-branch-switch '<track-id>')"
 command = "bin/sotp"
-args = ["make", "track-branch-switch", "${@}"]
+args = ["track", "branch", "switch", "--items-dir", "track/items", "${@}"]
 
 [tasks.track-pr-push]
 description = "[wrapper] Push current track branch to origin"
 command = "bin/sotp"
-args = ["make", "track-pr-push", "${@}"]
+args = ["pr", "push", "${@}"]
 
 [tasks.track-pr]
 description = "[wrapper] Push current branch and create/reuse a PR (push + ensure-pr in one step)"
+dependencies = ["track-pr-push"]
 command = "bin/sotp"
-args = ["make", "track-pr", "${@}"]
+args = ["pr", "ensure-pr", "${@}"]
 
 [tasks.track-pr-review]
 description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @codex review, poll, parse"
 command = "bin/sotp"
-args = ["make", "track-pr-review", "${@}"]
+args = ["pr", "review-cycle", "${@}"]
 
 [tasks.track-active-gate]
 private = true
@@ -673,7 +674,7 @@ script = ['bin/sotp track baseline-capture "$@"']
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 command = "bin/sotp"
-args = ["make", "track-switch-main"]
+args = ["git", "switch-and-pull", "main"]
 
 [tasks.track-local-review-fix-codex]
 description = "[wrapper] Resolve CODEX_BIN for toolchain-manager shims, then launch the Codex review-fix-lead fixer via bin/sotp review fix-local"
@@ -688,7 +689,7 @@ script = ['case "${1:-}" in --) shift ;; esac; CODEX_BIN="${CODEX_BIN:-$(asdf wh
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"
 command = "bin/sotp"
-args = ["make", "track-add-paths"]
+args = ["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"]
 
 [tasks.commit]
 description = "[gate] Run CI then commit (via sotp make)"
@@ -703,13 +704,13 @@ args = ["make", "track-commit-message"]
 
 [tasks.note]
 description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"
-command = "bin/sotp"
-args = ["make", "note", "${@}"]
+command = "git"
+args = ["notes", "add", "-f", "-m", "${@}", "HEAD"]
 
 [tasks.track-note]
 description = "[wrapper] Attach a git note from tmp/track-commit/note.md and delete the scratch file"
 command = "bin/sotp"
-args = ["make", "track-note"]
+args = ["git", "note-from-file", "tmp/track-commit/note.md", "--cleanup"]
 
 
 [tasks.clean]
