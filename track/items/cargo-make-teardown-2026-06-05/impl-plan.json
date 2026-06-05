@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "D6 new native: implement bin/sotp track set-commit-hash subcommand in apps/cli/src/commands/track/ (clap struct + execute fn) and apps/cli-composition/src/track/ (composition method); move persist_commit_hash_for_track logic from composition make.rs to track composition; add the TrackCommand::SetCommitHash variant in track/mod.rs and its execute arm; add unit tests. No Makefile.toml changes yet.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "84fe2652f4edfe408c098694b8118019dd4c7454"
     },
     {
       "id": "T003",
       "description": "D1 daemon teardown + D8 sync (daemon consumers): remove tools-daemon service from compose.yml; remove 10 daemon-exec tasks from Makefile.toml (tools-up, tools-down, fmt-exec, clippy-exec, test-exec, test-one-exec, check-exec, machete-exec, deny-exec, llvm-cov-exec); remove MakeTask::Exec variant and its dispatch arm from apps/cli/src/commands/make.rs (IN-01 / AC-01 require bin/sotp make exec to be deleted in this commit, not deferred); remove the corresponding EXPECTED_CARGO_MAKE_ALLOW entries from orchestra.rs; remove their Bash(cargo make ...) entries from .claude/settings.json permissions.allow; remove daemon-exec references from DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, and scripts/test_make_wrappers.py. The rest of apps/cli/src/commands/make.rs (all other MakeTask variants and dispatch_* functions) remains for now — only MakeTask::Exec is removed. CI must pass after this commit.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T005",

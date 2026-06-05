@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # cargo make ラッパー層の解体 — bin/sotp 直叩きへの一本化
 
-## Tasks (1/10 resolved)
+## Tasks (3/10 resolved)
 
 ### S1 — New infrastructure additions (D9, D6 new native)
 
@@ -9,14 +9,14 @@
 > These additions are purely additive — no existing behaviour is removed yet — so both T001 and T002 can pass cargo make ci independently.
 
 - [x] **T001**: D9 infra loader: add libs/infrastructure/src/dry_check.rs with DryCheckConfig::load and DryCheckConfigError; add .harness/config/dry-check.json (threshold=0.85, schema_version=1); wire into libs/infrastructure/src/lib.rs; add unit tests for load / threshold / fail-closed error cases. No callers changed yet — existing 0.85 defaults remain; this task only adds the new loader and config file. (`600f34e45e2011f2032d76fdd2efe08bca8c044d`)
-- [~] **T002**: D6 new native: implement bin/sotp track set-commit-hash subcommand in apps/cli/src/commands/track/ (clap struct + execute fn) and apps/cli-composition/src/track/ (composition method); move persist_commit_hash_for_track logic from composition make.rs to track composition; add the TrackCommand::SetCommitHash variant in track/mod.rs and its execute arm; add unit tests. No Makefile.toml changes yet.
+- [x] **T002**: D6 new native: implement bin/sotp track set-commit-hash subcommand in apps/cli/src/commands/track/ (clap struct + execute fn) and apps/cli-composition/src/track/ (composition method); move persist_commit_hash_for_track logic from composition make.rs to track composition; add the TrackCommand::SetCommitHash variant in track/mod.rs and its execute arm; add unit tests. No Makefile.toml changes yet. (`84fe2652f4edfe408c098694b8118019dd4c7454`)
 
 ### S2 — Daemon teardown (D1) with atomic consumer sync (D8)
 
 > Delete the tools-daemon service and its 10 dependent exec tasks. Also remove MakeTask::Exec from apps/cli/src/commands/make.rs in the same commit (IN-01 / AC-01 require bin/sotp make exec to be deleted alongside the daemon tasks, not deferred to T004). Co-located with orchestra.rs allowlist removal and settings.json / doc updates (CN-05).
 > After T003, make.rs still exists (with the remaining MakeTask variants other than Exec), so the Rust codebase compiles and CI passes.
 
-- [ ] **T003**: D1 daemon teardown + D8 sync (daemon consumers): remove tools-daemon service from compose.yml; remove 10 daemon-exec tasks from Makefile.toml (tools-up, tools-down, fmt-exec, clippy-exec, test-exec, test-one-exec, check-exec, machete-exec, deny-exec, llvm-cov-exec); remove MakeTask::Exec variant and its dispatch arm from apps/cli/src/commands/make.rs (IN-01 / AC-01 require bin/sotp make exec to be deleted in this commit, not deferred); remove the corresponding EXPECTED_CARGO_MAKE_ALLOW entries from orchestra.rs; remove their Bash(cargo make ...) entries from .claude/settings.json permissions.allow; remove daemon-exec references from DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, and scripts/test_make_wrappers.py. The rest of apps/cli/src/commands/make.rs (all other MakeTask variants and dispatch_* functions) remains for now — only MakeTask::Exec is removed. CI must pass after this commit.
+- [x] **T003**: D1 daemon teardown + D8 sync (daemon consumers): remove tools-daemon service from compose.yml; remove 10 daemon-exec tasks from Makefile.toml (tools-up, tools-down, fmt-exec, clippy-exec, test-exec, test-one-exec, check-exec, machete-exec, deny-exec, llvm-cov-exec); remove MakeTask::Exec variant and its dispatch arm from apps/cli/src/commands/make.rs (IN-01 / AC-01 require bin/sotp make exec to be deleted in this commit, not deferred); remove the corresponding EXPECTED_CARGO_MAKE_ALLOW entries from orchestra.rs; remove their Bash(cargo make ...) entries from .claude/settings.json permissions.allow; remove daemon-exec references from DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, and scripts/test_make_wrappers.py. The rest of apps/cli/src/commands/make.rs (all other MakeTask variants and dispatch_* functions) remains for now — only MakeTask::Exec is removed. CI must pass after this commit.
 
 ### S3 — Non-git passthrough migration (D3, IN-11) with consumer rewiring (D8)
 

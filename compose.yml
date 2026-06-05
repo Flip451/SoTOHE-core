@@ -20,7 +20,3 @@ services:
       CARGO_TARGET_DIR: /workspace/${CARGO_TARGET_DIR_RELATIVE:-target}
       SCCACHE_DIR: /workspace/.cache/sccache
 
-  tools-daemon:
-    extends:
-      service: tools
-    command: sleep infinity

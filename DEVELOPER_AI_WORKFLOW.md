@@ -244,7 +244,6 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
 用語:
 
 - `tools` イメージ: `fmt` / `clippy` / `test` / `ci` などの開発ツールを実行するためのコンテナイメージ
-- `tools-daemon`: `tools` イメージを常駐起動したサービス。`*-exec` タスクの実行先となり、コンテナ起動オーバーヘッドを省く
 - `app` イメージ: ローカル開発用の `bacon` ウォッチャーを起動するコンテナイメージ
 
 #### 4.1.1 セットアップとローカル実行
@@ -257,8 +256,6 @@ cargo make build-dev    # dev watcher イメージを事前ビルド（任意）
 cargo make up           # 開発用 compose サービスを起動（bacon watcher）
 cargo make logs         # dev watcher ログを表示
 cargo make down         # 開発用 compose サービスを停止
-cargo make tools-up     # tools-daemon を起動（exec 系タスク用）
-cargo make tools-down   # tools-daemon を停止
 ```
 
 注:
@@ -276,21 +273,6 @@ cargo make track-pr-review          # PR review helper を実行
 cargo make track-pr-status <pr>     # checks 状態を表示
 cargo make track-pr-merge <pr> --method merge
 ```
-
-#### 高速確認（exec 系）
-
-`tools-daemon` が起動していればコンテナ起動オーバーヘッドなしで実行できる。
-
-```bash
-cargo make test-exec               # テストを実行
-cargo make test-one-exec <name>    # 特定テストを実行
-cargo make clippy-exec             # 静的解析を実行
-cargo make fmt-exec                # フォーマットを適用
-cargo make check-exec              # コンパイル確認（成果物なし）
-cargo make llvm-cov-exec           # カバレッジを計測
-```
-
-`deny` と `machete` は依存関係を触った時の補助監査として `run --rm` 側で実行する。
 
 #### 再現性優先（run --rm）
 

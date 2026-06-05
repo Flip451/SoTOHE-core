@@ -93,10 +93,6 @@ pub enum MakeTask {
     AddAll,
     /// Unstage paths (remove from index without discarding worktree changes).
     Unstage,
-
-    // Phase 4: Exec
-    /// Run a cargo make task via tools-daemon exec with WORKER_ID isolation.
-    Exec,
 }
 
 /// Join raw args into a single string. Used for tasks where the entire
@@ -183,7 +179,6 @@ fn run(args: MakeArgs) -> Result<ExitCode, CliError> {
         MakeTask::Note => dispatch_note(&args.raw_args),
         MakeTask::TrackCommitMessage => dispatch_track_commit_message(),
         MakeTask::TrackSetCommitHash => dispatch_set_commit_hash(&args.raw_args),
-        MakeTask::Exec => dispatch_exec(&args.raw_args),
     }
 }
 
@@ -532,39 +527,6 @@ fn dispatch_set_commit_hash(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let track_id = raw_args_to_single(raw_args)
         .map_err(|_| CliError::Message("usage: track-set-commit-hash <track-id>".to_owned()))?;
     crate::commands::track::set_commit_hash::execute_set_commit_hash(track_id)
-}
-
-// --- Phase 4: Exec dispatcher ---
-
-fn dispatch_exec(raw_args: &[String]) -> Result<ExitCode, CliError> {
-    let words = raw_args_to_words(raw_args);
-    if words.is_empty() {
-        return Err(CliError::Message("error: usage: sotp make exec <local-task-name>".to_owned()));
-    }
-    // Safety: `.is_empty()` check above guarantees at least one element
-    let task_name = words.first().ok_or_else(|| {
-        CliError::Message("error: usage: sotp make exec <local-task-name>".to_owned())
-    })?;
-    let worker_id = std::env::var("WORKER_ID").ok();
-
-    let mut args: Vec<String> = vec!["compose".to_owned(), "exec".to_owned(), "-T".to_owned()];
-    if let Some(ref wid) = worker_id {
-        args.push("-e".to_owned());
-        args.push(format!("CARGO_TARGET_DIR=/workspace/target-{wid}"));
-    }
-    args.extend_from_slice(&[
-        "tools-daemon".to_owned(),
-        "cargo".to_owned(),
-        "make".to_owned(),
-        "--allow-private".to_owned(),
-        format!("{task_name}-local"),
-    ]);
-    // Forward any remaining args after the task name
-    for extra in words.get(1..).unwrap_or_default() {
-        args.push(extra.clone());
-    }
-    let arg_refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
-    run_command("docker", &arg_refs)
 }
 
 #[path = "make_review_fix.rs"]
