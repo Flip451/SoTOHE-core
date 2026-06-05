@@ -663,8 +663,8 @@ script = ['bin/sotp track type-signals && bin/sotp track catalogue-spec-signals 
 
 [tasks.track-set-commit-hash]
 description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"
-script_runner = "@shell"
-script = ['bin/sotp make track-set-commit-hash "$@"']
+command = "bin/sotp"
+args = ["track", "set-commit-hash", "${@}"]
 
 [tasks.track-baseline-capture]
 description = "[wrapper] Capture TypeGraph baseline for TDDD reverse signal filtering. Always idempotent (existing baseline is preserved). Usage: cargo make track-baseline-capture -- <track-id> [--layer <id>]"
@@ -692,15 +692,23 @@ command = "bin/sotp"
 args = ["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"]
 
 [tasks.commit]
-description = "[gate] Run CI then commit (via sotp make)"
-command = "bin/sotp"
-args = ["make", "commit", "${@}"]
+description = "[gate] Run CI then commit with message"
+dependencies = ["ci"]
+command = "git"
+args = ["commit", "-m", "${@}"]
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the strict commit gate: stage working tree, full cargo make ci, check-approved (review not approved → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the strict commit gate: stage working tree, full cargo make ci, check-approved (review not approved → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]
-command = "bin/sotp"
-args = ["make", "track-commit-message"]
+script_runner = "@shell"
+script = ['''
+bin/sotp git add-all && \
+cargo make ci && \
+bin/sotp review check-approved && \
+bin/sotp dry check-approved && \
+bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup && \
+bin/sotp track set-commit-hash
+''']
 
 [tasks.note]
 description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"

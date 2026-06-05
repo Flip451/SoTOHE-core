@@ -163,8 +163,9 @@ pub fn execute_dry_results(args: DryResultsArgs) -> ExitCode {
 #[derive(Debug, Args)]
 pub struct DryCheckApprovedArgs {
     /// Track ID used to locate the per-track dry-check.json and .commit_hash.
+    /// When omitted, resolved from the current git branch (`track/<id>`).
     #[arg(long)]
-    pub track_id: String,
+    pub track_id: Option<String>,
 
     /// Optional explicit base commit (overrides the .commit_hash store lookup).
     ///
@@ -195,8 +196,15 @@ pub struct DryCheckApprovedArgs {
 ///
 /// Exits 0 on Approved; exits non-zero on Blocked.
 pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
+    let track_id = match crate::commands::track::resolve_track_id(args.track_id, &args.items_dir) {
+        Ok(id) => id,
+        Err(msg) => {
+            eprintln!("{msg}");
+            return ExitCode::FAILURE;
+        }
+    };
     outcome_to_exit(CliApp::new().dry_check_approved(DryCheckApprovedInput {
-        track_id: args.track_id,
+        track_id,
         base_commit: args.base_commit,
         db_path: args.db_path,
         threshold: args.threshold,
@@ -411,13 +419,24 @@ mod tests {
     // ── sotp dry check-approved: arg parsing ──────────────────────────────────
 
     #[test]
-    fn test_dry_check_approved_required_args_parse_correctly() {
+    fn test_dry_check_approved_explicit_track_id_parses_correctly() {
         let cmd = parse_dry(&["dry", "check-approved", "--track-id", "my-track"]);
         match cmd {
             DryCommand::CheckApproved(args) => {
-                assert_eq!(args.track_id, "my-track");
+                assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 assert!(args.base_commit.is_none(), "base_commit must be absent by default");
                 assert_eq!(args.db_path, PathBuf::from(".semantic_index"));
+            }
+            other => panic!("expected CheckApproved, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_dry_check_approved_track_id_is_optional() {
+        let cmd = parse_dry(&["dry", "check-approved"]);
+        match cmd {
+            DryCommand::CheckApproved(args) => {
+                assert!(args.track_id.is_none(), "track_id must be None when omitted");
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }
@@ -435,6 +454,7 @@ mod tests {
         ]);
         match cmd {
             DryCommand::CheckApproved(args) => {
+                assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 assert_eq!(args.base_commit.as_deref(), Some("def5678"));
             }
             other => panic!("expected CheckApproved, got {other:?}"),

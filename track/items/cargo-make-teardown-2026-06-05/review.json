@@ -1,6 +1,290 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
+          "at": "2026-06-05T10:26:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
+          "at": "2026-06-05T10:29:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb3dbf1ebbdfba2718923035babe09b7d05e0ec237cb8883116d1acbb42046c1",
+          "at": "2026-06-05T13:03:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb3dbf1ebbdfba2718923035babe09b7d05e0ec237cb8883116d1acbb42046c1",
+          "at": "2026-06-05T13:05:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1dfd72779bc66988679d64fb92256507760d9acc9d716a76ddf8aea5ede77a28",
+          "at": "2026-06-05T13:51:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The verifier now requires the snippet `bin/sotp review local -- --round-type fast --group`, but the migrated native CLI does not use the cargo-make passthrough separator. The actual `sotp review local` clap command expects flags directly after `local`, and `.claude/commands/track/review.md` already documents `bin/sotp review local --round-type ...`, so `verify-orchestra` will report the review guidance as missing even when the docs are correct. The same stale `-- --model` pattern appears in the adjacent codex-system snippets and should be removed from the native command expectations.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 356,
+              "category": "correctness"
+            },
+            {
+              "message": "Switching the fixer prompt from `cargo make track-local-review` to `bin/sotp review local` drops the old cargo-make task dependency on `track-active-gate` (`type-signals -> catalogue-spec-signals -> views sync`) before every canonical review. I could not find equivalent regeneration in the current `sotp review local` path, so review-fix rounds can be recorded against stale rendered views/signals, which can leave review approval/hash state inconsistent with the later commit gate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+              "line": 51,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1dfd72779bc66988679d64fb92256507760d9acc9d716a76ddf8aea5ede77a28",
+          "at": "2026-06-05T13:56:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Replacing the reviewer command with direct `bin/sotp review local` drops the `track-local-review` wrapper's `track-active-gate` dependency. I don't see an equivalent pre-review `type-signals -> catalogue-spec-signals -> views sync` step in `sotp review local`, so fixer rounds can record review hashes against stale rendered views and later fail check-approved with a stale hash. The native review path needs to run the same gate before invoking/recording the reviewer, or this prompt should still point at a gated wrapper.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+              "line": 51,
+              "category": "logic"
+            },
+            {
+              "message": "These required snippets no longer match the documented codex-system commands. The current `.claude/skills/codex-system/SKILL.md` contains `bin/sotp review local --round-type ... --model ...`, while the verifier now requires `bin/sotp review local -- --model ...`; the literal check in `verify_review_wrapper_guidance` will therefore report the guidance as missing. The extra `--` is also inconsistent with the `sotp review local` clap options, so the verifier should require the real command shape.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 369,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:57d27da945674a7931c0a19f06b18907ec3e07b2f9d1d136e97756d34a93f94e",
+          "at": "2026-06-05T14:04:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c3c913715b9e71d2367afb0018ddc18cb3a8c29028989bb35d5b6776efbfa38",
+          "at": "2026-06-05T14:10:38Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI entry point has no happy-path or failure-path tests in the changed files. That leaves `TrackCommand::SetCommitHash` / `execute_set_commit_hash` unverified for the required branch-resolution and recovery-hint behavior.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
+              "line": 19,
+              "category": "testing"
+            },
+            {
+              "message": "`execute_set_commit_hash` forwards `outcome.stderr` even though `CliApp::track_set_commit_hash` already writes the same error and recovery hint directly to stderr. On failures this emits an extra bare error line, and the `make` wrapper now inherits that changed output contract instead of a pure delegation.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
+              "line": 22,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cc6bd15edfa88cc5c74fd5999bcace3b1ecd5d397578ce4cc20dd8bacabe3816",
+          "at": "2026-06-05T11:13:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI entry point has no happy-path or failure-path tests in the changed files. That leaves `TrackCommand::SetCommitHash` / `execute_set_commit_hash` unverified for the required branch-resolution and recovery-hint behavior.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
+              "line": 19,
+              "category": "testing"
+            },
+            {
+              "message": "`execute_set_commit_hash` forwards `outcome.stderr` even though `CliApp::track_set_commit_hash` already writes the same error and recovery hint directly to stderr. On failures this emits an extra bare error line, and the `make` wrapper now inherits that changed output contract instead of a pure delegation.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
+              "line": 22,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cc6bd15edfa88cc5c74fd5999bcace3b1ecd5d397578ce4cc20dd8bacabe3816",
+          "at": "2026-06-05T11:14:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8da183e3fe07927705da89b9da94f8037d39c8da66226ed9cfb5656dc52b32c",
+          "at": "2026-06-05T11:21:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8da183e3fe07927705da89b9da94f8037d39c8da66226ed9cfb5656dc52b32c",
+          "at": "2026-06-05T11:25:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Anchoring the new native subcommand to `PathBuf::from(\"track/items\")` makes `bin/sotp track set-commit-hash` fail before the composition layer runs whenever it is launched from a repo subdirectory, because the path is resolved against the current working directory instead of the discovered repo root. The underlying `CliApp::track_set_commit_hash` path already works from the repo root regardless of cwd, so this regresses a valid invocation context.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "line": 615,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:484c6252b30f671ee1bcdd79e56e0e8090a5a40f5c12e321dc457c832b166992",
+          "at": "2026-06-05T11:59:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b2d21cdb185cacc339c429e301c94e0187d28cc84f0b0f9d66742b3427e000d",
+          "at": "2026-06-05T12:05:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_in_dir` changes the process-wide current directory and only restores it after the closure returns normally. If the closure panics, Rust unwinds past the restore call, leaving later tests running from the temp repo directory (which may then be deleted), so tests using this shared helper are no longer independent. Restore via a guard/drop or `catch_unwind` so cleanup happens on both success and panic paths.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 643,
+              "category": "test_isolation"
+            }
+          ],
+          "hash": "rvw1:sha256:1b2d21cdb185cacc339c429e301c94e0187d28cc84f0b0f9d66742b3427e000d",
+          "at": "2026-06-05T12:11:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf553f96a64acfbcfed45ed2b0b2ef2411f888169762177a511de0f6cb72e521",
+          "at": "2026-06-05T12:14:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6ca4ddcaae94f54c140d0d999f6e2d2493ee953e089e48ec958725ed2a0d4e5",
+          "at": "2026-06-05T13:03:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6ca4ddcaae94f54c140d0d999f6e2d2493ee953e089e48ec958725ed2a0d4e5",
+          "at": "2026-06-05T13:05:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60a84e4f94c39c7807aec37d34cf6902b826eff4cf531fb56ef3289bdf91503",
+          "at": "2026-06-05T13:47:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60a84e4f94c39c7807aec37d34cf6902b826eff4cf531fb56ef3289bdf91503",
+          "at": "2026-06-05T13:49:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0f1f328760f34a6bf4605eea6f0c836c9c05b55ca90e40eb5a7a8ab0542323",
+          "at": "2026-06-05T17:38:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d0f1f328760f34a6bf4605eea6f0c836c9c05b55ca90e40eb5a7a8ab0542323",
+          "at": "2026-06-05T17:39:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae61e973563e9e4d22546e64b16483e5237fc8563e810822ec78503d6c898aaf",
+          "at": "2026-06-05T17:45:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae61e973563e9e4d22546e64b16483e5237fc8563e810822ec78503d6c898aaf",
+          "at": "2026-06-05T17:46:43Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
+          "at": "2026-06-05T11:10:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
+          "at": "2026-06-05T11:13:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
+          "at": "2026-06-05T11:59:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
+          "at": "2026-06-05T12:02:05Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -215,96 +499,6 @@
           "findings": [],
           "hash": "rvw1:sha256:ffe609078ea53661f2c9372b69f12c82670d610a639d684d58496437e0ab9635",
           "at": "2026-06-05T15:14:40Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
-          "at": "2026-06-05T10:26:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
-          "at": "2026-06-05T10:29:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb3dbf1ebbdfba2718923035babe09b7d05e0ec237cb8883116d1acbb42046c1",
-          "at": "2026-06-05T13:03:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb3dbf1ebbdfba2718923035babe09b7d05e0ec237cb8883116d1acbb42046c1",
-          "at": "2026-06-05T13:05:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1dfd72779bc66988679d64fb92256507760d9acc9d716a76ddf8aea5ede77a28",
-          "at": "2026-06-05T13:51:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The verifier now requires the snippet `bin/sotp review local -- --round-type fast --group`, but the migrated native CLI does not use the cargo-make passthrough separator. The actual `sotp review local` clap command expects flags directly after `local`, and `.claude/commands/track/review.md` already documents `bin/sotp review local --round-type ...`, so `verify-orchestra` will report the review guidance as missing even when the docs are correct. The same stale `-- --model` pattern appears in the adjacent codex-system snippets and should be removed from the native command expectations.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 356,
-              "category": "correctness"
-            },
-            {
-              "message": "Switching the fixer prompt from `cargo make track-local-review` to `bin/sotp review local` drops the old cargo-make task dependency on `track-active-gate` (`type-signals -> catalogue-spec-signals -> views sync`) before every canonical review. I could not find equivalent regeneration in the current `sotp review local` path, so review-fix rounds can be recorded against stale rendered views/signals, which can leave review approval/hash state inconsistent with the later commit gate.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
-              "line": 51,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1dfd72779bc66988679d64fb92256507760d9acc9d716a76ddf8aea5ede77a28",
-          "at": "2026-06-05T13:56:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Replacing the reviewer command with direct `bin/sotp review local` drops the `track-local-review` wrapper's `track-active-gate` dependency. I don't see an equivalent pre-review `type-signals -> catalogue-spec-signals -> views sync` step in `sotp review local`, so fixer rounds can record review hashes against stale rendered views and later fail check-approved with a stale hash. The native review path needs to run the same gate before invoking/recording the reviewer, or this prompt should still point at a gated wrapper.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
-              "line": 51,
-              "category": "logic"
-            },
-            {
-              "message": "These required snippets no longer match the documented codex-system commands. The current `.claude/skills/codex-system/SKILL.md` contains `bin/sotp review local --round-type ... --model ...`, while the verifier now requires `bin/sotp review local -- --model ...`; the literal check in `verify_review_wrapper_guidance` will therefore report the guidance as missing. The extra `--` is also inconsistent with the `sotp review local` clap options, so the verifier should require the real command shape.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 369,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:57d27da945674a7931c0a19f06b18907ec3e07b2f9d1d136e97756d34a93f94e",
-          "at": "2026-06-05T14:04:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c3c913715b9e71d2367afb0018ddc18cb3a8c29028989bb35d5b6776efbfa38",
-          "at": "2026-06-05T14:10:38Z"
         }
       ]
     },
@@ -579,6 +773,87 @@
           "findings": [],
           "hash": "rvw1:sha256:b60148ecf2e1ffc7303294d1a9a316d8e98a082ab42024467a3906460740ee65",
           "at": "2026-06-05T16:47:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This wrapper no longer preserves the old positional `cargo make track-set-commit-hash <track-id>` contract. It now forwards `${@}` straight to `sotp track set-commit-hash`, but the native `track` subcommand only accepts `--track-id`, so any existing explicit-track invocation will fail with an unexpected positional argument. If the task is meant to stay user-facing, translate the forwarded value to `--track-id` or make the no-arg-only behavior explicit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 667,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e004ec40c788f787b84ba47731d8aabd5135e7f33fe1d6f17fe18639c23b5c00",
+          "at": "2026-06-05T17:05:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `track-commit-message` test only checks that the step names appear somewhere in the task body. It does not assert the required execution order, so a regression that reorders `add-all`, `ci`, `review`, `dry`, `commit-from-file`, or `track set-commit-hash` would still pass. This weakens the only test covering the new six-step shell chain.",
+              "severity": "P1",
+              "file": "scripts/test_make_wrappers.py",
+              "line": 269,
+              "category": "testing"
+            },
+            {
+              "message": "The new `commit` task now depends on `ci` and invokes `git commit` directly, but there is no corresponding assertion in `scripts/test_make_wrappers.py`. A future change could drop the CI dependency or reintroduce the old `bin/sotp make` indirection without any test failure.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 694,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:e004ec40c788f787b84ba47731d8aabd5135e7f33fe1d6f17fe18639c23b5c00",
+          "at": "2026-06-05T17:11:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-commit-message` now invokes `bin/sotp dry check-approved` without forwarding the required `--track-id`, and it also stops passing the per-track threshold that the old Rust path resolved from `dry-check.json`. As written this step will fail at the DRY gate, and even after adding the missing track id it would silently fall back to the CLI default threshold instead of preserving the previous gate semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "line": 708,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:0822c3fbceb3742cc5107cc9181b897318c005e62a274262ec584474cfb4bfc0",
+          "at": "2026-06-05T17:17:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `commit` wrapper test is too weak to protect the changed contract: it only checks for the substring `\"commit\"`, which is already present in the task description. A regression such as `args = [\"push\"]` or dropping `-m \"${@}\"` would still pass this test, so the wrapper wiring is not actually covered.",
+              "severity": "P1",
+              "file": "scripts/test_make_wrappers.py",
+              "line": 299,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0822c3fbceb3742cc5107cc9181b897318c005e62a274262ec584474cfb4bfc0",
+          "at": "2026-06-05T17:28:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d653d72f71248e0564a2323405f30d37f69fe142b88f2d5e51701ec14dea4797",
+          "at": "2026-06-05T17:33:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d653d72f71248e0564a2323405f30d37f69fe142b88f2d5e51701ec14dea4797",
+          "at": "2026-06-05T17:35:56Z"
         }
       ]
     },
@@ -914,172 +1189,123 @@
           "findings": [],
           "hash": "rvw1:sha256:b714af275697e9ca7726085787c4cf76525b9b445857b0785e7af61ab421d92c",
           "at": "2026-06-05T16:52:05Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new CLI entry point has no happy-path or failure-path tests in the changed files. That leaves `TrackCommand::SetCommitHash` / `execute_set_commit_hash` unverified for the required branch-resolution and recovery-hint behavior.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
-              "line": 19,
-              "category": "testing"
-            },
-            {
-              "message": "`execute_set_commit_hash` forwards `outcome.stderr` even though `CliApp::track_set_commit_hash` already writes the same error and recovery hint directly to stderr. On failures this emits an extra bare error line, and the `make` wrapper now inherits that changed output contract instead of a pure delegation.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
-              "line": 22,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cc6bd15edfa88cc5c74fd5999bcace3b1ecd5d397578ce4cc20dd8bacabe3816",
-          "at": "2026-06-05T11:13:53Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfd835db54116842bfc848ca687192744f898f2f5b237774f74bb5fa04e0906a",
+          "at": "2026-06-05T17:05:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfd835db54116842bfc848ca687192744f898f2f5b237774f74bb5fa04e0906a",
+          "at": "2026-06-05T17:06:04Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new CLI entry point has no happy-path or failure-path tests in the changed files. That leaves `TrackCommand::SetCommitHash` / `execute_set_commit_hash` unverified for the required branch-resolution and recovery-hint behavior.",
+              "message": "T008 is marked `done`, but this scope's briefing calls for a progress-marker update to `in_progress`; the regenerated view should stay at `5/10 resolved` with `[~]`, not advance to `6/10 resolved` with `[x]`. `plan.md` mirrors the same completed state.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
-              "line": 19,
-              "category": "testing"
-            },
-            {
-              "message": "`execute_set_commit_hash` forwards `outcome.stderr` even though `CliApp::track_set_commit_hash` already writes the same error and recovery hint directly to stderr. On failures this emits an extra bare error line, and the `make` wrapper now inherits that changed output contract instead of a pure delegation.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
-              "line": 22,
-              "category": "correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 36,
+              "category": "factual error"
             }
           ],
-          "hash": "rvw1:sha256:cc6bd15edfa88cc5c74fd5999bcace3b1ecd5d397578ce4cc20dd8bacabe3816",
-          "at": "2026-06-05T11:14:11Z"
+          "hash": "rvw1:sha256:5deb1b5bffcd118ab27ed253bbc25b1df4f5bdbdd6b85965b724acb3040dac8d",
+          "at": "2026-06-05T17:40:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d8da183e3fe07927705da89b9da94f8037d39c8da66226ed9cfb5656dc52b32c",
-          "at": "2026-06-05T11:21:43Z"
+          "hash": "rvw1:sha256:5deb1b5bffcd118ab27ed253bbc25b1df4f5bdbdd6b85965b724acb3040dac8d",
+          "at": "2026-06-05T17:41:49Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d8da183e3fe07927705da89b9da94f8037d39c8da66226ed9cfb5656dc52b32c",
-          "at": "2026-06-05T11:25:25Z"
+          "hash": "rvw1:sha256:5deb1b5bffcd118ab27ed253bbc25b1df4f5bdbdd6b85965b724acb3040dac8d",
+          "at": "2026-06-05T17:42:29Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Anchoring the new native subcommand to `PathBuf::from(\"track/items\")` makes `bin/sotp track set-commit-hash` fail before the composition layer runs whenever it is launched from a repo subdirectory, because the path is resolved against the current working directory instead of the discovered repo root. The underlying `CliApp::track_set_commit_hash` path already works from the repo root regardless of cwd, so this regresses a valid invocation context.",
+              "message": "`plan.md` still says `track-signals` is present here and will be deleted by `T009`, but the earlier `T005` entry already removes the `track-signals` wrapper task. That makes the S6/S8 ordering note stale and internally inconsistent with the task list.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
-              "line": 615,
-              "category": "behavior regression"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cargo-make-teardown-2026-06-05/plan.md",
+              "line": 46,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:484c6252b30f671ee1bcdd79e56e0e8090a5a40f5c12e321dc457c832b166992",
-          "at": "2026-06-05T11:59:25Z"
+          "hash": "rvw1:sha256:d8cede8233fe33a086943eeb985f99ef648f03496657a271f7625cdafeeef62c",
+          "at": "2026-06-05T17:56:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 is marked done, but unlike the other completed tasks this entry has no `commit_hash`. The generated plan therefore cannot show which commit completed T008, and the artifact set is internally incomplete.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 34,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:cff66f0c2cb462939511bc971f57124f32b4c71a3d353bcc25c751f8aecd9512",
+          "at": "2026-06-05T18:00:24Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1b2d21cdb185cacc339c429e301c94e0187d28cc84f0b0f9d66742b3427e000d",
-          "at": "2026-06-05T12:05:07Z"
+          "hash": "rvw1:sha256:cff66f0c2cb462939511bc971f57124f32b4c71a3d353bcc25c751f8aecd9512",
+          "at": "2026-06-05T18:02:36Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`run_in_dir` changes the process-wide current directory and only restores it after the closure returns normally. If the closure panics, Rust unwinds past the restore call, leaving later tests running from the temp repo directory (which may then be deleted), so tests using this shared helper are no longer independent. Restore via a guard/drop or `catch_unwind` so cleanup happens on both success and panic paths.",
+              "message": "T004/S6 still classify `track-signals` as one of the non-git wrappers that \"called bin/sotp make\", but the same plan says T005 only deleted `track-signals` as an already-native wrapper (`bin/sotp track signals`, not `bin/sotp make`). This leaves the precondition narrative internally contradictory; remove `track-signals` from the make-consumer list and mention it only as already removed by T005.",
               "severity": "P1",
-              "file": "apps/cli/src/commands/track/mod.rs",
-              "line": 643,
-              "category": "test_isolation"
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 40,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:1b2d21cdb185cacc339c429e301c94e0187d28cc84f0b0f9d66742b3427e000d",
-          "at": "2026-06-05T12:11:08Z"
+          "hash": "rvw1:sha256:cff66f0c2cb462939511bc971f57124f32b4c71a3d353bcc25c751f8aecd9512",
+          "at": "2026-06-05T18:04:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S6 says T005 removed all non-git wrappers that called `bin/sotp make`, including `track-signals`, but the same plan states `track-signals` was already native and was never a `bin/sotp make` consumer. This leaves the T004 precondition narrative semantically contradictory; the parenthetical should not classify `track-signals` as one of the wrappers that called `bin/sotp make`.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 124,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a4a88a0e98e14ecc4b16fae54bb25fc711403f43357fcd1f4b42adedfdc2cfea",
+          "at": "2026-06-05T18:05:37Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf553f96a64acfbcfed45ed2b0b2ef2411f888169762177a511de0f6cb72e521",
-          "at": "2026-06-05T12:14:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c6ca4ddcaae94f54c140d0d999f6e2d2493ee953e089e48ec958725ed2a0d4e5",
-          "at": "2026-06-05T13:03:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c6ca4ddcaae94f54c140d0d999f6e2d2493ee953e089e48ec958725ed2a0d4e5",
-          "at": "2026-06-05T13:05:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60a84e4f94c39c7807aec37d34cf6902b826eff4cf531fb56ef3289bdf91503",
-          "at": "2026-06-05T13:47:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60a84e4f94c39c7807aec37d34cf6902b826eff4cf531fb56ef3289bdf91503",
-          "at": "2026-06-05T13:49:26Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
-          "at": "2026-06-05T11:10:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
-          "at": "2026-06-05T11:13:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
-          "at": "2026-06-05T11:59:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
-          "at": "2026-06-05T12:02:05Z"
+          "hash": "rvw1:sha256:0ce535032de7d5d038b16d51c05ae6ae4d233a23421922c272a13cb00f0c2ce8",
+          "at": "2026-06-05T18:06:50Z"
         }
       ]
     }

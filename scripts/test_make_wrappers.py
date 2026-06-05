@@ -258,7 +258,7 @@ class MakeWrappersTest(unittest.TestCase):
                 self.assertNotIn('"make"', task_body, f"{task_header} must not route through 'make'")
                 self.assertNotIn('script_runner', task_body, f"{task_header} should not use script_runner")
 
-    def test_track_commit_message_still_uses_sotp_make(self) -> None:
+    def test_track_commit_message_uses_native_shell_chain(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         task_header = "[tasks.track-commit-message]"
         task_start = makefile.index(task_header)
@@ -266,9 +266,40 @@ class MakeWrappersTest(unittest.TestCase):
         task_body = (
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
-        self.assertIn('command = "bin/sotp"', task_body)
-        self.assertIn('"make"', task_body)
-        self.assertIn('"track-commit-message"', task_body)
+        self.assertIn('dependencies = ["track-active-gate"]', task_body)
+        self.assertIn('script_runner = "@shell"', task_body)
+        script_start = task_body.index("script = [")
+        script_body = task_body[script_start:]
+        steps = [
+            "bin/sotp git add-all",
+            "cargo make ci",
+            "bin/sotp review check-approved",
+            "bin/sotp dry check-approved",
+            "bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup",
+            "bin/sotp track set-commit-hash",
+        ]
+        for step in steps:
+            self.assertIn(step, script_body)
+        for i in range(len(steps) - 1):
+            self.assertLess(
+                script_body.index(steps[i]),
+                script_body.index(steps[i + 1]),
+                f"Step order violation: '{steps[i]}' must precede '{steps[i + 1]}'",
+            )
+        self.assertNotIn('"make"', task_body)
+
+    def test_commit_task_runs_ci_then_git_commit(self) -> None:
+        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
+        task_header = "[tasks.commit]"
+        task_start = makefile.index(task_header)
+        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
+        task_body = (
+            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
+        )
+        self.assertIn('dependencies = ["ci"]', task_body)
+        self.assertIn('command = "git"', task_body)
+        self.assertIn('args = ["commit", "-m", "${@}"]', task_body)
+        self.assertNotIn("bin/sotp make", task_body)
 
     def test_track_pr_wrappers_delegate_to_sotp_native(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
@@ -327,7 +358,7 @@ class MakeWrappersTest(unittest.TestCase):
                 self.assertIn('"$@"', task_body)
                 self.assertNotIn("bin/sotp make", task_body)
 
-    def test_track_set_commit_hash_wrapper_delegates_to_sotp_make(self) -> None:
+    def test_track_set_commit_hash_wrapper_uses_native_subcommand(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
         task_header = "[tasks.track-set-commit-hash]"
         task_start = makefile.index(task_header)
@@ -336,9 +367,11 @@ class MakeWrappersTest(unittest.TestCase):
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
 
-        self.assertIn('script_runner = "@shell"', task_body)
-        self.assertIn('bin/sotp make track-set-commit-hash', task_body)
-        self.assertIn('"$@"', task_body)
+        self.assertIn('command = "bin/sotp"', task_body)
+        self.assertIn('"track"', task_body)
+        self.assertIn('"set-commit-hash"', task_body)
+        self.assertNotIn('script_runner', task_body)
+        self.assertNotIn('bin/sotp make', task_body)
 
     def test_conventions_wrappers_smoke(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -426,17 +459,18 @@ class MakeWrappersTest(unittest.TestCase):
         self.assertNotIn('"make"', task_body)
         self.assertNotIn('script_runner', task_body)
 
-        # track-commit-message: still uses sotp make (T008 scope)
+        # track-commit-message: native shell chain (T008 conversion)
         task_header = "[tasks.track-commit-message]"
         task_start = makefile.index(task_header)
         next_task = makefile.find("\n[tasks.", task_start + len(task_header))
         task_body = (
             makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
         )
-        self.assertIn('command = "bin/sotp"', task_body)
-        self.assertIn('"make"', task_body)
-        self.assertIn('"track-commit-message"', task_body)
-        self.assertNotIn('script_runner', task_body)
+        self.assertIn('script_runner = "@shell"', task_body)
+        self.assertIn("bin/sotp git add-all", task_body)
+        self.assertIn("bin/sotp git commit-from-file", task_body)
+        self.assertIn("bin/sotp track set-commit-hash", task_body)
+        self.assertNotIn('"make"', task_body)
 
         # track-note: native sotp git note-from-file
         task_header = "[tasks.track-note]"

@@ -219,7 +219,7 @@ mod tests {
         let exit = run_cli(cli, |cmd| {
             match cmd {
                 DryCommand::CheckApproved(args) => {
-                    assert_eq!(args.track_id, "my-track");
+                    assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 }
                 other => panic!("expected CheckApproved, got {other:?}"),
             }
@@ -236,7 +236,7 @@ mod tests {
             .unwrap();
         match cli.command {
             Some(CliCommand::Dry { cmd: DryCommand::CheckApproved(args) }) => {
-                assert_eq!(args.track_id, "my-track");
+                assert_eq!(args.track_id.as_deref(), Some("my-track"));
             }
             _ => panic!("expected Dry {{ CheckApproved }}, got a different variant"),
         }
