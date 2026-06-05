@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "D9 infra loader: add libs/infrastructure/src/dry_check.rs with DryCheckConfig::load and DryCheckConfigError; add .harness/config/dry-check.json (threshold=0.85, schema_version=1); wire into libs/infrastructure/src/lib.rs; add unit tests for load / threshold / fail-closed error cases. No callers changed yet — existing 0.85 defaults remain; this task only adds the new loader and config file.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "D6 new native: implement bin/sotp track set-commit-hash subcommand in apps/cli/src/commands/track/ (clap struct + execute fn) and apps/cli-composition/src/track/ (composition method); move persist_commit_hash_for_track logic from composition make.rs to track composition; add the TrackCommand::SetCommitHash variant in track/mod.rs and its execute arm; add unit tests. No Makefile.toml changes yet.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "D1 daemon teardown + D8 sync (daemon consumers): remove tools-daemon service from compose.yml; remove 10 daemon-exec tasks from Makefile.toml (tools-up, tools-down, fmt-exec, clippy-exec, test-exec, test-one-exec, check-exec, machete-exec, deny-exec, llvm-cov-exec); remove MakeTask::Exec variant and its dispatch arm from apps/cli/src/commands/make.rs (IN-01 / AC-01 require bin/sotp make exec to be deleted in this commit, not deferred); remove the corresponding EXPECTED_CARGO_MAKE_ALLOW entries from orchestra.rs; remove their Bash(cargo make ...) entries from .claude/settings.json permissions.allow; remove daemon-exec references from DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, and scripts/test_make_wrappers.py. The rest of apps/cli/src/commands/make.rs (all other MakeTask variants and dispatch_* functions) remains for now — only MakeTask::Exec is removed. CI must pass after this commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "D3/IN-11 non-git passthrough migration + D8 sync (non-git consumer updates): remove non-git passthrough cargo make wrapper tasks from Makefile.toml (track-resolve, track-transition, track-add-task, track-next-task, track-task-counts, track-set-override, track-sync-views, track-review-results, track-check-approved, track-local-plan, track-local-review, track-local-review-fix-codex, track-local-dry-fix, track-signals, track-pr-status, track-pr-merge, track-pr-ensure). Note: track-signals already calls bin/sotp track signals natively (not via bin/sotp make), so its deletion only removes the wrapper task entry; track-baseline-capture is handled as an orphan in T009 because it too already calls bin/sotp track baseline-capture natively and is not a bin/sotp make consumer. Audit native subcommand defaults and add --items-dir default_value where needed so callers need not supply it; update .claude/commands/**, .claude/skills/**, .claude/agents/** to call bin/sotp native directly; update DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, CLAUDE.md references; remove corresponding EXPECTED_CARGO_MAKE_ALLOW entries from orchestra.rs and Bash(cargo make ...) entries from settings.json permissions.allow. After this commit no Makefile.toml task calls bin/sotp make for any non-git passthrough route. CI must pass after this commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "D4 git wrapper rewiring: change remaining git-write cargo make tasks (add, add-all, unstage, track-add-paths, track-note, track-switch-main, track-branch-create, track-branch-switch, track-pr-push, track-pr, track-pr-review, note) from command=bin/sotp args=[make, <task>] or script_runner=@shell to command=bin/sotp args=[git, <sub>, ...] or args=[track, branch, <sub>] using command/args array form (no @shell); verify bin/sotp git safety logic (add-all scratch exclusion, commit-from-file branch guard, add-from-file path validation, switch-and-pull) remains intact inside the native commands; update any doc_patterns.rs or orchestra.rs entries that mention the old bin/sotp make forwarding forms. After this commit no Makefile.toml task calls bin/sotp make for any git-write route — every git-write task calls bin/sotp git <sub> directly via command/args. CI must pass after this commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "D6 commit script rebuild + D8 sync (commit consumers): rebuild track-commit-message in Makefile.toml as a 6-step @shell script (bin/sotp git add-all → cargo make ci → bin/sotp review check-approved → bin/sotp dry check-approved → bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup → bin/sotp track set-commit-hash) with no @shell logic beyond sequential invocation; rebuild commit task similarly; remove track-active-gate dependency from track-commit-message (the gate is now embedded in the 6-step script via ci + track set-commit-hash); rewrite track-set-commit-hash Makefile.toml wrapper task from 'bin/sotp make track-set-commit-hash' (its CURRENT form, as verified in Makefile.toml) to call bin/sotp track set-commit-hash directly — this is mandatory because track-set-commit-hash is a confirmed bin/sotp make consumer that must be eliminated before T004 deletes make.rs; update scripts/test_make_wrappers.py to replace test_track_set_commit_hash_wrapper_delegates_to_sotp_make with a test verifying the new native form; update orchestra.rs EXPECTED_CARGO_MAKE_ALLOW for the remaining commit-related tasks; update DEVELOPER_AI_WORKFLOW.md and track/workflow.md for the new commit flow. This task runs BEFORE T004: after T008 the commit-related tasks (commit, track-commit-message, track-set-commit-hash) no longer call bin/sotp make, completing the elimination of all Makefile.toml callers of the make subcommand. The 6-step script calls bin/sotp git, cargo make ci, bin/sotp review, bin/sotp dry, and bin/sotp track — none of which require make.rs to be deleted first. Depends on T002 (set-commit-hash native subcommand must exist). CI must pass after this commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "D2 make-subcommand abolition + D8 sync (make-namespace consumers): delete apps/cli/src/commands/make.rs (remaining MakeTask variants other than Exec — already removed in T003 — and dispatch_*, make_tests.rs, make_review_fix.rs, make_dry_fix.rs), delete apps/cli-composition/src/make.rs (all make_* methods including DEFAULT_THRESHOLD = 0.85 constant and resolve_commit_dry_threshold — both vanish as part of this wholesale deletion), remove CliCommand::Make arm from apps/cli/src/main.rs, remove pub mod make / use make::* from composition lib.rs. Precondition verification: by this point T003 removed MakeTask::Exec, T005 removed all non-git Makefile.toml wrapper tasks that called bin/sotp make (track-resolve, track-transition, track-add-task, track-next-task, track-task-counts, track-set-override, track-sync-views, track-review-results, track-check-approved, track-local-plan, track-local-review, track-local-review-fix-codex, track-local-dry-fix, track-signals, track-pr-status, track-pr-merge, track-pr-ensure), T006 rewired all git-write tasks (add-all, unstage, track-add-paths, track-note, track-switch-main, track-branch-create, track-branch-switch, track-pr-push, track-pr, track-pr-review, note), and T008 rebuilt the commit tasks (commit, track-commit-message) and rewrote track-set-commit-hash to call bin/sotp track directly — so no Makefile.toml task calls bin/sotp make at this point. Note: track-baseline-capture and track-signals are NOT bin/sotp make consumers (they already call bin/sotp track baseline-capture and bin/sotp track signals natively in the current Makefile.toml); T009 deletes those orphan wrapper tasks after T004 without ordering risk. The deletion of make.rs is safe and CI-green. Remove any remaining EXPECTED_CARGO_MAKE_ALLOW entries that referenced bin/sotp make pass-through wrappers; update orchestra.rs FORBIDDEN_ALLOW if any forbidden entry references make; remove any residual Bash(cargo make ...) entries from .claude/settings.json that targeted the now-deleted make wrappers; update scripts/test_make_wrappers.py for the removed tasks. CI must pass after this commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "D9 hardcode removal: in apps/cli/src/commands/dry.rs change --threshold default_value_t from 0.85 to Option<f32> (no default); in DryWriteInput and DryCheckApprovedInput change threshold field to Option<f32>; in composition dry.rs and dry/mod.rs wire DryCheckConfig::load to supply threshold when CLI Option is None; verify resolve_commit_dry_threshold is gone (was in composition make.rs deleted in T004); verify DEFAULT_THRESHOLD = 0.85 constant is gone (was in composition make.rs deleted in T004); add integration-level tests verifying fail-closed behaviour when dry-check.json is absent. Depends on T001 (DryCheckConfig::load) and T004 (composition make.rs already deleted, so no conflict with the DEFAULT_THRESHOLD constant and resolve_commit_dry_threshold that lived there). CI must pass after this commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "D7 orphan cleanup + D8 ghost-ref doc sync: remove test-nightly task from Makefile.toml; remove track-baseline-capture cargo make wrapper task from Makefile.toml (the wrapper task is a zero-reference orphan; note that track-baseline-capture already calls bin/sotp track baseline-capture natively in the current code — it is NOT a bin/sotp make consumer — so this deletion is safe regardless of ordering relative to T004 and does not affect the make.rs abolition precondition); remove verify-doc-links public compose wrapper task from Makefile.toml (verify-doc-links-local stays as internal ci-local dependency); remove cargo make hooks-selftest ghost reference from .claude/rules/07-dev-environment.md; remove any EXPECTED_CARGO_MAKE_ALLOW entries for the removed public wrappers; remove verify-doc-links Bash(cargo make verify-doc-links) entry from settings.json permissions.allow if present. CI must pass after this commit.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "D8 remaining downstream sync sweep: audit all remaining doc references in DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, CLAUDE.md, LOCAL_DEVELOPMENT.md for stale cargo make task names (track-local-plan, track-local-review, track-check-approved, track-review-results, etc.) and update to bin/sotp native forms; sweep .claude/commands/**, .claude/skills/**, .claude/agents/** for any residual cargo make call-sites missed in T005; sweep doc_patterns.rs, view_freshness.rs, convention_docs.rs error messages and policy.rs block messages for references to deleted tasks; verify orchestra.rs allowlist matches final Makefile.toml task set exactly; run scripts/test_make_wrappers.py selftest to confirm all deleted task tests are removed or skipped; confirm cargo make ci passes end-to-end.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "sections": [
+      {
+        "id": "S1",
+        "title": "New infrastructure additions (D9, D6 new native)",
+        "description": [
+          "Add the new pieces that later tasks depend on: the DryCheckConfig infrastructure loader and .harness/config/dry-check.json config file (D9), and the bin/sotp track set-commit-hash native subcommand (D6).",
+          "These additions are purely additive — no existing behaviour is removed yet — so both T001 and T002 can pass cargo make ci independently."
+        ],
+        "task_ids": ["T001", "T002"]
+      },
+      {
+        "id": "S2",
+        "title": "Daemon teardown (D1) with atomic consumer sync (D8)",
+        "description": [
+          "Delete the tools-daemon service and its 10 dependent exec tasks. Also remove MakeTask::Exec from apps/cli/src/commands/make.rs in the same commit (IN-01 / AC-01 require bin/sotp make exec to be deleted alongside the daemon tasks, not deferred to T004). Co-located with orchestra.rs allowlist removal and settings.json / doc updates (CN-05).",
+          "After T003, make.rs still exists (with the remaining MakeTask variants other than Exec), so the Rust codebase compiles and CI passes."
+        ],
+        "task_ids": ["T003"]
+      },
+      {
+        "id": "S3",
+        "title": "Non-git passthrough migration (D3, IN-11) with consumer rewiring (D8)",
+        "description": [
+          "Drop cargo make wrappers for non-git passthrough tasks; audit and update native subcommand defaults for --items-dir; rewire slash commands, skills, agents, and docs to call bin/sotp native directly.",
+          "T005 comes before T004 (make.rs abolition) so that after this commit no Makefile.toml non-git task calls bin/sotp make. Note: track-signals already calls bin/sotp track signals natively in the current Makefile.toml — its wrapper task is deleted here but it was never a bin/sotp make consumer. Note: track-baseline-capture is not in this task; it is handled as an orphan by T009 because it too already calls bin/sotp track baseline-capture natively (not via bin/sotp make), so its deletion is order-independent w.r.t. T004. CI passes because make.rs is still present (with the remaining non-Exec variants) and compiles cleanly."
+        ],
+        "task_ids": ["T005"]
+      },
+      {
+        "id": "S4",
+        "title": "Git wrapper rewiring (D4)",
+        "description": [
+          "Switch remaining git-write cargo make tasks from bin/sotp make routing to direct command/args arrays calling bin/sotp git <sub>. No logic moves — safety logic stays inside bin/sotp git. CN-03 is satisfied because command/args arrays avoid shell expansion.",
+          "T006 comes before T004 so that after this commit no Makefile.toml git-write task calls bin/sotp make either. make.rs is still present but has no Makefile.toml git-write caller remaining. CI passes because make.rs compiles (even without callers in this category)."
+        ],
+        "task_ids": ["T006"]
+      },
+      {
+        "id": "S5",
+        "title": "Commit script rebuild (D6) — last bin/sotp make callers removed",
+        "description": [
+          "Rebuild track-commit-message and commit in Makefile.toml as 6-step @shell scripts calling bin/sotp native subcommands directly (bin/sotp git, bin/sotp review, bin/sotp dry, bin/sotp track). Also rewrite track-set-commit-hash Makefile.toml wrapper from its current 'bin/sotp make track-set-commit-hash' form to call bin/sotp track set-commit-hash directly — track-set-commit-hash is a confirmed bin/sotp make consumer in the current Makefile.toml and must be migrated in the same commit as the commit task rebuild so that all make subcommand callers are gone before T004.",
+          "T008 must run BEFORE T004. The complete set of bin/sotp make Makefile.toml consumers is: (1) MakeTask::Exec — removed by T003; (2) non-git passthrough wrappers (track-resolve, track-transition, etc.) — removed by T005; (3) git-write wrappers (add-all, unstage, note, track-note, track-switch-main, track-add-paths, track-branch-create, track-branch-switch, track-pr-push, track-pr, track-pr-review) — rewired by T006; (4) commit, track-commit-message, track-set-commit-hash — rebuilt/rewired by T008. After T008, every Makefile.toml task that called bin/sotp make has been removed or rewired, making T004 safe.",
+          "The 6-step commit script calls bin/sotp git, cargo make ci, bin/sotp review, bin/sotp dry, and bin/sotp track — none of which are bin/sotp make calls — so T008 has no dependency on make.rs being deleted first. Depends on T002 (set-commit-hash native subcommand)."
+        ],
+        "task_ids": ["T008"]
+      },
+      {
+        "id": "S6",
+        "title": "bin/sotp make abolition (D2) with atomic consumer sync (D8)",
+        "description": [
+          "Delete the remaining content of apps/cli/src/commands/make.rs (all MakeTask variants other than Exec — already removed in T003 — plus dispatch_* functions and helper files), delete apps/cli-composition/src/make.rs (all make_* methods), and remove CliCommand::Make wiring. The DEFAULT_THRESHOLD = 0.85 constant and resolve_commit_dry_threshold function that lived in composition make.rs vanish as part of this wholesale deletion — T007 verifies their absence after this task.",
+          "By this point T003 removed MakeTask::Exec, T005 removed all non-git Makefile.toml wrappers that called bin/sotp make, T006 rewired all git-write tasks, and T008 rebuilt the commit tasks and rewrote track-set-commit-hash — zero Makefile.toml tasks call bin/sotp make. The deletion is CI-safe. Note: track-baseline-capture and track-signals wrapper tasks still exist in Makefile.toml at this point (they are deleted by T009), but since they already call bin/sotp track natively rather than bin/sotp make, their presence does not affect this task's safety.",
+          "Co-located with orchestra.rs allowlist pruning, settings.json updates, and test_make_wrappers.py cleanup (CN-05). After T004, the 3-layer passthrough and dead code are gone."
+        ],
+        "task_ids": ["T004"]
+      },
+      {
+        "id": "S7",
+        "title": "DRY hardcode removal (D9)",
+        "description": [
+          "Remove the 0.85 hardcodes from apps/cli/src/commands/dry.rs and wire DryCheckConfig::load in composition dry.rs, making --threshold an Option with fail-closed behaviour when the config file is absent. The DEFAULT_THRESHOLD constant and resolve_commit_dry_threshold function were already eliminated when T004 deleted composition make.rs wholesale; T007 verifies their absence as part of this task.",
+          "Depends on T001 (DryCheckConfig::load exists in infrastructure) and T004 (composition make.rs is already deleted, removing any conflict with the DEFAULT_THRESHOLD constant that lived there)."
+        ],
+        "task_ids": ["T007"]
+      },
+      {
+        "id": "S8",
+        "title": "Orphan / ghost cleanup (D7) and final sync sweep (D8)",
+        "description": [
+          "T009 removes the three orphan tasks (test-nightly, track-baseline-capture wrapper, verify-doc-links public wrapper) and the hooks-selftest ghost reference in docs. The track-baseline-capture wrapper task and track-signals wrapper task in Makefile.toml already call bin/sotp track natively (not via bin/sotp make), so their deletion in T009 (after T004) is ordering-safe — they are not make-subcommand consumers.",
+          "T010 is the final downstream sync sweep: audits every remaining doc and code reference against the finished Makefile.toml and orchestra.rs allowlist to confirm CI passes end-to-end."
+        ],
+        "task_ids": ["T009", "T010"]
+      }
+    ]
+  }
+}

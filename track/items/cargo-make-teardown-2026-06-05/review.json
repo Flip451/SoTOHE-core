@@ -75,6 +75,137 @@
           "findings": [],
           "hash": "rvw1:sha256:21232f160ef606558b713825aa650eff461a76732f1c7c56d389d15446d3086e",
           "at": "2026-06-05T07:33:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:832ac81e4edf441e061993eb6d4ab2ab69ae5a9aba5da0912448db3723d25598",
+          "at": "2026-06-05T08:44:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 explicitly leaves `MakeTask::Exec` intact, but IN-01/AC-01 require `bin/sotp make exec` to be removed as part of the daemon teardown, and task-coverage maps AC-01 only to T003. As written, the plan can complete T003 while the AC-01 command surface remains until T004, so the task/coverage contract contradicts the spec.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            },
+            {
+              "message": "The task order deletes the entire `bin/sotp make` command in T004 before T005 removes non-git cargo-make wrappers and before T006 rewires git-write wrappers. T004 still claims CI must pass after that commit, but the plan leaves wrapper tasks scheduled for later that still depend on the deleted intermediate command, making the per-task green-state plan infeasible.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            },
+            {
+              "message": "IN-04 includes the `add` git-write task, but T006's concrete rewrite list omits `add`, and task-coverage maps IN-04/AC-04 only to T006. That leaves the `add` wrapper outside the implementation plan despite being in scope.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 36,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-10 requires both adding `.harness/config/dry-check.json` and removing the scattered `0.85` hardcodes plus `resolve_commit_dry_threshold`, but task-coverage maps IN-10 only to T001 while T001 explicitly says existing `0.85` defaults remain. The hardcode removal is in T007, so IN-10 is under-covered as recorded.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/task-coverage.json",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:832ac81e4edf441e061993eb6d4ab2ab69ae5a9aba5da0912448db3723d25598",
+          "at": "2026-06-05T08:47:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T004` assumes all `bin/sotp make` callers are gone before `apps/cli/src/commands/make.rs` is deleted, but `T008` is still the task that rewrites `commit` / `track-commit-message`. Until `T008` runs, those commit-related tasks remain the remaining callers, so deleting the subcommand at this point would strand them and break CI. Reorder the plan so the commit-script rebuild happens before `T004`, or fold that rewrite into the same step.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cargo-make-teardown-2026-06-05/plan.md",
+              "line": 40,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:6e8fd023f240761e2bc9eb2686f227313a0966de5b21060deca6bb0e69d633e6",
+          "at": "2026-06-05T08:57:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:495d20e7b29d97b0010dbb7fe5327bd57e4d81c4f7fc20a6bb954466c438b51b",
+          "at": "2026-06-05T09:04:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 claims that after the non-git passthrough migration no Makefile.toml non-git route still calls `bin/sotp make`, and T004 relies on that before deleting the make subcommand. However spec IN-03 includes `track-baseline-capture` in the non-git passthrough set, while the plan leaves that wrapper removal to T009, which runs after T004. This makes the dependency order internally inconsistent: T004 can delete `bin/sotp make` while the `track-baseline-capture` cargo-make wrapper still exists and may still route through it.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:495d20e7b29d97b0010dbb7fe5327bd57e4d81c4f7fc20a6bb954466c438b51b",
+          "at": "2026-06-05T09:07:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-signals` has two different removal points in the plan: T005 already removes it from `Makefile.toml` (`plan.md:26`), but S6/S8 still describe it as a wrapper that survives until T009 (`plan.md:46`, `plan.md:60`). T009's actual task body only removes `track-baseline-capture` (`plan.md:63`), so the wrapper's lifecycle is internally contradictory.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cargo-make-teardown-2026-06-05/plan.md",
+              "line": 46,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cd324f180e21ba11daa4d817b94a3f85ccfb28c2918f4c73486e69ae1822461c",
+          "at": "2026-06-05T09:16:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 requires any cargo make task that invokes `bin/sotp git <sub>` to use `command`/`args` arrays and explicitly not an `@shell` script, but AC-06 and T008 require `commit`/`track-commit-message` to be a 6-step `@shell` script that invokes `bin/sotp git add-all` and `bin/sotp git commit-from-file`. As written, the plan cannot satisfy both the constraint and the commit-script acceptance/task requirements; CN-03 needs an explicit D6 orchestration exception or the T008/AC-06 design needs to change.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/spec.json",
+              "line": 274,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cd324f180e21ba11daa4d817b94a3f85ccfb28c2918f4c73486e69ae1822461c",
+          "at": "2026-06-05T09:19:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74a62fe6e824af3bfcbefdc01d0d93c5b9afe8acda76fb586b1ad7135a49941",
+          "at": "2026-06-05T09:31:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74a62fe6e824af3bfcbefdc01d0d93c5b9afe8acda76fb586b1ad7135a49941",
+          "at": "2026-06-05T09:32:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c74a62fe6e824af3bfcbefdc01d0d93c5b9afe8acda76fb586b1ad7135a49941",
+          "at": "2026-06-05T09:35:26Z"
         }
       ]
     }

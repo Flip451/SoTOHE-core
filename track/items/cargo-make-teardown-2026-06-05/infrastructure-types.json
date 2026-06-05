@@ -1,0 +1,152 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "DryCheckConfig": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Loaded .harness/config/dry-check.json configuration. Private serde DTO internals; public API is load() + threshold(). Following AgentProfiles::load pattern (CN-07 / D9).",
+      "spec_refs": [
+        {
+          "file": "track/items/cargo-make-teardown-2026-06-05/spec.json",
+          "anchor": "IN-10",
+          "hash": "70a8aebb851b1ea0a079dd76281d60dcae2f1d75aea4598879aa26bdcf843b2b"
+        },
+        {
+          "file": "track/items/cargo-make-teardown-2026-06-05/spec.json",
+          "anchor": "CN-07",
+          "hash": "d597ff2dea3a25dc7017e87c51ff6bfd01bec01052fb7e7725cf0bff613949d8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "DryCheckConfigError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "source", "ty": "std::io::Error" }
+              ]
+            }
+          },
+          {
+            "name": "Parse",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["serde_json::Error"]
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "found", "ty": "u32" },
+                { "name": "expected", "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidThreshold",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "dry_check",
+      "docs": "Errors from DryCheckConfig::load. Mirrors AgentProfilesError structure for the dry-check config loader (D9 / CN-07).",
+      "spec_refs": [
+        {
+          "file": "track/items/cargo-make-teardown-2026-06-05/spec.json",
+          "anchor": "IN-10",
+          "hash": "70a8aebb851b1ea0a079dd76281d60dcae2f1d75aea4598879aa26bdcf843b2b"
+        },
+        {
+          "file": "track/items/cargo-make-teardown-2026-06-05/spec.json",
+          "anchor": "CN-04",
+          "hash": "ea63df90acf623f419c934a16aee305bc44820b0fe9fc3aac849501e16dd6861"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "DryCheckConfig",
+      "methods": [
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<DryCheckConfig, DryCheckConfigError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "domain::semantic_dup::SimilarityThreshold",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "DryCheckConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<serde_json::Error>",
+      "for_type": "DryCheckConfigError"
+    }
+  ]
+}
