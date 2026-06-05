@@ -1,0 +1,8 @@
+{
+  "schema_version": 5,
+  "id": "cargo-make-teardown-2026-06-05",
+  "title": "cargo make ラッパー層の解体 — bin/sotp 直叩きへの一本化",
+  "branch": "track/cargo-make-teardown-2026-06-05",
+  "created_at": "2026-06-05T06:54:04Z",
+  "updated_at": "2026-06-05T06:54:04Z"
+}

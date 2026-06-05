@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81342caefd4396d8e222dcb2c52c54ebb571007e9a2e5a6805b75674f7439146",
+          "at": "2026-06-05T07:01:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 states that `verify-*` Docker reproducibility gates remain as `cargo make` entry points, but D7 later says the public `verify-doc-links` wrapper should be deleted and only the internal dependency retained. Since `verify-doc-links` is itself a `verify-*` task, the plan gives conflicting implementation requirements unless D5 excludes this task or D7 is explicitly marked as an exception.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-05-1535-cargo-make-teardown.md",
+              "line": 113,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:81342caefd4396d8e222dcb2c52c54ebb571007e9a2e5a6805b75674f7439146",
+          "at": "2026-06-05T07:05:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d62329c1f20e3fbe4e3b667ce2d739463e0d1b912378c022fed87cafeae45ea2",
+          "at": "2026-06-05T07:11:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6's concrete sequence requires step 2 to run `cargo make ci`, and D5 explicitly keeps CI as a `cargo make` Docker reproducibility gate, but this summary says the script will contain only “6 native commands.” That creates a semantic conflict about the layer placement of CI: implementers cannot both keep `cargo make ci` in the sequence and make every remaining step a native subcommand.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-05-1535-cargo-make-teardown.md",
+              "line": 144,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d62329c1f20e3fbe4e3b667ce2d739463e0d1b912378c022fed87cafeae45ea2",
+          "at": "2026-06-05T07:15:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 conflates `.harness/config/dry-check.json` as both the source of truth for the DRY threshold and a historical record whose `threshold` value should not affect the next decision. Those roles conflict in the same file/field, so the implementation boundary is ambiguous unless config and history are split or the wording is tightened.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-05-1535-cargo-make-teardown.md",
+              "line": 171,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b8badbbfa9fb9ae358eba45f3862ef80ea4e0398002868dc0f48dfbdd468e7ab",
+          "at": "2026-06-05T07:22:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21232f160ef606558b713825aa650eff461a76732f1c7c56d389d15446d3086e",
+          "at": "2026-06-05T07:29:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21232f160ef606558b713825aa650eff461a76732f1c7c56d389d15446d3086e",
+          "at": "2026-06-05T07:33:00Z"
+        }
+      ]
+    }
+  }
+}
