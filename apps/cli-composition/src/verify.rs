@@ -75,19 +75,70 @@ fn resolve_ci_verify_track_id_with_reader(
     }
 }
 
-fn build_spec_path_from_track_id(track_id: &str) -> Result<PathBuf, String> {
+/// Build the `spec.md` path from a resolved track ID, with presence checking.
+///
+/// Returns:
+/// - `Ok(Some(spec_md_path))` when at least one of `spec.json` or `spec.md` exists under
+///   `track/items/<track_id>/`. The returned path is always `spec.md`; the downstream
+///   `infrastructure::verify::spec_states::verify` prefers the sibling `spec.json` when
+///   present and falls back to reading `spec.md`, so passing the `spec.md` path is correct
+///   as long as at least one of the two exists.
+/// - `Ok(None)` (skip-signal) when the track artifact directory exists but **neither**
+///   `spec.json` **nor** `spec.md` exists — the spec artifacts have not yet been generated
+///   (Phase 0). Callers should render a SKIP outcome.
+/// - `Err(msg)` for infrastructure failures (fail-closed).
+fn build_spec_path_from_track_id(track_id: &str) -> Result<Option<PathBuf>, String> {
     use infrastructure::git_cli::GitRepository as _;
     let repo = infrastructure::git_cli::SystemGitRepo::discover()
         .map_err(|e| format!("cannot discover git repository: {e}"))?;
     let repo_root = repo.root().to_path_buf();
-    let spec_path = repo_root.join("track/items").join(track_id).join("spec.md");
-    if spec_path.exists() {
-        Ok(spec_path)
+    let track_dir = repo_root.join("track/items").join(track_id);
+    require_track_artifact_dir(track_id, &track_dir)?;
+    let spec_json_path = track_dir.join("spec.json");
+    let spec_md_path = track_dir.join("spec.md");
+    if spec_artifact_entry_exists(&spec_json_path)? || spec_artifact_entry_exists(&spec_md_path)? {
+        Ok(Some(spec_md_path))
     } else {
-        Err(format!(
-            "resolved spec path does not exist: {} (track: {track_id})",
-            spec_path.display()
-        ))
+        // Neither spec artifact exists yet (Phase 0) — return skip-signal.
+        Ok(None)
+    }
+}
+
+fn require_track_artifact_dir(track_id: &str, track_dir: &std::path::Path) -> Result<(), String> {
+    match std::fs::symlink_metadata(track_dir) {
+        Ok(metadata) if metadata.file_type().is_symlink() => Err(format!(
+            "track artifact directory {} for track '{track_id}' is a symlink",
+            track_dir.display()
+        )),
+        Ok(metadata) if metadata.is_dir() => Ok(()),
+        Ok(_) => Err(format!(
+            "track artifact path {} for track '{track_id}' is not a directory",
+            track_dir.display()
+        )),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Err(format!(
+            "track artifact directory {} for track '{track_id}' does not exist",
+            track_dir.display()
+        )),
+        Err(e) => Err(format!(
+            "failed to inspect track artifact directory {} for track '{track_id}': {e}",
+            track_dir.display()
+        )),
+    }
+}
+
+fn spec_artifact_entry_exists(path: &std::path::Path) -> Result<bool, String> {
+    match std::fs::symlink_metadata(path) {
+        Ok(metadata) if metadata.file_type().is_symlink() => Err(format!(
+            "spec artifact {} is a symlink; refusing to skip spec-state verification",
+            path.display()
+        )),
+        Ok(metadata) if metadata.is_file() => Ok(true),
+        Ok(_) => Err(format!(
+            "spec artifact {} is not a regular file; refusing to skip spec-state verification",
+            path.display()
+        )),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
+        Err(e) => Err(format!("failed to inspect spec artifact {}: {e}", path.display())),
     }
 }
 
@@ -339,7 +390,15 @@ impl CliApp {
                         "not on a track branch; skipping",
                     ));
                 }
-                Some(track_id) => build_spec_path_from_track_id(&track_id)?,
+                Some(track_id) => match build_spec_path_from_track_id(&track_id)? {
+                    Some(path) => path,
+                    None => {
+                        return Ok(render_skip(
+                            "verify spec states",
+                            "spec artifacts not yet generated (Phase 0); skipping",
+                        ));
+                    }
+                },
             },
         };
 
@@ -511,9 +570,115 @@ impl CliApp {
 
     /// Build the spec.md path from a resolved track ID.
     ///
+    /// Returns `Ok(path)` when at least one of `spec.json` or `spec.md` exists.
+    /// Returns `Err` when neither spec artifact exists (Phase 0) or on infrastructure failure.
+    /// Use `verify_spec_states` for the track-resolution path that emits a SKIP outcome
+    /// instead of an error when spec artifacts are absent.
+    ///
     /// # Errors
-    /// Returns a human-readable error string when the path does not exist.
+    /// Returns a human-readable error string when neither spec artifact exists or on
+    /// infrastructure failure.
     pub fn verify_build_spec_path_from_track_id(&self, track_id: &str) -> Result<PathBuf, String> {
-        build_spec_path_from_track_id(track_id)
+        match build_spec_path_from_track_id(track_id)? {
+            Some(path) => Ok(path),
+            None => Err(format!(
+                "spec artifacts not found for track '{track_id}': \
+                 neither spec.json nor spec.md exists under track/items/{track_id}/"
+            )),
+        }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_spec_artifact_entry_exists_missing_path_returns_false() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("missing-spec.json");
+
+        assert!(!spec_artifact_entry_exists(&path).unwrap());
+    }
+
+    #[test]
+    fn test_spec_artifact_entry_exists_existing_file_returns_true() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::write(&path, "{}").unwrap();
+
+        assert!(spec_artifact_entry_exists(&path).unwrap());
+    }
+
+    #[test]
+    fn test_spec_artifact_entry_exists_directory_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("spec.json");
+        std::fs::create_dir(&path).unwrap();
+
+        let message = spec_artifact_entry_exists(&path).unwrap_err();
+
+        assert!(
+            message.contains("is not a regular file"),
+            "artifact directories must fail closed, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_spec_artifact_entry_exists_dangling_symlink_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("missing-spec.json");
+        let link = dir.path().join("spec.json");
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        let message = spec_artifact_entry_exists(&link).unwrap_err();
+
+        assert!(
+            message.contains("is a symlink"),
+            "dangling artifact symlinks must fail closed, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_spec_artifact_entry_exists_not_directory_error_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        let not_dir = dir.path().join("not-dir");
+        std::fs::write(&not_dir, "not a directory").unwrap();
+        let path = not_dir.join("spec.json");
+        let raw_error = std::fs::symlink_metadata(&path).unwrap_err();
+        assert_eq!(
+            raw_error.kind(),
+            std::io::ErrorKind::NotADirectory,
+            "test setup must trigger a metadata error, not an absent artifact"
+        );
+
+        let message = spec_artifact_entry_exists(&path).unwrap_err();
+
+        assert!(
+            message.contains("failed to inspect spec artifact"),
+            "metadata errors must fail closed, got: {message}"
+        );
+    }
+
+    #[test]
+    fn test_require_track_artifact_dir_missing_dir_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("missing-track");
+
+        let message = require_track_artifact_dir("missing-track", &track_dir).unwrap_err();
+        assert!(
+            message.contains("does not exist"),
+            "missing track artifact directory must fail closed, got: {message}"
+        );
+    }
+
+    #[test]
+    fn test_require_track_artifact_dir_empty_dir_allows_phase0_skip() {
+        let dir = tempfile::tempdir().unwrap();
+
+        require_track_artifact_dir("phase0-track", dir.path()).unwrap();
     }
 }

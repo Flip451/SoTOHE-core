@@ -257,6 +257,21 @@ pub(super) fn dispatch_spec_states_with_resolver(
     args: SpecStatesArgs,
     resolver: impl Fn() -> Result<Option<String>, String>,
 ) -> ExitCode {
+    dispatch_spec_states_with_resolver_and_repo_root(args, resolver, || {
+        use infrastructure::git_cli::GitRepository as _;
+        infrastructure::git_cli::SystemGitRepo::discover()
+            .map(|repo| repo.root().to_path_buf())
+            .map_err(|e| format!("cannot discover git repository: {e}"))
+    })
+}
+
+/// Execute the `SpecStates` dispatch logic with injected branch and repo-root readers.
+#[cfg(test)]
+pub(super) fn dispatch_spec_states_with_resolver_and_repo_root(
+    args: SpecStatesArgs,
+    resolver: impl Fn() -> Result<Option<String>, String>,
+    repo_root_resolver: impl Fn() -> Result<PathBuf, String>,
+) -> ExitCode {
     use infrastructure::verify::{VerifyFinding, VerifyOutcome};
 
     let spec_path = match args.spec_path {
@@ -266,26 +281,24 @@ pub(super) fn dispatch_spec_states_with_resolver(
                 return print_skip("verify spec states", "not on a track branch; skipping");
             }
             Ok(Some(track_id)) => {
-                use infrastructure::git_cli::GitRepository as _;
-                let repo = match infrastructure::git_cli::SystemGitRepo::discover()
-                    .map_err(|e| format!("cannot discover git repository: {e}"))
-                {
-                    Ok(r) => r,
+                let repo_root = match repo_root_resolver() {
+                    Ok(root) => root,
                     Err(msg) => {
                         eprintln!("{msg}");
                         return ExitCode::FAILURE;
                     }
                 };
-                let repo_root = repo.root().to_path_buf();
-                let spec_path = repo_root.join("track/items").join(&track_id).join("spec.md");
-                if spec_path.exists() {
-                    spec_path
+                let track_dir = repo_root.join("track/items").join(&track_id);
+                let spec_json_path = track_dir.join("spec.json");
+                let spec_md_path = track_dir.join("spec.md");
+                if spec_json_path.exists() || spec_md_path.exists() {
+                    spec_md_path
                 } else {
-                    eprintln!(
-                        "resolved spec path does not exist: {} (track: {track_id})",
-                        spec_path.display()
+                    // Neither spec artifact exists (Phase 0) — emit SKIP instead of failing.
+                    return print_skip(
+                        "verify spec states",
+                        "spec artifacts not yet generated (Phase 0); skipping",
                     );
-                    return ExitCode::FAILURE;
                 }
             }
             Err(msg) => {

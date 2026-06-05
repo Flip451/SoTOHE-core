@@ -315,6 +315,190 @@ impl SemanticIndexPort for LanceDbSemanticIndexAdapter {
         )
     }
 
+    /// Insert a batch of (fragment, embedding) pairs into the index using a single
+    /// LanceDB transaction, eliminating per-fragment transaction overhead.
+    ///
+    /// An empty slice is a no-op. All embeddings must share the same dimension;
+    /// the dimension is inferred from the first item. The table is created on the
+    /// first call if absent (schema is inferred from the embedding dimension).
+    ///
+    /// If two concurrent callers race on an empty database, the loser of the
+    /// `create_table` race retries with `open_table`, ensuring no insert is
+    /// silently dropped.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SemanticIndexError::InsertFailed`] if any `source_path` is not
+    /// valid UTF-8 or if the insert operation fails.
+    fn insert_batch(&self, items: &[(CodeFragment, Vec<f32>)]) -> Result<(), SemanticIndexError> {
+        // Empty batch is a no-op.
+        if items.is_empty() {
+            return Ok(());
+        }
+
+        // Infer embedding dimension from first item.  The `is_empty()` guard
+        // above ensures at least one item exists, so `.first()` always returns
+        // `Some`.  We return `InsertFailed` for the unreachable `None` branch
+        // to keep production code panic-free.
+        let dim_usize = items
+            .first()
+            .ok_or_else(|| SemanticIndexError::InsertFailed {
+                source: "internal: items was empty after non-empty check".to_owned(),
+            })?
+            .1
+            .len();
+        for (_fragment, embedding) in items {
+            if embedding.len() != dim_usize {
+                return Err(SemanticIndexError::InsertFailed {
+                    source: format!(
+                        "all embeddings in a batch must have dimension {dim_usize}, got {}",
+                        embedding.len()
+                    ),
+                });
+            }
+        }
+        let dim = i32::try_from(dim_usize).map_err(|_| SemanticIndexError::InsertFailed {
+            source: format!("embedding dimension {dim_usize} exceeds i32::MAX"),
+        })?;
+        let schema = Arc::new(Self::arrow_schema(dim));
+
+        // Build parallel arrays for all rows in the batch.
+        let mut paths: Vec<&str> = Vec::with_capacity(items.len());
+        let mut contents: Vec<&str> = Vec::with_capacity(items.len());
+        // Owned path strings, so we can take &str references that live long enough.
+        let mut path_strings: Vec<String> = Vec::with_capacity(items.len());
+
+        for (fragment, _embedding) in items {
+            let path_str =
+                fragment.source_path.to_str().ok_or_else(|| SemanticIndexError::InsertFailed {
+                    source: format!(
+                        "source_path is not valid UTF-8: {}",
+                        fragment.source_path.display()
+                    ),
+                })?;
+            path_strings.push(path_str.to_owned());
+            contents.push(fragment.content());
+        }
+        for s in &path_strings {
+            paths.push(s.as_str());
+        }
+
+        let path_arr = Arc::new(StringArray::from(paths));
+        let content_arr = Arc::new(StringArray::from(contents));
+
+        // Build the fixed-size list vector column: one row per item.
+        let float_rows: Vec<Option<Vec<Option<f32>>>> =
+            items.iter().map(|(_frag, emb)| Some(emb.iter().map(|&v| Some(v)).collect())).collect();
+        let vector_arr =
+            Arc::new(FixedSizeListArray::from_iter_primitive::<Float32Type, _, _>(float_rows, dim));
+
+        let batch = RecordBatch::try_new(schema.clone(), vec![path_arr, content_arr, vector_arr])
+            .map_err(|e| SemanticIndexError::InsertFailed { source: e.to_string() })?;
+
+        let reader: Box<dyn RecordBatchReader + Send> = Box::new(RecordBatchIterator::new(
+            vec![Ok::<RecordBatch, ArrowError>(batch)].into_iter(),
+            schema.clone(),
+        ));
+
+        let connection = Arc::clone(&self.connection);
+        self.block_on_thread(
+            async move {
+                let table = match connection.open_table(TABLE_NAME).execute().await {
+                    Ok(t) => t,
+                    Err(e) if is_table_not_found(&e) => {
+                        let empty_reader: Box<dyn RecordBatchReader + Send> =
+                            Box::new(RecordBatchIterator::new(
+                                std::iter::empty::<Result<RecordBatch, ArrowError>>(),
+                                schema.clone(),
+                            ));
+                        match connection.create_table(TABLE_NAME, empty_reader).execute().await {
+                            Ok(t) => t,
+                            Err(ce) if is_table_already_exists(&ce) => {
+                                connection.open_table(TABLE_NAME).execute().await.map_err(|oe| {
+                                    SemanticIndexError::InsertFailed { source: oe.to_string() }
+                                })?
+                            }
+                            Err(ce) => {
+                                return Err(SemanticIndexError::InsertFailed {
+                                    source: ce.to_string(),
+                                });
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        return Err(SemanticIndexError::InsertFailed { source: e.to_string() });
+                    }
+                };
+
+                table
+                    .add(reader)
+                    .execute()
+                    .await
+                    .map(|_| ())
+                    .map_err(|e| SemanticIndexError::InsertFailed { source: e.to_string() })
+            },
+            SemanticIndexError::InsertFailed {
+                source: "async bridge thread panicked during insert_batch".to_owned(),
+            },
+        )
+    }
+
+    /// Delete all fragments whose `source_path` equals the given path from the
+    /// LanceDB table.
+    ///
+    /// Uses a LanceDB SQL predicate delete: `source_path = '<escaped_path>'`.
+    /// Single-quote characters in the path are escaped as `''` to prevent
+    /// malformed predicates.
+    ///
+    /// If the table does not exist yet (first-run empty index), returns `Ok(())`
+    /// without error.  If no rows match, returns `Ok(())` (idempotent).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SemanticIndexError::DeleteFailed`] if `source_path` is not
+    /// valid UTF-8 or if the delete operation fails.
+    fn delete_by_source_path(
+        &self,
+        source_path: &std::path::Path,
+    ) -> Result<(), SemanticIndexError> {
+        let path_str = source_path
+            .to_str()
+            .ok_or_else(|| SemanticIndexError::DeleteFailed {
+                source: format!("source_path is not valid UTF-8: {}", source_path.display()),
+            })?
+            .to_owned();
+
+        // Escape single quotes to prevent malformed predicates.
+        // SQL convention: a literal single-quote inside a string literal is
+        // represented as two consecutive single-quotes ('').
+        let escaped = path_str.replace('\'', "''");
+        let predicate = format!("{COL_PATH} = '{escaped}'");
+
+        let connection = Arc::clone(&self.connection);
+        self.block_on_thread(
+            async move {
+                let table = match connection.open_table(TABLE_NAME).execute().await {
+                    Ok(t) => t,
+                    Err(e) if is_table_not_found(&e) => {
+                        // Table does not exist — nothing to delete.
+                        return Ok(());
+                    }
+                    Err(e) => {
+                        return Err(SemanticIndexError::DeleteFailed { source: e.to_string() });
+                    }
+                };
+                table
+                    .delete(&predicate)
+                    .await
+                    .map(|_| ())
+                    .map_err(|e| SemanticIndexError::DeleteFailed { source: e.to_string() })
+            },
+            SemanticIndexError::DeleteFailed {
+                source: "async bridge thread panicked during delete_by_source_path".to_owned(),
+            },
+        )
+    }
+
     /// Search the index for the top-k most similar fragments using ANN cosine
     /// similarity.
     ///

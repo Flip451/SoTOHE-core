@@ -4,11 +4,24 @@
     {
       "id": "T001",
       "description": "Fix verify spec-states to skip when spec artifacts are absent on the track-resolution path, and add skip-branch test coverage. Two-site change in non-TDDD layers (cli-composition + cli): (1) In apps/cli-composition/src/verify.rs, change build_spec_path_from_track_id to check both spec.json and spec.md; return Ok(None) (skip-signal) when neither file exists, and Ok(Some(path)) for the existing path when at least one exists. In verify_spec_states, when build_spec_path_from_track_id returns Ok(None), render a SKIP outcome using render_skip(\"verify spec states\", ...) identical in shape to the non-track-branch skip already present in that function, and return Ok(...). When it returns Ok(Some(path)), continue with existing evaluation logic unchanged. (2) In apps/cli/src/commands/verify.rs, apply the same skip-signal logic to the #[cfg(test)] mirror dispatch_spec_states_with_resolver: when the resolver returns Ok(Some(track_id)), check both spec.json and spec.md; if neither exists, call print_skip and return ExitCode::SUCCESS, mirroring the cli-composition change. (3) Add unit tests covering: (a) track-resolution path + both spec artifacts absent => exit 0 + SKIP output; (b) track-resolution path + spec.md present => evaluates normally (delegates to infrastructure::verify::spec_states::verify); (c) track-resolution path + spec.json present (spec.md absent) => evaluates normally (not skipped); (d) explicit-path invocation with a missing file => still returns ExitCode::FAILURE (OS-01 unchanged). All existing tests remain passing. cargo make ci passes (fmt-check + clippy + nextest + deny + check-layers + verify-*).",
+      "status": "in_progress",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "dry-checker operability fixes: model resolution, strict schema, index-artifact gitignore, batched index insert, batched corpus embedding, and index persistence with corpus-fingerprint reuse. Six cohesive changes to make sotp dry write / dry check-approved / dry fix-local viable end-to-end in Codex/ChatGPT account environments and eliminate repeated embedding cost on unchanged corpora. (D1) In apps/cli/src/commands/dry.rs and apps/cli-composition/src/dry.rs, replace the hardcoded literal \"codex\" default with AgentProfiles::resolve_execution(\"dry-checker\", Final) when --model is not explicitly supplied, aligning with the same capability-resolution pattern already used by dry fix-local. (D2) In libs/infrastructure/src/dry_check/codex_dry_checker.rs, add \"refactor_proposal\" to the response_format schema's required array so that required is a superset of properties keys (OpenAI strict-mode requirement); keep the type as nullable [\"string\", \"null\"]. Add a regression test that asserts required ⊇ properties keys. (D3) In .gitignore, add entries for .semantic_index* (covering .semantic_index/ and sidecars such as .semantic_index.sotp-cache, .semantic_index.lock, and .semantic_index.manifest) and sotp-dry-index-*/ so that LanceDB index artifacts produced by sotp dry commands are excluded from version control. (D4) In libs/usecase/src/semantic_dup/ports.rs, add insert_batch to SemanticIndexPort; in libs/infrastructure/src/semantic_dup/index.rs, implement insert_batch using a single RecordBatch + single append operation; update libs/usecase/src/dry_check/interactor.rs and libs/usecase/src/dry_check/approval_interactor.rs to call insert_batch instead of per-fragment insert for corpus construction. The single-item insert method is retained for other callers. (D5) In libs/usecase/src/semantic_dup/ports.rs, add embed_batch to EmbeddingPort (signature: &self, fragments: &[CodeFragment]) -> Result<Vec<Vec<f32>>, EmbeddingError>); in libs/infrastructure, implement embed_batch on the existing EmbeddingPort adapter by delegating to the underlying engine in a single batched inference call; update the shared corpus-build helper (used by both the DRY write interactor and the approval interactor) to call embed_batch for the full fragment list instead of calling embed per-fragment. The single-item embed method is retained for other callers. (D6) In apps/cli-composition/src/dry.rs and libs/usecase/src/dry_check/shared.rs (pub(crate) helpers), implement semantic index persistence, corpus-fingerprint reuse, and cache safety: derive a corpus fingerprint from the sorted set of (path, content-hash) pairs for all corpus fragments plus the embedding model identifier, storing it as a sidecar file alongside the LanceDB index at --db-path (default .semantic_index/). Create and require the .semantic_index.sotp-cache marker for managed persistent indexes, acquire an fs4 exclusive lock via .semantic_index.lock around persistent-index mutation/reuse, and fail closed without deleting or overwriting if an existing index directory lacks the marker. At the start of corpus construction, check whether a persistent index exists and its recorded fingerprint matches the current corpus fingerprint; if both match, skip the embed_batch + insert_batch phase and reuse the existing index directly. On mismatch or absence, perform a full rebuild (embed_batch + insert_batch) and write the new fingerprint. No new public port methods are introduced; the fingerprint sidecar I/O, marker/lock safety, and reuse-vs-rebuild decision are confined to the composition root (apps/cli-composition) and pub(crate) helpers in libs/usecase/src/dry_check/shared.rs. Fragment-level incremental update is explicitly out of scope (OS-11). cargo make ci passes.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "D7 — file-unit incremental semantic index maintenance (IN-10 / AC-12). Replaces the single corpus-fingerprint sidecar introduced in D6 with a per-file content-hash manifest ({path -> content_hash} + embedding model identifier) and implements source_path-granular delta logic. (1) usecase layer: add delete_by_source_path(&self, source_path: &Path) -> Result<(), SemanticIndexError> to SemanticIndexPort (already declared in the type catalogue; implementation-side changes needed). Update all mock implementations and the NullInsertIndexProxy in cli-composition to add the new method stub. (2) infrastructure layer: implement LanceDbSemanticIndexAdapter::delete_by_source_path using a LanceDB source_path delete predicate constructed with parameter binding when available, or otherwise with explicit escaping/quoting, to remove all fragments for the given path without raw path interpolation. (3) cli-composition / usecase shared helpers: replace compute_corpus_fingerprint and the single sidecar file with a file-unit manifest sidecar. At corpus-construction time, load the existing manifest (if present) and compare against the current working-tree {path -> content_hash} map. Classify each file as: dirty (content hash changed or new) -> call delete_by_source_path then extract/embed/insert_batch for those files only; deleted (path absent from working tree) -> call delete_by_source_path only; unchanged -> skip. If the embedding model identifier has changed, treat every file as dirty (full rebuild). If the diff set is empty, skip all index operations. Write the updated manifest after each incremental run. The whole-corpus fingerprint function (compute_corpus_fingerprint) is removed as it is superseded by the manifest approach. Integrate into the open_persistent_index_with_corpus path used by dry write and dry check-approved. Ensure compatibility with D6 marker/lock safety mechanisms (IN-09). (4) Tests covering AC-12 observability: manifest persistence and delta classification, changed file re-embedded, unchanged file not re-embedded, deleted file fragment removed from index, model-id change triggers full rebuild, empty diff causes no index operations.",
       "status": "todo",
       "commit_hash": null
     }
   ],
   "plan": {
+    "summary": [],
     "sections": [
       {
         "id": "S1",
@@ -18,7 +31,39 @@
           "Touch points: build_spec_path_from_track_id (cli-composition/src/verify.rs), verify_spec_states (cli-composition/src/verify.rs), dispatch_spec_states_with_resolver #[cfg(test)] mirror (cli/src/commands/verify.rs).",
           "Existing evaluation path (spec artifact present) and explicit-path path are both unchanged."
         ],
-        "task_ids": ["T001"]
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "dry-checker operability fixes",
+        "description": [
+          "Six operability fixes to make sotp dry write / dry check-approved / dry fix-local viable end-to-end without manual --model flags and without index artifacts polluting the repository.",
+          "D1: resolve the dry-checker agent model via agent-profiles.json capability resolution instead of the hardcoded literal \"codex\" default.",
+          "D2: fix the structured-output response_format schema to include refactor_proposal in the required array, satisfying OpenAI strict-mode requirements and preventing 400 errors.",
+          "D3: add .semantic_index* (covering .semantic_index/ and sidecars such as .semantic_index.sotp-cache, .semantic_index.lock, and .semantic_index.manifest) and sotp-dry-index-*/ to .gitignore to prevent LanceDB index artifacts from entering commits.",
+          "D4: add insert_batch to SemanticIndexPort and its LanceDB adapter; update the DRY write and approval interactors to build the corpus with a single bulk insert instead of per-fragment transactions.",
+          "D5: add embed_batch to EmbeddingPort and its adapter; update the shared corpus-build helper to call embed_batch for the full fragment list in a single batched inference call instead of per-fragment embed calls. Single-item embed is retained for other callers (OS-10).",
+          "D6: persist the LanceDB semantic index at --db-path, record a corpus fingerprint (sorted (path, content-hash) pairs + embedding model identifier) as a sidecar file, create/require the .semantic_index.sotp-cache marker, and guard persistent-index mutation/reuse with an fs4 exclusive .semantic_index.lock. At corpus-construction time, check fingerprint match: if the managed index exists and the fingerprint matches, reuse the existing index (skip embed_batch + insert_batch); otherwise perform a full rebuild and write the new fingerprint. Unmarked existing index directories fail closed before deletion or overwrite. Implemented in apps/cli-composition/src/dry.rs and pub(crate) helpers in libs/usecase/src/dry_check/shared.rs. No new public port methods. Fragment-level incremental update is explicitly out of scope (OS-11)."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "D7 — file-unit incremental semantic index maintenance",
+        "description": [
+          "Replaces the whole-corpus fingerprint reuse introduced in D6 with a per-file content-hash manifest and source_path-granular delta logic (IN-10 / AC-12).",
+          "usecase: add delete_by_source_path to SemanticIndexPort (already declared in the type catalogue; implementation stubs needed in all mock/null implementations).",
+          "infrastructure: implement LanceDbSemanticIndexAdapter::delete_by_source_path via a LanceDB source_path delete predicate constructed with parameter binding or explicit escaping/quoting.",
+          "cli-composition / shared helpers: replace compute_corpus_fingerprint and the single sidecar with a file-unit manifest ({path -> content_hash} + model id). At run time, diff the manifest against the working tree and apply: dirty/new -> delete_by_source_path + re-embed + insert_batch; deleted -> delete_by_source_path only; unchanged -> skip. Model-id change triggers full rebuild. Empty diff skips all index operations.",
+          "Tests: manifest persistence, delta classification, changed-only re-embedding, deleted-file fragment removal, model-id full-rebuild, empty-diff no-op."
+        ],
+        "task_ids": [
+          "T003"
+        ]
       }
     ]
   }

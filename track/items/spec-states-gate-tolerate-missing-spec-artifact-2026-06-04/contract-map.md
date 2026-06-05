@@ -28,8 +28,107 @@ subgraph domain["domain"]
 end
 subgraph usecase["usecase"]
   direction TB
+  subgraph usecase_usecase_module_semantic_dup["usecase::semantic_dup"]
+    direction TB
+  subgraph T31_usecase_usecase_BuildIndexError["semantic_dup::BuildIndexError"]
+    direction TB
+    T31_usecase_usecase_BuildIndexError__self[BuildIndexError]
+    T31_usecase_usecase_BuildIndexError_Embedding[Embedding]
+    T31_usecase_usecase_BuildIndexError_Index[Index]
+    T31_usecase_usecase_BuildIndexError_Io[Io]
+  end
+  subgraph T29_usecase_usecase_DupCheckError["semantic_dup::DupCheckError"]
+    direction TB
+    T29_usecase_usecase_DupCheckError__self[DupCheckError]
+    T29_usecase_usecase_DupCheckError_Embedding[Embedding]
+    T29_usecase_usecase_DupCheckError_Index[Index]
+  end
+  subgraph T32_usecase_usecase_FindSimilarError["semantic_dup::FindSimilarError"]
+    direction TB
+    T32_usecase_usecase_FindSimilarError__self[FindSimilarError]
+    T32_usecase_usecase_FindSimilarError_Embedding[Embedding]
+    T32_usecase_usecase_FindSimilarError_Index[Index]
+  end
+  subgraph T35_usecase_usecase_MeasureQualityError["semantic_dup::MeasureQualityError"]
+    direction TB
+    T35_usecase_usecase_MeasureQualityError__self[MeasureQualityError]
+    T35_usecase_usecase_MeasureQualityError_Embedding[Embedding]
+    T35_usecase_usecase_MeasureQualityError_Index[Index]
+    T35_usecase_usecase_MeasureQualityError_Io[Io]
+  end
+  subgraph T34_usecase_usecase_SemanticIndexError["semantic_dup::SemanticIndexError"]
+    direction TB
+    T34_usecase_usecase_SemanticIndexError__self[SemanticIndexError]
+    T34_usecase_usecase_SemanticIndexError_OpenFailed[OpenFailed]
+    T34_usecase_usecase_SemanticIndexError_InsertFailed[InsertFailed]
+    T34_usecase_usecase_SemanticIndexError_DeleteFailed[DeleteFailed]
+    T34_usecase_usecase_SemanticIndexError_SearchFailed[SearchFailed]
+  end
+  subgraph R29_usecase_usecase_EmbeddingPort["semantic_dup::EmbeddingPort"]
+    direction TB
+    R29_usecase_usecase_EmbeddingPort__self[EmbeddingPort]
+    R29_usecase_usecase_EmbeddingPort_embed([embed])
+    R29_usecase_usecase_EmbeddingPort_embed_batch([embed_batch])
+  end
+  subgraph R33_usecase_usecase_SemanticIndexPort["semantic_dup::SemanticIndexPort"]
+    direction TB
+    R33_usecase_usecase_SemanticIndexPort__self[SemanticIndexPort]
+    R33_usecase_usecase_SemanticIndexPort_insert([insert])
+    R33_usecase_usecase_SemanticIndexPort_insert_batch([insert_batch])
+    R33_usecase_usecase_SemanticIndexPort_delete_by_source_path([delete_by_source_path])
+    R33_usecase_usecase_SemanticIndexPort_search([search])
+  end
+  end
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_semantic_dup["infrastructure::semantic_dup"]
+    direction TB
+  subgraph T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter["semantic_dup::index::LanceDbSemanticIndexAdapter"]
+    direction TB
+    T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter__self[LanceDbSemanticIndexAdapter]
+    T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter_new([new])
+  end
+  end
 end
+T31_usecase_usecase_BuildIndexError_Index --o T34_usecase_usecase_SemanticIndexError__self
+T29_usecase_usecase_DupCheckError_Index --o T34_usecase_usecase_SemanticIndexError__self
+T32_usecase_usecase_FindSimilarError_Index --o T34_usecase_usecase_SemanticIndexError__self
+T35_usecase_usecase_MeasureQualityError_Index --o T34_usecase_usecase_SemanticIndexError__self
+R33_usecase_usecase_SemanticIndexPort_insert --> T34_usecase_usecase_SemanticIndexError__self
+R33_usecase_usecase_SemanticIndexPort_insert_batch --> T34_usecase_usecase_SemanticIndexError__self
+R33_usecase_usecase_SemanticIndexPort_delete_by_source_path --> T34_usecase_usecase_SemanticIndexError__self
+R33_usecase_usecase_SemanticIndexPort_search --> T34_usecase_usecase_SemanticIndexError__self
+T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter_new --> T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter__self
+T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter_new --> T34_usecase_usecase_SemanticIndexError__self
+T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter__self -.impl.-> R33_usecase_usecase_SemanticIndexPort__self
+class T31_usecase_usecase_BuildIndexError_Embedding variant_node
+class T31_usecase_usecase_BuildIndexError_Index variant_node
+class T31_usecase_usecase_BuildIndexError_Io variant_node
+class T31_usecase_usecase_BuildIndexError__self error_type
+class T29_usecase_usecase_DupCheckError_Embedding variant_node
+class T29_usecase_usecase_DupCheckError_Index variant_node
+class T29_usecase_usecase_DupCheckError__self error_type
+class T32_usecase_usecase_FindSimilarError_Embedding variant_node
+class T32_usecase_usecase_FindSimilarError_Index variant_node
+class T32_usecase_usecase_FindSimilarError__self error_type
+class T35_usecase_usecase_MeasureQualityError_Embedding variant_node
+class T35_usecase_usecase_MeasureQualityError_Index variant_node
+class T35_usecase_usecase_MeasureQualityError_Io variant_node
+class T35_usecase_usecase_MeasureQualityError__self error_type
+class T34_usecase_usecase_SemanticIndexError_OpenFailed variant_node
+class T34_usecase_usecase_SemanticIndexError_InsertFailed variant_node
+class T34_usecase_usecase_SemanticIndexError_DeleteFailed variant_node
+class T34_usecase_usecase_SemanticIndexError_SearchFailed variant_node
+class T34_usecase_usecase_SemanticIndexError__self error_type
+class R29_usecase_usecase_EmbeddingPort_embed method_node
+class R29_usecase_usecase_EmbeddingPort_embed_batch method_node
+class R29_usecase_usecase_EmbeddingPort__self secondary_port
+class R33_usecase_usecase_SemanticIndexPort_insert method_node
+class R33_usecase_usecase_SemanticIndexPort_insert_batch method_node
+class R33_usecase_usecase_SemanticIndexPort_delete_by_source_path method_node
+class R33_usecase_usecase_SemanticIndexPort_search method_node
+class R33_usecase_usecase_SemanticIndexPort__self secondary_port
+class T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter_new method_node
+class T57_infrastructure_infrastructure_LanceDbSemanticIndexAdapter__self secondary_adapter
 ```

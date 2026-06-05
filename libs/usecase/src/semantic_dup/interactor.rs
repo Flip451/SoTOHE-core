@@ -724,6 +724,7 @@ mod tests {
         pub MockEmbeddingPort {}
         impl EmbeddingPort for MockEmbeddingPort {
             fn embed(&self, fragment: &CodeFragment) -> Result<Vec<f32>, EmbeddingError>;
+            fn embed_batch(&self, fragments: &[CodeFragment]) -> Result<Vec<Vec<f32>>, EmbeddingError>;
         }
     }
 
@@ -734,6 +735,16 @@ mod tests {
                 &self,
                 fragment: &CodeFragment,
                 embedding: &[f32],
+            ) -> Result<(), SemanticIndexError>;
+
+            fn insert_batch(
+                &self,
+                items: &[(CodeFragment, Vec<f32>)],
+            ) -> Result<(), SemanticIndexError>;
+
+            fn delete_by_source_path(
+                &self,
+                source_path: &std::path::Path,
             ) -> Result<(), SemanticIndexError>;
 
             fn search(

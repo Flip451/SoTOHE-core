@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "version": "1.0",
-  "title": "spec-states commit ゲートを spec 成果物未生成の段階でも通す",
+  "title": "spec-states commit ゲートを spec 成果物未生成の段階でも通す + dry-checker 運用修正",
   "goal": [
     {
       "id": "GO-01",
@@ -10,6 +10,40 @@
         {
           "file": "knowledge/adr/2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md",
           "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "`sotp dry` 一式（`dry write` / `dry check-approved` / `dry fix-local`）が Codex/ChatGPT アカウント環境で通しで成立するよう、エージェントモデル解決・出力スキーマ整合・インデックス成果物の除外・insert と埋め込みの一括化・インデックス永続化と増分維持という運用成立条件を修正する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D7"
         }
       ]
     }
@@ -63,6 +97,60 @@
           {
             "file": "knowledge/adr/2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md",
             "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "DRY 検出が生成する LanceDB インデックス成果物（既定パスの `.semantic_index/` ディレクトリ、その sidecar ファイル群 `.semantic_index.*`（`.sotp-cache` / `.lock` / `.manifest` 等、D6/D7 が永続インデックスと併せて生成するキャッシュマーカー・ファイルシステムロック・ファイル単位マニフェスト）、および一時インデックス `sotp-dry-index-*/`）を `.gitignore` に追加し、バージョン管理対象から除外する。グロブ `.semantic_index*` でディレクトリと全 sidecar を一括して覆える。再生成可能なローカル成果物であり、commit に混入させない",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "セマンティックインデックスへの insert を一括化する。コーパス構築は全フラグメントを単一の RecordBatch + 単一の追加操作で投入する。このため意味インデックスのポート（`SemanticIndexPort`、usecase 層）に一括投入オペレーション（`insert_batch`）を追加し、コーパス構築を行う各インタラクタ（DRY 書き込み・承認確認）が `insert_batch` を使う。単件 insert は別の利用者のために残置する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "コーパス構築における埋め込みを一括化する。埋め込みポート（`EmbeddingPort`、usecase 層）に一括埋め込みオペレーション（`embed_batch`）を追加し、コーパス構築を行う共有ヘルパーが `embed_batch` を呼ぶ。型カタログは `embed_batch` をこの spec 要素（IN-08）を根拠として宣言することでグラウンディングする。単件 `embed` は他の利用者がいれば残置する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "セマンティックインデックスを `--db-path`（既定 `.semantic_index`、D3 で gitignore 済み）に永続化する（D6）。永続インデックスの安全な消去・並行制御のためのキャッシュ安全機構（マーカー / ロック）も維持する（D6 が実装詳細を track 実装へ委譲、D7 がその維持を明記）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "セマンティックインデックスをファイル単位の内容ハッシュで増分維持する。単一フィンガープリントに代えて、各ソースファイルの内容ハッシュのマニフェスト（`{path → 内容ハッシュ}` + 埋め込みモデル識別子）を永続化する。実行時、現在のワーキングツリーの `{path → 内容ハッシュ}` をマニフェストと差分比較し変化分だけを更新する: 内容ハッシュ変化・新規ファイルは既存フラグメントを `source_path` 単位で削除してから抽出・埋め込み・挿入、消えたファイルは削除のみ、不変ファイルは何もしない（再埋め込みしない）。差分が空の場合は削除も挿入も発生しない。埋め込みモデル識別子が変わった場合は全ファイルを dirty 扱いとして全再構築する。鍵はワーキングツリーの内容ハッシュとし、git コミットハッシュは使わない（未コミット・未追跡も正しく扱うため）。この増分維持には `SemanticIndexPort`（usecase 層）に「`source_path` を指定してそのファイルの全フラグメントを削除する」オペレーションが必要になる。型変更（新 port メソッド等）は本 ADR の D7 を根拠として型カタログに宣言して grounding する（Phase 2 で実施）",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D7"
           }
         ]
       }
@@ -137,6 +225,50 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "OS-08",
+        "text": "DRY 検出の判定基準（類似閾値・判定モデルの良否）の変更は対象外とする。本トラックは運用成立条件（モデル解決・スキーマ整合・成果物 gitignore・insert 一括化・埋め込み一括化・インデックス永続化と増分維持）のみを対象とし、検出精度は不変とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-09",
+        "text": "単件 insert（`SemanticIndexPort` の既存の insert オペレーション）の削除は対象外とする。単件 insert は別の利用者が使っているため残置する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OS-10",
+        "text": "単件 `embed`（`EmbeddingPort` の既存の embed オペレーション）の削除は対象外とする。単件 `embed` は他の利用者がいれば残置し、削除の要否は本トラックの対象外とする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "OS-11",
+        "text": "フラグメント粒度の差分インデックス更新（変更されたフラグメントを個別に特定して部分的に再埋め込みし無効化する方式）は対象外とする。正確な差分追跡・古いフラグメントの部分無効化が必要で実装が複雑になる。フラグメント単位の差分更新は ADR Rejected Alternative E（D6 の代替として記録）として却下されている。ファイル単位（`source_path` 単位の削除→再挿入）の増分維持（D7, IN-10）で反復コストを解消できれば十分であり、フラグメント粒度の部分無効化は将来の最適化として保留する。なお、ファイル単位の増分維持（`source_path` 単位の削除→再挿入。D7）は IN-10 として in-scope であり、本項が除外するのはフラグメント粒度の部分無効化に限定する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+            "anchor": "D7"
+          }
+        ]
       }
     ]
   },
@@ -178,6 +310,26 @@
         {
           "file": "knowledge/adr/2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md",
           "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "`sotp dry write` のエージェントモデルは、`--model` を明示指定しない場合、`agent-profiles.json` の `dry-checker` capability から解決する（`AgentProfiles::resolve_execution(capability_name, Final)`）。リテラル `\"codex\"` を既定値としてアダプタへ渡す従来動作は廃止する。`--model` 明示値は上書きとして尊重する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "DRY 判定エージェントの構造化出力スキーマ（`response_format`）は OpenAI strict モード準拠とする。`required` 配列に `properties` の全キーを列挙する。`refactor_proposal` は違反でない場合に値を持たないため型は nullable（`[\"string\", \"null\"]`）を維持したうえで `required` に含める。スキーマの不変条件（`required` ⊇ `properties` のキー集合）を回帰テストで固定する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D2"
         }
       ]
     }
@@ -232,6 +384,76 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`sotp dry write` が `--model` を省略した場合に `agent-profiles.json` の `dry-checker` capability からモデルを解決して実行し、リテラル `\"codex\"` を既定値とする従来動作で発生していた 400 エラーが再現しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "DRY 判定エージェントの構造化出力スキーマについて、`required` に `properties` の全キー（`refactor_proposal` を含む）が列挙されており、`refactor_proposal` が nullable required として扱われることを、外部 API 呼び出しに依存しないローカルの strict-schema 不変条件テストで確認できる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "`.semantic_index/` とその sidecar 群（`.semantic_index.*`: `.sotp-cache` / `.lock` / `.manifest`）および `sotp-dry-index-*/` が `.gitignore` に登録されており（グロブ `.semantic_index*` で一括して覆われている）、`cargo make add-all`（または同等の一括ステージング操作）でこれらのパスが commit に含まれない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "インデックス構築（`sotp dry write` のコーパスビルドパス）が単一の一括 insert を発行する。ワークスペース規模（約 400 ソースファイル相当）のコーパスを対象とした DRY 実行が、フラグメント単位のトランザクション storm を起こさずに完了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "コーパス構築（`sotp dry write` のコーパスビルドパス）が、全フラグメントに対して単一の一括埋め込み呼び出し（`embed_batch`）を発行する。フラグメント単位の CPU 推論ループが主たる遅延要因でなくなり、ワークスペース規模（約 400 ソースファイル相当）のコーパスビルドが実用的な時間で完了する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "不変コーパスに対する 2 回目の DRY 実行（例: `dry write` 直後の `dry check-approved`、または同一コード上の連続実行）が、埋め込みフェーズをスキップしてインデックスを再利用することを確認できる（ログ出力またはテストで再埋め込みが走っていないことが観測可能）",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "ファイル単位マニフェスト（`{path → 内容ハッシュ}` + 埋め込みモデル識別子）が永続化されており、実行時に差分判定に使われることを確認できる。ソースファイルを変更・追加した場合、変更されたファイルのフラグメントのみが再埋め込み・再挿入され、不変ファイルのフラグメントは再埋め込みされない（ログ出力またはテストで不変ファイルが再埋め込みされないことが観測可能）。削除されたファイルのフラグメントはインデックスから除去されており、stale フラグメントが残らない。埋め込みモデル識別子が変わった場合は全ファイルが dirty 扱いとなり全再構築が走る",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-04-1042-dry-checker-operability-and-batch-index.md",
+          "anchor": "D7"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -249,7 +471,7 @@
     }
   ],
   "signals": {
-    "blue": 22,
+    "blue": 41,
     "yellow": 0,
     "red": 0
   }

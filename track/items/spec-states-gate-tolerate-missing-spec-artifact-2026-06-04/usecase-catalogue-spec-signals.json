@@ -1,5 +1,34 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1695363465c5f8d84294f733de660c7c731a201295dfde20f9cc61b097088a34",
-  "signals": []
+  "catalogue_declaration_hash": "3054e3ffb3a3be1c7c6b6be0eafed64cd3503c98f70a019c9af71e5fa81a39f1",
+  "signals": [
+    {
+      "type_name": "BuildIndexError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "DupCheckError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "FindSimilarError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "MeasureQualityError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticIndexError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EmbeddingPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticIndexPort",
+      "signal": "blue"
+    }
+  ]
 }

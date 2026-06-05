@@ -42,7 +42,7 @@ pub(crate) const DRY_CHECK_OUTPUT_SCHEMA_JSON: &str = r##"{
       "type": ["string", "null"]
     }
   },
-  "required": ["verdict", "rationale"],
+  "required": ["verdict", "rationale", "refactor_proposal"],
   "additionalProperties": false
 }"##;
 
@@ -71,7 +71,6 @@ enum AgentVerdict {
 struct DryCheckAgentOutputDto {
     verdict: AgentVerdict,
     rationale: String,
-    #[serde(default)]
     refactor_proposal: Option<String>,
 }
 
@@ -341,8 +340,15 @@ pub(crate) fn parse_agent_json_and_build_judgment(
     changed_fragment: &CodeFragment,
     candidate_fragment: &CodeFragment,
 ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
-    let dto: DryCheckAgentOutputDto =
+    let value: serde_json::Value =
         serde_json::from_str(json_str).map_err(|_| DryCheckAgentError::IllegalOutput)?;
+    let has_refactor_proposal =
+        value.as_object().map(|object| object.contains_key("refactor_proposal")).unwrap_or(false);
+    if !has_refactor_proposal {
+        return Err(DryCheckAgentError::IllegalOutput);
+    }
+    let dto: DryCheckAgentOutputDto =
+        serde_json::from_value(value).map_err(|_| DryCheckAgentError::IllegalOutput)?;
 
     // Validate non-empty rationale.
     let rationale = Rationale::new(dto.rationale).map_err(|e| match e {
@@ -554,7 +560,7 @@ fn run_codex_child(
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use std::path::PathBuf;
 
@@ -571,6 +577,40 @@ mod tests {
         format!("{bytes:x}")
     }
 
+    // ── Schema structural invariants ──────────────────────────────────────────
+
+    /// OpenAI strict structured output requires that `required` lists every key
+    /// present in `properties`.  This test parses the constant as JSON and asserts
+    /// that the two sets are identical, preventing the regression where
+    /// `refactor_proposal` was absent from `required` while present in `properties`.
+    #[test]
+    fn test_output_schema_required_contains_every_properties_key() {
+        let schema: serde_json::Value =
+            serde_json::from_str(DRY_CHECK_OUTPUT_SCHEMA_JSON).expect("schema must be valid JSON");
+
+        let properties_keys: std::collections::BTreeSet<String> = schema["properties"]
+            .as_object()
+            .expect("schema must have a properties object")
+            .keys()
+            .cloned()
+            .collect();
+
+        let required_keys: std::collections::BTreeSet<String> = schema["required"]
+            .as_array()
+            .expect("schema must have a required array")
+            .iter()
+            .map(|v| v.as_str().expect("required entries must be strings").to_owned())
+            .collect();
+
+        assert_eq!(
+            required_keys,
+            properties_keys,
+            "OpenAI strict mode requires that 'required' lists every key in 'properties'. \
+             Missing from required: {:?}",
+            properties_keys.difference(&required_keys).collect::<Vec<_>>()
+        );
+    }
+
     // ── JSON parsing tests (no subprocess needed) ─────────────────────────────
 
     #[test]
@@ -578,7 +618,11 @@ mod tests {
         let changed = make_fragment("src/a.rs", "fn foo() {}");
         let candidate = make_fragment("src/b.rs", "fn bar() {}");
 
-        let json = r#"{"verdict":"not_a_violation","rationale":"Different purpose"}"#;
+        let json = r#"{
+            "verdict": "not_a_violation",
+            "rationale": "Different purpose",
+            "refactor_proposal": null
+        }"#;
         let result = parse_agent_json_and_build_judgment(json, &changed, &candidate);
 
         let judgment = result.expect("should succeed");
@@ -595,7 +639,11 @@ mod tests {
         let changed = make_fragment("src/a.rs", "fn foo() {}");
         let candidate = make_fragment("src/b.rs", "fn bar() {}");
 
-        let json = r#"{"verdict":"accepted","rationale":"Intentional mirroring"}"#;
+        let json = r#"{
+            "verdict": "accepted",
+            "rationale": "Intentional mirroring",
+            "refactor_proposal": null
+        }"#;
         let result = parse_agent_json_and_build_judgment(json, &changed, &candidate);
 
         let judgment = result.expect("should succeed");
@@ -716,7 +764,7 @@ mod tests {
         let changed = make_fragment("src/a.rs", "fn foo() {}");
         let candidate = make_fragment("src/b.rs", "fn bar() {}");
 
-        let json = r#"{"verdict":"not_a_violation","rationale":""}"#;
+        let json = r#"{"verdict":"not_a_violation","rationale":"","refactor_proposal":null}"#;
         let result = parse_agent_json_and_build_judgment(json, &changed, &candidate);
         assert!(matches!(result, Err(DryCheckAgentError::IllegalOutput)), "got: {result:?}");
     }
@@ -726,9 +774,37 @@ mod tests {
         let changed = make_fragment("src/a.rs", "fn foo() {}");
         let candidate = make_fragment("src/b.rs", "fn bar() {}");
 
-        let json = r#"{"verdict":"not_a_violation","rationale":"Different","extra":"field"}"#;
+        let json = r#"{
+            "verdict": "not_a_violation",
+            "rationale": "Different",
+            "refactor_proposal": null,
+            "extra": "field"
+        }"#;
         let result = parse_agent_json_and_build_judgment(json, &changed, &candidate);
         assert!(matches!(result, Err(DryCheckAgentError::IllegalOutput)), "got: {result:?}");
+    }
+
+    /// Missing `refactor_proposal` field returns `IllegalOutput` regardless of verdict.
+    ///
+    /// All verdict values are exercised in a single table-driven test to avoid
+    /// duplicating the same assertion structure.
+    #[test]
+    fn test_parse_missing_refactor_proposal_returns_illegal_output_for_all_verdicts() {
+        let cases: &[(&str, &str)] = &[
+            ("not_a_violation", "Different"),
+            ("accepted", "Intentional duplication"),
+            ("violation", "Dup"),
+        ];
+        for (verdict, rationale) in cases {
+            let changed = make_fragment("src/a.rs", "fn foo() {}");
+            let candidate = make_fragment("src/b.rs", "fn bar() {}");
+            let json = format!(r#"{{"verdict":"{verdict}","rationale":"{rationale}"}}"#);
+            let result = parse_agent_json_and_build_judgment(&json, &changed, &candidate);
+            assert!(
+                matches!(result, Err(DryCheckAgentError::IllegalOutput)),
+                "verdict={verdict}: expected IllegalOutput, got: {result:?}"
+            );
+        }
     }
 
     #[test]
@@ -747,16 +823,6 @@ mod tests {
         let candidate = make_fragment("src/b.rs", "fn bar() {}");
 
         let json = r#"{"verdict":"violation","rationale":"Dup","refactor_proposal":null}"#;
-        let result = parse_agent_json_and_build_judgment(json, &changed, &candidate);
-        assert!(matches!(result, Err(DryCheckAgentError::IllegalOutput)), "got: {result:?}");
-    }
-
-    #[test]
-    fn test_parse_violation_with_missing_refactor_proposal_returns_illegal_output() {
-        let changed = make_fragment("src/a.rs", "fn foo() {}");
-        let candidate = make_fragment("src/b.rs", "fn bar() {}");
-
-        let json = r#"{"verdict":"violation","rationale":"Dup"}"#;
         let result = parse_agent_json_and_build_judgment(json, &changed, &candidate);
         assert!(matches!(result, Err(DryCheckAgentError::IllegalOutput)), "got: {result:?}");
     }
@@ -828,7 +894,7 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 if [ -n "$out" ]; then
-  printf '{"verdict":"not_a_violation","rationale":"Functions have different purposes"}\n' > "$out"
+  printf '{"verdict":"not_a_violation","rationale":"Functions have different purposes","refactor_proposal":null}\n' > "$out"
 fi
 exit 0
 "#;

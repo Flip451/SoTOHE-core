@@ -31,6 +31,17 @@ impl SemanticIndexPort for NoopSemanticIndexPort {
         Ok(())
     }
 
+    fn insert_batch(&self, _items: &[(CodeFragment, Vec<f32>)]) -> Result<(), SemanticIndexError> {
+        Ok(())
+    }
+
+    fn delete_by_source_path(
+        &self,
+        _source_path: &std::path::Path,
+    ) -> Result<(), SemanticIndexError> {
+        Ok(())
+    }
+
     fn search(
         &self,
         _embedding: &[f32],

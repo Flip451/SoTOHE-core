@@ -1096,6 +1096,87 @@ fn test_dispatch_catalogue_spec_refs_fail_closed_on_resolver_error() {
     );
 }
 
+// ── spec-states skip-gate: missing spec artifacts (D1 / T001) ──────────────
+//
+// These tests exercise the new spec-artifact-absent skip path in
+// `dispatch_spec_states_with_resolver_and_repo_root`. The repo-root reader is
+// injected so fixtures live in an isolated tempdir, not in the real checkout.
+fn dispatch_spec_states_with_track_fixture(
+    repo_root: &std::path::Path,
+    track_id: &str,
+    strict: bool,
+) -> ExitCode {
+    let id = track_id.to_owned();
+    let root = repo_root.to_path_buf();
+    dispatch_spec_states_with_resolver_and_repo_root(
+        SpecStatesArgs { spec_path: None, strict },
+        move || Ok(Some(id.clone())),
+        move || Ok(root.clone()),
+    )
+}
+
+fn create_temp_track_dir(repo_root: &std::path::Path, track_id: &str) -> std::path::PathBuf {
+    let path = repo_root.join("track/items").join(track_id);
+    std::fs::create_dir_all(&path).unwrap();
+    path
+}
+
+// (a) track-resolution path + BOTH spec artifacts absent → exit 0 + SKIP output.
+#[test]
+fn test_dispatch_spec_states_skips_when_both_spec_artifacts_absent_on_track_branch() {
+    let tmp = tempfile::TempDir::new().unwrap();
+    let track_id = "test-skip-gate-no-spec-artifacts-t001a";
+    let _track_dir = create_temp_track_dir(tmp.path(), track_id);
+    // The track directory now exists but has neither spec.json nor spec.md.
+    let exit = dispatch_spec_states_with_track_fixture(tmp.path(), track_id, false);
+    assert_eq!(
+        exit,
+        ExitCode::SUCCESS,
+        "spec-states must return SUCCESS (skip) when neither spec.json nor spec.md exists"
+    );
+}
+
+// (b) track-resolution path + `spec.md` present → evaluates normally (delegates to infra verify).
+#[test]
+fn test_dispatch_spec_states_evaluates_when_spec_md_is_present() {
+    let tmp = tempfile::TempDir::new().unwrap();
+    let track_id = "test-skip-gate-spec-md-present-t001b";
+    let track_dir = create_temp_track_dir(tmp.path(), track_id);
+    // Write an intentionally invalid spec.md. A real verification run fails;
+    // an accidental skip would return SUCCESS.
+    std::fs::write(track_dir.join("spec.md"), "# Spec Without Domain States\n").unwrap();
+    // spec.json is absent — only spec.md present.
+    assert!(!track_dir.join("spec.json").exists());
+    let exit = dispatch_spec_states_with_track_fixture(tmp.path(), track_id, false);
+    assert_eq!(
+        exit,
+        ExitCode::FAILURE,
+        "spec-states must evaluate (not skip) when spec.md is present"
+    );
+}
+
+// (c) track-resolution path + `spec.json` present, `spec.md` absent → evaluates normally (NOT skipped).
+#[test]
+fn test_dispatch_spec_states_evaluates_when_only_spec_json_is_present() {
+    let tmp = tempfile::TempDir::new().unwrap();
+    let track_id = "test-skip-gate-spec-json-only-t001c";
+    let track_dir = create_temp_track_dir(tmp.path(), track_id);
+    // Write a minimal spec.json (the infrastructure layer reads this if spec.md is absent).
+    std::fs::write(
+        track_dir.join("spec.json"),
+        r#"{"schema_version":2,"version":"1.0","title":"T","scope":{"in_scope":[],"out_of_scope":[]},"signals":{"blue":0,"yellow":0,"red":0}}"#,
+    )
+    .unwrap();
+    // spec.md is absent — only spec.json present.
+    assert!(!track_dir.join("spec.md").exists());
+    let exit = dispatch_spec_states_with_track_fixture(tmp.path(), track_id, false);
+    assert_eq!(
+        exit,
+        ExitCode::FAILURE,
+        "spec-states must evaluate (not skip) when spec.json is present without spec.md"
+    );
+}
+
 // --- CatalogueSpecSignals dispatch ---
 
 #[test]

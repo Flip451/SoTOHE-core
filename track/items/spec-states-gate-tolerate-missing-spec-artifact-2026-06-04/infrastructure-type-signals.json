@@ -1,6 +1,16 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-04T05:50:42Z",
-  "declaration_hash": "317bd8836fc1ce27d5020d8364fe45a8895237810a75e2c15c7dbc06ac04877e",
-  "signals": []
+  "generated_at": "2026-06-05T05:26:28Z",
+  "declaration_hash": "4565b22ca387c07e6b4c1529695087d61b32fbb045e07650a5b7bfd25bc582bf",
+  "signals": [
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SemanticIndexPort"
+      ]
+    }
+  ]
 }

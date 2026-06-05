@@ -75,8 +75,10 @@ pub struct DryWriteArgs {
     pub items_dir: PathBuf,
 
     /// Codex model name used by the DryCheckAgentPort.
-    #[arg(long, default_value = "codex")]
-    pub model: String,
+    /// When omitted the model is resolved from `agent-profiles.json`
+    /// `dry-checker.model`.
+    #[arg(long)]
+    pub model: Option<String>,
 
     /// Capability name forwarded to the CodexDryChecker.
     #[arg(long, default_value = "dry-checker")]
@@ -300,6 +302,25 @@ mod tests {
                 assert!(args.base_commit.is_none(), "base_commit must be absent by default");
                 assert_eq!(args.db_path, PathBuf::from(".semantic_index"));
                 assert!((args.threshold - 0.85).abs() < 1e-6);
+                assert!(
+                    args.model.is_none(),
+                    "model must be absent by default (resolved from agent-profiles)"
+                );
+            }
+            other => panic!("expected Write, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_dry_write_explicit_model_parses_when_given() {
+        let cmd = parse_dry(&["dry", "write", "--track-id", "my-track", "--model", "gpt-5.5"]);
+        match cmd {
+            DryCommand::Write(args) => {
+                assert_eq!(
+                    args.model.as_deref(),
+                    Some("gpt-5.5"),
+                    "explicit --model must be captured as Some(\"gpt-5.5\")"
+                );
             }
             other => panic!("expected Write, got {other:?}"),
         }
