@@ -16,7 +16,6 @@ mod file;
 mod git;
 mod guard;
 mod hook;
-mod make;
 mod pr;
 pub mod review_v2;
 mod semantic_dup;
