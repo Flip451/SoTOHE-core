@@ -299,11 +299,13 @@ impl CliApp {
         // Post-commit: persist HEAD SHA to .commit_hash
         let mut post_commit_failed = false;
         if let Ok(Some(ref tid)) = self.current_branch_track_id_strict() {
-            if let Err(msg) = crate::review_v2::persist_commit_hash_for_track(tid) {
+            let outcome = self.track_set_commit_hash(tid)?;
+            if outcome.exit_code != 0 {
+                let msg = outcome.stderr.as_deref().unwrap_or("unknown error");
                 eprintln!("[track-commit-message] WARNING: .commit_hash persistence failed: {msg}");
                 eprintln!(
-                    "[track-commit-message] Recovery: run `bin/sotp make track-set-commit-hash \
-                     {tid}` to set the v2 diff base manually."
+                    "[track-commit-message] Recovery: run `bin/sotp track set-commit-hash` \
+                     to set the v2 diff base manually."
                 );
                 post_commit_failed = true;
             }
@@ -529,10 +531,7 @@ impl CliApp {
     ) -> Result<CommandOutcome, String> {
         let track_id = raw_args_to_single(&raw_args)
             .map_err(|_| "usage: track-set-commit-hash <track-id>".to_owned())?;
-        match crate::review_v2::persist_commit_hash_for_track(&track_id) {
-            Ok(sha) => Ok(CommandOutcome::success(Some(format!("Recorded .commit_hash: {sha}")))),
-            Err(msg) => Ok(CommandOutcome::failure(Some(msg))),
-        }
+        self.track_set_commit_hash(&track_id)
     }
 
     pub fn make_add_all(&self, _raw_args: Vec<String>) -> Result<CommandOutcome, String> {

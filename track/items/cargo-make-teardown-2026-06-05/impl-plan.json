@@ -4,12 +4,13 @@
     {
       "id": "T001",
       "description": "D9 infra loader: add libs/infrastructure/src/dry_check.rs with DryCheckConfig::load and DryCheckConfigError; add .harness/config/dry-check.json (threshold=0.85, schema_version=1); wire into libs/infrastructure/src/lib.rs; add unit tests for load / threshold / fail-closed error cases. No callers changed yet — existing 0.85 defaults remain; this task only adds the new loader and config file.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "600f34e45e2011f2032d76fdd2efe08bca8c044d"
     },
     {
       "id": "T002",
       "description": "D6 new native: implement bin/sotp track set-commit-hash subcommand in apps/cli/src/commands/track/ (clap struct + execute fn) and apps/cli-composition/src/track/ (composition method); move persist_commit_hash_for_track logic from composition make.rs to track composition; add the TrackCommand::SetCommitHash variant in track/mod.rs and its execute arm; add unit tests. No Makefile.toml changes yet.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T003",

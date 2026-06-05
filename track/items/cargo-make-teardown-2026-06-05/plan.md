@@ -1,15 +1,15 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # cargo make ラッパー層の解体 — bin/sotp 直叩きへの一本化
 
-## Tasks (0/10 resolved)
+## Tasks (1/10 resolved)
 
 ### S1 — New infrastructure additions (D9, D6 new native)
 
 > Add the new pieces that later tasks depend on: the DryCheckConfig infrastructure loader and .harness/config/dry-check.json config file (D9), and the bin/sotp track set-commit-hash native subcommand (D6).
 > These additions are purely additive — no existing behaviour is removed yet — so both T001 and T002 can pass cargo make ci independently.
 
-- [~] **T001**: D9 infra loader: add libs/infrastructure/src/dry_check.rs with DryCheckConfig::load and DryCheckConfigError; add .harness/config/dry-check.json (threshold=0.85, schema_version=1); wire into libs/infrastructure/src/lib.rs; add unit tests for load / threshold / fail-closed error cases. No callers changed yet — existing 0.85 defaults remain; this task only adds the new loader and config file.
-- [ ] **T002**: D6 new native: implement bin/sotp track set-commit-hash subcommand in apps/cli/src/commands/track/ (clap struct + execute fn) and apps/cli-composition/src/track/ (composition method); move persist_commit_hash_for_track logic from composition make.rs to track composition; add the TrackCommand::SetCommitHash variant in track/mod.rs and its execute arm; add unit tests. No Makefile.toml changes yet.
+- [x] **T001**: D9 infra loader: add libs/infrastructure/src/dry_check.rs with DryCheckConfig::load and DryCheckConfigError; add .harness/config/dry-check.json (threshold=0.85, schema_version=1); wire into libs/infrastructure/src/lib.rs; add unit tests for load / threshold / fail-closed error cases. No callers changed yet — existing 0.85 defaults remain; this task only adds the new loader and config file. (`600f34e45e2011f2032d76fdd2efe08bca8c044d`)
+- [~] **T002**: D6 new native: implement bin/sotp track set-commit-hash subcommand in apps/cli/src/commands/track/ (clap struct + execute fn) and apps/cli-composition/src/track/ (composition method); move persist_commit_hash_for_track logic from composition make.rs to track composition; add the TrackCommand::SetCommitHash variant in track/mod.rs and its execute arm; add unit tests. No Makefile.toml changes yet.
 
 ### S2 — Daemon teardown (D1) with atomic consumer sync (D8)
 

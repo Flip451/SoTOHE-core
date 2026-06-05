@@ -220,24 +220,186 @@
           "findings": [],
           "hash": "rvw1:sha256:01284040bb492fac40d3db3bb9530bb583925ff889db6522d4ea6b348c4ca5a8",
           "at": "2026-06-05T10:29:41Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b356f0a89e09352b130d1cf905d072ceb72cf44f0d1efe6a1e8ac01279481e1",
-          "at": "2026-06-05T10:24:11Z"
+          "hash": "rvw1:sha256:add80b27137cfbf6d445f45a0a457dfb047b1e80de26a2eb596e57aed8c209fa",
+          "at": "2026-06-05T11:06:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b356f0a89e09352b130d1cf905d072ceb72cf44f0d1efe6a1e8ac01279481e1",
-          "at": "2026-06-05T10:25:59Z"
+          "hash": "rvw1:sha256:add80b27137cfbf6d445f45a0a457dfb047b1e80de26a2eb596e57aed8c209fa",
+          "at": "2026-06-05T11:09:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33ba737d50d2089214d40a6686f07c2b381738cf1ca604fc01794d528339542e",
+          "at": "2026-06-05T11:55:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33ba737d50d2089214d40a6686f07c2b381738cf1ca604fc01794d528339542e",
+          "at": "2026-06-05T11:57:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e72212453fcd6aa426c8e973f29e692955526f46278991a67d78c1f37e075cbd",
+          "at": "2026-06-05T12:20:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e72212453fcd6aa426c8e973f29e692955526f46278991a67d78c1f37e075cbd",
+          "at": "2026-06-05T12:23:15Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI entry point has no happy-path or failure-path tests in the changed files. That leaves `TrackCommand::SetCommitHash` / `execute_set_commit_hash` unverified for the required branch-resolution and recovery-hint behavior.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
+              "line": 19,
+              "category": "testing"
+            },
+            {
+              "message": "`execute_set_commit_hash` forwards `outcome.stderr` even though `CliApp::track_set_commit_hash` already writes the same error and recovery hint directly to stderr. On failures this emits an extra bare error line, and the `make` wrapper now inherits that changed output contract instead of a pure delegation.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
+              "line": 22,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cc6bd15edfa88cc5c74fd5999bcace3b1ecd5d397578ce4cc20dd8bacabe3816",
+          "at": "2026-06-05T11:13:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI entry point has no happy-path or failure-path tests in the changed files. That leaves `TrackCommand::SetCommitHash` / `execute_set_commit_hash` unverified for the required branch-resolution and recovery-hint behavior.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
+              "line": 19,
+              "category": "testing"
+            },
+            {
+              "message": "`execute_set_commit_hash` forwards `outcome.stderr` even though `CliApp::track_set_commit_hash` already writes the same error and recovery hint directly to stderr. On failures this emits an extra bare error line, and the `make` wrapper now inherits that changed output contract instead of a pure delegation.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/set_commit_hash.rs",
+              "line": 22,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cc6bd15edfa88cc5c74fd5999bcace3b1ecd5d397578ce4cc20dd8bacabe3816",
+          "at": "2026-06-05T11:14:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8da183e3fe07927705da89b9da94f8037d39c8da66226ed9cfb5656dc52b32c",
+          "at": "2026-06-05T11:21:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8da183e3fe07927705da89b9da94f8037d39c8da66226ed9cfb5656dc52b32c",
+          "at": "2026-06-05T11:25:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Anchoring the new native subcommand to `PathBuf::from(\"track/items\")` makes `bin/sotp track set-commit-hash` fail before the composition layer runs whenever it is launched from a repo subdirectory, because the path is resolved against the current working directory instead of the discovered repo root. The underlying `CliApp::track_set_commit_hash` path already works from the repo root regardless of cwd, so this regresses a valid invocation context.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "line": 615,
+              "category": "behavior regression"
+            }
+          ],
+          "hash": "rvw1:sha256:484c6252b30f671ee1bcdd79e56e0e8090a5a40f5c12e321dc457c832b166992",
+          "at": "2026-06-05T11:59:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b2d21cdb185cacc339c429e301c94e0187d28cc84f0b0f9d66742b3427e000d",
+          "at": "2026-06-05T12:05:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_in_dir` changes the process-wide current directory and only restores it after the closure returns normally. If the closure panics, Rust unwinds past the restore call, leaving later tests running from the temp repo directory (which may then be deleted), so tests using this shared helper are no longer independent. Restore via a guard/drop or `catch_unwind` so cleanup happens on both success and panic paths.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/mod.rs",
+              "line": 643,
+              "category": "test_isolation"
+            }
+          ],
+          "hash": "rvw1:sha256:1b2d21cdb185cacc339c429e301c94e0187d28cc84f0b0f9d66742b3427e000d",
+          "at": "2026-06-05T12:11:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf553f96a64acfbcfed45ed2b0b2ef2411f888169762177a511de0f6cb72e521",
+          "at": "2026-06-05T12:14:13Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
+          "at": "2026-06-05T11:10:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
+          "at": "2026-06-05T11:13:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
+          "at": "2026-06-05T11:59:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
+          "at": "2026-06-05T12:02:05Z"
         }
       ]
     },
@@ -256,6 +418,24 @@
           "findings": [],
           "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
           "at": "2026-06-05T10:29:33Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b356f0a89e09352b130d1cf905d072ceb72cf44f0d1efe6a1e8ac01279481e1",
+          "at": "2026-06-05T10:24:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b356f0a89e09352b130d1cf905d072ceb72cf44f0d1efe6a1e8ac01279481e1",
+          "at": "2026-06-05T10:25:59Z"
         }
       ]
     }

@@ -531,27 +531,7 @@ fn dispatch_track_commit_message() -> Result<ExitCode, CliError> {
 fn dispatch_set_commit_hash(raw_args: &[String]) -> Result<ExitCode, CliError> {
     let track_id = raw_args_to_single(raw_args)
         .map_err(|_| CliError::Message("usage: track-set-commit-hash <track-id>".to_owned()))?;
-    match persist_commit_hash_v2(&track_id) {
-        Ok(()) => Ok(ExitCode::SUCCESS),
-        Err(msg) => {
-            eprintln!("{msg}");
-            Ok(ExitCode::FAILURE)
-        }
-    }
-}
-
-/// Persists the current HEAD SHA to `.commit_hash` (v2 incremental diff base).
-///
-/// Delegates to `cli_composition::review_v2::persist_commit_hash_for_track` so
-/// that this function does not import `domain::CommitHash`, `domain::TrackId`,
-/// or `domain::review_v2::CommitHashWriter` directly (CN-01 / AC-03).
-///
-/// # Errors
-/// Returns a human-readable error string on failure.
-fn persist_commit_hash_v2(track_id: &str) -> Result<(), String> {
-    let head_sha = cli_composition::review_v2::persist_commit_hash_for_track(track_id)?;
-    eprintln!("[track-commit-message] Recorded .commit_hash: {head_sha}");
-    Ok(())
+    crate::commands::track::set_commit_hash::execute_set_commit_hash(track_id)
 }
 
 // --- Phase 4: Exec dispatcher ---
