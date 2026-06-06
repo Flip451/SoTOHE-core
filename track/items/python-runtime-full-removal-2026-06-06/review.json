@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39d243eefa473769baa22744cb421f5eb6b6089a6a1304632d110673b4445942",
+          "at": "2026-06-06T04:09:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 requires updating the roadmap ADR front matter with `superseded_by`, but the related external_guides ADR explicitly says that same roadmap ADR is grandfathered/post-merge and must not receive semantic front-matter changes. That makes the supersede mechanism contradictory; the plan should use a permitted back-reference/new-ADR encoding instead of requiring a forbidden roadmap front-matter update.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md",
+              "line": 79,
+              "category": "contradiction"
+            },
+            {
+              "message": "The Makefile migration instructions conflict for `conventions-verify-index`: one bullet says `conventions-*` wrapper tasks should be retained with their implementation swapped to Rust, while the next says the `conventions-verify-index` wrapper should be deleted. This leaves the implementation boundary ambiguous for an existing public task name.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:39d243eefa473769baa22744cb421f5eb6b6089a6a1304632d110673b4445942",
+          "at": "2026-06-06T04:12:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR keeps non-git `cargo make` wrappers (`conventions-*`, `architecture-rules-*`, `workspace-tree*`) and only rewires them to Rust commands, but the already indexed cargo-make teardown ADR says native subcommands that can be called directly should not be wrapped by `cargo make`; non-git pass-through wrappers should move to direct `bin/sotp <native>` usage and be deleted. These plan artifacts now give contradictory implementation direction for the same wrapper layer, so implementers could preserve tasks that the newer workflow ADR requires removing.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8d6d70d4333719826c6ab97307c7fc331916f11659fdba803ad6801a870d0a59",
+          "at": "2026-06-06T04:16:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cdb3c0568de242d43711e82c4a35c8fb431d6b6860c6801a40ddd82087c0318",
+          "at": "2026-06-06T04:20:38Z"
+        }
+      ]
+    }
+  }
+}
