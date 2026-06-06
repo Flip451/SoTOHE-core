@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-06T07:01:42Z",
+  "generated_at": "2026-06-06T07:49:03Z",
   "declaration_hash": "2578c3fbfbb92f035b9780d1dd1784da66a0600772bfd852680ebee22c127732",
   "signals": [
     {
@@ -18,9 +18,9 @@
     {
       "type_name": "ConventionDocsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -53,20 +53,20 @@
     {
       "type_name": "infrastructure::conventions::add_convention_doc",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::conventions::update_convention_index",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::conventions::verify_convention_index",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::verify::convention_docs::verify",

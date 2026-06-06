@@ -74,6 +74,116 @@
           "findings": [],
           "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
           "at": "2026-06-06T06:44:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` now returns `pass()` when `knowledge/conventions/` has no `.md` files and `README.md` is missing. That diverges from the Python behavior and current tests, which treat a missing README as an error, so `verify-index` can silently succeed in an empty conventions tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
+              "line": 186,
+              "category": "correctness"
+            },
+            {
+              "message": "`render_index_block` swallows `read_dir` errors and falls back to an empty index block. Any filesystem/permission failure while scanning `knowledge/conventions` will therefore be treated as \"no docs\", letting `update-index` rewrite README.md and `verify-index` pass instead of surfacing the I/O error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
+              "line": 391,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:2fbbd36841877ddb38ebe6a01f7c28a70e347021616ef7d437d632af066d2ce4",
+          "at": "2026-06-06T07:15:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d928f5852c152d9794609cd4fab9c3e0476427e78fd9f55015a98dfe8df6d877",
+          "at": "2026-06-06T07:22:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_index_block` silently discards `read_dir` entry errors with `.flatten()`. During `update_convention_index`, that can regenerate and write `README.md` from a partial directory listing while still returning success, so unreadable entries can be dropped from the index instead of surfacing an error. Propagate each `ReadDir` item error instead of flattening it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 407,
+              "category": "error-handling"
+            },
+            {
+              "message": "The public error display path leaks absolute/internal filesystem paths because variants are populated from `Path::display()` and then formatted directly. For example, duplicate and missing README errors include the workspace/temp root path, which violates the briefing requirement that error messages not leak internal paths. Store/render repo-relative paths or fixed logical paths such as `knowledge/conventions/README.md`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 64,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d928f5852c152d9794609cd4fab9c3e0476427e78fd9f55015a98dfe8df6d877",
+          "at": "2026-06-06T07:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` now fails whenever `knowledge/conventions` exists without `README.md`, even when there are no convention documents. The shim delegates existing `verify::convention_docs::verify` callers to this path, but the previous verifier returned pass when `has_convention_docs` was false, so this is a bootstrapping regression and contradicts the briefing's 'relocated, not rewritten' requirement.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 188,
+              "category": "correctness"
+            },
+            {
+              "message": "I/O errors still store and display root-derived absolute paths via `display().to_string()` in several public error paths, starting here and continuing for target/readme/render failures. `ConventionDocsError::Display` exposes those strings to callers, but the briefing requires convention-doc errors not to leak internal paths. Normalize these to `knowledge/conventions/...` relative paths before returning them.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 126,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:62a4460b4eb148b5b9c3c8e7de61fe15767709386b8c020a6c09d067fa9f0c48",
+          "at": "2026-06-06T07:29:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_index_block` still formats filesystem paths with `display()` into errors, and those strings are returned directly by `verify_convention_index` or wrapped as an `Io` source by `update_convention_index`. A read failure on `knowledge/conventions` or one of its `.md` files will expose the caller's absolute workspace path, which violates this scope's requirement that errors not leak internal paths. Use stable relative paths such as `knowledge/conventions` and `knowledge/conventions/<file>.md` in these error strings.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 416,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:4fbf1f44a1fd16356bec33d4913af822831fdc95911c27d9019baecfb8e34ad2",
+          "at": "2026-06-06T07:34:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` returns pass when `knowledge/conventions/` exists without `README.md` and contains no convention docs. The Python `verify_index()` being ported calls `load_readme_content()` unconditionally, so a missing README is an error even for an empty conventions directory. This regression lets a bootstrapped-but-broken conventions directory pass verification.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 189,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:18e6311ed681cddaa4f41b6ec8423cce4fb32a8028033a463832e5a88d322707",
+          "at": "2026-06-06T07:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e6311ed681cddaa4f41b6ec8423cce4fb32a8028033a463832e5a88d322707",
+          "at": "2026-06-06T07:40:04Z"
         }
       ]
     },
@@ -395,6 +505,42 @@
           "findings": [],
           "hash": "rvw1:sha256:c8fc27ce67f91e3e7595a0815b50a3ce7bb81037e5ad22f4d8a52d702a14d8eb",
           "at": "2026-06-06T07:01:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001` is recorded as `done` and `T002` as `in_progress`, and the rendered plan/counts follow that later state (`1/7 resolved`). That contradicts the scope briefing, which said this round should only advance `T001` from `todo` to `in_progress`. The plan artifacts are now one transition ahead of the requested state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "The generated-view note says `T002+` types remain yellow, but `infrastructure-types.md` already renders `ConventionDocsError` and all three `infrastructure::conventions::*` free functions as blue. That makes the note stale and internally inconsistent with the rendered type table.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a17c393c87da3058c14ae50228b7c0a473cead8722654096df58e2a2d52a8e17",
+          "at": "2026-06-06T07:44:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe6a9d8b66045cfacca27fc80192e57e9000b7c5e99db980a8800ca03ceb7fde",
+          "at": "2026-06-06T07:46:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe6a9d8b66045cfacca27fc80192e57e9000b7c5e99db980a8800ca03ceb7fde",
+          "at": "2026-06-06T07:48:53Z"
         }
       ]
     }

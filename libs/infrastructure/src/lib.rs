@@ -5,6 +5,7 @@ pub mod adr_decision;
 pub mod agent_profiles;
 pub mod arch;
 pub mod code_profile_builder;
+pub mod conventions;
 pub mod demo;
 pub mod dry_check;
 pub mod gh_cli;
