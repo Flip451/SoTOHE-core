@@ -9,6 +9,7 @@
 // Submodule declarations (impl blocks for CliApp, grouped by command family)
 // ---------------------------------------------------------------------------
 
+mod arch;
 mod demo;
 mod domain;
 pub mod dry;

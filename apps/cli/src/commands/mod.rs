@@ -4,6 +4,7 @@ use std::process::ExitCode;
 
 use cli_composition::CommandOutcome;
 
+pub mod arch;
 pub mod domain;
 pub mod dry;
 pub mod file;

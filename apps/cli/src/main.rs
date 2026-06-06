@@ -20,6 +20,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum CliCommand {
+    /// Architecture rules analysis tools.
+    Arch {
+        #[command(subcommand)]
+        cmd: commands::arch::ArchCommand,
+    },
     /// Domain analysis tools (export-schema, etc.).
     Domain {
         #[command(subcommand)]
@@ -94,6 +99,7 @@ fn main() -> ExitCode {
 
 fn run_cli(cli: Cli, dry_execute: impl FnOnce(commands::dry::DryCommand) -> ExitCode) -> ExitCode {
     match cli.command {
+        Some(CliCommand::Arch { cmd }) => commands::arch::execute(cmd),
         Some(CliCommand::Domain { cmd }) => commands::domain::execute(cmd),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
         Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
@@ -126,13 +132,35 @@ fn run_cli(cli: Cli, dry_execute: impl FnOnce(commands::dry::DryCommand) -> Exit
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::fs;
     use std::process::ExitCode;
 
     use clap::Parser as _;
     use cli_composition::CliApp;
+    use tempfile::TempDir;
 
     use super::{Cli, CliCommand, run_cli};
     use crate::commands::dry::DryCommand;
+
+    const MINIMAL_RULES: &str = r#"{
+  "layers": [
+    { "crate": "domain",  "path": "libs/domain",  "may_depend_on": [] },
+    { "crate": "usecase", "path": "libs/usecase", "may_depend_on": ["domain"] }
+  ]
+}"#;
+
+    /// End-to-end dispatch: `sotp arch tree --project-root <dir>` parses via `Cli::try_parse_from`
+    /// and is dispatched through `run_cli` to `commands::arch::execute`, returning success.
+    #[test]
+    fn test_arch_tree_dispatch_via_run_cli_succeeds_with_valid_rules() {
+        let dir = TempDir::new().unwrap();
+        fs::write(dir.path().join("architecture-rules.json"), MINIMAL_RULES).unwrap();
+        let project_root = dir.path().to_str().unwrap();
+        let cli =
+            Cli::try_parse_from(["sotp", "arch", "tree", "--project-root", project_root]).unwrap();
+        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
 
     #[test]
     fn example_cli_flow_saves_track_successfully() {

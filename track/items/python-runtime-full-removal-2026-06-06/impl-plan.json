@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "Add infrastructure conventions module: create libs/infrastructure/src/conventions.rs (or conventions/mod.rs) with ConventionDocsError enum (Io/MissingReadme/MissingMarkers/AlreadyExists/InvalidSlug variants + Debug/Display/Error impls) and three free functions: add_convention_doc (creates template file + calls update_convention_index), update_convention_index (regenerates README.md index block between markers), verify_convention_index (relocates existing logic from libs/infrastructure/src/verify/convention_docs.rs; the existing function body is moved, not rewritten — CN-06). Keep libs/infrastructure/src/verify/convention_docs.rs as a minimal compatibility shim whose verify function delegates to conventions::verify_convention_index, and keep its pub mod entry in libs/infrastructure/src/verify/mod.rs until T004 rewires the CLI composition caller; do not leave duplicate behavior. Register the new module in libs/infrastructure/src/lib.rs. Add Rust unit tests covering: template generation, index update idempotency, verify pass/fail cases (existing tests from convention_docs.rs are migrated here). No CLI wiring yet — infrastructure layer only.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "02cbc5433dc2c84dcceaab54c5fa273f0b23159a"
     },
     {
       "id": "T003",
       "description": "Add sotp arch subcommand group: create apps/cli/src/commands/arch.rs with ArchCommand enum (Tree/TreeFull/Members/DirectChecks) and execute fn, each variant delegating to the corresponding CliApp method; add the module to apps/cli/src/commands/mod.rs and wire CliCommand::Arch in apps/cli/src/main.rs. Create apps/cli-composition/src/arch.rs with CliApp methods arch_tree, arch_tree_full, arch_members, arch_direct_checks that call the infrastructure functions from T001; register in apps/cli-composition/src/lib.rs. All four subcommands accept --project-root (default '.') and print the returned string to stdout (exit 0 on success, exit 1 on error). Add integration-level tests (in apps/cli/src/commands/arch.rs #[cfg(test)]) verifying command dispatch roundtrip on a temp directory with a minimal architecture-rules.json. Depends on T001.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T004",
@@ -41,7 +42,7 @@
   "plan": {
     "summary": [
       "Known generated-view deviation for this review: contract-map.md currently renders update_convention_index and verify_convention_index with the same F82 length prefix in their Mermaid node ids. This is a contract-map-renderer issue, not plan content, and the renderer fix is tracked separately.",
-      "Known generated-view deviation for this review: infrastructure-types.md signal columns reflect implementation progress. T001 and T002 types render blue (implemented). T003-T007 types and infrastructure::verify::convention_docs::verify (action=delete, pending T004) remain yellow."
+      "Known generated-view deviation for this review: infrastructure-types.md signal columns reflect implementation progress. T001 and T002 infrastructure types render blue (implemented). infrastructure::verify::convention_docs::verify (action=delete, pending T004) remains the only yellow. T003-T007 types are CLI/other layer types not tracked in the infrastructure catalogue."
     ],
     "sections": [
       {
