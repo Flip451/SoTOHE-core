@@ -1,6 +1,275 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `arch` coverage stops at `execute(ArchCommand::...)`; it never exercises the real `sotp arch ...` entrypoint through `Cli::try_parse_from` and `run_cli`. That means a regression in the new `CliCommand::Arch` wiring or clap nesting in `main.rs` could still pass this suite. Add at least one temp-dir end-to-end dispatch test for the top-level CLI path.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 21,
+              "category": "testing"
+            },
+            {
+              "message": "`TreeFull` only has a happy-path dispatch test. The sibling arch subcommands include a missing-rules-file assertion, but this variant does not, so an error-propagation regression in `CliApp::arch_tree_full` would go untested. Add a failure-path test mirroring the other three arch subcommands.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/arch.rs",
+              "line": 158,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4354a2eb85c5d5b163dc5c082e14ecb29eb13d5b71c0dfb34dd14a6f45ec2e45",
+          "at": "2026-06-06T08:04:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
+          "at": "2026-06-06T08:08:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
+          "at": "2026-06-06T08:11:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Conventions` entrypoint in `main.rs` is not covered by an end-to-end CLI dispatch test. The tests in `apps/cli/src/commands/conventions.rs` only exercise the nested parser and direct `execute()` calls, so a wiring regression in `Cli::parse`/`run_cli` for `CliCommand::Conventions` would slip past CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 29,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:110164076a9783940f438e8d803bf4869f0599b2047a2fc0528c202ac009d12b",
+          "at": "2026-06-06T11:53:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8925d4b4d6071aedf856248352594c72e12d01092e49bee27a3cb8270c07c68e",
+          "at": "2026-06-06T11:59:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8925d4b4d6071aedf856248352594c72e12d01092e49bee27a3cb8270c07c68e",
+          "at": "2026-06-06T12:02:14Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ExtraDirEntry.label` is required here, but the Python reference treats it as optional with a default empty string. A valid `extra_dirs` entry without a label will now fail to load, and the error will surface as `Parse` instead of `InvalidRules`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 52,
+              "category": "correctness"
+            },
+            {
+              "message": "`load_rules()` still misses Python-side validation for malformed input: empty `may_depend_on` items are accepted, and `extra_dirs` paths are not checked for duplicates or collisions with layer paths. Those cases should be rejected as `InvalidRules`; today they can be accepted or silently alter the rendered tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 62,
+              "category": "correctness"
+            },
+            {
+              "message": "`ArchRulesError::Io` embeds `rules_path.display()` in the public error string. When the caller passes an absolute workspace root, this leaks an internal filesystem path to the user.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 65,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:88b8f31b7e55178e8ddf04a4148b669bdde02e482509f2dada0ee141567e4d98",
+          "at": "2026-06-06T06:01:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_rules()` eagerly parses `extra_dirs` ([arch.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs#L178)), so malformed `extra_dirs` make `render_workspace_members`, `render_direct_checks`, and `render_workspace_tree(..., include_extra_dirs = false)` fail even though the Python reference ignores `extra_dirs` for those code paths. This is a behavior regression for valid workspace-member/direct-check outputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/arch.rs",
+              "line": 178,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f3a759af8c026f754d06a5d2326a10ce98c997bce4c9ff5b931c36644927d67e",
+          "at": "2026-06-06T06:10:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cabc8ff3c7cfce0e1773adf091389846866495ba323a294f00bb42bb62dd80d",
+          "at": "2026-06-06T06:16:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cabc8ff3c7cfce0e1773adf091389846866495ba323a294f00bb42bb62dd80d",
+          "at": "2026-06-06T06:19:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
+          "at": "2026-06-06T06:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
+          "at": "2026-06-06T06:44:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` now returns `pass()` when `knowledge/conventions/` has no `.md` files and `README.md` is missing. That diverges from the Python behavior and current tests, which treat a missing README as an error, so `verify-index` can silently succeed in an empty conventions tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
+              "line": 186,
+              "category": "correctness"
+            },
+            {
+              "message": "`render_index_block` swallows `read_dir` errors and falls back to an empty index block. Any filesystem/permission failure while scanning `knowledge/conventions` will therefore be treated as \"no docs\", letting `update-index` rewrite README.md and `verify-index` pass instead of surfacing the I/O error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
+              "line": 391,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:2fbbd36841877ddb38ebe6a01f7c28a70e347021616ef7d437d632af066d2ce4",
+          "at": "2026-06-06T07:15:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d928f5852c152d9794609cd4fab9c3e0476427e78fd9f55015a98dfe8df6d877",
+          "at": "2026-06-06T07:22:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_index_block` silently discards `read_dir` entry errors with `.flatten()`. During `update_convention_index`, that can regenerate and write `README.md` from a partial directory listing while still returning success, so unreadable entries can be dropped from the index instead of surfacing an error. Propagate each `ReadDir` item error instead of flattening it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 407,
+              "category": "error-handling"
+            },
+            {
+              "message": "The public error display path leaks absolute/internal filesystem paths because variants are populated from `Path::display()` and then formatted directly. For example, duplicate and missing README errors include the workspace/temp root path, which violates the briefing requirement that error messages not leak internal paths. Store/render repo-relative paths or fixed logical paths such as `knowledge/conventions/README.md`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 64,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d928f5852c152d9794609cd4fab9c3e0476427e78fd9f55015a98dfe8df6d877",
+          "at": "2026-06-06T07:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` now fails whenever `knowledge/conventions` exists without `README.md`, even when there are no convention documents. The shim delegates existing `verify::convention_docs::verify` callers to this path, but the previous verifier returned pass when `has_convention_docs` was false, so this is a bootstrapping regression and contradicts the briefing's 'relocated, not rewritten' requirement.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 188,
+              "category": "correctness"
+            },
+            {
+              "message": "I/O errors still store and display root-derived absolute paths via `display().to_string()` in several public error paths, starting here and continuing for target/readme/render failures. `ConventionDocsError::Display` exposes those strings to callers, but the briefing requires convention-doc errors not to leak internal paths. Normalize these to `knowledge/conventions/...` relative paths before returning them.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 126,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:62a4460b4eb148b5b9c3c8e7de61fe15767709386b8c020a6c09d067fa9f0c48",
+          "at": "2026-06-06T07:29:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_index_block` still formats filesystem paths with `display()` into errors, and those strings are returned directly by `verify_convention_index` or wrapped as an `Io` source by `update_convention_index`. A read failure on `knowledge/conventions` or one of its `.md` files will expose the caller's absolute workspace path, which violates this scope's requirement that errors not leak internal paths. Use stable relative paths such as `knowledge/conventions` and `knowledge/conventions/<file>.md` in these error strings.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 416,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:4fbf1f44a1fd16356bec33d4913af822831fdc95911c27d9019baecfb8e34ad2",
+          "at": "2026-06-06T07:34:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` returns pass when `knowledge/conventions/` exists without `README.md` and contains no convention docs. The Python `verify_index()` being ported calls `load_readme_content()` unconditionally, so a missing README is an error even for an empty conventions directory. This regression lets a bootstrapped-but-broken conventions directory pass verification.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 189,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:18e6311ed681cddaa4f41b6ec8423cce4fb32a8028033a463832e5a88d322707",
+          "at": "2026-06-06T07:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e6311ed681cddaa4f41b6ec8423cce4fb32a8028033a463832e5a88d322707",
+          "at": "2026-06-06T07:40:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff4c826f6d09bd2710abbb5cd0c8eb6a30fed61b9e7d98fcb6de5f9be66b3795",
+          "at": "2026-06-06T12:08:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff4c826f6d09bd2710abbb5cd0c8eb6a30fed61b9e7d98fcb6de5f9be66b3795",
+          "at": "2026-06-06T12:09:26Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -413,46 +682,64 @@
           "findings": [],
           "hash": "rvw1:sha256:61fe831c0649b3a3d20d854f596a84d56a58f3e164f8bce5095552d5d03ed116",
           "at": "2026-06-06T08:31:35Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new `arch` coverage stops at `execute(ArchCommand::...)`; it never exercises the real `sotp arch ...` entrypoint through `Cli::try_parse_from` and `run_cli`. That means a regression in the new `CliCommand::Arch` wiring or clap nesting in `main.rs` could still pass this suite. Add at least one temp-dir end-to-end dispatch test for the top-level CLI path.",
+              "message": "`plan.md:7` still says `infrastructure::verify::convention_docs::verify` is the only yellow / pending T004, but `infrastructure-types.md:21` already marks that row blue. The plan artifacts now disagree on whether the shim deletion is still pending; update the summary to reflect 0 yellow or remove the stale note.",
               "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 21,
-              "category": "testing"
-            },
-            {
-              "message": "`TreeFull` only has a happy-path dispatch test. The sibling arch subcommands include a missing-rules-file assertion, but this variant does not, so an error-propagation regression in `CliApp::arch_tree_full` would go untested. Add a failure-path test mirroring the other three arch subcommands.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/arch.rs",
-              "line": 158,
-              "category": "testing"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 7,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:4354a2eb85c5d5b163dc5c082e14ecb29eb13d5b71c0dfb34dd14a6f45ec2e45",
-          "at": "2026-06-06T08:04:12Z"
+          "hash": "rvw1:sha256:b3bd2bf018e8238f7544d590443d327d613faf0c9265971e81b0b2f675e0535c",
+          "at": "2026-06-06T12:11:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 introduces `apps/cli/src/commands/conventions.rs` and `apps/cli-composition/src/conventions.rs`, but unlike T003 it never says to register the new composition module in `apps/cli-composition/src/lib.rs`. That leaves the new `CliApp` methods unhooked from the crate module tree, so the task is incomplete as written.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:9acfb5dba28a776c3349273c280b3db3f6e442043675f8fe32dab24d57c33d0c",
+          "at": "2026-06-06T12:15:16Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
-          "at": "2026-06-06T08:08:25Z"
+          "hash": "rvw1:sha256:9acfb5dba28a776c3349273c280b3db3f6e442043675f8fe32dab24d57c33d0c",
+          "at": "2026-06-06T12:18:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
-          "at": "2026-06-06T08:11:42Z"
+          "hash": "rvw1:sha256:9acfb5dba28a776c3349273c280b3db3f6e442043675f8fe32dab24d57c33d0c",
+          "at": "2026-06-06T12:19:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b24091e8259fbb46835853fab64b244b1d759a0786279a8124c5c9ea03509ff",
+          "at": "2026-06-06T12:22:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b24091e8259fbb46835853fab64b244b1d759a0786279a8124c5c9ea03509ff",
+          "at": "2026-06-06T12:24:01Z"
         }
       ]
     },
@@ -471,192 +758,20 @@
           "findings": [],
           "hash": "rvw1:sha256:4d186665d31ac5bc07f26f408a2bf3b9d61a4aa7c835c22bfaf41ea8f7aacaaf",
           "at": "2026-06-06T08:15:52Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ExtraDirEntry.label` is required here, but the Python reference treats it as optional with a default empty string. A valid `extra_dirs` entry without a label will now fail to load, and the error will surface as `Parse` instead of `InvalidRules`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
-              "line": 52,
-              "category": "correctness"
-            },
-            {
-              "message": "`load_rules()` still misses Python-side validation for malformed input: empty `may_depend_on` items are accepted, and `extra_dirs` paths are not checked for duplicates or collisions with layer paths. Those cases should be rejected as `InvalidRules`; today they can be accepted or silently alter the rendered tree.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
-              "line": 62,
-              "category": "correctness"
-            },
-            {
-              "message": "`ArchRulesError::Io` embeds `rules_path.display()` in the public error string. When the caller passes an absolute workspace root, this leaks an internal filesystem path to the user.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
-              "line": 65,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:88b8f31b7e55178e8ddf04a4148b669bdde02e482509f2dada0ee141567e4d98",
-          "at": "2026-06-06T06:01:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load_rules()` eagerly parses `extra_dirs` ([arch.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs#L178)), so malformed `extra_dirs` make `render_workspace_members`, `render_direct_checks`, and `render_workspace_tree(..., include_extra_dirs = false)` fail even though the Python reference ignores `extra_dirs` for those code paths. This is a behavior regression for valid workspace-member/direct-check outputs.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/arch.rs",
-              "line": 178,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f3a759af8c026f754d06a5d2326a10ce98c997bce4c9ff5b931c36644927d67e",
-          "at": "2026-06-06T06:10:13Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1cabc8ff3c7cfce0e1773adf091389846866495ba323a294f00bb42bb62dd80d",
-          "at": "2026-06-06T06:16:21Z"
+          "hash": "rvw1:sha256:44efd63b555c5b17b13e3a977c9dfdddd4f87db24307f00248a2c8342eb69177",
+          "at": "2026-06-06T12:04:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1cabc8ff3c7cfce0e1773adf091389846866495ba323a294f00bb42bb62dd80d",
-          "at": "2026-06-06T06:19:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
-          "at": "2026-06-06T06:39:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
-          "at": "2026-06-06T06:44:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_convention_index` now returns `pass()` when `knowledge/conventions/` has no `.md` files and `README.md` is missing. That diverges from the Python behavior and current tests, which treat a missing README as an error, so `verify-index` can silently succeed in an empty conventions tree.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
-              "line": 186,
-              "category": "correctness"
-            },
-            {
-              "message": "`render_index_block` swallows `read_dir` errors and falls back to an empty index block. Any filesystem/permission failure while scanning `knowledge/conventions` will therefore be treated as \"no docs\", letting `update-index` rewrite README.md and `verify-index` pass instead of surfacing the I/O error.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
-              "line": 391,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:2fbbd36841877ddb38ebe6a01f7c28a70e347021616ef7d437d632af066d2ce4",
-          "at": "2026-06-06T07:15:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d928f5852c152d9794609cd4fab9c3e0476427e78fd9f55015a98dfe8df6d877",
-          "at": "2026-06-06T07:22:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`render_index_block` silently discards `read_dir` entry errors with `.flatten()`. During `update_convention_index`, that can regenerate and write `README.md` from a partial directory listing while still returning success, so unreadable entries can be dropped from the index instead of surfacing an error. Propagate each `ReadDir` item error instead of flattening it.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions.rs",
-              "line": 407,
-              "category": "error-handling"
-            },
-            {
-              "message": "The public error display path leaks absolute/internal filesystem paths because variants are populated from `Path::display()` and then formatted directly. For example, duplicate and missing README errors include the workspace/temp root path, which violates the briefing requirement that error messages not leak internal paths. Store/render repo-relative paths or fixed logical paths such as `knowledge/conventions/README.md`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions.rs",
-              "line": 64,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:d928f5852c152d9794609cd4fab9c3e0476427e78fd9f55015a98dfe8df6d877",
-          "at": "2026-06-06T07:25:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_convention_index` now fails whenever `knowledge/conventions` exists without `README.md`, even when there are no convention documents. The shim delegates existing `verify::convention_docs::verify` callers to this path, but the previous verifier returned pass when `has_convention_docs` was false, so this is a bootstrapping regression and contradicts the briefing's 'relocated, not rewritten' requirement.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions.rs",
-              "line": 188,
-              "category": "correctness"
-            },
-            {
-              "message": "I/O errors still store and display root-derived absolute paths via `display().to_string()` in several public error paths, starting here and continuing for target/readme/render failures. `ConventionDocsError::Display` exposes those strings to callers, but the briefing requires convention-doc errors not to leak internal paths. Normalize these to `knowledge/conventions/...` relative paths before returning them.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions.rs",
-              "line": 126,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:62a4460b4eb148b5b9c3c8e7de61fe15767709386b8c020a6c09d067fa9f0c48",
-          "at": "2026-06-06T07:29:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`render_index_block` still formats filesystem paths with `display()` into errors, and those strings are returned directly by `verify_convention_index` or wrapped as an `Io` source by `update_convention_index`. A read failure on `knowledge/conventions` or one of its `.md` files will expose the caller's absolute workspace path, which violates this scope's requirement that errors not leak internal paths. Use stable relative paths such as `knowledge/conventions` and `knowledge/conventions/<file>.md` in these error strings.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions.rs",
-              "line": 416,
-              "category": "security"
-            }
-          ],
-          "hash": "rvw1:sha256:4fbf1f44a1fd16356bec33d4913af822831fdc95911c27d9019baecfb8e34ad2",
-          "at": "2026-06-06T07:34:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`verify_convention_index` returns pass when `knowledge/conventions/` exists without `README.md` and contains no convention docs. The Python `verify_index()` being ported calls `load_readme_content()` unconditionally, so a missing README is an error even for an empty conventions directory. This regression lets a bootstrapped-but-broken conventions directory pass verification.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions.rs",
-              "line": 189,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:18e6311ed681cddaa4f41b6ec8423cce4fb32a8028033a463832e5a88d322707",
-          "at": "2026-06-06T07:37:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18e6311ed681cddaa4f41b6ec8423cce4fb32a8028033a463832e5a88d322707",
-          "at": "2026-06-06T07:40:04Z"
+          "hash": "rvw1:sha256:44efd63b555c5b17b13e3a977c9dfdddd4f87db24307f00248a2c8342eb69177",
+          "at": "2026-06-06T12:07:15Z"
         }
       ]
     }

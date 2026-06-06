@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------
 
 mod arch;
+mod conventions;
 mod demo;
 mod domain;
 pub mod dry;

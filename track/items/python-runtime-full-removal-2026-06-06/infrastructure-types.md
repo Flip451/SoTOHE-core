@@ -18,5 +18,5 @@
 | infrastructure::conventions::add_convention_doc | free_function | — | fn(root: &std::path::Path, name: &str, slug: Option<&str>, title: Option<&str>, summary: Option<&str>) -> Result<(), ConventionDocsError> | 🔵 | 🔵 |
 | infrastructure::conventions::update_convention_index | free_function | — | fn(root: &std::path::Path) -> Result<(), ConventionDocsError> | 🔵 | 🔵 |
 | infrastructure::conventions::verify_convention_index | free_function | — | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
-| infrastructure::verify::convention_docs::verify | free_function | delete | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🟡 | 🔵 |
+| infrastructure::verify::convention_docs::verify | free_function | delete | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 

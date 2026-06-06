@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-06T08:31:52Z",
+  "generated_at": "2026-06-06T12:24:09Z",
   "declaration_hash": "2578c3fbfbb92f035b9780d1dd1784da66a0600772bfd852680ebee22c127732",
   "signals": [
     {
@@ -71,8 +71,8 @@
     {
       "type_name": "infrastructure::verify::convention_docs::verify",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }
