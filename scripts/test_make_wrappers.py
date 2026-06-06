@@ -288,19 +288,6 @@ class MakeWrappersTest(unittest.TestCase):
             )
         self.assertNotIn('"make"', task_body)
 
-    def test_commit_task_runs_ci_then_git_commit(self) -> None:
-        makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
-        task_header = "[tasks.commit]"
-        task_start = makefile.index(task_header)
-        next_task = makefile.find("\n[tasks.", task_start + len(task_header))
-        task_body = (
-            makefile[task_start:] if next_task == -1 else makefile[task_start:next_task]
-        )
-        self.assertIn('dependencies = ["ci"]', task_body)
-        self.assertIn('command = "git"', task_body)
-        self.assertIn('args = ["commit", "-m", "${@}"]', task_body)
-        self.assertNotIn("bin/sotp make", task_body)
-
     def test_track_pr_wrappers_delegate_to_sotp_native(self) -> None:
         makefile = (PROJECT_ROOT / "Makefile.toml").read_text(encoding="utf-8")
 

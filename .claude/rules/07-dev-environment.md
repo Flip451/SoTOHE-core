@@ -39,8 +39,7 @@ cargo make add <files>            # 手動の低レベル staging（terminal 直
 cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
 cargo make track-add-paths        # tmp/track-commit/add-paths.txt から選択的に stage
 cargo make unstage <paths>        # index から除去（worktree 変更は保持）
-cargo make commit                 # 手動の低レベル commit（terminal 直実行用）
-cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit
+cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit（唯一のコミット経路）
 cargo make track-note             # tmp/track-commit/note.md から note を適用して削除
 bin/sotp track transition         # タスク状態遷移 + ビュー自動再生成
 bin/sotp track views sync         # plan.md + registry.md を metadata.json から再生成
