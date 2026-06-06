@@ -1,0 +1,359 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "ArchRulesError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "source", "ty": "std::io::Error" }
+              ]
+            }
+          },
+          {
+            "name": "Parse",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["serde_json::Error"]
+            }
+          },
+          {
+            "name": "InvalidRules",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "arch",
+      "docs": "Errors from loading and parsing architecture-rules.json for sotp arch subcommands.",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-01",
+          "hash": "221ef66a5f92ae127054b26d2e43a2237f0c1362d38bd3cbdc6bca7912ba7bfd"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ConventionDocsError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "source", "ty": "std::io::Error" }
+              ]
+            }
+          },
+          {
+            "name": "MissingReadme",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          },
+          {
+            "name": "MissingMarkers",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          },
+          {
+            "name": "AlreadyExists",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          },
+          {
+            "name": "InvalidSlug",
+            "payload": {
+              "kind": "tuple",
+              "fields": ["String"]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "conventions",
+      "docs": "Errors from sotp conventions add and update-index operations.",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-02",
+          "hash": "ccb6bfd37d8f39a0eeaaa27c21c87e6cd7043f32dcac9bbe30e806d3bb39ba6b"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::arch::render_workspace_tree": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<String, ArchRulesError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Render the workspace tree (crate paths only) from architecture-rules.json. Implements sotp arch tree.",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-01",
+          "hash": "221ef66a5f92ae127054b26d2e43a2237f0c1362d38bd3cbdc6bca7912ba7bfd"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "AC-04",
+          "hash": "f22b601fa50f3cb3afc033b8e60649da605c7d9a7790359eca94127f16a61a0d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::arch::render_workspace_tree_full": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<String, ArchRulesError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Render the workspace tree including extra_dirs from architecture-rules.json. Implements sotp arch tree-full.",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-01",
+          "hash": "221ef66a5f92ae127054b26d2e43a2237f0c1362d38bd3cbdc6bca7912ba7bfd"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "AC-04",
+          "hash": "f22b601fa50f3cb3afc033b8e60649da605c7d9a7790359eca94127f16a61a0d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::arch::render_workspace_members": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<String, ArchRulesError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "List workspace member paths (one per line) from architecture-rules.json. Implements sotp arch members.",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-01",
+          "hash": "221ef66a5f92ae127054b26d2e43a2237f0c1362d38bd3cbdc6bca7912ba7bfd"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "AC-04",
+          "hash": "f22b601fa50f3cb3afc033b8e60649da605c7d9a7790359eca94127f16a61a0d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::arch::render_direct_checks": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<String, ArchRulesError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Render direct dependency check matrix (crate TAB forbidden|crates) from architecture-rules.json. Implements sotp arch direct-checks. Output format matches Python version to preserve permission allowlist and orchestra verification compatibility.",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-01",
+          "hash": "221ef66a5f92ae127054b26d2e43a2237f0c1362d38bd3cbdc6bca7912ba7bfd"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "CN-02",
+          "hash": "50b758de6025298aec32b10f7ce044105947e8c4862d058389aadf7e39042360"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-10",
+          "hash": "8b3040d06570f8667e782c722aa9a33b5606a85ab59343b3d6431428822338cd"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "AC-04",
+          "hash": "f22b601fa50f3cb3afc033b8e60649da605c7d9a7790359eca94127f16a61a0d"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::conventions::add_convention_doc": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" },
+        { "name": "name", "ty": "&str" },
+        { "name": "slug", "ty": "Option<&str>" },
+        { "name": "title", "ty": "Option<&str>" },
+        { "name": "summary", "ty": "Option<&str>" }
+      ],
+      "returns": "Result<(), ConventionDocsError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Create a new convention document from template and update the README index. Implements sotp conventions add.",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-02",
+          "hash": "ccb6bfd37d8f39a0eeaaa27c21c87e6cd7043f32dcac9bbe30e806d3bb39ba6b"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "AC-05",
+          "hash": "424949c53a0446049d15774ddf88e168f3b9f5913f9359d3de2791a8da84f3b2"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::conventions::update_convention_index": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<(), ConventionDocsError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Regenerate the README.md index from current convention documents. Implements sotp conventions update-index.",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-02",
+          "hash": "ccb6bfd37d8f39a0eeaaa27c21c87e6cd7043f32dcac9bbe30e806d3bb39ba6b"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "AC-05",
+          "hash": "424949c53a0446049d15774ddf88e168f3b9f5913f9359d3de2791a8da84f3b2"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::conventions::verify_convention_index": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Verify the convention README index is in sync. Implements sotp conventions verify-index. Logic relocated from verify::convention_docs::verify (D3/CN-06).",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-02",
+          "hash": "ccb6bfd37d8f39a0eeaaa27c21c87e6cd7043f32dcac9bbe30e806d3bb39ba6b"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "CN-06",
+          "hash": "3cdb18093fab82d065409d6cc2a16d0477f0bc05899c229b8b8608c62b977c42"
+        },
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "AC-06",
+          "hash": "0c4a47fc253e671cfaa56d7bf86bb4bb38885389137f4c4e6b0b1856fa68e31e"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::convention_docs::verify": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: logic relocated to conventions::verify_convention_index (D3/CN-06).",
+      "spec_refs": [
+        {
+          "file": "track/items/python-runtime-full-removal-2026-06-06/spec.json",
+          "anchor": "IN-02",
+          "hash": "ccb6bfd37d8f39a0eeaaa27c21c87e6cd7043f32dcac9bbe30e806d3bb39ba6b"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ArchRulesError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ArchRulesError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ArchRulesError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ConventionDocsError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "ConventionDocsError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "ConventionDocsError"
+    }
+  ]
+}

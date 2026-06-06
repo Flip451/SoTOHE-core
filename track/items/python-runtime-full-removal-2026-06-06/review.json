@@ -53,6 +53,155 @@
           "findings": [],
           "hash": "rvw1:sha256:1cdb3c0568de242d43711e82c4a35c8fb431d6b6860c6801a40ddd82087c0318",
           "at": "2026-06-06T04:20:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 claims the infrastructure work is \"purely additive\" and that no existing code is removed yet, but T002 in the same plan deletes `libs/infrastructure/src/verify/convention_docs.rs` and removes its module entry. The section-level sequencing claim is false and should be rewritten to acknowledge the relocation/deletion step.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b12e3dd98702fd05bc7243c05e7fa8947d6c1e648e24d524942497b983259b1f",
+          "at": "2026-06-06T04:54:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`update_convention_index` and `verify_convention_index` are emitted with the same Mermaid node ID (`F82`), so the second node overwrites the first and the contract map no longer faithfully represents the catalogue.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
+              "line": 60,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ed01900fed51945a3216f4a91438e0febd504ca08399007d4ab242728cd9f330",
+          "at": "2026-06-06T04:58:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`doc_patterns.rs` is called out in CN-04 as part of the same scripts-deletion / CI-verification sync change, but this plan defers any `doc_patterns.rs` update to T006 while T005 is defined as the only commit that must satisfy CN-04. That splits a required same-commit synchronization across two commits and makes the plan violate its own constraint as written.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 43,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ed01900fed51945a3216f4a91438e0febd504ca08399007d4ab242728cd9f330",
+          "at": "2026-06-06T05:02:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`update_convention_index` and `verify_convention_index` are rendered with the same Mermaid node id (`F82_infrastructure_infrastructure_infrastructure__conventions__...`). That collapses two distinct functions into one node, and `verify_convention_index` no longer has its own edge to `ConventionDocsError`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
+              "line": 60,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:3348ddc91ce7228dc662cc1d38164535fe42df4b97f48519329119ef07b9b2d8",
+          "at": "2026-06-06T05:06:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 removes the orchestra/settings allow-list entries for the `architecture-rules-*` and `conventions-*` wrapper task names, but those Makefile wrappers are only updated later in T006. Unless T005 also deletes or rewrites those tasks, the intermediate commit cannot stay CI-green and will fail the stated `verify-orchestra`/CI requirement.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 36,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:3348ddc91ce7228dc662cc1d38164535fe42df4b97f48519329119ef07b9b2d8",
+          "at": "2026-06-06T05:13:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` under-maps the test criteria: `AC-07` is assigned only to T001/T002, but `plan.md` assigns the required CLI integration roundtrip tests to T003/T004 as well. That makes the coverage matrix internally inconsistent and understates which tasks satisfy the test-related requirements (the same gap exists for `IN-07` at line 10).",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/task-coverage.json",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c45c1b4ebae26eda98fd8351554dbdb60cd1093fc0db05953804981216cfdca1",
+          "at": "2026-06-06T05:20:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`F82` is reused for both `update_convention_index` and `verify_convention_index`. In the Mermaid contract map, the second definition overwrites the first, so `verify_convention_index` does not have its own node/edge and the catalogue is no longer accurate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
+              "line": 61,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:72218c436e636576879b163c93566ae053f98c7d1d99201556961e8523863380",
+          "at": "2026-06-06T05:23:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91ae0a5ee67d1640fd41497d2e7ecefa972d5ab457136f5c44eddb5f1fc67fa3",
+          "at": "2026-06-06T05:27:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 deletes `libs/infrastructure/src/verify/convention_docs.rs` and removes its verify module entry while explicitly deferring CLI wiring; T004 is later tasked with replacing the existing verify dispatch that calls `infrastructure::verify::convention_docs::verify`. That ordering leaves the tree broken after T002 and contradicts the S1 claim that T002 can be written/tested independently. Move the verify dispatch update or a compatibility shim into T002, or stop deleting the old module until T004.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 11,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:91ae0a5ee67d1640fd41497d2e7ecefa972d5ab457136f5c44eddb5f1fc67fa3",
+          "at": "2026-06-06T05:31:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` now treats the metadata-only aliases `T008`-`T014` as real implementation tasks and assigns all of them to S1. That contradicts the plan narrative and coverage, which define the executable chain as `T001`-`T007` with only `T001`/`T002` in S1; the rendered plan consequently shows `0/14` tasks and places CLI/removal/docs/ADR work under the infrastructure section. This makes task execution/status ambiguous rather than a harmless metadata alias. Keep the alias tasks out of the impl-plan task list/section task_ids, or otherwise render them only as references to `T001`-`T007`.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 88,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d101587cee1cfb714aaf92fa0ab8c752c04fac0dc7bf7d23c64c26ba4e7ff7aa",
+          "at": "2026-06-06T05:36:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa9fd20dd8043fc5b14c414211c71c48fc49f868d19b7037bb4074827a1bc17d",
+          "at": "2026-06-06T05:39:54Z"
         }
       ]
     }

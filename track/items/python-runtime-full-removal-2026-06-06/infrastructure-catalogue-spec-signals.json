@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "3ca3c801806052f8310d3972307c332b71ab8e90acd106586dbd0c364a48488a",
+  "signals": [
+    {
+      "type_name": "ArchRulesError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ConventionDocsError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::arch::render_direct_checks",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::arch::render_workspace_members",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::arch::render_workspace_tree",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::arch::render_workspace_tree_full",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::conventions::add_convention_doc",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::conventions::update_convention_index",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::conventions::verify_convention_index",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::convention_docs::verify",
+      "signal": "blue"
+    }
+  ]
+}
