@@ -19,35 +19,22 @@ ENV CARGO_HOME=/usr/local/cargo \
     CARGO_TARGET_DIR=${IMAGE_CARGO_TARGET_DIR} \
     PATH=/usr/local/cargo/bin:$PATH
 
-ARG UV_VERSION=0.7.12
-
 RUN apt-get update && apt-get install -y \
     mold \
     clang \
     cmake \
     curl \
-    python3 \
-    python3-yaml \
-    python3-pytest \
     ripgrep \
     pkg-config \
     libssl-dev \
     protobuf-compiler \
     && rm -rf /var/lib/apt/lists/* \
-    && rustup component add --toolchain ${RUST_VERSION} rustfmt clippy \
-    && curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh
+    && rustup component add --toolchain ${RUST_VERSION} rustfmt clippy
 
 RUN --mount=type=cache,target=${CARGO_HOME}/registry,sharing=locked \
     --mount=type=cache,target=${CARGO_HOME}/git,sharing=locked \
     --mount=type=cache,target=${CARGO_TARGET_DIR},sharing=locked \
     cargo install --locked cargo-chef --version ${CARGO_CHEF_VERSION} --force
-
-# Python deps from requirements-python.txt (SSoT for ruff version).
-# Placed after apt-get and cargo-chef layers so only this small layer
-# rebuilds when Python deps change.
-COPY requirements-python.txt /tmp/requirements-python.txt
-RUN $HOME/.local/bin/uv pip install --system --break-system-packages \
-    -r /tmp/requirements-python.txt
 
 # 2. Build tool binaries once
 FROM chef AS tools-builder

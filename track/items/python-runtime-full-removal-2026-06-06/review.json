@@ -1,75 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `arch` coverage stops at `execute(ArchCommand::...)`; it never exercises the real `sotp arch ...` entrypoint through `Cli::try_parse_from` and `run_cli`. That means a regression in the new `CliCommand::Arch` wiring or clap nesting in `main.rs` could still pass this suite. Add at least one temp-dir end-to-end dispatch test for the top-level CLI path.",
-              "severity": "P1",
-              "file": "apps/cli/src/main.rs",
-              "line": 21,
-              "category": "testing"
-            },
-            {
-              "message": "`TreeFull` only has a happy-path dispatch test. The sibling arch subcommands include a missing-rules-file assertion, but this variant does not, so an error-propagation regression in `CliApp::arch_tree_full` would go untested. Add a failure-path test mirroring the other three arch subcommands.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/arch.rs",
-              "line": 158,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:4354a2eb85c5d5b163dc5c082e14ecb29eb13d5b71c0dfb34dd14a6f45ec2e45",
-          "at": "2026-06-06T08:04:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
-          "at": "2026-06-06T08:08:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
-          "at": "2026-06-06T08:11:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `Conventions` entrypoint in `main.rs` is not covered by an end-to-end CLI dispatch test. The tests in `apps/cli/src/commands/conventions.rs` only exercise the nested parser and direct `execute()` calls, so a wiring regression in `Cli::parse`/`run_cli` for `CliCommand::Conventions` would slip past CI.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
-              "line": 29,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:110164076a9783940f438e8d803bf4869f0599b2047a2fc0528c202ac009d12b",
-          "at": "2026-06-06T11:53:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8925d4b4d6071aedf856248352594c72e12d01092e49bee27a3cb8270c07c68e",
-          "at": "2026-06-06T11:59:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8925d4b4d6071aedf856248352594c72e12d01092e49bee27a3cb8270c07c68e",
-          "at": "2026-06-06T12:02:14Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -267,6 +198,154 @@
           "findings": [],
           "hash": "rvw1:sha256:ff4c826f6d09bd2710abbb5cd0c8eb6a30fed61b9e7d98fcb6de5f9be66b3795",
           "at": "2026-06-06T12:09:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:402be0e060b50f6cdcdbd732e96c524b76d22d6d6bc157bbb1bd1847f54d14f2",
+          "at": "2026-06-06T12:51:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:402be0e060b50f6cdcdbd732e96c524b76d22d6d6bc157bbb1bd1847f54d14f2",
+          "at": "2026-06-06T12:54:15Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting this file removes the only direct regression coverage for the public `cargo make` wrapper surface that this diff rewires. Without an equivalent test elsewhere, accidental changes to wrapper command mappings or forwarded args in `Makefile.toml` will no longer be caught by CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/scripts/test_make_wrappers.py",
+              "line": 1,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:3b1e52f6c7fbb1ae241c26838de12b81fad8f8979063427614c794b3bf68eaa3",
+          "at": "2026-06-06T12:56:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b1e52f6c7fbb1ae241c26838de12b81fad8f8979063427614c794b3bf68eaa3",
+          "at": "2026-06-06T13:00:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b1e52f6c7fbb1ae241c26838de12b81fad8f8979063427614c794b3bf68eaa3",
+          "at": "2026-06-06T13:07:32Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `arch` coverage stops at `execute(ArchCommand::...)`; it never exercises the real `sotp arch ...` entrypoint through `Cli::try_parse_from` and `run_cli`. That means a regression in the new `CliCommand::Arch` wiring or clap nesting in `main.rs` could still pass this suite. Add at least one temp-dir end-to-end dispatch test for the top-level CLI path.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 21,
+              "category": "testing"
+            },
+            {
+              "message": "`TreeFull` only has a happy-path dispatch test. The sibling arch subcommands include a missing-rules-file assertion, but this variant does not, so an error-propagation regression in `CliApp::arch_tree_full` would go untested. Add a failure-path test mirroring the other three arch subcommands.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/arch.rs",
+              "line": 158,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4354a2eb85c5d5b163dc5c082e14ecb29eb13d5b71c0dfb34dd14a6f45ec2e45",
+          "at": "2026-06-06T08:04:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
+          "at": "2026-06-06T08:08:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
+          "at": "2026-06-06T08:11:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Conventions` entrypoint in `main.rs` is not covered by an end-to-end CLI dispatch test. The tests in `apps/cli/src/commands/conventions.rs` only exercise the nested parser and direct `execute()` calls, so a wiring regression in `Cli::parse`/`run_cli` for `CliCommand::Conventions` would slip past CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 29,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:110164076a9783940f438e8d803bf4869f0599b2047a2fc0528c202ac009d12b",
+          "at": "2026-06-06T11:53:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8925d4b4d6071aedf856248352594c72e12d01092e49bee27a3cb8270c07c68e",
+          "at": "2026-06-06T11:59:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8925d4b4d6071aedf856248352594c72e12d01092e49bee27a3cb8270c07c68e",
+          "at": "2026-06-06T12:02:14Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d186665d31ac5bc07f26f408a2bf3b9d61a4aa7c835c22bfaf41ea8f7aacaaf",
+          "at": "2026-06-06T08:13:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d186665d31ac5bc07f26f408a2bf3b9d61a4aa7c835c22bfaf41ea8f7aacaaf",
+          "at": "2026-06-06T08:15:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44efd63b555c5b17b13e3a977c9dfdddd4f87db24307f00248a2c8342eb69177",
+          "at": "2026-06-06T12:04:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44efd63b555c5b17b13e3a977c9dfdddd4f87db24307f00248a2c8342eb69177",
+          "at": "2026-06-06T12:07:15Z"
         }
       ]
     },
@@ -740,38 +819,89 @@
           "findings": [],
           "hash": "rvw1:sha256:9b24091e8259fbb46835853fab64b244b1d759a0786279a8124c5c9ea03509ff",
           "at": "2026-06-06T12:24:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f28ecca34f47041bfda82f98002d2e17fd30f2a7f94bd5af2b6fa7888e6a244",
+          "at": "2026-06-06T12:47:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f28ecca34f47041bfda82f98002d2e17fd30f2a7f94bd5af2b6fa7888e6a244",
+          "at": "2026-06-06T12:52:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f569572a4f14fb4bb6f3c10947c0bcc81ce454393f808648c722d529962786c",
+          "at": "2026-06-06T13:16:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f569572a4f14fb4bb6f3c10947c0bcc81ce454393f808648c722d529962786c",
+          "at": "2026-06-06T13:16:57Z"
         }
       ]
     },
-    "cli_composition": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d186665d31ac5bc07f26f408a2bf3b9d61a4aa7c835c22bfaf41ea8f7aacaaf",
-          "at": "2026-06-06T08:13:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d186665d31ac5bc07f26f408a2bf3b9d61a4aa7c835c22bfaf41ea8f7aacaaf",
-          "at": "2026-06-06T08:15:52Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This step still tells the reader to run `cargo make conventions-verify-index`, but the harness migration removed that wrapper from the allowed command set and replaced it with the native `bin/sotp conventions verify-index` flow. As written, the documented workflow is internally inconsistent and will fail for anyone following it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/DEVELOPER_AI_WORKFLOW.md",
+              "line": 158,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:af82e42e169e301c16dc623660f5d4769416ea771f5dee10ec37214cffd7f987",
+          "at": "2026-06-06T12:53:02Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:44efd63b555c5b17b13e3a977c9dfdddd4f87db24307f00248a2c8342eb69177",
-          "at": "2026-06-06T12:04:51Z"
+          "hash": "rvw1:sha256:acb6688831a127ee138a27b17af809406690972a74d2e499b9430c78951bbf11",
+          "at": "2026-06-06T13:05:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This still uses the deleted cargo-make wrapper naming (`conventions-*` / `architecture-rules-*`) while saying to run them through `bin/sotp`. The native CLI exposes `bin/sotp conventions ...` and `bin/sotp arch ...`, and the settings only allow those groups, so this policy can send agents toward non-existent command forms after the wrapper removal. Update this line to name the native command groups, e.g. `bin/sotp conventions ...` / `bin/sotp arch ...`.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 27,
+              "category": "workflow-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:acb6688831a127ee138a27b17af809406690972a74d2e499b9430c78951bbf11",
+          "at": "2026-06-06T13:08:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fde104c036d3e7f70a75feb1f87e02355ec6f5c5f2c7ebe3510d5c887c8ed7a",
+          "at": "2026-06-06T13:11:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:44efd63b555c5b17b13e3a977c9dfdddd4f87db24307f00248a2c8342eb69177",
-          "at": "2026-06-06T12:07:15Z"
+          "hash": "rvw1:sha256:7fde104c036d3e7f70a75feb1f87e02355ec6f5c5f2c7ebe3510d5c887c8ed7a",
+          "at": "2026-06-06T13:12:54Z"
         }
       ]
     }

@@ -85,13 +85,10 @@ fn require_line(root: &Path, rel_path: &str, pattern: &str, label: &str) -> Veri
     }
 }
 
-static REQUIRED_FILES: &[RequireFile] = &[
-    RequireFile {
-        rel_path: "architecture-rules.json",
-        label: "architecture rules source of truth",
-    },
-    RequireFile { rel_path: "scripts/architecture_rules.py", label: "architecture rules helper" },
-];
+static REQUIRED_FILES: &[RequireFile] = &[RequireFile {
+    rel_path: "architecture-rules.json",
+    label: "architecture rules source of truth",
+}];
 
 /// Convention-specific required files — only checked when conventions are bootstrapped.
 static CONVENTIONS_REQUIRED_FILES: &[RequireFile] = &[RequireFile {
@@ -121,11 +118,6 @@ static REQUIRED_LINES: &[RequireLine] = &[
         rel_path: "track/workflow.md",
         pattern: "`cargo make verify-tech-stack` passes",
         label: "workflow tech-stack gate",
-    },
-    RequireLine {
-        rel_path: "track/workflow.md",
-        pattern: "`cargo make scripts-selftest` passes",
-        label: "workflow scripts selftest gate",
     },
     RequireLine {
         rel_path: "track/workflow.md",
@@ -172,11 +164,6 @@ static REQUIRED_LINES: &[RequireLine] = &[
         rel_path: "DEVELOPER_AI_WORKFLOW.md",
         pattern: "/track:revert",
         label: "developer workflow revert command",
-    },
-    RequireLine {
-        rel_path: "DEVELOPER_AI_WORKFLOW.md",
-        pattern: "cargo make scripts-selftest",
-        label: "developer workflow scripts selftest gate",
     },
 ];
 

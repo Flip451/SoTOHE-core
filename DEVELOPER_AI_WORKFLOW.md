@@ -12,8 +12,6 @@
 ### 0.1 前提条件
 
 - 必須: Docker + docker compose
-- 必須: Python 3.11+
-- 任意: asdf（`.tool-versions` の `python 3.12.8` を使う場合）
 - Linux で uid/gid が `1000:1000` 以外なら `HOST_UID=$(id -u)` / `HOST_GID=$(id -g)` を export してから compose wrapper を使う
 - 必須: Claude Code が利用可能
 - 既定 profile（`default`）を使う場合は Codex CLI が必須
@@ -26,9 +24,7 @@
   - Claude Code: `orchestrator` / `spec-designer` / `impl-planner` / `type-designer` / `adr-editor` / `implementer`
   - Codex: `reviewer`
   - Gemini: `researcher`
-- `conventions-*` / `architecture-rules-*` は `cargo make` wrapper 経由で実行する。
-- ローカルの `python3` 解決が不安定な場合は `.tool-versions` の Python 3.12.8 を使うか、ホスト側の検証スクリプトと `cargo make --allow-private verify-orchestra-local` に対して `PYTHON_BIN=/path/to/python3.12 ...` を使う。
-- Python test（`scripts-selftest`）は Docker 経由で `pytest` を実行する。
+- `bin/sotp conventions ...` / `bin/sotp arch ...` でコンベンション・アーキテクチャルール操作を実行する。
 - `*-local` タスクは内部専用（private）。
 
 ### 0.2 最初にやること（初回のみ）
@@ -45,7 +41,7 @@ START_HERE_HUMAN.md
 /track:catchup
 ```
 
-上記コマンドが Python venv 作成、Docker イメージビルド、CI 実行、プロジェクト状態の確認をまとめて行う。
+上記コマンドが Docker イメージビルド、CI 実行、プロジェクト状態の確認をまとめて行う。
 手動で進める場合は `cargo make bootstrap` を Terminal で実行し、その後 `/track:setup` を Claude Code で実行する。
 
 ### 0.3 開発の基本フロー（毎回）
@@ -159,7 +155,7 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
 1. `[Claude Code]` `/conventions:add api-design`
 2. Claude Code が必要なら title, slug, 目的文だけ補足確認する
 3. Claude Code が `knowledge/conventions/<slug>.md` を作成し、`README.md` の索引を更新する
-4. Claude Code が `cargo make conventions-verify-index` と `cargo make verify-arch-docs` で整合を確認する
+4. Claude Code が `bin/sotp conventions verify-index` と `cargo make verify-arch-docs` で整合を確認する
 
 ## 2. 役割分担
 
@@ -180,7 +176,7 @@ track 成果物は「ADR → 仕様 → 型契約 → 実装計画」の SoT Cha
 基本的には次の順で進める。
 
 1. `[Claude Code]` `/track:catchup`（初回のみ）
-   - 環境構築（Python venv、Docker イメージ、CI）+ track setup + プロジェクト状態ブリーフィングをまとめて実行
+   - 環境構築（Docker イメージ、CI）+ track setup + プロジェクト状態ブリーフィングをまとめて実行
 2. `[Claude Code]` `/track:plan <feature>`
    - ADR 確認 + Phase 0-3 を順次 invoke する orchestrator（§1.2 参照）。実行前に ADR が `knowledge/adr/` に存在することを確認する
    - Phase 0: `metadata.json` (identity)、Phase 1: `spec.json` (振る舞い契約)、Phase 2: `<layer>-types.json` (型契約、`/track:type-design` 経由)、Phase 3: `impl-plan.json` + `task-coverage.json` (実装計画)
@@ -298,10 +294,9 @@ cargo make verify-track-registry # track registry.md と metadata.json の同期
 cargo make verify-tech-stack  # tech-stack.md の TODO 解消を検査
 cargo make verify-latest-track  # 最新トラックの spec.md / spec.json / plan.md 完成度確認（metadata.updated_at + placeholder 検知）
 cargo make verify-orchestra  # フック・権限・エージェント設定を検査
-cargo make scripts-selftest  # verify script の回帰テストを実行
 ```
 
-補足: `cargo make ci` には `fmt-check`, `clippy`, `test`, `test-doc`, `deny`, `scripts-selftest`, `check-layers`, `verify-arch-docs`, `verify-plan-progress`, `verify-track-metadata`, `verify-track-registry`, `verify-tech-stack`, `verify-orchestra`, `verify-latest-track` が含まれる。`cargo make check` はローカルでの高速なコンパイル確認用で、`cargo make ci` には含まれない。`cargo make machete` は依存整理時の補助監査として個別に回す。
+補足: `cargo make ci` には `fmt-check`, `clippy`, `test`, `test-doc`, `deny`, `check-layers`, `verify-arch-docs`, `verify-plan-progress`, `verify-track-metadata`, `verify-track-registry`, `verify-tech-stack`, `verify-orchestra`, `verify-latest-track` が含まれる。`cargo make check` はローカルでの高速なコンパイル確認用で、`cargo make ci` には含まれない。`cargo make machete` は依存整理時の補助監査として個別に回す。
 
 ### 4.2 `bacon` を使う場合
 
