@@ -1,93 +1,145 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
-          "at": "2026-06-05T10:26:35Z"
+          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
+          "at": "2026-06-05T11:10:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
-          "at": "2026-06-05T10:29:33Z"
+          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
+          "at": "2026-06-05T11:13:37Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fb3dbf1ebbdfba2718923035babe09b7d05e0ec237cb8883116d1acbb42046c1",
-          "at": "2026-06-05T13:03:15Z"
+          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
+          "at": "2026-06-05T11:59:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fb3dbf1ebbdfba2718923035babe09b7d05e0ec237cb8883116d1acbb42046c1",
-          "at": "2026-06-05T13:05:00Z"
+          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
+          "at": "2026-06-05T12:02:05Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1dfd72779bc66988679d64fb92256507760d9acc9d716a76ddf8aea5ede77a28",
-          "at": "2026-06-05T13:51:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The verifier now requires the snippet `bin/sotp review local -- --round-type fast --group`, but the migrated native CLI does not use the cargo-make passthrough separator. The actual `sotp review local` clap command expects flags directly after `local`, and `.claude/commands/track/review.md` already documents `bin/sotp review local --round-type ...`, so `verify-orchestra` will report the review guidance as missing even when the docs are correct. The same stale `-- --model` pattern appears in the adjacent codex-system snippets and should be removed from the native command expectations.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 356,
-              "category": "correctness"
-            },
-            {
-              "message": "Switching the fixer prompt from `cargo make track-local-review` to `bin/sotp review local` drops the old cargo-make task dependency on `track-active-gate` (`type-signals -> catalogue-spec-signals -> views sync`) before every canonical review. I could not find equivalent regeneration in the current `sotp review local` path, so review-fix rounds can be recorded against stale rendered views/signals, which can leave review approval/hash state inconsistent with the later commit gate.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
-              "line": 51,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:1dfd72779bc66988679d64fb92256507760d9acc9d716a76ddf8aea5ede77a28",
-          "at": "2026-06-05T13:56:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Replacing the reviewer command with direct `bin/sotp review local` drops the `track-local-review` wrapper's `track-active-gate` dependency. I don't see an equivalent pre-review `type-signals -> catalogue-spec-signals -> views sync` step in `sotp review local`, so fixer rounds can record review hashes against stale rendered views and later fail check-approved with a stale hash. The native review path needs to run the same gate before invoking/recording the reviewer, or this prompt should still point at a gated wrapper.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
-              "line": 51,
-              "category": "logic"
-            },
-            {
-              "message": "These required snippets no longer match the documented codex-system commands. The current `.claude/skills/codex-system/SKILL.md` contains `bin/sotp review local --round-type ... --model ...`, while the verifier now requires `bin/sotp review local -- --model ...`; the literal check in `verify_review_wrapper_guidance` will therefore report the guidance as missing. The extra `--` is also inconsistent with the `sotp review local` clap options, so the verifier should require the real command shape.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/orchestra.rs",
-              "line": 369,
-              "category": "test"
-            }
-          ],
-          "hash": "rvw1:sha256:57d27da945674a7931c0a19f06b18907ec3e07b2f9d1d136e97756d34a93f94e",
-          "at": "2026-06-05T14:04:14Z"
+          "hash": "rvw1:sha256:de5660c1ee6be2be8c28cda56580fd6dd5056674ae02b3bb0412d8746a714511",
+          "at": "2026-06-05T23:04:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6c3c913715b9e71d2367afb0018ddc18cb3a8c29028989bb35d5b6776efbfa38",
-          "at": "2026-06-05T14:10:38Z"
+          "hash": "rvw1:sha256:de5660c1ee6be2be8c28cda56580fd6dd5056674ae02b3bb0412d8746a714511",
+          "at": "2026-06-05T23:05:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `threshold: None` branch in both `dry_write` and `dry_check_approved` has no unit coverage. Every existing test in this module still passes `Some(...)`, so the fail-closed config lookup (`DryCheckConfig::load`) and the required missing-config error path can regress without detection.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 243,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:79cdc7a83d434820b78c66cbafb44a872580856124867e7fb54261dc9db0d678",
+          "at": "2026-06-05T23:17:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `threshold: None` path in `dry_write`/`dry_check_approved` has no coverage at all. The existing tests only exercise `Some(...)` inputs, so the new config-fallback and fail-closed behavior can regress without a unit test catching a broken `.harness/config/dry-check.json` load or a missing config file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 243,
+              "category": "test_coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:79cdc7a83d434820b78c66cbafb44a872580856124867e7fb54261dc9db0d678",
+          "at": "2026-06-05T23:21:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `threshold: None` tests do not create `.harness/config/dry-check.json`; they only assert that the error is not `invalid --threshold`. As written, they will still pass if the config fallback never runs, so the new fail-closed/config-loading behavior is not actually covered.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "line": 1329,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:2fb40a10b2f16703a3c56d55970c11d0a21a2d2f98728397bd9eb5b397866665",
+          "at": "2026-06-05T23:25:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `threshold: None` tests do not actually exercise the fallback branch. They only assert that the eventual error message is not about threshold handling, but the call can still fail later in diff/index setup because the test fixture uses a synthetic base commit and never makes the fallback path observable. A regression in `DryCheckConfig::load` or the `None` branch could still pass these tests, so the new API contract is effectively untested.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 1330,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4149eea105a466a4b6ea5c98591212f58b0fb8a800c8fae979648458b13baee0",
+          "at": "2026-06-05T23:32:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `threshold: None` coverage does not actually exercise the fallback branch. Both tests still pass a synthetic `base_commit`, and `resolve_dry_diff_base()` runs before threshold resolution, so a `merge-base` failure can happen before `DryCheckConfig::load()` is ever called. These tests can therefore pass even if the new config fallback is dead or broken.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 1339,
+              "category": "test coverage"
+            },
+            {
+              "message": "There is still no test for the required fail-closed case when `.harness/config/dry-check.json` is absent. The added coverage only checks the happy path against the checked-in config file, so the CN-04 / AC-12 contract can regress without detection.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/dry.rs",
+              "line": 1327,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:361c39f5b1dd8397d9a8acbaec75b4d64a801663f96599b1d463ed8a765ca0fc",
+          "at": "2026-06-05T23:36:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:361c39f5b1dd8397d9a8acbaec75b4d64a801663f96599b1d463ed8a765ca0fc",
+          "at": "2026-06-05T23:41:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:361c39f5b1dd8397d9a8acbaec75b4d64a801663f96599b1d463ed8a765ca0fc",
+          "at": "2026-06-06T00:22:07Z"
         }
       ]
     },
@@ -443,6 +495,251 @@
           "findings": [],
           "hash": "rvw1:sha256:d653d72f71248e0564a2323405f30d37f69fe142b88f2d5e51701ec14dea4797",
           "at": "2026-06-05T17:35:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0befae152815e5042c91500620a4791433f6c1a7e4d38db7c5db14776564f70e",
+          "at": "2026-06-06T00:42:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0befae152815e5042c91500620a4791433f6c1a7e4d38db7c5db14776564f70e",
+          "at": "2026-06-06T00:45:18Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This section still advertises the deleted daemon task `cargo make test-one-exec`, so the harness-policy docs point users at a command that no longer exists. Update it to the new run-`--rm` wrapper or remove the example.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/07-dev-environment.md",
+              "line": 186,
+              "category": "broken-ref"
+            }
+          ],
+          "hash": "rvw1:sha256:d1117afc5abc8820eff05433fb60172ead8000e8c1f70f7ec7d6c1db1afc8595",
+          "at": "2026-06-05T13:04:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e19f7890c7ca7a7cb191ee44de5f93a38ddb088ed02992c45bbf3d2603ed833",
+          "at": "2026-06-05T13:05:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e19f7890c7ca7a7cb191ee44de5f93a38ddb088ed02992c45bbf3d2603ed833",
+          "at": "2026-06-05T13:08:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Stale `cargo make track-local-review` guidance remains after the migration. That wrapper is no longer defined, so the agent now points at a dead command; the same stale reference also appears in `.claude/rules/07-dev-environment.md:15`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 22,
+              "category": "broken ref"
+            },
+            {
+              "message": "The direct `bin/sotp review local` example still includes a `--` separator before the flags. `review local` takes its flags directly, so this command will not parse; the same mistake also appears in `.claude/rules/10-guardrails.md:82-83` for the planner/reviewer examples.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 100,
+              "category": "command syntax"
+            }
+          ],
+          "hash": "rvw1:sha256:fd4ff34dadda288908f2c24f1ffd00de0526a0ca55c76143da864e6e9bc05bc4",
+          "at": "2026-06-05T13:51:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The PermissionRequest hook still tells users to fall back to `cargo make track-review-results`, `cargo make track-check-approved`, and `cargo make track-local-plan` for direct native review/plan commands, but those cargo-make tasks are no longer defined and were removed from the allowlists. That leaves the newly documented `bin/sotp review results` / `bin/sotp review check-approved` / `bin/sotp plan codex-local` paths blocked with no valid fallback.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
+              "line": 64,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:d2b3b2c56cb2f13968b6254b1a94346858e4c42c087c230d8baec3cfe9183495",
+          "at": "2026-06-05T14:05:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fallback example for the reviewer is not runnable as written: `bin/sotp review local` requires `--round-type` and `--group`, but the guardrail only shows `--model` and `--briefing-file`. Copying this snippet will fail argument parsing instead of launching the reviewer.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/10-guardrails.md",
+              "line": 83,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:8239fdb9be57208eebe4ec95e721fc4da4df3d1f583380e512f6b91ed9d28624",
+          "at": "2026-06-05T14:24:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The reviewer invocation example is stale: the real fixer prompt prepends `bin/sotp track views sync &&` and passes `--track-id`, but this section shows only `bin/sotp review local --round-type fast --group {scope} --briefing-file ...` and says the reviewer self-resolves track-id. That misstates the command contract and can lead agents to omit the sync prelude.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 100,
+              "category": "correctness"
+            },
+            {
+              "message": "`sotp review local` does not invoke `track type-signals`; only the commit-gate `track-active-gate` does. This note overstates the host-side `protoc` requirement for review runs and ties it to the wrong command path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/07-dev-environment.md",
+              "line": 15,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:881a74cb963ce39f5e3c4425d9426c5307aeaeb8f5b51d355b4fb2a14f99205a",
+          "at": "2026-06-05T14:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This still refers to `sotp review codex-local`, but the current entry point is `bin/sotp review local`. The old command name is no longer valid, so this guidance now points agents at a non-existent command.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "line": 57,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:89844192b876b37ea0a063d9a5c3604e7c9d1434245cadc3bc4faadfb0501b39",
+          "at": "2026-06-05T14:40:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This note still points to `track-pr-merge`, but that cargo-make wrapper no longer exists; the merge path has been renamed to `bin/sotp pr wait-and-merge` / `/track:merge`. Update the note so it does not reference a dead command.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/pr-review.md",
+              "line": 34,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:0a407ce5a27d0b6ceaec547ca1c96eaacf833d90cf915cef4f883fbd6b857bef",
+          "at": "2026-06-05T14:46:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "PermissionRequest still tells users to fall back to `cargo make track-check-approved` and `cargo make track-review-results`, but this patch removed those wrappers from the allowlist and Makefile, so the hook now points at dead commands for `bin/sotp review check-approved` / `results`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
+              "line": 64,
+              "category": "broken ref"
+            },
+            {
+              "message": "The Codex dry-fix wrapper example is missing the `--` separator before forwarded args. Without it, `--track-id` and `--briefing-file` are treated as cargo-make flags instead of reaching `track-local-dry-fix`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/dry-check.md",
+              "line": 22,
+              "category": "command syntax"
+            },
+            {
+              "message": "Both Codex review-fix examples dropped the `--` separator (`cargo make track-local-review-fix-codex --scope ...`), so `--scope` / `--track-id` / `--briefing-file` will not be forwarded to the wrapper. The fast-round example at this line and the final-round example at line 127 both need the separator restored.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "line": 87,
+              "category": "command syntax"
+            }
+          ],
+          "hash": "rvw1:sha256:dd3441ae7124e82968bd52435a1c9b1fdcfb76ad9f8b3fe5b01417ed3e566c46",
+          "at": "2026-06-05T14:52:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e74a3e2f43cd13c5102b4091346a95eec1914498ffdb02685793c8b4de9ebf0",
+          "at": "2026-06-05T14:58:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated Claude-provider reviewer prompt gives the agent a single `bin/sotp track views sync && bin/sotp review local ...` command, but `.claude/settings.json` now denies any Bash permission request containing `&&` before considering alternatives. Since this is presented as the reviewer invocation, the review-fix agent can be blocked before recording the round. Split this into a separate sync instruction plus a standalone `bin/sotp review local ...` invocation.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 104,
+              "category": "workflow_correctness"
+            },
+            {
+              "message": "This still contains the placeholder command reference `cargo make track-...` in the completed-state verification path. That wrapper does not exist and this migration is replacing these passthrough references with native `bin/sotp` calls, so an agent following the first command in the sentence can run an invalid verification command. Replace the placeholder with only `bin/sotp dry check-approved --track-id <id>`.",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 38,
+              "category": "broken_ref"
+            }
+          ],
+          "hash": "rvw1:sha256:8e74a3e2f43cd13c5102b4091346a95eec1914498ffdb02685793c8b4de9ebf0",
+          "at": "2026-06-05T15:05:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The migration from `cargo make track-local-review` to `bin/sotp review local` drops the mandatory pre-review `track-active-gate`. The removed wrapper used to run type-signals, catalogue-spec-signals, and views sync before review; `bin/sotp review local` does not do that itself, and this doc now only suggests an optional `bin/sotp track views sync`. That can record review rounds against stale generated artifacts/signals and later fail approval/commit on stale hashes. Make the full native pre-review gate mandatory before each review round, as separate commands: `bin/sotp track type-signals`, `bin/sotp track catalogue-spec-signals`, then `bin/sotp track views sync`.",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 64,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:38fddb814b8e8c1b21d1f28da7cc01178fa77cdc533e76a66b072b16c790c5cf",
+          "at": "2026-06-05T15:09:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ffe609078ea53661f2c9372b69f12c82670d610a639d684d58496437e0ab9635",
+          "at": "2026-06-05T15:14:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6489b50909a6188d1f46a3f07dc6a2160178b463b21f32a83a870f9fcb3cbd59",
+          "at": "2026-06-06T00:43:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6489b50909a6188d1f46a3f07dc6a2160178b463b21f32a83a870f9fcb3cbd59",
+          "at": "2026-06-06T00:45:30Z"
         }
       ]
     },
@@ -944,365 +1241,125 @@
           "findings": [],
           "hash": "rvw1:sha256:7b8dd5cef4b95841eb5b04a00e1b80ca7742a07bf881723ae4312e0210ac51c7",
           "at": "2026-06-06T00:35:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcaabe389e7f26d713286e8779fc1ff133407c55bba69370ac4cfa178d95d7ab",
+          "at": "2026-06-06T00:43:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The T009-only progress marker update also adds a commit_hash to T007, and the generated plan view now renders that T007 hash. The briefing explicitly limits this scope to marking T009 done and keeping other tasks' commit_hash fields invariant, so this artifact update is no longer scoped to the T009 transition.",
+              "severity": "P1",
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "line": 47,
+              "category": "factual_error"
+            }
+          ],
+          "hash": "rvw1:sha256:bcaabe389e7f26d713286e8779fc1ff133407c55bba69370ac4cfa178d95d7ab",
+          "at": "2026-06-06T00:45:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcaabe389e7f26d713286e8779fc1ff133407c55bba69370ac4cfa178d95d7ab",
+          "at": "2026-06-06T00:48:15Z"
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This section still advertises the deleted daemon task `cargo make test-one-exec`, so the harness-policy docs point users at a command that no longer exists. Update it to the new run-`--rm` wrapper or remove the example.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/07-dev-environment.md",
-              "line": 186,
-              "category": "broken-ref"
-            }
-          ],
-          "hash": "rvw1:sha256:d1117afc5abc8820eff05433fb60172ead8000e8c1f70f7ec7d6c1db1afc8595",
-          "at": "2026-06-05T13:04:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e19f7890c7ca7a7cb191ee44de5f93a38ddb088ed02992c45bbf3d2603ed833",
-          "at": "2026-06-05T13:05:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e19f7890c7ca7a7cb191ee44de5f93a38ddb088ed02992c45bbf3d2603ed833",
-          "at": "2026-06-05T13:08:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Stale `cargo make track-local-review` guidance remains after the migration. That wrapper is no longer defined, so the agent now points at a dead command; the same stale reference also appears in `.claude/rules/07-dev-environment.md:15`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
-              "line": 22,
-              "category": "broken ref"
-            },
-            {
-              "message": "The direct `bin/sotp review local` example still includes a `--` separator before the flags. `review local` takes its flags directly, so this command will not parse; the same mistake also appears in `.claude/rules/10-guardrails.md:82-83` for the planner/reviewer examples.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
-              "line": 100,
-              "category": "command syntax"
-            }
-          ],
-          "hash": "rvw1:sha256:fd4ff34dadda288908f2c24f1ffd00de0526a0ca55c76143da864e6e9bc05bc4",
-          "at": "2026-06-05T13:51:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The PermissionRequest hook still tells users to fall back to `cargo make track-review-results`, `cargo make track-check-approved`, and `cargo make track-local-plan` for direct native review/plan commands, but those cargo-make tasks are no longer defined and were removed from the allowlists. That leaves the newly documented `bin/sotp review results` / `bin/sotp review check-approved` / `bin/sotp plan codex-local` paths blocked with no valid fallback.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
-              "line": 64,
-              "category": "broken_ref"
-            }
-          ],
-          "hash": "rvw1:sha256:d2b3b2c56cb2f13968b6254b1a94346858e4c42c087c230d8baec3cfe9183495",
-          "at": "2026-06-05T14:05:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The fallback example for the reviewer is not runnable as written: `bin/sotp review local` requires `--round-type` and `--group`, but the guardrail only shows `--model` and `--briefing-file`. Copying this snippet will fail argument parsing instead of launching the reviewer.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/10-guardrails.md",
-              "line": 83,
-              "category": "broken_ref"
-            }
-          ],
-          "hash": "rvw1:sha256:8239fdb9be57208eebe4ec95e721fc4da4df3d1f583380e512f6b91ed9d28624",
-          "at": "2026-06-05T14:24:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The reviewer invocation example is stale: the real fixer prompt prepends `bin/sotp track views sync &&` and passes `--track-id`, but this section shows only `bin/sotp review local --round-type fast --group {scope} --briefing-file ...` and says the reviewer self-resolves track-id. That misstates the command contract and can lead agents to omit the sync prelude.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
-              "line": 100,
-              "category": "correctness"
-            },
-            {
-              "message": "`sotp review local` does not invoke `track type-signals`; only the commit-gate `track-active-gate` does. This note overstates the host-side `protoc` requirement for review runs and ties it to the wrong command path.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/07-dev-environment.md",
-              "line": 15,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:881a74cb963ce39f5e3c4425d9426c5307aeaeb8f5b51d355b4fb2a14f99205a",
-          "at": "2026-06-05T14:31:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This still refers to `sotp review codex-local`, but the current entry point is `bin/sotp review local`. The old command name is no longer valid, so this guidance now points agents at a non-existent command.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
-              "line": 57,
-              "category": "broken_ref"
-            }
-          ],
-          "hash": "rvw1:sha256:89844192b876b37ea0a063d9a5c3604e7c9d1434245cadc3bc4faadfb0501b39",
-          "at": "2026-06-05T14:40:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This note still points to `track-pr-merge`, but that cargo-make wrapper no longer exists; the merge path has been renamed to `bin/sotp pr wait-and-merge` / `/track:merge`. Update the note so it does not reference a dead command.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/pr-review.md",
-              "line": 34,
-              "category": "broken_ref"
-            }
-          ],
-          "hash": "rvw1:sha256:0a407ce5a27d0b6ceaec547ca1c96eaacf833d90cf915cef4f883fbd6b857bef",
-          "at": "2026-06-05T14:46:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "PermissionRequest still tells users to fall back to `cargo make track-check-approved` and `cargo make track-review-results`, but this patch removed those wrappers from the allowlist and Makefile, so the hook now points at dead commands for `bin/sotp review check-approved` / `results`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
-              "line": 64,
-              "category": "broken ref"
-            },
-            {
-              "message": "The Codex dry-fix wrapper example is missing the `--` separator before forwarded args. Without it, `--track-id` and `--briefing-file` are treated as cargo-make flags instead of reaching `track-local-dry-fix`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/dry-check.md",
-              "line": 22,
-              "category": "command syntax"
-            },
-            {
-              "message": "Both Codex review-fix examples dropped the `--` separator (`cargo make track-local-review-fix-codex --scope ...`), so `--scope` / `--track-id` / `--briefing-file` will not be forwarded to the wrapper. The fast-round example at this line and the final-round example at line 127 both need the separator restored.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
-              "line": 87,
-              "category": "command syntax"
-            }
-          ],
-          "hash": "rvw1:sha256:dd3441ae7124e82968bd52435a1c9b1fdcfb76ad9f8b3fe5b01417ed3e566c46",
-          "at": "2026-06-05T14:52:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e74a3e2f43cd13c5102b4091346a95eec1914498ffdb02685793c8b4de9ebf0",
-          "at": "2026-06-05T14:58:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The generated Claude-provider reviewer prompt gives the agent a single `bin/sotp track views sync && bin/sotp review local ...` command, but `.claude/settings.json` now denies any Bash permission request containing `&&` before considering alternatives. Since this is presented as the reviewer invocation, the review-fix agent can be blocked before recording the round. Split this into a separate sync instruction plus a standalone `bin/sotp review local ...` invocation.",
-              "severity": "P1",
-              "file": ".claude/commands/track/review.md",
-              "line": 104,
-              "category": "workflow_correctness"
-            },
-            {
-              "message": "This still contains the placeholder command reference `cargo make track-...` in the completed-state verification path. That wrapper does not exist and this migration is replacing these passthrough references with native `bin/sotp` calls, so an agent following the first command in the sentence can run an invalid verification command. Replace the placeholder with only `bin/sotp dry check-approved --track-id <id>`.",
-              "severity": "P1",
-              "file": ".claude/commands/track/dry-check.md",
-              "line": 38,
-              "category": "broken_ref"
-            }
-          ],
-          "hash": "rvw1:sha256:8e74a3e2f43cd13c5102b4091346a95eec1914498ffdb02685793c8b4de9ebf0",
-          "at": "2026-06-05T15:05:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The migration from `cargo make track-local-review` to `bin/sotp review local` drops the mandatory pre-review `track-active-gate`. The removed wrapper used to run type-signals, catalogue-spec-signals, and views sync before review; `bin/sotp review local` does not do that itself, and this doc now only suggests an optional `bin/sotp track views sync`. That can record review rounds against stale generated artifacts/signals and later fail approval/commit on stale hashes. Make the full native pre-review gate mandatory before each review round, as separate commands: `bin/sotp track type-signals`, `bin/sotp track catalogue-spec-signals`, then `bin/sotp track views sync`.",
-              "severity": "P1",
-              "file": ".claude/agents/review-fix-lead.md",
-              "line": 64,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:38fddb814b8e8c1b21d1f28da7cc01178fa77cdc533e76a66b072b16c790c5cf",
-          "at": "2026-06-05T15:09:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ffe609078ea53661f2c9372b69f12c82670d610a639d684d58496437e0ab9635",
-          "at": "2026-06-05T15:14:40Z"
-        }
-      ]
-    },
-    "cli_composition": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
-          "at": "2026-06-05T11:10:13Z"
+          "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
+          "at": "2026-06-05T10:26:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7e41f869ae641b966c7786b5e88efe9fdb75735f5e9cff179e4bea5f3052aec1",
-          "at": "2026-06-05T11:13:37Z"
+          "hash": "rvw1:sha256:6fdf9dd575e86a47c21ac184dfe7fd6681a6344b44cd3ac29ad97f8c44749a2c",
+          "at": "2026-06-05T10:29:33Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
-          "at": "2026-06-05T11:59:03Z"
+          "hash": "rvw1:sha256:fb3dbf1ebbdfba2718923035babe09b7d05e0ec237cb8883116d1acbb42046c1",
+          "at": "2026-06-05T13:03:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:28b4240fca477b304a18f387acf409611cf35df4e154d5e54d2b2017904dfdaf",
-          "at": "2026-06-05T12:02:05Z"
+          "hash": "rvw1:sha256:fb3dbf1ebbdfba2718923035babe09b7d05e0ec237cb8883116d1acbb42046c1",
+          "at": "2026-06-05T13:05:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:de5660c1ee6be2be8c28cda56580fd6dd5056674ae02b3bb0412d8746a714511",
-          "at": "2026-06-05T23:04:11Z"
+          "hash": "rvw1:sha256:1dfd72779bc66988679d64fb92256507760d9acc9d716a76ddf8aea5ede77a28",
+          "at": "2026-06-05T13:51:13Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:de5660c1ee6be2be8c28cda56580fd6dd5056674ae02b3bb0412d8746a714511",
-          "at": "2026-06-05T23:05:33Z"
-        },
-        {
-          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new `threshold: None` branch in both `dry_write` and `dry_check_approved` has no unit coverage. Every existing test in this module still passes `Some(...)`, so the fail-closed config lookup (`DryCheckConfig::load`) and the required missing-config error path can regress without detection.",
+              "message": "The verifier now requires the snippet `bin/sotp review local -- --round-type fast --group`, but the migrated native CLI does not use the cargo-make passthrough separator. The actual `sotp review local` clap command expects flags directly after `local`, and `.claude/commands/track/review.md` already documents `bin/sotp review local --round-type ...`, so `verify-orchestra` will report the review guidance as missing even when the docs are correct. The same stale `-- --model` pattern appears in the adjacent codex-system snippets and should be removed from the native command expectations.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 243,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:79cdc7a83d434820b78c66cbafb44a872580856124867e7fb54261dc9db0d678",
-          "at": "2026-06-05T23:17:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `threshold: None` path in `dry_write`/`dry_check_approved` has no coverage at all. The existing tests only exercise `Some(...)` inputs, so the new config-fallback and fail-closed behavior can regress without a unit test catching a broken `.harness/config/dry-check.json` load or a missing config file.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 243,
-              "category": "test_coverage_gap"
-            }
-          ],
-          "hash": "rvw1:sha256:79cdc7a83d434820b78c66cbafb44a872580856124867e7fb54261dc9db0d678",
-          "at": "2026-06-05T23:21:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `threshold: None` tests do not create `.harness/config/dry-check.json`; they only assert that the error is not `invalid --threshold`. As written, they will still pass if the config fallback never runs, so the new fail-closed/config-loading behavior is not actually covered.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
-              "line": 1329,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:2fb40a10b2f16703a3c56d55970c11d0a21a2d2f98728397bd9eb5b397866665",
-          "at": "2026-06-05T23:25:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `threshold: None` tests do not actually exercise the fallback branch. They only assert that the eventual error message is not about threshold handling, but the call can still fail later in diff/index setup because the test fixture uses a synthetic base commit and never makes the fallback path observable. A regression in `DryCheckConfig::load` or the `None` branch could still pass these tests, so the new API contract is effectively untested.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 1330,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:4149eea105a466a4b6ea5c98591212f58b0fb8a800c8fae979648458b13baee0",
-          "at": "2026-06-05T23:32:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `threshold: None` coverage does not actually exercise the fallback branch. Both tests still pass a synthetic `base_commit`, and `resolve_dry_diff_base()` runs before threshold resolution, so a `merge-base` failure can happen before `DryCheckConfig::load()` is ever called. These tests can therefore pass even if the new config fallback is dead or broken.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 1339,
-              "category": "test coverage"
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 356,
+              "category": "correctness"
             },
             {
-              "message": "There is still no test for the required fail-closed case when `.harness/config/dry-check.json` is absent. The added coverage only checks the happy path against the checked-in config file, so the CN-04 / AC-12 contract can regress without detection.",
+              "message": "Switching the fixer prompt from `cargo make track-local-review` to `bin/sotp review local` drops the old cargo-make task dependency on `track-active-gate` (`type-signals -> catalogue-spec-signals -> views sync`) before every canonical review. I could not find equivalent regeneration in the current `sotp review local` path, so review-fix rounds can be recorded against stale rendered views/signals, which can leave review approval/hash state inconsistent with the later commit gate.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/dry.rs",
-              "line": 1327,
-              "category": "test coverage"
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+              "line": 51,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:361c39f5b1dd8397d9a8acbaec75b4d64a801663f96599b1d463ed8a765ca0fc",
-          "at": "2026-06-05T23:36:41Z"
+          "hash": "rvw1:sha256:1dfd72779bc66988679d64fb92256507760d9acc9d716a76ddf8aea5ede77a28",
+          "at": "2026-06-05T13:56:06Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:361c39f5b1dd8397d9a8acbaec75b4d64a801663f96599b1d463ed8a765ca0fc",
-          "at": "2026-06-05T23:41:25Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Replacing the reviewer command with direct `bin/sotp review local` drops the `track-local-review` wrapper's `track-active-gate` dependency. I don't see an equivalent pre-review `type-signals -> catalogue-spec-signals -> views sync` step in `sotp review local`, so fixer rounds can record review hashes against stale rendered views and later fail check-approved with a stale hash. The native review path needs to run the same gate before invoking/recording the reviewer, or this prompt should still point at a gated wrapper.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+              "line": 51,
+              "category": "logic"
+            },
+            {
+              "message": "These required snippets no longer match the documented codex-system commands. The current `.claude/skills/codex-system/SKILL.md` contains `bin/sotp review local --round-type ... --model ...`, while the verifier now requires `bin/sotp review local -- --model ...`; the literal check in `verify_review_wrapper_guidance` will therefore report the guidance as missing. The extra `--` is also inconsistent with the `sotp review local` clap options, so the verifier should require the real command shape.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/orchestra.rs",
+              "line": 369,
+              "category": "test"
+            }
+          ],
+          "hash": "rvw1:sha256:57d27da945674a7931c0a19f06b18907ec3e07b2f9d1d136e97756d34a93f94e",
+          "at": "2026-06-05T14:04:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:361c39f5b1dd8397d9a8acbaec75b4d64a801663f96599b1d463ed8a765ca0fc",
-          "at": "2026-06-06T00:22:07Z"
+          "hash": "rvw1:sha256:6c3c913715b9e71d2367afb0018ddc18cb3a8c29028989bb35d5b6776efbfa38",
+          "at": "2026-06-05T14:10:38Z"
         }
       ]
     },

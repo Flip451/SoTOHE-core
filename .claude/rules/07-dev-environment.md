@@ -54,7 +54,6 @@ bin/sotp track resolve            # 現在の track phase / next command / block
 cargo make track-branch-create    # main からトラックブランチを作成して切替
 cargo make track-branch-switch    # 既存トラックブランチに切替
 cargo make scripts-selftest       # verify / helper スクリプトの回帰テスト
-cargo make hooks-selftest         # Claude hook Python セルフテスト
 cargo make help                   # カテゴリ付きタスク一覧表示
 cargo make export-schema -- --crate domain --pretty  # domain crate の pub API を JSON 出力（要 nightly）
 cargo make shell                  # tools コンテナ内でシェルを開く

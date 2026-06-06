@@ -523,12 +523,6 @@ description = "[internal] Verify local Markdown links resolve to existing files"
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify doc-links']
 
-[tasks.verify-doc-links]
-description = "[gate] Verify Markdown doc links (docker compose)"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-doc-links-local"]
-
 [tasks.verify-plan-progress]
 description = "[gate] Verify track plan status consistency (docker compose)"
 dependencies = ["prepare-local-cache-dirs"]
@@ -624,11 +618,6 @@ description = "[host] Export domain crate public API schema as JSON (requires ni
 script_runner = "@shell"
 script = ['bin/sotp domain export-schema "$@"']
 
-[tasks.test-nightly]
-description = "[host] Run ignored tests that require nightly toolchain"
-command = "cargo"
-args = ["nextest", "run", "--run-ignored", "ignored-only", "-E", "package(infrastructure)"]
-
 [tasks.track-branch-create]
 description = "[wrapper] Create a track branch from main and switch to it (branch only; no metadata, no commit). (usage: cargo make track-branch-create '<track-id>')"
 command = "bin/sotp"
@@ -665,11 +654,6 @@ script = ['bin/sotp track type-signals && bin/sotp track catalogue-spec-signals 
 description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"
 command = "bin/sotp"
 args = ["track", "set-commit-hash", "${@}"]
-
-[tasks.track-baseline-capture]
-description = "[wrapper] Capture TypeGraph baseline for TDDD reverse signal filtering. Always idempotent (existing baseline is preserved). Usage: cargo make track-baseline-capture -- <track-id> [--layer <id>]"
-script_runner = "@shell"
-script = ['bin/sotp track baseline-capture "$@"']
 
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
