@@ -16,7 +16,7 @@ TARGET_DIR="target"
 if [ -n "${WORKER_ID:-}" ]; then
   TARGET_DIR="target-${WORKER_ID}"
 fi
-mkdir -p "$TARGET_DIR" .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest
+mkdir -p "$TARGET_DIR" .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home
 ''']
 
 [tasks.help]
@@ -24,73 +24,8 @@ description = "Show available tasks with category labels: [wrapper] [fast] [gate
 command = "cargo"
 args = ["make", "--list-all-steps"]
 
-[tasks.conventions-add]
-description = "[wrapper] Add a project convention document and update index"
-command = "python3"
-args = ["scripts/convention_docs.py", "add", "${@}"]
-
-[tasks.conventions-update-index]
-description = "[wrapper] Regenerate project convention README index"
-command = "python3"
-args = ["scripts/convention_docs.py", "update-index"]
-
-[tasks.conventions-verify-index]
-description = "[wrapper] Verify project convention README index is in sync"
-command = "python3"
-args = ["scripts/convention_docs.py", "verify-index"]
-
-[tasks.architecture-rules-workspace-members]
-description = "[wrapper] List workspace members from architecture rule source of truth"
-command = "python3"
-args = ["scripts/architecture_rules.py", "workspace-members"]
-
-[tasks.workspace-tree]
-description = "[wrapper] Render crate-only workspace tree from architecture rule source of truth"
-command = "python3"
-args = ["scripts/architecture_rules.py", "workspace-tree"]
-
-[tasks.workspace-tree-full]
-description = "[wrapper] Render workspace tree including extra non-crate directories"
-command = "python3"
-args = ["scripts/architecture_rules.py", "workspace-tree-full"]
-
-[tasks.architecture-rules-direct-checks]
-description = "[wrapper] Emit direct cargo-deny check pairs from architecture rules"
-command = "python3"
-args = ["scripts/architecture_rules.py", "direct-checks"]
-
-[tasks.architecture-rules-verify-sync]
-description = "[wrapper] Verify architecture rules sync with Cargo.toml and deny.toml"
-command = "python3"
-args = ["scripts/architecture_rules.py", "verify-sync"]
-
-[tasks.scripts-selftest-local]
-private = true
-description = "[internal] Run verify and helper script regression tests"
-command = "pytest"
-args = [
-  "-q",
-  "-o",
-  "cache_dir=.cache/pytest",
-  "scripts/test_architecture_rules.py",
-  "scripts/test_convention_docs.py",
-  "scripts/test_make_wrappers.py",
-]
-
-[tasks.scripts-selftest]
-description = "[wrapper] Run verify and helper script regression tests"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "scripts-selftest-local"]
-
-[tasks.python-lint-local]
-private = true
-description = "[internal] Run ruff lint on Python helper scripts under scripts/"
-script_runner = "@shell"
-script = ['ruff check scripts/']
-
 [tasks.bootstrap]
-description = "[gate] Set up host Python venv, build Docker images, and run CI"
+description = "[gate] Build Docker images, sotp CLI, and run CI"
 script_runner = "@shell"
 script = ['''
 set -e
@@ -98,7 +33,7 @@ echo "=== Bootstrap: development environment setup ==="
 
 # 1. Check prerequisites
 echo ""
-echo "--- Step 1/6: Check prerequisites ---"
+echo "--- Step 1/5: Check prerequisites ---"
 if ! command -v docker >/dev/null 2>&1; then
   echo "[FAIL] docker not found. Install Docker first."
   exit 1
@@ -115,45 +50,28 @@ if ! command -v cargo >/dev/null 2>&1; then
 fi
 echo "[OK] cargo available"
 
-if ! command -v uv >/dev/null 2>&1; then
-  echo "[FAIL] uv not found. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
-  exit 1
-fi
-echo "[OK] uv available"
-
-# 2. Python venv + dependencies
+# 2. Docker images
 echo ""
-echo "--- Step 2/6: Python venv + dependencies ---"
-if [ ! -d .venv ]; then
-  echo "Creating .venv ..."
-  uv venv .venv
-fi
-echo "Installing Python dependencies from requirements-python.txt ..."
-uv pip install --python .venv/bin/python -r requirements-python.txt
-echo "[OK] Python dependencies installed"
-
-# 3. Docker images
-echo ""
-echo "--- Step 3/6: Build Docker images ---"
-mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest
+echo "--- Step 2/5: Build Docker images ---"
+mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home
 docker compose build tools
 echo "[OK] Docker tools image built"
 
-# 4. Build sotp CLI binary
+# 3. Build sotp CLI binary
 echo ""
-echo "--- Step 4/6: Build sotp CLI binary ---"
+echo "--- Step 3/5: Build sotp CLI binary ---"
 cargo make build-sotp
 echo "[OK] bin/sotp built and installed"
 
-# 5. CI
+# 4. CI
 echo ""
-echo "--- Step 5/6: Run CI ---"
+echo "--- Step 4/5: Run CI ---"
 docker compose run --rm tools cargo make --allow-private ci-local
 echo "[OK] CI passed"
 
-# 6. Git notes fetch refspec
+# 5. Git notes fetch refspec
 echo ""
-echo "--- Step 6/6: Configure git notes fetch refspec ---"
+echo "--- Step 5/5: Configure git notes fetch refspec ---"
 if git remote get-url origin >/dev/null 2>&1; then
   if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
     echo "[OK] git notes refspec already configured"
@@ -416,7 +334,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local CI checks"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -424,7 +342,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "python-lint-local", "scripts-selftest-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-orchestra-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-spec-states-current-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -585,15 +503,8 @@ dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-rust-local"]
 
-# Host-side convenience lint. Graceful skip when ruff is not installed.
-# The authoritative gate is python-lint-local (runs inside Docker via ci-local).
-[tasks.python-lint]
-description = "[optional] Run ruff lint on Python scripts and hooks (host, no docker)"
-script_runner = "@shell"
-script = ['RUFF="${RUFF_BIN:-.venv/bin/ruff}"; if [ -x "$RUFF" ] || command -v ruff >/dev/null 2>&1; then RUFF="${RUFF_BIN:-$(command -v ruff 2>/dev/null || echo .venv/bin/ruff)}"; "$RUFF" check scripts/; else echo "[python-lint] ruff not found, skipping (install: uv tool install ruff)"; fi']
-
 [tasks.ci]
-description = "[gate] Run CI checks (docker compose + host python-lint)"
+description = "[gate] Run CI checks (docker compose)"
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "ci-local"]

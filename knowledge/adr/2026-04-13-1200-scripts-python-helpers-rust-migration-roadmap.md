@@ -174,6 +174,8 @@ planning 段階で見落としていた重要な事実:
 > Rust 移植ではなく削除で対処される。これにより `external_guides` 関連の Rust 移植コスト (HTTP client 実装・`sotp guides` サブコマンド実装等) は消失している。
 > `convention_docs.py` (`add` / `update-index`) の移行は引き続きフェーズ 3 の残作業として存在する。
 
+> **2026-06-06 追記**: 本 ADR の残作業 (フェーズ 2 の `architecture_rules.py` コマンド移行、フェーズ 3 の `convention_docs.py` 移行および `scripts/` ディレクトリ削除) は `knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md` で完了した。
+
 ### フェーズ 1 の先行実施理由
 
 フェーズ 1 のみでも保守対象を 10 ファイル削減でき、かつ本番パスに影響しない。移行作業の中では「最も安全で効果が大きい部分」であり、先行して実施することで後続フェーズの実装時に track_branch_guard / markdown / registry / state_machine 系の二重実装を気にしなくてよくなる。

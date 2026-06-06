@@ -24,17 +24,17 @@ protoc --version
 `Makefile.toml` でタスクを管理する：
 
 ```bash
-cargo make bootstrap    # 初回セットアップ（venv + Docker + CI 一括）
+cargo make bootstrap    # 初回セットアップ（Docker + CI 一括）
 cargo make build-tools  # ツールコンテナのビルド
 cargo make fmt          # rustfmt でフォーマット（compose内）
 cargo make clippy       # clippy で静的解析（-D warnings）
 cargo make test         # cargo nextest でテスト
 cargo make ci-rust      # Rust専用CI（fmt-check + clippy + test + deny + check-layers）アプリ開発内側ループ用
-cargo make ci           # 全体CI（ci-rust + scripts/hooks selftest + verify-* すべて）コミット前ゲート
+cargo make ci           # 全体CI（ci-rust + verify-* すべて）コミット前ゲート
 cargo make check-layers     # レイヤー依存関係チェック（標準CIに含む）
 cargo make verify-arch-docs # ドキュメント乖離チェック（標準CIに含む）
-cargo make workspace-tree   # crate のみの workspace tree を表示
-cargo make workspace-tree-full  # crate + 非 crate ディレクトリを含む workspace tree を表示
+bin/sotp arch tree          # crate のみの workspace tree を表示
+bin/sotp arch tree-full     # crate + 非 crate ディレクトリを含む workspace tree を表示
 cargo make add <files>            # 手動の低レベル staging（terminal 直実行用）
 cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
 cargo make track-add-paths        # tmp/track-commit/add-paths.txt から選択的に stage
@@ -52,13 +52,11 @@ cargo make track-switch-main      # main に切替 + pull
 bin/sotp track resolve            # 現在の track phase / next command / blocker を表示
 cargo make track-branch-create    # main からトラックブランチを作成して切替
 cargo make track-branch-switch    # 既存トラックブランチに切替
-cargo make scripts-selftest       # verify / helper スクリプトの回帰テスト
 cargo make help                   # カテゴリ付きタスク一覧表示
 cargo make export-schema -- --crate domain --pretty  # domain crate の pub API を JSON 出力（要 nightly）
 cargo make shell                  # tools コンテナ内でシェルを開く
 cargo make check                  # cargo check（docker compose 経由）
 cargo make test-doc               # ドキュメントテスト
-cargo make python-lint            # ruff lint（Python scripts / hooks）
 ```
 
 ### `bin/sotp` Native Subcommands
@@ -79,6 +77,13 @@ bin/sotp review check-approved
 bin/sotp review local --round-type fast --group <scope> --track-id <track-id> --briefing-file tmp/reviewer-runtime/briefing-<scope>.md
 bin/sotp dry fix-local --track-id <track-id> --briefing-file tmp/reviewer-runtime/dry-fix-briefing.md
 bin/sotp track signals
+bin/sotp arch tree
+bin/sotp arch tree-full
+bin/sotp arch members
+bin/sotp arch direct-checks
+bin/sotp conventions add <name> --slug <slug> --title <title> --summary <summary>
+bin/sotp conventions update-index
+bin/sotp conventions verify-index
 bin/sotp pr status <pr>
 bin/sotp pr wait-and-merge <pr>
 bin/sotp pr ensure-pr

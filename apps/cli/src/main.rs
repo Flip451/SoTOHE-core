@@ -20,6 +20,16 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum CliCommand {
+    /// Architecture rules analysis tools.
+    Arch {
+        #[command(subcommand)]
+        cmd: commands::arch::ArchCommand,
+    },
+    /// Convention document management tools.
+    Conventions {
+        #[command(subcommand)]
+        cmd: commands::conventions::ConventionsCommand,
+    },
     /// Domain analysis tools (export-schema, etc.).
     Domain {
         #[command(subcommand)]
@@ -94,6 +104,8 @@ fn main() -> ExitCode {
 
 fn run_cli(cli: Cli, dry_execute: impl FnOnce(commands::dry::DryCommand) -> ExitCode) -> ExitCode {
     match cli.command {
+        Some(CliCommand::Arch { cmd }) => commands::arch::execute(cmd),
+        Some(CliCommand::Conventions { cmd }) => commands::conventions::execute(cmd),
         Some(CliCommand::Domain { cmd }) => commands::domain::execute(cmd),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
         Some(CliCommand::Hook { cmd }) => commands::hook::execute(cmd),
@@ -126,13 +138,35 @@ fn run_cli(cli: Cli, dry_execute: impl FnOnce(commands::dry::DryCommand) -> Exit
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::fs;
     use std::process::ExitCode;
 
     use clap::Parser as _;
     use cli_composition::CliApp;
+    use tempfile::TempDir;
 
     use super::{Cli, CliCommand, run_cli};
     use crate::commands::dry::DryCommand;
+
+    const MINIMAL_RULES: &str = r#"{
+  "layers": [
+    { "crate": "domain",  "path": "libs/domain",  "may_depend_on": [] },
+    { "crate": "usecase", "path": "libs/usecase", "may_depend_on": ["domain"] }
+  ]
+}"#;
+
+    /// End-to-end dispatch: `sotp arch tree --project-root <dir>` parses via `Cli::try_parse_from`
+    /// and is dispatched through `run_cli` to `commands::arch::execute`, returning success.
+    #[test]
+    fn test_arch_tree_dispatch_via_run_cli_succeeds_with_valid_rules() {
+        let dir = TempDir::new().unwrap();
+        fs::write(dir.path().join("architecture-rules.json"), MINIMAL_RULES).unwrap();
+        let project_root = dir.path().to_str().unwrap();
+        let cli =
+            Cli::try_parse_from(["sotp", "arch", "tree", "--project-root", project_root]).unwrap();
+        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
 
     #[test]
     fn example_cli_flow_saves_track_successfully() {
@@ -245,5 +279,48 @@ mod tests {
     fn test_dry_dispatch_unknown_subcommand_is_rejected() {
         let result = Cli::try_parse_from(["sotp", "dry", "unknown-subcmd"]);
         assert!(result.is_err(), "unrecognized dry subcommand must be rejected by clap");
+    }
+
+    // ── CliCommand::Conventions entrypoint dispatch routing ──────────────────
+
+    const CONV_INDEX_START: &str = "<!-- convention-docs:start -->";
+    const CONV_INDEX_END: &str = "<!-- convention-docs:end -->";
+
+    /// Set up a minimal conventions directory with a README index and one doc
+    /// so that `verify-index` returns success.
+    ///
+    /// The README block must exactly match what `render_index_block` produces:
+    /// `- \`<filename>\`: <first-heading>` for each non-README `.md` file.
+    fn setup_conventions_dir_with_doc(root: &std::path::Path) {
+        let conv_dir = root.join("knowledge").join("conventions");
+        fs::create_dir_all(&conv_dir).unwrap();
+        // Write a placeholder convention doc with a heading line.
+        fs::write(conv_dir.join("sample.md"), "# Sample\n").unwrap();
+        // Write the README with the exact block format render_index_block produces:
+        // `- \`<file>\`: <heading>` (backtick filename, colon, heading text).
+        let readme = format!(
+            "# Conventions\n\n{CONV_INDEX_START}\n- `sample.md`: Sample\n{CONV_INDEX_END}\n"
+        );
+        fs::write(conv_dir.join("README.md"), readme).unwrap();
+    }
+
+    /// End-to-end dispatch: `sotp conventions verify-index --project-root <dir>` parses via
+    /// `Cli::try_parse_from` and is dispatched through `run_cli` to
+    /// `commands::conventions::execute`, returning success when the index is in sync.
+    #[test]
+    fn test_conventions_verify_index_dispatch_via_run_cli_succeeds_with_synced_index() {
+        let dir = TempDir::new().unwrap();
+        setup_conventions_dir_with_doc(dir.path());
+        let project_root = dir.path().to_str().unwrap();
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "conventions",
+            "verify-index",
+            "--project-root",
+            project_root,
+        ])
+        .unwrap();
+        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
+        assert_eq!(exit, ExitCode::SUCCESS);
     }
 }

@@ -7,6 +7,8 @@ use std::path::Path;
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
+use crate::arch::{self, LayerEntry};
+
 /// Verify architecture rules synchronization.
 ///
 /// Checks:
@@ -20,7 +22,7 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 pub fn verify(root: &Path) -> VerifyOutcome {
     let mut outcome = VerifyOutcome::pass();
 
-    let rules = match load_rules(root) {
+    let rules = match arch::load_rules(root) {
         Ok(r) => r,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
@@ -28,125 +30,21 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             ))]);
         }
     };
-
-    let layers = match parse_layers(&rules) {
-        Ok(l) => l,
-        Err(e) => {
-            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "Failed to parse architecture rules: {e}"
-            ))]);
-        }
-    };
+    let layers = rules.layers();
 
     // Verify Cargo.toml workspace members match.
-    outcome.merge(verify_cargo_members(root, &layers));
+    outcome.merge(verify_cargo_members(root, layers));
 
     // Verify deny.toml deny rules match.
-    outcome.merge(verify_deny_rules(root, &rules, &layers));
+    outcome.merge(verify_deny_rules(root, layers));
 
     // Verify each workspace member is referenced in Cargo.toml and tech-stack.md.
-    outcome.merge(verify_member_references(root, &layers));
+    outcome.merge(verify_member_references(root, layers));
 
     outcome
 }
 
-#[derive(Debug, Clone)]
-struct LayerRule {
-    crate_name: String,
-    path: String,
-    may_depend_on: Vec<String>,
-    deny_reason: String,
-}
-
-fn load_rules(root: &Path) -> Result<serde_json::Value, String> {
-    let path = root.join("architecture-rules.json");
-    let content = std::fs::read_to_string(&path)
-        .map_err(|e| format!("Cannot read {}: {e}", path.display()))?;
-    serde_json::from_str(&content).map_err(|e| format!("Invalid JSON in {}: {e}", path.display()))
-}
-
-fn parse_layers(rules: &serde_json::Value) -> Result<Vec<LayerRule>, String> {
-    let layers = rules
-        .get("layers")
-        .and_then(|v| v.as_array())
-        .ok_or("architecture rules must define a non-empty 'layers' array")?;
-
-    if layers.is_empty() {
-        return Err("architecture rules 'layers' array is empty".to_owned());
-    }
-
-    let mut result = Vec::new();
-    let mut seen_crates = std::collections::BTreeSet::new();
-    let mut seen_paths = std::collections::BTreeSet::new();
-
-    for layer in layers {
-        let crate_name = layer
-            .get("crate")
-            .and_then(|v| v.as_str())
-            .filter(|s| !s.is_empty())
-            .ok_or("layer 'crate' must be a non-empty string")?
-            .to_owned();
-        let path = layer
-            .get("path")
-            .and_then(|v| v.as_str())
-            .filter(|s| !s.is_empty())
-            .ok_or(format!("layer '{crate_name}' must define a non-empty 'path'"))?
-            .to_owned();
-        let may_depend_on_arr = match layer.get("may_depend_on") {
-            Some(v) => {
-                v.as_array().ok_or(format!("layer '{crate_name}' has invalid 'may_depend_on'"))?
-            }
-            None => &Vec::new(), // Python defaults missing may_depend_on to []
-        };
-        let mut may_depend_on = Vec::with_capacity(may_depend_on_arr.len());
-        for item in may_depend_on_arr {
-            let s = item
-                .as_str()
-                .filter(|s| !s.is_empty())
-                .ok_or(format!("layer '{crate_name}' has invalid 'may_depend_on' entries"))?;
-            may_depend_on.push(s.to_owned());
-        }
-        let deny_reason = match layer.get("deny_reason") {
-            Some(v) => v
-                .as_str()
-                .ok_or(format!(
-                    "layer '{crate_name}' has invalid 'deny_reason' (must be a string)"
-                ))?
-                .to_owned(),
-            None => String::new(),
-        };
-
-        if !seen_crates.insert(crate_name.clone()) {
-            return Err(format!("duplicate crate in architecture rules: {crate_name}"));
-        }
-        if !seen_paths.insert(path.clone()) {
-            return Err(format!("duplicate path in architecture rules: {path}"));
-        }
-
-        result.push(LayerRule { crate_name, path, may_depend_on, deny_reason });
-    }
-
-    // Validate dependency references.
-    let known_crates: std::collections::BTreeSet<&str> =
-        result.iter().map(|l| l.crate_name.as_str()).collect();
-    for layer in &result {
-        for dep in &layer.may_depend_on {
-            if !known_crates.contains(dep.as_str()) {
-                return Err(format!(
-                    "layer '{}' references unknown dependency: {dep}",
-                    layer.crate_name
-                ));
-            }
-            if dep == &layer.crate_name {
-                return Err(format!("layer '{}' cannot depend on itself", layer.crate_name));
-            }
-        }
-    }
-
-    Ok(result)
-}
-
-fn verify_cargo_members(root: &Path, layers: &[LayerRule]) -> VerifyOutcome {
+fn verify_cargo_members(root: &Path, layers: &[LayerEntry]) -> VerifyOutcome {
     let cargo_path = root.join("Cargo.toml");
     let content = match std::fs::read_to_string(&cargo_path) {
         Ok(c) => c,
@@ -205,11 +103,7 @@ fn verify_cargo_members(root: &Path, layers: &[LayerRule]) -> VerifyOutcome {
     VerifyOutcome::pass()
 }
 
-fn verify_deny_rules(
-    root: &Path,
-    rules: &serde_json::Value,
-    layers: &[LayerRule],
-) -> VerifyOutcome {
+fn verify_deny_rules(root: &Path, layers: &[LayerEntry]) -> VerifyOutcome {
     let deny_path = root.join("deny.toml");
     let content = match std::fs::read_to_string(&deny_path) {
         Ok(c) => c,
@@ -237,7 +131,7 @@ fn verify_deny_rules(
             ))]);
         }
     };
-    let expected_deny = match expected_deny_rules(rules, layers) {
+    let expected_deny = match expected_deny_rules(layers) {
         Ok(d) => d,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
@@ -314,10 +208,7 @@ fn parse_deny_entries(deny_data: &toml::Value) -> Result<Vec<DenyEntry>, String>
     Ok(result)
 }
 
-fn expected_deny_rules(
-    _rules: &serde_json::Value,
-    layers: &[LayerRule],
-) -> Result<Vec<DenyEntry>, String> {
+fn expected_deny_rules(layers: &[LayerEntry]) -> Result<Vec<DenyEntry>, String> {
     // Build dependents map: for each crate, which crates depend on it?
     let mut dependents: std::collections::BTreeMap<String, Vec<String>> =
         layers.iter().map(|l| (l.crate_name.clone(), Vec::new())).collect();
@@ -354,7 +245,7 @@ fn expected_deny_rules(
     Ok(result)
 }
 
-fn verify_member_references(root: &Path, layers: &[LayerRule]) -> VerifyOutcome {
+fn verify_member_references(root: &Path, layers: &[LayerEntry]) -> VerifyOutcome {
     let mut outcome = VerifyOutcome::pass();
 
     let cargo_content = std::fs::read_to_string(root.join("Cargo.toml")).unwrap_or_default();

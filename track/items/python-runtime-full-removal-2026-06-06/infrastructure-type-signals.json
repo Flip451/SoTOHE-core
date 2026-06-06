@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-06T13:33:33Z",
+  "declaration_hash": "2578c3fbfbb92f035b9780d1dd1784da66a0600772bfd852680ebee22c127732",
+  "signals": [
+    {
+      "type_name": "ArchRulesError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ConventionDocsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "infrastructure::arch::render_direct_checks",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::arch::render_workspace_members",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::arch::render_workspace_tree",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::arch::render_workspace_tree_full",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::conventions::add_convention_doc",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::conventions::update_convention_index",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::conventions::verify_convention_index",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::convention_docs::verify",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

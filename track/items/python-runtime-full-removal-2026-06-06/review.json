@@ -1,0 +1,981 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This step still tells the reader to run `cargo make conventions-verify-index`, but the harness migration removed that wrapper from the allowed command set and replaced it with the native `bin/sotp conventions verify-index` flow. As written, the documented workflow is internally inconsistent and will fail for anyone following it.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/DEVELOPER_AI_WORKFLOW.md",
+              "line": 158,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:af82e42e169e301c16dc623660f5d4769416ea771f5dee10ec37214cffd7f987",
+          "at": "2026-06-06T12:53:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acb6688831a127ee138a27b17af809406690972a74d2e499b9430c78951bbf11",
+          "at": "2026-06-06T13:05:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This still uses the deleted cargo-make wrapper naming (`conventions-*` / `architecture-rules-*`) while saying to run them through `bin/sotp`. The native CLI exposes `bin/sotp conventions ...` and `bin/sotp arch ...`, and the settings only allow those groups, so this policy can send agents toward non-existent command forms after the wrapper removal. Update this line to name the native command groups, e.g. `bin/sotp conventions ...` / `bin/sotp arch ...`.",
+              "severity": "P1",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
+              "line": 27,
+              "category": "workflow-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:acb6688831a127ee138a27b17af809406690972a74d2e499b9430c78951bbf11",
+          "at": "2026-06-06T13:08:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fde104c036d3e7f70a75feb1f87e02355ec6f5c5f2c7ebe3510d5c887c8ed7a",
+          "at": "2026-06-06T13:11:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fde104c036d3e7f70a75feb1f87e02355ec6f5c5f2c7ebe3510d5c887c8ed7a",
+          "at": "2026-06-06T13:12:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This workflow still tells maintainers to update `scripts/check_layers.py`, but that file has been removed from the repository. The command now points to a nonexistent enforcement step, so the architecture migration instructions are stale and internally inconsistent.",
+              "severity": "P1",
+              "file": ".claude/commands/architecture-customizer.md",
+              "line": 21,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6eac2df126cad286e3e15128a4da22e8023af303965b9aad7be15a819e053d5f",
+          "at": "2026-06-06T13:22:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The architecture customizer still lists `scripts/check_layers.py` as a file to update. This track removes the Python/script-based layer enforcement references, and the briefing explicitly requires this command to no longer reference `scripts/`; following the command would send maintainers to edit a deleted/nonexistent enforcement file during architecture migrations. Replace this with the current Rust/bin/sotp enforcement surface or remove the stale entry.",
+              "severity": "P1",
+              "file": ".claude/commands/architecture-customizer.md",
+              "line": 21,
+              "category": "stale-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:6eac2df126cad286e3e15128a4da22e8023af303965b9aad7be15a819e053d5f",
+          "at": "2026-06-06T13:24:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:edccf5388347a4b3968474ff40810e85ff7dad1fa30c204c6c30dc38a32b7c4e",
+          "at": "2026-06-06T13:26:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:edccf5388347a4b3968474ff40810e85ff7dad1fa30c204c6c30dc38a32b7c4e",
+          "at": "2026-06-06T13:29:00Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `arch` coverage stops at `execute(ArchCommand::...)`; it never exercises the real `sotp arch ...` entrypoint through `Cli::try_parse_from` and `run_cli`. That means a regression in the new `CliCommand::Arch` wiring or clap nesting in `main.rs` could still pass this suite. Add at least one temp-dir end-to-end dispatch test for the top-level CLI path.",
+              "severity": "P1",
+              "file": "apps/cli/src/main.rs",
+              "line": 21,
+              "category": "testing"
+            },
+            {
+              "message": "`TreeFull` only has a happy-path dispatch test. The sibling arch subcommands include a missing-rules-file assertion, but this variant does not, so an error-propagation regression in `CliApp::arch_tree_full` would go untested. Add a failure-path test mirroring the other three arch subcommands.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/arch.rs",
+              "line": 158,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4354a2eb85c5d5b163dc5c082e14ecb29eb13d5b71c0dfb34dd14a6f45ec2e45",
+          "at": "2026-06-06T08:04:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
+          "at": "2026-06-06T08:08:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af9798b66e798a36dd093e1b34864f1e0a1e49abac177de0d00a90e811b7d758",
+          "at": "2026-06-06T08:11:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `Conventions` entrypoint in `main.rs` is not covered by an end-to-end CLI dispatch test. The tests in `apps/cli/src/commands/conventions.rs` only exercise the nested parser and direct `execute()` calls, so a wiring regression in `Cli::parse`/`run_cli` for `CliCommand::Conventions` would slip past CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "line": 29,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:110164076a9783940f438e8d803bf4869f0599b2047a2fc0528c202ac009d12b",
+          "at": "2026-06-06T11:53:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8925d4b4d6071aedf856248352594c72e12d01092e49bee27a3cb8270c07c68e",
+          "at": "2026-06-06T11:59:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8925d4b4d6071aedf856248352594c72e12d01092e49bee27a3cb8270c07c68e",
+          "at": "2026-06-06T12:02:14Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ExtraDirEntry.label` is required here, but the Python reference treats it as optional with a default empty string. A valid `extra_dirs` entry without a label will now fail to load, and the error will surface as `Parse` instead of `InvalidRules`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 52,
+              "category": "correctness"
+            },
+            {
+              "message": "`load_rules()` still misses Python-side validation for malformed input: empty `may_depend_on` items are accepted, and `extra_dirs` paths are not checked for duplicates or collisions with layer paths. Those cases should be rejected as `InvalidRules`; today they can be accepted or silently alter the rendered tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 62,
+              "category": "correctness"
+            },
+            {
+              "message": "`ArchRulesError::Io` embeds `rules_path.display()` in the public error string. When the caller passes an absolute workspace root, this leaks an internal filesystem path to the user.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 65,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:88b8f31b7e55178e8ddf04a4148b669bdde02e482509f2dada0ee141567e4d98",
+          "at": "2026-06-06T06:01:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_rules()` eagerly parses `extra_dirs` ([arch.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs#L178)), so malformed `extra_dirs` make `render_workspace_members`, `render_direct_checks`, and `render_workspace_tree(..., include_extra_dirs = false)` fail even though the Python reference ignores `extra_dirs` for those code paths. This is a behavior regression for valid workspace-member/direct-check outputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/arch.rs",
+              "line": 178,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f3a759af8c026f754d06a5d2326a10ce98c997bce4c9ff5b931c36644927d67e",
+          "at": "2026-06-06T06:10:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cabc8ff3c7cfce0e1773adf091389846866495ba323a294f00bb42bb62dd80d",
+          "at": "2026-06-06T06:16:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cabc8ff3c7cfce0e1773adf091389846866495ba323a294f00bb42bb62dd80d",
+          "at": "2026-06-06T06:19:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
+          "at": "2026-06-06T06:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
+          "at": "2026-06-06T06:44:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` now returns `pass()` when `knowledge/conventions/` has no `.md` files and `README.md` is missing. That diverges from the Python behavior and current tests, which treat a missing README as an error, so `verify-index` can silently succeed in an empty conventions tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
+              "line": 186,
+              "category": "correctness"
+            },
+            {
+              "message": "`render_index_block` swallows `read_dir` errors and falls back to an empty index block. Any filesystem/permission failure while scanning `knowledge/conventions` will therefore be treated as \"no docs\", letting `update-index` rewrite README.md and `verify-index` pass instead of surfacing the I/O error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
+              "line": 391,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:2fbbd36841877ddb38ebe6a01f7c28a70e347021616ef7d437d632af066d2ce4",
+          "at": "2026-06-06T07:15:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d928f5852c152d9794609cd4fab9c3e0476427e78fd9f55015a98dfe8df6d877",
+          "at": "2026-06-06T07:22:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_index_block` silently discards `read_dir` entry errors with `.flatten()`. During `update_convention_index`, that can regenerate and write `README.md` from a partial directory listing while still returning success, so unreadable entries can be dropped from the index instead of surfacing an error. Propagate each `ReadDir` item error instead of flattening it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 407,
+              "category": "error-handling"
+            },
+            {
+              "message": "The public error display path leaks absolute/internal filesystem paths because variants are populated from `Path::display()` and then formatted directly. For example, duplicate and missing README errors include the workspace/temp root path, which violates the briefing requirement that error messages not leak internal paths. Store/render repo-relative paths or fixed logical paths such as `knowledge/conventions/README.md`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 64,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d928f5852c152d9794609cd4fab9c3e0476427e78fd9f55015a98dfe8df6d877",
+          "at": "2026-06-06T07:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` now fails whenever `knowledge/conventions` exists without `README.md`, even when there are no convention documents. The shim delegates existing `verify::convention_docs::verify` callers to this path, but the previous verifier returned pass when `has_convention_docs` was false, so this is a bootstrapping regression and contradicts the briefing's 'relocated, not rewritten' requirement.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 188,
+              "category": "correctness"
+            },
+            {
+              "message": "I/O errors still store and display root-derived absolute paths via `display().to_string()` in several public error paths, starting here and continuing for target/readme/render failures. `ConventionDocsError::Display` exposes those strings to callers, but the briefing requires convention-doc errors not to leak internal paths. Normalize these to `knowledge/conventions/...` relative paths before returning them.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 126,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:62a4460b4eb148b5b9c3c8e7de61fe15767709386b8c020a6c09d067fa9f0c48",
+          "at": "2026-06-06T07:29:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_index_block` still formats filesystem paths with `display()` into errors, and those strings are returned directly by `verify_convention_index` or wrapped as an `Io` source by `update_convention_index`. A read failure on `knowledge/conventions` or one of its `.md` files will expose the caller's absolute workspace path, which violates this scope's requirement that errors not leak internal paths. Use stable relative paths such as `knowledge/conventions` and `knowledge/conventions/<file>.md` in these error strings.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 416,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:4fbf1f44a1fd16356bec33d4913af822831fdc95911c27d9019baecfb8e34ad2",
+          "at": "2026-06-06T07:34:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_convention_index` returns pass when `knowledge/conventions/` exists without `README.md` and contains no convention docs. The Python `verify_index()` being ported calls `load_readme_content()` unconditionally, so a missing README is an error even for an empty conventions directory. This regression lets a bootstrapped-but-broken conventions directory pass verification.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions.rs",
+              "line": 189,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:18e6311ed681cddaa4f41b6ec8423cce4fb32a8028033a463832e5a88d322707",
+          "at": "2026-06-06T07:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e6311ed681cddaa4f41b6ec8423cce4fb32a8028033a463832e5a88d322707",
+          "at": "2026-06-06T07:40:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff4c826f6d09bd2710abbb5cd0c8eb6a30fed61b9e7d98fcb6de5f9be66b3795",
+          "at": "2026-06-06T12:08:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff4c826f6d09bd2710abbb5cd0c8eb6a30fed61b9e7d98fcb6de5f9be66b3795",
+          "at": "2026-06-06T12:09:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:402be0e060b50f6cdcdbd732e96c524b76d22d6d6bc157bbb1bd1847f54d14f2",
+          "at": "2026-06-06T12:51:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:402be0e060b50f6cdcdbd732e96c524b76d22d6d6bc157bbb1bd1847f54d14f2",
+          "at": "2026-06-06T12:54:15Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d186665d31ac5bc07f26f408a2bf3b9d61a4aa7c835c22bfaf41ea8f7aacaaf",
+          "at": "2026-06-06T08:13:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d186665d31ac5bc07f26f408a2bf3b9d61a4aa7c835c22bfaf41ea8f7aacaaf",
+          "at": "2026-06-06T08:15:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44efd63b555c5b17b13e3a977c9dfdddd4f87db24307f00248a2c8342eb69177",
+          "at": "2026-06-06T12:04:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44efd63b555c5b17b13e3a977c9dfdddd4f87db24307f00248a2c8342eb69177",
+          "at": "2026-06-06T12:07:15Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Deleting this file removes the only direct regression coverage for the public `cargo make` wrapper surface that this diff rewires. Without an equivalent test elsewhere, accidental changes to wrapper command mappings or forwarded args in `Makefile.toml` will no longer be caught by CI.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/scripts/test_make_wrappers.py",
+              "line": 1,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:3b1e52f6c7fbb1ae241c26838de12b81fad8f8979063427614c794b3bf68eaa3",
+          "at": "2026-06-06T12:56:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b1e52f6c7fbb1ae241c26838de12b81fad8f8979063427614c794b3bf68eaa3",
+          "at": "2026-06-06T13:00:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b1e52f6c7fbb1ae241c26838de12b81fad8f8979063427614c794b3bf68eaa3",
+          "at": "2026-06-06T13:07:32Z"
+        }
+      ]
+    },
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39d243eefa473769baa22744cb421f5eb6b6089a6a1304632d110673b4445942",
+          "at": "2026-06-06T04:09:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 requires updating the roadmap ADR front matter with `superseded_by`, but the related external_guides ADR explicitly says that same roadmap ADR is grandfathered/post-merge and must not receive semantic front-matter changes. That makes the supersede mechanism contradictory; the plan should use a permitted back-reference/new-ADR encoding instead of requiring a forbidden roadmap front-matter update.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md",
+              "line": 79,
+              "category": "contradiction"
+            },
+            {
+              "message": "The Makefile migration instructions conflict for `conventions-verify-index`: one bullet says `conventions-*` wrapper tasks should be retained with their implementation swapped to Rust, while the next says the `conventions-verify-index` wrapper should be deleted. This leaves the implementation boundary ambiguous for an existing public task name.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md",
+              "line": 55,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:39d243eefa473769baa22744cb421f5eb6b6089a6a1304632d110673b4445942",
+          "at": "2026-06-06T04:12:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR keeps non-git `cargo make` wrappers (`conventions-*`, `architecture-rules-*`, `workspace-tree*`) and only rewires them to Rust commands, but the already indexed cargo-make teardown ADR says native subcommands that can be called directly should not be wrapped by `cargo make`; non-git pass-through wrappers should move to direct `bin/sotp <native>` usage and be deleted. These plan artifacts now give contradictory implementation direction for the same wrapper layer, so implementers could preserve tasks that the newer workflow ADR requires removing.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md",
+              "line": 54,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8d6d70d4333719826c6ab97307c7fc331916f11659fdba803ad6801a870d0a59",
+          "at": "2026-06-06T04:16:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cdb3c0568de242d43711e82c4a35c8fb431d6b6860c6801a40ddd82087c0318",
+          "at": "2026-06-06T04:20:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S1 claims the infrastructure work is \"purely additive\" and that no existing code is removed yet, but T002 in the same plan deletes `libs/infrastructure/src/verify/convention_docs.rs` and removes its module entry. The section-level sequencing claim is false and should be rewritten to acknowledge the relocation/deletion step.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 8,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b12e3dd98702fd05bc7243c05e7fa8947d6c1e648e24d524942497b983259b1f",
+          "at": "2026-06-06T04:54:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`update_convention_index` and `verify_convention_index` are emitted with the same Mermaid node ID (`F82`), so the second node overwrites the first and the contract map no longer faithfully represents the catalogue.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
+              "line": 60,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ed01900fed51945a3216f4a91438e0febd504ca08399007d4ab242728cd9f330",
+          "at": "2026-06-06T04:58:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`doc_patterns.rs` is called out in CN-04 as part of the same scripts-deletion / CI-verification sync change, but this plan defers any `doc_patterns.rs` update to T006 while T005 is defined as the only commit that must satisfy CN-04. That splits a required same-commit synchronization across two commits and makes the plan violate its own constraint as written.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 43,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:ed01900fed51945a3216f4a91438e0febd504ca08399007d4ab242728cd9f330",
+          "at": "2026-06-06T05:02:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`update_convention_index` and `verify_convention_index` are rendered with the same Mermaid node id (`F82_infrastructure_infrastructure_infrastructure__conventions__...`). That collapses two distinct functions into one node, and `verify_convention_index` no longer has its own edge to `ConventionDocsError`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
+              "line": 60,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:3348ddc91ce7228dc662cc1d38164535fe42df4b97f48519329119ef07b9b2d8",
+          "at": "2026-06-06T05:06:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 removes the orchestra/settings allow-list entries for the `architecture-rules-*` and `conventions-*` wrapper task names, but those Makefile wrappers are only updated later in T006. Unless T005 also deletes or rewrites those tasks, the intermediate commit cannot stay CI-green and will fail the stated `verify-orchestra`/CI requirement.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 36,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:3348ddc91ce7228dc662cc1d38164535fe42df4b97f48519329119ef07b9b2d8",
+          "at": "2026-06-06T05:13:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` under-maps the test criteria: `AC-07` is assigned only to T001/T002, but `plan.md` assigns the required CLI integration roundtrip tests to T003/T004 as well. That makes the coverage matrix internally inconsistent and understates which tasks satisfy the test-related requirements (the same gap exists for `IN-07` at line 10).",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/task-coverage.json",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c45c1b4ebae26eda98fd8351554dbdb60cd1093fc0db05953804981216cfdca1",
+          "at": "2026-06-06T05:20:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`F82` is reused for both `update_convention_index` and `verify_convention_index`. In the Mermaid contract map, the second definition overwrites the first, so `verify_convention_index` does not have its own node/edge and the catalogue is no longer accurate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
+              "line": 61,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:72218c436e636576879b163c93566ae053f98c7d1d99201556961e8523863380",
+          "at": "2026-06-06T05:23:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:91ae0a5ee67d1640fd41497d2e7ecefa972d5ab457136f5c44eddb5f1fc67fa3",
+          "at": "2026-06-06T05:27:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 deletes `libs/infrastructure/src/verify/convention_docs.rs` and removes its verify module entry while explicitly deferring CLI wiring; T004 is later tasked with replacing the existing verify dispatch that calls `infrastructure::verify::convention_docs::verify`. That ordering leaves the tree broken after T002 and contradicts the S1 claim that T002 can be written/tested independently. Move the verify dispatch update or a compatibility shim into T002, or stop deleting the old module until T004.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 11,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:91ae0a5ee67d1640fd41497d2e7ecefa972d5ab457136f5c44eddb5f1fc67fa3",
+          "at": "2026-06-06T05:31:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json` now treats the metadata-only aliases `T008`-`T014` as real implementation tasks and assigns all of them to S1. That contradicts the plan narrative and coverage, which define the executable chain as `T001`-`T007` with only `T001`/`T002` in S1; the rendered plan consequently shows `0/14` tasks and places CLI/removal/docs/ADR work under the infrastructure section. This makes task execution/status ambiguous rather than a harmless metadata alias. Keep the alias tasks out of the impl-plan task list/section task_ids, or otherwise render them only as references to `T001`-`T007`.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 88,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d101587cee1cfb714aaf92fa0ab8c752c04fac0dc7bf7d23c64c26ba4e7ff7aa",
+          "at": "2026-06-06T05:36:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa9fd20dd8043fc5b14c414211c71c48fc49f868d19b7037bb4074827a1bc17d",
+          "at": "2026-06-06T05:39:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ArchRulesError` is the only new infrastructure type rendered as `🔴`, while the four `infrastructure::arch::*` entry points in the same artifact are already `🔵`. For a task that is only moved to `in_progress`, that red declaration is internally inconsistent with the rest of the plan artifact and should not appear here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:86da0b54f97437397677abfb33aca5fcb682ba8b085b6b4a094a9df5d3f83027",
+          "at": "2026-06-06T06:00:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8d55e56ab64bf83d4fd899b094cbeb1dfacc3c36186687c9aade3d11c25cdf5",
+          "at": "2026-06-06T06:05:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The type catalogue now adds `From<serde_json::Error>` for `ArchRulesError`, but this scope's briefing limits plan-artifact changes to T001 status, the rendered plan, and the added DRY check. T001's plan text also only calls for Debug/Display/Error impls, so this expands the tracked public/design surface outside the intended plan transition.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.json",
+              "line": 343,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d8d55e56ab64bf83d4fd899b094cbeb1dfacc3c36186687c9aade3d11c25cdf5",
+          "at": "2026-06-06T06:08:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated type artifact now changes T001 type signals beyond the intended plan-only status transition: `ArchRulesError` is marked red while the four `infrastructure::arch::*` functions are marked blue. The briefing explicitly says the plan artifacts should be unchanged except T001 moving to `in_progress`, the plan render, and the DRY result, with type signals remaining yellow as an accepted pre-implementation deviation. This makes the reviewed plan artifacts contradict the declared review state and needs either corrected regeneration or an explicit updated justification.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:86da0b54f97437397677abfb33aca5fcb682ba8b085b6b4a094a9df5d3f83027",
+          "at": "2026-06-06T06:12:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61ae0178f70e4f8dadc0eaf95cdce844b1380d56063cf01dc5aeac62d79396b2",
+          "at": "2026-06-06T06:17:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da3780ca8098a22d44080b8eba7d1b003173ace7bdd96281c2b6897af0ef52f5",
+          "at": "2026-06-06T06:38:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da3780ca8098a22d44080b8eba7d1b003173ace7bdd96281c2b6897af0ef52f5",
+          "at": "2026-06-06T06:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::verify::convention_docs::verify` is marked `delete` here, but `impl-plan.json` task T002 still requires the compatibility shim and its `pub mod` entry to remain until T004 rewires the caller. That makes the artifact set internally inconsistent about whether the shim still exists.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.json",
+              "line": 305,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e3c4dbc067315d05f2d8d98494ed7272a8c7a8765f5fe9fbd522b35850b0aada",
+          "at": "2026-06-06T06:53:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3c4dbc067315d05f2d8d98494ed7272a8c7a8765f5fe9fbd522b35850b0aada",
+          "at": "2026-06-06T06:57:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The summary says ArchRulesError's intended catalogue surface remains only Debug, Display, and Error, with From<serde_json::Error> treated as an out-of-catalogue implementation deviation. But infrastructure-types.json now catalogs core::convert::From<serde_json::Error> for ArchRulesError as an action add. That makes the deviation part of the approved type surface and contradicts the plan's stated API boundary; either remove the From entry or update the summary if From is intended.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.json",
+              "line": 343,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e3c4dbc067315d05f2d8d98494ed7272a8c7a8765f5fe9fbd522b35850b0aada",
+          "at": "2026-06-06T06:59:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8fc27ce67f91e3e7595a0815b50a3ce7bb81037e5ad22f4d8a52d702a14d8eb",
+          "at": "2026-06-06T07:01:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T001` is recorded as `done` and `T002` as `in_progress`, and the rendered plan/counts follow that later state (`1/7 resolved`). That contradicts the scope briefing, which said this round should only advance `T001` from `todo` to `in_progress`. The plan artifacts are now one transition ahead of the requested state.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 7,
+              "category": "contradiction"
+            },
+            {
+              "message": "The generated-view note says `T002+` types remain yellow, but `infrastructure-types.md` already renders `ConventionDocsError` and all three `infrastructure::conventions::*` free functions as blue. That makes the note stale and internally inconsistent with the rendered type table.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a17c393c87da3058c14ae50228b7c0a473cead8722654096df58e2a2d52a8e17",
+          "at": "2026-06-06T07:44:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe6a9d8b66045cfacca27fc80192e57e9000b7c5e99db980a8800ca03ceb7fde",
+          "at": "2026-06-06T07:46:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe6a9d8b66045cfacca27fc80192e57e9000b7c5e99db980a8800ca03ceb7fde",
+          "at": "2026-06-06T07:48:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56c029f35e24afff016a191fffaa1ed730d4e2b10641e040ec24fb9edac7bdcc",
+          "at": "2026-06-06T08:17:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan state does not match the review briefing's intended progression. The briefing says this round should have T001 done, T002 in_progress, and 1/7 resolved, but impl-plan.json marks T002 done and advances T003 to in_progress, with plan.md rendering 2/7 resolved. That changes the track narrative to the next task before the assigned T002 plan-artifact state has been reviewed/accepted.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:56c029f35e24afff016a191fffaa1ed730d4e2b10641e040ec24fb9edac7bdcc",
+          "at": "2026-06-06T08:18:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated-view deviation summary still says `T003-T007 types ... remain yellow`, but the review briefing states that T003+ types are not yet in catalogue scope and that the only remaining yellow type signal is `infrastructure::verify::convention_docs::verify`. This makes the plan artifacts contradict the intended scope state and overstate unresolved type-signal deviations; the rendered `plan.md` carries the same sentence from this source.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 45,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:56c029f35e24afff016a191fffaa1ed730d4e2b10641e040ec24fb9edac7bdcc",
+          "at": "2026-06-06T08:20:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2d012ae42a6b13c7c82d3e5c6bcb0e69e51231145fdb7ee3a9f245f28e2b1a3",
+          "at": "2026-06-06T08:22:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61fe831c0649b3a3d20d854f596a84d56a58f3e164f8bce5095552d5d03ed116",
+          "at": "2026-06-06T08:29:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61fe831c0649b3a3d20d854f596a84d56a58f3e164f8bce5095552d5d03ed116",
+          "at": "2026-06-06T08:31:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md:7` still says `infrastructure::verify::convention_docs::verify` is the only yellow / pending T004, but `infrastructure-types.md:21` already marks that row blue. The plan artifacts now disagree on whether the shim deletion is still pending; update the summary to reflect 0 yellow or remove the stale note.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b3bd2bf018e8238f7544d590443d327d613faf0c9265971e81b0b2f675e0535c",
+          "at": "2026-06-06T12:11:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 introduces `apps/cli/src/commands/conventions.rs` and `apps/cli-composition/src/conventions.rs`, but unlike T003 it never says to register the new composition module in `apps/cli-composition/src/lib.rs`. That leaves the new `CliApp` methods unhooked from the crate module tree, so the task is incomplete as written.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:9acfb5dba28a776c3349273c280b3db3f6e442043675f8fe32dab24d57c33d0c",
+          "at": "2026-06-06T12:15:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9acfb5dba28a776c3349273c280b3db3f6e442043675f8fe32dab24d57c33d0c",
+          "at": "2026-06-06T12:18:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9acfb5dba28a776c3349273c280b3db3f6e442043675f8fe32dab24d57c33d0c",
+          "at": "2026-06-06T12:19:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b24091e8259fbb46835853fab64b244b1d759a0786279a8124c5c9ea03509ff",
+          "at": "2026-06-06T12:22:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b24091e8259fbb46835853fab64b244b1d759a0786279a8124c5c9ea03509ff",
+          "at": "2026-06-06T12:24:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f28ecca34f47041bfda82f98002d2e17fd30f2a7f94bd5af2b6fa7888e6a244",
+          "at": "2026-06-06T12:47:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f28ecca34f47041bfda82f98002d2e17fd30f2a7f94bd5af2b6fa7888e6a244",
+          "at": "2026-06-06T12:52:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f569572a4f14fb4bb6f3c10947c0bcc81ce454393f808648c722d529962786c",
+          "at": "2026-06-06T13:16:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f569572a4f14fb4bb6f3c10947c0bcc81ce454393f808648c722d529962786c",
+          "at": "2026-06-06T13:16:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7acd68d54620bb7eb5d9e7fbb832b2ddea4936ebbf2050c985d8ed97ab18f487",
+          "at": "2026-06-06T13:25:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7acd68d54620bb7eb5d9e7fbb832b2ddea4936ebbf2050c985d8ed97ab18f487",
+          "at": "2026-06-06T13:27:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8451793a82c99486fe93a795414b249e4555be33f5d228f9914e38e16e68a5c3",
+          "at": "2026-06-06T13:31:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8451793a82c99486fe93a795414b249e4555be33f5d228f9914e38e16e68a5c3",
+          "at": "2026-06-06T13:33:11Z"
+        }
+      ]
+    }
+  }
+}

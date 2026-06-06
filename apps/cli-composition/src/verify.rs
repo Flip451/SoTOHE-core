@@ -252,7 +252,7 @@ impl CliApp {
     pub fn verify_arch_docs(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
         let mut outcome = infrastructure::verify::architecture_rules::verify(&project_root);
         outcome.merge(infrastructure::verify::doc_patterns::verify(&project_root));
-        outcome.merge(infrastructure::verify::convention_docs::verify(&project_root));
+        outcome.merge(infrastructure::conventions::verify_convention_index(&project_root));
         Ok(render_outcome("verify architecture docs", &outcome))
     }
 
