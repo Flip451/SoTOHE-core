@@ -193,11 +193,11 @@ Artifact generation uses post-hoc review (show the artifact to the user and wait
 Invocation path depends on the active profile (`.harness/config/agent-profiles.json`):
 
 - **Claude (default profile)**: invoke via the Agent tool with `subagent_type: "spec-designer"`. The `model: opus` frontmatter in `.claude/agents/spec-designer.md` guarantees Opus selection.
-- **Codex (codex-heavy profile)**: invoke out-of-process through the repo-owned wrapper:
+- **Codex (codex-heavy profile)**: invoke out-of-process through the native subcommand:
   ```bash
-  cargo make track-local-plan -- --model {model} --briefing-file tmp/spec-designer-briefing.md
+  bin/sotp plan codex-local --model {model} --briefing-file tmp/spec-designer-briefing.md
   ```
-  The wrapper translates `--briefing-file` internally so git keywords do not leak into the command string (compatible with the `block-direct-git-ops` guardrail).
+  The native subcommand translates `--briefing-file` internally so git keywords do not leak into the command string (compatible with the `block-direct-git-ops` guardrail).
 
 The subagent owns `spec.json` and `spec.md`, runs the CLI signal evaluation internally, and returns the blue / yellow / red counts to `/track:plan`. See `.claude/agents/spec-designer.md` for its internal pipeline.
 
@@ -210,9 +210,9 @@ Invoke via the Agent tool with `subagent_type: "type-designer"`. The subagent ow
 Invocation path depends on the active profile:
 
 - **Claude (default profile)**: invoke via the Agent tool with `subagent_type: "impl-planner"`.
-- **Codex (codex-heavy profile)**: invoke out-of-process through the same wrapper used for Phase 1:
+- **Codex (codex-heavy profile)**: invoke out-of-process through the same native subcommand used for Phase 1:
   ```bash
-  cargo make track-local-plan -- --model {model} --briefing-file tmp/impl-planner-briefing.md
+  bin/sotp plan codex-local --model {model} --briefing-file tmp/impl-planner-briefing.md
   ```
 
 The subagent owns `impl-plan.json` and `task-coverage.json`, and evaluates the task-coverage binary gate internally. `/track:plan` receives the OK / ERROR verdict. See `.claude/agents/impl-planner.md`.

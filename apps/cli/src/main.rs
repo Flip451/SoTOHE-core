@@ -70,8 +70,6 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::verify::VerifyCommand,
     },
-    /// Replaces Makefile.toml shell wrappers with safe Rust dispatch.
-    Make(commands::make::MakeArgs),
     /// Find semantically similar code fragments in the index (information-only).
     FindSimilar(commands::semantic_dup::FindSimilarArgs),
     /// Manage the semantic duplicate detection index (build, measure-quality).
@@ -106,7 +104,6 @@ fn run_cli(cli: Cli, dry_execute: impl FnOnce(commands::dry::DryCommand) -> Exit
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Verify { cmd }) => commands::verify::execute(cmd),
-        Some(CliCommand::Make(args)) => commands::make::execute(args),
         Some(CliCommand::FindSimilar(args)) => commands::semantic_dup::execute_find_similar(args),
         Some(CliCommand::DupIndex { cmd }) => commands::semantic_dup::execute_dup_index(cmd),
         Some(CliCommand::DupCheck(args)) => commands::semantic_dup::execute_dup_check(args),
@@ -219,7 +216,7 @@ mod tests {
         let exit = run_cli(cli, |cmd| {
             match cmd {
                 DryCommand::CheckApproved(args) => {
-                    assert_eq!(args.track_id, "my-track");
+                    assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 }
                 other => panic!("expected CheckApproved, got {other:?}"),
             }
@@ -236,7 +233,7 @@ mod tests {
             .unwrap();
         match cli.command {
             Some(CliCommand::Dry { cmd: DryCommand::CheckApproved(args) }) => {
-                assert_eq!(args.track_id, "my-track");
+                assert_eq!(args.track_id.as_deref(), Some("my-track"));
             }
             _ => panic!("expected Dry {{ CheckApproved }}, got a different variant"),
         }

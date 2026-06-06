@@ -227,115 +227,6 @@ dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "bash"]
 
-[tasks.tools-up]
-description = "[fast] Start resident tools-daemon container for exec-based feedback"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "up", "-d", "tools-daemon"]
-
-[tasks.tools-down]
-description = "[fast] Stop resident tools-daemon container"
-command = "docker"
-args = ["compose", "stop", "tools-daemon"]
-
-# Daemon-exec wrappers (fast TDD loop — requires tools-daemon running: cargo make tools-up)
-# When WORKER_ID is set, each exec gets its own CARGO_TARGET_DIR to prevent build lock contention.
-[tasks.fmt-exec]
-description = "[fast] Run fmt via tools-daemon exec (requires tools-up)"
-dependencies = ["prepare-local-cache-dirs"]
-script_runner = "@shell"
-script = ['''
-WORKER_ENV=""
-if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
-fi
-docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private fmt-local
-''']
-
-[tasks.clippy-exec]
-description = "[fast] Run clippy via tools-daemon exec (requires tools-up)"
-dependencies = ["prepare-local-cache-dirs"]
-script_runner = "@shell"
-script = ['''
-WORKER_ENV=""
-if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
-fi
-docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private clippy-local
-''']
-
-[tasks.test-exec]
-description = "[fast] Run all tests via tools-daemon exec (requires tools-up)"
-dependencies = ["prepare-local-cache-dirs"]
-script_runner = "@shell"
-script = ['''
-WORKER_ENV=""
-if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
-fi
-docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private test-local
-''']
-
-[tasks.test-one-exec]
-description = "[fast] Run a single nextest test via tools-daemon exec (requires tools-up)"
-dependencies = ["prepare-local-cache-dirs"]
-script_runner = "@shell"
-script = ['''
-WORKER_ENV=""
-if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
-fi
-docker compose exec -T $WORKER_ENV tools-daemon cargo nextest run --locked "$CARGO_MAKE_TASK_ARGS"
-''']
-
-[tasks.check-exec]
-description = "[fast] Run cargo check via tools-daemon exec (requires tools-up)"
-dependencies = ["prepare-local-cache-dirs"]
-script_runner = "@shell"
-script = ['''
-WORKER_ENV=""
-if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
-fi
-docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private check-local
-''']
-
-[tasks.machete-exec]
-description = "[fast] Run cargo-machete via tools-daemon exec (requires tools-up)"
-dependencies = ["prepare-local-cache-dirs"]
-script_runner = "@shell"
-script = ['''
-WORKER_ENV=""
-if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
-fi
-docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private machete-local
-''']
-
-[tasks.deny-exec]
-description = "[fast] Run cargo-deny via tools-daemon exec (requires tools-up)"
-dependencies = ["prepare-local-cache-dirs"]
-script_runner = "@shell"
-script = ['''
-WORKER_ENV=""
-if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
-fi
-docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private deny-local
-''']
-
-[tasks.llvm-cov-exec]
-description = "[fast] Run HTML coverage via tools-daemon exec (requires tools-up)"
-dependencies = ["prepare-local-cache-dirs"]
-script_runner = "@shell"
-script = ['''
-WORKER_ENV=""
-if [ -n "${WORKER_ID:-}" ]; then
-  WORKER_ENV="-e CARGO_TARGET_DIR=/workspace/target-${WORKER_ID}"
-fi
-docker compose exec -T $WORKER_ENV tools-daemon cargo make --allow-private llvm-cov-local
-''']
-
 # Local quality tasks (executed inside container by default)
 [tasks.fmt-local]
 private = true
@@ -632,12 +523,6 @@ description = "[internal] Verify local Markdown links resolve to existing files"
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify doc-links']
 
-[tasks.verify-doc-links]
-description = "[gate] Verify Markdown doc links (docker compose)"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-doc-links-local"]
-
 [tasks.verify-plan-progress]
 description = "[gate] Verify track plan status consistency (docker compose)"
 dependencies = ["prepare-local-cache-dirs"]
@@ -721,180 +606,98 @@ args = ["add", "${@}"]
 [tasks.add-all]
 description = "[wrapper] Stage all worktree changes except transient automation scratch files"
 command = "bin/sotp"
-args = ["make", "add-all"]
+args = ["git", "add-all"]
 
 [tasks.unstage]
 description = "[wrapper] Unstage paths (remove from index without discarding worktree changes)"
-script_runner = "@shell"
-script = ['bin/sotp make unstage "$@"']
+command = "bin/sotp"
+args = ["git", "unstage", "${@}"]
 
 [tasks.export-schema]
 description = "[host] Export domain crate public API schema as JSON (requires nightly toolchain)"
 script_runner = "@shell"
 script = ['bin/sotp domain export-schema "$@"']
 
-[tasks.test-nightly]
-description = "[host] Run ignored tests that require nightly toolchain"
-command = "cargo"
-args = ["nextest", "run", "--run-ignored", "ignored-only", "-E", "package(infrastructure)"]
-
 [tasks.track-branch-create]
 description = "[wrapper] Create a track branch from main and switch to it (branch only; no metadata, no commit). (usage: cargo make track-branch-create '<track-id>')"
 command = "bin/sotp"
-args = ["make", "track-branch-create", "${@}"]
+args = ["track", "branch", "create", "--items-dir", "track/items", "${@}"]
 
 [tasks.track-branch-switch]
 description = "[wrapper] Materialize branch metadata if needed, then switch to an existing track branch (usage: cargo make track-branch-switch '<track-id>')"
 command = "bin/sotp"
-args = ["make", "track-branch-switch", "${@}"]
-
-[tasks.track-resolve]
-description = "[wrapper] Resolve current track phase, next command, and blocker"
-command = "bin/sotp"
-args = ["make", "track-resolve", "${@}"]
+args = ["track", "branch", "switch", "--items-dir", "track/items", "${@}"]
 
 [tasks.track-pr-push]
 description = "[wrapper] Push current track branch to origin"
 command = "bin/sotp"
-args = ["make", "track-pr-push", "${@}"]
-
-[tasks.track-pr-ensure]
-description = "[wrapper] Create or reuse a PR for the current track branch"
-command = "bin/sotp"
-args = ["make", "track-pr-ensure", "${@}"]
+args = ["pr", "push", "${@}"]
 
 [tasks.track-pr]
 description = "[wrapper] Push current branch and create/reuse a PR (push + ensure-pr in one step)"
+dependencies = ["track-pr-push"]
 command = "bin/sotp"
-args = ["make", "track-pr", "${@}"]
+args = ["pr", "ensure-pr", "${@}"]
 
 [tasks.track-pr-review]
 description = "[wrapper] Run full PR review cycle: push, ensure PR, trigger @codex review, poll, parse"
 command = "bin/sotp"
-args = ["make", "track-pr-review", "${@}"]
-
-[tasks.track-pr-merge]
-description = "[wrapper] Wait for PR checks to pass, then merge"
-command = "bin/sotp"
-args = ["make", "track-pr-merge", "${@}"]
-
-[tasks.track-pr-status]
-description = "[wrapper] Show PR check status"
-command = "bin/sotp"
-args = ["make", "track-pr-status", "${@}"]
-
-[tasks.track-local-plan]
-description = "[wrapper] Run the local Codex planner through the repo-owned Rust wrapper"
-script_runner = "@shell"
-script = ['bin/sotp make track-local-plan "$@"']
+args = ["pr", "review-cycle", "${@}"]
 
 [tasks.track-active-gate]
 private = true
-description = "[gate] Regen sequence: type-signals → catalogue-spec-signals → views sync. Both track-local-review and track-commit-message depend on this shared task (D4 symmetry, CN-11 DRY). Each sotp command self-resolves the active track from the current branch (D1). Absent catalogue files are skipped unconditionally. Fail-closed: non-zero exit aborts the chain (CN-09)."
+description = "[gate] Regen sequence: type-signals → catalogue-spec-signals → views sync. Both track-commit-message and review invocations depend on this shared task (D4 symmetry, CN-11 DRY). Each sotp command self-resolves the active track from the current branch (D1). Absent catalogue files are skipped unconditionally. Fail-closed: non-zero exit aborts the chain (CN-09)."
 script_runner = "@shell"
 script = ['bin/sotp track type-signals && bin/sotp track catalogue-spec-signals && bin/sotp track views sync']
 
-[tasks.track-local-review]
-description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the local Codex reviewer. The shared regen gate (track-active-gate) ensures the reviewer observes the same signal state that the commit gate will re-check, eliminating hash-mismatch check-approved blocks (AC-12)."
-dependencies = ["track-active-gate"]
-script_runner = "@shell"
-script = ['bin/sotp make track-local-review "$@"']
-
-[tasks.track-local-review-fix-codex]
-description = "[wrapper] Launch a Codex review-fix-lead fixer via `sotp review fix-local`. Resolves CODEX_BIN (absolute real-binary path) so the sanitized fixer env can launch codex regardless of toolchain manager. Performs smoke-tests (sandbox assertion + version check) and credential isolation (strips GITHUB_TOKEN, SSH credentials). Parses Codex output for `completed`/`blocked_cross_scope`/`failed` and prints the result. Usage: cargo make track-local-review-fix-codex -- --scope <scope> --briefing-file <path> --track-id <id> --round-type <fast|final> --reviewer-model <model> [--model <model>] --scope-files <file1,file2,...>"
-script_runner = "@shell"
-script = ['CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp make track-local-review-fix-codex "$@"']
-
-[tasks.track-local-dry-fix]
-description = "[wrapper] Launch a Codex dry-fix-lead fixer via `sotp dry fix-local`. Resolves CODEX_BIN (absolute real-binary path) so the sanitized fixer env can launch codex regardless of toolchain manager. Performs smoke-tests (sandbox assertion + version check) and credential isolation (strips GITHUB_TOKEN, SSH credentials). Parses Codex output for `completed`/`blocked`/`failed` and prints the result. Usage: cargo make track-local-dry-fix -- --track-id <id> --briefing-file <path> [--model <model>]"
-script_runner = "@shell"
-script = ['CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp make track-local-dry-fix "$@"']
-
 [tasks.track-set-commit-hash]
 description = "[wrapper] Write current HEAD SHA to .commit_hash (set v2 diff base)"
-script_runner = "@shell"
-script = ['bin/sotp make track-set-commit-hash "$@"']
-
-[tasks.track-review-results]
-description = "[wrapper] Show per-scope review results for a track (state summary by default)"
-script_runner = "@shell"
-script = ['bin/sotp make track-review-results "$@"']
-
-[tasks.track-check-approved]
-description = "[wrapper] Check that the review state is approved and code hash is current"
-script_runner = "@shell"
-script = ['bin/sotp make track-check-approved "$@"']
-
-[tasks.track-signals]
-description = "[wrapper] Evaluate confidence signals for a track's spec.json"
-script_runner = "@shell"
-script = ['bin/sotp track signals "$@"']
-
-[tasks.track-baseline-capture]
-description = "[wrapper] Capture TypeGraph baseline for TDDD reverse signal filtering. Always idempotent (existing baseline is preserved). Usage: cargo make track-baseline-capture -- <track-id> [--layer <id>]"
-script_runner = "@shell"
-script = ['bin/sotp track baseline-capture "$@"']
+command = "bin/sotp"
+args = ["track", "set-commit-hash", "${@}"]
 
 [tasks.track-switch-main]
 description = "[wrapper] Switch to main branch and pull latest"
 command = "bin/sotp"
-args = ["make", "track-switch-main"]
+args = ["git", "switch-and-pull", "main"]
+
+[tasks.track-local-review-fix-codex]
+description = "[wrapper] Resolve CODEX_BIN for toolchain-manager shims, then launch the Codex review-fix-lead fixer via bin/sotp review fix-local"
+script_runner = "@shell"
+script = ['case "${1:-}" in --) shift ;; esac; CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review fix-local "$@"']
+
+[tasks.track-local-dry-fix]
+description = "[wrapper] Resolve CODEX_BIN for toolchain-manager shims, then launch the Codex dry-fix-lead fixer via bin/sotp dry fix-local"
+script_runner = "@shell"
+script = ['case "${1:-}" in --) shift ;; esac; CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp dry fix-local "$@"']
 
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"
 command = "bin/sotp"
-args = ["make", "track-add-paths"]
-
-[tasks.commit]
-description = "[gate] Run CI then commit (via sotp make)"
-command = "bin/sotp"
-args = ["make", "commit", "${@}"]
+args = ["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"]
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the strict commit gate: stage working tree, full cargo make ci, check-approved (review not approved → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt. The regen sequence is shared with track-local-review via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate), then run the strict commit gate: stage working tree, full cargo make ci, check-approved (review not approved → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]
-command = "bin/sotp"
-args = ["make", "track-commit-message"]
+script_runner = "@shell"
+script = ['''
+bin/sotp git add-all && \
+cargo make ci && \
+bin/sotp review check-approved && \
+bin/sotp dry check-approved && \
+bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup && \
+bin/sotp track set-commit-hash
+''']
 
 [tasks.note]
 description = "[git] Attach a git note to HEAD (usage: cargo make note '<note text>')"
-command = "bin/sotp"
-args = ["make", "note", "${@}"]
+command = "git"
+args = ["notes", "add", "-f", "-m", "${@}", "HEAD"]
 
 [tasks.track-note]
 description = "[wrapper] Attach a git note from tmp/track-commit/note.md and delete the scratch file"
 command = "bin/sotp"
-args = ["make", "track-note"]
+args = ["git", "note-from-file", "tmp/track-commit/note.md", "--cleanup"]
 
-[tasks.track-transition]
-description = "[wrapper] Transition a task status and sync rendered views. Usage: cargo make track-transition -- <track_dir> <task_id> <status> [--commit-hash <hash>]. Example: cargo make track-transition -- track/items/my-track T001 done --commit-hash abc1234"
-command = "bin/sotp"
-args = ["make", "track-transition", "${@}"]
-
-[tasks.track-add-task]
-description = "[wrapper] Add a new task to a track"
-script_runner = "@shell"
-script = ['bin/sotp make track-add-task "$@"']
-
-[tasks.track-next-task]
-description = "[wrapper] Show the next open task for a track (JSON)"
-command = "bin/sotp"
-args = ["make", "track-next-task", "${@}"]
-
-[tasks.track-task-counts]
-description = "[wrapper] Show task status counts for a track (JSON)"
-command = "bin/sotp"
-args = ["make", "track-task-counts", "${@}"]
-
-[tasks.track-set-override]
-description = "[wrapper] Set or clear a status override on a track"
-script_runner = "@shell"
-script = ['bin/sotp make track-set-override "$@"']
-
-[tasks.track-sync-views]
-description = "[wrapper] Render plan.md and registry.md from metadata.json"
-command = "bin/sotp"
-args = ["make", "track-sync-views", "${@}"]
 
 [tasks.clean]
 description = "[wrapper] Remove compose resources"

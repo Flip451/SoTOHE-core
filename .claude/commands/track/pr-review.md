@@ -31,12 +31,12 @@ cargo make track-pr-push
 ```
 
 > **Note**: `track-pr-push` does NOT enforce task completion. Push is allowed with unresolved tasks.
-> Task completion is only enforced at merge time (`track-pr-merge` / `/track:merge`).
+> Task completion is only enforced at merge time (`bin/sotp pr wait-and-merge` / `/track:merge`).
 
 Then:
 
 ```bash
-cargo make track-pr-ensure
+bin/sotp pr ensure-pr
 ```
 
 The ensure step will either create a new PR or reuse an existing one for this track branch.

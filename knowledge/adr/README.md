@@ -123,6 +123,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [track-id 引数を省略可能にし、省略時は現在ブランチに紐づくアクティブトラックを既定値とする](2026-05-26-1813-track-id-default-active-track.md) | Proposed | 2026-05-26 |
 | [review / commit ゲートを型カタログ未生成の段階でも通す — active-gate のシグナル評価を欠損入力に寛容にする](2026-06-01-0406-review-gate-tolerate-missing-catalogue.md) | — | 2026-06-01 |
 | [spec-states commit ゲートを spec 成果物未生成の段階でも通す — トラック解決時のシグナル評価を欠損入力に寛容にする](2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md) | Proposed | 2026-06-03 |
+| [cargo make ラッパー層の解体 — bin/sotp 直叩きへの一本化](2026-06-05-1535-cargo-make-teardown.md) | Proposed | 2026-06-05 |
 
 ### ADR 運用
 

@@ -2,6 +2,7 @@
 
 mod ops;
 mod resolution;
+mod set_commit_hash;
 mod tddd;
 
 use std::path::{Path, PathBuf};

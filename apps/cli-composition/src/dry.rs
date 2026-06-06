@@ -76,7 +76,7 @@ pub struct DryWriteInput {
     /// Path to the LanceDB semantic index database.
     pub db_path: PathBuf,
     /// Cosine similarity threshold (0.0–1.0) for the dry-check gate.
-    pub threshold: f32,
+    pub threshold: Option<f32>,
     /// Root of the workspace to scan for Rust sources (corpus extraction).
     pub workspace_root: PathBuf,
     /// Path to the track items directory.
@@ -128,7 +128,7 @@ pub struct DryCheckApprovedInput {
     /// Path to the LanceDB semantic index database.
     pub db_path: PathBuf,
     /// Cosine similarity threshold (0.0–1.0).
-    pub threshold: f32,
+    pub threshold: Option<f32>,
     /// Root of the workspace to scan for Rust sources (corpus extraction).
     pub workspace_root: PathBuf,
     /// Path to the track items directory.
@@ -240,9 +240,18 @@ impl CliApp {
             &canonical_root,
         )?;
 
-        // Parse threshold.
-        let threshold = SimilarityThreshold::new(input.threshold)
-            .map_err(|e| format!("invalid --threshold: {e}"))?;
+        // Resolve threshold: explicit --threshold wins; otherwise load from dry-check config.
+        let threshold = match input.threshold {
+            Some(t) => {
+                SimilarityThreshold::new(t).map_err(|e| format!("invalid --threshold: {e}"))?
+            }
+            None => {
+                let config_path = root.join(".harness/config/dry-check.json");
+                let config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
+                    .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+                config.threshold()
+            }
+        };
 
         let workspace_root = resolve_existing_dir_under_repo(
             &input.workspace_root,
@@ -408,9 +417,18 @@ impl CliApp {
             &canonical_root,
         )?;
 
-        // Parse threshold.
-        let threshold = SimilarityThreshold::new(input.threshold)
-            .map_err(|e| format!("invalid --threshold: {e}"))?;
+        // Resolve threshold: explicit --threshold wins; otherwise load from dry-check config.
+        let threshold = match input.threshold {
+            Some(t) => {
+                SimilarityThreshold::new(t).map_err(|e| format!("invalid --threshold: {e}"))?
+            }
+            None => {
+                let config_path = root.join(".harness/config/dry-check.json");
+                let config = infrastructure::dry_check::DryCheckConfig::load(&config_path)
+                    .map_err(|e| format!("failed to load dry-check config: {e}"))?;
+                config.threshold()
+            }
+        };
 
         let workspace_root = resolve_existing_dir_under_repo(
             &input.workspace_root,
@@ -1148,7 +1166,7 @@ exit 0
             track_id: track_id.to_owned(),
             base_commit: Some("not-a-hash".to_owned()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
             model: Some("codex".to_owned()),
@@ -1169,7 +1187,7 @@ exit 0
             track_id: "dry-write-outside-items-dir".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
             model: Some("codex".to_owned()),
@@ -1190,7 +1208,7 @@ exit 0
             track_id: "../outside".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
             model: Some("codex".to_owned()),
@@ -1212,7 +1230,7 @@ exit 0
             track_id: "dry-write-missing-track-invalid-threshold".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 1.5,
+            threshold: Some(1.5),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
             model: Some("codex".to_owned()),
@@ -1236,7 +1254,7 @@ exit 0
             track_id: track_id.to_owned(),
             base_commit: Some("not-a-hash".to_owned()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
@@ -1255,7 +1273,7 @@ exit 0
             track_id: "dry-check-approved-outside-items-dir".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
@@ -1274,7 +1292,7 @@ exit 0
             track_id: "../outside".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
@@ -1294,7 +1312,7 @@ exit 0
             track_id: "dry-check-approved-missing-track-invalid-threshold".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 1.5,
+            threshold: Some(1.5),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
         });
@@ -1303,6 +1321,79 @@ exit 0
         assert!(
             message.contains("invalid --threshold"),
             "missing track dir must not be rejected before threshold validation, got: {message}"
+        );
+    }
+
+    // ── threshold: None config fallback (D9 / CN-04) ──────────────────────
+    //
+    // When threshold is None, the code loads `.harness/config/dry-check.json`
+    // (CN-04 fail-closed).  These tests prove the fallback ran:
+    //   1. No "invalid --threshold" → the Some(t) branch was not taken.
+    //   2. No "failed to load dry-check config" → DryCheckConfig::load succeeded.
+    //   3. Error IS about "merge-base" → execution advanced past threshold
+    //      resolution to the diff step, which fails on the synthetic commit hash.
+    // A regression in the None branch or DryCheckConfig::load would change the
+    // error to a threshold/config message, failing assertion 2 or 3.
+
+    #[test]
+    fn test_dry_write_threshold_none_loads_config_then_reaches_diff_step() {
+        let dir = temp_items_dir_under_repo();
+        let track_id = "dry-write-threshold-none";
+        std::fs::create_dir_all(dir.path().join(track_id)).unwrap();
+
+        let result = CliApp::new().dry_write(DryWriteInput {
+            track_id: track_id.to_owned(),
+            base_commit: Some(valid_commit_hash_for_tests()),
+            db_path: dir.path().join("semantic-index"),
+            threshold: None,
+            workspace_root: PathBuf::from("."),
+            items_dir: dir.path().to_path_buf(),
+            model: Some("codex".to_owned()),
+            capability_name: "dry-checker".to_owned(),
+        });
+
+        let message = result.unwrap_err();
+        assert!(
+            !message.contains("invalid --threshold"),
+            "must not hit Some(t) branch; got: {message}"
+        );
+        assert!(
+            !message.contains("failed to load dry-check config"),
+            "config fallback must succeed; got: {message}"
+        );
+        assert!(
+            message.contains("merge-base"),
+            "must advance past threshold to diff step; got: {message}"
+        );
+    }
+
+    #[test]
+    fn test_dry_check_approved_threshold_none_loads_config_then_reaches_diff_step() {
+        let dir = temp_items_dir_under_repo();
+        let track_id = "dry-check-approved-threshold-none";
+        std::fs::create_dir_all(dir.path().join(track_id)).unwrap();
+
+        let result = CliApp::new().dry_check_approved(DryCheckApprovedInput {
+            track_id: track_id.to_owned(),
+            base_commit: Some(valid_commit_hash_for_tests()),
+            db_path: dir.path().join("semantic-index"),
+            threshold: None,
+            workspace_root: PathBuf::from("."),
+            items_dir: dir.path().to_path_buf(),
+        });
+
+        let message = result.unwrap_err();
+        assert!(
+            !message.contains("invalid --threshold"),
+            "must not hit Some(t) branch; got: {message}"
+        );
+        assert!(
+            !message.contains("failed to load dry-check config"),
+            "config fallback must succeed; got: {message}"
+        );
+        assert!(
+            message.contains("merge-base"),
+            "must advance past threshold to diff step; got: {message}"
         );
     }
 
@@ -1359,7 +1450,7 @@ exit 0
             track_id: "my-track".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             // Outside repo → will fail at items_dir validation, not model resolution.
             items_dir: dir.path().to_path_buf(),
@@ -1390,7 +1481,7 @@ exit 0
             track_id: "my-track".to_owned(),
             base_commit: Some(valid_commit_hash_for_tests()),
             db_path: dir.path().join("semantic-index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: dir.path().to_path_buf(),
             model: None,
@@ -1413,7 +1504,7 @@ exit 0
             track_id: "my-track".to_owned(),
             base_commit: Some("abc1234".to_owned()),
             db_path: PathBuf::from(".semantic_index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: PathBuf::from("track/items"),
             model: Some("codex-model".to_owned()),
@@ -1421,7 +1512,7 @@ exit 0
         };
         assert_eq!(input.track_id, "my-track");
         assert_eq!(input.base_commit.as_deref(), Some("abc1234"));
-        assert!((input.threshold - 0.85).abs() < 1e-6);
+        assert!((input.threshold.unwrap() - 0.85).abs() < 1e-6);
     }
 
     #[test]
@@ -1430,7 +1521,7 @@ exit 0
             track_id: "my-track".to_owned(),
             base_commit: None,
             db_path: PathBuf::from(".semantic_index"),
-            threshold: 0.85,
+            threshold: Some(0.85),
             workspace_root: PathBuf::from("."),
             items_dir: PathBuf::from("track/items"),
         };

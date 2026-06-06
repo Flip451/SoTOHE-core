@@ -33,7 +33,7 @@ Execution:
    - `created_at` / `updated_at`: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
 4. Render rendered views (`plan.md` + `track/registry.md`) from `metadata.json`:
    ```bash
-   cargo make track-sync-views
+   bin/sotp track views sync
    ```
    (`verify-track-metadata` in step 5 checks that `track/registry.md` is in sync with `metadata.json`, so this render must run before step 5. A warning about `contract-map.md` skipping the new track because no `domain-types.json` exists yet is expected at this phase — the catalogue is created later in Phase 2 by `/track:type-design`.)
 5. Verify identity schema:

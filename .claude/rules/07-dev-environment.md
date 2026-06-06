@@ -12,7 +12,7 @@ rustup show
 rustup component add rustfmt clippy
 
 # ホスト側 protoc（TDDD type-signals 用）
-# `bin/sotp track type-signals`（commit gate の track-active-gate / track-local-review が呼ぶ）は
+# `bin/sotp track type-signals`（commit gate の track-active-gate が呼ぶ）は
 # ホスト上で `cargo rustdoc` を実行する。TDDD 対象 crate（infrastructure 等）が protoc を要求する依存
 # （例: lancedb → lance-encoding）を持つ場合、Docker イメージだけでなくホストにも protoc が必要。
 # Debian/Ubuntu: sudo apt-get install -y protobuf-compiler
@@ -39,22 +39,20 @@ cargo make add <files>            # 手動の低レベル staging（terminal 直
 cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
 cargo make track-add-paths        # tmp/track-commit/add-paths.txt から選択的に stage
 cargo make unstage <paths>        # index から除去（worktree 変更は保持）
-cargo make commit                 # 手動の低レベル commit（terminal 直実行用）
-cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit
+cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit（唯一のコミット経路）
 cargo make track-note             # tmp/track-commit/note.md から note を適用して削除
-cargo make track-transition       # タスク状態遷移 + ビュー自動再生成
-cargo make track-sync-views       # plan.md + registry.md を metadata.json から再生成
+bin/sotp track transition         # タスク状態遷移 + ビュー自動再生成
+bin/sotp track views sync         # plan.md + registry.md を metadata.json から再生成
 cargo make track-pr-push          # 現在のトラックブランチを origin にプッシュ
-cargo make track-pr-ensure        # PR 作成（既存なら再利用）
-cargo make track-pr-merge <pr> --method <merge|squash|rebase>  # CI 待ち → マージ
-cargo make track-pr-status <pr>   # PR チェック状況表示
+bin/sotp pr ensure-pr             # PR 作成（既存なら再利用）
+bin/sotp pr wait-and-merge <pr> --method <merge|squash|rebase>  # CI 待ち → マージ
+bin/sotp pr status <pr>           # PR チェック状況表示
 cargo make track-pr-review        # PR レビューサイクル（push + PR作成 + @codex review）
 cargo make track-switch-main      # main に切替 + pull
-cargo make track-resolve          # 現在の track phase / next command / blocker を表示
+bin/sotp track resolve            # 現在の track phase / next command / blocker を表示
 cargo make track-branch-create    # main からトラックブランチを作成して切替
 cargo make track-branch-switch    # 既存トラックブランチに切替
 cargo make scripts-selftest       # verify / helper スクリプトの回帰テスト
-cargo make hooks-selftest         # Claude hook Python セルフテスト
 cargo make help                   # カテゴリ付きタスク一覧表示
 cargo make export-schema -- --crate domain --pretty  # domain crate の pub API を JSON 出力（要 nightly）
 cargo make shell                  # tools コンテナ内でシェルを開く
@@ -63,22 +61,29 @@ cargo make test-doc               # ドキュメントテスト
 cargo make python-lint            # ruff lint（Python scripts / hooks）
 ```
 
-### `sotp make` Dispatch
+### `bin/sotp` Native Subcommands
 
-Most `cargo make` tasks internally delegate to `bin/sotp make <task>`, which
-replaces shell string interpolation with safe Rust argument handling.
+Non-git track operations (transition, sync-views, resolve, add-task, etc.) use
+`bin/sotp` native subcommands directly — there are no `cargo make` wrapper tasks for them.
+Git-write operations (add-all, commit, note, branch ops, PR push) remain routed
+through `cargo make` tasks to stay within the `block-direct-git-ops` hook boundary.
 
+```bash
+# Direct bin/sotp (native subcommands with default --items-dir track/items)
+bin/sotp track transition T001 done
+bin/sotp track views sync
+bin/sotp track resolve
+bin/sotp track add-task "description with spaces"
+bin/sotp review results
+bin/sotp review check-approved
+bin/sotp review local --round-type fast --group <scope> --track-id <track-id> --briefing-file tmp/reviewer-runtime/briefing-<scope>.md
+bin/sotp dry fix-local --track-id <track-id> --briefing-file tmp/reviewer-runtime/dry-fix-briefing.md
+bin/sotp track signals
+bin/sotp pr status <pr>
+bin/sotp pr wait-and-merge <pr>
+bin/sotp pr ensure-pr
+bin/sotp plan codex-local --model <model> --briefing-file tmp/planner-runtime/briefing.md
 ```
-# Via cargo make (recommended) — backward-compatible interface
-cargo make track-transition track/items/xxx T001 done
-
-# Direct bin/sotp (safely passes multi-word arguments)
-bin/sotp make track-add-task my-track "description with spaces"
-```
-
-A few tasks (`track-local-review`, `track-add-task`, `track-set-override`) use
-a shell `"$@"` wrapper because cargo-make's `${@}` expansion loses quoting for
-multi-word positional arguments.
 
 ### `bin/sotp` バイナリ管理
 
@@ -119,29 +124,26 @@ cargo make ci
 コンテナ内の toolchain バージョンと一致しない可能性がある。
 再現性を保つため、常に compose ラッパー（非 `-local` タスク）を使うこと。
 
-## Parallel Worker Isolation (WORKER_ID)
+## Parallel Worker Isolation (CARGO_TARGET_DIR_RELATIVE)
 
-Agent Teams で複数ワーカーが同時にビルドする場合、`WORKER_ID` 環境変数で
+Agent Teams で複数ワーカーが同時にビルドする場合、`CARGO_TARGET_DIR_RELATIVE` 環境変数で
 `CARGO_TARGET_DIR` を分離して build lock 競合を防ぐ：
 
 ```bash
-# Worker ごとに固有の ID を設定
-WORKER_ID=w1 cargo make test-exec   # → target-w1/
-WORKER_ID=w2 cargo make clippy-exec # → target-w2/
+# Worker ごとに固有の target dir を設定
+CARGO_TARGET_DIR_RELATIVE=target-w1 cargo make test    # → target-w1/
+CARGO_TARGET_DIR_RELATIVE=target-w2 cargo make clippy  # → target-w2/
 
-# デフォルト（WORKER_ID 未設定）は従来通り target/ を使用
-cargo make test-exec                # → target/
+# デフォルト（未設定）は従来通り target/ を使用
+cargo make test                                        # → target/
 ```
 
 | 項目 | 動作 |
 |------|------|
-| `WORKER_ID` 未設定 | `CARGO_TARGET_DIR=/workspace/target`（従来互換） |
-| `WORKER_ID=w1` | `CARGO_TARGET_DIR=/workspace/target-w1` |
+| `CARGO_TARGET_DIR_RELATIVE` 未設定 | `CARGO_TARGET_DIR=/workspace/target`（従来互換） |
+| `CARGO_TARGET_DIR_RELATIVE=target-w1` | `CARGO_TARGET_DIR=/workspace/target-w1` |
 | sccache | ワーカー間で共有（`SCCACHE_DIR` は共通） |
-| 対象タスク | `-exec` サフィックス付きタスク（`test-exec`, `clippy-exec` 等） |
-
-**注意**: `run --rm` ラッパー（`cargo make ci` 等）はホスト側で `CARGO_TARGET_DIR_RELATIVE`
-環境変数を設定することで分離可能（例: `CARGO_TARGET_DIR_RELATIVE=target-w1 cargo make test`）。
+| 対象タスク | `run --rm` ラッパー（`cargo make test`, `cargo make clippy` 等） |
 
 ## Project Bootstrap (Version Research)
 
@@ -186,7 +188,6 @@ use_small_heuristics = "Max"
 
 ```bash
 cargo make test                 # 標準テスト
-cargo make test-one-exec test_name  # 特定テスト
 cargo make llvm-cov             # カバレッジ
 cargo make test-nocapture       # 出力表示（必要時のみ）
 ```

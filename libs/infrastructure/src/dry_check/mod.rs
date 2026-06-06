@@ -7,14 +7,21 @@
 //! - [`GitDryCheckDiffGetter`]: git-based diff-source returning hunk ranges.
 //! - [`FsDryCheckCommitHashStore`]: filesystem reader for the `.commit_hash` file.
 //! - [`CodexDryChecker`]: Codex-backed agent adapter implementing `DryCheckAgentPort`.
+//!
+//! Also provides the `.harness/config/dry-check.json` loader:
+//!
+//! - [`DryCheckConfig`]: loaded dry-check configuration (threshold, schema_version).
+//! - [`DryCheckConfigError`]: errors from [`DryCheckConfig::load`].
 
 mod codec;
 mod codex_dry_checker;
 mod commit_hash_store;
+pub mod config;
 mod diff_getter;
 mod store;
 
 pub use codex_dry_checker::CodexDryChecker;
 pub use commit_hash_store::{DryCheckCommitHashError, FsDryCheckCommitHashStore};
+pub use config::{DryCheckConfig, DryCheckConfigError};
 pub use diff_getter::GitDryCheckDiffGetter;
 pub use store::FsDryCheckStore;

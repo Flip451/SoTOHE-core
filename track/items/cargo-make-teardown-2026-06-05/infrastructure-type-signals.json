@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-06T03:00:44Z",
+  "declaration_hash": "d96f9ca705aa7c1a73b0d807452d098467e11ed7d46b24cea578606ec2376a48",
+  "signals": [
+    {
+      "type_name": "DryCheckConfig",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "DryCheckConfigError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    }
+  ]
+}

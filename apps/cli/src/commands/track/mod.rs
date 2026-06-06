@@ -7,6 +7,7 @@ use clap::{Args, Subcommand};
 
 mod branch_ops;
 mod resolve;
+pub(crate) mod set_commit_hash;
 mod signals;
 mod state_ops;
 pub(crate) mod tddd;
@@ -24,7 +25,7 @@ pub enum TrackCommand {
     /// Transition a task to a new status (atomic read-modify-write).
     Transition {
         /// Path to the track items root directory (e.g., `track/items`).
-        #[arg(long)]
+        #[arg(long, default_value = "track/items")]
         items_dir: PathBuf,
 
         /// Track ID (directory name under items_dir).
@@ -352,6 +353,14 @@ pub enum TrackCommand {
         layer: Option<String>,
     },
 
+    /// Persist the current HEAD SHA to `.commit_hash` for the active track (v2 diff base).
+    ///
+    /// Writes the HEAD SHA to `track/items/<track-id>/.commit_hash`.
+    /// On failure, prints a recovery hint to stderr.
+    ///
+    /// The track ID is resolved from the current git branch when `--track-id` is omitted.
+    SetCommitHash(SetCommitHashArgs),
+
     /// Run catalogue lint rules against a layer catalogue and report violations.
     ///
     /// Wires `FsCatalogueLoader` + `InMemoryCatalogueLinter` +
@@ -428,6 +437,15 @@ pub struct BranchArgs {
 
     /// Track ID used to form the branch name `track/<track-id>`.
     track_id: String,
+}
+
+/// Arguments for `sotp track set-commit-hash`.
+#[derive(Debug, Args, Clone)]
+pub struct SetCommitHashArgs {
+    /// Track ID (directory name under `track/items`).
+    /// When omitted, resolved from the current git branch (`track/<id>`).
+    #[arg(long)]
+    pub track_id: Option<String>,
 }
 
 #[derive(Debug, Args, Clone)]
@@ -593,6 +611,11 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
                 )
             })
         }
+        TrackCommand::SetCommitHash(args) => {
+            resolve_track_id_from_root_for_write(args.track_id, &PathBuf::from("."))
+                .map_err(CliError::Message)
+                .and_then(set_commit_hash::execute_set_commit_hash)
+        }
     };
     match result {
         Ok(code) => code,
@@ -604,9 +627,96 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
+pub(crate) mod test_support {
+    use std::io::{Read as _, Seek as _, SeekFrom, Write as _};
+    use std::os::fd::AsRawFd as _;
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
+    use std::sync::Mutex;
+
+    pub(crate) fn process_env_lock() -> &'static Mutex<()> {
+        static LOCK: Mutex<()> = Mutex::new(());
+        &LOCK
+    }
+
+    pub(crate) fn run_in_dir<T>(path: &Path, run: impl FnOnce() -> T) -> T {
+        let original = std::env::current_dir().unwrap();
+        std::env::set_current_dir(path).unwrap();
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(run));
+        std::env::set_current_dir(original).unwrap();
+        match result {
+            Ok(value) => value,
+            Err(payload) => std::panic::resume_unwind(payload),
+        }
+    }
+
+    pub(crate) fn run_git(path: &Path, args: &[&str]) {
+        let status = Command::new("git")
+            .args(args)
+            .current_dir(path)
+            .env("GIT_AUTHOR_NAME", "Test")
+            .env("GIT_AUTHOR_EMAIL", "test@test.com")
+            .env("GIT_COMMITTER_NAME", "Test")
+            .env("GIT_COMMITTER_EMAIL", "test@test.com")
+            .status()
+            .unwrap();
+        assert!(status.success(), "git {:?} failed with {status}", args);
+    }
+
+    pub(crate) fn seed_repo(path: &Path, branch: &str) {
+        run_git(path, &["init", "-q"]);
+        run_git(path, &["checkout", "-B", branch]);
+        run_git(path, &["commit", "--allow-empty", "-m", "init", "--no-gpg-sign"]);
+    }
+
+    pub(crate) fn create_track_dir(path: &Path, track_id: &str) -> PathBuf {
+        let track_dir = path.join("track").join("items").join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        track_dir
+    }
+
+    pub(crate) fn capture_stderr<T>(run: impl FnOnce() -> T) -> (T, String) {
+        let mut capture = tempfile::tempfile().unwrap();
+        let stderr_fd = std::io::stderr().as_raw_fd();
+        let capture_fd = capture.as_raw_fd();
+        std::io::stderr().flush().unwrap();
+
+        // Safety: `stderr_fd` is a valid process file descriptor for stderr.
+        let saved_fd = unsafe { libc::dup(stderr_fd) };
+        assert!(saved_fd >= 0, "dup(stderr) failed");
+        // Safety: both descriptors are valid; this redirects stderr to the temp file.
+        let redirect_result = unsafe { libc::dup2(capture_fd, stderr_fd) };
+        assert_eq!(redirect_result, stderr_fd, "dup2(capture, stderr) failed");
+
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(run));
+
+        std::io::stderr().flush().unwrap();
+        // Safety: `saved_fd` was returned by `dup`; this restores stderr.
+        let restore_result = unsafe { libc::dup2(saved_fd, stderr_fd) };
+        assert_eq!(restore_result, stderr_fd, "dup2(saved, stderr) failed");
+        // Safety: `saved_fd` is no longer needed after restoring stderr.
+        let close_result = unsafe { libc::close(saved_fd) };
+        assert_eq!(close_result, 0, "close(saved stderr) failed");
+
+        capture.seek(SeekFrom::Start(0)).unwrap();
+        let mut output = String::new();
+        capture.read_to_string(&mut output).unwrap();
+
+        match result {
+            Ok(value) => (value, output),
+            Err(payload) => std::panic::resume_unwind(payload),
+        }
+    }
+}
+
+#[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::commands::track::test_support::{
+        create_track_dir, process_env_lock, run_in_dir, seed_repo,
+    };
     use std::sync::Arc;
     use usecase::track_resolution::{
         ActiveTrackResolveError, ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
@@ -866,6 +976,61 @@ mod tests {
     fn test_resolve_track_id_for_write_none_on_non_track_branch_returns_error() {
         let result = resolve_track_id_for_write_with_reader(None, branch_reader(Some("main")));
         assert!(result.is_err(), "expected Err on non-track branch with no explicit id");
+    }
+
+    #[test]
+    fn test_execute_set_commit_hash_without_track_id_resolves_branch_and_writes_hash() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        seed_repo(dir.path(), "track/my-track-2026");
+        let track_dir = create_track_dir(dir.path(), "my-track-2026");
+
+        let exit = run_in_dir(dir.path(), || {
+            execute(TrackCommand::SetCommitHash(SetCommitHashArgs { track_id: None }))
+        });
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        let written = std::fs::read_to_string(track_dir.join(".commit_hash")).unwrap();
+        assert_eq!(written.trim().len(), 40, "written SHA must be 40 hex chars");
+    }
+
+    #[test]
+    fn test_execute_set_commit_hash_from_subdir_resolves_repo_root_and_writes_hash() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        seed_repo(dir.path(), "track/my-track-2026");
+        let track_dir = create_track_dir(dir.path(), "my-track-2026");
+        let subdir = dir.path().join("nested").join("workdir");
+        std::fs::create_dir_all(&subdir).unwrap();
+
+        let exit = run_in_dir(&subdir, || {
+            execute(TrackCommand::SetCommitHash(SetCommitHashArgs { track_id: None }))
+        });
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        let written = std::fs::read_to_string(track_dir.join(".commit_hash")).unwrap();
+        assert_eq!(written.trim().len(), 40, "written SHA must be 40 hex chars");
+    }
+
+    #[test]
+    fn test_execute_set_commit_hash_with_mismatched_track_id_fails_closed_before_write() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        seed_repo(dir.path(), "track/my-track-2026");
+        create_track_dir(dir.path(), "my-track-2026");
+        let other_track_dir = create_track_dir(dir.path(), "other-track-2026");
+
+        let exit = run_in_dir(dir.path(), || {
+            execute(TrackCommand::SetCommitHash(SetCommitHashArgs {
+                track_id: Some("other-track-2026".to_owned()),
+            }))
+        });
+
+        assert_eq!(exit, ExitCode::FAILURE);
+        assert!(
+            !other_track_dir.join(".commit_hash").exists(),
+            "branch mismatch must fail before writing the explicit track's .commit_hash"
+        );
     }
 
     // ── resolve_track_id_from_root_for_write ─────────────────────────────────

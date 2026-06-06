@@ -18,9 +18,10 @@ Requires being on a `track/<id>` branch. If on any other branch, stop and instru
 Resolve `capabilities.dry-fix-lead` from `.harness/config/agent-profiles.json`:
 
 - **`provider: claude`** — launch the `dry-fix-lead` subagent (`subagent_type: "dry-fix-lead"`, `run_in_background: true`) with the track id, a briefing generated from the most recent `sotp dry write` `DryCheckFinding` output, and the whole-codebase scope ownership (D13). Wait for its terminal status.
-- **`provider: codex`** (default) — launch the T014 wrapper via Bash:
+- **`provider: codex`** (default) — launch the Codex fixer wrapper via Bash:
   `cargo make track-local-dry-fix -- --track-id <id> --briefing-file <path>`
-  The wrapper runs the same `sotp dry write` → fix → `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved` loop inside a `workspace-write` sandbox with credential isolation, and prints one of the three terminal status lines.
+  The `cargo make` wrapper resolves `CODEX_BIN` (asdf shim → real binary) then delegates to
+  `bin/sotp dry fix-local`. The subcommand runs the same `sotp dry write` → fix → `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved` loop inside a `workspace-write` sandbox with credential isolation, and prints one of the three terminal status lines.
 
 ## Step 2: Read the terminal state
 
@@ -34,7 +35,7 @@ The dfl reports exactly ONE of three **mutually-exclusive** outcomes:
 
 ## Step 3: Handle the outcome
 
-- **`completed`**: verify by running `cargo make track-... ` — i.e. run `bin/sotp dry check-approved --track-id <id>` directly and confirm exit 0. Report that DFP passed, and recommend `/track:review` for the RFP phase (a separate command — DFP does NOT run it).
+- **`completed`**: verify by running `bin/sotp dry check-approved --track-id <id>` directly and confirm exit 0. Report that DFP passed, and recommend `/track:review` for the RFP phase (a separate command — DFP does NOT run it).
 - **`blocked`**: surface the unresolved DRY violation pairs (from `bin/sotp dry results --track-id <id> --filter violation`). Clearly state this is a DRY-gate block, NOT a tooling error. Do NOT proceed to review. Recommend the user manually resolve the remaining violations (or escalate).
 - **`failed`**: report the execution / tooling error and stop. Do NOT proceed.
 

@@ -26,20 +26,9 @@ cargo make down          # 停止
 
 `up/down/logs/ps` は dev overlay（`compose.dev.yml`）を使用する。`app` サービスは `bacon`-based のウォッチャーコンテナで、HTTP サーバではない。`tools` サービスは ephemeral で `docker compose run --rm ...` wrapper（`fmt`, `clippy`, `test`, `ci` 等）から起動される。Cargo cache / `target` / pytest cache は repo bind mount を使う。
 
-### tools-daemon（反復作業の高速化）
-
-`tools-daemon` コンテナを起動しておくと、`*-exec` 系タスク（`test-exec`, `clippy-exec`, `fmt-exec`, `check-exec`, `llvm-cov-exec`, `test-one-exec`）を `docker compose exec` 経由で実行でき、`run --rm` の起動オーバーヘッドを回避できる。
-
-```bash
-cargo make tools-up      # 起動（バックグラウンド）
-cargo make tools-down    # 停止
-```
-
-`cargo make ci` / `deny` などの最終ゲートは `run --rm` のまま維持される。`verify-latest-track` はホスト直実行（Docker なし）。
-
 ## Useful Commands
 
-`cargo make help` でカテゴリ付きタスク一覧を表示する。主要 wrapper（`bacon`, `test-exec`, `track-pr-*` 等）は表示一覧から確認する。
+`cargo make help` でカテゴリ付きタスク一覧を表示する。主要 wrapper（`bacon`, `track-pr-*` 等）は表示一覧から確認する。
 
 capability-to-provider マッピング: `.harness/config/agent-profiles.json`
 
