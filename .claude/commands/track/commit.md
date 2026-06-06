@@ -31,7 +31,7 @@ Before committing:
 1. Run `git diff --cached --stat` and verify the staged scope matches the intended commit.
 2. If the staged diff is empty or includes unrelated changes, stop and fix staging before continuing. If `review.json` shows as modified-but-unstaged in `git status`, the caller staged before the final review round — re-stage now before proceeding.
 3. Resolve the current track from the current `track/<id>` branch. A guarded commit from a non-track branch is rejected (fail-closed) — switch to the track branch first.
-4. `track/registry.md` is a generated view (gitignored, not version-controlled). Do NOT attempt to stage or commit it. If the current track's `plan.md` or `spec.md` views appear stale, run `cargo make track-sync-views` to regenerate them. Note: this command syncs views for ALL tracks, so when staging for commit, only include the current track's files — do not stage other tracks' regenerated views. This is purely about commit scope; staging does not affect review hash computation (hashes are worktree-based).
+4. `track/registry.md` is a generated view (gitignored, not version-controlled). Do NOT attempt to stage or commit it. If the current track's `plan.md` or `spec.md` views appear stale, run `bin/sotp track views sync` to regenerate them. Note: from a `track/<id>` branch, this command refreshes `track/registry.md` and the current track's rendered views. When staging for commit, only include the current track's versioned files and intended review artifacts. This is purely about commit scope; staging does not affect review hash computation (hashes are worktree-based).
 
 ## Step 2: Guarded commit
 
@@ -90,6 +90,6 @@ After execution, report:
 
 1. Commit result (success/failure) and commit hash
 2. Commit message used
-3. `track/registry.md` status: regenerated locally via `track-sync-views` / already current / skipped (gitignored, not committed)
+3. `track/registry.md` status: regenerated locally via `bin/sotp track views sync` / already current / skipped (gitignored, not committed)
 4. Git note status: applied (source: generated tmp scratch file) or skipped (reason)
 5. Next recommended action

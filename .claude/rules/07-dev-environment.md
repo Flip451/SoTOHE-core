@@ -62,14 +62,12 @@ cargo make test-doc               # ドキュメントテスト
 cargo make python-lint            # ruff lint（Python scripts / hooks）
 ```
 
-### `sotp make` Dispatch
+### `bin/sotp` Native Subcommands
 
-Some `cargo make` tasks internally delegate to `bin/sotp make <task>`, which
-replaces shell string interpolation with safe Rust argument handling.
-
-Non-git track operations (transition, sync-views, resolve, add-task, etc.) now use
-`bin/sotp` native subcommands directly — there are no longer `cargo make` wrapper
-tasks for them:
+Non-git track operations (transition, sync-views, resolve, add-task, etc.) use
+`bin/sotp` native subcommands directly — there are no `cargo make` wrapper tasks for them.
+Git-write operations (add-all, commit, note, branch ops, PR push) remain routed
+through `cargo make` tasks to stay within the `block-direct-git-ops` hook boundary.
 
 ```bash
 # Direct bin/sotp (native subcommands with default --items-dir track/items)
@@ -79,13 +77,13 @@ bin/sotp track resolve
 bin/sotp track add-task "description with spaces"
 bin/sotp review results
 bin/sotp review check-approved
-bin/sotp review local
-bin/sotp dry fix-local
+bin/sotp review local --round-type fast --group <scope> --track-id <track-id> --briefing-file tmp/reviewer-runtime/briefing-<scope>.md
+bin/sotp dry fix-local --track-id <track-id> --briefing-file tmp/reviewer-runtime/dry-fix-briefing.md
 bin/sotp track signals
 bin/sotp pr status <pr>
 bin/sotp pr wait-and-merge <pr>
 bin/sotp pr ensure-pr
-bin/sotp plan codex-local
+bin/sotp plan codex-local --model <model> --briefing-file tmp/planner-runtime/briefing.md
 ```
 
 ### `bin/sotp` バイナリ管理
