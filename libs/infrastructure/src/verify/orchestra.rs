@@ -182,7 +182,11 @@ const EXPECTED_CARGO_MAKE_ALLOW: &[(&str, &str)] = &[
     ("Bash(cargo make track-pr:*)", "cargo make track-pr wildcard permission"),
     ("Bash(cargo make track-pr-push)", "cargo make track-pr-push permission"),
     ("Bash(cargo make track-pr-review)", "cargo make track-pr-review permission"),
-    ("Bash(cargo make track-set-commit-hash:*)", "cargo make track-set-commit-hash permission"),
+    ("Bash(cargo make track-set-commit-hash)", "cargo make track-set-commit-hash bare permission"),
+    (
+        "Bash(cargo make track-set-commit-hash:*)",
+        "cargo make track-set-commit-hash wildcard permission",
+    ),
     ("Bash(cargo make track-switch-main)", "cargo make track-switch-main permission"),
     (
         "Bash(cargo make track-local-review-fix-codex:*)",

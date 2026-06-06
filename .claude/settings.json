@@ -144,6 +144,7 @@
       "Bash(cargo make track-pr:*)",
       "Bash(cargo make track-pr-push)",
       "Bash(cargo make track-pr-review)",
+      "Bash(cargo make track-set-commit-hash)",
       "Bash(cargo make track-set-commit-hash:*)",
       "Bash(cargo make track-switch-main)",
       "Bash(cargo make track-local-review-fix-codex:*)",
