@@ -8,15 +8,7 @@ use std::process::Command;
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
-const ARCH_RULES_FILE: &str = "architecture-rules.json";
-
-/// A parsed layer rule from `architecture-rules.json`.
-#[derive(Debug, Clone, PartialEq, Eq)]
-struct LayerRule {
-    crate_name: String,
-    path: String,
-    may_depend_on: Vec<String>,
-}
+use crate::arch::{self, LayerEntry};
 
 /// Check layer dependency constraints for all workspace crates.
 ///
@@ -28,11 +20,12 @@ struct LayerRule {
 /// Returns findings when the rules file is missing, cargo metadata fails,
 /// or any direct/transitive layer violation is detected.
 pub fn verify(root: &Path) -> VerifyOutcome {
-    let rules_json = match load_architecture_rules(root) {
+    let rules = match arch::load_rules(root) {
         Ok(v) => v,
         Err(e) => {
             return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "Failed to load {ARCH_RULES_FILE}: {e}"
+                "Failed to load {}: {e}",
+                arch::ARCH_RULES_FILE
             ))]);
         }
     };
@@ -46,7 +39,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
         }
     };
 
-    verify_with_metadata(root, &rules_json, &metadata)
+    verify_rules_with_metadata(root, rules.layers(), &metadata)
 }
 
 /// Verify layer dependencies using pre-loaded cargo metadata JSON.
@@ -72,6 +65,14 @@ pub fn verify_with_metadata(
         }
     };
 
+    verify_rules_with_metadata(root, &rules, metadata)
+}
+
+fn verify_rules_with_metadata(
+    root: &Path,
+    rules: &[LayerEntry],
+    metadata: &serde_json::Value,
+) -> VerifyOutcome {
     let actual_graph = match workspace_graph(metadata) {
         Ok(g) => g,
         Err(e) => {
@@ -82,12 +83,12 @@ pub fn verify_with_metadata(
     };
 
     let _ = root; // root is used only for loading files; not needed here
-    let allowed_graph = allowed_dependency_graph(&rules);
+    let allowed_graph = allowed_dependency_graph(rules);
 
     let mut findings = Vec::new();
 
     // Report crates required by rules but absent from workspace metadata.
-    for rule in &rules {
+    for rule in rules {
         if !actual_graph.contains_key(rule.crate_name.as_str()) {
             findings.push(VerifyFinding::error(format!(
                 "{}: required crate not found in workspace metadata",
@@ -97,7 +98,7 @@ pub fn verify_with_metadata(
     }
 
     // Check each crate that is present in both rules and actual graph.
-    for rule in &rules {
+    for rule in rules {
         if !actual_graph.contains_key(rule.crate_name.as_str()) {
             continue;
         }
@@ -112,89 +113,9 @@ pub fn verify_with_metadata(
     if findings.is_empty() { VerifyOutcome::pass() } else { VerifyOutcome::from_findings(findings) }
 }
 
-/// Read and parse `architecture-rules.json` from the project root.
-fn load_architecture_rules(root: &Path) -> Result<serde_json::Value, String> {
-    let path = root.join(ARCH_RULES_FILE);
-    let content = std::fs::read_to_string(&path)
-        .map_err(|e| format!("cannot read {}: {e}", path.display()))?;
-    serde_json::from_str(&content).map_err(|e| format!("invalid JSON in {}: {e}", path.display()))
-}
-
-/// Parse the `layers` array from the architecture rules JSON.
-fn layer_rules(rules: &serde_json::Value) -> Result<Vec<LayerRule>, String> {
-    let layers = rules
-        .get("layers")
-        .and_then(|v| v.as_array())
-        .ok_or_else(|| "missing or invalid 'layers' array in architecture rules".to_owned())?;
-
-    if layers.is_empty() {
-        return Err("architecture rules 'layers' array is empty".to_owned());
-    }
-
-    let mut result = Vec::with_capacity(layers.len());
-    let mut seen_crates = BTreeSet::new();
-    let mut seen_paths = BTreeSet::new();
-
-    for (i, layer) in layers.iter().enumerate() {
-        let obj = layer.as_object().ok_or_else(|| format!("layer[{i}] is not an object"))?;
-
-        let crate_name = obj
-            .get("crate")
-            .and_then(|v| v.as_str())
-            .filter(|s| !s.is_empty())
-            .ok_or_else(|| format!("layer[{i}] 'crate' must be a non-empty string"))?
-            .to_owned();
-
-        let path = obj
-            .get("path")
-            .and_then(|v| v.as_str())
-            .filter(|s| !s.is_empty())
-            .ok_or_else(|| format!("layer '{crate_name}' must define a non-empty 'path'"))?
-            .to_owned();
-
-        let may_depend_on_arr = match obj.get("may_depend_on") {
-            Some(v) => v
-                .as_array()
-                .ok_or_else(|| format!("layer '{crate_name}' has invalid 'may_depend_on'"))?,
-            None => &Vec::new(), // Python defaults missing may_depend_on to []
-        };
-        let may_depend_on = may_depend_on_arr
-            .iter()
-            .enumerate()
-            .map(|(j, v)| {
-                v.as_str().filter(|s| !s.is_empty()).map(ToOwned::to_owned).ok_or_else(|| {
-                    format!("layer '{crate_name}'.may_depend_on[{j}] must be a non-empty string")
-                })
-            })
-            .collect::<Result<Vec<_>, _>>()?;
-
-        if !seen_crates.insert(crate_name.clone()) {
-            return Err(format!("duplicate crate in architecture rules: {crate_name}"));
-        }
-        if !seen_paths.insert(path.clone()) {
-            return Err(format!("duplicate path in architecture rules: {path}"));
-        }
-
-        result.push(LayerRule { crate_name, path, may_depend_on });
-    }
-
-    // Validate dependency references.
-    let known: BTreeSet<&str> = result.iter().map(|l| l.crate_name.as_str()).collect();
-    for layer in &result {
-        for dep in &layer.may_depend_on {
-            if !known.contains(dep.as_str()) {
-                return Err(format!(
-                    "layer '{}' references unknown dependency: {dep}",
-                    layer.crate_name
-                ));
-            }
-            if dep == &layer.crate_name {
-                return Err(format!("layer '{}' cannot depend on itself", layer.crate_name));
-            }
-        }
-    }
-
-    Ok(result)
+/// Parse the `layers` array through the shared architecture rules parser.
+fn layer_rules(rules: &serde_json::Value) -> Result<Vec<LayerEntry>, String> {
+    arch::parse_rules(rules).map(|rules| rules.layers().to_vec()).map_err(|e| e.to_string())
 }
 
 /// Run `cargo metadata --format-version 1 --locked` and return the parsed JSON.
@@ -350,7 +271,7 @@ fn workspace_graph(
 /// Build the allowed dependency graph from layer rules.
 ///
 /// Returns a map of `crate_name -> allowed crate names`.
-fn allowed_dependency_graph(rules: &[LayerRule]) -> BTreeMap<String, BTreeSet<String>> {
+fn allowed_dependency_graph(rules: &[LayerEntry]) -> BTreeMap<String, BTreeSet<String>> {
     rules
         .iter()
         .map(|r| (r.crate_name.clone(), r.may_depend_on.iter().cloned().collect::<BTreeSet<_>>()))

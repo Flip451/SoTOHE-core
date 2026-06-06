@@ -1,14 +1,15 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-06T05:41:25Z",
-  "declaration_hash": "3ca3c801806052f8310d3972307c332b71ab8e90acd106586dbd0c364a48488a",
+  "generated_at": "2026-06-06T07:01:42Z",
+  "declaration_hash": "2578c3fbfbb92f035b9780d1dd1784da66a0600772bfd852680ebee22c127732",
   "signals": [
     {
       "type_name": "ArchRulesError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -28,26 +29,26 @@
     {
       "type_name": "infrastructure::arch::render_direct_checks",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::arch::render_workspace_members",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::arch::render_workspace_tree",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::arch::render_workspace_tree_full",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::conventions::add_convention_doc",

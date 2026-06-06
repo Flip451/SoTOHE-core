@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3ca3c801806052f8310d3972307c332b71ab8e90acd106586dbd0c364a48488a",
+  "catalogue_declaration_hash": "2578c3fbfbb92f035b9780d1dd1784da66a0600772bfd852680ebee22c127732",
   "signals": [
     {
       "type_name": "ArchRulesError",

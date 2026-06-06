@@ -4,7 +4,7 @@
     {
       "id": "T001",
       "description": "Add infrastructure arch module: create libs/infrastructure/src/arch.rs (or arch/mod.rs) with ArchRulesError enum (Io/Parse/InvalidRules variants + Debug/Display/Error impls), and four free functions render_workspace_tree, render_workspace_tree_full, render_workspace_members, render_direct_checks — each taking &std::path::Path (workspace root) and returning Result<String, ArchRulesError>. Implement workspace tree rendering (crate-only and with extra_dirs), members listing (one path per line), and direct-check matrix (crate TAB forbidden|crates) matching Python output format exactly (CN-02/IN-10). Register the new module in libs/infrastructure/src/lib.rs. Add Rust unit tests covering: tree rendering with known architecture-rules.json fixture, members listing, direct-checks output format parity, error cases (missing file, invalid JSON). No CLI wiring yet — infrastructure layer only.",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T002",
@@ -39,7 +39,8 @@
   ],
   "plan": {
     "summary": [
-      "Known generated-view deviation for this review: contract-map.md currently renders update_convention_index and verify_convention_index with the same F82 length prefix in their Mermaid node ids. This is a contract-map-renderer issue, not plan content, and the renderer fix is tracked separately."
+      "Known generated-view deviation for this review: contract-map.md currently renders update_convention_index and verify_convention_index with the same F82 length prefix in their Mermaid node ids. This is a contract-map-renderer issue, not plan content, and the renderer fix is tracked separately.",
+      "Known generated-view deviation for this review: infrastructure-types.md signal columns reflect implementation-scope work already present in the worktree. The T001 arch functions and ArchRulesError trait impls may render blue (implemented) while T002+ types remain yellow (not yet implemented)."
     ],
     "sections": [
       {

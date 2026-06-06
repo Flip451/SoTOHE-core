@@ -1,6 +1,82 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ExtraDirEntry.label` is required here, but the Python reference treats it as optional with a default empty string. A valid `extra_dirs` entry without a label will now fail to load, and the error will surface as `Parse` instead of `InvalidRules`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 52,
+              "category": "correctness"
+            },
+            {
+              "message": "`load_rules()` still misses Python-side validation for malformed input: empty `may_depend_on` items are accepted, and `extra_dirs` paths are not checked for duplicates or collisions with layer paths. Those cases should be rejected as `InvalidRules`; today they can be accepted or silently alter the rendered tree.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 62,
+              "category": "correctness"
+            },
+            {
+              "message": "`ArchRulesError::Io` embeds `rules_path.display()` in the public error string. When the caller passes an absolute workspace root, this leaks an internal filesystem path to the user.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "line": 65,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:88b8f31b7e55178e8ddf04a4148b669bdde02e482509f2dada0ee141567e4d98",
+          "at": "2026-06-06T06:01:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_rules()` eagerly parses `extra_dirs` ([arch.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs#L178)), so malformed `extra_dirs` make `render_workspace_members`, `render_direct_checks`, and `render_workspace_tree(..., include_extra_dirs = false)` fail even though the Python reference ignores `extra_dirs` for those code paths. This is a behavior regression for valid workspace-member/direct-check outputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/arch.rs",
+              "line": 178,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f3a759af8c026f754d06a5d2326a10ce98c997bce4c9ff5b931c36644927d67e",
+          "at": "2026-06-06T06:10:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cabc8ff3c7cfce0e1773adf091389846866495ba323a294f00bb42bb62dd80d",
+          "at": "2026-06-06T06:16:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cabc8ff3c7cfce0e1773adf091389846866495ba323a294f00bb42bb62dd80d",
+          "at": "2026-06-06T06:19:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
+          "at": "2026-06-06T06:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8d51aecc5e133ba791c6c0478780b20d3c8198d49f027971fa23baa802a6382",
+          "at": "2026-06-06T06:44:38Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -202,6 +278,123 @@
           "findings": [],
           "hash": "rvw1:sha256:aa9fd20dd8043fc5b14c414211c71c48fc49f868d19b7037bb4074827a1bc17d",
           "at": "2026-06-06T05:39:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ArchRulesError` is the only new infrastructure type rendered as `🔴`, while the four `infrastructure::arch::*` entry points in the same artifact are already `🔵`. For a task that is only moved to `in_progress`, that red declaration is internally inconsistent with the rest of the plan artifact and should not appear here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:86da0b54f97437397677abfb33aca5fcb682ba8b085b6b4a094a9df5d3f83027",
+          "at": "2026-06-06T06:00:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8d55e56ab64bf83d4fd899b094cbeb1dfacc3c36186687c9aade3d11c25cdf5",
+          "at": "2026-06-06T06:05:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The type catalogue now adds `From<serde_json::Error>` for `ArchRulesError`, but this scope's briefing limits plan-artifact changes to T001 status, the rendered plan, and the added DRY check. T001's plan text also only calls for Debug/Display/Error impls, so this expands the tracked public/design surface outside the intended plan transition.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.json",
+              "line": 343,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d8d55e56ab64bf83d4fd899b094cbeb1dfacc3c36186687c9aade3d11c25cdf5",
+          "at": "2026-06-06T06:08:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The generated type artifact now changes T001 type signals beyond the intended plan-only status transition: `ArchRulesError` is marked red while the four `infrastructure::arch::*` functions are marked blue. The briefing explicitly says the plan artifacts should be unchanged except T001 moving to `in_progress`, the plan render, and the DRY result, with type signals remaining yellow as an accepted pre-implementation deviation. This makes the reviewed plan artifacts contradict the declared review state and needs either corrected regeneration or an explicit updated justification.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:86da0b54f97437397677abfb33aca5fcb682ba8b085b6b4a094a9df5d3f83027",
+          "at": "2026-06-06T06:12:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61ae0178f70e4f8dadc0eaf95cdce844b1380d56063cf01dc5aeac62d79396b2",
+          "at": "2026-06-06T06:17:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da3780ca8098a22d44080b8eba7d1b003173ace7bdd96281c2b6897af0ef52f5",
+          "at": "2026-06-06T06:38:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da3780ca8098a22d44080b8eba7d1b003173ace7bdd96281c2b6897af0ef52f5",
+          "at": "2026-06-06T06:41:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::verify::convention_docs::verify` is marked `delete` here, but `impl-plan.json` task T002 still requires the compatibility shim and its `pub mod` entry to remain until T004 rewires the caller. That makes the artifact set internally inconsistent about whether the shim still exists.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.json",
+              "line": 305,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e3c4dbc067315d05f2d8d98494ed7272a8c7a8765f5fe9fbd522b35850b0aada",
+          "at": "2026-06-06T06:53:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3c4dbc067315d05f2d8d98494ed7272a8c7a8765f5fe9fbd522b35850b0aada",
+          "at": "2026-06-06T06:57:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The summary says ArchRulesError's intended catalogue surface remains only Debug, Display, and Error, with From<serde_json::Error> treated as an out-of-catalogue implementation deviation. But infrastructure-types.json now catalogs core::convert::From<serde_json::Error> for ArchRulesError as an action add. That makes the deviation part of the approved type surface and contradicts the plan's stated API boundary; either remove the From entry or update the summary if From is intended.",
+              "severity": "P1",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.json",
+              "line": 343,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e3c4dbc067315d05f2d8d98494ed7272a8c7a8765f5fe9fbd522b35850b0aada",
+          "at": "2026-06-06T06:59:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8fc27ce67f91e3e7595a0815b50a3ce7bb81037e5ad22f4d8a52d702a14d8eb",
+          "at": "2026-06-06T07:01:33Z"
         }
       ]
     }

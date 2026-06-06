@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "07afea008c119bfb970b59da6325428f3878e01946b65a50822b5fecbb491dee",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "954c8484964d9cc8ca430a4adc32a3b9c7251135e8eb83e9c2c00a725affd966",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper, e.g. `fn render_workspace_tree_from_rules(rules: &ArchRules, include_extra_dirs: bool) -> String`, or `fn build_workspace_tree_entries(rules: &ArchRules, include_extra_dirs: bool) -> Vec<(String, String)>`. Then implement `render_workspace_tree` with `include_extra_dirs = false` and `render_workspace_tree_full` with `include_extra_dirs = true`."
+        }
+      },
+      "similarity_score": 0.9321261644363404,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "Both functions duplicate the same workflow in the same module: load rules, convert layers into labeled tree entries, create borrowed entry refs, call build_tree_lines, and join with newlines. The only behavioral difference is whether extra_dirs are appended, so the repeated tree-rendering logic is avoidable and likely to drift if formatting or entry construction changes.",
+      "recorded_at": "2026-06-06T05:52:10Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "7c3d9562fb9ccaa97b9cd9e15eb5004f25ab7ece13f6243c593a79bdec92d826",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "a6468439f6df4ca97c925293367a8ad7dfdbded3818f351d6e93174fe19919d8",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9281771183013916,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "The fragments share minimal test setup structure, but they verify complementary behavior of two different APIs: `render_workspace_tree` should exclude `extra_dirs`, while `render_workspace_tree_full` should include them. The repeated lines are ordinary test scaffolding and the assertions encode distinct requirements, so extracting them would likely reduce clarity without removing meaningful duplication.",
+      "recorded_at": "2026-06-06T05:52:23Z"
+    },
+    {
+      "low_path": "libs/domain/src/lib.rs",
+      "low_hash": "3de5191c87d6c658aebc45dfe3c5810fb5e7f56f201d9f75fc36235ac4f56d0c",
+      "high_path": "libs/infrastructure/src/lib.rs",
+      "high_hash": "3bdfdca1cb9d14331f21185bec4eb785f86004c0ae478ccf486c5ff3d9310112",
+      "changed_path": "libs/infrastructure/src/lib.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8883441090583801,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "The fragments are both crate root module/export lists, but they serve different crate boundaries: infrastructure declares infrastructure adapters and helpers, while domain declares domain modules and re-exports domain types. The overlap in names such as dry_check, review_v2, semantic_dup, spec, tddd, track, and verify reflects parallel domain/infrastructure organization rather than duplicated implementation or repeated business logic. There is no copied algorithm, validation rule, or behavior that would require extraction.",
+      "recorded_at": "2026-06-06T05:52:36Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "06ff73f85ac5d952213a683c037b40246a6c471c4403316d3b65bbc29f2ea804",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "b198263e0752cdec8e0836c82abdbd7a6340761abccc672851aef9cd6a74bae1",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8988229036331177,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "The two functions are intentionally small public wrappers over the shared implementation `render_tree_inner`, differing only in the boolean mode they expose (`false` vs `true`). The repeated `load_rules(root)?` call is minimal glue needed to preserve two distinct API entry points, and the core tree rendering logic is already centralized.",
+      "recorded_at": "2026-06-06T05:55:13Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "0e9b87a6b30e04ae2d211d522c25c7bb7d35a49a1e5a11e57729f59f66202573",
+      "high_path": "libs/infrastructure/src/verify/architecture_rules.rs",
+      "high_hash": "a2b85593c197e91d5129d0a8564abfcdb7917529907ac1fb978dfdf3df0fc6cf",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared helper or constant for loading the architecture rules JSON, for example `const ARCH_RULES_FILE: &str = \"architecture-rules.json\"` plus `load_rules_json(root: &Path) -> Result<Value, ArchRulesError>` or an equivalent helper with an error type that callers can map. Then `libs/infrastructure/src/arch.rs` can call the helper and pass the `Value` to `parse_rules`, while `verify/architecture_rules.rs` can reuse the same helper or map its typed errors into its existing `String` diagnostics."
+        }
+      },
+      "similarity_score": 0.9227760434150696,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "Both fragments encode the same knowledge: the architecture rules file is named `architecture-rules.json`, is located under the supplied root path, must be read from disk, and must be parsed as JSON. The changed fragment adds typed rule parsing and a typed error, while the candidate returns raw JSON with string errors, but the file-discovery and JSON-loading behavior is duplicated. If the file name, lookup rules, or JSON-loading policy changes, both places must be updated.",
+      "recorded_at": "2026-06-06T06:21:32Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "94c5f4c05e9b13237637d156b69255bcc3a09e6bc32baafc36389b3ae7e39f1a",
+      "high_path": "libs/infrastructure/src/verify/architecture_rules.rs",
+      "high_hash": "b13d968bec1693180cef363e32fe3400b21e6cab1d3fcc737dd886405306de1d",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract a shared parser/validator for layer rule entries in libs/infrastructure, returning a common validated layer representation or accepting a small adapter to construct ArchRules/LayerRule. Keep caller-specific wrapping such as extra_dirs and error type conversion at the edges, but centralize the layer schema validation, duplicate checks, dependency reference checks, and deny_reason handling."
+        }
+      },
+      "similarity_score": 0.8990381956100464,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "Both fragments implement the same architecture-layer JSON schema parsing and validation: required non-empty layers, required crate/path strings, optional may_depend_on array, deny_reason validation, duplicate crate/path checks, unknown dependency checks, and self-dependency rejection. The duplication is behavioral, not just structural, and drift is already visible in error messages, unknown-dependency handling, and deny_reason treatment, so future schema changes could easily update one parser but not the other.",
+      "recorded_at": "2026-06-06T06:21:51Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "94c5f4c05e9b13237637d156b69255bcc3a09e6bc32baafc36389b3ae7e39f1a",
+      "high_path": "libs/infrastructure/src/verify/layers.rs",
+      "high_hash": "8098d6c0b6dd2cfe44d0928befc0d191a35396c7d058894ad52d42b5f8a3622b",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Extract the shared layer parsing and validation into one reusable function or domain type, for example parse_layer_entries(value) -> Result<Vec<LayerEntry>, ArchRulesError>, and have both ArchRules parsing and verify/layers.rs consume that shared representation or map its error type at the boundary."
+        }
+      },
+      "similarity_score": 0.8961541652679443,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "Both fragments encode the same architecture-layer JSON contract: require a non-empty layers array, parse crate/path/may_depend_on, reject duplicate crates and paths, validate dependency references, and reject self-dependencies. The newer parser already diverges in details such as aggregated unknown-dependency reporting, deny_reason validation, extra_dirs retention, and error wording, which is exactly the maintenance risk DRY is meant to prevent.",
+      "recorded_at": "2026-06-06T06:22:07Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "15173e0d672586b0eba347c7b22db979b8f6bf4a9635f86e25157561ab20b89e",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "ef254fba58ad4e4858ecff3fa1f45e11f68c5576269747eab72a0ad03a14c928",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8973620533943176,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "The two public wrapper functions have intentionally distinct semantics: one renders the normal workspace tree and the other includes extra_dirs. The shared behavior is already factored into load_rules and render_tree_inner; the remaining duplication is a small, readable API wrapper differing only in the include-extra-dirs flag.",
+      "recorded_at": "2026-06-06T06:22:27Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "046e13d593dcbd2522595618d279fb98f67dc7501911ae1707eaac4560929a5d",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "7c3d9562fb9ccaa97b9cd9e15eb5004f25ab7ece13f6243c593a79bdec92d826",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8942520022392273,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "Both fragments exercise the same public API and share a small arrange/act pattern, but they verify distinct behavior: labeled extra_dirs are rendered with their label, while unlabeled extra_dirs still render their path segments. The repeated setup and render call are normal test structure and not enough duplication to justify abstraction.",
+      "recorded_at": "2026-06-06T06:22:44Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "21d3a41bf92ac78b54a34e6c03761213460f47ac2770c2ebbcd13da568667e92",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "a669c46ab217319cce892d0d2bbd1ef6a83ced7d8e54f2c1d6c66fee9dfee999",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8578981757164001,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "Both fragments are tests for `render_workspace_tree_full` returning `ArchRulesError::InvalidRules`, but they cover distinct validation cases: malformed `extra_dirs` type versus a duplicate extra dir path colliding with a layer path. The changed test also asserts that other renderers still succeed before checking the full tree failure, so the repeated setup/error assertion is incidental test structure rather than duplicated domain logic.",
+      "recorded_at": "2026-06-06T06:22:59Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "1a52d9674604c4b704b7e1115239a4a1b80498e9911e288c3c9aa204083fbcf4",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "9727df4f9c005cc6d30982844a9a613f179152e98c45ee714cee61562a2f38b9",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8733563423156738,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "Both tests share a small setup because they exercise the same missing-file scenario, but they assert different behaviors: one verifies the error type is `ArchRulesError::Io`, while the other verifies the display string redacts the workspace path and includes the expected filename. The duplication is minimal and improves test clarity, so it does not constitute a DRY violation.",
+      "recorded_at": "2026-06-06T06:23:13Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "1aa30bd8fee96dc000133c53b999693e5e1197f479320e410bd5d5b7e31c458b",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "a669c46ab217319cce892d0d2bbd1ef6a83ced7d8e54f2c1d6c66fee9dfee999",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8669683933258057,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "Both fragments share a small, conventional test shape, but they exercise distinct invalid-rules cases: duplicate layer crate names versus an extra_dirs path colliding with a layer path. The differing JSON fixtures and render functions are the meaningful parts of each test, so extracting a helper would likely obscure the specific scenarios without removing harmful duplication.",
+      "recorded_at": "2026-06-06T06:23:26Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "bc5c142a7b9fd10d7f944f00233a072380e07385368c94e664dacb31b3ce2e0e",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "fa3ffc93b53176e818d0d7e988f5705523f0ec6c00d579358a6fd8a4c9e92f5e",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.888879656791687,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "The fragments share the same small test skeleton, but they encode distinct invalid-rule cases: an empty dependency name versus an unknown dependency name. The repeated setup/assertion is ordinary test fixture structure and does not duplicate domain logic or maintenance-sensitive production behavior.",
+      "recorded_at": "2026-06-06T06:23:43Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/arch.rs",
+      "low_hash": "542566316e61c9a84ef92263f75b4715add251c44c77799c88d70c9874a2f253",
+      "high_path": "libs/infrastructure/src/arch.rs",
+      "high_hash": "a669c46ab217319cce892d0d2bbd1ef6a83ced7d8e54f2c1d6c66fee9dfee999",
+      "changed_path": "libs/infrastructure/src/arch.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.9567491412162781,
+      "threshold": 0.8500000238418579,
+      "base_commit": "46f2e6c222aa97b49e63d2a063faf13b37eba861",
+      "rationale": "The fragments are similar test scaffolding, but they exercise distinct validation rules: one rejects an extra directory whose path duplicates a layer path, and the other rejects duplicate paths within extra_dirs. The repeated setup/assertion is small and keeps each test case explicit, so this does not create meaningful maintenance risk.",
+      "recorded_at": "2026-06-06T06:23:55Z"
+    }
+  ]
+}
