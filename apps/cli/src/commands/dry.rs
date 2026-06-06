@@ -63,8 +63,8 @@ pub struct DryWriteArgs {
     pub db_path: PathBuf,
 
     /// Cosine similarity threshold (0.0–1.0) above which a pair is flagged.
-    #[arg(long, default_value_t = 0.85_f32)]
-    pub threshold: f32,
+    #[arg(long)]
+    pub threshold: Option<f32>,
 
     /// Workspace root to scan for Rust sources (corpus + diff fragment extraction).
     #[arg(long, default_value = ".")]
@@ -180,8 +180,8 @@ pub struct DryCheckApprovedArgs {
     pub db_path: PathBuf,
 
     /// Cosine similarity threshold (0.0–1.0).
-    #[arg(long, default_value_t = 0.85_f32)]
-    pub threshold: f32,
+    #[arg(long)]
+    pub threshold: Option<f32>,
 
     /// Workspace root to scan for Rust sources (corpus + diff fragment extraction).
     #[arg(long, default_value = ".")]
@@ -309,7 +309,7 @@ mod tests {
                 assert_eq!(args.track_id, "my-track");
                 assert!(args.base_commit.is_none(), "base_commit must be absent by default");
                 assert_eq!(args.db_path, PathBuf::from(".semantic_index"));
-                assert!((args.threshold - 0.85).abs() < 1e-6);
+                assert!(args.threshold.is_none(), "threshold must be absent by default");
                 assert!(
                     args.model.is_none(),
                     "model must be absent by default (resolved from agent-profiles)"
@@ -351,7 +351,7 @@ mod tests {
         let cmd = parse_dry(&["dry", "write", "--track-id", "my-track", "--threshold", "0.9"]);
         match cmd {
             DryCommand::Write(args) => {
-                assert!((args.threshold - 0.9).abs() < 1e-5);
+                assert!((args.threshold.unwrap() - 0.9).abs() < 1e-5);
             }
             other => panic!("expected Write, got {other:?}"),
         }
@@ -426,6 +426,19 @@ mod tests {
                 assert_eq!(args.track_id.as_deref(), Some("my-track"));
                 assert!(args.base_commit.is_none(), "base_commit must be absent by default");
                 assert_eq!(args.db_path, PathBuf::from(".semantic_index"));
+                assert!(args.threshold.is_none(), "threshold must be absent by default");
+            }
+            other => panic!("expected CheckApproved, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_dry_check_approved_custom_threshold_parses() {
+        let cmd =
+            parse_dry(&["dry", "check-approved", "--track-id", "my-track", "--threshold", "0.9"]);
+        match cmd {
+            DryCommand::CheckApproved(args) => {
+                assert!((args.threshold.unwrap() - 0.9).abs() < 1e-5);
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }

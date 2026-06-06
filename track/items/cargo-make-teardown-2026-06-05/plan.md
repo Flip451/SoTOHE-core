@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # cargo make ラッパー層の解体 — bin/sotp 直叩きへの一本化
 
-## Tasks (7/10 resolved)
+## Tasks (8/10 resolved)
 
 ### S1 — New infrastructure additions (D9, D6 new native)
 
@@ -53,7 +53,7 @@
 > Remove the 0.85 hardcodes from apps/cli/src/commands/dry.rs and wire DryCheckConfig::load in composition dry.rs, making --threshold an Option with fail-closed behaviour when the config file is absent. The DEFAULT_THRESHOLD constant and resolve_commit_dry_threshold function were already eliminated when T004 deleted composition make.rs wholesale; T007 verifies their absence as part of this task.
 > Depends on T001 (DryCheckConfig::load exists in infrastructure) and T004 (composition make.rs is already deleted, removing any conflict with the DEFAULT_THRESHOLD constant that lived there).
 
-- [ ] **T007**: D9 hardcode removal: in apps/cli/src/commands/dry.rs change --threshold default_value_t from 0.85 to Option<f32> (no default); in DryWriteInput and DryCheckApprovedInput change threshold field to Option<f32>; in composition dry.rs and dry/mod.rs wire DryCheckConfig::load to supply threshold when CLI Option is None; verify resolve_commit_dry_threshold is gone (was in composition make.rs deleted in T004); verify DEFAULT_THRESHOLD = 0.85 constant is gone (was in composition make.rs deleted in T004); add integration-level tests verifying fail-closed behaviour when dry-check.json is absent. Depends on T001 (DryCheckConfig::load) and T004 (composition make.rs already deleted, so no conflict with the DEFAULT_THRESHOLD constant and resolve_commit_dry_threshold that lived there). CI must pass after this commit.
+- [x] **T007**: D9 hardcode removal: in apps/cli/src/commands/dry.rs change --threshold default_value_t from 0.85 to Option<f32> (no default); in DryWriteInput and DryCheckApprovedInput change threshold field to Option<f32>; in composition dry.rs and dry/mod.rs wire DryCheckConfig::load to supply threshold when CLI Option is None; verify resolve_commit_dry_threshold is gone (was in composition make.rs deleted in T004); verify DEFAULT_THRESHOLD = 0.85 constant is gone (was in composition make.rs deleted in T004); add integration-level tests verifying fail-closed behaviour when dry-check.json is absent. Depends on T001 (DryCheckConfig::load) and T004 (composition make.rs already deleted, so no conflict with the DEFAULT_THRESHOLD constant and resolve_commit_dry_threshold that lived there). CI must pass after this commit.
 
 ### S8 — Orphan / ghost cleanup (D7) and final sync sweep (D8)
 

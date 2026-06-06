@@ -43,7 +43,7 @@
     {
       "id": "T007",
       "description": "D9 hardcode removal: in apps/cli/src/commands/dry.rs change --threshold default_value_t from 0.85 to Option<f32> (no default); in DryWriteInput and DryCheckApprovedInput change threshold field to Option<f32>; in composition dry.rs and dry/mod.rs wire DryCheckConfig::load to supply threshold when CLI Option is None; verify resolve_commit_dry_threshold is gone (was in composition make.rs deleted in T004); verify DEFAULT_THRESHOLD = 0.85 constant is gone (was in composition make.rs deleted in T004); add integration-level tests verifying fail-closed behaviour when dry-check.json is absent. Depends on T001 (DryCheckConfig::load) and T004 (composition make.rs already deleted, so no conflict with the DEFAULT_THRESHOLD constant and resolve_commit_dry_threshold that lived there). CI must pass after this commit.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T009",
