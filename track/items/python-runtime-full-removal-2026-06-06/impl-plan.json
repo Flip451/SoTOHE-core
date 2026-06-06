@@ -38,7 +38,7 @@
     {
       "id": "T007",
       "description": "Roadmap ADR back-reference (IN-09, AC-09): Edit knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md — append a back-reference note to the Phase 3 section body stating that this ADR's remaining work (convention_docs / architecture_rules command migration and scripts/ deletion) is completed by knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md. Do NOT modify the front-matter (no status/superseded_by changes — OS-04). This is a minimal prose addition only. CI must pass after this commit.",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {

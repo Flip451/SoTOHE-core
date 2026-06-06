@@ -6,7 +6,7 @@
 Known generated-view deviation for this review: contract-map.md currently renders update_convention_index and verify_convention_index with the same F82 length prefix in their Mermaid node ids. This is a contract-map-renderer issue, not plan content, and the renderer fix is tracked separately.
 Known generated-view deviation for this review: infrastructure-types.md signal columns reflect implementation progress. All infrastructure catalogue types now render blue (0 yellow). T003-T007 types are CLI/other layer types not tracked in the infrastructure catalogue.
 
-## Tasks (6/7 resolved)
+## Tasks (7/7 resolved)
 
 ### S1 — Infrastructure layer additions (architecture rules + convention docs)
 
@@ -44,4 +44,4 @@ Known generated-view deviation for this review: infrastructure-types.md signal c
 
 > Append the back-reference note to the Phase 3 section of the roadmap ADR (knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md) recording that this ADR's work completes the Phase 3 remaining tasks (IN-09, AC-09). No front-matter changes (OS-04). This is a standalone commit that can land after the main implementation is CI-green.
 
-- [ ] **T007**: Roadmap ADR back-reference (IN-09, AC-09): Edit knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md — append a back-reference note to the Phase 3 section body stating that this ADR's remaining work (convention_docs / architecture_rules command migration and scripts/ deletion) is completed by knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md. Do NOT modify the front-matter (no status/superseded_by changes — OS-04). This is a minimal prose addition only. CI must pass after this commit.
+- [x] **T007**: Roadmap ADR back-reference (IN-09, AC-09): Edit knowledge/adr/2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md — append a back-reference note to the Phase 3 section body stating that this ADR's remaining work (convention_docs / architecture_rules command migration and scripts/ deletion) is completed by knowledge/adr/2026-06-03-1327-python-runtime-full-removal.md. Do NOT modify the front-matter (no status/superseded_by changes — OS-04). This is a minimal prose addition only. CI must pass after this commit.
