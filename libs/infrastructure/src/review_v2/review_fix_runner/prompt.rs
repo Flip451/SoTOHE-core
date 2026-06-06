@@ -34,10 +34,11 @@ pub(super) fn shell_quote_arg(raw: &str) -> String {
 /// it via `bin/sotp review files --scope <scope>` (ADR 2026-06-01-2300 D1).
 ///
 /// `bin/sotp review local` does not run `track-active-gate` automatically;
-/// the reviewer invocation therefore prepends `bin/sotp track views sync`
-/// to ensure rendered views / signal hashes are fresh before each review
-/// round (preserving the AC-12 guarantee from the old `cargo make
-/// track-local-review` `dependencies = ["track-active-gate"]` chain).
+/// the reviewer invocation therefore prepends the full active gate
+/// (`type-signals` → `catalogue-spec-signals` → `views sync`) to ensure
+/// signal hashes and rendered views are fresh before each review round
+/// (preserving the guarantee from the old `cargo make track-local-review`
+/// `dependencies = ["track-active-gate"]` chain).
 pub(super) fn build_prompt(
     scope: &str,
     briefing_file: &Path,
@@ -54,7 +55,10 @@ pub(super) fn build_prompt(
     let scope = prompt_path_string(Path::new(scope), "scope")?;
     let round_type = prompt_path_string(Path::new(&command.round_type), "round_type")?;
     let reviewer_invocation = format!(
-        "bin/sotp track views sync && bin/sotp review local --round-type {} \
+        "bin/sotp track type-signals && \
+         bin/sotp track catalogue-spec-signals && \
+         bin/sotp track views sync && \
+         bin/sotp review local --round-type {} \
          --group {} --track-id {} --briefing-file {}",
         shell_quote_arg(&round_type),
         shell_quote_arg(&scope),
@@ -115,6 +119,28 @@ mod tests {
 
         assert!(prompt.contains("bin/sotp review local --round-type"));
         assert!(!prompt.contains("--model"), "reviewer invocation must not include --model flag");
+    }
+
+    #[test]
+    fn test_build_prompt_prepends_full_active_gate_before_reviewer() {
+        let dir = tempfile::tempdir().unwrap();
+        let briefing = dir.path().join("briefing.md");
+        std::fs::write(&briefing, "briefing").unwrap();
+
+        let prompt = build_prompt("infrastructure", &briefing, &make_command()).unwrap();
+
+        assert!(
+            prompt.contains("bin/sotp track type-signals"),
+            "must run type-signals as part of the pre-review gate"
+        );
+        assert!(
+            prompt.contains("bin/sotp track catalogue-spec-signals"),
+            "must run catalogue-spec-signals as part of the pre-review gate"
+        );
+        assert!(
+            prompt.contains("bin/sotp track views sync"),
+            "must run views sync as part of the pre-review gate"
+        );
     }
 
     #[test]

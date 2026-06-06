@@ -55,7 +55,8 @@
     {
       "id": "T010",
       "description": "D8 remaining downstream sync sweep: audit all remaining doc references in DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, CLAUDE.md, LOCAL_DEVELOPMENT.md for stale cargo make task names (track-local-plan, track-local-review, track-check-approved, track-review-results, etc.) and update to bin/sotp native forms; sweep .claude/commands/**, .claude/skills/**, .claude/agents/** for any residual cargo make call-sites missed in T005; sweep doc_patterns.rs, view_freshness.rs, convention_docs.rs error messages and policy.rs block messages for references to deleted tasks; verify orchestra.rs allowlist matches final Makefile.toml task set exactly; run scripts/test_make_wrappers.py selftest to confirm all deleted task tests are removed or skipped; confirm cargo make ci passes end-to-end.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "56d948ed"
     }
   ],
   "plan": {

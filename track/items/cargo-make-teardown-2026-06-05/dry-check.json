@@ -1971,11 +1971,24 @@
       "high_hash": "68d55ac66e9f2965fd32cb0e06b9db14d669cdb3232da2cd8f27e6027fc534fe",
       "changed_path": "apps/cli-composition/src/dry.rs",
       "verdict": "accepted",
-      "similarity_score": 0.9168446660041809,
+      "similarity_score": 0.9168446660041808,
       "threshold": 0.8500000238418579,
       "base_commit": "ea93fde8256c80d7a04fcd32e4e204d55c5a5cc3",
       "rationale": "The fragments repeat most of the DryWriteInput test setup, but they exercise complementary branches of the same behavior: explicit model bypasses agent-profiles resolution, while model: None forces agent-profiles resolution. The duplicated fields are incidental test fixture setup rather than duplicated domain logic, and keeping them inline preserves the branch-specific intent. This is acceptable test duplication, not a DRY violation requiring refactoring.",
       "recorded_at": "2026-06-06T00:33:41Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+      "low_hash": "273d72c9e27ad5aa0731834ec1200c2f7a1338ef9787084c59501ff8e6ccc3d4",
+      "high_path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+      "high_hash": "b2c98ac888af514469581ccfdb129454bcc8f802605c6db7db941a55c421256e",
+      "changed_path": "libs/infrastructure/src/review_v2/review_fix_runner/prompt.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8581917881965637,
+      "threshold": 0.8500000238418579,
+      "base_commit": "56d948ed2ebf6735ec477ce1011ad29ab5fe9d33",
+      "rationale": "The fragments share simple test setup for creating a temp briefing file and building a prompt, but they assert different behavior: one checks the reviewer invocation omits `--model`, while the other checks the pre-review gate commands are present. This is ordinary test arrange boilerplate and does not duplicate the same knowledge or behavior enough to require abstraction.",
+      "recorded_at": "2026-06-06T01:38:15Z"
     }
   ]
 }
