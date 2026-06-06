@@ -1,0 +1,61 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {},
+  "traits": {},
+  "functions": {
+    "infrastructure::verify::module_size::verify": {
+      "action": "modify",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Check .rs file sizes against module_limits in architecture-rules.json. Test files (*_tests.rs, tests/ directory) and #[cfg(test)] blocks are excluded from the line count. Files exceeding max_lines (700) cause an error-level finding (fail-closed per CN-04). Files exceeding warn_lines (400) but within max_lines produce a warning.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-01",
+          "hash": "6ff2dc2d64a2168ebadff3e01214372dcd08ffd2ad365ab5858b8a167e86964a"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-04",
+          "hash": "109e80b371c072b2f699a3c6a5e71e822f1c6a8829a44cc9086f2db84de29da7"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-01",
+          "hash": "8ca95cde09b44c6b8c8a2ff7cdb14ab18801298d2e01bd696427f2b79f51c9d8"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-02",
+          "hash": "ff15dcf75481001d85d62bd68c074707e42e317aa94a21099fb2071f374985e3"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-04",
+          "hash": "577af833d6068a976919cc8b12181ab2be3daeb55ef02dc574507607d809eafb"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "AC-01",
+          "hash": "95dd4c493630df3247d719673ccf3fcd5b040dcef096920fedbdbc18eff9cbff"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "AC-05",
+          "hash": "1616c6afd6f6522683dc91720757e6e83e6dc7bce963e3754fb5ed1087d8c912"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [],
+  "trait_impls": []
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "111eb265c71129dabfbe7f70a238cacc08e8084deadffa50811e00df1a7df59f",
+  "signals": [
+    {
+      "type_name": "Severity",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyFinding",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifyOutcome",
+      "signal": "blue"
+    }
+  ]
+}

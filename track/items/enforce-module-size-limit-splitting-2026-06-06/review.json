@@ -16,6 +16,42 @@
           "findings": [],
           "hash": "rvw1:sha256:945f45d5314e97cb17022ab01960c94275e670ee12824a01eaedabc26c2658fd",
           "at": "2026-06-06T16:20:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.md` says T001 must land before any file-splitting task, but `impl-plan.json` encodes every task with `depends_on: []`. The machine-readable plan therefore permits the split work to run out of order, which contradicts the stated sequencing requirement.",
+              "severity": "P1",
+              "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/impl-plan.json",
+              "line": 11,
+              "category": "contradiction"
+            },
+            {
+              "message": "The three reference entries in `domain-types.json` still have empty `spec_refs` arrays. This scope's checklist requires formal `spec_refs` with SHA-256 hashes, so the type catalogue is not fully grounded as written.",
+              "severity": "P1",
+              "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/domain-types.json",
+              "line": 6,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:cf228572642abcd6330e9684b0b7c7b39653022d1b76bd779032969f7f592fa3",
+          "at": "2026-06-06T16:49:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:911879a09738c0cc7e7794876debe935b872d71b2eb97b03f3a1f620d0f10436",
+          "at": "2026-06-06T16:54:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:911879a09738c0cc7e7794876debe935b872d71b2eb97b03f3a1f620d0f10436",
+          "at": "2026-06-06T16:57:32Z"
         }
       ]
     }

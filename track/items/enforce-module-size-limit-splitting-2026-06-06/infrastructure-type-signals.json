@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-06T16:58:30Z",
+  "declaration_hash": "db1c37220137b928bc6705a3153a1f6bbf0f110f100d412ed70d8bf177588286",
+  "signals": [
+    {
+      "type_name": "infrastructure::verify::module_size::verify",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
