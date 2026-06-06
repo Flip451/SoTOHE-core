@@ -6,7 +6,7 @@
 Known generated-view deviation for this review: contract-map.md currently renders update_convention_index and verify_convention_index with the same F82 length prefix in their Mermaid node ids. This is a contract-map-renderer issue, not plan content, and the renderer fix is tracked separately.
 Known generated-view deviation for this review: infrastructure-types.md signal columns reflect implementation progress. All infrastructure catalogue types now render blue (0 yellow). T003-T007 types are CLI/other layer types not tracked in the infrastructure catalogue.
 
-## Tasks (5/7 resolved)
+## Tasks (6/7 resolved)
 
 ### S1 — Infrastructure layer additions (architecture rules + convention docs)
 
@@ -38,7 +38,7 @@ Known generated-view deviation for this review: infrastructure-types.md signal c
 > With Makefile.toml wrapper deletion/rewrite decisions already completed in T005, sweep downstream prose consumers (slash commands, skills, agents, workflow docs, DEVELOPER_AI_WORKFLOW.md, CLAUDE.md, .claude/rules/07-dev-environment.md) to remove references to deleted Python-backed cargo make tasks and update to the Rust-native wrapper or direct bin/sotp native entrypoint chosen in T005 (AC-10).
 > No Makefile.toml or orchestra/settings permission synchronization is deferred into this task; T006 is documentation and command-reference cleanup after the CI-sensitive removal commit.
 
-- [ ] **T006**: Downstream docs/commands/skills/agents update (AC-10): With Makefile.toml wrapper deletion/rewrite decisions already completed in T005, update downstream prose references only: scan DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, CLAUDE.md, .claude/commands/**, .claude/skills/**, .claude/agents/** for references to deleted cargo make Python wrapper tasks and update them to the surviving Rust-native wrapper or direct bin/sotp arch ... / bin/sotp conventions ... entrypoint chosen in T005. Do not defer any Makefile.toml or orchestra/settings permission synchronization from T005 into this task. CI must pass after this commit. Depends on T005.
+- [x] **T006**: Downstream docs/commands/skills/agents update (AC-10): With Makefile.toml wrapper deletion/rewrite decisions already completed in T005, update downstream prose references only: scan DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, CLAUDE.md, .claude/commands/**, .claude/skills/**, .claude/agents/** for references to deleted cargo make Python wrapper tasks and update them to the surviving Rust-native wrapper or direct bin/sotp arch ... / bin/sotp conventions ... entrypoint chosen in T005. Do not defer any Makefile.toml or orchestra/settings permission synchronization from T005 into this task. CI must pass after this commit. Depends on T005.
 
 ### S5 — Roadmap ADR back-reference
 

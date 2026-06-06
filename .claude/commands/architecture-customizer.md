@@ -18,7 +18,6 @@ Required workflow:
    - `Cargo.toml`
    - `architecture-rules.json`
    - `deny.toml`
-   - `scripts/check_layers.py`
    - `Makefile.toml`
 4. Update crates and dependency edges.
 5. Update architecture-facing documents:
@@ -26,7 +25,6 @@ Required workflow:
    - `track/workflow.md`
    - `CLAUDE.md` when the file tree changes
 6. Run:
-   - `python3 -m py_compile scripts/check_layers.py`
    - `cargo fmt --all -- --check`
    - `cargo make check-layers`
    - `cargo make verify-arch-docs`

@@ -28,7 +28,7 @@ Operating notes:
 - Prefer `/track:*` over any legacy alias
 - `plan.md` is a read-only view rendered from `metadata.json`
 - `architecture-rules.json` is the SSoT for workspace structure and layer policy
-- Workspace tree: `cargo make workspace-tree` / `cargo make workspace-tree-full`
+- Workspace tree: `bin/sotp arch tree` / `bin/sotp arch tree-full`
 - Implementation is blocked while `track/tech-stack.md` still has unresolved `TODO:` markers
 - Keep references to `knowledge/conventions/` up to date
 - Read `.claude/rules/08-orchestration.md`, `.claude/rules/09-maintainer-checklist.md`, and `.claude/rules/10-guardrails.md` before making changes

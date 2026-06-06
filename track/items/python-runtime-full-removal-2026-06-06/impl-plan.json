@@ -33,7 +33,7 @@
     {
       "id": "T006",
       "description": "Downstream docs/commands/skills/agents update (AC-10): With Makefile.toml wrapper deletion/rewrite decisions already completed in T005, update downstream prose references only: scan DEVELOPER_AI_WORKFLOW.md, track/workflow.md, .claude/rules/07-dev-environment.md, CLAUDE.md, .claude/commands/**, .claude/skills/**, .claude/agents/** for references to deleted cargo make Python wrapper tasks and update them to the surviving Rust-native wrapper or direct bin/sotp arch ... / bin/sotp conventions ... entrypoint chosen in T005. Do not defer any Makefile.toml or orchestra/settings permission synchronization from T005 into this task. CI must pass after this commit. Depends on T005.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T007",
