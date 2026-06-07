@@ -13,4 +13,4 @@ mod builder;
 mod child_items;
 mod state;
 
-pub(super) use builder::phase1_build_s_and_d;
+pub(crate) use builder::phase1_build_s_and_d;

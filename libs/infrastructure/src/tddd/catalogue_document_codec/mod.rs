@@ -38,6 +38,7 @@ use thiserror::Error;
 mod decode;
 mod dto;
 mod encode;
+mod validate;
 
 use decode::dto_to_domain;
 use dto::SchemaVersionProbe;

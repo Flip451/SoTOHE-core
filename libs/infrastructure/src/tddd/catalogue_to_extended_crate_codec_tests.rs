@@ -14,7 +14,9 @@ use domain::tddd::catalogue_v2::{
     CatalogueDocument, CrateName, FieldName, MethodName, ModulePath, ParamName, TraitName,
     TypeName, TypeRef, VariantName,
 };
-use rustdoc_types::{Id, ItemEnum, Type};
+use rustdoc_types::{
+    GenericBound, GenericParamDefKind, Id, ItemEnum, Type, VariantKind, WherePredicate,
+};
 
 use super::*;
 use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;

@@ -433,6 +433,7 @@ mod tests {
     };
 
     use super::{items_structurally_equal, structs_structurally_equal};
+    use crate::tddd::signal_evaluator_v2::generics_eq::make_simple_trait_bound as make_trait_bound;
 
     fn make_struct_field_item(id: Id, ty_str: &str) -> Item {
         Item {
@@ -866,16 +867,6 @@ mod tests {
         GenericParamDef {
             name: name.to_string(),
             kind: GenericParamDefKind::Type { bounds, default: None, is_synthetic: false },
-        }
-    }
-
-    /// Builds a `GenericBound::TraitBound` for a plain trait name (no generics,
-    /// no HRTB) — the only bound kind the A-codec can encode.
-    fn make_trait_bound(trait_name: &str) -> rustdoc_types::GenericBound {
-        rustdoc_types::GenericBound::TraitBound {
-            trait_: Path { path: trait_name.to_string(), id: Id(0), args: None },
-            generic_params: vec![],
-            modifier: rustdoc_types::TraitBoundModifier::None,
         }
     }
 

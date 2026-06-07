@@ -1,0 +1,235 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Severity": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Info",    "payload": { "kind": "unit" } },
+          { "name": "Warning", "payload": { "kind": "unit" } },
+          { "name": "Error",   "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify",
+      "docs": "Severity level for a verification finding. Carried as reference so downstream edges (VerifyFinding, VerifyOutcome) resolve in the contract-map.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-04",
+          "hash": "577af833d6068a976919cc8b12181ab2be3daeb55ef02dc574507607d809eafb"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyFinding": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "severity", "ty": "Severity" },
+            { "name": "message",  "ty": "String" }
+          ],
+          "returns": "VerifyFinding",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "error",
+          "receiver": null,
+          "params": [
+            { "name": "message", "ty": "String" }
+          ],
+          "returns": "VerifyFinding",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "warning",
+          "receiver": null,
+          "params": [
+            { "name": "message", "ty": "String" }
+          ],
+          "returns": "VerifyFinding",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "severity",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Severity",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "message",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "verify",
+      "docs": "A single verification finding. Carried as reference for contract-map edge resolution.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-01",
+          "hash": "6ff2dc2d64a2168ebadff3e01214372dcd08ffd2ad365ab5858b8a167e86964a"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-04",
+          "hash": "577af833d6068a976919cc8b12181ab2be3daeb55ef02dc574507607d809eafb"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "VerifyOutcome": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "pass",
+          "receiver": null,
+          "params": [],
+          "returns": "VerifyOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "from_findings",
+          "receiver": null,
+          "params": [
+            { "name": "findings", "ty": "Vec<VerifyFinding>" }
+          ],
+          "returns": "VerifyOutcome",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "is_ok",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "has_errors",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "findings",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[VerifyFinding]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "add",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "finding", "ty": "VerifyFinding" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "merge",
+          "receiver": "&mut self",
+          "params": [
+            { "name": "other", "ty": "VerifyOutcome" }
+          ],
+          "returns": "()",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "error_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "verify",
+      "docs": "Outcome of a verification check. Carried as reference for contract-map edge resolution.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "AC-01",
+          "hash": "95dd4c493630df3247d719673ccf3fcd5b040dcef096920fedbdbc18eff9cbff"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-04",
+          "hash": "577af833d6068a976919cc8b12181ab2be3daeb55ef02dc574507607d809eafb"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": []
+}

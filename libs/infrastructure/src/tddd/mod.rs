@@ -26,6 +26,7 @@ pub mod contract_map_adapter;
 pub mod contract_map_renderer_adapter;
 pub mod fs_catalogue_spec_signals_store;
 pub mod in_memory_catalogue_linter;
+pub(crate) mod mermaid_style;
 pub mod rustdoc_baseline_capture_adapter;
 pub mod rustdoc_crate_adapter;
 pub mod signal_evaluator_v2;

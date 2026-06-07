@@ -11,6 +11,8 @@ use domain::verify::{VerifyFinding, VerifyOutcome};
 use syn::spanned::Spanned;
 use syn::visit::Visit;
 
+use super::syn_helpers::has_cfg_test_attr as has_cfg_test;
+
 const USECASE_SRC_DIR: &str = "libs/usecase/src";
 
 /// Path prefixes forbidden in pure layers (domain, usecase).
@@ -451,24 +453,10 @@ fn impl_item_attrs(item: &syn::ImplItem) -> &[syn::Attribute] {
 }
 
 fn has_test_attr(attrs: &[syn::Attribute]) -> bool {
-    attrs.iter().any(|attr| {
-        // #[test]
-        if attr.path().is_ident("test") {
-            return true;
-        }
-        // #[cfg(test)]
-        if attr.path().is_ident("cfg") {
-            let mut found = false;
-            let _ = attr.parse_nested_meta(|meta| {
-                if meta.path.is_ident("test") {
-                    found = true;
-                }
-                Ok(())
-            });
-            return found;
-        }
-        false
-    })
+    // #[test] — direct test attribute
+    attrs.iter().any(|attr| attr.path().is_ident("test"))
+        // #[cfg(test)] — delegated to shared helper
+        || has_cfg_test(attrs)
 }
 
 #[cfg(test)]

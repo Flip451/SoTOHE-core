@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-07T12:51:35Z",
+  "declaration_hash": "81f4199059ebe4b9eee3912ebf52dbd8d196059df60abf73b3f82e371b919ed8",
+  "signals": [
+    {
+      "type_name": "infrastructure::track::render::plan::render_plan",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::track::render::registry::render_registry",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::track::render::snapshot::collect_track_snapshots",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::track::render::sync::sync_rendered_views",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::track::render::validate::validate_track_snapshots",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::module_size::verify",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::track::render::collect_track_snapshots",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::track::render::render_plan",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::track::render::render_registry",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::track::render::sync_rendered_views",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::track::render::validate_track_snapshots",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::plan_artifact_refs::build_element_map",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::verify::plan_artifact_refs::canonical_json_sha256",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

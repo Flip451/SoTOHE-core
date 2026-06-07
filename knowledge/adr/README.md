@@ -187,6 +187,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [semantic-dup を活用した DRY 違反の自動検出 capability](2026-06-02-0716-dry-checker.md) | Proposed | 2026-06-02 |
 | [dry-checker(sotp dry)の運用修正 — Codex アカウント対応・スキーマ厳格化・インデックス除外・insert と埋め込みの一括化・インデックス永続化](2026-06-04-1042-dry-checker-operability-and-batch-index.md) | Proposed | 2026-06-04 |
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
+| [モジュールサイズ制限の厳格化と分割リファクタリング](2026-06-06-1609-enforce-module-size-limit-splitting.md) | Proposed | 2026-06-06 |
 
 ### Review コマンド / API
 

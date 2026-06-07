@@ -20,7 +20,11 @@ use domain::schema::{
 };
 use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
 use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
-use rustdoc_types::{GenericArg, GenericArgs, ItemEnum, Type, Variant, VariantKind, Visibility};
+use rustdoc_types::{ItemEnum, Type, Variant, VariantKind, Visibility};
+
+#[path = "schema_export/format_helpers.rs"]
+mod format_helpers;
+use format_helpers::{collect_type_names, format_type};
 
 /// Adapter implementing `SchemaExporter` via rustdoc JSON.
 pub struct RustdocSchemaExporter {
@@ -674,130 +678,13 @@ fn extract_return_type_names(sig: &rustdoc_types::FunctionSignature) -> Vec<Stri
     })
 }
 
-/// Collect type names from a rustdoc `Type`, selectively unwrapping only
-/// `Result<T, E>` and `Option<T>` (extracting the first generic argument).
-///
-/// Other generic wrappers (`Vec<T>`, `HashMap<K,V>`, `Box<T>`, `Arc<T>`, etc.)
-/// are added as bare names without recursing into their type arguments.
-/// `BorrowedRef` (`&T`) is unwrapped to extract the inner type.
-/// `Tuple` elements are NOT expanded (tuples are not transition targets).
-fn collect_type_names(ty: &Type, out: &mut Vec<String>) {
-    match ty {
-        Type::ResolvedPath(p) => {
-            let name = p.path.rsplit("::").next().unwrap_or(&p.path);
-            match name {
-                "Result" | "Option" => {
-                    if let Some(args) = &p.args {
-                        if let GenericArgs::AngleBracketed { args, .. } = args.as_ref() {
-                            if let Some(GenericArg::Type(inner)) = args.first() {
-                                collect_type_names(inner, out);
-                            }
-                        }
-                    }
-                }
-                _ => {
-                    out.push(name.to_string());
-                }
-            }
-        }
-        Type::BorrowedRef { type_: inner, .. } => {
-            collect_type_names(inner, out);
-        }
-        _ => {}
-    }
-}
-
-/// Recursive type formatter at L1 resolution.
-///
-/// Renders a rustdoc `Type` as a short-name string, preserving generic
-/// structure verbatim. Module paths are stripped (last segment only). The
-/// unit type `()` is rendered explicitly.
-fn format_type(ty: &Type) -> String {
-    match ty {
-        Type::ResolvedPath(p) => {
-            let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
-            if let Some(args) = &p.args {
-                let rendered = format_args(args);
-                if rendered.is_empty() { short } else { format!("{short}<{rendered}>") }
-            } else {
-                short
-            }
-        }
-        Type::Generic(name) => name.clone(),
-        Type::Primitive(name) => name.clone(),
-        Type::BorrowedRef { is_mutable, type_: inner, .. } => {
-            let mut_str = if *is_mutable { "mut " } else { "" };
-            format!("&{mut_str}{}", format_type(inner))
-        }
-        Type::Slice(inner) => format!("[{}]", format_type(inner)),
-        Type::Array { type_: inner, len } => {
-            // Sanitize: const-generic length expressions may contain `::` (e.g. `N::VALUE`).
-            // Replace `::` with `.` to preserve the L1 invariant that rendered type strings
-            // never contain `::`.
-            let safe_len = len.replace("::", ".");
-            format!("[{}; {}]", format_type(inner), safe_len)
-        }
-        Type::Tuple(tys) if tys.is_empty() => "()".to_string(),
-        Type::Tuple(tys) => {
-            let items: Vec<String> = tys.iter().map(format_type).collect();
-            format!("({})", items.join(", "))
-        }
-        Type::RawPointer { is_mutable, type_: inner } => {
-            let kw = if *is_mutable { "mut" } else { "const" };
-            format!("*{kw} {}", format_type(inner))
-        }
-        Type::ImplTrait(bounds) => {
-            let rendered = bounds
-                .iter()
-                .filter_map(|b| match b {
-                    rustdoc_types::GenericBound::TraitBound { trait_, .. } => {
-                        Some(trait_.path.rsplit("::").next().unwrap_or(&trait_.path).to_string())
-                    }
-                    _ => None,
-                })
-                .collect::<Vec<_>>()
-                .join(" + ");
-            if rendered.is_empty() { "impl _".to_string() } else { format!("impl {rendered}") }
-        }
-        Type::DynTrait(dyn_trait) => {
-            let rendered = dyn_trait
-                .traits
-                .iter()
-                .map(|pt| pt.trait_.path.rsplit("::").next().unwrap_or(&pt.trait_.path).to_string())
-                .collect::<Vec<_>>()
-                .join(" + ");
-            if rendered.is_empty() { "dyn _".to_string() } else { format!("dyn {rendered}") }
-        }
-        _ => "_".to_string(),
-    }
-}
-
-/// Render angle-bracketed generic argument lists. Lifetime and const
-/// arguments are preserved in source order; type arguments are recursively
-/// formatted via `format_type`.
-fn format_args(args: &GenericArgs) -> String {
-    match args {
-        GenericArgs::AngleBracketed { args, .. } => args
-            .iter()
-            .map(|arg| match arg {
-                GenericArg::Type(t) => format_type(t),
-                GenericArg::Lifetime(lt) => lt.clone(),
-                // Sanitize: const expressions may contain `::` (e.g. `N::VALUE`).
-                // Replace `::` with `.` to preserve the L1 invariant that rendered
-                // type strings never contain `::`.
-                GenericArg::Const(c) => c.expr.replace("::", "."),
-                GenericArg::Infer => "_".to_string(),
-            })
-            .collect::<Vec<_>>()
-            .join(", "),
-        GenericArgs::Parenthesized { .. } => String::new(),
-        GenericArgs::ReturnTypeNotation => String::new(),
-    }
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
+    use rustdoc_types::{
+        FunctionHeader, FunctionPointer, FunctionSignature, GenericArg, GenericArgs,
+    };
+
     use super::*;
 
     /// Helper: build a `ResolvedPath` type with optional generic args.
@@ -816,6 +703,38 @@ mod tests {
 
     fn simple(name: &str) -> Type {
         resolved(name, None)
+    }
+
+    fn trait_bound(name: &str) -> rustdoc_types::GenericBound {
+        rustdoc_types::GenericBound::TraitBound {
+            trait_: rustdoc_types::Path {
+                path: name.to_owned(),
+                id: rustdoc_types::Id(0),
+                args: None,
+            },
+            generic_params: vec![],
+            modifier: rustdoc_types::TraitBoundModifier::None,
+        }
+    }
+
+    fn poly_trait(name: &str) -> rustdoc_types::PolyTrait {
+        rustdoc_types::PolyTrait {
+            trait_: rustdoc_types::Path {
+                path: name.to_owned(),
+                id: rustdoc_types::Id(0),
+                args: None,
+            },
+            generic_params: vec![],
+        }
+    }
+
+    fn default_fn_header() -> FunctionHeader {
+        FunctionHeader {
+            is_async: false,
+            is_const: false,
+            is_unsafe: false,
+            abi: rustdoc_types::Abi::Rust,
+        }
     }
 
     #[test]
@@ -929,6 +848,78 @@ mod tests {
     fn format_type_renders_unit_tuple() {
         let ty = Type::Tuple(vec![]);
         assert_eq!(format_type(&ty), "()");
+    }
+
+    #[test]
+    fn format_type_preserves_impl_trait_bound_order_for_schema_export() {
+        let ty = Type::ImplTrait(vec![trait_bound("crate::B"), trait_bound("crate::A")]);
+        assert_eq!(format_type(&ty), "impl B + A");
+    }
+
+    #[test]
+    fn format_type_preserves_dyn_trait_bound_order_for_schema_export() {
+        let ty = Type::DynTrait(rustdoc_types::DynTrait {
+            traits: vec![poly_trait("crate::B"), poly_trait("crate::A")],
+            lifetime: Some("'a".to_owned()),
+        });
+        assert_eq!(format_type(&ty), "dyn B + A");
+    }
+
+    #[test]
+    fn format_type_ignores_associated_type_constraints_for_schema_export() {
+        let ty = Type::ResolvedPath(rustdoc_types::Path {
+            path: "Iterator".to_owned(),
+            id: rustdoc_types::Id(0),
+            args: Some(Box::new(GenericArgs::AngleBracketed {
+                args: vec![],
+                constraints: vec![rustdoc_types::AssocItemConstraint {
+                    name: "Item".to_owned(),
+                    args: None,
+                    binding: rustdoc_types::AssocItemConstraintKind::Equality(
+                        rustdoc_types::Term::Type(simple("u8")),
+                    ),
+                }],
+            })),
+        });
+        assert_eq!(format_type(&ty), "Iterator");
+    }
+
+    #[test]
+    fn format_type_renders_function_pointer_for_schema_export() {
+        let ty = Type::FunctionPointer(Box::new(FunctionPointer {
+            sig: FunctionSignature {
+                inputs: vec![("_".to_string(), simple("Input"))],
+                output: Some(simple("Output")),
+                is_c_variadic: false,
+            },
+            header: default_fn_header(),
+            generic_params: vec![],
+        }));
+        assert_eq!(format_type(&ty), "fn(Input)->Output");
+    }
+
+    #[test]
+    fn format_type_renders_pattern_base_type_for_schema_export() {
+        let ty = Type::Pat {
+            type_: Box::new(simple("NonZero")),
+            __pat_unstable_do_not_use: "1..".to_string(),
+        };
+        assert_eq!(format_type(&ty), "NonZero");
+    }
+
+    #[test]
+    fn format_type_renders_qualified_path_for_schema_export() {
+        let ty = Type::QualifiedPath {
+            name: "Item".to_string(),
+            self_type: Box::new(Type::Generic("T".to_string())),
+            trait_: Some(rustdoc_types::Path {
+                path: "core::iter::Iterator".to_string(),
+                id: rustdoc_types::Id(0),
+                args: None,
+            }),
+            args: None,
+        };
+        assert_eq!(format_type(&ty), "<T as Iterator>::Item");
     }
 
     #[test]

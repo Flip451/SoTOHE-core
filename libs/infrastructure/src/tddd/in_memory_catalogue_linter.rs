@@ -91,78 +91,25 @@ use domain::tddd::catalogue_linter::{
     CatalogueLintViolation, CatalogueLinter, CatalogueLinterError, CatalogueLinterRule,
     CatalogueLinterRuleKind,
 };
-use domain::tddd::catalogue_v2::{
-    CatalogueDocument, ContractRole, DataRole, FunctionRole, StructShape, TypeKindV2,
+use domain::tddd::catalogue_v2::{CatalogueDocument, DataRole, StructShape, TypeKindV2};
+
+// Kind-tag helpers are the single source of truth in `type_signals_evaluator::signal_tags`.
+// Import them directly so the linter and the signal evaluator share the same mapping.
+use crate::tddd::type_signals_evaluator::signal_tags::{
+    contract_role_kind_tag, data_role_kind_tag, function_role_kind_tag,
 };
 
 // ---------------------------------------------------------------------------
-// Kind-tag helpers
+// Kind-tag alias used within this module
 // ---------------------------------------------------------------------------
 
 /// Derives the v2-compatible kind tag for a v3 `TypeEntry`.
 ///
-/// This is a self-contained definition of the grandfathered kind-tag mapping.
-/// Lint rules targeting v2 kind tags fire for v3 entries equivalently:
-///
-/// 1. `Struct(StructKind { typestate: Some(_), .. })` (any shape) → `"typestate"`
-/// 2. `Enum { .. }` with `ErrorType` role → `"error_type"`
-/// 3. `Enum { .. }` with other role → `"enum"`
-/// 4. All other shapes → v2-compat role mapping via `data_role_kind_tag_v2compat`
-///
-/// The role mapping collapses `Entity`, `AggregateRoot`, and `Specification` to
-/// `"value_object"` so that `value_object` lint rules cover those entries (the v2
-/// stub rendered all three as `ValueObject` shape).
+/// Delegates to `signal_tags::data_role_kind_tag`, which is the single source of
+/// truth for the grandfathered kind-tag mapping shared by the type-signal evaluator
+/// and the catalogue linter.
 fn type_entry_kind_tag(role: DataRole, kind: &TypeKindV2) -> &'static str {
-    match kind {
-        TypeKindV2::Struct(sk) if sk.typestate.is_some() => "typestate",
-        TypeKindV2::Enum { .. } if matches!(role, DataRole::ErrorType) => "error_type",
-        TypeKindV2::Enum { .. } => "enum",
-        _ => data_role_kind_tag_v2compat(role),
-    }
-}
-
-/// Maps a v3 `DataRole` to its v2-compatible kind tag string.
-///
-/// `Entity`, `AggregateRoot`, and `Specification` collapse to `"value_object"`
-/// (v2-compatible kind-tag scheme, grandfathered). All other roles map 1-to-1.
-fn data_role_kind_tag_v2compat(role: DataRole) -> &'static str {
-    match role {
-        DataRole::ValueObject
-        | DataRole::Entity
-        | DataRole::AggregateRoot
-        | DataRole::Specification => "value_object",
-        DataRole::DomainService => "domain_service",
-        DataRole::Factory => "factory",
-        DataRole::UseCase => "use_case",
-        DataRole::Interactor => "interactor",
-        DataRole::Command => "command",
-        DataRole::Query => "query",
-        DataRole::Dto => "dto",
-        DataRole::ErrorType => "error_type",
-        DataRole::SecondaryAdapter => "secondary_adapter",
-    }
-}
-
-fn contract_role_kind_tag(role: ContractRole) -> &'static str {
-    match role {
-        // SpecificationPort collapses to "secondary_port" for lint-rule compatibility:
-        // both SecondaryPort and SpecificationPort map to kind_tag "secondary_port"
-        // under the v2-compatible (grandfathered) scheme. Existing lint rules
-        // configured for "secondary_port" must continue to fire for SpecificationPort
-        // entries so rule behaviour is equivalent to the v2 mapping.
-        ContractRole::SpecificationPort | ContractRole::SecondaryPort => "secondary_port",
-        ContractRole::ApplicationService => "application_service",
-    }
-}
-
-fn function_role_kind_tag(role: FunctionRole) -> &'static str {
-    match role {
-        // All FunctionRole variants collapse to "free_function" for lint-rule
-        // compatibility (v2-compatible grandfathered scheme): both `FreeFunction` and
-        // `UseCaseFunction` map to `"free_function"`, matching the `type_signals_evaluator`
-        // storage key. Lint rules targeting "free_function" fire for UseCaseFunction entries.
-        FunctionRole::FreeFunction | FunctionRole::UseCaseFunction => "free_function",
-    }
+    data_role_kind_tag(role, kind)
 }
 
 // ---------------------------------------------------------------------------

@@ -10,15 +10,7 @@
 //! Full rendering pipeline (node extraction, edge rendering, cluster enumeration) will be
 //! implemented in T005–T010.
 //!
-//! Style config section structure:
-//! - `[node.*]`    — shape + class for node categories (Method, Variant, Function).
-//! - `[pattern.*]` — overlay class for structural patterns (future extension).
-//! - `[class.*]`   — mermaid `classDef` parameters.
-//! - `[edge.*]`    — arrow syntax + optional label.
-//! - `[filter]`    — future rendering filters.
-//!
-//! `[role.*]` is intentionally absent: Reality View input is `rustdoc_types::Crate`,
-//! which carries no catalogue role data (ADR 2026-05-22-1507 Decision C / IN-04).
+//! Private TOML schema DTOs and section details live in `render::style_config`.
 //!
 //! Symmetric to `ContractMapRendererAdapter`. (IN-02 / IN-04 / AC-02 / AC-15 / CN-02 / CN-06)
 
