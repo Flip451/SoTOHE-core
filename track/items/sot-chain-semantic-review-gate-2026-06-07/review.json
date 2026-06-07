@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf8e69931b03436e4959459fdb86cdb81ac8294f2226871841524b397c6e6719",
+          "at": "2026-06-07T16:30:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 states that concrete model values should live in `agent-profiles.json` and that non-canonical configuration examples should not be placed in the ADR body, but the preceding paragraph includes a concrete provider/model example (`claude-opus-4-7`, `gpt-5.4-mini`). Remove the concrete example or relax the stated rule; as written the ADR contradicts itself on whether model examples belong in the ADR.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+              "line": 136,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cf8e69931b03436e4959459fdb86cdb81ac8294f2226871841524b397c6e6719",
+          "at": "2026-06-07T17:10:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e2a19e8f49e3a8d62cdc0666ca4d94b12ef1813e5eb289e4a1bee19c898f1c6",
+          "at": "2026-06-07T17:12:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3788c71d67efe985cb62ad77995c37e229013be05470bcc5b9fd1184e6a0c839",
+          "at": "2026-06-07T17:27:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3788c71d67efe985cb62ad77995c37e229013be05470bcc5b9fd1184e6a0c839",
+          "at": "2026-06-07T17:29:48Z"
+        }
+      ]
+    }
+  }
+}
