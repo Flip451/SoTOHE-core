@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-07T21:09:58Z",
+  "declaration_hash": "92eaad770247ea5a900f56e3d6fa192ae90e4365560917d07849fdbb52bcc10b",
+  "signals": [
+    {
+      "type_name": "AgentExecutionRunner",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AgentRefVerifierAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "RefVerifierPort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CatalogueSpecVerifyCacheDocumentDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyCacheAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "RefVerifyCachePort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyPairSourceAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "RefVerifyPairSourcePort",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "SemanticVerdictDto",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SemanticVerifyCodecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SemanticVerifyEntryDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "SpecAdrVerifyCacheDocumentCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "SpecAdrVerifyCacheDocumentDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AgentProfiles",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RoundType",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

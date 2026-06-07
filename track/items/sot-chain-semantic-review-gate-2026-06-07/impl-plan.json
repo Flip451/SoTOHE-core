@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "`plan-artifact-refs` 検証器に `AdrRef` の anchor 実在確認を追加する (IN-03 / AC-05 / D3)。`libs/infrastructure/src/verify/plan_artifact_refs/mod.rs` の Step 3「spec.json の file-based refs を検証する」ループ内で、`AdrRef` ごとに `check_ref_file` によるファイル存在確認に加えて anchor 実在確認を実施する。具体的には: (1) ADR ファイルを UTF-8 で読み込む、(2) YAML front-matter ブロック (ファイル先頭の `---` ... `---`) を既存の `parse_yaml_frontmatter` ヘルパーまたは簡易抽出で取得する、(3) `#[derive(Deserialize)]` 付きの `AdrFrontMatterDto { decisions: Vec<AdrDecisionDto> }` と `AdrDecisionDto { id: String }` を定義し、`serde_yaml::from_str::<AdrFrontMatterDto>` で typed deserialize する、(4) DTO の decisions 配列に `AdrRef.anchor` の値 (例: `\"D1\"`) が含まれなければ `VerifyFinding::error` を追加する。front-matter がない ADR は anchor 実在確認不能として fail-closed の `VerifyFinding::error` を追加する (OS-02 との整合: ADR に canonical hash は作らないが、anchor 存在確認は D3/AC-05 の構造ゲートとして必須)。パース失敗 (不正 YAML / decisions 配列なし) は typed-deserialization error finding として扱う。anchor 確認に使う `AdrDecisionIdExtractor` または DTO + helper を `spec_refs.rs` か新規 `adr_anchor.rs` に追加する — infrastructure の ADR パース責務はここにとどめ usecase や domain には持ち込まない。unit tests: anchor が ADR decisions[].id に存在する場合に pass / anchor が存在しない場合に error finding / front-matter のない ADR で error finding / decisions 配列が空の front-matter で anchor 確認を行い error finding / decisions 欠落や型不一致で typed-deserialization error finding を追加する。前提: なし (独立タスク)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "domain 層に意味論レビュー専用の value object 群を追加する (IN-04 / IN-07 / IN-10 / CN-01 / CN-06)。追加対象は type catalogue `domain-types.json` に宣言された新規型すべて: `EvidenceCitation` (非空の validated newtype String — `try_new` コンストラクタ、`as_str` アクセサ、`Display`・`PartialEq`・`Eq`・`Clone`・`Debug` を実装)。`SemanticVerdict` enum (variants: `Pass { citation: EvidenceCitation }` / `Fail { reason: String }` / `Pending` — Pass は citation 必須で「引用なし合格」を構造的に排除)。`SemanticVerifyEntry` struct (`claim_hash: ContentHash` / `evidence_hash: ContentHash` / `verdict: SemanticVerdict` の 3 フィールド、`new` コンストラクタ)。`ModelTier` enum (`Fast` / `Final` の 2 variants — domain 層内の意味論ゲート専用: `infrastructure::agent_profiles::RoundType` とは独立した型で CN-01 を満たす)。`SpecAdrVerifyCacheDocument` struct (`entries: Vec<SemanticVerifyEntry>` の 1 フィールド、`new` コンストラクタ — Chain① `spec-adr-verify-cache.json` のルートドキュメント)。`CatalogueSpecVerifyCacheDocument` struct (`layer: LayerId` / `entries: Vec<SemanticVerifyEntry>` の 2 フィールド、`new` コンストラクタ — Chain② `<layer>-catalogue-spec-verify-cache.json` のルートドキュメント)。モジュール配置: `libs/domain/src/tddd/semantic_verify.rs` (新規)。すべての型は serde derives なし (hexagonal アーキテクチャ原則: serde は infrastructure 層の codec に置く)。`ValidationError` に `EvidenceCitationEmpty` variant を追加する (または既存 variant を再利用: 既存コードを確認して重複を避ける)。unit tests: `EvidenceCitation::try_new` で空文字 / 空白のみ → エラー / 非空 → OK / `SemanticVerdict::Pass` が citation フィールドを保持すること / `SemanticVerdict::Fail` が reason を保持すること / `SemanticVerifyEntry::new` で各フィールドが正しく格納されること / `SpecAdrVerifyCacheDocument` と `CatalogueSpecVerifyCacheDocument` の構築を検証する。前提: なし (独立タスク)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "domain 層の `CatalogueSpecSignal` struct に `entry_hash: ContentHash` フィールドを追加する (IN-05 / AC-06 / CN-04 / CN-10)。対象ファイル: `libs/domain/src/tddd/catalogue_spec_signal.rs`。変更内容: `CatalogueSpecSignal` struct の `new` コンストラクタ引数に `entry_hash: ContentHash` を追加し、フィールドとして保持する。`entry_hash` アクセサメソッドを追加する。`CatalogueSpecSignal` を構築または decode しているすべてのサイト (catalogue-spec-signals 生成・信号評価コード・`CatalogueSpecSignalsDocument` codec) を同じ実装 slice で更新して `entry_hash` を渡すようにする。既存の `catalogue_declaration_hash` は廃止せず維持する (CN-10)。`entry_hash` の値は `canonical_json_sha256` ヘルパーを使って catalogue entry の canonical JSON subtree から計算する (CN-04)。entry_hash を計算するサイトで `canonical_json_sha256` が利用可能であること (infrastructure 層の関数のため、domain には持ち込まない; entry_hash を渡す側は infrastructure 層のシグナル生成コードが計算して注入する設計)。`<layer>-catalogue-spec-signals.json` の各エントリに `entry_hash: String (hex)` フィールドを追加 encode/decode し、decode ロジックは `entry_hash` を必須フィールドとして読み込む。新 schema 導入後の active track では `entry_hash` 欠落を typed-deserialization error とし、欠落時の代替値や compatibility wrapper は作らない (CN-10 の required `ContentHash` と no-backward-compat convention に整合)。domain 層の型定義には `entry_hash: ContentHash` フィールドと `new` コンストラクタ引数のみを追加し、計算ロジックは持ち込まない。T003 はこの field addition と signals codec/construction-site update を一つの atomic compile boundary として完了し、field 追加後に古い codec が残る中間状態を作らない。unit tests: `CatalogueSpecSignal::new` が `entry_hash` を正しく保持すること / `entry_hash()` アクセサが値を返すこと / `entry_hash` ありの signals JSON を decode して `CatalogueSpecSignal.entry_hash()` が正しい値を返すこと / `entry_hash` 欠落の signals JSON decode がエラーになること / signals を encode したときに `entry_hash` フィールドが含まれること。前提: T002 (ContentHash の存在確認 — 既存型のため不要だが T002 との作業衝突がないことを確認する)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "infrastructure 層に verify-cache artifact の serde codec を実装する (IN-10 / AC-03 / CN-06)。追加対象: `libs/infrastructure/src/tddd/semantic_verify_codec.rs` (新規) または既存 `tddd` サブモジュール内の適切な場所。実装内容: `SemanticVerifyEntry` / `SemanticVerdict` / `EvidenceCitation` / `SpecAdrVerifyCacheDocument` / `CatalogueSpecVerifyCacheDocument` の serde DTO (JSON encode/decode)。`spec-adr-verify-cache.json` の encode/decode: `SpecAdrVerifyCacheDocumentCodec::encode` / `decode` — `schema_version: 1` を含む JSON ルートオブジェクトとして serialize/deserialize。`<layer>-catalogue-spec-verify-cache.json` の encode/decode: `CatalogueSpecVerifyCacheDocumentCodec::encode` / `decode` — `schema_version: 1` + `layer: String` + `entries: [...]` 形式。`SemanticVerdict` の JSON 表現: `{ \"kind\": \"pass\", \"citation\": \"...\" }` / `{ \"kind\": \"fail\", \"reason\": \"...\" }` / `{ \"kind\": \"pending\" }` の serde tag 設計 (または `#[serde(tag = \"kind\")]`)。fail-closed: unknown `kind` や missing required fields → decode エラー (typed-deserialization convention)。`ContentHash` の JSON 表現は既存実装に従う (hex string)。unit tests: `SpecAdrVerifyCacheDocument` の encode → JSON 文字列が schema_version と entries を含むこと / decode ラウンドトリップ (encode → decode → 元の値に等しい) / `CatalogueSpecVerifyCacheDocument` の encode/decode ラウンドトリップ / unknown kind field で decode がエラー / citation 欠落の pass でエラー。前提: T002 (domain 型が存在すること)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T005",
+      "description": "T003 で atomic に更新された `CatalogueSpecSignals` codec と signal generation path を active track artifact に反映し、regeneration/verification の手順を固定する (IN-05 / AC-06 / CN-04 / CN-10)。対象: `bin/sotp track catalogue-spec-signals` と関連 fixture / golden JSON。変更内容: T003 後の codec を使って `<layer>-catalogue-spec-signals.json` を再生成し、各エントリに `entry_hash: String (hex)` が含まれ、document-level `catalogue_declaration_hash` が維持されることを確認する。`entry_hash` の欠落は T003 の codec で typed-deserialization error になるため、T005 は互換 fallback を追加しない。unit tests / verification: active track の domain / usecase / infrastructure signals を再生成して catalogue-spec-signals gate が all blue になること、既存の `catalogue_declaration_hash` が document-level に残ること、T003 の codec tests とあわせて AC-06 を満たすこと。前提: T003 (domain field + construction sites + signals codec が同一 compile boundary で実装済み)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T006",
+      "description": "`.harness/config/agent-profiles.json` に `ref-verifier` capability エントリを追加する (IN-09 / AC-01 / AC-12 / CN-07)。追加内容: `\"ref-verifier\": { \"provider\": \"claude\", \"model\": \"claude-opus-4-8\", \"fast_provider\": \"claude\", \"fast_model\": \"claude-haiku-4-5\", \"timeout_seconds\": 120, \"prompt_template_path\": \".harness/prompts/ref-verifier.md\" }` (初期値 — CN-07: 具体モデル値は設定に置き ADR 本文に記載しない)。`fast_provider` / `fast_model` を指定することで `AgentProfiles::resolve_execution` の Fast ラウンドが `fast_provider ?? provider` / `fast_model ?? model` 解決を行い、段1 (Fast) と段2 (Final) に異なるモデルを割り当て可能になる (AC-01)。`timeout_seconds` と `prompt_template_path` も capability ごとの設定として保持し、`reviewer` capability とは独立したエントリとして model / timeout / prompt 設定が互いに干渉しないことを確認する (IN-09 / AC-12)。`agent-profiles.json` の既存構造 (`schema_version: 1` / `providers` / `capabilities`) を崩さずに追記し、timeout と prompt template path は `AgentProfiles::resolve_timeout_seconds(capability)` / `AgentProfiles::resolve_prompt_template_path(capability)` の capability-local resolver で取得する。`AgentProfiles::resolve_execution` は引き続き provider/model 解決のみを返し、`ResolvedExecution` に timeout/prompt を混在させない。unit tests: `AgentProfiles::load` で `ref-verifier` capability がロードされ、`resolve_execution(\"ref-verifier\", RoundType::Fast)` が `fast_provider` / `fast_model` を返し、`resolve_execution(\"ref-verifier\", RoundType::Final)` が `provider` / `model` を返すことを確認する (既存 `test_resolve_fast_with_cross_provider` パターンに準拠)。`resolve_timeout_seconds(\"ref-verifier\")` と `resolve_prompt_template_path(\"ref-verifier\")` が ref-verifier 固有値を返し、`reviewer` と `ref-verifier` に異なる timeout / prompt template path を設定してもそれぞれ独立に解決されることを確認する。前提: なし (独立タスク)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T007",
+      "description": "usecase 層に意味論レビューの application service ・ port trait ・ command/error 型を実装する (IN-06 / IN-08 / IN-10 / IN-11 / IN-12 / CN-01 / CN-05 / CN-06 / AC-03 / AC-07 / AC-08 / AC-09 / AC-10)。新規モジュール: `libs/usecase/src/ref_verify.rs`。実装内容: `RefVerifyScope` enum (`Chain1` / `Chain2 { layer: domain::tddd::LayerId }` / `All`) — 呼び出しコンテキストから解決したスコープ表現。`RefVerifyCacheScope` enum (`SpecAdr` / `CatalogueSpec { layer: domain::tddd::LayerId }`) — verify-cache artifact の保存先を表す routing scope。`RefVerifyCommand` struct (`track_id: domain::TrackId` / `scope: RefVerifyScope`)。`RefVerifyPair` struct (`claim: String` / `evidence: String` / `claim_hash: ContentHash` / `evidence_hash: ContentHash` / `cache_scope: RefVerifyCacheScope` / `known_bad: bool`) — infrastructure が列挙・hash 計算した参照ペアを usecase が扱う入力型。`known_bad` ペアは劣化検出用の monitor probe であり、verify-cache の hit 判定対象にも永続化対象にもせず毎回モデルで評価する。`RefVerifyPercent` validated nonzero percentage newtype (`u8`, `try_new` は 1..=100 のみ許可, `as_u8` accessor) と `RefVerifyParallelism` validated newtype (`usize`, `try_new` は 0 を拒否, `as_usize` accessor) を追加する。`RefVerifyConfig` struct (`known_bad_injection_rate_percent: RefVerifyPercent` / `known_bad_detection_threshold_percent: RefVerifyPercent` / `max_parallelism: RefVerifyParallelism`) — composition 層から注入し、usecase は設定ファイル I/O を行わない。`RefVerifyConfig::try_new(raw_injection_percent: u8, raw_threshold_percent: u8, raw_max_parallelism: usize) -> Result<Self, RefVerifyError>` は raw DTO 値を usecase 境界で検証し、0 percent・100 超 percent・zero parallelism で `RefVerifyError::InvalidConfig` を返す。`Default` 実装は ADR の初期デフォルト (known_bad 注入率 10% / 検出率閾値 90%) と nonzero max_parallelism default を返す。`RefVerifyError` enum (`InvalidConfig { message: String }` / `TrackNotActive { branch: String }` / `VerifierPort { message: String }` / `CachePersistence { message: String }` / `SemanticFailuresConfirmed { pair_count: usize }` / `HumanEscalationRequired { pair_count: usize }`) — `Display` + `Error` + `Debug` を実装する。`SemanticFailuresConfirmed` は final tier で production Fail が確定した場合に writer/fix loop へ差し戻す経路を表し、`HumanEscalationRequired` は final tier でも Pending が残る場合または known_bad 劣化が確認された場合だけ返す。`RefVerifyApplicationService` trait (`execute(&self, cmd: &RefVerifyCommand) -> Result<(), RefVerifyError>`) — CN-01 に従い code-review インフラの `Reviewer` port や `Verdict` と型を共有しない。`RefVerifyPairSourcePort` secondary port trait (`load_pairs(&self, cmd: &RefVerifyCommand, config: &RefVerifyConfig) -> Result<Vec<RefVerifyPair>, RefVerifyError>`) — spec/catalogue/ADR 読み込み、hash 取得、cache_scope 付与、既知の誤り例注入は infrastructure adapter に委譲する。`RefVerifyCachePort` secondary port trait (`load_entries(&self, cmd: &RefVerifyCommand, cache_scope: &RefVerifyCacheScope) -> Result<Vec<SemanticVerifyEntry>, RefVerifyError>` / `save_entries(&self, cmd: &RefVerifyCommand, cache_scope: &RefVerifyCacheScope, entries: Vec<SemanticVerifyEntry>) -> Result<(), RefVerifyError>`) — verify-cache artifact の読み書きは concrete cache scope ごとに infrastructure adapter に委譲する。`RefVerifierPort` secondary port trait (`verify_pair(&self, claim: String, evidence: String, tier: domain::tddd::semantic_verify::ModelTier) -> Result<domain::tddd::semantic_verify::SemanticVerdict, RefVerifyError>`) — adapter は意味論判定のみを返し、usecase 層が外部で確定済みの `claim_hash` / `evidence_hash` と組み合わせて `SemanticVerifyEntry` を構築する。`SemanticVerdict::Pass` は `EvidenceCitation` を必須にするため、citation 欠落 pass は adapter/codec 境界で reject され、usecase には到達しない。`ModelTier` を引数に取ることで fast/final の段階引き上げを制御する; 各 secondary port は `Send + Sync` を supertrait bound に持つ。`VerifySemanticRefsInteractor` struct (`Arc<dyn RefVerifyPairSourcePort>` / `Arc<dyn RefVerifyCachePort>` / `Arc<dyn RefVerifierPort>` / `RefVerifyConfig` を注入、`new` コンストラクタ) — `RefVerifyApplicationService` を実装。Interactor のコア処理: (1) `RefVerifyPairSourcePort::load_pairs` で対象ペアと hash と cache_scope を取得し、production pair を `cache_scope` ごとに group 化して `RefVerifyCachePort::load_entries` で既存 cache entries を取得する; `(claim_hash, evidence_hash)` が変化していない production pair はスキップするが、`known_bad` monitor probe は cache hit 判定を適用せず毎回評価する (AC-07 / AC-09 / CN-06)。(2) 残った production pair と全 `known_bad` probe を fast tier (`ModelTier::Fast`) で `RefVerifierPort::verify_pair` に渡し、production pair の返却 `SemanticVerdict` だけを usecase 側で `SemanticVerifyEntry` に包む。`known_bad` の verdict は検出率計算にのみ使い、verify-cache には保存しない。(3) production pair の `SemanticVerdict::Fail` / `Pending` は `ModelTier::Final` に引き上げる。fast tier で同一バッチの known_bad 検出率が閾値を下回った場合は、検証器劣化の health check として `known_bad` probe を `ModelTier::Final` に引き上げ、同一バッチの未cache production verdict (fast Pass を含む) も untrusted として `ModelTier::Final` で再評価してから cache 対象にする。known_bad calibration が健全なバッチでは、fast tier で Pass した production pair は final tier へ引き上げない (AC-08 / AC-09 / IN-06 / IN-08)。(4) `known_bad` ペアの検出率 (デフォルト閾値 90%) を確認; fast tier で閾値を下回った場合は即時 human escalation ではなく D5 の段2 final tier へ known_bad probe を引き上げる。final tier 後も known_bad 検出率が閾値未満、または production pair に Pending が残る場合のみ `HumanEscalationRequired` を返す。final tier で production Fail が確定した場合は verify-cache に Fail verdict を保存し、`SemanticFailuresConfirmed` を返して writer/fix loop に差し戻す (D5 / AC-04 / AC-09 / IN-08 / OS-04)。(5) calibration が fast tier で通った batch の trusted fast production verdict と、calibration failure batch で final tier 再判定された production verdict だけを `cache_scope` ごとに group 化し、`RefVerifyCachePort::save_entries` で `spec-adr-verify-cache.json` または `<layer>-catalogue-spec-verify-cache.json` に書き込む (CachePersistence error path)。`RefVerifyScope::All` でも pair ごとの `cache_scope` により Chain1 と各 Chain2 layer の artifact へ分解して保存できる (IN-10 / AC-03 / IN-12)。バッチ並列化: `Chain1` は (spec element × ADR file) ペア単位、`Chain2` は layer 単位バッチ (CN-05)。バッチ上限・スロットリング数値は validated `RefVerifyConfig` で注入する。code-review インフラの `Verdict` / `ReviewTarget` / `review.json` は一切参照しない (CN-01)。unit tests: pair source / cache / verifier ports を mockall で mock し、`RefVerifyPercent::try_new(1)` / `try_new(100)` が成功し、`try_new(0)` と `try_new(101)` 相当の raw DTO path が `InvalidConfig` になること、`RefVerifyParallelism::try_new(0)` が `InvalidConfig` になること、`RefVerifyConfig::try_new` が invalid percent / zero parallelism を拒否すること、`RefVerifyConfig::default()` が注入率 10 / 検出率閾値 90 / nonzero max_parallelism を返すこと / all production pair が trusted fast Pass の場合に Ok(()) を返して cache 保存すること / production cache hit ペアをスキップすること / cache hit と同じ hash の `known_bad` probe でもスキップせず verifier に渡すこと / Fail pair が final tier に引き上げられること / known_bad 検出率が fast tier で閾値未満なら known_bad probe と同一バッチの fast Pass production pair が final tier に引き上げられること / healthy fast calibration の場合に trusted fast production verdict が cache 保存され、calibration failure batch では final production verdict だけが cache 保存されること / adapter 返却 verdict が正しい `(claim_hash, evidence_hash)` とともに `SemanticVerifyEntry` に保存されること / `RefVerifyScope::All` で SpecAdr と CatalogueSpec layer ごとに `save_entries` が分かれて呼ばれること / 既知の誤り例の検出率が fast tier で閾値を下回ると known_bad probe が final tier に引き上げられること / final tier 後も検出率閾値未満なら `HumanEscalationRequired` が返ること / final tier 後に production Fail が確定した場合は Fail verdict が保存され `SemanticFailuresConfirmed` が返ること / final tier 後に production Pending が残る場合は `HumanEscalationRequired` が返ること / citation 欠落 pass が adapter/codec 境界の error として扱われ、Pass として保存されないこと。前提: T002 (domain 型)、T003 (CatalogueSpecSignal の entry_hash)、T004 (codec)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T008",
+      "description": "infrastructure 層に `RefVerifyPairSourceAdapter` / `RefVerifyCacheAdapter` / `AgentRefVerifierAdapter` を実装し、usecase の3つの secondary port をすべて concrete adapter に接続する (IN-04 / IN-08 / IN-09 / IN-10 / IN-12 / AC-01 / AC-03 / AC-07 / AC-12 / CN-01)。対象: `libs/infrastructure/src/ref_verify.rs` (新規)。`RefVerifyPairSourceAdapter` は `RefVerifyPairSourcePort` を実装し、track artifacts から Chain1 (spec→ADR) と Chain2 (catalogue→spec) の参照ペアを列挙し、claim/evidence hash と `RefVerifyCacheScope` を付与し、`RefVerifyConfig` に従って known_bad monitor probe を注入する。`RefVerifyCacheAdapter` は `RefVerifyCachePort` を実装し、`SpecAdr` を `spec-adr-verify-cache.json` に、`CatalogueSpec { layer }` を `<layer>-catalogue-spec-verify-cache.json` に route して T004 の codec で load/save する。`AgentExecutionRunner` type alias (`dyn Fn(ResolvedExecution, String, u64) -> Result<String, RefVerifyError> + Send + Sync`) を infrastructure-local な callable model runner abstraction として追加し、`AgentRefVerifierAdapter` struct は `Arc<AgentProfiles>` と `Arc<AgentExecutionRunner>` を内部保持する (`new(profiles, runner)` コンストラクタ)。この callable は infrastructure 内部の実行差し替え点であり、usecase 境界をまたぐ secondary port ではない。`RefVerifierPort::verify_pair` を実装: `tier: domain::tddd::semantic_verify::ModelTier` を `infrastructure::agent_profiles::RoundType` に変換 (`ModelTier::Fast` → `RoundType::Fast` / `ModelTier::Final` → `RoundType::Final`)、`AgentProfiles::resolve_execution(\"ref-verifier\", round_type)` で provider / model を取得し、`AgentProfiles::resolve_timeout_seconds(\"ref-verifier\")` と `AgentProfiles::resolve_prompt_template_path(\"ref-verifier\")` で timeout_seconds / prompt_template_path を取得する。いずれかを取得できなければ `RefVerifyError::VerifierPort` を返す (fail-closed)。model invocation 部分: 解決した provider / model / timeout で `ref-verifier` capability を実行し、`prompt_template_path` から読み込んだ template に claim / evidence / tier を埋め込み、machine-readable JSON verdict (`pass` with citation / `fail` with reason / `pending`) を要求する。adapter は応答を typed parser で `SemanticVerdict` に変換し、schema 不一致・モデル失敗・prompt template 読み込み失敗・citation 欠落 pass は `RefVerifyError::VerifierPort` または fail-closed verdict として扱う。`Debug` trait 実装を3 adapter に追加する。unit tests: pair source が Chain1/Chain2 pairs に正しい hash/cache_scope を付与し known_bad probe を注入すること / cache adapter が SpecAdr と CatalogueSpec layer を別 artifact に load/save すること / `AgentRefVerifierAdapter::new` が `AgentProfiles` と runner callable を受け取って構築できること / `ModelTier::Fast` 時に `RoundType::Fast` で `resolve_execution` が呼ばれ、ref-verifier 固有の timeout と prompt template path が `resolve_timeout_seconds` / `resolve_prompt_template_path` 経由で runner/rendering に使われること / `reviewer` capability に異なる timeout や prompt template path があっても参照されないこと / `ref-verifier` capability が `agent-profiles.json` に存在しない場合に `RefVerifyError::VerifierPort` が返ること / runner が pass JSON + citation を返すと `SemanticVerdict::Pass` が返ること / malformed JSON や citation 欠落 pass が fail-closed error になること。前提: T004 (verify-cache codec)、T006 (agent-profiles.json に ref-verifier 追加)、T007 (usecase ports 定義)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T009",
+      "description": "`bin/sotp ref-verify` CLI サブコマンドを実装する (IN-08 / IN-11 / IN-12 / AC-02 / AC-09 / AC-11 / CN-09)。また意味論側 approved ゲートコマンド `bin/sotp ref-verify check-approved` を実装する (AC-04 / CN-08)。CLI 実装: `apps/cli/src/main.rs` の `CliCommand` enum に `RefVerify { cmd: RefVerifyCommand }` variant を追加し、`apps/cli/src/commands/ref_verify.rs` (新規) にサブコマンドを実装する。`ref-verify` のサブコマンド構成: (1) `run` — 意味論レビューの実行 (スコープは呼び出しコンテキストから自動解決: git branch から active track を解決し phase によって Chain1 / Chain2 / All を決定 — spec-design 後は Chain1、type-design 後は Chain2、それ以外は All); スタンドアロン実行では全ペアを対象とする (IN-12 / AC-02)。`run` は cli_composition 層で `.harness/config/ref-verify.json` を raw DTO (`known_bad_injection_rate_percent?: u8`, `known_bad_detection_threshold_percent?: u8`, `max_parallelism?: usize`) として typed deserialize し、省略値は `RefVerifyConfig::default()` から補完したうえで `RefVerifyConfig::try_new` に渡して usecase validated config を構築する。unknown fields は DTO deserialize error、0 percent・100 超 percent・zero max_parallelism は `RefVerifyError::InvalidConfig` 由来の fail-closed CLI error とする (IN-08 / AC-09 / CN-06)。(2) `check-approved` — verify-cache artifact (`spec-adr-verify-cache.json` および `<layer>-catalogue-spec-verify-cache.json`) を読んで全エントリが `SemanticVerdict::Pass` であれば exit 0、未確定 (`Pending`) または `Fail` が存在すれば exit 1 (AC-04 / CN-08)。`check-approved` は `review.json` を読まず、独立した verify-cache artifact のみを読む (CN-02 / CN-08)。既存 `bin/sotp review check-approved` は変更しない (CN-02)。cli_composition 層に `RefVerifyInput` DTO と `CliApp::ref_verify_run` / `CliApp::ref_verify_check_approved` メソッドを追加し、domain/usecase/infrastructure 型を public face に漏らさない (既存 CN-02 パターン)。`sotp verify *` の subcommand group (layer ②) には追加しない — 独立した `ref-verify` トップレベルサブコマンドを持つ (AC-11 / D9 の独立 surface)。unit tests: `sotp ref-verify run` が clap でパースされること / `sotp ref-verify check-approved` が clap でパースされること / `.harness/config/ref-verify.json` の known_bad 注入率・検出率閾値・max_parallelism が `RefVerifyConfig::try_new` 経由で反映されること / 設定省略時に 10% / 90% / nonzero max_parallelism defaults が注入されること / unknown fields が fail-closed になること / 0 percent・100 超 percent・zero max_parallelism が fail-closed になること / verify-cache に全 Pass エントリがある場合に check-approved が exit 0 を返すこと / Pending エントリがある場合に exit 1 を返すこと。前提: T004 (codec)、T007 (usecase)、T008 (adapter)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T010",
+      "description": "commit ゲートに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` を追加し、commit 最終関門で全 Chain の意味論レビューを実行してから意味論側 approved ゲートを code-review ゲートと AND で評価する (IN-02 / IN-12 / AC-04 / CN-02 / CN-08 / CN-09)。変更対象: `Makefile.toml` の `track-commit-message` タスク。現行の commit gate 連鎖 (`bin/sotp review check-approved && bin/sotp dry check-approved && ...`) に `bin/sotp ref-verify run && bin/sotp ref-verify check-approved &&` を追加する。追加位置は `bin/sotp review check-approved` と `bin/sotp dry check-approved` の間または直後 — 既存の code-review ゲートを変更・拡張しない (CN-02)。`bin/sotp ref-verify run` は commit gate コンテキストで All スコープ (Chain1 + Chain2) を自動解決し、差分キャッシュにより `(claim_hash, evidence_hash)` が変化したペアだけを再レビューする (IN-02 / IN-12 / AC-07 / CN-09)。`bin/sotp ref-verify check-approved` の失敗 (Pending / Fail エントリあり) は commit をブロックする (AC-04)。verify-cache artifact が存在しない場合は `run` が先に生成・更新する設計だが、`check-approved` 単体実行では fail-closed として exit 1 を返すこと (CN-06)。`track/workflow.md` の Quality Gates セクションに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` 行を追加する。前提: T009 (`ref-verify run` / `ref-verify check-approved` コマンドが実装済みであること)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T011",
+      "description": "`/track:ref-verify` skill を新設し、`/track:plan` の phase オーケストレーションから `bin/sotp ref-verify run` を呼ぶ統合を追加する (IN-02 / AC-11 / CN-09)。実装内容: (1) `.claude/skills/ref-verify/SKILL.md` (新規) を作成し、`/track:ref-verify` skill の定義 (purpose / behavior / inputs / outputs) を記述する。skill は `bin/sotp ref-verify run` を実行し結果を報告するだけのシンラッパー (D9: 発火点ごとに別実装を持たない)。(2) `/track:ref-verify` コマンドファイル (`.claude/commands/ref-verify.md`) を作成 (または既存コマンド命名規則に合わせた場所に追加) し、`bin/sotp ref-verify run` の呼び出しと出力のフォーマット方法を記述する。(3) `/track:plan` の phase オーケストレーションスクリプトまたはドキュメント (`.claude/commands/plan.md` など) を更新し、spec-design フェーズ後に `bin/sotp ref-verify run` (Chain1 スコープ) を、type-design フェーズ後に `bin/sotp ref-verify run` (Chain2 スコープ) を呼ぶことを明記する (IN-02 / CN-09)。発火点は `bin/sotp ref-verify run` の同一コマンドを呼ぶ — 発火ごとに別実装を持たない (D9)。`/track:review` (code review) とは独立した surface として保つ (OS-06 / AC-11)。`sotp verify *` (layer ②) とも独立した surface として保つ (AC-11)。前提: T009 (`bin/sotp ref-verify run` 実装済み)。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T012",
+      "description": "E2E CI gate を確認し、全 acceptance criteria を満たすことを検証する。T001-T011 完了後に `cargo make ci` を実行し、fmt-check + clippy + nextest + deny + check-layers + verify-* すべての gate が pass することを確認する (AC-07)。具体的に確認する AC: AC-01 (`agent-profiles.json` の `ref-verifier` capability と `resolve_execution` 動作)、AC-02 (`bin/sotp ref-verify run` が Chain スコープを自動解決すること)、AC-03 (verify-cache artifact が正しい形式で書き込まれること)、AC-04 (`check-approved` が全 Pass で exit 0 / Pending/Fail で exit 1 になること)、AC-05 (`plan-artifact-refs` で存在しない anchor や front-matter 欠落 ADR が error finding になること)、AC-06 (`<layer>-catalogue-spec-signals.json` の `CatalogueSpecSignal.entry_hash` が encode/decode できること、かつ document-level `catalogue_declaration_hash` が保持されること)、AC-07 (キャッシュ差分動作が正しいこと — 変化のないペアを再レビューしないこと)、AC-08 (healthy fast calibration の Pass は final 段に上げず、calibration failure batch の production verdict は final 再評価してから cache すること)、AC-09 (既知の誤り例の検出率閾値ロジックが正しく動作すること)、AC-10 (citation 欠落 pass が adapter/codec 境界で拒否され、verify-cache に Pass として記録されないこと)、AC-11 (`/track:ref-verify` と `bin/sotp ref-verify` が独立した surface として存在すること)、AC-12 (`ref-verifier` と `reviewer` の設定が干渉しないこと)。failing gate や clippy warning が発生した場合は同タスク内で修正する。前提: T001-T011 完了。",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Goal coverage note: `task-coverage.json` schema_version 1 only carries `in_scope` / `out_of_scope` / `constraints` / `acceptance_criteria` maps. GO-01 is covered by T002/T007/T008, GO-02 by T007/T009/T010, and GO-03 by T003/T005; these goal mappings are recorded here because adding GO keys to task-coverage.json fails the plan-artifact-refs verifier."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Layer-2 Fix — AdrRef Anchor Existence Check in plan-artifact-refs Verifier (T001)",
+        "description": [
+          "`plan-artifact-refs` 検証器の Step 3 (spec.json の adr_refs ファイル確認) に anchor 実在確認を追加する (D3 / IN-03 / AC-05)。",
+          "ファイル存在確認に続けて ADR front-matter を typed deserialization で読み込み、`decisions[].id` 配列に `AdrRef.anchor` 値が含まれるかを確認する。含まれなければ `VerifyFinding::error` を追加する。",
+          "front-matter のない ADR は anchor 実在確認不能として fail-closed の finding にする (OS-02 との整合: ADR に canonical hash は作らないが、anchor 存在確認は必須)。",
+          "anchor 確認ロジックを `spec_refs.rs` または新規 `adr_anchor.rs` に集約し、infrastructure 層に閉じる。"
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Domain Layer — Semantic Verify Value Objects (T002)",
+        "description": [
+          "意味論レビュー専用の domain 型群を `libs/domain/src/tddd/semantic_verify.rs` に新規追加する (IN-04 / IN-07 / IN-10 / CN-01 / CN-06)。",
+          "`EvidenceCitation` (validated newtype — 空文字拒否)、`SemanticVerdict` enum (Pass { citation } / Fail { reason } / Pending)、`SemanticVerifyEntry` struct、`ModelTier` enum (Fast / Final)、`SpecAdrVerifyCacheDocument`、`CatalogueSpecVerifyCacheDocument` を追加する。",
+          "Pass variant が `EvidenceCitation` を必須フィールドとして持つことで「引用なし合格」を構造的に排除する (D6 / IN-07 / CN-06)。",
+          "code-review インフラの `Verdict` / `ReviewerFinding` とは型を共有しない (D1 / CN-01)。"
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Atomic CatalogueSpecSignal per-entry Hash + Signals Codec (T003)",
+        "description": [
+          "`CatalogueSpecSignal` struct に `entry_hash: ContentHash` フィールドを追加し、同じ compile boundary で signals codec / construction sites も更新する (IN-05 / AC-06 / CN-04 / CN-10)。",
+          "既存の `catalogue_declaration_hash` (全体粒度) は廃止せず、per-entry hash と共存させる (CN-10)。",
+          "hash の計算は infrastructure 層の signals 生成コードが `canonical_json_sha256` を呼んで行い、domain 型には計算ロジックを持ち込まない (CN-04)。T003 単体で古い codec が残る中間状態を作らない。"
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Infrastructure Layer — Verify-Cache Codecs + Signal Artifact Regeneration (T004, T005)",
+        "description": [
+          "T004: verify-cache artifact (`spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json`) の serde codec を infrastructure に実装する (IN-10 / AC-03)。typed-deserialization convention に従い unknown fields で decode エラー。",
+          "T005: T003 で atomic に更新した `<layer>-catalogue-spec-signals.json` codec / generation path を active track artifacts に反映し、catalogue-spec-signals gate と fixtures で `entry_hash` 必須化を確認する (IN-05 / CN-04 / CN-10)。`entry_hash` 欠落の互換 fallback は作らない。"
+        ],
+        "task_ids": [
+          "T004",
+          "T005"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Harness Config — ref-verifier Capability Entry (T006)",
+        "description": [
+          "`.harness/config/agent-profiles.json` に `ref-verifier` capability エントリを追加する (IN-09 / AC-01 / AC-12 / CN-07)。",
+          "`fast_provider` / `fast_model` (段1) と `provider` / `model` (段2) を独立して設定し、`AgentProfiles::resolve_execution` の Fast/Final 解決機構で provider をまたぐ段階引き上げを実現する (D5 / D7)。",
+          "`timeout_seconds` と `prompt_template_path` も `ref-verifier` capability の typed 設定として追加し、`reviewer` capability とは model / timeout / prompt 設定が互いに干渉しないことを確認する (IN-09 / AC-12)。"
+        ],
+        "task_ids": [
+          "T006"
+        ]
+      },
+      {
+        "id": "S6",
+        "title": "Usecase Layer — RefVerify Application Service + Port Trait (T007)",
+        "description": [
+          "意味論レビューの application service ・ port trait ・ command/error 型を `libs/usecase/src/ref_verify.rs` に実装する (IN-06 / IN-08 / IN-10 / IN-11 / IN-12 / CN-01 / CN-05 / CN-06 / AC-03 / AC-07 / AC-08 / AC-09 / AC-10)。",
+          "`RefVerifierPort` (secondary port)、`RefVerifyApplicationService` (primary port)、`VerifySemanticRefsInteractor` (実装) を追加する。",
+          "`RefVerifyConfig` は `RefVerifyPercent` と `RefVerifyParallelism` validated value object を保持し、`RefVerifyConfig::try_new` が raw 設定値を usecase 境界で検証する。`Default` は known_bad 注入率 10% / 検出率閾値 90% / nonzero max_parallelism を提供し、設定ファイル I/O は T009 の cli_composition に委譲する。",
+          "Interactor コア処理: pair-source port から対象ペア/hash/cache_scope を取得 → production pair は cache_scope ごとに既存 entries を読み cache hit をスキップ → known_bad monitor probe は cache 対象外として毎回評価 → fast tier 並列評価 → production Fail/Pending は final tier に引き上げ、fast-tier known_bad 検出率が閾値未満の場合は known_bad probe と同一バッチの未cache production verdict (fast Pass を含む) を final tier で再判定する。healthy calibration の fast Pass production pair は final tier へ引き上げない → final 後の production Fail は writer/fix loop へ差し戻し、final Pending または known_bad 劣化は human escalation → calibration が fast tier で通った trusted fast production verdict または final production verdict だけを cache_scope ごとに verify-cache artifact へ書き込む (AC-03 / AC-07 / AC-08 / AC-09 / AC-10)。citation 欠落 pass は adapter/codec 境界で reject し、usecase には到達させない。",
+          "code-review インフラ型 (`Verdict` / `ReviewTarget` 等) は一切参照しない (D1 / CN-01)。"
+        ],
+        "task_ids": [
+          "T007"
+        ]
+      },
+      {
+        "id": "S7",
+        "title": "Infrastructure Layer — RefVerify Secondary Adapters (T008)",
+        "description": [
+          "`RefVerifyPairSourceAdapter` / `RefVerifyCacheAdapter` / `AgentRefVerifierAdapter` を実装し、usecase の `RefVerifyPairSourcePort` / `RefVerifyCachePort` / `RefVerifierPort` をすべて concrete adapter に接続する (IN-04 / IN-08 / IN-09 / IN-10 / IN-12 / AC-01 / AC-03 / AC-07 / AC-12 / CN-01)。",
+          "`RefVerifyPairSourceAdapter` は Chain1/Chain2 の参照ペア列挙、claim/evidence hash 付与、cache_scope routing、known_bad probe 注入を担当する。`RefVerifyCacheAdapter` は verify-cache artifact の load/save と cache_scope routing を担当する。",
+          "`AgentProfiles::resolve_execution(\"ref-verifier\", round_type)` で provider/model を解決し、`resolve_timeout_seconds(\"ref-verifier\")` と `resolve_prompt_template_path(\"ref-verifier\")` で capability-local timeout/prompt_template_path を解決する。`ModelTier` → `RoundType` の変換も実装する。",
+          "解決した provider/model/timeout と prompt template で `ref-verifier` capability を実行し、machine-readable JSON verdict を `SemanticVerdict` に変換する。schema 不一致・prompt 読み込み失敗・モデル失敗・citation 欠落 pass は fail-closed に扱う。"
+        ],
+        "task_ids": [
+          "T008"
+        ]
+      },
+      {
+        "id": "S8",
+        "title": "CLI Layer — bin/sotp ref-verify Subcommand + check-approved Gate (T009)",
+        "description": [
+          "`bin/sotp ref-verify` サブコマンドを実装し、`run` (意味論レビュー実行) と `check-approved` (verify-cache 読み込みゲート) の2つのサブコマンドを持たせる (IN-08 / IN-11 / IN-12 / AC-02 / AC-04 / AC-09 / AC-11 / CN-08 / CN-09)。",
+          "`run` はコンテキストから Chain スコープを自動解決する (spec-design 後は Chain1、type-design 後は Chain2、その他は All)。",
+          "`run` は `.harness/config/ref-verify.json` を cli_composition 層で読み込み、known_bad 注入率・検出率閾値・max_parallelism を `RefVerifyConfig::try_new` に渡して validated config を構築する。設定値省略時は `RefVerifyConfig::default()` の 10% / 90% / nonzero max_parallelism defaults を使う。",
+          "`check-approved` は verify-cache artifact のみを読む独立したゲート — `review.json` は読まず `review check-approved` を変更しない (CN-02 / CN-08)。",
+          "`sotp verify *` サブコマンドグループには追加せず、独立した `ref-verify` トップレベルサブコマンドとして layer ③ 専用の surface を持つ (D9 / AC-11)。"
+        ],
+        "task_ids": [
+          "T009"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "Commit Gate Integration (T010)",
+        "description": [
+          "`Makefile.toml` の `track-commit-message` タスクに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` を追加し、commit 最終関門で全 Chain を再評価してから code-review ゲートと AND 評価する (IN-02 / IN-12 / AC-04 / CN-02 / CN-08 / CN-09)。",
+          "既存の `bin/sotp review check-approved` と `bin/sotp dry check-approved` は変更しない (CN-02 / D1 SRP 分離)。",
+          "`track/workflow.md` の Quality Gates セクションに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` 行を追記する。"
+        ],
+        "task_ids": [
+          "T010"
+        ]
+      },
+      {
+        "id": "S10",
+        "title": "/track:ref-verify Skill + Phase Orchestration Integration (T011)",
+        "description": [
+          "`.claude/skills/ref-verify/SKILL.md` と `/track:ref-verify` コマンドファイルを追加し、`bin/sotp ref-verify run` のシン public UI を提供する (IN-11 / AC-11 / D9)。",
+          "`/track:plan` の phase オーケストレーション (spec-design 後に Chain1、type-design 後に Chain2 を `bin/sotp ref-verify run` で発火) を明文化し、発火点ごとに同一コマンドを呼ぶ設計を固定する (IN-02 / CN-09)。",
+          "`/track:review` (code review) および `sotp verify *` (layer ②) とは独立した呼び出し口として保つ (OS-06 / AC-11)。"
+        ],
+        "task_ids": [
+          "T011"
+        ]
+      },
+      {
+        "id": "S11",
+        "title": "Final CI Gate Verification (T012)",
+        "description": [
+          "T001-T011 完了後に `cargo make ci` を実行し、すべての gate が pass することを確認する (AC-07 through AC-12)。",
+          "各 AC (AC-01 〜 AC-12) を個別に確認し、failing gate や clippy warning があれば同タスク内で修正する。"
+        ],
+        "task_ids": [
+          "T012"
+        ]
+      }
+    ]
+  }
+}

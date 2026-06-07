@@ -45,6 +45,426 @@
           "findings": [],
           "hash": "rvw1:sha256:3788c71d67efe985cb62ad77995c37e229013be05470bcc5b9fd1184e6a0c839",
           "at": "2026-06-07T17:29:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says to parse ADR front-matter with `serde_yaml::Value` and manually walk `decisions[].id`. That conflicts with the typed-deserialization rule for `libs/infrastructure/src/verify/`, which requires typed `Deserialize` DTOs instead of untyped Value walking in verify/guard code.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 13,
+              "category": "contradiction"
+            },
+            {
+              "message": "T003 makes `CatalogueSpecSignal.entry_hash` a required `ContentHash`, but T005 still requires decoding legacy `<layer>-catalogue-spec-signals.json` files without `entry_hash` and returning a `None`-equivalent. Those requirements cannot both be true as written; the codec needs either an explicit optional/migration wrapper or a non-optional field with a different legacy-handling rule.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 38,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fcce1c9217740465df15313aabca033c266da14a43effe979385f042d49fe56d",
+          "at": "2026-06-07T18:08:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 still permits a `todo!()`-style stub in `libs/infrastructure/src/ref_verify.rs`. That is a panic path in library code, which conflicts with the repo's no-panics rule and makes the adapter path unsafe if the stub is ever exercised.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 63,
+              "category": "contradiction"
+            },
+            {
+              "message": "The `RoundType` doc says `RefVerifierPort.verify_pair` takes `RoundType`, but `usecase-types.json` defines that port parameter as `domain::tddd::ModelTier`, and T008 explicitly says the adapter performs the `ModelTier -> RoundType` conversion. This catalogue entry is therefore stale and contradicts the layer boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.json",
+              "line": 151,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:15fa319f6751bedb313547a1c7e62e6684be64570e3ef485398efcdfd8cb6a50",
+          "at": "2026-06-07T18:16:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7e016c4466746b52e9e4ac4238b23defa40ebb2fdc23337a6a3131b573a4799",
+          "at": "2026-06-07T18:22:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 makes the only planned `RefVerifierPort` implementation fail-closed after resolving provider/model, deferring the actual model invocation to a future stub. That contradicts the same plan's `ref-verify run`, cache-writing, and `check-approved` acceptance path, because no implementation task can ever produce `Pass` entries for the verify-cache artifacts.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 63,
+              "category": "infeasibility"
+            },
+            {
+              "message": "`RefVerifierPort::verify_pair` returns a full `SemanticVerifyEntry` containing `claim_hash` and `evidence_hash`, but the port receives only raw `claim` and `evidence` strings plus a tier. IN-04 defines those hashes as externally determined identities, especially ADR git blob hash for Chain①, so the adapter cannot construct the required cache key correctly from this interface.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 160,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7e016c4466746b52e9e4ac4238b23defa40ebb2fdc23337a6a3131b573a4799",
+          "at": "2026-06-07T18:28:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueSpecSignal` is declared with a complete field list containing only `type_name`, `signal`, and `entry_hash`, but the spec and plan require the existing `catalogue_declaration_hash` to be retained and coexist with the new per-entry hash. Implementing this catalogue literally would remove the whole-file hash that CN-10 says must remain.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/domain-types.json",
+              "line": 13,
+              "category": "contradiction"
+            },
+            {
+              "message": "T007 requires the usecase layer to downgrade a citation-less Pass to Pending and even test that case, but the same artifacts make that state unrepresentable: `SemanticVerdict::Pass` requires `EvidenceCitation`, and `RefVerifierPort` returns `SemanticVerdict`. A citation-less pass cannot reach the interactor; this handling belongs in the adapter/codec boundary or should be removed from the usecase task.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 55,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:57ca7b75c6c46666fccfc7206015c19e740d689d96eac0ed967c45b07357070e",
+          "at": "2026-06-07T18:37:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 assigns `VerifySemanticRefsInteractor` responsibility for enumerating Chain pairs, reading existing verify-cache artifacts, skipping unchanged `(claim_hash, evidence_hash)` pairs, and writing updated cache artifacts, but the usecase catalogue only injects `Arc<dyn RefVerifierPort>`. There is no secondary port for spec/catalogue reads, cache persistence, hash source, or ref-verify config, so the plan either forces infrastructure I/O into the usecase layer or leaves the interactor unable to perform its stated workflow. Add explicit usecase ports/dependencies for these external operations or move the I/O responsibility out of the interactor plan.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 235,
+              "category": "architecture violation"
+            },
+            {
+              "message": "The infrastructure catalogue declares `AgentRefVerifierAdapter::new` with only `profiles: Arc<AgentProfiles>`, while T008 says the adapter stores an agent execution client/runner and tests require `AgentRefVerifierAdapter::new` to receive both `AgentProfiles` and the runner. As written, the catalogue and implementation plan disagree on the adapter boundary, making the planned tests/implementation inconsistent. Include the runner/client dependency in the type catalogue constructor or revise T008 to explain how invocation is supplied without injection.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.json",
+              "line": 165,
+              "category": "contradiction"
+            },
+            {
+              "message": "`RefVerifyError` documents `EscalationRequired` as human escalation, but the spec explicitly excludes immediate human escalation for known-bad-pair degradation and requires the D5 path to try the heavyweight model first before reporting to a human. T007 also says a below-threshold known-error detection test returns `EscalationRequired`, so an implementer following the catalogue would short-circuit the required段2 escalation path. Rename/scope the error to final human escalation only, or add a separate model-escalation state that preserves the D5 sequence.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 78,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:722122e2d36fa1dd1348bf38452818971a9ea3e48e3ba09d92bd7de7830b7b1b",
+          "at": "2026-06-07T18:44:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 makes ADRs without YAML front matter skip anchor validation and pass, but AC-05 requires `plan-artifact-refs` to fail when `spec.json` contains an `AdrRef` with a non-existent anchor. With this exception, any anchored reference to a grandfathered ADR can never satisfy the stated existence check, so the plan can pass invalid anchors contrary to D3/AC-05. Either narrow AC-05 to front-matter ADRs or make missing front matter fail for anchored refs.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "AC-06 says the per-entry hash must be added to catalogue entries and that the `<layer>-types.json` codec encodes/decodes it, but T003/T005 place `entry_hash` on `CatalogueSpecSignal` and update the `<layer>-catalogue-spec-signals.json` codec instead. That leaves the actual type catalogue entries without the hash AC-06 requires, so the implementation can complete the planned tasks while still not meeting the acceptance criterion for differential Chain② review.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3096ddafa3bf52a5107687fae3a68bb774feaa3e2055b1c8f9cbc0eaf1781e5a",
+          "at": "2026-06-07T18:55:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010 only adds `bin/sotp ref-verify check-approved` to the commit gate, while the spec requires the commit final gate to verify all Chains before commit and the plan defines `check-approved` as a cache-only reader. Without a commit-gate `bin/sotp ref-verify run` step, changed reference pairs after the phase gate are never semantically re-reviewed at the final gate, so the plan does not implement IN-02/D2's final verification step.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 80,
+              "category": "contradiction"
+            },
+            {
+              "message": "IN-11 requires both the public `/track:ref-verify` skill and the `bin/sotp ref-verify` subcommand, but the coverage map assigns IN-11 only to T007 and T009. T011 is the task that actually creates the `/track:ref-verify` skill and command file, so the current coverage lets IN-11 appear covered while omitting half of its required surface.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/task-coverage.json",
+              "line": 14,
+              "category": "contradiction"
+            },
+            {
+              "message": "`CatalogueSpecSignal` declares only the updated `new` method here, but the implementation plan for T003 also requires an `entry_hash()` accessor and T005's tests consume that accessor. The type catalogue and plan therefore disagree on the public API needed for `entry_hash`, leaving implementers following the catalogue without the method required by the later codec task.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/domain-types.json",
+              "line": 21,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c0b2890a08aa985d6965dbd82b355c847b13dec606f071d0c37d605bf18be5b5",
+          "at": "2026-06-07T19:02:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 skips unchanged `(claim_hash, evidence_hash)` pairs before fast-tier evaluation, but IN-08/AC-09 require known-bad pairs to be injected into each batch to monitor verifier degradation. As written, a stable known-bad probe with a cached entry is skipped, so later phase/commit runs can satisfy the cache rule without exercising the model or measuring detection rate. The plan needs to exempt known-bad probes from cache-hit skipping, or make them non-cacheable by design.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 52,
+              "category": "contradiction"
+            },
+            {
+              "message": "The cache port API cannot route results for `RefVerifyScope::All` into the required per-chain/per-layer cache artifacts. `save_entries(&cmd, Vec<SemanticVerifyEntry>)` receives a flat entry list, and each entry only carries hashes/verdict, while `All` covers Chain1 plus all Chain2 layers and IN-10/AC-03 require separate `spec-adr-verify-cache.json` and `<layer>-catalogue-spec-verify-cache.json` files. Without chain/layer identity on each pair/entry or explicit per-scope decomposition before saving, the commit-gate All scope is not executable.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 283,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:8ad9966c3efb7e7d85341d59d038d6010963dba415596160627ff585f49c012e",
+          "at": "2026-06-07T19:09:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` starts with `in_scope` mappings and has no `goal` section, so GO-01 through GO-03 are not mapped to any tasks even though the spec contains 43 elements including those goals. This leaves the top-level goals uncovered by the coverage artifact; add goal mappings or otherwise include GO-01/GO-02/GO-03 in task coverage.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/task-coverage.json",
+              "line": 3,
+              "category": "coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:c5981c89a0e3b80cac308824a294c482a806a03b992cdd153a6595af90e7c2d0",
+          "at": "2026-06-07T19:21:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 requires the known-bad injection rate and detection threshold to be configurable from a settings file with defaults, but task coverage maps IN-08 only to T007. T007 only introduces an injected `RefVerifyConfig` and explicitly keeps filesystem/config I/O out of the usecase; no CLI/composition task is assigned to load those settings or provide the 10%/90% defaults. As written, the plan cannot satisfy the spec's configurability requirement.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/task-coverage.json",
+              "line": 14,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The spec requires `ref-verifier` to be independently configurable for model, timeout, and prompt, and AC-12 requires those settings not to interfere with `reviewer`. T006 only adds `provider`/`model`/`fast_provider`/`fast_model` and tests model resolution; T008 then formats the prompt in the adapter. There is no planned work for timeout or prompt configuration independence, so the plan only implements part of IN-09/AC-12.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 46,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:49e7f6e37cc0a9af6c917f8b4922279887ded3dcc4733fe5894e3b0677cced07",
+          "at": "2026-06-07T19:28:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 escalates only the known_bad probes when the fast-tier detection rate falls below threshold, then persists the production verdicts without rechecking the production pairs that were passed by the now-untrusted fast tier. That undercuts IN-08/AC-09's calibration gate: a batch-level monitor failure should cause the affected production work to enter the escalation path, otherwise the hard gate can cache false Pass verdicts from a verifier that just failed its known-bad check.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 57,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AgentExecutionRunner` is declared as a `SecondaryPort` while its own docs and T008 describe it as an infrastructure-local runner abstraction used inside `AgentRefVerifierAdapter`. That places a hexagonal boundary port in the infrastructure layer for an adapter implementation detail; either make it a real usecase/domain port if it is part of the application boundary, or keep it as an infrastructure-internal trait and do not catalogue it as `SecondaryPort`.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.json",
+              "line": 199,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:92f34e443aad0ce572e03143d67725a0034998a5b10d281c4d0923d1875a62d2",
+          "at": "2026-06-07T19:38:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007's core flow says that when the known_bad detection rate falls below the threshold, the whole fast batch is re-run at final, including production pairs that already passed. That contradicts the same spec's IN-06/AC-08 requirement that only Fail/Pending pairs are escalated and that no batch-wide escalation occurs, while this task also claims to satisfy AC-08. As written, implementers cannot satisfy both the task and the acceptance criteria.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0ba9050c2e993abdfc47887062473437635ace338625ddde1d795bd5fecf28aa",
+          "at": "2026-06-07T19:49:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyConfig` is modeled as a value object but its percentage fields are plain `u8`s with no constructor or validated percentage type. T009 only says the CLI rejects out-of-range config, but this usecase-level config is injected directly and can still represent impossible states such as `known_bad_detection_threshold_percent = 255` or `max_parallelism = 0`, which can make the semantic gate fail or behave nonsensically outside the CLI path. The plan should make these settings validated at the type boundary, not only at one adapter.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 85,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:0d60dff9ef8d94481383052e50368968b55b5d9f30211a13f0ac2bcdefa0970b",
+          "at": "2026-06-07T19:55:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 requires `RefVerifyPercent::try_new(0)` to succeed and uses the same percent type for both known-bad injection rate and detection threshold. That allows a config with 0% injection, so no known-bad probes are injected, or a 0% threshold, so degradation can never fall below the threshold. This contradicts IN-08/AC-09, which require known-bad probes to be injected into each batch and to trigger escalation when detection is below threshold. The plan should make the semantic health-check settings non-disableable, e.g. by validating injection and threshold as 1..=100 or by using separate field-specific value objects.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 60,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:55211ac6b1295abe1958cb42d23c5ccd8b4a3c1a11cf8abb6c1be269318a861d",
+          "at": "2026-06-07T20:05:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-08 states that only production pairs that Fail/Pending are escalated and that fast-pass pairs never run the final tier. That conflicts with the known_bad calibration path in AC-09/D5/D6: once the injected known_bad checks fall below threshold, the fast verifier for that batch has already been marked degraded, so caching same-batch fast-pass production verdicts without final re-evaluation (as T007 also specifies) can freeze false Passes despite the hard-gate intent.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+              "line": 398,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:385a7985d0cf3eec989f05c62d9c529900b0a70943c49e199a099d5fc28c84f3",
+          "at": "2026-06-07T20:12:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`HumanEscalationRequired` is documented as the outcome when final-tier verification still has failed/pending production pairs. That collapses two D5 paths: verifier degradation/unresolved cases may require human escalation, but confirmed production failures are supposed to be handed back to the writer/fix loop and then reverified. As written, the usecase contract makes confirmed semantic failures look like human-escalation failures and does not represent the writer handback path.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 220,
+              "category": "contradiction"
+            },
+            {
+              "message": "T003 adds `entry_hash` to `CatalogueSpecSignal`, changes the constructor, and says all construction sites should pass the new value, but it explicitly defers `CatalogueSpecSignalsDocument` encode/decode changes to T005. Since the signals codec is one of the places that constructs/decodes `CatalogueSpecSignal`, the T003/T005 ordering leaves the plan unable to compile or verify at the T003 boundary. Merge the codec update into T003 or make T003/T005 a single executable task group.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 34,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:51cd40dbb5caa1cf0b8f0b510f333ee04ddc57212b2bc05400d13aef51195184",
+          "at": "2026-06-07T20:21:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006/T008 require `timeout_seconds` and `prompt_template_path` to be added as typed fields on `CapabilityConfigDto` / `ResolvedExecution`, and say `resolve_execution(\"ref-verifier\", ...)` returns those values. The infrastructure catalogue, however, only models `AgentProfiles` as a reference and keeps `resolve_execution` returning `Option<ResolvedExecution>` while exposing timeout/prompt as separate methods, without any `ResolvedExecution` or `CapabilityConfigDto` modification. That leaves the plan and catalogue with conflicting contracts for how the adapter obtains timeout/prompt, so the implementation can satisfy one artifact while violating the other.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 50,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d874d45a8513a85f7c704983479c5042ab75f078c56edf8bd0344cfef4fd9136",
+          "at": "2026-06-07T20:32:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-06 says only production pairs that Fail or Pending at the fast tier are escalated to final, but AC-08 requires fast-Pass production pairs in a degraded known_bad batch to be re-evaluated at final before caching. That leaves T007 with conflicting rules for the same path: either fast Passes are never escalated unless they Fail/Pending, or they must be escalated when calibration fails. The plan should state the known_bad degradation exception consistently in IN-06 or remove it from AC-08.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+              "line": 91,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ae7d815e892d004dfb76e7d02712be284aee9b65e0cf8d3b77ec8e51e94d4919",
+          "at": "2026-06-07T20:37:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifierPort::verify_pair` declares its tier parameter as `domain::tddd::ModelTier`, but the domain catalogue declares `ModelTier` under `tddd::semantic_verify` and the surrounding semantic types are referenced through `domain::tddd::semantic_verify::...`. This makes the cross-layer port contract inconsistent with the declared domain type catalogue and will steer T007/T008 toward a different or nonexistent type path instead of the dedicated semantic-review type.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 468,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:4570beb4c337e18219fe1739d8168305e6d908f3a99c9aa88b0e7f9a8380603b",
+          "at": "2026-06-07T20:42:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan defines `RefVerifyPairSourcePort` and `RefVerifyCachePort` as infrastructure-backed ports for pair enumeration, known_bad injection, hash/cache routing, and artifact persistence, but the infrastructure catalogue only plans `AgentRefVerifierAdapter`. Since T007 delegates these responsibilities out of usecase and no concrete pair-source/cache adapters are planned, `bin/sotp ref-verify run` cannot be wired without adding unplanned infrastructure types/tasks.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 374,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:f8065a50cc995eaf85f6c29dbaa3aef61cfc32c49a75ddccf721853fc4ee3329",
+          "at": "2026-06-07T20:50:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 requires new verify-cache codec contracts (`SpecAdrVerifyCacheDocumentCodec::encode/decode`, `CatalogueSpecVerifyCacheDocumentCodec::encode/decode`, and DTO encode/decode behavior), but the infrastructure catalogue does not declare any codec type, function, or inherent impl for them. That leaves the AC-03 verify-cache codec work outside the catalogue/spec contract, so the plan artifacts are internally inconsistent: the implementation plan depends on contracts that the type catalogue cannot track or verify.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 24,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f8d7ad753fcbccd09d8f044e8f84f03c72155d2953224ffa8dd4659e9ba5a322",
+          "at": "2026-06-07T20:58:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b31f1380837ba47232f87ec3e863d67490a0e4000f93a521e24af9b7f91aab05",
+          "at": "2026-06-07T21:05:50Z"
         }
       ]
     }

@@ -1,0 +1,485 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "CatalogueSpecSignal": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "type_name", "ty": "String" },
+            { "name": "signal", "ty": "ConfidenceSignal" },
+            { "name": "entry_hash", "ty": "ContentHash" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "type_name", "ty": "String" },
+            { "name": "signal", "ty": "ConfidenceSignal" },
+            { "name": "entry_hash", "ty": "ContentHash" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "entry_hash",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&ContentHash",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::catalogue_spec_signal",
+      "docs": "Per-entry signal record stored inside existing `CatalogueSpecSignalsDocument.signals`. Adds per-entry SHA-256 hash for D4 differential re-review. The existing document-level `catalogue_declaration_hash` remains on `CatalogueSpecSignalsDocument` and is not moved into each entry.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-05",
+          "hash": "dfb5e52cb2a1fd525c2d898b1b5db7e086f6c01aacad5f12b10505458bf4a907"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-06",
+          "hash": "fc6256f9f2e2f3240b63de074b208f48b503d241bced0e891e9eded1391b9b90"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-04",
+          "hash": "4ee118cdc8dadd46cf2d5aa8e4fb31ecc916a90befb1980bdaf06e4ea8625c06"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueSpecVerifyCacheDocument": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "layer", "ty": "LayerId" },
+            { "name": "entries", "ty": "Vec<SemanticVerifyEntry>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "layer", "ty": "LayerId" },
+            { "name": "entries", "ty": "Vec<SemanticVerifyEntry>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Aggregate root for `<layer>-catalogue-spec-verify-cache.json`. Stores frozen (claim_hash, evidence_hash) verdict pairs for Chain-2 (catalogue -> spec) semantic review.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "EvidenceCitation": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": ["String"],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "citation", "ty": "String" }
+          ],
+          "returns": "Result<Self, ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_str",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Non-empty validated quotation from the evidence (ADR or spec element) that backs the semantic review pass verdict (D6). Required for any Pass — absence forces Pending.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-07",
+          "hash": "38366308ab32d38c3765cbf1b4f981941fdd4c7fd09cf32b4346b71fa3f104cb"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticVerdict": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pass",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "citation", "ty": "EvidenceCitation" }
+              ]
+            }
+          },
+          {
+            "name": "Fail",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Result of a single semantic review of a (claim, evidence) reference pair. Pass requires a citation quotation (D6). Pending means the reviewer could not confirm — treated as Fail at the gate.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-07",
+          "hash": "38366308ab32d38c3765cbf1b4f981941fdd4c7fd09cf32b4346b71fa3f104cb"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticVerifyEntry": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "claim_hash", "ty": "ContentHash" },
+            { "name": "evidence_hash", "ty": "ContentHash" },
+            { "name": "verdict", "ty": "SemanticVerdict" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "claim_hash", "ty": "ContentHash" },
+            { "name": "evidence_hash", "ty": "ContentHash" },
+            { "name": "verdict", "ty": "SemanticVerdict" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Single frozen verdict record in a semantic verify cache artifact. Keyed by (claim_hash, evidence_hash); when either changes the entry must be re-reviewed.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-04",
+          "hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ModelTier": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fast",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Final",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Tier selection for the three-tier model escalation funnel (D5). Fast selects the lightweight model (fast_provider/fast_model in agent-profiles.json); Final selects the heavyweight model. Independent of infrastructure::agent_profiles::RoundType per CN-01.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-06",
+          "hash": "11aa8f7341ab23adc5eb7f8158ab618f95406a78df797acbb17c1f5f9d09fbea"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-01",
+          "hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SpecAdrVerifyCacheDocument": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "entries", "ty": "Vec<SemanticVerifyEntry>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "entries", "ty": "Vec<SemanticVerifyEntry>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::semantic_verify",
+      "docs": "Aggregate root for `spec-adr-verify-cache.json`. Stores frozen (claim_hash, evidence_hash) verdict pairs for Chain-1 (spec -> ADR) semantic review at track granularity.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueSpecSignal"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CatalogueSpecSignal"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "CatalogueSpecSignal"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "CatalogueSpecSignal"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueSpecVerifyCacheDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CatalogueSpecVerifyCacheDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "CatalogueSpecVerifyCacheDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "CatalogueSpecVerifyCacheDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "EvidenceCitation"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "EvidenceCitation"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "EvidenceCitation"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "EvidenceCitation"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "EvidenceCitation"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SemanticVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SemanticVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "SemanticVerdict"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticVerifyEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SemanticVerifyEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SemanticVerifyEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "SemanticVerifyEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecAdrVerifyCacheDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SpecAdrVerifyCacheDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SpecAdrVerifyCacheDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "SpecAdrVerifyCacheDocument"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ModelTier"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ModelTier"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ModelTier"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ModelTier"
+    }
+  ]
+}

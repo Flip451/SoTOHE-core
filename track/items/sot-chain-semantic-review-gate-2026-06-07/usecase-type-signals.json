@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-07T21:09:55Z",
+  "declaration_hash": "836bc94a1cb258c6613af4a0e1ebca042ff7315cdc4a24dddd98e64388613b03",
+  "signals": [
+    {
+      "type_name": "RefVerifierPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyApplicationService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyCachePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyCacheScope",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyConfig",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RefVerifyPair",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyPairSourcePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "RefVerifyParallelism",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "RefVerifyPercent",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "RefVerifyScope",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "VerifySemanticRefsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "RefVerifyApplicationService"
+      ]
+    }
+  ]
+}

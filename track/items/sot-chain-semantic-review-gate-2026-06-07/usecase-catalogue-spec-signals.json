@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "836bc94a1cb258c6613af4a0e1ebca042ff7315cdc4a24dddd98e64388613b03",
+  "signals": [
+    {
+      "type_name": "RefVerifyCacheScope",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyCommand",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyConfig",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyError",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyPair",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyParallelism",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyPercent",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyScope",
+      "signal": "blue"
+    },
+    {
+      "type_name": "VerifySemanticRefsInteractor",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifierPort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyApplicationService",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyCachePort",
+      "signal": "blue"
+    },
+    {
+      "type_name": "RefVerifyPairSourcePort",
+      "signal": "blue"
+    }
+  ]
+}

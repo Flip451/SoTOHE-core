@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "3d43c915d5620573d1a79e34907482ee5a57d57fcb8c7c71ef69862e2c2f3685",
+  "signals": [
+    {
+      "type_name": "CatalogueSpecSignal",
+      "signal": "blue"
+    },
+    {
+      "type_name": "CatalogueSpecVerifyCacheDocument",
+      "signal": "blue"
+    },
+    {
+      "type_name": "EvidenceCitation",
+      "signal": "blue"
+    },
+    {
+      "type_name": "ModelTier",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticVerdict",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SemanticVerifyEntry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "SpecAdrVerifyCacheDocument",
+      "signal": "blue"
+    }
+  ]
+}

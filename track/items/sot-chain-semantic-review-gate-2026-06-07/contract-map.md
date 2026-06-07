@@ -1,0 +1,396 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T33_domain_domain_CatalogueSpecSignal["tddd::catalogue_spec_signal::CatalogueSpecSignal"]
+    direction TB
+    T33_domain_domain_CatalogueSpecSignal__self[CatalogueSpecSignal]
+    T33_domain_domain_CatalogueSpecSignal_new([new])
+    T33_domain_domain_CatalogueSpecSignal_entry_hash([entry_hash])
+  end
+  subgraph T46_domain_domain_CatalogueSpecVerifyCacheDocument["tddd::semantic_verify::CatalogueSpecVerifyCacheDocument"]
+    direction TB
+    T46_domain_domain_CatalogueSpecVerifyCacheDocument__self[CatalogueSpecVerifyCacheDocument]
+    T46_domain_domain_CatalogueSpecVerifyCacheDocument_new([new])
+  end
+  subgraph T30_domain_domain_EvidenceCitation["tddd::semantic_verify::EvidenceCitation"]
+    direction TB
+    T30_domain_domain_EvidenceCitation__self[EvidenceCitation]
+    T30_domain_domain_EvidenceCitation_try_new([try_new])
+    T30_domain_domain_EvidenceCitation_as_str([as_str])
+  end
+  subgraph T23_domain_domain_ModelTier["tddd::semantic_verify::ModelTier"]
+    direction TB
+    T23_domain_domain_ModelTier__self[ModelTier]
+    T23_domain_domain_ModelTier_Fast[Fast]
+    T23_domain_domain_ModelTier_Final[Final]
+  end
+  subgraph T29_domain_domain_SemanticVerdict["tddd::semantic_verify::SemanticVerdict"]
+    direction TB
+    T29_domain_domain_SemanticVerdict__self[SemanticVerdict]
+    T29_domain_domain_SemanticVerdict_Pass[Pass]
+    T29_domain_domain_SemanticVerdict_Fail[Fail]
+    T29_domain_domain_SemanticVerdict_Pending[Pending]
+  end
+  subgraph T33_domain_domain_SemanticVerifyEntry["tddd::semantic_verify::SemanticVerifyEntry"]
+    direction TB
+    T33_domain_domain_SemanticVerifyEntry__self[SemanticVerifyEntry]
+    T33_domain_domain_SemanticVerifyEntry_new([new])
+  end
+  subgraph T40_domain_domain_SpecAdrVerifyCacheDocument["tddd::semantic_verify::SpecAdrVerifyCacheDocument"]
+    direction TB
+    T40_domain_domain_SpecAdrVerifyCacheDocument__self[SpecAdrVerifyCacheDocument]
+    T40_domain_domain_SpecAdrVerifyCacheDocument_new([new])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_ref_verify["usecase::ref_verify"]
+    direction TB
+  subgraph T35_usecase_usecase_RefVerifyCacheScope["ref_verify::RefVerifyCacheScope"]
+    direction TB
+    T35_usecase_usecase_RefVerifyCacheScope__self[RefVerifyCacheScope]
+    T35_usecase_usecase_RefVerifyCacheScope_SpecAdr[SpecAdr]
+    T35_usecase_usecase_RefVerifyCacheScope_CatalogueSpec[CatalogueSpec]
+  end
+  subgraph T32_usecase_usecase_RefVerifyCommand["ref_verify::RefVerifyCommand"]
+    direction TB
+    T32_usecase_usecase_RefVerifyCommand__self[RefVerifyCommand]
+  end
+  subgraph T31_usecase_usecase_RefVerifyConfig["ref_verify::RefVerifyConfig"]
+    direction TB
+    T31_usecase_usecase_RefVerifyConfig__self[RefVerifyConfig]
+    T31_usecase_usecase_RefVerifyConfig_try_new([try_new])
+  end
+  subgraph T30_usecase_usecase_RefVerifyError["ref_verify::RefVerifyError"]
+    direction TB
+    T30_usecase_usecase_RefVerifyError__self[RefVerifyError]
+    T30_usecase_usecase_RefVerifyError_InvalidConfig[InvalidConfig]
+    T30_usecase_usecase_RefVerifyError_TrackNotActive[TrackNotActive]
+    T30_usecase_usecase_RefVerifyError_VerifierPort[VerifierPort]
+    T30_usecase_usecase_RefVerifyError_CachePersistence[CachePersistence]
+    T30_usecase_usecase_RefVerifyError_SemanticFailuresConfirmed[SemanticFailuresConfirmed]
+    T30_usecase_usecase_RefVerifyError_HumanEscalationRequired[HumanEscalationRequired]
+  end
+  subgraph T29_usecase_usecase_RefVerifyPair["ref_verify::RefVerifyPair"]
+    direction TB
+    T29_usecase_usecase_RefVerifyPair__self[RefVerifyPair]
+  end
+  subgraph T36_usecase_usecase_RefVerifyParallelism["ref_verify::RefVerifyParallelism"]
+    direction TB
+    T36_usecase_usecase_RefVerifyParallelism__self[RefVerifyParallelism]
+    T36_usecase_usecase_RefVerifyParallelism_try_new([try_new])
+    T36_usecase_usecase_RefVerifyParallelism_as_usize([as_usize])
+  end
+  subgraph T32_usecase_usecase_RefVerifyPercent["ref_verify::RefVerifyPercent"]
+    direction TB
+    T32_usecase_usecase_RefVerifyPercent__self[RefVerifyPercent]
+    T32_usecase_usecase_RefVerifyPercent_try_new([try_new])
+    T32_usecase_usecase_RefVerifyPercent_as_u8([as_u8])
+  end
+  subgraph T30_usecase_usecase_RefVerifyScope["ref_verify::RefVerifyScope"]
+    direction TB
+    T30_usecase_usecase_RefVerifyScope__self[RefVerifyScope]
+    T30_usecase_usecase_RefVerifyScope_Chain1[Chain1]
+    T30_usecase_usecase_RefVerifyScope_Chain2[Chain2]
+    T30_usecase_usecase_RefVerifyScope_All[All]
+  end
+  subgraph T44_usecase_usecase_VerifySemanticRefsInteractor["ref_verify::VerifySemanticRefsInteractor"]
+    direction TB
+    T44_usecase_usecase_VerifySemanticRefsInteractor__self[VerifySemanticRefsInteractor]
+    T44_usecase_usecase_VerifySemanticRefsInteractor_new([new])
+  end
+  subgraph R31_usecase_usecase_RefVerifierPort["ref_verify::RefVerifierPort"]
+    direction TB
+    R31_usecase_usecase_RefVerifierPort__self[RefVerifierPort]
+    R31_usecase_usecase_RefVerifierPort_verify_pair([verify_pair])
+  end
+  subgraph R43_usecase_usecase_RefVerifyApplicationService["ref_verify::RefVerifyApplicationService"]
+    direction TB
+    R43_usecase_usecase_RefVerifyApplicationService__self[RefVerifyApplicationService]
+    R43_usecase_usecase_RefVerifyApplicationService_execute([execute])
+  end
+  subgraph R34_usecase_usecase_RefVerifyCachePort["ref_verify::RefVerifyCachePort"]
+    direction TB
+    R34_usecase_usecase_RefVerifyCachePort__self[RefVerifyCachePort]
+    R34_usecase_usecase_RefVerifyCachePort_load_entries([load_entries])
+    R34_usecase_usecase_RefVerifyCachePort_save_entries([save_entries])
+  end
+  subgraph R39_usecase_usecase_RefVerifyPairSourcePort["ref_verify::RefVerifyPairSourcePort"]
+    direction TB
+    R39_usecase_usecase_RefVerifyPairSourcePort__self[RefVerifyPairSourcePort]
+    R39_usecase_usecase_RefVerifyPairSourcePort_load_pairs([load_pairs])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_agent_profiles["infrastructure::agent_profiles"]
+    direction TB
+  subgraph T43_infrastructure_infrastructure_AgentProfiles["agent_profiles::AgentProfiles"]
+    direction TB
+    T43_infrastructure_infrastructure_AgentProfiles__self[AgentProfiles]
+    T43_infrastructure_infrastructure_AgentProfiles_load([load])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_execution([resolve_execution])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_model([resolve_model])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_provider([resolve_provider])
+    T43_infrastructure_infrastructure_AgentProfiles_provider_label([provider_label])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_capability([resolve_capability])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_timeout_seconds([resolve_timeout_seconds])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_prompt_template_path([resolve_prompt_template_path])
+  end
+  subgraph T39_infrastructure_infrastructure_RoundType["agent_profiles::RoundType"]
+    direction TB
+    T39_infrastructure_infrastructure_RoundType__self[RoundType]
+    T39_infrastructure_infrastructure_RoundType_Final[Final]
+    T39_infrastructure_infrastructure_RoundType_Fast[Fast]
+  end
+  end
+  subgraph infrastructure_infrastructure_module_ref_verify["infrastructure::ref_verify"]
+    direction TB
+  subgraph T50_infrastructure_infrastructure_AgentExecutionRunner["ref_verify::AgentExecutionRunner"]
+    direction TB
+    T50_infrastructure_infrastructure_AgentExecutionRunner__self[AgentExecutionRunner]
+  end
+  subgraph T53_infrastructure_infrastructure_AgentRefVerifierAdapter["ref_verify::AgentRefVerifierAdapter"]
+    direction TB
+    T53_infrastructure_infrastructure_AgentRefVerifierAdapter__self[AgentRefVerifierAdapter]
+    T53_infrastructure_infrastructure_AgentRefVerifierAdapter_new([new])
+  end
+  subgraph T51_infrastructure_infrastructure_RefVerifyCacheAdapter["ref_verify::RefVerifyCacheAdapter"]
+    direction TB
+    T51_infrastructure_infrastructure_RefVerifyCacheAdapter__self[RefVerifyCacheAdapter]
+    T51_infrastructure_infrastructure_RefVerifyCacheAdapter_new([new])
+  end
+  subgraph T56_infrastructure_infrastructure_RefVerifyPairSourceAdapter["ref_verify::RefVerifyPairSourceAdapter"]
+    direction TB
+    T56_infrastructure_infrastructure_RefVerifyPairSourceAdapter__self[RefVerifyPairSourceAdapter]
+    T56_infrastructure_infrastructure_RefVerifyPairSourceAdapter_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec["tddd::semantic_verify_codec::CatalogueSpecVerifyCacheDocumentCodec"]
+    direction TB
+    T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec__self[CatalogueSpecVerifyCacheDocumentCodec]
+    T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec_encode([encode])
+    T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec_decode([decode])
+  end
+  subgraph T65_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentDto["tddd::semantic_verify_codec::CatalogueSpecVerifyCacheDocumentDto"]
+    direction TB
+    T65_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentDto__self[CatalogueSpecVerifyCacheDocumentDto]
+  end
+  subgraph T48_infrastructure_infrastructure_SemanticVerdictDto["tddd::semantic_verify_codec::SemanticVerdictDto"]
+    direction TB
+    T48_infrastructure_infrastructure_SemanticVerdictDto__self[SemanticVerdictDto]
+    T48_infrastructure_infrastructure_SemanticVerdictDto_Pass[Pass]
+    T48_infrastructure_infrastructure_SemanticVerdictDto_Fail[Fail]
+    T48_infrastructure_infrastructure_SemanticVerdictDto_Pending[Pending]
+  end
+  subgraph T54_infrastructure_infrastructure_SemanticVerifyCodecError["tddd::semantic_verify_codec::SemanticVerifyCodecError"]
+    direction TB
+    T54_infrastructure_infrastructure_SemanticVerifyCodecError__self[SemanticVerifyCodecError]
+    T54_infrastructure_infrastructure_SemanticVerifyCodecError_Json[Json]
+    T54_infrastructure_infrastructure_SemanticVerifyCodecError_UnsupportedSchemaVersion[UnsupportedSchemaVersion]
+    T54_infrastructure_infrastructure_SemanticVerifyCodecError_Validation[Validation]
+  end
+  subgraph T52_infrastructure_infrastructure_SemanticVerifyEntryDto["tddd::semantic_verify_codec::SemanticVerifyEntryDto"]
+    direction TB
+    T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self[SemanticVerifyEntryDto]
+  end
+  subgraph T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec["tddd::semantic_verify_codec::SpecAdrVerifyCacheDocumentCodec"]
+    direction TB
+    T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec__self[SpecAdrVerifyCacheDocumentCodec]
+    T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec_encode([encode])
+    T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec_decode([decode])
+  end
+  subgraph T59_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentDto["tddd::semantic_verify_codec::SpecAdrVerifyCacheDocumentDto"]
+    direction TB
+    T59_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentDto__self[SpecAdrVerifyCacheDocumentDto]
+  end
+  end
+end
+T33_domain_domain_CatalogueSpecSignal_new --> T33_domain_domain_CatalogueSpecSignal__self
+T46_domain_domain_CatalogueSpecVerifyCacheDocument_new --o T33_domain_domain_SemanticVerifyEntry__self
+T46_domain_domain_CatalogueSpecVerifyCacheDocument_new --> T46_domain_domain_CatalogueSpecVerifyCacheDocument__self
+T46_domain_domain_CatalogueSpecVerifyCacheDocument__self --o|entries| T33_domain_domain_SemanticVerifyEntry__self
+T30_domain_domain_EvidenceCitation_try_new --> T30_domain_domain_EvidenceCitation__self
+T29_domain_domain_SemanticVerdict_Pass --o|citation| T30_domain_domain_EvidenceCitation__self
+T33_domain_domain_SemanticVerifyEntry_new --o T29_domain_domain_SemanticVerdict__self
+T33_domain_domain_SemanticVerifyEntry_new --> T33_domain_domain_SemanticVerifyEntry__self
+T33_domain_domain_SemanticVerifyEntry__self --o|verdict| T29_domain_domain_SemanticVerdict__self
+T40_domain_domain_SpecAdrVerifyCacheDocument_new --o T33_domain_domain_SemanticVerifyEntry__self
+T40_domain_domain_SpecAdrVerifyCacheDocument_new --> T40_domain_domain_SpecAdrVerifyCacheDocument__self
+T40_domain_domain_SpecAdrVerifyCacheDocument__self --o|entries| T33_domain_domain_SemanticVerifyEntry__self
+T32_usecase_usecase_RefVerifyCommand__self --o|scope| T30_usecase_usecase_RefVerifyScope__self
+T31_usecase_usecase_RefVerifyConfig_try_new --> T30_usecase_usecase_RefVerifyError__self
+T31_usecase_usecase_RefVerifyConfig_try_new --> T31_usecase_usecase_RefVerifyConfig__self
+T31_usecase_usecase_RefVerifyConfig__self --o|known_bad_injection_rate_percent| T32_usecase_usecase_RefVerifyPercent__self
+T31_usecase_usecase_RefVerifyConfig__self --o|known_bad_detection_threshold_percent| T32_usecase_usecase_RefVerifyPercent__self
+T31_usecase_usecase_RefVerifyConfig__self --o|max_parallelism| T36_usecase_usecase_RefVerifyParallelism__self
+T29_usecase_usecase_RefVerifyPair__self --o|cache_scope| T35_usecase_usecase_RefVerifyCacheScope__self
+T36_usecase_usecase_RefVerifyParallelism_try_new --> T30_usecase_usecase_RefVerifyError__self
+T36_usecase_usecase_RefVerifyParallelism_try_new --> T36_usecase_usecase_RefVerifyParallelism__self
+T32_usecase_usecase_RefVerifyPercent_try_new --> T30_usecase_usecase_RefVerifyError__self
+T32_usecase_usecase_RefVerifyPercent_try_new --> T32_usecase_usecase_RefVerifyPercent__self
+T44_usecase_usecase_VerifySemanticRefsInteractor_new --o T31_usecase_usecase_RefVerifyConfig__self
+T44_usecase_usecase_VerifySemanticRefsInteractor_new --> T44_usecase_usecase_VerifySemanticRefsInteractor__self
+R31_usecase_usecase_RefVerifierPort_verify_pair --o T23_domain_domain_ModelTier__self
+R31_usecase_usecase_RefVerifierPort_verify_pair --> T30_usecase_usecase_RefVerifyError__self
+R31_usecase_usecase_RefVerifierPort_verify_pair --> T29_domain_domain_SemanticVerdict__self
+R43_usecase_usecase_RefVerifyApplicationService_execute --o T32_usecase_usecase_RefVerifyCommand__self
+R43_usecase_usecase_RefVerifyApplicationService_execute --> T30_usecase_usecase_RefVerifyError__self
+R34_usecase_usecase_RefVerifyCachePort_load_entries --o T32_usecase_usecase_RefVerifyCommand__self
+R34_usecase_usecase_RefVerifyCachePort_load_entries --o T35_usecase_usecase_RefVerifyCacheScope__self
+R34_usecase_usecase_RefVerifyCachePort_load_entries --> T30_usecase_usecase_RefVerifyError__self
+R34_usecase_usecase_RefVerifyCachePort_load_entries --> T33_domain_domain_SemanticVerifyEntry__self
+R34_usecase_usecase_RefVerifyCachePort_save_entries --o T32_usecase_usecase_RefVerifyCommand__self
+R34_usecase_usecase_RefVerifyCachePort_save_entries --o T35_usecase_usecase_RefVerifyCacheScope__self
+R34_usecase_usecase_RefVerifyCachePort_save_entries --o T33_domain_domain_SemanticVerifyEntry__self
+R34_usecase_usecase_RefVerifyCachePort_save_entries --> T30_usecase_usecase_RefVerifyError__self
+R39_usecase_usecase_RefVerifyPairSourcePort_load_pairs --o T32_usecase_usecase_RefVerifyCommand__self
+R39_usecase_usecase_RefVerifyPairSourcePort_load_pairs --o T31_usecase_usecase_RefVerifyConfig__self
+R39_usecase_usecase_RefVerifyPairSourcePort_load_pairs --> T30_usecase_usecase_RefVerifyError__self
+R39_usecase_usecase_RefVerifyPairSourcePort_load_pairs --> T29_usecase_usecase_RefVerifyPair__self
+T44_usecase_usecase_VerifySemanticRefsInteractor__self -.impl.-> R43_usecase_usecase_RefVerifyApplicationService__self
+T43_infrastructure_infrastructure_AgentProfiles_load --> T43_infrastructure_infrastructure_AgentProfiles__self
+T43_infrastructure_infrastructure_AgentProfiles_resolve_execution --o T39_infrastructure_infrastructure_RoundType__self
+T43_infrastructure_infrastructure_AgentProfiles_resolve_model --o T39_infrastructure_infrastructure_RoundType__self
+T43_infrastructure_infrastructure_AgentProfiles_resolve_provider --o T39_infrastructure_infrastructure_RoundType__self
+T43_infrastructure_infrastructure_AgentProfiles_provider_label --o T39_infrastructure_infrastructure_RoundType__self
+T53_infrastructure_infrastructure_AgentRefVerifierAdapter_new --o T43_infrastructure_infrastructure_AgentProfiles__self
+T53_infrastructure_infrastructure_AgentRefVerifierAdapter_new --o T50_infrastructure_infrastructure_AgentExecutionRunner__self
+T53_infrastructure_infrastructure_AgentRefVerifierAdapter_new --> T53_infrastructure_infrastructure_AgentRefVerifierAdapter__self
+T51_infrastructure_infrastructure_RefVerifyCacheAdapter_new --> T51_infrastructure_infrastructure_RefVerifyCacheAdapter__self
+T56_infrastructure_infrastructure_RefVerifyPairSourceAdapter_new --> T56_infrastructure_infrastructure_RefVerifyPairSourceAdapter__self
+T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec_encode --o T46_domain_domain_CatalogueSpecVerifyCacheDocument__self
+T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec_encode --> T54_infrastructure_infrastructure_SemanticVerifyCodecError__self
+T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec_decode --> T54_infrastructure_infrastructure_SemanticVerifyCodecError__self
+T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec_decode --> T46_domain_domain_CatalogueSpecVerifyCacheDocument__self
+T65_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentDto__self --o|entries| T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self
+T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self --o|verdict| T48_infrastructure_infrastructure_SemanticVerdictDto__self
+T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec_encode --o T40_domain_domain_SpecAdrVerifyCacheDocument__self
+T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec_encode --> T54_infrastructure_infrastructure_SemanticVerifyCodecError__self
+T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec_decode --> T54_infrastructure_infrastructure_SemanticVerifyCodecError__self
+T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec_decode --> T40_domain_domain_SpecAdrVerifyCacheDocument__self
+T59_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentDto__self --o|entries| T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self
+T53_infrastructure_infrastructure_AgentRefVerifierAdapter__self -.impl.-> R31_usecase_usecase_RefVerifierPort__self
+T56_infrastructure_infrastructure_RefVerifyPairSourceAdapter__self -.impl.-> R39_usecase_usecase_RefVerifyPairSourcePort__self
+T51_infrastructure_infrastructure_RefVerifyCacheAdapter__self -.impl.-> R34_usecase_usecase_RefVerifyCachePort__self
+class T33_domain_domain_CatalogueSpecSignal_new method_node
+class T33_domain_domain_CatalogueSpecSignal_entry_hash method_node
+class T33_domain_domain_CatalogueSpecSignal__self value_object
+class T46_domain_domain_CatalogueSpecVerifyCacheDocument_new method_node
+class T46_domain_domain_CatalogueSpecVerifyCacheDocument__self value_object
+class T30_domain_domain_EvidenceCitation_try_new method_node
+class T30_domain_domain_EvidenceCitation_as_str method_node
+class T30_domain_domain_EvidenceCitation__self value_object
+class T23_domain_domain_ModelTier_Fast variant_node
+class T23_domain_domain_ModelTier_Final variant_node
+class T23_domain_domain_ModelTier__self value_object
+class T29_domain_domain_SemanticVerdict_Pass variant_node
+class T29_domain_domain_SemanticVerdict_Fail variant_node
+class T29_domain_domain_SemanticVerdict_Pending variant_node
+class T29_domain_domain_SemanticVerdict__self value_object
+class T33_domain_domain_SemanticVerifyEntry_new method_node
+class T33_domain_domain_SemanticVerifyEntry__self value_object
+class T40_domain_domain_SpecAdrVerifyCacheDocument_new method_node
+class T40_domain_domain_SpecAdrVerifyCacheDocument__self value_object
+class T35_usecase_usecase_RefVerifyCacheScope_SpecAdr variant_node
+class T35_usecase_usecase_RefVerifyCacheScope_CatalogueSpec variant_node
+class T35_usecase_usecase_RefVerifyCacheScope__self value_object
+class T32_usecase_usecase_RefVerifyCommand__self command
+class T31_usecase_usecase_RefVerifyConfig_try_new method_node
+class T31_usecase_usecase_RefVerifyConfig__self value_object
+class T30_usecase_usecase_RefVerifyError_InvalidConfig variant_node
+class T30_usecase_usecase_RefVerifyError_TrackNotActive variant_node
+class T30_usecase_usecase_RefVerifyError_VerifierPort variant_node
+class T30_usecase_usecase_RefVerifyError_CachePersistence variant_node
+class T30_usecase_usecase_RefVerifyError_SemanticFailuresConfirmed variant_node
+class T30_usecase_usecase_RefVerifyError_HumanEscalationRequired variant_node
+class T30_usecase_usecase_RefVerifyError__self error_type
+class T29_usecase_usecase_RefVerifyPair__self value_object
+class T36_usecase_usecase_RefVerifyParallelism_try_new method_node
+class T36_usecase_usecase_RefVerifyParallelism_as_usize method_node
+class T36_usecase_usecase_RefVerifyParallelism__self value_object
+class T32_usecase_usecase_RefVerifyPercent_try_new method_node
+class T32_usecase_usecase_RefVerifyPercent_as_u8 method_node
+class T32_usecase_usecase_RefVerifyPercent__self value_object
+class T30_usecase_usecase_RefVerifyScope_Chain1 variant_node
+class T30_usecase_usecase_RefVerifyScope_Chain2 variant_node
+class T30_usecase_usecase_RefVerifyScope_All variant_node
+class T30_usecase_usecase_RefVerifyScope__self value_object
+class T44_usecase_usecase_VerifySemanticRefsInteractor_new method_node
+class T44_usecase_usecase_VerifySemanticRefsInteractor__self interactor
+class R31_usecase_usecase_RefVerifierPort_verify_pair method_node
+class R31_usecase_usecase_RefVerifierPort__self secondary_port
+class R43_usecase_usecase_RefVerifyApplicationService_execute method_node
+class R43_usecase_usecase_RefVerifyApplicationService__self app_service
+class R34_usecase_usecase_RefVerifyCachePort_load_entries method_node
+class R34_usecase_usecase_RefVerifyCachePort_save_entries method_node
+class R34_usecase_usecase_RefVerifyCachePort__self secondary_port
+class R39_usecase_usecase_RefVerifyPairSourcePort_load_pairs method_node
+class R39_usecase_usecase_RefVerifyPairSourcePort__self secondary_port
+class T43_infrastructure_infrastructure_AgentProfiles_load method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_execution method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_model method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_provider method_node
+class T43_infrastructure_infrastructure_AgentProfiles_provider_label method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_capability method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_timeout_seconds method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_prompt_template_path method_node
+class T43_infrastructure_infrastructure_AgentProfiles__self secondary_adapter
+class T39_infrastructure_infrastructure_RoundType_Final variant_node
+class T39_infrastructure_infrastructure_RoundType_Fast variant_node
+class T39_infrastructure_infrastructure_RoundType__self value_object
+class T50_infrastructure_infrastructure_AgentExecutionRunner__self value_object
+class T53_infrastructure_infrastructure_AgentRefVerifierAdapter_new method_node
+class T53_infrastructure_infrastructure_AgentRefVerifierAdapter__self secondary_adapter
+class T51_infrastructure_infrastructure_RefVerifyCacheAdapter_new method_node
+class T51_infrastructure_infrastructure_RefVerifyCacheAdapter__self secondary_adapter
+class T56_infrastructure_infrastructure_RefVerifyPairSourceAdapter_new method_node
+class T56_infrastructure_infrastructure_RefVerifyPairSourceAdapter__self secondary_adapter
+class T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec_encode method_node
+class T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec_decode method_node
+class T67_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentCodec__self secondary_adapter
+class T65_infrastructure_infrastructure_CatalogueSpecVerifyCacheDocumentDto__self dto
+class T48_infrastructure_infrastructure_SemanticVerdictDto_Pass variant_node
+class T48_infrastructure_infrastructure_SemanticVerdictDto_Fail variant_node
+class T48_infrastructure_infrastructure_SemanticVerdictDto_Pending variant_node
+class T48_infrastructure_infrastructure_SemanticVerdictDto__self dto
+class T54_infrastructure_infrastructure_SemanticVerifyCodecError_Json variant_node
+class T54_infrastructure_infrastructure_SemanticVerifyCodecError_UnsupportedSchemaVersion variant_node
+class T54_infrastructure_infrastructure_SemanticVerifyCodecError_Validation variant_node
+class T54_infrastructure_infrastructure_SemanticVerifyCodecError__self error_type
+class T52_infrastructure_infrastructure_SemanticVerifyEntryDto__self dto
+class T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec_encode method_node
+class T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec_decode method_node
+class T61_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentCodec__self secondary_adapter
+class T59_infrastructure_infrastructure_SpecAdrVerifyCacheDocumentDto__self dto
+```

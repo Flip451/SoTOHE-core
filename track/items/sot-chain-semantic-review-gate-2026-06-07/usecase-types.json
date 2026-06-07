@@ -1,0 +1,662 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "RefVerifyCommand": {
+      "action": "add",
+      "role": "Command",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "track_id", "ty": "domain::TrackId" },
+            { "name": "scope", "ty": "RefVerifyScope" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Command input for `RefVerifyApplicationService::execute`. Identifies which track and which Chain scope (Chain1, Chain2, or All) to verify.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyPair": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "claim", "ty": "String" },
+            { "name": "evidence", "ty": "String" },
+            { "name": "claim_hash", "ty": "domain::tddd::ContentHash" },
+            { "name": "evidence_hash", "ty": "domain::tddd::ContentHash" },
+            { "name": "cache_scope", "ty": "RefVerifyCacheScope" },
+            { "name": "known_bad", "ty": "bool" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Usecase-owned representation of one semantic reference pair. It carries the claim/evidence text for the verifier, externally determined hashes for cache lookup, the cache artifact scope used to route results, and a known_bad flag for D6 degradation checks. known_bad pairs are monitor probes: they are evaluated every run and are not satisfied from or persisted to the verify-cache.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-04",
+          "hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-08",
+          "hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyPercent": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": ["u8"],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Validated nonzero percentage value object for ref-verify health-check configuration. `try_new` accepts only values in 1..=100 so known-bad injection and detection thresholds cannot be disabled by zero-valued settings.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-08",
+          "hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyParallelism": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "tuple",
+          "fields": ["usize"],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Validated nonzero parallelism limit for ref-verify batching. `try_new` rejects 0 so the interactor cannot be configured with a nonsensical worker limit.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-05",
+          "hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyConfig": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "known_bad_injection_rate_percent", "ty": "RefVerifyPercent" },
+            { "name": "known_bad_detection_threshold_percent", "ty": "RefVerifyPercent" },
+            { "name": "max_parallelism", "ty": "RefVerifyParallelism" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Usecase configuration injected by the composition layer. It keeps known-bad injection rate, detection threshold, and parallelism limits out of filesystem/config I/O inside the interactor while making invalid settings unrepresentable through `RefVerifyPercent` and `RefVerifyParallelism`. `try_new` validates raw DTO values at the usecase boundary. The Default implementation supplies 10% known-bad injection, 90% detection threshold, and a nonzero max_parallelism default.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-08",
+          "hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-05",
+          "hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidConfig",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "TrackNotActive",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "branch", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "VerifierPort",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "CachePersistence",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "SemanticFailuresConfirmed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pair_count", "ty": "usize" }
+              ]
+            }
+          },
+          {
+            "name": "HumanEscalationRequired",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "pair_count", "ty": "usize" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Failure modes of `RefVerifyApplicationService::execute`. InvalidConfig is returned by RefVerifyPercent/RefVerifyParallelism/RefVerifyConfig constructors for impossible settings; TrackNotActive guards the active-track contract; VerifierPort wraps adapter failures; CachePersistence wraps artifact write failures; SemanticFailuresConfirmed reports final-tier production Fail entries back to the writer/fix loop; HumanEscalationRequired is reserved for final-tier Pending/unresolved cases or confirmed known-bad verifier degradation.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-06",
+          "hash": "11aa8f7341ab23adc5eb7f8158ab618f95406a78df797acbb17c1f5f9d09fbea"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyScope": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Chain1",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Chain2",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "domain::tddd::LayerId" }
+              ]
+            }
+          },
+          {
+            "name": "All",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Selects which SoT Chain links to verify. Chain1 = spec -> ADR; Chain2 { layer } = catalogue -> spec for one layer; All = both chains, all layers.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyCacheScope": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SpecAdr",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "CatalogueSpec",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "domain::tddd::LayerId" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Routes verified pairs to the concrete cache artifact required by D8. SpecAdr maps to spec-adr-verify-cache.json; CatalogueSpec { layer } maps to <layer>-catalogue-spec-verify-cache.json. RefVerifyScope::All is decomposed into these cache scopes before cache load/save.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "VerifySemanticRefsInteractor": {
+      "action": "add",
+      "role": "Interactor",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Default `RefVerifyApplicationService` implementation. Orchestrates pair loading, cache hit checks, verifier calls, final-tier escalation, and cache persistence through injected secondary ports; it does not perform filesystem/config I/O directly.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-11",
+          "hash": "1c44cc74a394987dd3d1130fcfc2309e893922eaf2c829ad18dfa3a4ea3d72e0"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-01",
+          "hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "RefVerifyPairSourcePort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "load_pairs",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RefVerifyCommand" },
+            { "name": "config", "ty": "&RefVerifyConfig" }
+          ],
+          "returns": "Result<Vec<RefVerifyPair>, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify",
+      "docs": "Secondary port for infrastructure-backed enumeration of Chain1/Chain2 reference pairs, including claim/evidence hashes, cache artifact scope, and configured known-bad pair injection. This keeps spec/catalogue/ADR reads outside the usecase layer.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-04",
+          "hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-08",
+          "hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyCachePort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "load_entries",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RefVerifyCommand" },
+            { "name": "cache_scope", "ty": "&RefVerifyCacheScope" }
+          ],
+          "returns": "Result<Vec<domain::tddd::semantic_verify::SemanticVerifyEntry>, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "save_entries",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RefVerifyCommand" },
+            { "name": "cache_scope", "ty": "&RefVerifyCacheScope" },
+            { "name": "entries", "ty": "Vec<domain::tddd::semantic_verify::SemanticVerifyEntry>" }
+          ],
+          "returns": "Result<(), RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify",
+      "docs": "Secondary port for loading and saving semantic verify-cache entries for one concrete cache artifact. The interactor decomposes RefVerifyScope::All into RefVerifyCacheScope groups before calling this port, so infrastructure can route SpecAdr to spec-adr-verify-cache.json and CatalogueSpec { layer } to <layer>-catalogue-spec-verify-cache.json. known_bad monitor probes are not loaded from or saved to these caches.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-04",
+          "hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-07",
+          "hash": "e76b6ab619a70343805540fd8345ce814e2a46d531d0dc54e663034da5dc1db3"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifierPort": {
+      "action": "add",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "verify_pair",
+          "receiver": "&self",
+          "params": [
+            { "name": "claim", "ty": "String" },
+            { "name": "evidence", "ty": "String" },
+            { "name": "tier", "ty": "domain::tddd::semantic_verify::ModelTier" }
+          ],
+          "returns": "Result<domain::tddd::semantic_verify::SemanticVerdict, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify",
+      "docs": "Secondary port for semantic review of a single (claim, evidence) reference pair. The adapter returns only `SemanticVerdict`; the usecase layer owns externally determined claim_hash/evidence_hash values and wraps the verdict into `SemanticVerifyEntry` for cache persistence. ModelTier selects fast vs final model per D5 three-tier escalation. Implemented by the `ref-verifier` capability adapter in infrastructure (D7, CN-01).",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "220ba51a7324319f8d0c8b718f41bee78ffd302c396a176700c48de176acd826"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-01",
+          "hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyApplicationService": {
+      "action": "add",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RefVerifyCommand" }
+          ],
+          "returns": "Result<(), RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify",
+      "docs": "Primary port for the `bin/sotp ref-verify` use case (D9). Runs three-tier escalation over the selected Chain scope and persists updated cache artifacts.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-11",
+          "hash": "1c44cc74a394987dd3d1130fcfc2309e893922eaf2c829ad18dfa3a4ea3d72e0"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-08",
+          "hash": "aa8c96c3c51e0eb0f9b8afc86f84039f97376d36eb4d2b42a5455f852812c012"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "RefVerifyPercent",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "value", "ty": "u8" }
+          ],
+          "returns": "Result<Self, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_u8",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RefVerifyParallelism",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "value", "ty": "usize" }
+          ],
+          "returns": "Result<Self, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_usize",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RefVerifyConfig",
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [
+            { "name": "known_bad_injection_rate_percent", "ty": "u8" },
+            { "name": "known_bad_detection_threshold_percent", "ty": "u8" },
+            { "name": "max_parallelism", "ty": "usize" }
+          ],
+          "returns": "Result<Self, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "VerifySemanticRefsInteractor",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "pair_source", "ty": "std::sync::Arc<dyn RefVerifyPairSourcePort>" },
+            { "name": "cache", "ty": "std::sync::Arc<dyn RefVerifyCachePort>" },
+            { "name": "verifier", "ty": "std::sync::Arc<dyn RefVerifierPort>" },
+            { "name": "config", "ty": "RefVerifyConfig" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyCommand", "action": "add" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyCommand", "action": "add" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyCommand", "action": "add" },
+    { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyCommand", "action": "add" },
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyPair", "action": "add" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyPair", "action": "add" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyPair", "action": "add" },
+    { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyPair", "action": "add" },
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyPercent", "action": "add" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyPercent", "action": "add" },
+    { "trait_ref": "core::marker::Copy", "for_type": "RefVerifyPercent", "action": "add" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyPercent", "action": "add" },
+    { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyPercent", "action": "add" },
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyParallelism", "action": "add" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyParallelism", "action": "add" },
+    { "trait_ref": "core::marker::Copy", "for_type": "RefVerifyParallelism", "action": "add" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyParallelism", "action": "add" },
+    { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyParallelism", "action": "add" },
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyConfig", "action": "add" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyConfig", "action": "add" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyConfig", "action": "add" },
+    { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyConfig", "action": "add" },
+    { "trait_ref": "core::default::Default", "for_type": "RefVerifyConfig", "action": "add" },
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyError", "action": "add" },
+    { "trait_ref": "core::fmt::Display", "for_type": "RefVerifyError", "action": "add" },
+    { "trait_ref": "core::error::Error", "for_type": "RefVerifyError", "action": "add" },
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyScope", "action": "add" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyScope", "action": "add" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyScope", "action": "add" },
+    { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyScope", "action": "add" },
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyCacheScope", "action": "add" },
+    { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyCacheScope", "action": "add" },
+    { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyCacheScope", "action": "add" },
+    { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyCacheScope", "action": "add" },
+    { "trait_ref": "RefVerifyApplicationService", "for_type": "VerifySemanticRefsInteractor", "action": "add" }
+  ]
+}

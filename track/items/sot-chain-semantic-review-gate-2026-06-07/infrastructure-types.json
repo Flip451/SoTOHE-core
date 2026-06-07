@@ -1,0 +1,723 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "AgentProfiles": {
+      "action": "reference",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Result<Self, AgentProfilesError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_execution",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" },
+            { "name": "round_type", "ty": "RoundType" }
+          ],
+          "returns": "Option<ResolvedExecution>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_model",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" },
+            { "name": "round_type", "ty": "RoundType" }
+          ],
+          "returns": "Option<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_provider",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" },
+            { "name": "round_type", "ty": "RoundType" }
+          ],
+          "returns": "Option<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "provider_label",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" },
+            { "name": "round_type", "ty": "RoundType" }
+          ],
+          "returns": "String",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_capability",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" }
+          ],
+          "returns": "Option<CapabilityConfigDto>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_timeout_seconds",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" }
+          ],
+          "returns": "Option<u64>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_prompt_template_path",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" }
+          ],
+          "returns": "Option<std::path::PathBuf>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "agent_profiles",
+      "docs": "Carried for edge exposure: AgentRefVerifierAdapter uses AgentProfiles to resolve the ref-verifier capability (D7), including provider/model, timeout, and prompt template path as capability-local settings.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "220ba51a7324319f8d0c8b718f41bee78ffd302c396a176700c48de176acd826"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-12",
+          "hash": "cb8015e95880cdd9f3070caac22a14c76242b2e146ba20063a507017c450bbfb"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AgentExecutionRunner": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "type_alias",
+        "target": "dyn Fn(ResolvedExecution, String, u64) -> Result<String, usecase::ref_verify::RefVerifyError> + Send + Sync"
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Infrastructure-local callable type alias for executing a resolved ref-verifier model request. This is not a hexagonal secondary port; `RefVerifierPort` remains the only semantic verification port crossing the usecase/infrastructure boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "220ba51a7324319f8d0c8b718f41bee78ffd302c396a176700c48de176acd826"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-01",
+          "hash": "8e7ca469038b83f3701657f2ea2a5178cf0fbde4ec7139e27c0db0b18fbdb2b9"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-12",
+          "hash": "cb8015e95880cdd9f3070caac22a14c76242b2e146ba20063a507017c450bbfb"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AgentRefVerifierAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Secondary adapter implementing `RefVerifierPort` by dispatching to the `ref-verifier` capability in `agent-profiles.json`. Handles fast/final round resolution via `AgentProfiles.resolve_execution`, renders the configured prompt template, applies the configured timeout, and delegates execution to an injected `AgentExecutionRunner` callable (D7, CN-01, AC-01, AC-12).",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "220ba51a7324319f8d0c8b718f41bee78ffd302c396a176700c48de176acd826"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-01",
+          "hash": "8e7ca469038b83f3701657f2ea2a5178cf0fbde4ec7139e27c0db0b18fbdb2b9"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-01",
+          "hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-12",
+          "hash": "cb8015e95880cdd9f3070caac22a14c76242b2e146ba20063a507017c450bbfb"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticVerifyCodecError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "expected", "ty": "u32" },
+                { "name": "actual", "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "Validation",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Shared error enum for the semantic verify-cache JSON codecs. Covers serde JSON failures, unsupported schema_version, and validation failures while preserving fail-closed typed-deserialization behavior.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticVerdictDto": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pass",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "citation", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Fail",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "reason", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Private serde DTO for the `SemanticVerdict` JSON representation in verify-cache artifacts. Uses kind-tagged pass/fail/pending variants; pass requires citation and unknown or malformed variants decode as errors.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticVerifyEntryDto": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "claim_hash", "ty": "String" },
+            { "name": "evidence_hash", "ty": "String" },
+            { "name": "verdict", "ty": "SemanticVerdictDto" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Private serde DTO for one verify-cache entry. Encodes claim_hash and evidence_hash as hex strings and the verdict through `SemanticVerdictDto`; all fields are required.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SpecAdrVerifyCacheDocumentDto": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "entries", "ty": "Vec<SemanticVerifyEntryDto>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Private serde DTO for `spec-adr-verify-cache.json` schema_version 1. Unknown fields are denied and all entries are converted through typed domain constructors.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueSpecVerifyCacheDocumentDto": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "schema_version", "ty": "u32" },
+            { "name": "layer", "ty": "String" },
+            { "name": "entries", "ty": "Vec<SemanticVerifyEntryDto>" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Private serde DTO for `<layer>-catalogue-spec-verify-cache.json` schema_version 1. Carries the target layer plus typed semantic verdict entries and denies unknown fields.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SpecAdrVerifyCacheDocumentCodec": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Stateless codec for `spec-adr-verify-cache.json`. Encodes and decodes schema_version 1 documents through `SpecAdrVerifyCacheDocumentDto` and returns typed fail-closed errors for malformed JSON, unsupported versions, missing fields, or invalid domain values.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueSpecVerifyCacheDocumentCodec": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Stateless codec for `<layer>-catalogue-spec-verify-cache.json`. Encodes and decodes schema_version 1 documents through `CatalogueSpecVerifyCacheDocumentDto`, preserving the layer field and failing closed on malformed or semantically invalid artifact content.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyPairSourceAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Secondary adapter implementing `RefVerifyPairSourcePort`. Enumerates Chain1 spec->ADR and Chain2 catalogue->spec reference pairs from track artifacts, computes claim/evidence hashes, assigns RefVerifyCacheScope routing, skips persisted cache decisions only after the usecase asks the cache port, and injects configured known_bad monitor probes for degradation checks.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-04",
+          "hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-08",
+          "hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyCacheAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Secondary adapter implementing `RefVerifyCachePort`. Loads and saves `spec-adr-verify-cache.json` and `<layer>-catalogue-spec-verify-cache.json` through RefVerifyCacheScope, using the verify-cache codecs while keeping artifact I/O out of the usecase interactor.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-07",
+          "hash": "e76b6ab619a70343805540fd8345ce814e2a46d531d0dc54e663034da5dc1db3"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RoundType": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Final",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Fast",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "docs": "Carried for edge exposure: AgentRefVerifierAdapter maps domain::tddd::semantic_verify::ModelTier to RoundType before calling AgentProfiles::resolve_execution for fast/final provider selection (D5, D7).",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "SpecAdrVerifyCacheDocumentCodec",
+      "methods": [
+        {
+          "name": "encode",
+          "receiver": null,
+          "params": [
+            { "name": "doc", "ty": "&domain::tddd::semantic_verify::SpecAdrVerifyCacheDocument" }
+          ],
+          "returns": "Result<String, SemanticVerifyCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "decode",
+          "receiver": null,
+          "params": [
+            { "name": "json", "ty": "&str" }
+          ],
+          "returns": "Result<domain::tddd::semantic_verify::SpecAdrVerifyCacheDocument, SemanticVerifyCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
+      "methods": [
+        {
+          "name": "encode",
+          "receiver": null,
+          "params": [
+            { "name": "doc", "ty": "&domain::tddd::semantic_verify::CatalogueSpecVerifyCacheDocument" }
+          ],
+          "returns": "Result<String, SemanticVerifyCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "decode",
+          "receiver": null,
+          "params": [
+            { "name": "json", "ty": "&str" }
+          ],
+          "returns": "Result<domain::tddd::semantic_verify::CatalogueSpecVerifyCacheDocument, SemanticVerifyCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "AgentRefVerifierAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "profiles", "ty": "std::sync::Arc<AgentProfiles>" },
+            { "name": "runner", "ty": "std::sync::Arc<AgentExecutionRunner>" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RefVerifyPairSourceAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RefVerifyCacheAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecAdrVerifyCacheDocumentCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueSpecVerifyCacheDocumentCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AgentRefVerifierAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::RefVerifierPort",
+      "for_type": "AgentRefVerifierAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyPairSourceAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::RefVerifyPairSourcePort",
+      "for_type": "RefVerifyPairSourceAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyCacheAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::RefVerifyCachePort",
+      "for_type": "RefVerifyCacheAdapter"
+    }
+  ]
+}
