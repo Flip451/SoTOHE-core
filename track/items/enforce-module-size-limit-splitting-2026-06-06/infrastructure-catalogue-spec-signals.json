@@ -1,9 +1,57 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "db1c37220137b928bc6705a3153a1f6bbf0f110f100d412ed70d8bf177588286",
+  "catalogue_declaration_hash": "81f4199059ebe4b9eee3912ebf52dbd8d196059df60abf73b3f82e371b919ed8",
   "signals": [
     {
+      "type_name": "infrastructure::track::render::collect_track_snapshots",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::render_plan",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::render_registry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::sync_rendered_views",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::validate_track_snapshots",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::plan::render_plan",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::registry::render_registry",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::snapshot::collect_track_snapshots",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::sync::sync_rendered_views",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::track::render::validate::validate_track_snapshots",
+      "signal": "blue"
+    },
+    {
       "type_name": "infrastructure::verify::module_size::verify",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::plan_artifact_refs::build_element_map",
+      "signal": "blue"
+    },
+    {
+      "type_name": "infrastructure::verify::plan_artifact_refs::canonical_json_sha256",
       "signal": "blue"
     }
   ]

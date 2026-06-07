@@ -1,6 +1,49 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ac59429a7ebc792548899b9c87015999cbb7ef7883765a6ed254b59e088494f",
+          "at": "2026-06-07T08:59:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ac59429a7ebc792548899b9c87015999cbb7ef7883765a6ed254b59e088494f",
+          "at": "2026-06-07T09:02:03Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99520d65958075f719059b5f8fb01644d52a97e95f3a3658bcf3c61d80e9c11",
+          "at": "2026-06-07T08:57:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99520d65958075f719059b5f8fb01644d52a97e95f3a3658bcf3c61d80e9c11",
+          "at": "2026-06-07T08:59:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d99520d65958075f719059b5f8fb01644d52a97e95f3a3658bcf3c61d80e9c11",
+          "at": "2026-06-07T09:01:46Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -52,6 +95,530 @@
           "findings": [],
           "hash": "rvw1:sha256:911879a09738c0cc7e7794876debe935b872d71b2eb97b03f3a1f620d0f10436",
           "at": "2026-06-06T16:57:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T021 and T022 duplicate T001 instead of adding new work, so S1 now contains three verifier tasks and the plan grows from the briefing's 20 canonical tasks (T001-T020) to 22. That is a semantic mismatch with the stated plan structure and makes the generated `plan.md` task count and S1 checklist misleading as well.",
+              "severity": "P1",
+              "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/impl-plan.json",
+              "line": 105,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:66bac9f0394c335881fd6544526a239dd81070a0be9e7301be242a5ee8c6a55a",
+          "at": "2026-06-07T02:00:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f4edd5e74f19aa89901cdda42b4f1bc55bd6090db2208d30932939c4507cf04",
+          "at": "2026-06-07T02:02:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f4edd5e74f19aa89901cdda42b4f1bc55bd6090db2208d30932939c4507cf04",
+          "at": "2026-06-07T02:06:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:643942268008ab6e9d293eb495ae01161b269c461b216e67c3fdea9bcbb395e0",
+          "at": "2026-06-07T09:00:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-check.json` is supposed to represent the approved DRY check records for the completed track, but it still contains records with a `violation` verdict. I counted 28 such records, starting here, so the artifact contradicts the completed/approved plan state and would leave unresolved DRY work in the plan artifacts.",
+              "severity": "P1",
+              "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/dry-check.json",
+              "line": 141,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:643942268008ab6e9d293eb495ae01161b269c461b216e67c3fdea9bcbb395e0",
+          "at": "2026-06-07T09:03:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06ef510d38743c001d776463eb051b8cdfbd833ee10eaf4e20238e5058ef025e",
+          "at": "2026-06-07T09:06:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd3cb08c550c57d5677bc6600d63fadd7a763040dfd1b818673b5d7c16e00b4c",
+          "at": "2026-06-07T10:08:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd3cb08c550c57d5677bc6600d63fadd7a763040dfd1b818673b5d7c16e00b4c",
+          "at": "2026-06-07T10:12:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba82bef7590786504ff08fbfa47305ac675fc82e980f4c8ff8cf310e0e8096e5",
+          "at": "2026-06-07T11:32:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-check.json` still records unresolved DRY violations: this record and four later records use a `verdict.violation` object rather than `accepted` or `not-a-violation` (also at lines 3134, 3151, 3181, and 3237). That contradicts the completed/approved plan-artifact state because these pairs remain genuine DRY findings with refactor proposals instead of approved resolutions.",
+              "severity": "P1",
+              "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/dry-check.json",
+              "line": 3039,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ba82bef7590786504ff08fbfa47305ac675fc82e980f4c8ff8cf310e0e8096e5",
+          "at": "2026-06-07T11:37:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d39ff3a8df637ec48fb1de733aeccc1feef57d9c705e76aeeffcd95f15916b5",
+          "at": "2026-06-07T11:45:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T015 is now marked `done`, but its task text still says the `track/render.rs` split produced `track/render/metadata.rs`. The artifact set recorded in `infrastructure-types.json` and `contract-map.md` instead shows five submodules: `plan`, `registry`, `snapshot`, `sync`, and `validate`. That makes the completed task description out of sync with the actual split scope.",
+              "severity": "P1",
+              "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/impl-plan.json",
+              "line": 76,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:142b2da23517fd9f8e56d949cb92903be07c15494fc728052213a50c442d43aa",
+          "at": "2026-06-07T12:40:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ed5ba730718d358801147e7670a09a978984e0d6cdd6d67371d6e5b2751bc07",
+          "at": "2026-06-07T12:43:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ed5ba730718d358801147e7670a09a978984e0d6cdd6d67371d6e5b2751bc07",
+          "at": "2026-06-07T12:48:09Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `#[cfg(test)]` state machine double-counts any line that follows the attribute unless it is a recognized `mod` declaration: `count += 1` runs inside the `saw_cfg_test` branch and then again unconditionally at the end of the loop. That inflates counts for real files that use top-level `#[cfg(test)]` helper items (for example, this repo has `#[cfg(test)] fn` shims in `apps/cli/src/commands/review/codex_local.rs`), so the verifier can emit false max-line errors.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "line": 104,
+              "category": "correctness"
+            },
+            {
+              "message": "The test-module exclusion only recognizes `mod ` and `pub mod ` immediately after `#[cfg(test)]`. Standard rustfmt-normalized forms already present in this repo, such as `#[cfg(test)] pub(crate) mod test_support {}` and `#[cfg(test)] #[path = \"...\"] mod tests;`, fall through to the counting path and are treated as production code. That means test-only modules can still push a file over `max_lines`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "line": 106,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a49cdc9c844df37b11a7f72b5af036a2ad9a7c379a663e06bd410658b908f768",
+          "at": "2026-06-07T00:39:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new path filter still counts test-only source files named `tests.rs`. This repo already has large files like `libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs` and `libs/domain/src/review_v2/tests.rs`, so the verifier will keep emitting max-line errors on test code instead of excluding it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 191,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b155448e46a52e7bfca55471b0e3bfde3ac2b391eea2cff31d013483bbc69946",
+          "at": "2026-06-07T00:48:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`count_production_lines()` only excludes inline `#[cfg(test)] mod { ... }` items. Common external test modules declared as `#[cfg(test)] mod tests;` are still counted, so files in this repo that use that pattern (for example `apps/cli/src/commands/review/mod.rs` and `libs/infrastructure/src/review_v2/persistence/mod.rs`) can still hit false module-size violations.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 91,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4e9f6927912a13e56897fc42d1a15a40425da5a1471a331d71103384a1c3cd77",
+          "at": "2026-06-07T00:51:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`count_production_lines` only inspects `file.items`, so `#[cfg(test)] mod tests { ... }` nested inside another module is never excluded. Files that use nested test modules will still count test code toward `max_lines`, which can produce false module-size errors.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 88,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4e9f6927912a13e56897fc42d1a15a40425da5a1471a331d71103384a1c3cd77",
+          "at": "2026-06-07T00:53:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`count_production_lines` only inspects `file.items`, so it strips top-level `#[cfg(test)] mod ...` blocks but misses the same pattern when it is nested inside another inline module. Those test-only lines will still be counted and can falsely trip the module-size gate.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 88,
+              "category": "correctness"
+            },
+            {
+              "message": "This skips any file named `tests.rs`, but the task only asked to exclude `_tests.rs` files and directories named `tests/`. A large production module with that name would now bypass the size check entirely.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 192,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4e9f6927912a13e56897fc42d1a15a40425da5a1471a331d71103384a1c3cd77",
+          "at": "2026-06-07T00:55:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57a623cc1cf9cedd4e114d262982ae2fdeb8b659b0869f00045d0084408fa68f",
+          "at": "2026-06-07T01:04:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cfg(test) exclusion is line-range based, so it drops the entire closing-brace line as soon as a test module is matched. Any production item written on the same physical line as that brace will also be excluded from the count, which undercounts the file and creates a bypass for `max_lines` enforcement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "line": 95,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:57a623cc1cf9cedd4e114d262982ae2fdeb8b659b0869f00045d0084408fa68f",
+          "at": "2026-06-07T01:05:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 correctness: [`libs/infrastructure/src/verify/module_size.rs`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs#L121) only strips inline `#[cfg(test)] mod { ... }` blocks. File-backed test modules declared as `#[cfg(test)] mod tests;` - including the common `#[path = \"..._tests.rs\"] mod tests;` pattern used elsewhere in this repo - still fall through and are counted as production lines, so files that use that pattern can still trip `max_lines` even though the test code is supposed to be exempt.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "line": 121,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5cab032ee0bc8bf1026e9f90c6647a1a76689bd5ac3e98ae7475c6599be9d42b",
+          "at": "2026-06-07T01:14:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tests.rs` is excluded here, but the brief only asked for `_tests.rs` files and `tests/` directories. That extra basename exemption lets a large production module named `tests.rs` bypass the size gate entirely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "line": 222,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f3257294baf3dbbaf539a5f415b4ebe0a53b9ebed9d6d9310bfe079be372c241",
+          "at": "2026-06-07T01:22:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new file filter still counts plain `tests.rs` modules, because it only skips files ending in `_tests.rs` and directories named `tests/`. This repo has large `#[cfg(test)]`-only modules such as `libs/domain/src/review_v2/tests.rs` and `libs/usecase/src/review_v2/tests.rs`, so the verifier will now emit false size findings on test-only code. Please skip `tests.rs` as well, or otherwise detect file-backed `#[cfg(test)]` modules.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "line": 231,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:19e08bf17b97b934b72774962d80da719d7040c5e8d231473ee788299622a7c9",
+          "at": "2026-06-07T01:27:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`#[cfg(test)] mod foo;` is only stripped from the declaration span here; the referenced file is still scanned unless its basename happens to match `_tests.rs` or `tests.rs`. That leaves test-only modules with other filenames counted as production code, so the new exclusion is incomplete and can still raise false size violations.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 149,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:118dddb4b1f83c753b6323e9f30de1e37ea7568e0f1c2fa121085eb790b84702",
+          "at": "2026-06-07T01:32:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`#[cfg(test)] mod foo;` is returned early here without subtracting the declaration line from the count. Files that use a file-backed test module still keep that `mod ...;` line in the production tally, so an otherwise test-only tail can still push a file over `max_lines` and trigger a false violation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "line": 147,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b413e8869d5921f84a33172d053b15e21bea5fa23ee01dfa2aa9d09be0e19e65",
+          "at": "2026-06-07T01:37:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc69fbb30b1f8b82e37aa11aac306982415f2c48eb68b4fcfd0f4e75dd2a0ed5",
+          "at": "2026-06-07T01:41:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new filename filter skips files named exactly `tests.rs`, but the requested production-code exclusions only cover `*_tests.rs`, files under a `tests/` directory, and `#[cfg(test)]` blocks. A production module such as `src/foo/tests.rs` included by an ungated `mod tests;` will now be ignored entirely, letting oversized production code evade the fail-closed module-size check. Remove the `n == \"tests.rs\"` shortcut unless the file itself is proven test-only via `#![cfg(test)]` or a cfg-gated module declaration.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 235,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bc69fbb30b1f8b82e37aa11aac306982415f2c48eb68b4fcfd0f4e75dd2a0ed5",
+          "at": "2026-06-07T01:43:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c5564ce5851e3b4c16dd7fb0e5c95123c9773c34fcede539d16733f543d5516",
+          "at": "2026-06-07T01:53:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c5564ce5851e3b4c16dd7fb0e5c95123c9773c34fcede539d16733f543d5516",
+          "at": "2026-06-07T01:55:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c5564ce5851e3b4c16dd7fb0e5c95123c9773c34fcede539d16733f543d5516",
+          "at": "2026-06-07T01:58:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_rs_files` only suppresses backing files for `#[cfg(test)] mod tests;` when the file is literally `tests.rs`. A file-backed test module such as `#[cfg(test)] mod fixtures;` still has `fixtures.rs` counted as production unless it happens to match `_tests.rs` or live under a `tests/` directory. Since the visitor excludes only the declaration lines, this misses the briefing requirement to handle file-backed `#[cfg(test)] mod` declarations and can make CI fail on test-only helper modules over `max_lines`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 298,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6c5564ce5851e3b4c16dd7fb0e5c95123c9773c34fcede539d16733f543d5516",
+          "at": "2026-06-07T02:01:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_test_only_module_file` only looks for the cfg-gated `mod` declaration in files named as candidates beside the child path (`parent_dir/mod.rs`, `parent_dir/lib.rs`, `parent_dir/main.rs`, or `grandparent/<parent>.rs`). That misses Rust’s valid nested file-backed module case where the parent is inline in an ancestor file, e.g. `src/lib.rs` contains `mod outer { #[cfg(test)] mod fixtures; }` and Rust loads `src/outer/fixtures.rs`. Such a test-only file will be counted as production, and with the new fail-closed max-lines behavior can incorrectly block verification. The file-backed cfg(test) lookup needs to account for inline ancestor declarations or this exclusion path needs a regression test/constraint.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 237,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6e56cd526025eb2a9de718818b14895861d61a89ef4b8fa06ca0d88c40ef2c76",
+          "at": "2026-06-07T02:07:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78bf920dc24940f71885c4042aa9a9f5d056b9a895b433a7c350c58cb925d8c4",
+          "at": "2026-06-07T02:15:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bce5733ddb1a83a1956b4e0508008806394feeb0a9a2bbd6ec428813eb831e2f",
+          "at": "2026-06-07T08:54:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bce5733ddb1a83a1956b4e0508008806394feeb0a9a2bbd6ec428813eb831e2f",
+          "at": "2026-06-07T09:06:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bce5733ddb1a83a1956b4e0508008806394feeb0a9a2bbd6ec428813eb831e2f",
+          "at": "2026-06-07T09:14:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d722f1f8b9bf73f8f32ccebaac575a29538984c6c72cbb9347b839fb08b14203",
+          "at": "2026-06-07T10:32:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`schema_export` now persists type strings through `signal_evaluator_v2::format::format_type`, but that formatter is a structural-comparison key renderer, not the previous Rust-syntax renderer. It canonicalizes/sorts `dyn`/`impl` bounds and emits extra structural details for variants the old exporter rendered differently, so exporting the same rustdoc JSON can produce different catalogue `TypeRef` strings. This violates the stated no-behavior-change split and can break downstream consumers that expect the schema exporter’s prior TypeRef surface. Keep the old schema-export rendering semantics, or factor out a shared renderer that is explicitly Rust TypeRef syntax preserving.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export/format_helpers.rs",
+              "line": 72,
+              "category": "behavioral_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:d722f1f8b9bf73f8f32ccebaac575a29538984c6c72cbb9347b839fb08b14203",
+          "at": "2026-06-07T10:39:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `CfgTestModCollector` accesses `a.pound_token.span` and, later, `s.span`, but `syn` punctuation tokens such as `Pound` and `Semi` expose `spans: [Span; 1]` rather than a `span` field. This makes `libs/infrastructure` fail to compile as soon as `verify::module_size` is type-checked. Use `a.pound_token.spans[0]` / `s.spans[0]` or the `Spanned` trait instead.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 145,
+              "category": "compile_error"
+            }
+          ],
+          "hash": "rvw1:sha256:b47eca20dd0a073ccb535663f82c43672b65a43900cc560873bf1211a9b26724",
+          "at": "2026-06-07T10:50:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2554f1a6c5aaa0eafb27799cf04db6ceb3d5ab502c5922ff26ef9fccc80aa350",
+          "at": "2026-06-07T10:57:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`format_type` now delegates to `format_short_type_with_policy`, but that helper does not preserve `Type::FunctionPointer`, `Type::Pat`, or `Type::QualifiedPath`. Those variants now fall through to `_`, so schema export will start emitting lossy TypeRef strings for function-pointer fields and associated-type projections instead of the previous representation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export/format_helpers.rs",
+              "line": 71,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:11362eef2b02224d78166d72d169817157080a59e255686e2276618481a9dca5",
+          "at": "2026-06-07T11:34:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84550f8931bf7e0b0fec32439471b855e424fc4e3b7f28b3f566dca00dd2b34d",
+          "at": "2026-06-07T11:50:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`has_cfg_test_attr` treats any nested `test` token inside a `cfg` expression as test-only. That means `#[cfg(not(test))]` and mixed gates like `#[cfg(any(test, feature = \"test-helpers\"))]` both return true. The new module-size verifier then uses this helper to return 0 lines for file-level attrs and to exclude whole modules/files, so production-only or feature-enabled production code can bypass the enforced 700-line limit. Match only an exact test-only cfg before excluding code from production counts.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/syn_helpers.rs",
+              "line": 14,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:84550f8931bf7e0b0fec32439471b855e424fc4e3b7f28b3f566dca00dd2b34d",
+          "at": "2026-06-07T11:56:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_rs_files` now skips every directory named `tests` before checking whether the files inside are actually test-only. That is broader than the stated exemption for `tests/` integration tests and `#[cfg(test)]` modules: a production module such as `src/tests/mod.rs` included with an ungated `mod tests;` would be omitted from the production line count, allowing oversized production code to bypass the 700-line enforcement. Restrict this skip to actual integration-test roots or require parent/file-level `#[cfg(test)]` for nested `tests` modules.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
+              "line": 352,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b44521b9a04aecf88fc5581961cab7161b9670e524f52f7eaa907cfe9f3c2ac6",
+          "at": "2026-06-07T12:07:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fad980d5df032d0c71ec1201d5205e5306a6d9ea81f8141d7d206c871b068bd",
+          "at": "2026-06-07T12:15:28Z"
         }
       ]
     }

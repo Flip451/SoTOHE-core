@@ -13,6 +13,13 @@ use serde::Deserialize;
 
 use domain::tddd::baseline_graph_ports::BaselineGraphRendererError;
 
+// Re-export shared mermaid style DTOs and rendering helpers from the common module so
+// that callers (`render/mod.rs`, `entry_emitter.rs`, `impl_processor.rs`) can continue
+// to import them via `style_config::{apply_shape, class_def_line, ...}` without change.
+pub(super) use crate::tddd::mermaid_style::{
+    ClassStyle, EdgeStyle, NodeStyle, PatternStyle, apply_shape, class_def_line,
+};
+
 // ---------------------------------------------------------------------------
 // Private TOML schema DTOs
 // ---------------------------------------------------------------------------
@@ -43,57 +50,6 @@ pub(in crate::tddd::baseline_graph_renderer_adapter) struct StyleConfig {
     pub(super) filter: FilterConfig,
 }
 
-/// `[node.<NodeCategory>]` — shape template + class name for a node category.
-///
-/// Used in T005-T010 for applying node shapes and class names to rendered nodes.
-#[allow(dead_code)]
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub(super) struct NodeStyle {
-    /// Optional mermaid shape template (e.g. `"([{label}])"` for stadium shape).
-    /// When absent the default mermaid rectangular shape is used.
-    #[serde(default)]
-    pub(super) shape: Option<String>,
-    /// Optional classDef name to apply to nodes of this category.
-    #[serde(default)]
-    pub(super) class: Option<String>,
-}
-
-/// `[pattern.<PatternName>]` — overlay class for a structural pattern (future).
-#[allow(dead_code)]
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub(super) struct PatternStyle {
-    /// classDef name used as an overlay for this pattern.
-    pub(super) overlay_class: String,
-}
-
-/// `[class.<ClassName>]` — mermaid `classDef` CSS-like parameters.
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub(super) struct ClassStyle {
-    #[serde(default)]
-    fill: Option<String>,
-    #[serde(default)]
-    stroke: Option<String>,
-    #[serde(default)]
-    stroke_width: Option<String>,
-    #[serde(default)]
-    stroke_dasharray: Option<String>,
-}
-
-/// `[edge.<EdgeKind>]` — arrow syntax and optional label for an edge kind.
-///
-/// Used in T005-T010 for edge rendering (trait impl, variant payload, field, alias, etc.).
-#[allow(dead_code)]
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub(super) struct EdgeStyle {
-    pub(super) arrow: String,
-    #[serde(default)]
-    pub(super) label: Option<String>,
-}
-
 /// `[filter]` — future rendering filter configuration (I decision reserve).
 #[derive(Debug, Default, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -109,7 +65,7 @@ fn default_include_functions() -> bool {
 }
 
 // ---------------------------------------------------------------------------
-// Rendering helpers (symmetric to ContractMapRendererAdapter render helpers)
+// Rendering helpers
 // ---------------------------------------------------------------------------
 
 /// Sanitize a string for use as a mermaid node_id segment.
@@ -117,39 +73,6 @@ fn default_include_functions() -> bool {
 /// Replaces every character that is not ASCII alphanumeric or underscore with `_`.
 pub(super) fn sanitize(s: &str) -> String {
     s.chars().map(|c| if c.is_ascii_alphanumeric() || c == '_' { c } else { '_' }).collect()
-}
-
-/// Format a mermaid `classDef` line from a `ClassStyle`.
-pub(super) fn class_def_line(name: &str, style: &ClassStyle) -> String {
-    let mut parts: Vec<String> = Vec::new();
-    if let Some(ref fill) = style.fill {
-        parts.push(format!("fill:{fill}"));
-    }
-    if let Some(ref stroke) = style.stroke {
-        parts.push(format!("stroke:{stroke}"));
-    }
-    if let Some(ref sw) = style.stroke_width {
-        parts.push(format!("stroke-width:{sw}"));
-    }
-    if let Some(ref sd) = style.stroke_dasharray {
-        parts.push(format!("stroke-dasharray:{sd}"));
-    }
-    if parts.is_empty() {
-        format!("classDef {name}")
-    } else {
-        format!("classDef {name} {}", parts.join(","))
-    }
-}
-
-/// Apply a node shape template from a `NodeStyle` to a node label.
-///
-/// Used in T005-T010 for rendering nodes with configurable shapes.
-#[allow(dead_code)]
-pub(super) fn apply_shape(label: &str, shape: Option<&str>) -> String {
-    match shape {
-        Some(s) => s.replace("{label}", label),
-        None => format!("[{label}]"),
-    }
 }
 
 /// Resolve an `EdgeStyle` to `(arrow, label_option)`.

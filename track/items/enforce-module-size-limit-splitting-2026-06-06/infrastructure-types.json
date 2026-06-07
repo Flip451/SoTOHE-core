@@ -54,6 +54,285 @@
         }
       ],
       "informal_grounds": []
+    },
+    "infrastructure::track::render::collect_track_snapshots": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<Vec<TrackSnapshot>, RenderError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: moved to infrastructure::track::render::snapshot::collect_track_snapshots when render.rs was split into submodules to satisfy the 700-line limit (IN-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-03",
+          "hash": "050f458c69d0cfb06204b30aa892cedab98e5e27b0038b80141cda4f3613a205"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::render_plan": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track", "ty": "&domain::TrackMetadata" },
+        { "name": "impl_plan", "ty": "Option<&domain::ImplPlanDocument>" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: moved to infrastructure::track::render::plan::render_plan when render.rs was split into submodules to satisfy the 700-line limit (IN-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-03",
+          "hash": "050f458c69d0cfb06204b30aa892cedab98e5e27b0038b80141cda4f3613a205"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::render_registry": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "tracks", "ty": "&[TrackSnapshot]" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: moved to infrastructure::track::render::registry::render_registry when render.rs was split into submodules to satisfy the 700-line limit (IN-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-03",
+          "hash": "050f458c69d0cfb06204b30aa892cedab98e5e27b0038b80141cda4f3613a205"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::sync_rendered_views": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "Option<&str>" }
+      ],
+      "returns": "Result<Vec<std::path::PathBuf>, RenderError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: moved to infrastructure::track::render::sync::sync_rendered_views when render.rs was split into submodules to satisfy the 700-line limit (IN-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-03",
+          "hash": "050f458c69d0cfb06204b30aa892cedab98e5e27b0038b80141cda4f3613a205"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::validate_track_snapshots": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<(), RenderError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: moved to infrastructure::track::render::validate::validate_track_snapshots when render.rs was split into submodules to satisfy the 700-line limit (IN-03).",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-03",
+          "hash": "050f458c69d0cfb06204b30aa892cedab98e5e27b0038b80141cda4f3613a205"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::plan_artifact_refs::build_element_map": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "raw", "ty": "&serde_json::Value" }
+      ],
+      "returns": "std::collections::HashMap<String, String>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: visibility changed from pub to pub(crate) when plan_artifact_refs.rs was split into a submodule directory (IN-03). No longer part of the public API surface.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-03",
+          "hash": "050f458c69d0cfb06204b30aa892cedab98e5e27b0038b80141cda4f3613a205"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::verify::plan_artifact_refs::canonical_json_sha256": {
+      "action": "delete",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "json", "ty": "&str" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Deleted: visibility changed from pub to pub(crate) when plan_artifact_refs.rs was split into a submodule directory (IN-03). No longer part of the public API surface.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        },
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "CN-03",
+          "hash": "050f458c69d0cfb06204b30aa892cedab98e5e27b0038b80141cda4f3613a205"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::plan::render_plan": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "track", "ty": "&domain::TrackMetadata" },
+        { "name": "impl_plan", "ty": "Option<&domain::ImplPlanDocument>" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Renders plan.md content from track identity metadata and an optional ImplPlanDocument. When impl_plan is Some, renders the full task list and plan sections from the document. When None, emits a placeholder stub.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::registry::render_registry": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "tracks", "ty": "&[TrackSnapshot]" }
+      ],
+      "returns": "String",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Renders registry.md content from all track snapshots.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::snapshot::collect_track_snapshots": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<Vec<TrackSnapshot>, RenderError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Collects all valid track snapshots from active and archive directories.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::sync::sync_rendered_views": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" },
+        { "name": "track_id", "ty": "Option<&str>" }
+      ],
+      "returns": "Result<Vec<std::path::PathBuf>, RenderError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Renders plan.md and registry.md from metadata.json and writes changed files atomically.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::track::render::validate::validate_track_snapshots": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "root", "ty": "&std::path::Path" }
+      ],
+      "returns": "Result<(), RenderError>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Validates all metadata documents under the project root.",
+      "spec_refs": [
+        {
+          "file": "track/items/enforce-module-size-limit-splitting-2026-06-06/spec.json",
+          "anchor": "IN-03",
+          "hash": "52fb6130978f5f04be0653b939f8d483d12b47a6eb54aff62c50a90a0420ac81"
+        }
+      ],
+      "informal_grounds": []
     }
   },
   "inherent_impls": [],

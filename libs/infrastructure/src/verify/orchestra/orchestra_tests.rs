@@ -1,5 +1,8 @@
 //! Tests for [`orchestra`] (split out to keep the main module under the 200-400 line guideline).
 
+use std::collections::BTreeSet;
+use std::path::Path;
+
 use serde_json::json;
 use tempfile::TempDir;
 

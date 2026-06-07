@@ -25,22 +25,9 @@ use domain::{TypeSignalsDocument, check_type_signals};
 
 use crate::catalogue_spec_refs::SpecElementHashReader;
 
-/// Result of a port-level blob fetch.
-///
-/// Infrastructure adapters translate their native errors (git spawn errors,
-/// UTF-8 decode errors, JSON decode errors, non-path-not-found git errors)
-/// into [`BlobFetchResult::FetchError`], and path-not-found cases into
-/// [`BlobFetchResult::NotFound`] so the usecase can apply opt-in semantics.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum BlobFetchResult<T> {
-    /// The blob was found and decoded into a domain document.
-    Found(T),
-    /// The blob does not exist at the requested path on the target ref.
-    NotFound,
-    /// An I/O, decode, or adapter-level error occurred. The string carries
-    /// a human-readable description for the caller's error output.
-    FetchError(String),
-}
+#[path = "merge_gate/blob_fetch_result.rs"]
+mod blob_fetch_result;
+pub use blob_fetch_result::BlobFetchResult;
 
 /// Usecase port for reading track-level domain documents from an external
 /// source (git ref, filesystem, etc).
