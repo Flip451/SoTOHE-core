@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-08T08:29:57Z",
-  "declaration_hash": "90b02d1a2986109e7d9b6a517c4dde66292faa3d2b2d8ab66872d792db810375",
+  "generated_at": "2026-06-08T10:52:45Z",
+  "declaration_hash": "3d4f3a0720d19bc2ae007b34361f8dc5c5681f53e699495bae29b72733d409c9",
   "signals": [
     {
       "type_name": "CatalogueEntryRef",
@@ -12,39 +12,40 @@
     {
       "type_name": "RefVerifierPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RefVerifyApplicationService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RefVerifyCachePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RefVerifyCacheScope",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "core::hash::Hash"
       ]
     },
     {
       "type_name": "RefVerifyCommand",
       "kind_tag": "command",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -54,9 +55,9 @@
     {
       "type_name": "RefVerifyConfig",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -67,9 +68,9 @@
     {
       "type_name": "RefVerifyError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -78,9 +79,9 @@
     {
       "type_name": "RefVerifyPair",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -90,15 +91,15 @@
     {
       "type_name": "RefVerifyPairSourcePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RefVerifyParallelism",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -110,8 +111,8 @@
       "type_name": "RefVerifyPercent",
       "kind_tag": "value_object",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -122,9 +123,9 @@
     {
       "type_name": "RefVerifyScope",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -151,9 +152,9 @@
     {
       "type_name": "VerifySemanticRefsInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "RefVerifyApplicationService"
       ]
     },

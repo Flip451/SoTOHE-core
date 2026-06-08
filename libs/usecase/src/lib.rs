@@ -27,6 +27,7 @@ pub mod merge_gate;
 pub mod pr_review;
 pub mod pr_workflow;
 pub mod pre_commit_type_signals;
+pub mod ref_verify;
 pub mod review_v2;
 pub mod review_workflow;
 pub mod semantic_dup;

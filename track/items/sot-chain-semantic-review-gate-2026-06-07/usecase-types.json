@@ -942,6 +942,7 @@
     { "trait_ref": "core::clone::Clone", "for_type": "RefVerifyCacheScope", "action": "add" },
     { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyCacheScope", "action": "add" },
     { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyCacheScope", "action": "add" },
+    { "trait_ref": "core::hash::Hash", "for_type": "RefVerifyCacheScope", "action": "add" },
     { "trait_ref": "RefVerifyApplicationService", "for_type": "VerifySemanticRefsInteractor", "action": "add" }
   ]
 }
