@@ -1,6 +1,64 @@
 {
   "schema_version": 2,
   "scopes": {
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
+          "at": "2026-06-08T00:26:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `EvidenceCitation::try_new` API returns `ValidationError`, and this change adds a production `ValidationError` variant, but the T002 domain catalogue does not declare `ValidationError`; the generated `domain-type-signals.json` now contains a red `ValidationError` signal. The briefing explicitly treats non-add red/yellow domain type signals as factual findings, so the catalogue/implementation contract is inconsistent until `ValidationError` is declared/updated in the catalogue or the public signature avoids the undeclared type.",
+              "severity": "P1",
+              "file": "libs/domain/src/error.rs",
+              "line": 99,
+              "category": "type-signal"
+            }
+          ],
+          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
+          "at": "2026-06-08T00:30:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
+          "at": "2026-06-08T00:45:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
+          "at": "2026-06-08T00:48:03Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:51:24Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -586,24 +644,50 @@
           "findings": [],
           "hash": "rvw1:sha256:f3d6fcd773b721f6e28b452b3cd9116b867f1b509834b0c47ac059ebb5aecd3f",
           "at": "2026-06-08T00:06:38Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
-          "at": "2026-06-07T23:47:20Z"
+          "hash": "rvw1:sha256:dff1bddc87d38bd2d52e1fc9e9c612fcae6a71d2f39729a9b29311f056686638",
+          "at": "2026-06-08T00:25:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is marked complete and its task text says it adds every new domain semantic-review type, including `EvidenceCitation`, but the scoped domain type catalogue still marks `EvidenceCitation` as yellow/unresolved. That leaves the plan internally inconsistent about whether the T002 slice is actually complete; either the catalogue signal should be blue for this required type or T002 should not be resolved yet.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/domain-types.md",
+              "line": 16,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dff1bddc87d38bd2d52e1fc9e9c612fcae6a71d2f39729a9b29311f056686638",
+          "at": "2026-06-08T00:27:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain-types.md` now marks several T002-owned semantic verify domain types as blue (`ModelTier`, `SemanticVerdict`, cache documents, `SemanticVerifyEntry`), while `plan.md`/`impl-plan.json` still leave T002 as todo and describe those same types as work to be added. The artifacts therefore simultaneously claim this slice is implemented and still pending, which makes the plan state ambiguous.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/domain-types.md",
+              "line": 7,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:59ecda5443e734ec731469e6a09debae903e0b67540f5d3a35b988f3e299a9ae",
+          "at": "2026-06-08T00:31:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
-          "at": "2026-06-07T23:51:24Z"
+          "hash": "rvw1:sha256:65d2d0199f09178ae94ef088f0de94a17c88d6858cc59c97db574448467ebd7d",
+          "at": "2026-06-08T00:35:07Z"
         }
       ]
     }
