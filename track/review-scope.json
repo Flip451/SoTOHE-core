@@ -38,6 +38,7 @@
   },
   "review_operational": [
     "track/items/<track-id>/review.json",
+    "track/items/<track-id>/dry-check.json",
     "track/items/<track-id>/*-type-signals.json",
     "track/items/<track-id>/*-catalogue-spec-signals.json"
   ],

@@ -1,6 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
+          "at": "2026-06-07T21:44:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFrontMatterDto`/`AdrDecisionDto` only require `decisions[].id` and explicitly allow all other fields to be absent or unknown. As a result, an ADR front-matter block like `decisions: [{ id: D1 }]` or one with misspelled/unknown schema keys deserializes successfully, and any `adr_ref` to `D1` passes even though the ADR metadata is malformed. The briefing calls out typed-deserialization fail-closed behavior for unknown/missing fields, so this should either reuse the existing strict ADR front-matter codec or mirror its required fields/`deny_unknown_fields` behavior before accepting the anchor.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs/adr_anchor.rs",
+              "line": 36,
+              "category": "typed-deserialization"
+            }
+          ],
+          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
+          "at": "2026-06-07T21:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4aeaa65e03a35f90176117707f8d43f14a4922d0bbf15d572404aceb5b3c791a",
+          "at": "2026-06-07T21:54:39Z"
+        }
+      ]
+    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -465,6 +498,112 @@
           "findings": [],
           "hash": "rvw1:sha256:b31f1380837ba47232f87ec3e863d67490a0e4000f93a521e24af9b7f91aab05",
           "at": "2026-06-07T21:05:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticVerdict` is treated as a 3-state enum (`Pass` / `Fail` / `Pending`) here and in the downstream codec/usecase/CLI tasks, but the briefing for this scope defines the domain type as only `Pass { citation }` / `Fail { reason }`. That is a design contradiction: either the briefing needs to be updated or the plan needs to remove `Pending` everywhere it propagates.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 22,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8951a667e9a567c41bb22b2832a7804348c1cc3eccd5d356892c2c3115b26267",
+          "at": "2026-06-07T21:42:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8151478ae18d576f6877dc27e438eeed3d3436de3f4589a56f10ba74ebf504d5",
+          "at": "2026-06-07T21:50:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8151478ae18d576f6877dc27e438eeed3d3436de3f4589a56f10ba74ebf504d5",
+          "at": "2026-06-07T21:53:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e99ea2559b5a4597acb9f808d8bc382a8bbd145bb06be3494271204155873b9",
+          "at": "2026-06-07T23:48:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002/T004 now describe `SemanticVerdict` as only `Pass`/`Fail` and omit the `pending` JSON form, while the domain type catalogue still declares a `Pending` variant for `SemanticVerdict` and documents it as the representation for inconclusive reviews. This leaves the implementation plan inconsistent with the catalogue it claims to implement: following the plan would produce domain/codecs that cannot satisfy the current catalogue contract or any cache entries using `Pending`. Either keep `Pending` throughout the plan/codecs or update the catalogue/spec artifacts in the same semantic change.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 11,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2e99ea2559b5a4597acb9f808d8bc382a8bbd145bb06be3494271204155873b9",
+          "at": "2026-06-07T23:52:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "S6 now says only production `Fail` verdicts are promoted to the final tier, but the detailed T007 task body in the same artifact still requires both `Fail` and `Pending` to be promoted, matching ADR D5. Following this summary would leave healthy-calibration fast-tier `Pending` results without a final review path, making the later `final tierでも Pending` escalation condition unreachable for those pairs. The same summary text is duplicated in `impl-plan.json` line 139, so both artifacts need the same correction.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 57,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9b572c35e99a7afd38a15a9ffeaa16cbcc6e3bda7e0acf93d594d17156b1090a",
+          "at": "2026-06-07T23:59:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009 defines `ref-verify check-approved` as reading only the verify-cache artifacts and returning success when all existing entries are `SemanticVerdict::Pass`. That does not establish that every current Chain pair has a Pass cache entry; an incomplete cache containing only Pass entries would pass even though T010/AC-04 require missing/unresolved pairs to block the commit gate. The plan needs an explicit completeness check or artifact marker so absent Pass cache for any current pair fails closed.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 46,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b5c7a0411cc14cad837086f0b8159b8b492aabf83b3f123d262974be46b4b41b",
+          "at": "2026-06-08T00:02:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3d6fcd773b721f6e28b452b3cd9116b867f1b509834b0c47ac059ebb5aecd3f",
+          "at": "2026-06-08T00:06:38Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:51:24Z"
         }
       ]
     }

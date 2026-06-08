@@ -32,26 +32,43 @@ pub(crate) fn check_ref_file(
     context: &str,
     findings: &mut Vec<VerifyFinding>,
 ) {
+    check_ref_file_returning(file, trusted_root, context, findings);
+}
+
+/// Variant of [`check_ref_file`] that returns `true` when the file exists and passed
+/// all guards, `false` otherwise.
+///
+/// Callers that need to perform additional checks only when the file is present
+/// (e.g. anchor existence verification) should use this variant.
+pub(crate) fn check_ref_file_returning(
+    file: &Path,
+    trusted_root: &Path,
+    context: &str,
+    findings: &mut Vec<VerifyFinding>,
+) -> bool {
     match resolve_path(trusted_root, file) {
         None => {
             findings.push(VerifyFinding::error(format!(
                 "{context}: invalid path (absolute or path-traversal): {}",
                 file.display()
             )));
+            false
         }
         Some(p) => match symlink_guard::reject_symlinks_below(&p, trusted_root) {
-            Ok(true) => {}
+            Ok(true) => true,
             Ok(false) => {
                 findings.push(VerifyFinding::error(format!(
                     "{context}: file not found: {}",
                     file.display()
                 )));
+                false
             }
             Err(e) => {
                 findings.push(VerifyFinding::error(format!(
                     "{context}: symlink guard for '{}': {e}",
                     file.display()
                 )));
+                false
             }
         },
     }
