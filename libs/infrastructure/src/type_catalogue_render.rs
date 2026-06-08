@@ -623,8 +623,12 @@ mod tests {
         signals: Vec<(String, ConfidenceSignal)>,
     ) -> CatalogueSpecSignalsDocument {
         use domain::{CatalogueSpecSignal, CatalogueSpecSignalsDocument};
-        let sigs =
-            signals.into_iter().map(|(name, sig)| CatalogueSpecSignal::new(name, sig)).collect();
+        let sigs = signals
+            .into_iter()
+            .map(|(name, sig)| {
+                CatalogueSpecSignal::new(name, sig, domain::ContentHash::from_bytes([0u8; 32]))
+            })
+            .collect();
         CatalogueSpecSignalsDocument::new(make_dummy_hash(), sigs)
     }
 

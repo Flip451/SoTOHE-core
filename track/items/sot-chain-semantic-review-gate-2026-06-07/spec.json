@@ -155,6 +155,26 @@
             "anchor": "D9"
           }
         ]
+      },
+      {
+        "id": "IN-13",
+        "text": "catalogue entry の section-qualified key（`section_key`）は、`types:<name>` / `traits:<name>` / `functions:<path>` の形式で一つの `CatalogueDocument` 内でグローバルに一意な識別子とする。短い bare key がタイプ・トレイト・関数の複数セクションに重複して存在するケース（クロスセクション衝突）を防ぐため、インフラストラクチャアダプターが per-entry hash マップを構築する際のキーには bare key ではなく `section_key` を使用する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-14",
+        "text": "catalogue の全エントリを正規の順序（types → traits → functions、各セクション内は BTreeMap 順）でイテレートし、各エントリに bare `key` と section-qualified `section_key` の両方を付与するファンクションを一箇所に集約する。`catalogue_spec_refs` と `catalogue_spec_signals` で独立してキー導出ロジックを持つと drift が生じるため、すべてのインフラアダプターはこの集約関数経由でエントリを走査する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+            "anchor": "D4"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -442,6 +462,16 @@
           "anchor": "D7"
         }
       ]
+    },
+    {
+      "id": "AC-13",
+      "text": "`RefreshCatalogueSpecSignalsInteractor` がインフラアダプターから受け取る per-entry hash マップは `section_key`（`types:<name>` / `traits:<name>` / `functions:<path>` 形式）をキーとして構成される。`iter_catalogue_entries` が生成した `section_key` に対応するエントリハッシュがマップに存在しない場合、ユースケースは偽のゼロ hash を補完せず `MissingEntryHash` エラーを返してフェイルクローズする",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D4"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -483,7 +513,7 @@
     }
   ],
   "signals": {
-    "blue": 43,
+    "blue": 46,
     "yellow": 0,
     "red": 0
   }

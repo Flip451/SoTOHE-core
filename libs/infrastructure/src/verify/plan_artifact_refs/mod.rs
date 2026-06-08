@@ -33,9 +33,11 @@ use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::track::symlink_guard;
 
 // Re-export items used by tests (via `super::*`) and by external callers.
-#[cfg(test)]
-pub(crate) use spec_refs::canonical_json;
-pub(crate) use spec_refs::{SpecElementMap, build_element_map, canonical_json_sha256};
+// `canonical_json` is needed both by tests and by production code that computes
+// per-entry hashes (e.g. `merge_gate_adapter::build_catalogue_entry_hashes`).
+pub(crate) use spec_refs::{
+    SpecElementMap, build_element_map, canonical_json, canonical_json_sha256,
+};
 
 /// Errors specific to the `plan-artifact-refs` verifier.
 ///

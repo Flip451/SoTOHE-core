@@ -4,31 +4,38 @@
   "signals": [
     {
       "type_name": "CatalogueSpecSignal",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "f498720632ffb4ea7c546e56c70c68d04bd3a9c48334a2d6b37e0ff25f8a8327"
     },
     {
       "type_name": "CatalogueSpecVerifyCacheDocument",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "8f345d966ad3d7eedd40b8e0e47beee9e5a9a4473cecb9984fbd8a6566727b9f"
     },
     {
       "type_name": "EvidenceCitation",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "820ecbf904254dd4baa33043c1c589f12d7a2d841766f65a9c7ab842ad244b75"
     },
     {
       "type_name": "ModelTier",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "d62a3766b5a5cc335dfaf767c41e8f468b93225e65e467eff324eabcf1cf3f5a"
     },
     {
       "type_name": "SemanticVerdict",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "41a606f42593ee6b4b2fc987f0203dd31ff48b671e913d13ec1615691650bc5b"
     },
     {
       "type_name": "SemanticVerifyEntry",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "7d54f51895c5501970914d50f4270c4cbc276c596c28ffe0a045aa366ee2301b"
     },
     {
       "type_name": "SpecAdrVerifyCacheDocument",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "e7e0222f14ff434f48d9d2218f839002f508cd1184aed401aec1b7abacf67e81"
     }
   ]
 }

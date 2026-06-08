@@ -1,8 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-08T00:49:38Z",
-  "declaration_hash": "836bc94a1cb258c6613af4a0e1ebca042ff7315cdc4a24dddd98e64388613b03",
+  "generated_at": "2026-06-08T06:08:31Z",
+  "declaration_hash": "90b02d1a2986109e7d9b6a517c4dde66292faa3d2b2d8ab66872d792db810375",
   "signals": [
+    {
+      "type_name": "CatalogueEntryRef",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "RefVerifierPort",
       "kind_tag": "secondary_port",
@@ -126,6 +132,23 @@
       ]
     },
     {
+      "type_name": "RefreshCatalogueSpecSignalsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "VerifySemanticRefsInteractor",
       "kind_tag": "interactor",
       "signal": "yellow",
@@ -133,6 +156,12 @@
       "missing_items": [
         "RefVerifyApplicationService"
       ]
+    },
+    {
+      "type_name": "usecase::catalogue_traversal::iter_catalogue_entries",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

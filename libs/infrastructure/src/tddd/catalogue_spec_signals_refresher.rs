@@ -34,6 +34,7 @@ use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
 use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
+use crate::verify::plan_artifact_refs::{canonical_json, canonical_json_sha256};
 use crate::verify::tddd_layers::TdddLayerBinding;
 use usecase::catalogue_spec_signals::CatalogueSpecSignalsWriter;
 
@@ -148,6 +149,18 @@ pub fn refresh_one_layer(
     let v3_doc = CatalogueDocumentCodec::decode(text, &filename_stem)
         .map_err(|e| format!("cannot decode catalogue '{}': {e}", catalogue_path.display()))?;
 
+    // Parse the catalogue bytes as raw JSON to extract per-entry canonical JSON
+    // subtrees for `entry_hash` computation (CN-04 / IN-05 / AC-06 of ADR
+    // `2026-05-27-1601-sot-chain-semantic-review-gate.md`).
+    // The hash is computed over the canonical JSON of each entry's value object
+    // within the `types`, `traits`, or `functions` map.
+    let raw_json: serde_json::Value = serde_json::from_slice(&bytes).map_err(|e| {
+        format!(
+            "cannot re-parse catalogue '{}' as JSON for entry_hash: {e}",
+            catalogue_path.display()
+        )
+    })?;
+
     let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
     for (type_name, entry) in &v3_doc.types {
         let signal = evaluate_catalogue_entry_signal(
@@ -155,7 +168,9 @@ pub fn refresh_one_layer(
             &entry.spec_refs,
             &entry.informal_grounds,
         );
-        signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal));
+        let entry_hash = catalogue_entry_hash(&raw_json, "types", type_name.as_str())
+            .map_err(|e| format!("entry_hash for type '{type_name}': {e}"))?;
+        signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal, entry_hash));
     }
     for (trait_name, entry) in &v3_doc.traits {
         let signal = evaluate_catalogue_entry_signal(
@@ -163,7 +178,9 @@ pub fn refresh_one_layer(
             &entry.spec_refs,
             &entry.informal_grounds,
         );
-        signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal));
+        let entry_hash = catalogue_entry_hash(&raw_json, "traits", trait_name.as_str())
+            .map_err(|e| format!("entry_hash for trait '{trait_name}': {e}"))?;
+        signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal, entry_hash));
     }
     for (fn_path, entry) in &v3_doc.functions {
         let signal = evaluate_catalogue_entry_signal(
@@ -171,7 +188,10 @@ pub fn refresh_one_layer(
             &entry.spec_refs,
             &entry.informal_grounds,
         );
-        signals.push(CatalogueSpecSignal::new(fn_path.to_string(), signal));
+        let fn_key = fn_path.to_string();
+        let entry_hash = catalogue_entry_hash(&raw_json, "functions", &fn_key)
+            .map_err(|e| format!("entry_hash for function '{fn_key}': {e}"))?;
+        signals.push(CatalogueSpecSignal::new(fn_key, signal, entry_hash));
     }
 
     // Compute raw-bytes SHA-256 (same canonical-hash helper as merge_gate_adapter).
@@ -196,6 +216,30 @@ pub fn refresh_one_layer(
         blue + yellow + red
     );
     Ok(())
+}
+
+/// Compute the SHA-256 of the canonical JSON for a single catalogue entry.
+///
+/// Looks up `section[entry_key]` in the raw catalogue `serde_json::Value`
+/// and hashes the canonical JSON of that subtree.  Returns an error string
+/// (human-readable) when the section or key is absent — which would indicate
+/// a mismatch between the decoded `CatalogueDocument` and the raw JSON (should
+/// never occur with a well-formed v3 catalogue).
+fn catalogue_entry_hash(
+    raw: &serde_json::Value,
+    section: &str,
+    entry_key: &str,
+) -> Result<ContentHash, String> {
+    let value = raw.get(section).and_then(|s| s.get(entry_key)).ok_or_else(|| {
+        format!(
+            "internal: catalogue entry '{entry_key}' not found in section '{section}' of raw JSON"
+        )
+    })?;
+    let json_str = canonical_json(value);
+    let hex = canonical_json_sha256(&json_str);
+    ContentHash::try_from_hex(&hex).map_err(|e| {
+        format!("internal: canonical_json_sha256 produced non-hex output for '{entry_key}': {e}")
+    })
 }
 
 fn count_signals(signals: &[CatalogueSpecSignal]) -> (usize, usize, usize) {
@@ -273,6 +317,7 @@ mod tests {
         let v3_doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
 
         // Replicate the refresher's v3 signal computation inline.
+        let raw_json: serde_json::Value = serde_json::from_str(json).unwrap();
         let mut signals: Vec<CatalogueSpecSignal> = Vec::new();
         for (type_name, entry) in &v3_doc.types {
             let signal = evaluate_catalogue_entry_signal(
@@ -280,7 +325,8 @@ mod tests {
                 &entry.spec_refs,
                 &entry.informal_grounds,
             );
-            signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal));
+            let entry_hash = catalogue_entry_hash(&raw_json, "types", type_name.as_str()).unwrap();
+            signals.push(CatalogueSpecSignal::new(type_name.as_str(), signal, entry_hash));
         }
         for (trait_name, entry) in &v3_doc.traits {
             let signal = evaluate_catalogue_entry_signal(
@@ -288,7 +334,9 @@ mod tests {
                 &entry.spec_refs,
                 &entry.informal_grounds,
             );
-            signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal));
+            let entry_hash =
+                catalogue_entry_hash(&raw_json, "traits", trait_name.as_str()).unwrap();
+            signals.push(CatalogueSpecSignal::new(trait_name.as_str(), signal, entry_hash));
         }
         for (fn_path, entry) in &v3_doc.functions {
             let signal = evaluate_catalogue_entry_signal(
@@ -296,7 +344,9 @@ mod tests {
                 &entry.spec_refs,
                 &entry.informal_grounds,
             );
-            signals.push(CatalogueSpecSignal::new(fn_path.to_string(), signal));
+            let fn_key = fn_path.to_string();
+            let entry_hash = catalogue_entry_hash(&raw_json, "functions", &fn_key).unwrap();
+            signals.push(CatalogueSpecSignal::new(fn_key, signal, entry_hash));
         }
 
         let (blue, yellow, red) = count_signals(&signals);

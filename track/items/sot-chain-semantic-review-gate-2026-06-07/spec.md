@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 43, yellow: 0, red: 0 }
+signals: { blue: 46, yellow: 0, red: 0 }
 ---
 
 # SoT Chain に意味論レビューゲートを追加する
@@ -27,6 +27,8 @@ signals: { blue: 43, yellow: 0, red: 0 }
 - [IN-10] 意味論レビューの判定結果を Chain ごとの別 artifact に収容する。Chain① の結果は `spec-adr-verify-cache.json`（track 単位）、Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D8] [tasks: T004, T007, T008]
 - [IN-11] 意味論検証の呼び出し口として専用の `/track:ref-verify` skill（公開 UI）と `bin/sotp ref-verify` サブコマンドを新設する。既存の `sotp verify *`（層②の構造/新鮮度チェック）や `/track:review`（code review）には相乗りせず、層③専用の独立した surface を持つ [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D9] [tasks: T007, T009, T011]
 - [IN-12] `bin/sotp ref-verify` は1コマンドで全 Chain を扱い、スコープを呼び出しコンテキストから自動解決する。spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain を対象とする。差分キャッシュにより、対象のうち変化したペアだけが再レビューされる [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D9] [tasks: T007, T008, T009]
+- [IN-13] catalogue entry の section-qualified key（`section_key`）は、`types:<name>` / `traits:<name>` / `functions:<path>` の形式で一つの `CatalogueDocument` 内でグローバルに一意な識別子とする。短い bare key がタイプ・トレイト・関数の複数セクションに重複して存在するケース（クロスセクション衝突）を防ぐため、インフラストラクチャアダプターが per-entry hash マップを構築する際のキーには bare key ではなく `section_key` を使用する [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D4] [tasks: T003, T005]
+- [IN-14] catalogue の全エントリを正規の順序（types → traits → functions、各セクション内は BTreeMap 順）でイテレートし、各エントリに bare `key` と section-qualified `section_key` の両方を付与するファンクションを一箇所に集約する。`catalogue_spec_refs` と `catalogue_spec_signals` で独立してキー導出ロジックを持つと drift が生じるため、すべてのインフラアダプターはこの集約関数経由でエントリを走査する [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D4] [tasks: T003, T005]
 
 ### Out of Scope
 - [OS-01] 意味論検証結果を presence 信号（🔵🟡🔴）の色に統合すること。presence（引用したか）と意味論（裏付けるか）は別の層であり、混在させると信号の情報量が落ちる [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D1] [tasks: T002]
@@ -61,6 +63,7 @@ signals: { blue: 43, yellow: 0, red: 0 }
 - [ ] [AC-10] 合格判定の際に根拠のどの箇所が主張を裏付けるかの引用が判定結果 artifact に記録される。引用なしの合格は判定保留として扱われ、verify-cache に合格として記録されない [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D6] [tasks: T002, T007]
 - [ ] [AC-11] `/track:ref-verify` skill と `bin/sotp ref-verify` が存在し、`sotp verify *`（層②）および `/track:review`（code review）とは独立した呼び出し口として機能する。3つの検証層がそれぞれ独立した surface を持つ [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D9] [tasks: T009, T011]
 - [ ] [AC-12] `ref-verifier` capability と `reviewer` capability が同時に実行される場合に、設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D7] [tasks: T006, T008, T012]
+- [ ] [AC-13] `RefreshCatalogueSpecSignalsInteractor` がインフラアダプターから受け取る per-entry hash マップは `section_key`（`types:<name>` / `traits:<name>` / `functions:<path>` 形式）をキーとして構成される。`iter_catalogue_entries` が生成した `section_key` に対応するエントリハッシュがマップに存在しない場合、ユースケースは偽のゼロ hash を補完せず `MissingEntryHash` エラーを返してフェイルクローズする [adr: knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md#D4] [tasks: T003, T005, T012]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/hexagonal-architecture.md#Port Placement Rules
@@ -76,5 +79,5 @@ signals: { blue: 43, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 43  🟡 0  🔴 0
+🔵 46  🟡 0  🔴 0
 

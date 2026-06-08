@@ -76,11 +76,19 @@ pub struct CatalogueSpecSignalsDocumentDto {
 /// shape of the codec layer, not part of the catalogue's declared public
 /// API. Only the aggregate [`CatalogueSpecSignalsDocumentDto`] is exposed
 /// as a catalogue entry.
+///
+/// `entry_hash` is a REQUIRED field (64-char lowercase hex SHA-256 of the
+/// catalogue entry's canonical JSON subtree). Absent `entry_hash` triggers
+/// a typed-deserialization error — no fallback (no-backward-compat convention
+/// / CN-10 of ADR `2026-05-27-1601-sot-chain-semantic-review-gate.md`).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct CatalogueSpecSignalDto {
     pub(crate) type_name: String,
     pub(crate) signal: String,
+    /// SHA-256 of the catalogue entry's canonical JSON subtree (hex, 64 chars).
+    /// Required — absent field is a decode error.
+    pub(crate) entry_hash: String,
 }
 
 // ---------------------------------------------------------------------------
@@ -133,33 +141,65 @@ pub fn encode(
 }
 
 // ---------------------------------------------------------------------------
+// Shared wire-format helpers (pub(crate) — consumed by type_signals_codec)
+// ---------------------------------------------------------------------------
+
+/// Parses a `ConfidenceSignal` from its wire-format string (`"blue"`, `"yellow"`,
+/// `"red"`).
+///
+/// Returns `Some(variant)` on a recognised tag and `None` on any unknown string.
+/// Callers that need strict rejection should convert `None` into a validation
+/// error; callers that need a fail-safe fallback (e.g. `type_signals_codec`,
+/// which pre-dates this codec and has a legacy `Red`-fallback contract) should
+/// map `None` to `ConfidenceSignal::Red`.
+///
+/// Centralising this mapping ensures that a future variant addition (or wire-
+/// name change) is made in one place and both codecs stay in sync.
+pub(crate) fn parse_confidence_signal(s: &str) -> Option<ConfidenceSignal> {
+    match s {
+        "blue" => Some(ConfidenceSignal::Blue),
+        "yellow" => Some(ConfidenceSignal::Yellow),
+        "red" => Some(ConfidenceSignal::Red),
+        _ => None,
+    }
+}
+
+/// Serialises a `ConfidenceSignal` to its wire-format string.
+///
+/// Unknown / future variants fall back to `"red"` (most-conservative state) so
+/// a forward-compat catalogue file does not silently disappear a signal entry.
+pub(crate) fn confidence_signal_to_str(signal: ConfidenceSignal) -> &'static str {
+    match signal {
+        ConfidenceSignal::Blue => "blue",
+        ConfidenceSignal::Yellow => "yellow",
+        ConfidenceSignal::Red => "red",
+        _ => "red", // future-proofing: unknown variants default to the most conservative state
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 fn signal_from_dto(
     dto: CatalogueSpecSignalDto,
 ) -> Result<CatalogueSpecSignal, CatalogueSpecSignalsCodecError> {
-    let signal = match dto.signal.as_str() {
-        "blue" => ConfidenceSignal::Blue,
-        "yellow" => ConfidenceSignal::Yellow,
-        "red" => ConfidenceSignal::Red,
-        other => {
-            return Err(CatalogueSpecSignalsCodecError::Validation(format!(
-                "unknown signal variant '{other}' (expected 'blue', 'yellow', or 'red')"
-            )));
-        }
-    };
-    Ok(CatalogueSpecSignal::new(dto.type_name, signal))
+    let signal = parse_confidence_signal(dto.signal.as_str()).ok_or_else(|| {
+        CatalogueSpecSignalsCodecError::Validation(format!(
+            "unknown signal variant '{}' (expected 'blue', 'yellow', or 'red')",
+            dto.signal
+        ))
+    })?;
+    let entry_hash = ContentHash::try_from_hex(&dto.entry_hash)?;
+    Ok(CatalogueSpecSignal::new(dto.type_name, signal, entry_hash))
 }
 
 fn signal_to_dto(signal: &CatalogueSpecSignal) -> CatalogueSpecSignalDto {
-    let signal_str = match signal.signal {
-        ConfidenceSignal::Blue => "blue",
-        ConfidenceSignal::Yellow => "yellow",
-        ConfidenceSignal::Red => "red",
-        _ => "red", // future-proofing: unknown variants default to the most conservative state
-    };
-    CatalogueSpecSignalDto { type_name: signal.type_name.clone(), signal: signal_str.to_owned() }
+    CatalogueSpecSignalDto {
+        type_name: signal.type_name.clone(),
+        signal: confidence_signal_to_str(signal.signal).to_owned(),
+        entry_hash: signal.entry_hash().to_hex(),
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -183,9 +223,21 @@ mod tests {
         CatalogueSpecSignalsDocument::new(
             ContentHash::try_from_hex(hex_pattern(0xab)).unwrap(),
             vec![
-                CatalogueSpecSignal::new("Foo", ConfidenceSignal::Blue),
-                CatalogueSpecSignal::new("Bar", ConfidenceSignal::Yellow),
-                CatalogueSpecSignal::new("Baz", ConfidenceSignal::Red),
+                CatalogueSpecSignal::new(
+                    "Foo",
+                    ConfidenceSignal::Blue,
+                    ContentHash::try_from_hex(hex_pattern(0x01)).unwrap(),
+                ),
+                CatalogueSpecSignal::new(
+                    "Bar",
+                    ConfidenceSignal::Yellow,
+                    ContentHash::try_from_hex(hex_pattern(0x02)).unwrap(),
+                ),
+                CatalogueSpecSignal::new(
+                    "Baz",
+                    ConfidenceSignal::Red,
+                    ContentHash::try_from_hex(hex_pattern(0x03)).unwrap(),
+                ),
             ],
         )
     }
@@ -225,6 +277,20 @@ mod tests {
         assert!(json.contains("\"signals\""));
         assert!(json.contains("\"type_name\""));
         assert!(json.contains("\"signal\""));
+        assert!(json.contains("\"entry_hash\""), "encode must include entry_hash field");
+    }
+
+    #[test]
+    fn encode_includes_entry_hash_for_each_signal() {
+        let json = encode(&sample_doc()).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        let signals = parsed["signals"].as_array().unwrap();
+        for sig in signals {
+            assert!(
+                sig.get("entry_hash").is_some(),
+                "each signal must have entry_hash field, got: {sig:?}"
+            );
+        }
     }
 
     // --- schema version ---
@@ -267,13 +333,71 @@ mod tests {
               "schema_version": 1,
               "catalogue_declaration_hash": "{}",
               "signals": [
-                {{"type_name": "Foo", "signal": "blue", "extra": "bad"}}
+                {{"type_name": "Foo", "signal": "blue", "entry_hash": "{}", "extra": "bad"}}
+              ]
+            }}"#,
+            hex_pattern(0x00),
+            hex_pattern(0x01)
+        );
+        let err = decode(&json).unwrap_err();
+        assert!(matches!(err, CatalogueSpecSignalsCodecError::Json(_)));
+    }
+
+    #[test]
+    fn decode_rejects_missing_entry_hash_in_signal() {
+        let json = format!(
+            r#"{{
+              "schema_version": 1,
+              "catalogue_declaration_hash": "{}",
+              "signals": [
+                {{"type_name": "Foo", "signal": "blue"}}
               ]
             }}"#,
             hex_pattern(0x00)
         );
         let err = decode(&json).unwrap_err();
-        assert!(matches!(err, CatalogueSpecSignalsCodecError::Json(_)));
+        assert!(
+            matches!(err, CatalogueSpecSignalsCodecError::Json(_)),
+            "absent entry_hash must be a typed-deserialization error, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn decode_rejects_malformed_entry_hash_in_signal() {
+        let json = format!(
+            r#"{{
+              "schema_version": 1,
+              "catalogue_declaration_hash": "{}",
+              "signals": [
+                {{"type_name": "Foo", "signal": "blue", "entry_hash": "not-hex"}}
+              ]
+            }}"#,
+            hex_pattern(0x00)
+        );
+        let err = decode(&json).unwrap_err();
+        assert!(matches!(err, CatalogueSpecSignalsCodecError::Validation(_)));
+    }
+
+    #[test]
+    fn decode_entry_hash_roundtrip_preserves_value() {
+        let expected_hash = hex_pattern(0xbe);
+        let json = format!(
+            r#"{{
+              "schema_version": 1,
+              "catalogue_declaration_hash": "{}",
+              "signals": [
+                {{"type_name": "MyType", "signal": "blue", "entry_hash": "{expected_hash}"}}
+              ]
+            }}"#,
+            hex_pattern(0x00)
+        );
+        let doc = decode(&json).unwrap();
+        assert_eq!(doc.signals.len(), 1);
+        assert_eq!(
+            doc.signals[0].entry_hash().to_hex(),
+            expected_hash,
+            "decoded entry_hash must match the JSON value"
+        );
     }
 
     // --- hash validation ---
@@ -312,10 +436,11 @@ mod tests {
               "schema_version": 1,
               "catalogue_declaration_hash": "{}",
               "signals": [
-                {{"type_name": "Foo", "signal": "pink"}}
+                {{"type_name": "Foo", "signal": "pink", "entry_hash": "{}"}}
               ]
             }}"#,
-            hex_pattern(0x00)
+            hex_pattern(0x00),
+            hex_pattern(0x01)
         );
         let err = decode(&json).unwrap_err();
         match err {
@@ -334,12 +459,15 @@ mod tests {
               "schema_version": 1,
               "catalogue_declaration_hash": "{}",
               "signals": [
-                {{"type_name": "A", "signal": "blue"}},
-                {{"type_name": "B", "signal": "yellow"}},
-                {{"type_name": "C", "signal": "red"}}
+                {{"type_name": "A", "signal": "blue", "entry_hash": "{}"}},
+                {{"type_name": "B", "signal": "yellow", "entry_hash": "{}"}},
+                {{"type_name": "C", "signal": "red", "entry_hash": "{}"}}
               ]
             }}"#,
-            hex_pattern(0x11)
+            hex_pattern(0x11),
+            hex_pattern(0x01),
+            hex_pattern(0x02),
+            hex_pattern(0x03)
         );
         let doc = decode(&json).unwrap();
         assert_eq!(doc.signals.len(), 3);
@@ -381,9 +509,21 @@ mod tests {
         let doc = CatalogueSpecSignalsDocument::new(
             ContentHash::try_from_hex(hex_pattern(0x00)).unwrap(),
             vec![
-                CatalogueSpecSignal::new("Gamma", ConfidenceSignal::Blue),
-                CatalogueSpecSignal::new("Alpha", ConfidenceSignal::Yellow),
-                CatalogueSpecSignal::new("Beta", ConfidenceSignal::Red),
+                CatalogueSpecSignal::new(
+                    "Gamma",
+                    ConfidenceSignal::Blue,
+                    ContentHash::try_from_hex(hex_pattern(0x01)).unwrap(),
+                ),
+                CatalogueSpecSignal::new(
+                    "Alpha",
+                    ConfidenceSignal::Yellow,
+                    ContentHash::try_from_hex(hex_pattern(0x02)).unwrap(),
+                ),
+                CatalogueSpecSignal::new(
+                    "Beta",
+                    ConfidenceSignal::Red,
+                    ContentHash::try_from_hex(hex_pattern(0x03)).unwrap(),
+                ),
             ],
         );
         let json = encode(&doc).unwrap();

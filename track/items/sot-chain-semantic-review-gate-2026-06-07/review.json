@@ -1,6 +1,127 @@
 {
   "schema_version": 2,
   "scopes": {
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Missing `entry_hashes` entries are silently replaced with `ContentHash::from_bytes([0; 32])`. That fabricates a valid-looking but incorrect `entry_hash` in `<layer>-catalogue-spec-signals.json` if the adapter/key-derivation ever drifts, which should fail closed instead of persisting corrupted integrity metadata.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "line": 206,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a59a6be5ee5c23b3c26f4c61a7afd133c0a12895209e7dadb371543b85d9934a",
+          "at": "2026-06-08T03:04:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0896551e413edf23b3b71715695e6bcb0cb240f86b92a0174db2904d07d2264",
+          "at": "2026-06-08T03:14:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new shared traversal helper is public and now drives both `catalogue_spec_refs` and `catalogue_spec_signals`, but the added tests only cover type entries. There is no direct coverage for trait/function traversal or for a same-short-name cross-section collision, so a regression in `section_key` formatting or section order would reach production unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_traversal.rs",
+              "line": 69,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c857a53c1f462b5cd9fbf0a2f5482c080005ecaad365d8af9d89dece6a1c1d",
+          "at": "2026-06-08T03:38:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11fb2822d7eb0853a16ccb3695b119d2994dff56bbc45764aa9a92453d8ba438",
+          "at": "2026-06-08T03:43:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
+          "at": "2026-06-08T04:10:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The merge gate now receives per-entry catalogue hashes, but it immediately discards `_entry_hashes` and only checks signal count, positional name, document-level `catalogue_declaration_hash`, and color. That means a committed `<layer>-catalogue-spec-signals.json` can contain a stale or fabricated `CatalogueSpecSignal.entry_hash` while the gate still approves, so the semantic Chain ② cache key no longer reflects the current catalogue entry. Compare each signal's `entry_hash()` against the current entry hash map using the same traversal/order and fail closed on missing or mismatched hashes.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 518,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
+          "at": "2026-06-08T04:14:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c980ae55c3d11384f209e3a7d7efbb5654364d616eb7d65dffe47e145eae811",
+          "at": "2026-06-08T04:22:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`merge_gate.rs` now has 752 lines of production code before `#[cfg(test)]`, which exceeds the repo's 700-line maximum for production modules. This is an architecture violation and should be split into smaller modules.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/merge_gate.rs",
+              "line": 753,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:36:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:41:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Chain ② per-entry hash block pushes the production portion of `merge_gate.rs` to line 752 before `#[cfg(test)]`, exceeding the repository's 700-line maximum for production modules. This was 690 lines before the change, so the current patch crosses the guardrail; please split the new catalogue-spec integrity/signals logic into a helper module or otherwise reduce this file below the limit.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 665,
+              "category": "module_size"
+            }
+          ],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:44:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89e40b79e65a9a9888e8890d7475c92deaf231dc3023599c264cc5ff0a017354",
+          "at": "2026-06-08T04:54:55Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -38,57 +159,20 @@
           "findings": [],
           "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
           "at": "2026-06-08T00:48:03Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
-          "at": "2026-06-07T23:47:20Z"
+          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
+          "at": "2026-06-08T03:03:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
-          "at": "2026-06-07T23:51:24Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
-          "at": "2026-06-07T21:44:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AdrFrontMatterDto`/`AdrDecisionDto` only require `decisions[].id` and explicitly allow all other fields to be absent or unknown. As a result, an ADR front-matter block like `decisions: [{ id: D1 }]` or one with misspelled/unknown schema keys deserializes successfully, and any `adr_ref` to `D1` passes even though the ADR metadata is malformed. The briefing calls out typed-deserialization fail-closed behavior for unknown/missing fields, so this should either reuse the existing strict ADR front-matter codec or mirror its required fields/`deny_unknown_fields` behavior before accepting the anchor.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/plan_artifact_refs/adr_anchor.rs",
-              "line": 36,
-              "category": "typed-deserialization"
-            }
-          ],
-          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
-          "at": "2026-06-07T21:47:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4aeaa65e03a35f90176117707f8d43f14a4922d0bbf15d572404aceb5b3c791a",
-          "at": "2026-06-07T21:54:39Z"
+          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
+          "at": "2026-06-08T04:12:17Z"
         }
       ]
     },
@@ -688,6 +772,309 @@
           "findings": [],
           "hash": "rvw1:sha256:65d2d0199f09178ae94ef088f0de94a17c88d6858cc59c97db574448467ebd7d",
           "at": "2026-06-08T00:35:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61dd2981ef76b8fd886fe6298450568649ddbc57da1ec2ae4cc079dc38ddb75e",
+          "at": "2026-06-08T03:02:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61dd2981ef76b8fd886fe6298450568649ddbc57da1ec2ae4cc079dc38ddb75e",
+          "at": "2026-06-08T04:13:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T002` is marked resolved (`[x]` in `plan.md`, `status: \"done\"` in `impl-plan.json`), but the task body still says `T002 は未完了として扱う`. That is a direct status contradiction across the two plan artifacts and makes the progress state ambiguous.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 26,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:61dd2981ef76b8fd886fe6298450568649ddbc57da1ec2ae4cc079dc38ddb75e",
+          "at": "2026-06-08T04:59:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e41a87113c32744e928f5533e423f839684475bf6228cdd48bc07c0d65fcc19",
+          "at": "2026-06-08T05:00:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The S2 section still describes `EvidenceCitation` as the current yellow/unresolved work to complete, while the same task is now marked `[x]` as completed with a commit hash. That leaves the generated plan asserting both that T002 is done and that its only unresolved piece is still pending, which can mislead the next implementer about whether the domain value-object slice is complete. Update the S2 description to reflect the completed state, or keep T002 incomplete until that yellow state is actually resolved.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 21,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9e41a87113c32744e928f5533e423f839684475bf6228cdd48bc07c0d65fcc19",
+          "at": "2026-06-08T05:03:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95c05e7552af12fccf9a3b3f2873db95960883f5649c35f7e3437e322d2d918a",
+          "at": "2026-06-08T05:05:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001’s front-matter check is under-specified: `AdrFrontMatterDto { decisions: Vec<AdrDecisionDto> }` only validates `decisions[].id`, so malformed ADR front-matter with unknown/misspelled schema keys or missing required metadata can still deserialize and pass anchor validation. That contradicts the stated fail-closed typed-deserialization requirement.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:27d15a2652f68de14fc043dc07624336b16154e38f103074e16aac1d5b3af593",
+          "at": "2026-06-08T05:35:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`impl-plan.json`'s final validation task T012 still enumerates only AC-01..AC-12, but `spec.json` adds AC-13. As written, the plan never verifies the new fail-closed `MissingEntryHash` path, so the added acceptance criterion can be shipped unvalidated.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 62,
+              "category": "infeasibility"
+            },
+            {
+              "message": "The new usecase-side artifacts introduced in `usecase-types.json` (`CatalogueEntryRef`, `iter_catalogue_entries`, `TrackBlobReader.read_catalogue_for_spec_ref_check`, and `RefreshCatalogueSpecSignalsError::MissingEntryHash`) do not have a corresponding implementation task in `impl-plan.json`; T003/T005 only cover the domain `CatalogueSpecSignal` and signal artifact regeneration. That leaves AC-13 without an executable implementation step.",
+              "severity": "P1",
+              "file": null,
+              "line": null,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:27d15a2652f68de14fc043dc07624336b16154e38f103074e16aac1d5b3af593",
+          "at": "2026-06-08T05:38:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T003` / `S3` says `TrackBlobReader.read_type_catalogue` should be expanded to return `(CatalogueDocument, String, HashMap<String, ContentHash>)`, but the type registry and contract map put that 3-tuple on `read_catalogue_for_spec_ref_check` and leave `read_type_catalogue` as `(Vec<u8>, String)`. As written, the plan targets the wrong port and leaves the actual new API unchanged.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 107,
+              "category": "contradiction"
+            },
+            {
+              "message": "`AC-13` makes the missing-hash path key off `section_key`, but `RefreshCatalogueSpecSignalsError::MissingEntryHash` only carries `entry_key`. In the collision case that `section_key` was introduced to eliminate, the error cannot identify which entry actually missed a hash, so the fail-closed contract is not represented accurately.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "line": 245,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3b6cb19ca78c659a3a227c5bcae0e677308257d3573d29aa5df90469118d0e97",
+          "at": "2026-06-08T05:46:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T003` names the failure as `RefreshCatalogueSpecSignalsError::MissingEntryHash { layer_id, entry_key }`, but the same task and the generated type catalogue define the payload field as `section_key`. That makes the error shape internally inconsistent and leaves the implementation target ambiguous.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            },
+            {
+              "message": "S3’s last bullet says to extend `TrackBlobReader.read_type_catalogue`, but the rest of the plan/spec consistently attach the per-entry hash map to `read_catalogue_for_spec_ref_check`. `read_type_catalogue` is a different port shape, so this names the wrong method for the change.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 107,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:36d76b2dcd307b00fa450a9cc054292d96d5595e9b1b1332ffef2ecb52ff72bc",
+          "at": "2026-06-08T05:50:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is internally inconsistent: it first requires adding an `entry_hash()` accessor to `CatalogueSpecSignal`, but later says the domain type definition adds only the `entry_hash` field and `new` constructor argument. That leaves the intended API surface ambiguous.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 18,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e1b6b3affc1007b978d2124fc8f8af41b9d1169476d5ec916612dea9da69d0e2",
+          "at": "2026-06-08T05:55:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:635c1779e4fd8e30d5e5d5df7258a1822f789d2a9ba3a5cc64dd29de720ab572",
+          "at": "2026-06-08T06:00:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "task-coverage.json assigns IN-13/IN-14 and AC-13 to T005, but T005's plan text only covers regenerating catalogue-spec-signals artifacts for entry_hash/AC-06 and does not mention section_key keying, iter_catalogue_entries, or MissingEntryHash fail-closed behavior. This is a semantic coverage contradiction: an implementer following T005 can leave the adapter-side section_key/hash-map requirements unimplemented while the coverage map still claims those requirements are handled.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 28,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:635c1779e4fd8e30d5e5d5df7258a1822f789d2a9ba3a5cc64dd29de720ab572",
+          "at": "2026-06-08T06:03:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4cdf58387ee5ddd50957b010c7ae192ae76fcb5f80abb4fca5e1402567d893f",
+          "at": "2026-06-08T06:07:12Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
+          "at": "2026-06-08T03:03:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
+          "at": "2026-06-08T04:13:29Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
+          "at": "2026-06-07T21:44:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFrontMatterDto`/`AdrDecisionDto` only require `decisions[].id` and explicitly allow all other fields to be absent or unknown. As a result, an ADR front-matter block like `decisions: [{ id: D1 }]` or one with misspelled/unknown schema keys deserializes successfully, and any `adr_ref` to `D1` passes even though the ADR metadata is malformed. The briefing calls out typed-deserialization fail-closed behavior for unknown/missing fields, so this should either reuse the existing strict ADR front-matter codec or mirror its required fields/`deny_unknown_fields` behavior before accepting the anchor.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs/adr_anchor.rs",
+              "line": 36,
+              "category": "typed-deserialization"
+            }
+          ],
+          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
+          "at": "2026-06-07T21:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4aeaa65e03a35f90176117707f8d43f14a4922d0bbf15d572404aceb5b3c791a",
+          "at": "2026-06-07T21:54:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_catalogue_entry_hashes` keys the returned `HashMap` only by the bare entry name. Type and trait short names are not globally unique in a catalogue, so a same-named type/trait pair will overwrite one another here and later be assigned the wrong `entry_hash` when the refresher looks up hashes by the same bare key. This silently corrupts the generated `<layer>-catalogue-spec-signals.json` for valid catalogues that contain such collisions; the key needs to include the section (or another disambiguator).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 434,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:56ea2ad1ab48440de8ec9cf3c3dee569f3ca993e6f5e5184dfab107d72218b2c",
+          "at": "2026-06-08T03:06:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_catalogue_entry_hashes` uses a flat `HashMap<String, ContentHash>` keyed only by the bare entry name, but `CatalogueDocument` only guarantees uniqueness within each of `types`, `traits`, and `functions`. A valid catalogue can therefore contain the same short name in different sections; this code will reject it as a collision and the refresher cannot distinguish the hashes. The key needs a section discriminator, or the structure needs to be nested by section, so cross-section name overlaps still round-trip correctly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 429,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:42054208e173f8a2f04c41152c0fa2891cac39d2acb64585a4e6aa9bd9b95a12",
+          "at": "2026-06-08T03:15:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
+          "at": "2026-06-08T03:38:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
+          "at": "2026-06-08T03:45:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
+          "at": "2026-06-08T04:15:19Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:51:24Z"
         }
       ]
     }

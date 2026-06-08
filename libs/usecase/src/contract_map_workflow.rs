@@ -320,9 +320,9 @@ mod tests {
         LayerId::try_new(name.to_owned()).unwrap()
     }
 
-    fn empty_v3_doc(crate_name: &str) -> CatalogueDocument {
-        CatalogueDocument::new(3, CrateName::new(crate_name).unwrap(), layer(crate_name))
-    }
+    // Reuse the shared helper from catalogue_traversal so the empty-v3-doc
+    // construction knowledge lives in one place (DRY fix).
+    use crate::catalogue_traversal::tests::empty_v3_doc;
 
     fn three_layer_catalogues() -> (Vec<LayerId>, BTreeMap<LayerId, CatalogueDocument>) {
         let domain_layer = layer("domain");

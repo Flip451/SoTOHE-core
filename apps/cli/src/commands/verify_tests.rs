@@ -685,7 +685,7 @@ fn test_catalogue_spec_signals_strict_false_yellow_is_warning_only() {
         "schema_version": 1,
         "catalogue_declaration_hash": "a".repeat(64),
         "signals": [
-            { "type_name": "MyType", "signal": "yellow" }
+            { "type_name": "MyType", "signal": "yellow", "entry_hash": "a".repeat(64) }
         ]
     });
     std::fs::write(
@@ -723,7 +723,7 @@ fn test_catalogue_spec_signals_strict_true_yellow_is_error() {
         "schema_version": 1,
         "catalogue_declaration_hash": "a".repeat(64),
         "signals": [
-            { "type_name": "MyType", "signal": "yellow" }
+            { "type_name": "MyType", "signal": "yellow", "entry_hash": "a".repeat(64) }
         ]
     });
     std::fs::write(

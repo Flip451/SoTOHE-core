@@ -468,33 +468,32 @@ mod tests {
   "functions": {}
 }"#;
 
-    /// A `domain-catalogue-spec-signals.json` referencing `MyType` with a Blue signal.
+    /// Builds a `domain-catalogue-spec-signals.json` fixture referencing the given `type_name`
+    /// with a Blue signal.
     ///
     /// Uses the production codec shape: `catalogue_declaration_hash` + `signals` array.
-    fn signals_referencing_existing_type() -> String {
-        r#"{
+    /// `entry_hash` is a required field per T003/AC-06.
+    fn signals_referencing_type(type_name: &str) -> String {
+        format!(
+            r#"{{
   "schema_version": 1,
   "catalogue_declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
-    {"type_name": "MyType", "signal": "blue"}
+    {{"type_name": "{type_name}", "signal": "blue", "entry_hash": "0000000000000000000000000000000000000000000000000000000000000000"}}
   ]
-}"#
-        .to_owned()
+}}"#
+        )
+    }
+
+    /// A `domain-catalogue-spec-signals.json` referencing `MyType` with a Blue signal.
+    fn signals_referencing_existing_type() -> String {
+        signals_referencing_type("MyType")
     }
 
     /// A `domain-catalogue-spec-signals.json` referencing a type `NonExistentType`
     /// that does NOT appear in the v3 catalogue.
-    ///
-    /// Uses the production codec shape: `catalogue_declaration_hash` + `signals` array.
     fn signals_referencing_nonexistent_type() -> String {
-        r#"{
-  "schema_version": 1,
-  "catalogue_declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "signals": [
-    {"type_name": "NonExistentType", "signal": "blue"}
-  ]
-}"#
-        .to_owned()
+        signals_referencing_type("NonExistentType")
     }
 
     fn write_file(dir: &std::path::Path, relative: &str, content: &str) {

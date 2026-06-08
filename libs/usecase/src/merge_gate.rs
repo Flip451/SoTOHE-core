@@ -14,13 +14,13 @@
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D2, §D5.2, §D6, §D8.
 
+use std::collections::HashMap;
+
 use domain::spec::{SpecDocument, check_spec_doc_signals};
 use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::validate_branch_ref;
 use domain::verify::{VerifyFinding, VerifyOutcome};
-use domain::{
-    CatalogueSpecSignalsDocument, ConfidenceSignal, ContentHash, ImplPlanDocument, TrackId,
-};
+use domain::{CatalogueSpecSignalsDocument, ContentHash, ImplPlanDocument, TrackId};
 use domain::{TypeSignalsDocument, check_type_signals};
 
 use crate::catalogue_spec_refs::SpecElementHashReader;
@@ -28,6 +28,9 @@ use crate::catalogue_spec_refs::SpecElementHashReader;
 #[path = "merge_gate/blob_fetch_result.rs"]
 mod blob_fetch_result;
 pub use blob_fetch_result::BlobFetchResult;
+
+#[path = "merge_gate/chain2_gate.rs"]
+mod chain2_gate;
 
 /// Usecase port for reading track-level domain documents from an external
 /// source (git ref, filesystem, etc).
@@ -101,15 +104,21 @@ pub trait TrackBlobReader {
     /// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D2.2).
     ///
     /// Returns the v3 `CatalogueDocument` decoded via `CatalogueDocumentCodec::decode`
-    /// alongside the 64-character lowercase hex SHA-256 of the on-disk bytes.
+    /// alongside the 64-character lowercase hex SHA-256 of the on-disk bytes,
+    /// and a per-entry hash map (`entry_name → SHA-256 of the entry's canonical JSON subtree`).
     /// Non-v3 catalogues surface as `BlobFetchResult::FetchError` (CN-11 fail-closed).
     ///
-    /// The `Found` variant returns `(doc, raw_bytes_sha256_hex)` where the
-    /// 64-character lowercase hex SHA-256 is computed over the canonical
-    /// on-disk bytes of the catalogue. Callers convert this into a
-    /// [`ContentHash`] via [`ContentHash::try_from_hex`] and pass it to
-    /// the inline Chain ② integrity checks as `current_catalogue_hash`
-    /// for stale detection.
+    /// The `Found` variant returns `(doc, raw_bytes_sha256_hex, entry_hashes)` where:
+    /// - `raw_bytes_sha256_hex`: 64-character lowercase hex SHA-256 over the canonical
+    ///   on-disk bytes of the catalogue. Callers convert this into a [`ContentHash`]
+    ///   via [`ContentHash::try_from_hex`] and pass it to inline Chain ② integrity
+    ///   checks as `current_catalogue_hash` for stale detection.
+    /// - `entry_hashes`: maps each entry name (type / trait / function key) to its
+    ///   per-entry SHA-256 computed in infrastructure via `canonical_json_sha256`
+    ///   over the entry's canonical JSON subtree. Used by
+    ///   [`crate::catalogue_spec_signals::RefreshCatalogueSpecSignalsInteractor`] to
+    ///   inject `entry_hash: ContentHash` into each [`domain::CatalogueSpecSignal`]
+    ///   (CN-04 / IN-05 / AC-06 of ADR `2026-05-27-1601`).
     ///
     /// A default implementation returns `NotFound` so opt-out test mocks
     /// skip silently without failing the merge gate. Real infrastructure
@@ -119,7 +128,7 @@ pub trait TrackBlobReader {
         _branch: &str,
         _track_id: &str,
         _layer_id: &str,
-    ) -> BlobFetchResult<(CatalogueDocument, String)> {
+    ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
         // Default: NotFound so opt-out test mocks skip silently without failing
         // the merge gate. Real infrastructure implementations override.
         BlobFetchResult::NotFound
@@ -466,223 +475,15 @@ where
         if !opted_in_layers.contains(layer_id) {
             continue;
         }
-        // `LayerId::try_new` was validated in the pre-validation pass above and
-        // any failures caused an early return, so this conversion is infallible.
-        // Step 1: read signals file.
-        //
-        // For an opted-in layer the signals file MUST exist on the branch —
-        // treating `NotFound` as silent skip would let a PR bypass Chain ②
-        // by deleting `<layer>-catalogue-spec-signals.json` while leaving the
-        // opt-in flag set. Fail-closed with a remediation hint pointing at
-        // `sotp track catalogue-spec-signals`.
-        let signals_doc = match reader
-            .read_catalogue_spec_signals_document(branch, track_id, layer_id)
-        {
-            BlobFetchResult::Found(doc) => doc,
-            BlobFetchResult::NotFound => {
-                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "opted-in layer '{layer_id}' is missing \
-                     <layer>-catalogue-spec-signals.json on origin/{branch}. Run \
-                     `sotp track catalogue-spec-signals` and commit the generated file \
-                     so the merge gate can evaluate Chain ②."
-                ))]));
-                continue;
-            }
-            BlobFetchResult::FetchError(msg) => {
-                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "failed to read catalogue-spec signals for layer '{layer_id}' \
-                             on origin/{branch}: {msg}"
-                ))]));
-                continue;
-            }
-        };
-
-        // Step 2: read catalogue (v3-native CatalogueDocument) + hash.
-        //
-        // Opted-in layers are also `tddd.enabled` (see the opt-in gate above
-        // — the set is a strict subset), so a missing catalogue on an
-        // opted-in layer is an integrity violation, not a benign opt-out.
-        // Mirror the step-1 fail-closed policy.
-        //
-        // T024: `read_catalogue_for_spec_ref_check` now returns
-        // `BlobFetchResult<(CatalogueDocument, String)>` (v3-native). Non-v3
-        // catalogues surface as FetchError (CN-11 fail-closed).
-        let (catalogue, catalogue_hash_hex) = match reader
-            .read_catalogue_for_spec_ref_check(branch, track_id, layer_id)
-        {
-            BlobFetchResult::Found(pair) => pair,
-            BlobFetchResult::NotFound => {
-                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "opted-in layer '{layer_id}' is missing its catalogue file \
-                     on origin/{branch}. A layer cannot opt in to Chain ② without the \
-                     `<layer>-types.json` catalogue the signals are computed from."
-                ))]));
-                continue;
-            }
-            BlobFetchResult::FetchError(msg) => {
-                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "failed to read catalogue hash for layer '{layer_id}' \
-                             on origin/{branch}: {msg}"
-                ))]));
-                continue;
-            }
-        };
-        let catalogue_hash = match ContentHash::try_from_hex(&catalogue_hash_hex) {
-            Ok(h) => h,
-            Err(e) => {
-                outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                    "catalogue hash for layer '{layer_id}' is not canonical hex: {e}"
-                ))]));
-                continue;
-            }
-        };
-
-        // Step 3: integrity binary gate (dangling / mismatch / stale).
-        //
-        // T024: inline equivalent of `check_catalogue_spec_ref_integrity` over
-        // v3 `CatalogueDocument`. Iterates types + traits + functions BTreeMaps
-        // and checks each entry's `spec_refs` for dangling anchors and hash
-        // mismatches. StaleSignals check uses `signals_doc.catalogue_declaration_hash`.
-        //
-        // Per-entry spec_refs iteration (types then traits then functions, BTreeMap order):
-        let catalogue_file = format!("{layer_id}-types.json");
-        let mut integrity_errors: Vec<VerifyFinding> = Vec::new();
-
-        // Helper: check spec_refs for one entry.
-        macro_rules! check_spec_refs_for_entry {
-            ($entry_name:expr, $spec_refs:expr) => {
-                for (ref_index, spec_ref) in $spec_refs.iter().enumerate() {
-                    match spec_element_hashes.get(&spec_ref.anchor) {
-                        None => {
-                            integrity_errors.push(VerifyFinding::error(format!(
-                                "catalogue-spec integrity violation on layer '{layer_id}': \
-                                 DanglingAnchor {{ catalogue_entry: {:?}, ref_index: {ref_index}, \
-                                 spec_file: {:?}, anchor: {:?} }}",
-                                $entry_name,
-                                spec_ref.file,
-                                spec_ref.anchor
-                            )));
-                        }
-                        Some(actual_hash) if actual_hash != &spec_ref.hash => {
-                            integrity_errors.push(VerifyFinding::error(format!(
-                                "catalogue-spec integrity violation on layer '{layer_id}': \
-                                 HashMismatch {{ catalogue_entry: {:?}, ref_index: {ref_index}, \
-                                 spec_file: {:?}, anchor: {:?}, declared: {:?}, actual: {:?} }}",
-                                $entry_name,
-                                spec_ref.file,
-                                spec_ref.anchor,
-                                spec_ref.hash,
-                                actual_hash
-                            )));
-                        }
-                        Some(_) => {} // anchor present + hash matches — no finding
-                    }
-                }
-            };
-        }
-
-        for (type_name, entry) in &catalogue.types {
-            check_spec_refs_for_entry!(type_name.as_str(), entry.spec_refs);
-        }
-        for (trait_name, entry) in &catalogue.traits {
-            check_spec_refs_for_entry!(trait_name.as_str(), entry.spec_refs);
-        }
-        for (fn_path, entry) in &catalogue.functions {
-            check_spec_refs_for_entry!(fn_path.to_string(), entry.spec_refs);
-        }
-
-        // StaleSignals: compare signals_doc.catalogue_declaration_hash to current hash.
-        if signals_doc.catalogue_declaration_hash != catalogue_hash {
-            integrity_errors.push(VerifyFinding::error(format!(
-                "catalogue-spec integrity violation on layer '{layer_id}': \
-                 StaleSignals {{ declared: {:?}, actual: {:?} }}",
-                signals_doc.catalogue_declaration_hash, catalogue_hash
-            )));
-        }
-
-        if !integrity_errors.is_empty() {
-            outcome.merge(VerifyOutcome::from_findings(integrity_errors));
-        }
-
-        // Step 4: signal gate — strict=true (merge gate blocks Yellow).
-        // T024: inline equivalent of `check_catalogue_spec_signals` over v3
-        // `CatalogueDocument`. Entry ordering mirrors the signal refresher:
-        // types (BTreeMap order) then traits then functions.
-        //
-        // Coverage check: total entry count must equal signals count, and
-        // positional names must match (fail-closed against trimmed signals files).
-        let total_entries =
-            catalogue.types.len() + catalogue.traits.len() + catalogue.functions.len();
-        let signals = &signals_doc.signals;
-        if total_entries != signals.len() {
-            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{catalogue_file}: catalogue-spec signals coverage mismatch — catalogue has \
-                 {total_entries} entry/entries, signals document has {} signal(s). \
-                 Regenerate the signals file with `sotp track catalogue-spec-signals` so \
-                 every catalogue entry is covered.",
-                signals.len()
-            ))]));
-            continue;
-        }
-
-        // Positional name match: types → traits → functions, BTreeMap iteration order.
-        let catalogue_names: Vec<String> = catalogue
-            .types
-            .keys()
-            .map(|k| k.as_str().to_owned())
-            .chain(catalogue.traits.keys().map(|k| k.as_str().to_owned()))
-            .chain(catalogue.functions.keys().map(|k| k.to_string()))
-            .collect();
-        if let Some((i, cat_name, sig)) = catalogue_names
-            .iter()
-            .zip(signals.iter())
-            .enumerate()
-            .find(|(_, (cat_name, sig))| cat_name.as_str() != sig.type_name.as_str())
-            .map(|(i, (cat_name, sig))| (i, cat_name, sig))
-        {
-            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{catalogue_file}: catalogue-spec signals positional mismatch at index {i} \
-                 (catalogue entry '{cat_name}' vs signal '{}'). Regenerate the signals file.",
-                sig.type_name
-            ))]));
-            continue;
-        }
-
-        if signals.is_empty() {
-            // Empty on both sides: pass (empty layer).
-            continue;
-        }
-
-        let reds: Vec<&str> = signals
-            .iter()
-            .filter(|s| s.signal == ConfidenceSignal::Red)
-            .map(|s| s.type_name.as_str())
-            .collect();
-        if !reds.is_empty() {
-            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{catalogue_file}: {} catalogue entry/entries have Red catalogue-spec signal \
-                 (missing both spec_refs[] and informal_grounds[] — every entry must carry \
-                 at least one grounding ref): {}",
-                reds.len(),
-                reds.join(", ")
-            ))]));
-            continue;
-        }
-
-        let yellows: Vec<&str> = signals
-            .iter()
-            .filter(|s| s.signal == ConfidenceSignal::Yellow)
-            .map(|s| s.type_name.as_str())
-            .collect();
-        if !yellows.is_empty() {
-            outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-                "{catalogue_file}: {} catalogue entry/entries have Yellow catalogue-spec signal \
-                 — merge gate will block these until upgraded to Blue. Upgrade by promoting \
-                 informal_grounds[] to spec_refs[] with anchor + canonical SHA-256 hash: {}",
-                yellows.len(),
-                yellows.join(", ")
-            ))]));
-        }
+        // Delegate the per-layer Chain ② check to the extracted helper.
+        // Each call returns a VerifyOutcome that is merged into the accumulator.
+        outcome.merge(chain2_gate::check_chain2_for_layer(
+            reader,
+            branch,
+            track_id,
+            layer_id,
+            &spec_element_hashes,
+        ));
     }
 
     outcome
@@ -1552,7 +1353,11 @@ mod tests {
 
     struct ChainTwoMock {
         signals: BlobFetchResult<domain::CatalogueSpecSignalsDocument>,
-        catalogue: BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)>,
+        catalogue: BlobFetchResult<(
+            domain::tddd::catalogue_v2::CatalogueDocument,
+            String,
+            HashMap<String, ContentHash>,
+        )>,
         spec_hashes:
             BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>,
     }
@@ -1562,7 +1367,11 @@ mod tests {
         /// Stage 2) and Chain ② reads are controlled via arguments.
         fn new(
             signals: BlobFetchResult<domain::CatalogueSpecSignalsDocument>,
-            catalogue: BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)>,
+            catalogue: BlobFetchResult<(
+                domain::tddd::catalogue_v2::CatalogueDocument,
+                String,
+                HashMap<String, ContentHash>,
+            )>,
             spec_hashes: BlobFetchResult<
                 std::collections::BTreeMap<domain::SpecElementId, ContentHash>,
             >,
@@ -1639,7 +1448,11 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)> {
+        ) -> BlobFetchResult<(
+            domain::tddd::catalogue_v2::CatalogueDocument,
+            String,
+            HashMap<String, ContentHash>,
+        )> {
             self.catalogue.clone()
         }
     }
@@ -1647,14 +1460,22 @@ mod tests {
     fn all_yellow_signals() -> domain::CatalogueSpecSignalsDocument {
         domain::CatalogueSpecSignalsDocument::new(
             ContentHash::from_bytes([0xcd_u8; 32]),
-            vec![domain::CatalogueSpecSignal::new("TrackId", domain::ConfidenceSignal::Yellow)],
+            vec![domain::CatalogueSpecSignal::new(
+                "TrackId",
+                domain::ConfidenceSignal::Yellow,
+                ContentHash::from_bytes([0u8; 32]),
+            )],
         )
     }
 
     fn all_blue_catalogue_signals() -> domain::CatalogueSpecSignalsDocument {
         domain::CatalogueSpecSignalsDocument::new(
             ContentHash::from_bytes([0xcd_u8; 32]),
-            vec![domain::CatalogueSpecSignal::new("TrackId", domain::ConfidenceSignal::Blue)],
+            vec![domain::CatalogueSpecSignal::new(
+                "TrackId",
+                domain::ConfidenceSignal::Blue,
+                ContentHash::from_bytes([0u8; 32]),
+            )],
         )
     }
 
@@ -1663,13 +1484,10 @@ mod tests {
         format!("{:02x}", byte).repeat(32)
     }
 
-    /// Catalogue with a single `TrackId` entry matching `all_*_signals()` doc
-    /// structure. Hash uses `0xcd` repeat so `declaration_hash` matches the
-    /// signals document used in these tests.
-    ///
-    /// T024: now returns a v3-native `CatalogueDocument` with one type entry.
-    fn catalogue_with_trackid_entry()
-    -> BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)> {
+    /// Build a v3 `CatalogueDocument` with a single `TrackId` `ValueObject` entry.
+    /// Shared construction used by both `catalogue_doc_with_entry_hashes` and
+    /// `catalogue_with_trackid_entry` so the fixture stays in one place.
+    fn trackid_catalogue_doc() -> domain::tddd::catalogue_v2::CatalogueDocument {
         use domain::tddd::LayerId;
         use domain::tddd::catalogue_v2::CatalogueDocument;
         use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
@@ -1680,22 +1498,56 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::ValueObject,
-            kind: TypeKindV2::Struct(StructKind::new(
-                StructShape::Plain { fields: vec![], has_stripped_fields: false },
-                None,
-            )),
-            methods: vec![],
+        doc.types.insert(
+            TypeName::new("TrackId").unwrap(),
+            TypeEntry {
+                action: ItemAction::Add,
+                role: DataRole::ValueObject,
+                kind: TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
+                methods: vec![],
+                module_path: ModulePath::root(),
+                docs: None,
+                spec_refs: vec![],
+                informal_grounds: vec![],
+            },
+        );
+        doc
+    }
 
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        doc.types.insert(TypeName::new("TrackId").unwrap(), entry);
-        BlobFetchResult::Found((doc, hex64(0xcd)))
+    /// Build a catalogue result containing the `TrackId` entry paired with the
+    /// `0xcd`-repeat declaration hash and the provided `entry_hashes` map.
+    /// Used by U43/U44 to vary only the per-entry hash state.
+    fn catalogue_doc_with_entry_hashes(
+        entry_hashes: HashMap<String, ContentHash>,
+    ) -> BlobFetchResult<(
+        domain::tddd::catalogue_v2::CatalogueDocument,
+        String,
+        HashMap<String, ContentHash>,
+    )> {
+        BlobFetchResult::Found((trackid_catalogue_doc(), hex64(0xcd), entry_hashes))
+    }
+
+    /// Catalogue with a single `TrackId` entry matching `all_*_signals()` doc
+    /// structure. Hash uses `0xcd` repeat so `declaration_hash` matches the
+    /// signals document used in these tests.
+    ///
+    /// T024: now returns a v3-native `CatalogueDocument` with one type entry.
+    fn catalogue_with_trackid_entry() -> BlobFetchResult<(
+        domain::tddd::catalogue_v2::CatalogueDocument,
+        String,
+        HashMap<String, ContentHash>,
+    )> {
+        // Per-entry hash for `"types:TrackId"` must match the `entry_hash` stored
+        // in the companion signals documents (`all_blue_catalogue_signals` and
+        // `all_yellow_signals`), which both use `ContentHash::from_bytes([0u8; 32])`.
+        // The per-entry hash freshness check (added alongside AC-06) will block if
+        // this map is empty or supplies the wrong hash for an opted-in layer.
+        let mut entry_hashes = HashMap::new();
+        entry_hashes.insert("types:TrackId".to_owned(), ContentHash::from_bytes([0u8; 32]));
+        catalogue_doc_with_entry_hashes(entry_hashes)
     }
 
     #[test]
@@ -1878,7 +1730,11 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)> {
+        ) -> BlobFetchResult<(
+            domain::tddd::catalogue_v2::CatalogueDocument,
+            String,
+            HashMap<String, ContentHash>,
+        )> {
             // Match the hash embedded in `all_yellow_signals()`:
             // ContentHash::from_bytes([0xcd; 32]) → hex64(0xcd)
             catalogue_with_trackid_entry()
@@ -2216,6 +2072,58 @@ mod tests {
         );
     }
 
+    // ===============================================================
+    // U43–U44 — per-entry hash freshness check (AC-06 / IN-05 / D4).
+    //
+    // `catalogue_with_trackid_entry` now supplies `entry_hashes` with the
+    // correct hash for `"types:TrackId"`.  These two tests verify the
+    // newly-added per-entry check in isolation:
+    //   U43: entry_hashes empty → hash missing → BLOCKED
+    //   U44: entry_hashes supplies a wrong hash → BLOCKED (stale signals)
+    // ===============================================================
+
+    #[test]
+    fn test_u43_chain2_missing_entry_hash_blocks_fail_closed() {
+        // U43: The infrastructure adapter returns an empty `entry_hashes` map
+        // (no hash for `"types:TrackId"`). The gate must block fail-closed
+        // rather than silently passing an unverified entry.
+        // Return empty entry_hashes → triggers the "hash missing" branch.
+        let catalogue = catalogue_doc_with_entry_hashes(HashMap::new());
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::Found(all_blue_catalogue_signals()),
+            catalogue,
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "missing per-entry hash must block fail-closed: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("per-entry hash missing")),
+            "error must mention 'per-entry hash missing': {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u44_chain2_stale_entry_hash_blocks() {
+        // U44: The adapter supplies a hash for `"types:TrackId"` that differs
+        // from the `entry_hash` stored in the signals document.  This indicates
+        // the signals file was not regenerated after the catalogue entry changed.
+        // Supply a hash that differs from the signal's entry_hash([0u8; 32]).
+        let mut entry_hashes = HashMap::new();
+        entry_hashes.insert("types:TrackId".to_owned(), ContentHash::from_bytes([0xab_u8; 32]));
+        let catalogue = catalogue_doc_with_entry_hashes(entry_hashes);
+        let reader = ChainTwoMock::new(
+            BlobFetchResult::Found(all_blue_catalogue_signals()),
+            catalogue,
+            BlobFetchResult::Found(std::collections::BTreeMap::new()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader);
+        assert!(outcome.has_errors(), "stale per-entry hash must block: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|f| f.message().contains("per-entry hash mismatch")),
+            "error must mention 'per-entry hash mismatch': {outcome:?}"
+        );
+    }
+
     #[test]
     fn test_u35_chain2_does_not_run_when_stage2_fails() {
         // U35: Stage 2 (type catalogue) failure → short-circuits before Chain ②
@@ -2285,8 +2193,11 @@ mod tests {
                 _branch: &str,
                 _track_id: &str,
                 _layer_id: &str,
-            ) -> BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String)>
-            {
+            ) -> BlobFetchResult<(
+                domain::tddd::catalogue_v2::CatalogueDocument,
+                String,
+                HashMap<String, ContentHash>,
+            )> {
                 // Return a valid catalogue so that the signal gate would be reached
                 // if Chain ② were not short-circuited. Without this override the
                 // NotFound default causes the per-layer loop to `continue` before

@@ -3,6 +3,40 @@
   "crate_name": "usecase",
   "layer": "usecase",
   "types": {
+    "CatalogueEntryRef": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "key", "ty": "String" },
+            { "name": "section_key", "ty": "String" },
+            { "name": "action", "ty": "domain::tddd::catalogue_v2::roles::ItemAction" },
+            { "name": "spec_refs", "ty": "&'a [domain::SpecRef]" },
+            { "name": "informal_grounds", "ty": "&'a [domain::InformalGroundRef]" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_traversal",
+      "docs": "A single entry extracted from a CatalogueDocument in canonical traversal order. key is the bare entry name; section_key is a section-qualified discriminator ('types:Foo', 'traits:Foo', 'functions:path') globally unique within a CatalogueDocument and used by infrastructure adapters to key per-entry hash maps (D4 / CN-04 / IN-05 of ADR 2026-05-27-1601).",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-13",
+          "hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-14",
+          "hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25"
+        }
+      ],
+      "informal_grounds": []
+    },
     "RefVerifyCommand": {
       "action": "add",
       "role": "Command",
@@ -158,6 +192,100 @@
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
           "anchor": "CN-05",
           "hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefreshCatalogueSpecSignalsError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NonActiveTrack",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "branch", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "BranchTrackMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "branch", "ty": "String" },
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "CatalogueNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "branch", "ty": "String" },
+                { "name": "layer_id", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "FetchError",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "String" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "MissingEntryHash",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "String" },
+                { "name": "section_key", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidCatalogueHash",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "String" },
+                { "name": "source", "ty": "domain::ValidationError" }
+              ]
+            }
+          },
+          {
+            "name": "WriteFailed",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "String" },
+                { "name": "source", "ty": "domain::RepositoryError" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_spec_signals",
+      "docs": "Failure modes of RefreshCatalogueSpecSignalsInteractor::execute. MissingEntryHash added in T003/T005: the infrastructure adapter did not supply a per-entry hash for the given section-qualified key, indicating a key-derivation drift between catalogue entries and the hash map. Fail-closed: persisting a fabricated zero hash would corrupt integrity metadata silently.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-13",
+          "hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-13",
+          "hash": "e54a00da94e34e75ce15f87bc887f6d94380e8ab4d74c90ec68213dd4d6eff2b"
         }
       ],
       "informal_grounds": []
@@ -524,9 +652,163 @@
         }
       ],
       "informal_grounds": []
+    },
+    "TrackBlobReader": {
+      "action": "modify",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "read_spec_document",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::spec::SpecDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_type_catalogue",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" },
+            { "name": "layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<(Vec<u8>, String)>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_impl_plan",
+          "receiver": "&self",
+          "params": [
+            { "name": "branch", "ty": "&str" },
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::ImplPlanDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "read_enabled_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_for_spec_ref_check",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String, std::collections::HashMap<String, domain::ContentHash>)>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_spec_signals_document",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::CatalogueSpecSignalsDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_catalogue_spec_signal_opted_in_layers",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<Vec<String>>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        },
+        {
+          "name": "read_type_signals",
+          "receiver": "&self",
+          "params": [
+            { "name": "_branch", "ty": "&str" },
+            { "name": "_track_id", "ty": "&str" },
+            { "name": "_layer_id", "ty": "&str" }
+          ],
+          "returns": "BlobFetchResult<domain::TypeSignalsDocument>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": true,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": [],
+      "module_path": "merge_gate",
+      "docs": "Usecase port for reading track-level domain documents from an external source (git ref, filesystem, etc). read_catalogue_for_spec_ref_check updated in T003/T005: return type extended from (CatalogueDocument, String) to (CatalogueDocument, String, HashMap<String, ContentHash>) where the HashMap is keyed by section-qualified entry keys ('types:Foo', 'traits:Foo', 'functions:path') per D4/CN-04 of ADR 2026-05-27-1601, preventing cross-section key collisions for entries that share a short name across types and traits.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-13",
+          "hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-14",
+          "hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25"
+        }
+      ],
+      "informal_grounds": []
     }
   },
-  "functions": {},
+  "functions": {
+    "usecase::catalogue_traversal::iter_catalogue_entries": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "catalogue", "ty": "&domain::tddd::catalogue_v2::CatalogueDocument" }
+      ],
+      "returns": "impl Iterator<Item = CatalogueEntryRef<'_>>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Returns an iterator over every entry in catalogue in canonical order: types (BTreeMap sorted) then traits (BTreeMap sorted) then functions (BTreeMap sorted). Each entry carries both a bare key and a section-qualified section_key ('types:Foo', 'traits:Foo', 'functions:path') that is globally unique across all three sections of a single catalogue. Centralizes key-derivation for catalogue_spec_refs and catalogue_spec_signals to prevent independent drift.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-13",
+          "hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-14",
+          "hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
   "inherent_impls": [
     {
       "type_name": "RefVerifyPercent",
@@ -646,6 +928,9 @@
     { "trait_ref": "core::cmp::PartialEq", "for_type": "RefVerifyConfig", "action": "add" },
     { "trait_ref": "core::cmp::Eq", "for_type": "RefVerifyConfig", "action": "add" },
     { "trait_ref": "core::default::Default", "for_type": "RefVerifyConfig", "action": "add" },
+    { "trait_ref": "core::fmt::Debug", "for_type": "RefreshCatalogueSpecSignalsError", "action": "modify" },
+    { "trait_ref": "core::fmt::Display", "for_type": "RefreshCatalogueSpecSignalsError", "action": "modify" },
+    { "trait_ref": "core::error::Error", "for_type": "RefreshCatalogueSpecSignalsError", "action": "modify" },
     { "trait_ref": "core::fmt::Debug", "for_type": "RefVerifyError", "action": "add" },
     { "trait_ref": "core::fmt::Display", "for_type": "RefVerifyError", "action": "add" },
     { "trait_ref": "core::error::Error", "for_type": "RefVerifyError", "action": "add" },

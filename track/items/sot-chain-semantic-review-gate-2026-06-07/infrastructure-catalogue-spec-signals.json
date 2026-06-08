@@ -4,55 +4,68 @@
   "signals": [
     {
       "type_name": "AgentExecutionRunner",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "1d2e0a37eaed68d3e77519609bba0fc13d312d7f8a90e51dedba7edd4183ce0f"
     },
     {
       "type_name": "AgentProfiles",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "add1018caa8b6bea417a61e4442e8b8c4f07937cf2cfab08acd7f9a971b496fc"
     },
     {
       "type_name": "AgentRefVerifierAdapter",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "93592d0fa5cb7a645c75b1b78323a369601ff4269d2602f79dc1a4088c3a6880"
     },
     {
       "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "e3dc4b68443329f36e0fc5c7db90947b94a69b7f9dd51d7e2330a490507e6c1c"
     },
     {
       "type_name": "CatalogueSpecVerifyCacheDocumentDto",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "2553a6ddacd2c4818e761d4e1e2d3e7e6e7bbd6ef2f07263b8bd5b3262ca7b46"
     },
     {
       "type_name": "RefVerifyCacheAdapter",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "086ff3e52f99a5b1361bbd50d671b879a1ec4fda80bd63e7f3846c82021126e2"
     },
     {
       "type_name": "RefVerifyPairSourceAdapter",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "1edee18af2148318f14a8b9495537932ad146e26d0f04e3f67d22e502bc444e7"
     },
     {
       "type_name": "RoundType",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "4e2c6bddf22e713f6db8e3c8f81e9516ccb027648859244a732adecc088e8d36"
     },
     {
       "type_name": "SemanticVerdictDto",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "890127d719f3e3faa402725ea5bcc2435976bee00a38fb55cf9f8a541594a7bd"
     },
     {
       "type_name": "SemanticVerifyCodecError",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "9018c3c451a463e1408e61b3c7ea0249aa61ae837b884e9361ef118c89bc8efd"
     },
     {
       "type_name": "SemanticVerifyEntryDto",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "c9b38963d5a41115ffca68cd1af2414f0810829d9dc821b63902b6c475a0e419"
     },
     {
       "type_name": "SpecAdrVerifyCacheDocumentCodec",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "e08f48b4f69f20976c7fa8df4477955c004796697c1432cb50c199aa5f83f1a4"
     },
     {
       "type_name": "SpecAdrVerifyCacheDocumentDto",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "4845ed0df63717ef65921e8edb29ccce092d260627cb8064726cdd62a672d50f"
     }
   ]
 }

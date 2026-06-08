@@ -1,58 +1,91 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "836bc94a1cb258c6613af4a0e1ebca042ff7315cdc4a24dddd98e64388613b03",
+  "catalogue_declaration_hash": "90b02d1a2986109e7d9b6a517c4dde66292faa3d2b2d8ab66872d792db810375",
   "signals": [
     {
+      "type_name": "CatalogueEntryRef",
+      "signal": "blue",
+      "entry_hash": "9270a4e3bad0fca79f2c5e3adc8eb6e97d05dfa54619d8329226850588d0bb0d"
+    },
+    {
       "type_name": "RefVerifyCacheScope",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "0ba5153b2999fe775269e7638e3f9459c868a26e2c7509d4e83ceebcebc2ff75"
     },
     {
       "type_name": "RefVerifyCommand",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "87ff1b9c394dbaa2ab58b6e768c7ad31b860e756acd35242208c162ef3372b5f"
     },
     {
       "type_name": "RefVerifyConfig",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "5689f006a4631752e9bfb7a18f9218cbb50c47308f779b4942ed941cf44692b5"
     },
     {
       "type_name": "RefVerifyError",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "59174f8c1243f2760bd5b6e384b71f37186c3c9f4eaaf079a0d4eeeae419c877"
     },
     {
       "type_name": "RefVerifyPair",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "26794e2122d2b825f5f33e82ed918d804d0e7a75d2531a6618f4e7396769a700"
     },
     {
       "type_name": "RefVerifyParallelism",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "a2bc450f095f5617cd2d81701b24ae8dda06f077c673fc48772bd425bbf8d219"
     },
     {
       "type_name": "RefVerifyPercent",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "7e37ef7ae736b1a3fe945f97b5d989838a4685dcbc4bd02d8060c6616657cd4b"
     },
     {
       "type_name": "RefVerifyScope",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "bc4743d1c5e9b09bdcd773dedbd03f42888d8b20a83b66abecddaf6b2209e594"
+    },
+    {
+      "type_name": "RefreshCatalogueSpecSignalsError",
+      "signal": "blue",
+      "entry_hash": "10d2730b7db6167eeef7ff94599375ec5cfcd057043b1cd3ba10dd59f61a4316"
     },
     {
       "type_name": "VerifySemanticRefsInteractor",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "7acdeaa5093c783ca88e1ba179b09a12716fc45608e41387b665eb3ed49e9ac3"
     },
     {
       "type_name": "RefVerifierPort",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "e5d96a39f46a1605fbea8ea6346223cd9dcb1fd60b68cbccc7ac0b3fc4a044d4"
     },
     {
       "type_name": "RefVerifyApplicationService",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "9a64566fb805d16b26caab0762b20cda95cb7f21c0165d9b042303e89ef4256e"
     },
     {
       "type_name": "RefVerifyCachePort",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "e46ebd9b5551b261c6e5d3ae0492cc4e2ce3dd63459da9126c664192f6ae9e3d"
     },
     {
       "type_name": "RefVerifyPairSourcePort",
-      "signal": "blue"
+      "signal": "blue",
+      "entry_hash": "f1ee1a2526e5243bdf14956fdbf799a03318caa3bfb7cfb51e92a4d318360b9c"
+    },
+    {
+      "type_name": "TrackBlobReader",
+      "signal": "blue",
+      "entry_hash": "624ff1af177ba5f699c8e2dcd6126469be653c1d5c93fc73e3d02ca64c8024ae"
+    },
+    {
+      "type_name": "usecase::catalogue_traversal::iter_catalogue_entries",
+      "signal": "blue",
+      "entry_hash": "035827486632b6582f9cb06a476056d18ad34fc1d6c83650e93b5d5f7ccf89d3"
     }
   ]
 }

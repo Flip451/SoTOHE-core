@@ -111,18 +111,44 @@ impl SpecRefFinding {
 /// `2026-04-23-0344-catalogue-spec-signal-activation.md` §D1.1). A catalogue
 /// entry with multiple `spec_refs[]` collapses to a single signal — the
 /// per-ref hash validation is reported separately as a [`SpecRefFinding`].
+///
+/// The `entry_hash` field holds the per-entry SHA-256 hash of the catalogue
+/// entry's canonical JSON subtree, injected at the infrastructure
+/// signal-generation site (CN-04 / IN-05 / AC-06 of ADR
+/// `2026-05-27-1601-sot-chain-semantic-review-gate.md`). Domain holds the
+/// field only; hash computation stays in infrastructure.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CatalogueSpecSignal {
     /// Name of the catalogue entry (matches `TypeCatalogueEntry.name`).
     pub type_name: String,
     /// Per-entry signal computed by the informal-priority rule.
     pub signal: ConfidenceSignal,
+    /// SHA-256 of the catalogue entry's canonical JSON subtree.
+    ///
+    /// Computed in infrastructure via `canonical_json_sha256` and injected
+    /// here. The field is REQUIRED in `<layer>-catalogue-spec-signals.json`;
+    /// absent `entry_hash` is a typed-deserialization error (no fallback).
+    entry_hash: ContentHash,
 }
 
 impl CatalogueSpecSignal {
     /// Construct a new per-entry signal record.
-    pub fn new(type_name: impl Into<String>, signal: ConfidenceSignal) -> Self {
-        Self { type_name: type_name.into(), signal }
+    ///
+    /// `entry_hash` must be the SHA-256 of the catalogue entry's canonical
+    /// JSON subtree.  Computing the hash is the caller's responsibility
+    /// (infrastructure layer, not domain).
+    pub fn new(
+        type_name: impl Into<String>,
+        signal: ConfidenceSignal,
+        entry_hash: ContentHash,
+    ) -> Self {
+        Self { type_name: type_name.into(), signal, entry_hash }
+    }
+
+    /// Returns the SHA-256 hash of the catalogue entry's canonical JSON
+    /// subtree (hex, 64 characters).
+    pub fn entry_hash(&self) -> &ContentHash {
+        &self.entry_hash
     }
 }
 
@@ -344,27 +370,36 @@ mod tests {
 
     #[test]
     fn catalogue_spec_signal_stores_name_and_signal() {
-        let s = CatalogueSpecSignal::new("SpecRefFinding", ConfidenceSignal::Blue);
+        let s = CatalogueSpecSignal::new("SpecRefFinding", ConfidenceSignal::Blue, hash(0x01));
         assert_eq!(s.type_name, "SpecRefFinding");
         assert_eq!(s.signal, ConfidenceSignal::Blue);
     }
 
     #[test]
+    fn catalogue_spec_signal_stores_entry_hash() {
+        let h = hash(0x42);
+        let s = CatalogueSpecSignal::new("MyType", ConfidenceSignal::Blue, h.clone());
+        assert_eq!(s.entry_hash(), &h);
+    }
+
+    #[test]
     fn catalogue_spec_signal_equality_compares_all_fields() {
-        let a = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Yellow);
-        let b = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Yellow);
-        let c = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Red);
-        let d = CatalogueSpecSignal::new("Bar", ConfidenceSignal::Yellow);
+        let a = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Yellow, hash(0x01));
+        let b = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Yellow, hash(0x01));
+        let c = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Red, hash(0x01));
+        let d = CatalogueSpecSignal::new("Bar", ConfidenceSignal::Yellow, hash(0x01));
+        let e = CatalogueSpecSignal::new("Foo", ConfidenceSignal::Yellow, hash(0x02));
         assert_eq!(a, b);
         assert_ne!(a, c);
         assert_ne!(a, d);
+        assert_ne!(a, e, "different entry_hash must not be equal");
     }
 
     #[test]
     fn document_new_pins_schema_version_to_one() {
         let doc = CatalogueSpecSignalsDocument::new(
             hash(0xcd),
-            vec![CatalogueSpecSignal::new("T", ConfidenceSignal::Blue)],
+            vec![CatalogueSpecSignal::new("T", ConfidenceSignal::Blue, hash(0x01))],
         );
         assert_eq!(doc.schema_version(), CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION);
         assert_eq!(doc.schema_version(), 1);
@@ -380,9 +415,9 @@ mod tests {
     #[test]
     fn document_preserves_signals_in_order() {
         let signals = vec![
-            CatalogueSpecSignal::new("First", ConfidenceSignal::Blue),
-            CatalogueSpecSignal::new("Second", ConfidenceSignal::Yellow),
-            CatalogueSpecSignal::new("Third", ConfidenceSignal::Red),
+            CatalogueSpecSignal::new("First", ConfidenceSignal::Blue, hash(0x01)),
+            CatalogueSpecSignal::new("Second", ConfidenceSignal::Yellow, hash(0x02)),
+            CatalogueSpecSignal::new("Third", ConfidenceSignal::Red, hash(0x03)),
         ];
         let doc = CatalogueSpecSignalsDocument::new(hash(0x00), signals.clone());
         assert_eq!(doc.signals, signals);
@@ -391,7 +426,7 @@ mod tests {
 
     #[test]
     fn document_equality_detects_any_field_drift() {
-        let signals = vec![CatalogueSpecSignal::new("T", ConfidenceSignal::Blue)];
+        let signals = vec![CatalogueSpecSignal::new("T", ConfidenceSignal::Blue, hash(0x01))];
         let a = CatalogueSpecSignalsDocument::new(hash(0x01), signals.clone());
         let b = CatalogueSpecSignalsDocument::new(hash(0x01), signals.clone());
         let c = CatalogueSpecSignalsDocument::new(hash(0x02), signals.clone());
@@ -409,8 +444,8 @@ mod tests {
         let doc = CatalogueSpecSignalsDocument::new(
             hash(0x77),
             vec![
-                CatalogueSpecSignal::new("Alpha", ConfidenceSignal::Blue),
-                CatalogueSpecSignal::new("Beta", ConfidenceSignal::Yellow),
+                CatalogueSpecSignal::new("Alpha", ConfidenceSignal::Blue, hash(0x01)),
+                CatalogueSpecSignal::new("Beta", ConfidenceSignal::Yellow, hash(0x02)),
             ],
         );
         let clone = doc.clone();

@@ -15,7 +15,7 @@
 //! Reference: ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md`
 //! §D5.3.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
 
 use domain::ImplPlanDocument;
@@ -281,26 +281,33 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         }
     }
 
-    /// Reads `<layer>-types.json` and returns `(doc, raw_bytes_sha256_hex)`.
+    /// Reads `<layer>-types.json` and returns `(doc, raw_bytes_sha256_hex, entry_hashes)`.
     ///
     /// Shares the same filename-resolution + UTF-8 + decode pipeline as
     /// `read_type_catalogue`, but the `String` slot carries the SHA-256 hex
     /// digest of the raw catalogue bytes (used for catalogue-spec stale
-    /// detection) instead of the resolved filename. No Stage-2 signal-file
-    /// hydration runs here — this port feeds the SoT Chain ② binary gate
-    /// which does its own freshness check via `catalogue_declaration_hash`.
+    /// detection) instead of the resolved filename. `entry_hashes` maps each
+    /// entry name (type / trait / function key) to its per-entry SHA-256,
+    /// computed via `canonical_json_sha256` so the usecase layer never needs
+    /// to import infrastructure hashing helpers (CN-04 / IN-05).
+    /// No Stage-2 signal-file hydration runs here — this port feeds the SoT
+    /// Chain ② binary gate which does its own freshness check via
+    /// `catalogue_declaration_hash`.
     fn read_catalogue_for_spec_ref_check(
         &self,
         branch: &str,
         track_id: &str,
         layer_id: &str,
-    ) -> BlobFetchResult<(CatalogueDocument, String)> {
+    ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
         let filename = match self.resolve_catalogue_filename(branch, layer_id) {
             Ok(name) => name,
             Err(msg) => return BlobFetchResult::FetchError(msg),
         };
         let path = Self::blob_path(track_id, &filename);
-        let text = match self.fetch_string::<(CatalogueDocument, String)>(branch, &path) {
+        let text = match self
+            .fetch_string::<(CatalogueDocument, String, HashMap<String, ContentHash>)>(
+                branch, &path,
+            ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -333,7 +340,19 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             }
         };
         let hash_hex = crate::tddd::type_signals_codec::declaration_hash(text.as_bytes());
-        BlobFetchResult::Found((doc, hash_hex))
+
+        // Compute per-entry canonical JSON hashes (CN-04 / IN-05).
+        // Parse raw text as serde_json::Value to extract per-entry subtrees.
+        let entry_hashes = match build_catalogue_entry_hashes(&text) {
+            Ok(map) => map,
+            Err(e) => {
+                return BlobFetchResult::FetchError(format!(
+                    "{path}: failed to compute per-entry hashes: {e}"
+                ));
+            }
+        };
+
+        BlobFetchResult::Found((doc, hash_hex, entry_hashes))
     }
 
     /// Reads `<layer>-catalogue-spec-signals.json` and decodes it via the
@@ -394,6 +413,50 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             }
         }
     }
+}
+
+/// Build a `HashMap<String, ContentHash>` mapping each catalogue entry to
+/// the SHA-256 of its canonical JSON subtree.
+///
+/// Keys are **section-qualified** (`"types:<name>"`, `"traits:<name>"`,
+/// `"functions:<path>"`) so that a type and a trait that share the same short
+/// name cannot overwrite each other.  Callers must look up by the same
+/// section-qualified key (see [`crate::catalogue_traversal::CatalogueEntryRef::section_key`]).
+///
+/// Parses `catalogue_text` as raw JSON and extracts the `types`, `traits`, and
+/// `functions` sections, hashing each entry's value object via
+/// `super::plan_artifact_refs::canonical_json_sha256` (CN-04 / IN-05).
+///
+/// # Errors
+///
+/// Returns a human-readable error string when `catalogue_text` is not valid JSON
+/// or when an expected section is not an object.
+fn build_catalogue_entry_hashes(
+    catalogue_text: &str,
+) -> Result<HashMap<String, ContentHash>, String> {
+    let raw: serde_json::Value =
+        serde_json::from_str(catalogue_text).map_err(|e| format!("JSON parse error: {e}"))?;
+    let mut out: HashMap<String, ContentHash> = HashMap::new();
+    for section in &["types", "traits", "functions"] {
+        if let Some(obj) = raw.get(section).and_then(|v| v.as_object()) {
+            for (entry_name, entry_value) in obj {
+                let json_str = super::plan_artifact_refs::canonical_json(entry_value);
+                let hex = super::plan_artifact_refs::canonical_json_sha256(&json_str);
+                let hash = ContentHash::try_from_hex(&hex).map_err(|e| {
+                    format!(
+                        "internal: canonical_json_sha256 produced non-hex for \
+                         entry '{entry_name}' in section '{section}': {e}"
+                    )
+                })?;
+                // Section-qualified key: "types:Foo", "traits:Foo", "functions:my_fn".
+                // CatalogueDocument guarantees uniqueness within each section, not
+                // across sections, so bare names would overwrite each other when a
+                // type and a trait share the same short name.
+                out.insert(format!("{section}:{entry_name}"), hash);
+            }
+        }
+    }
+    Ok(out)
 }
 
 /// `SpecElementHashReader` is implemented on the same adapter so consumers
@@ -917,11 +980,11 @@ mod tests {
         );
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         match reader.read_catalogue_for_spec_ref_check("main", "foo", "domain") {
-            BlobFetchResult::Found((_doc, hash_hex)) => {
+            BlobFetchResult::Found((_doc, hash_hex, _entry_hashes)) => {
                 // Must be a 64-char lowercase hex string (SHA-256), not a filename.
                 assert_eq!(hash_hex.len(), 64, "hash_hex must be 64-char hex, got '{hash_hex}'");
                 assert!(
-                    hash_hex.chars().all(|c| c.is_ascii_hexdigit() && !c.is_uppercase()),
+                    hash_hex.chars().all(|c: char| c.is_ascii_hexdigit() && !c.is_uppercase()),
                     "hash_hex must be lowercase hex, got '{hash_hex}'"
                 );
                 // Must NOT be the filename.
