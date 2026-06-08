@@ -5,7 +5,6 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | RoundType | enum | reference | Final, Fast | 🔵 | 🔵 |
-| SemanticVerdictDto | enum | — | Pass, Fail, Pending | 🟡 | 🔵 |
 
 ## Value Objects
 
@@ -17,15 +16,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SemanticVerifyCodecError | error_type | — | Json, UnsupportedSchemaVersion, Validation | 🟡 | 🔵 |
-
-## DTOs
-
-| Name | Kind | Action | Details | Signal | Cat-Spec |
-|------|------|--------|---------|--------|----------|
-| CatalogueSpecVerifyCacheDocumentDto | dto | — | — | 🟡 | 🔵 |
-| SemanticVerifyEntryDto | dto | — | — | 🟡 | 🔵 |
-| SpecAdrVerifyCacheDocumentDto | dto | — | — | 🟡 | 🔵 |
+| SemanticVerifyCodecError | error_type | — | Json, UnsupportedSchemaVersion, Validation | 🔵 | 🔵 |
 
 ## Secondary Adapters
 

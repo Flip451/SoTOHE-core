@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "92eaad770247ea5a900f56e3d6fa192ae90e4365560917d07849fdbb52bcc10b",
+  "catalogue_declaration_hash": "1a7f03378971311d8a342c5740da6da2eda23be65f090bbfa277a417a3246091",
   "signals": [
     {
       "type_name": "AgentExecutionRunner",
@@ -20,12 +20,7 @@
     {
       "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
       "signal": "blue",
-      "entry_hash": "e3dc4b68443329f36e0fc5c7db90947b94a69b7f9dd51d7e2330a490507e6c1c"
-    },
-    {
-      "type_name": "CatalogueSpecVerifyCacheDocumentDto",
-      "signal": "blue",
-      "entry_hash": "2553a6ddacd2c4818e761d4e1e2d3e7e6e7bbd6ef2f07263b8bd5b3262ca7b46"
+      "entry_hash": "f54f4795b9eb0dc6dcf59c6f83db33e12abb77c6c0128a01587d367b4ad1bc80"
     },
     {
       "type_name": "RefVerifyCacheAdapter",
@@ -43,29 +38,14 @@
       "entry_hash": "4e2c6bddf22e713f6db8e3c8f81e9516ccb027648859244a732adecc088e8d36"
     },
     {
-      "type_name": "SemanticVerdictDto",
-      "signal": "blue",
-      "entry_hash": "890127d719f3e3faa402725ea5bcc2435976bee00a38fb55cf9f8a541594a7bd"
-    },
-    {
       "type_name": "SemanticVerifyCodecError",
       "signal": "blue",
       "entry_hash": "9018c3c451a463e1408e61b3c7ea0249aa61ae837b884e9361ef118c89bc8efd"
     },
     {
-      "type_name": "SemanticVerifyEntryDto",
-      "signal": "blue",
-      "entry_hash": "c9b38963d5a41115ffca68cd1af2414f0810829d9dc821b63902b6c475a0e419"
-    },
-    {
       "type_name": "SpecAdrVerifyCacheDocumentCodec",
       "signal": "blue",
-      "entry_hash": "e08f48b4f69f20976c7fa8df4477955c004796697c1432cb50c199aa5f83f1a4"
-    },
-    {
-      "type_name": "SpecAdrVerifyCacheDocumentDto",
-      "signal": "blue",
-      "entry_hash": "4845ed0df63717ef65921e8edb29ccce092d260627cb8064726cdd62a672d50f"
+      "entry_hash": "89591ffa8f85b1a48d63ab6d7f483a343945cf06b84abfb463773ac9ea898383"
     }
   ]
 }

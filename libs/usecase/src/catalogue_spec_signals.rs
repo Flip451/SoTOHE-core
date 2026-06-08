@@ -560,15 +560,6 @@ mod tests {
         doc
     }
 
-    /// A 64-char lowercase hex string made of the given byte repeated 32 times.
-    fn hex_pattern(byte: u8) -> String {
-        let mut s = String::with_capacity(64);
-        for _ in 0..32 {
-            s.push_str(&format!("{byte:02x}"));
-        }
-        s
-    }
-
     fn refresh_cmd(
         branch: &str,
         track_id: &str,
@@ -599,7 +590,7 @@ mod tests {
                 ],
             ),
         ]);
-        let hash_hex = hex_pattern(0xab);
+        let hash_hex = ContentHash::from_bytes([0xab; 32]).to_hex();
         // Section-qualified keys match the contract from `iter_catalogue_entries`.
         let entry_hashes = make_entry_hashes(&["types:TypeA", "types:TypeB"]);
         let reader = FixedReader::found(cat, hash_hex.clone(), entry_hashes);
@@ -721,7 +712,8 @@ mod tests {
     fn refresh_wraps_writer_errors() {
         let cat = catalogue_with_types(vec![("X", ItemAction::Add, Vec::new(), Vec::new())]);
         let entry_hashes = make_entry_hashes(&["types:X"]);
-        let reader = FixedReader::found(cat, hex_pattern(0x00), entry_hashes);
+        let reader =
+            FixedReader::found(cat, ContentHash::from_bytes([0x00; 32]).to_hex(), entry_hashes);
         let writer = FailingWriter;
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
 
@@ -749,9 +741,9 @@ mod tests {
             Vec::new(),
             Vec::new(),
         );
-        let hash_hex = hex_pattern(0xcc);
         let entry_hashes = make_entry_hashes(&["types:ExternalType"]);
-        let reader = FixedReader::found(cat, hash_hex, entry_hashes);
+        let reader =
+            FixedReader::found(cat, ContentHash::from_bytes([0xcc; 32]).to_hex(), entry_hashes);
         let writer = CapturingWriter::new();
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
 
@@ -780,7 +772,8 @@ mod tests {
             Vec::new(),
         )]);
         // Intentionally supply an empty map — simulates an adapter omitting the key.
-        let reader = FixedReader::found(cat, hex_pattern(0x01), HashMap::new());
+        let reader =
+            FixedReader::found(cat, ContentHash::from_bytes([0x01; 32]).to_hex(), HashMap::new());
         let writer = CapturingWriter::new();
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
 

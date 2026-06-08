@@ -209,15 +209,8 @@ fn signal_to_dto(signal: &CatalogueSpecSignal) -> CatalogueSpecSignalDto {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used, clippy::panic)]
 mod tests {
+    use super::super::test_support::hex_pattern;
     use super::*;
-
-    fn hex_pattern(byte: u8) -> String {
-        let mut s = String::with_capacity(64);
-        for _ in 0..32 {
-            s.push_str(&format!("{byte:02x}"));
-        }
-        s
-    }
 
     fn sample_doc() -> CatalogueSpecSignalsDocument {
         CatalogueSpecSignalsDocument::new(

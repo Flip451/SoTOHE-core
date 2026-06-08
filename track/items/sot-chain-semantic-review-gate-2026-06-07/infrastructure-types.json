@@ -252,148 +252,6 @@
       ],
       "informal_grounds": []
     },
-    "SemanticVerdictDto": {
-      "action": "add",
-      "role": "Dto",
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Pass",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "citation", "ty": "String" }
-              ]
-            }
-          },
-          {
-            "name": "Fail",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                { "name": "reason", "ty": "String" }
-              ]
-            }
-          },
-          {
-            "name": "Pending",
-            "payload": { "kind": "unit" }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "tddd::semantic_verify_codec",
-      "docs": "Private serde DTO for the `SemanticVerdict` JSON representation in verify-cache artifacts. Uses kind-tagged pass/fail/pending variants; pass requires citation and unknown or malformed variants decode as errors.",
-      "spec_refs": [
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "AC-03",
-          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
-        },
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "CN-06",
-          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "SemanticVerifyEntryDto": {
-      "action": "add",
-      "role": "Dto",
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [
-            { "name": "claim_hash", "ty": "String" },
-            { "name": "evidence_hash", "ty": "String" },
-            { "name": "verdict", "ty": "SemanticVerdictDto" }
-          ],
-          "has_stripped_fields": false
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::semantic_verify_codec",
-      "docs": "Private serde DTO for one verify-cache entry. Encodes claim_hash and evidence_hash as hex strings and the verdict through `SemanticVerdictDto`; all fields are required.",
-      "spec_refs": [
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "IN-10",
-          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
-        },
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "AC-03",
-          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "SpecAdrVerifyCacheDocumentDto": {
-      "action": "add",
-      "role": "Dto",
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [
-            { "name": "schema_version", "ty": "u32" },
-            { "name": "entries", "ty": "Vec<SemanticVerifyEntryDto>" }
-          ],
-          "has_stripped_fields": false
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::semantic_verify_codec",
-      "docs": "Private serde DTO for `spec-adr-verify-cache.json` schema_version 1. Unknown fields are denied and all entries are converted through typed domain constructors.",
-      "spec_refs": [
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "IN-10",
-          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
-        },
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "AC-03",
-          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "CatalogueSpecVerifyCacheDocumentDto": {
-      "action": "add",
-      "role": "Dto",
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [
-            { "name": "schema_version", "ty": "u32" },
-            { "name": "layer", "ty": "String" },
-            { "name": "entries", "ty": "Vec<SemanticVerifyEntryDto>" }
-          ],
-          "has_stripped_fields": false
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::semantic_verify_codec",
-      "docs": "Private serde DTO for `<layer>-catalogue-spec-verify-cache.json` schema_version 1. Carries the target layer plus typed semantic verdict entries and denies unknown fields.",
-      "spec_refs": [
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "IN-10",
-          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
-        },
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "AC-03",
-          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
-        }
-      ],
-      "informal_grounds": []
-    },
     "SpecAdrVerifyCacheDocumentCodec": {
       "action": "add",
       "role": "SecondaryAdapter",
@@ -407,7 +265,7 @@
       },
       "methods": [],
       "module_path": "tddd::semantic_verify_codec",
-      "docs": "Stateless codec for `spec-adr-verify-cache.json`. Encodes and decodes schema_version 1 documents through `SpecAdrVerifyCacheDocumentDto` and returns typed fail-closed errors for malformed JSON, unsupported versions, missing fields, or invalid domain values.",
+      "docs": "Stateless codec for `spec-adr-verify-cache.json`. Encodes `SpecAdrVerifyCacheDocument` to a schema_version 1 JSON string and decodes back to the domain aggregate. Returns typed fail-closed errors for malformed JSON, unsupported versions, missing required fields, or invalid domain values.",
       "spec_refs": [
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
@@ -440,7 +298,7 @@
       },
       "methods": [],
       "module_path": "tddd::semantic_verify_codec",
-      "docs": "Stateless codec for `<layer>-catalogue-spec-verify-cache.json`. Encodes and decodes schema_version 1 documents through `CatalogueSpecVerifyCacheDocumentDto`, preserving the layer field and failing closed on malformed or semantically invalid artifact content.",
+      "docs": "Stateless codec for `<layer>-catalogue-spec-verify-cache.json`. Encodes `CatalogueSpecVerifyCacheDocument` to a schema_version 1 JSON string (preserving the layer field) and decodes back to the domain aggregate. Fails closed on malformed or semantically invalid artifact content.",
       "spec_refs": [
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
@@ -677,6 +535,16 @@
     {
       "action": "add",
       "trait_ref": "core::error::Error",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<serde_json::Error>",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<domain::ValidationError>",
       "for_type": "SemanticVerifyCodecError"
     },
     {

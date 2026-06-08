@@ -29,6 +29,7 @@ pub mod in_memory_catalogue_linter;
 pub(crate) mod mermaid_style;
 pub mod rustdoc_baseline_capture_adapter;
 pub mod rustdoc_crate_adapter;
+pub mod semantic_verify_codec;
 pub mod signal_evaluator_v2;
 pub mod spec_ground_codec;
 pub mod tddd_catalogue_document_loader;
@@ -40,3 +41,26 @@ pub mod type_ref_parser;
 pub mod type_signals_codec;
 pub mod type_signals_evaluator;
 pub mod type_signals_executor_adapter;
+
+// ---------------------------------------------------------------------------
+// Shared test support
+// ---------------------------------------------------------------------------
+
+/// Test utilities shared across sibling TDDD codec test modules.
+///
+/// This module is compiled only in test builds (`#[cfg(test)]`). Child modules
+/// reference it as `use super::super::test_support::...`.
+#[cfg(test)]
+pub(crate) mod test_support {
+    /// Build a 64-character lowercase hex string by repeating `byte` 32 times.
+    ///
+    /// Useful for constructing deterministic fake [`ContentHash`] values in
+    /// tests without depending on any particular hash function.
+    pub(crate) fn hex_pattern(byte: u8) -> String {
+        let mut s = String::with_capacity(64);
+        for _ in 0..32 {
+            s.push_str(&format!("{byte:02x}"));
+        }
+        s
+    }
+}

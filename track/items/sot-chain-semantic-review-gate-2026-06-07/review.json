@@ -1,6 +1,209 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
+          "at": "2026-06-08T03:03:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
+          "at": "2026-06-08T04:13:29Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:51:24Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
+          "at": "2026-06-08T00:26:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `EvidenceCitation::try_new` API returns `ValidationError`, and this change adds a production `ValidationError` variant, but the T002 domain catalogue does not declare `ValidationError`; the generated `domain-type-signals.json` now contains a red `ValidationError` signal. The briefing explicitly treats non-add red/yellow domain type signals as factual findings, so the catalogue/implementation contract is inconsistent until `ValidationError` is declared/updated in the catalogue or the public signature avoids the undeclared type.",
+              "severity": "P1",
+              "file": "libs/domain/src/error.rs",
+              "line": 99,
+              "category": "type-signal"
+            }
+          ],
+          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
+          "at": "2026-06-08T00:30:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
+          "at": "2026-06-08T00:45:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
+          "at": "2026-06-08T00:48:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
+          "at": "2026-06-08T03:03:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
+          "at": "2026-06-08T04:12:17Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
+          "at": "2026-06-07T21:44:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrFrontMatterDto`/`AdrDecisionDto` only require `decisions[].id` and explicitly allow all other fields to be absent or unknown. As a result, an ADR front-matter block like `decisions: [{ id: D1 }]` or one with misspelled/unknown schema keys deserializes successfully, and any `adr_ref` to `D1` passes even though the ADR metadata is malformed. The briefing calls out typed-deserialization fail-closed behavior for unknown/missing fields, so this should either reuse the existing strict ADR front-matter codec or mirror its required fields/`deny_unknown_fields` behavior before accepting the anchor.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs/adr_anchor.rs",
+              "line": 36,
+              "category": "typed-deserialization"
+            }
+          ],
+          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
+          "at": "2026-06-07T21:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4aeaa65e03a35f90176117707f8d43f14a4922d0bbf15d572404aceb5b3c791a",
+          "at": "2026-06-07T21:54:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_catalogue_entry_hashes` keys the returned `HashMap` only by the bare entry name. Type and trait short names are not globally unique in a catalogue, so a same-named type/trait pair will overwrite one another here and later be assigned the wrong `entry_hash` when the refresher looks up hashes by the same bare key. This silently corrupts the generated `<layer>-catalogue-spec-signals.json` for valid catalogues that contain such collisions; the key needs to include the section (or another disambiguator).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 434,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:56ea2ad1ab48440de8ec9cf3c3dee569f3ca993e6f5e5184dfab107d72218b2c",
+          "at": "2026-06-08T03:06:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_catalogue_entry_hashes` uses a flat `HashMap<String, ContentHash>` keyed only by the bare entry name, but `CatalogueDocument` only guarantees uniqueness within each of `types`, `traits`, and `functions`. A valid catalogue can therefore contain the same short name in different sections; this code will reject it as a collision and the refresher cannot distinguish the hashes. The key needs a section discriminator, or the structure needs to be nested by section, so cross-section name overlaps still round-trip correctly.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 429,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:42054208e173f8a2f04c41152c0fa2891cac39d2acb64585a4e6aa9bd9b95a12",
+          "at": "2026-06-08T03:15:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
+          "at": "2026-06-08T03:38:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
+          "at": "2026-06-08T03:45:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
+          "at": "2026-06-08T04:15:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Validate `schema_version` before converting `layer` into a `LayerId`. As written, a future artifact with an unsupported schema version but a changed/invalid `layer` value will fail with `Validation` instead of `UnsupportedSchemaVersion`, which misclassifies the format error and breaks forward-compatibility behavior.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "line": 330,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5ff3f6a8c13df8e5c7bd18b710c4054c66841b59ab0b500d8a2fdff228a03f93",
+          "at": "2026-06-08T06:50:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8dfd77fa6cd8efc56dace5bd65d568ec8a80753bf582af6fd1354ceba1eea0dd",
+          "at": "2026-06-08T06:54:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8dfd77fa6cd8efc56dace5bd65d568ec8a80753bf582af6fd1354ceba1eea0dd",
+          "at": "2026-06-08T06:59:05Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -119,60 +322,20 @@
           "findings": [],
           "hash": "rvw1:sha256:89e40b79e65a9a9888e8890d7475c92deaf231dc3023599c264cc5ff0a017354",
           "at": "2026-06-08T04:54:55Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
-          "at": "2026-06-08T00:26:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `EvidenceCitation::try_new` API returns `ValidationError`, and this change adds a production `ValidationError` variant, but the T002 domain catalogue does not declare `ValidationError`; the generated `domain-type-signals.json` now contains a red `ValidationError` signal. The briefing explicitly treats non-add red/yellow domain type signals as factual findings, so the catalogue/implementation contract is inconsistent until `ValidationError` is declared/updated in the catalogue or the public signature avoids the undeclared type.",
-              "severity": "P1",
-              "file": "libs/domain/src/error.rs",
-              "line": 99,
-              "category": "type-signal"
-            }
-          ],
-          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
-          "at": "2026-06-08T00:30:08Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
-          "at": "2026-06-08T00:45:03Z"
+          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
+          "at": "2026-06-08T07:03:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
-          "at": "2026-06-08T00:48:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
-          "at": "2026-06-08T03:03:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
-          "at": "2026-06-08T04:12:17Z"
+          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
+          "at": "2026-06-08T07:05:11Z"
         }
       ]
     },
@@ -955,126 +1118,35 @@
           "findings": [],
           "hash": "rvw1:sha256:b4cdf58387ee5ddd50957b010c7ae192ae76fcb5f80abb4fca5e1402567d893f",
           "at": "2026-06-08T06:07:12Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
-          "at": "2026-06-08T03:03:38Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
-          "at": "2026-06-08T04:13:29Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
-          "at": "2026-06-07T21:44:03Z"
+          "hash": "rvw1:sha256:ac5e2a02ad3a3ef7f799ae526928a9bb2c83d822a3c43e04ea849319abcc4983",
+          "at": "2026-06-08T06:56:27Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`AdrFrontMatterDto`/`AdrDecisionDto` only require `decisions[].id` and explicitly allow all other fields to be absent or unknown. As a result, an ADR front-matter block like `decisions: [{ id: D1 }]` or one with misspelled/unknown schema keys deserializes successfully, and any `adr_ref` to `D1` passes even though the ADR metadata is malformed. The briefing calls out typed-deserialization fail-closed behavior for unknown/missing fields, so this should either reuse the existing strict ADR front-matter codec or mirror its required fields/`deny_unknown_fields` behavior before accepting the anchor.",
+              "message": "T004 still describes the verify-cache codecs as encoding/decoding through `SpecAdrVerifyCacheDocumentDto` and `CatalogueSpecVerifyCacheDocumentDto`, but the same artifact set now removes all verify-cache DTO type entries from `infrastructure-types.json`, `infrastructure-types.md`, and the contract map. That leaves the plan artifacts contradictory about whether these DTOs are part of the infrastructure contract, and drops the only type-level contract for the pass/fail/pending JSON representation that T004 is supposed to implement. Restore the DTO entries or rewrite the codec contract so it no longer refers to named DTOs that the artifact set intentionally omits.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/verify/plan_artifact_refs/adr_anchor.rs",
-              "line": 36,
-              "category": "typed-deserialization"
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.json",
+              "line": 268,
+              "category": "contradiction"
             }
           ],
-          "hash": "rvw1:sha256:ca87a68740639fecb6c51fd68e60a15948556b8154703f55a0bd3e0e3f6cb578",
-          "at": "2026-06-07T21:47:20Z"
+          "hash": "rvw1:sha256:8bbc3979dfa90f1560c990853b09fc702e2443600bbdbf9263c9e768d7142d47",
+          "at": "2026-06-08T07:17:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4aeaa65e03a35f90176117707f8d43f14a4922d0bbf15d572404aceb5b3c791a",
-          "at": "2026-06-07T21:54:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_catalogue_entry_hashes` keys the returned `HashMap` only by the bare entry name. Type and trait short names are not globally unique in a catalogue, so a same-named type/trait pair will overwrite one another here and later be assigned the wrong `entry_hash` when the refresher looks up hashes by the same bare key. This silently corrupts the generated `<layer>-catalogue-spec-signals.json` for valid catalogues that contain such collisions; the key needs to include the section (or another disambiguator).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/merge_gate_adapter.rs",
-              "line": 434,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:56ea2ad1ab48440de8ec9cf3c3dee569f3ca993e6f5e5184dfab107d72218b2c",
-          "at": "2026-06-08T03:06:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`build_catalogue_entry_hashes` uses a flat `HashMap<String, ContentHash>` keyed only by the bare entry name, but `CatalogueDocument` only guarantees uniqueness within each of `types`, `traits`, and `functions`. A valid catalogue can therefore contain the same short name in different sections; this code will reject it as a collision and the refresher cannot distinguish the hashes. The key needs a section discriminator, or the structure needs to be nested by section, so cross-section name overlaps still round-trip correctly.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/merge_gate_adapter.rs",
-              "line": 429,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:42054208e173f8a2f04c41152c0fa2891cac39d2acb64585a4e6aa9bd9b95a12",
-          "at": "2026-06-08T03:15:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
-          "at": "2026-06-08T03:38:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
-          "at": "2026-06-08T03:45:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bc345e940afb1020e5d5fc4f7bca59be538ac8cffcc65f6fb0dcfa9bfb19a8d",
-          "at": "2026-06-08T04:15:19Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
-          "at": "2026-06-07T23:47:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
-          "at": "2026-06-07T23:51:24Z"
+          "hash": "rvw1:sha256:2449075f4fddfdbc95b315cdd8f4d63e8c8b0448ad34e0c7c47dff13c80033a6",
+          "at": "2026-06-08T07:21:38Z"
         }
       ]
     }

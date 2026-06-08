@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-08T06:08:34Z",
-  "declaration_hash": "92eaad770247ea5a900f56e3d6fa192ae90e4365560917d07849fdbb52bcc10b",
+  "generated_at": "2026-06-08T07:22:27Z",
+  "declaration_hash": "1a7f03378971311d8a342c5740da6da2eda23be65f090bbfa277a417a3246091",
   "signals": [
     {
       "type_name": "AgentExecutionRunner",
@@ -23,16 +23,10 @@
       "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
       "kind_tag": "secondary_adapter",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug"
       ]
-    },
-    {
-      "type_name": "CatalogueSpecVerifyCacheDocumentDto",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
     },
     {
       "type_name": "RefVerifyCacheAdapter",
@@ -55,42 +49,26 @@
       ]
     },
     {
-      "type_name": "SemanticVerdictDto",
-      "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
       "type_name": "SemanticVerifyCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::convert::From<ValidationError>",
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
       ]
     },
     {
-      "type_name": "SemanticVerifyEntryDto",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
       "type_name": "SpecAdrVerifyCacheDocumentCodec",
       "kind_tag": "secondary_adapter",
       "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug"
       ]
-    },
-    {
-      "type_name": "SpecAdrVerifyCacheDocumentDto",
-      "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false
     },
     {
       "type_name": "AgentProfiles",
