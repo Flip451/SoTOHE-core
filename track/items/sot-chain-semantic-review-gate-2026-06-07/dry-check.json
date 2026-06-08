@@ -2996,6 +2996,157 @@
       "base_commit": "82c150a83d132aca0b0da6dddce6c19777b6924c",
       "rationale": "The fragments share a small codec pattern, but the meaningful common behavior, schema-version validation and entry collection, is already extracted into check_schema_version_and_collect_entries. The remaining differences are domain-specific: different DTO/document types and Catalogue additionally validates and preserves layer. Further abstraction would likely obscure these per-document semantics for little reduction in duplication.",
       "recorded_at": "2026-06-08T07:00:45Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "073f94450acc8919874202a839f304da7bcd2a1d4a431faf4690b1df4d8e38fb",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "7baecb0ec2b1d717d67e77e6615429773316bbfd2354604c4238b2f716966b01",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8595412373542786,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "Both fragments return an optional timeout value, but they operate at different abstraction levels: `resolve_timeout_seconds` performs a capability lookup on the profile and then reads the configured timeout, while `timeout_seconds` is a direct accessor on an already-selected capability. The shared `Option<u64>` return and field access are incidental, not duplicated business logic.",
+      "recorded_at": "2026-06-08T07:27:53Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "7342e6e5218c7eb6d9ad9ae65ab0a5de5826750eb022585b3104cc8a4917975d",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "87cdbc7ca3335a4490a14a941017fa5c7af38aa87ec41c556e3d460b238e2d9d",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.8775442838668823,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "The fragments are structurally similar test cases, but they validate two distinct fields (`fast_model` and `fast_provider`) and the duplicated setup/assertion is small, local, and in test code. This does not duplicate production logic or create meaningful maintenance risk beyond ordinary explicit test coverage.",
+      "recorded_at": "2026-06-08T07:28:09Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "306f1096ba45f5ec71fd6b5c67442d2f26397b9db9360cf3d04acd929964aa91",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "7342e6e5218c7eb6d9ad9ae65ab0a5de5826750eb022585b3104cc8a4917975d",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8664090037345886,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "The fragments share the same test structure, but they validate distinct capability fields: `provider` versus `fast_provider`. The repeated setup/assertion is small, localized test code and improves clarity for separate validation cases rather than duplicating production logic.",
+      "recorded_at": "2026-06-08T07:28:23Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "6e97f7b280effd41aa6015572853df17131b5ea9780048379089ab0932646cff",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "f55b0c9ea1ae1008bb036f502979903870dda69de181031cc47321f400e5f0aa",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "accepted",
+      "similarity_score": 0.8891216516494751,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "The fragments are structurally similar, but they are short, local unit tests covering two distinct round-type behaviors (`Fast` vs `Final`) with different expected models. The repeated setup is minimal and keeps each test case explicit; extracting a helper or table would not clearly improve maintainability here.",
+      "recorded_at": "2026-06-08T07:28:39Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "6e97f7b280effd41aa6015572853df17131b5ea9780048379089ab0932646cff",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "cde9a804353f9dce39e7d7fef8f100c0bfb439736aa04894bcee73fcc324877c",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.875844419002533,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "Both fragments share ordinary test setup structure, but they verify different behavior: the changed test covers `ref-verifier` resolving both fast provider and fast model from `REF_VERIFIER_CONFIG`, while the candidate covers `reviewer` retaining the default provider when only `fast_model` is configured in `FULL_CONFIG`. The repeated tempdir/load/resolve/assert pattern is small and expected in tests, and extracting it would likely obscure the distinct cases rather than reduce meaningful duplication.",
+      "recorded_at": "2026-06-08T07:28:50Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "d3f28a6c9df734328e77238cb80335212ff39366c0402e752acfce630b88dfec",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "f55b0c9ea1ae1008bb036f502979903870dda69de181031cc47321f400e5f0aa",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.906865119934082,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "The fragments share a small Arrange-Act-Assert test shape, but they exercise distinct fixtures and profile keys: `FULL_CONFIG`/`orchestrator` expecting `claude-opus-4-7` versus `REF_VERIFIER_CONFIG`/`ref-verifier` expecting `claude-opus-4-8`. This is ordinary unit-test pattern repetition, not duplicated domain logic or a maintenance-risk DRY violation.",
+      "recorded_at": "2026-06-08T07:29:05Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "79a87e62d9042e43d60b044474fefef7541bdb17151a1cce85993d59613ba0c3",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "8a7cd8752f9c7002073559489d59b94198495c0c00fee9df51d985528bb7e665",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Remove the new single-assertion test, or keep one combined test that asserts both `reviewer` and `ref-verifier` timeout values from `REF_VERIFIER_CONFIG`."
+        }
+      },
+      "similarity_score": 0.9200435876846312,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "The changed test duplicates the same fixture setup and the same `resolve_timeout_seconds(\"ref-verifier\") == Some(120)` assertion already covered by `test_ref_verifier_and_reviewer_timeout_are_independent`. It does not add a distinct behavior or edge case, so it repeats existing test coverage rather than clarifying a separate requirement.",
+      "recorded_at": "2026-06-08T07:29:19Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "0a95a41a642699c80e19258ae4fb6a82599f254757bdb26103082282f90a400d",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "79a87e62d9042e43d60b044474fefef7541bdb17151a1cce85993d59613ba0c3",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8838002681732178,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "The fragments repeat a small amount of test setup, but they exercise distinct cases for the same API: one verifies a configured capability resolves to Some(120), while the other verifies an unknown capability resolves to None. Keeping the arrange steps local in each independent test is normal and improves readability; extracting this would add little value and could obscure the scenarios.",
+      "recorded_at": "2026-06-08T07:29:38Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "829a2e4879a4bdfe2e481dfa48eb9ca25bcf9b95703712525e9920efb3e8975d",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "82ba4a97ffc83054606395444d31c7e38fbb715e80473912dc1c1feab32d4548",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": {
+        "violation": {
+          "refactor_proposal": "Remove `test_resolve_prompt_template_path_returns_ref_verifier_value()` and rely on `test_ref_verifier_and_reviewer_prompt_template_paths_are_independent()`, or fold any intended extra coverage into that existing test."
+        }
+      },
+      "similarity_score": 0.8830546140670776,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "The changed test repeats the same setup and the same ref-verifier path assertion that is already covered by the existing independence test. The existing test is a behavioral superset: it loads the same config, resolves ref-verifier, asserts the same expected path, and additionally verifies reviewer independence.",
+      "recorded_at": "2026-06-08T07:29:53Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "0a95a41a642699c80e19258ae4fb6a82599f254757bdb26103082282f90a400d",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "f127e9d5226c27a980aa7089914bdd83c742262fde362a9b7f79c6de91fa1a1b",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.8957822918891907,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "Both fragments share small test setup boilerplate, but they exercise different behavior: one verifies a missing capability returns None, while the other verifies an existing capability with an absent timeout_seconds field returns None. The repeated tempfile/load/assert pattern is normal test scaffolding and extracting it would likely reduce clarity more than it reduces meaningful duplication.",
+      "recorded_at": "2026-06-08T07:30:04Z"
+    },
+    {
+      "low_path": "libs/infrastructure/src/agent_profiles.rs",
+      "low_hash": "1887b55b052ff1534ce8862706d90aef4ad2011ee3b9ad3b00005c8ad47c0387",
+      "high_path": "libs/infrastructure/src/agent_profiles.rs",
+      "high_hash": "68ada7b76dbd9f5607454a4f9c325858c59eed0e4cae1000fab587a6025ce9bd",
+      "changed_path": "libs/infrastructure/src/agent_profiles.rs",
+      "verdict": "not-a-violation",
+      "similarity_score": 0.879666268825531,
+      "threshold": 0.8500000238418579,
+      "base_commit": "4978bb546837ae8f3469f30f8eab293e65c5bcc2",
+      "rationale": "The fragments share routine test setup for loading AgentProfiles from a temporary JSON config, but they exercise distinct behavioral cases: an unknown capability name versus a known capability whose prompt_template_path field is absent. The repeated setup is small, localized, and typical for independent tests, so extracting it would not meaningfully reduce knowledge duplication.",
+      "recorded_at": "2026-06-08T07:30:15Z"
     }
   ]
 }

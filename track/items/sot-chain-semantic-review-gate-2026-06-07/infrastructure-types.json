@@ -4,7 +4,7 @@
   "layer": "infrastructure",
   "types": {
     "AgentProfiles": {
-      "action": "reference",
+      "action": "modify",
       "role": "SecondaryAdapter",
       "kind": {
         "kind": "struct",
@@ -19,7 +19,7 @@
           "name": "load",
           "receiver": null,
           "params": [
-            { "name": "path", "ty": "std::path::PathBuf" }
+            { "name": "path", "ty": "&std::path::Path" }
           ],
           "returns": "Result<Self, AgentProfilesError>",
           "is_async": false,
@@ -70,10 +70,9 @@
           "name": "provider_label",
           "receiver": "&self",
           "params": [
-            { "name": "capability", "ty": "&str" },
-            { "name": "round_type", "ty": "RoundType" }
+            { "name": "provider", "ty": "&str" }
           ],
-          "returns": "String",
+          "returns": "Option<&str>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -85,7 +84,7 @@
           "params": [
             { "name": "capability", "ty": "&str" }
           ],
-          "returns": "Option<CapabilityConfigDto>",
+          "returns": "Option<&CapabilityConfigDto>",
           "is_async": false,
           "generics": [],
           "has_default_impl": false,
@@ -117,12 +116,111 @@
         }
       ],
       "module_path": "agent_profiles",
-      "docs": "Carried for edge exposure: AgentRefVerifierAdapter uses AgentProfiles to resolve the ref-verifier capability (D7), including provider/model, timeout, and prompt template path as capability-local settings.",
+      "docs": "Loaded agent profiles configuration. Provides resolution of capability -> (provider, model) pairs, plus per-capability timeout and prompt template path access added by T006 (D7, CN-07, AC-12, IN-09).",
       "spec_refs": [
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
           "anchor": "IN-09",
           "hash": "220ba51a7324319f8d0c8b718f41bee78ffd302c396a176700c48de176acd826"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-07",
+          "hash": "2cfe91b1f89474c9c5b15a824b8634165c922565676ed9f369b74c9534da0da5"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-12",
+          "hash": "cb8015e95880cdd9f3070caac22a14c76242b2e146ba20063a507017c450bbfb"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CapabilityConfigDto": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "provider",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "model",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fast_provider",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fast_model",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "timeout_seconds",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<u64>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "prompt_template_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "agent_profiles",
+      "docs": "Serde DTO for a single capability entry in agent-profiles.json. All fields are private; access via accessor methods. timeout_seconds and prompt_template_path are per-capability settings added by T006 (IN-09, CN-07, AC-12) to support the ref-verifier capability's independent timeout and prompt template configuration. Raw primitives are justified: timeout_seconds is a truly opaque u64 tick count with no domain constraint; prompt_template_path is a free-form filesystem path with no domain validation.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "220ba51a7324319f8d0c8b718f41bee78ffd302c396a176700c48de176acd826"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-07",
+          "hash": "2cfe91b1f89474c9c5b15a824b8634165c922565676ed9f369b74c9534da0da5"
         },
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
@@ -586,6 +684,26 @@
       "action": "add",
       "trait_ref": "usecase::ref_verify::RefVerifyCachePort",
       "for_type": "RefVerifyCacheAdapter"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AgentProfiles"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CapabilityConfigDto"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CapabilityConfigDto"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "CapabilityConfigDto"
     }
   ]
 }

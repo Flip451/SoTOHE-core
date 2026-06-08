@@ -58,6 +58,14 @@
     },
     "pr-reviewer": {
       "provider": "codex"
+    },
+    "ref-verifier": {
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "fast_provider": "claude",
+      "fast_model": "claude-haiku-4-5",
+      "timeout_seconds": 120,
+      "prompt_template_path": ".harness/prompts/ref-verifier.md"
     }
   }
 }

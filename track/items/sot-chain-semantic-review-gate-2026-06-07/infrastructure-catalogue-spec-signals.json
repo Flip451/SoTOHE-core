@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1a7f03378971311d8a342c5740da6da2eda23be65f090bbfa277a417a3246091",
+  "catalogue_declaration_hash": "d632f0a3402231b8723e882f2a065514acccac0ab691763bf24888b3c4992e7f",
   "signals": [
     {
       "type_name": "AgentExecutionRunner",
@@ -10,12 +10,17 @@
     {
       "type_name": "AgentProfiles",
       "signal": "blue",
-      "entry_hash": "add1018caa8b6bea417a61e4442e8b8c4f07937cf2cfab08acd7f9a971b496fc"
+      "entry_hash": "cf35deb817a68ce5a778e8e0651d5afafdf442572a1c4f5673449ec8e05d4133"
     },
     {
       "type_name": "AgentRefVerifierAdapter",
       "signal": "blue",
       "entry_hash": "93592d0fa5cb7a645c75b1b78323a369601ff4269d2602f79dc1a4088c3a6880"
+    },
+    {
+      "type_name": "CapabilityConfigDto",
+      "signal": "blue",
+      "entry_hash": "0ca41edaae60960830ee4ccbf0ec1cc98ab3326f50ea52c24d0efe6b6fad1d3a"
     },
     {
       "type_name": "CatalogueSpecVerifyCacheDocumentCodec",

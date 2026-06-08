@@ -99,6 +99,10 @@ pub struct CapabilityConfigDto {
     model: Option<String>,
     fast_provider: Option<String>,
     fast_model: Option<String>,
+    /// Optional timeout in seconds for this capability's executions.
+    timeout_seconds: Option<u64>,
+    /// Optional path to the prompt template for this capability.
+    prompt_template_path: Option<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -223,6 +227,26 @@ impl AgentProfiles {
     pub fn provider_label(&self, provider: &str) -> Option<&str> {
         self.providers.get(provider).and_then(|p| p.label.as_deref())
     }
+
+    /// Returns the configured timeout in seconds for a capability, if set.
+    ///
+    /// Returns `None` if the capability is not defined or has no `timeout_seconds` field.
+    #[must_use]
+    pub fn resolve_timeout_seconds(&self, capability: &str) -> Option<u64> {
+        self.capabilities.get(capability)?.timeout_seconds
+    }
+
+    /// Returns the configured prompt template path for a capability, if set.
+    ///
+    /// Returns `None` if the capability is not defined or has no `prompt_template_path` field.
+    #[must_use]
+    pub fn resolve_prompt_template_path(&self, capability: &str) -> Option<std::path::PathBuf> {
+        self.capabilities
+            .get(capability)?
+            .prompt_template_path
+            .as_deref()
+            .map(std::path::PathBuf::from)
+    }
 }
 
 // Re-export CapabilityConfigDto fields for callers that need raw access.
@@ -249,6 +273,18 @@ impl CapabilityConfigDto {
     #[must_use]
     pub fn fast_model(&self) -> Option<&str> {
         self.fast_model.as_deref()
+    }
+
+    /// The timeout in seconds for executions using this capability, if set.
+    #[must_use]
+    pub fn timeout_seconds(&self) -> Option<u64> {
+        self.timeout_seconds
+    }
+
+    /// The prompt template path for this capability, if set.
+    #[must_use]
+    pub fn prompt_template_path(&self) -> Option<&str> {
+        self.prompt_template_path.as_deref()
     }
 }
 
@@ -517,5 +553,127 @@ mod tests {
             matches!(err, AgentProfilesError::InvalidCapability { .. }),
             "unexpected error: {err}"
         );
+    }
+
+    // -----------------------------------------------------------------------
+    // T006 tests: ref-verifier capability with timeout_seconds and
+    // prompt_template_path fields; independent resolution from reviewer.
+    // -----------------------------------------------------------------------
+
+    const REF_VERIFIER_CONFIG: &str = r#"{
+        "schema_version": 1,
+        "providers": {
+            "claude": { "label": "Claude Code" },
+            "codex": { "label": "Codex CLI" }
+        },
+        "capabilities": {
+            "reviewer": {
+                "provider": "codex",
+                "model": "gpt-5.5",
+                "fast_model": "gpt-5.4-mini",
+                "timeout_seconds": 60,
+                "prompt_template_path": ".harness/prompts/reviewer.md"
+            },
+            "ref-verifier": {
+                "provider": "claude",
+                "model": "claude-opus-4-8",
+                "fast_provider": "claude",
+                "fast_model": "claude-haiku-4-5",
+                "timeout_seconds": 120,
+                "prompt_template_path": ".harness/prompts/ref-verifier.md"
+            }
+        }
+    }"#;
+
+    #[test]
+    fn test_load_ref_verifier_capability_is_loaded() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+        assert!(profiles.resolve_capability("ref-verifier").is_some());
+    }
+
+    #[test]
+    fn test_resolve_ref_verifier_fast_returns_fast_provider_and_fast_model() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let fast = profiles.resolve_execution("ref-verifier", RoundType::Fast).unwrap();
+        assert_eq!(fast.provider, "claude");
+        assert_eq!(fast.model.as_deref(), Some("claude-haiku-4-5"));
+    }
+
+    #[test]
+    fn test_resolve_ref_verifier_final_returns_provider_and_model() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let final_exec = profiles.resolve_execution("ref-verifier", RoundType::Final).unwrap();
+        assert_eq!(final_exec.provider, "claude");
+        assert_eq!(final_exec.model.as_deref(), Some("claude-opus-4-8"));
+    }
+
+    #[test]
+    fn test_ref_verifier_and_reviewer_timeout_are_independent() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        assert_eq!(profiles.resolve_timeout_seconds("reviewer"), Some(60));
+        assert_eq!(profiles.resolve_timeout_seconds("ref-verifier"), Some(120));
+    }
+
+    #[test]
+    fn test_ref_verifier_and_reviewer_prompt_template_paths_are_independent() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let reviewer_path = profiles.resolve_prompt_template_path("reviewer").unwrap();
+        let ref_verifier_path = profiles.resolve_prompt_template_path("ref-verifier").unwrap();
+
+        assert_eq!(reviewer_path.to_str(), Some(".harness/prompts/reviewer.md"));
+        assert_eq!(ref_verifier_path.to_str(), Some(".harness/prompts/ref-verifier.md"));
+        assert_ne!(reviewer_path, ref_verifier_path);
+    }
+
+    #[test]
+    fn test_resolve_timeout_seconds_returns_none_for_missing_capability() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        assert!(profiles.resolve_timeout_seconds("nonexistent").is_none());
+    }
+
+    #[test]
+    fn test_resolve_prompt_template_path_returns_none_for_missing_capability() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        assert!(profiles.resolve_prompt_template_path("nonexistent").is_none());
+    }
+
+    #[test]
+    fn test_resolve_timeout_seconds_returns_none_when_field_absent() {
+        // orchestrator entry has no timeout_seconds field
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), FULL_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        assert!(profiles.resolve_timeout_seconds("orchestrator").is_none());
+    }
+
+    #[test]
+    fn test_resolve_prompt_template_path_returns_none_when_field_absent() {
+        // orchestrator entry has no prompt_template_path field
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), FULL_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        assert!(profiles.resolve_prompt_template_path("orchestrator").is_none());
     }
 }

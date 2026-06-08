@@ -21,7 +21,7 @@
     {
       "id": "T004",
       "description": "infrastructure 層に verify-cache artifact の serde codec を実装する (IN-10 / AC-03 / CN-06)。追加対象: `libs/infrastructure/src/tddd/semantic_verify_codec.rs` (新規) または既存 `tddd` サブモジュール内の適切な場所。実装内容: `SemanticVerifyEntry` / `SemanticVerdict` / `EvidenceCitation` / `SpecAdrVerifyCacheDocument` / `CatalogueSpecVerifyCacheDocument` の serde DTO (JSON encode/decode)。`spec-adr-verify-cache.json` の encode/decode: `SpecAdrVerifyCacheDocumentCodec::encode` / `decode` — `schema_version: 1` を含む JSON ルートオブジェクトとして serialize/deserialize。`<layer>-catalogue-spec-verify-cache.json` の encode/decode: `CatalogueSpecVerifyCacheDocumentCodec::encode` / `decode` — `schema_version: 1` + `layer: String` + `entries: [...]` 形式。`SemanticVerdict` の JSON 表現: `{ \"kind\": \"pass\", \"citation\": \"...\" }` / `{ \"kind\": \"fail\", \"reason\": \"...\" }` / `{ \"kind\": \"pending\" }` の serde tag 設計 (または `#[serde(tag = \"kind\")]`)。fail-closed: unknown `kind` や missing required fields → decode エラー (typed-deserialization convention)。`ContentHash` の JSON 表現は既存実装に従う (hex string)。unit tests: `SpecAdrVerifyCacheDocument` の encode → JSON 文字列が schema_version と entries を含むこと / decode ラウンドトリップ (encode → decode → 元の値に等しい) / `CatalogueSpecVerifyCacheDocument` の encode/decode ラウンドトリップ / unknown kind field で decode がエラー / `pending` kind が `SemanticVerdict::Pending` に decode されること / citation 欠落の pass でエラー。前提: T002 (domain 型が存在すること)。",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T005",
@@ -31,7 +31,7 @@
     {
       "id": "T006",
       "description": "`.harness/config/agent-profiles.json` に `ref-verifier` capability エントリを追加する (IN-09 / AC-01 / AC-12 / CN-07)。追加内容: `\"ref-verifier\": { \"provider\": \"claude\", \"model\": \"claude-opus-4-8\", \"fast_provider\": \"claude\", \"fast_model\": \"claude-haiku-4-5\", \"timeout_seconds\": 120, \"prompt_template_path\": \".harness/prompts/ref-verifier.md\" }` (初期値 — CN-07: 具体モデル値は設定に置き ADR 本文に記載しない)。`fast_provider` / `fast_model` を指定することで `AgentProfiles::resolve_execution` の Fast ラウンドが `fast_provider ?? provider` / `fast_model ?? model` 解決を行い、段1 (Fast) と段2 (Final) に異なるモデルを割り当て可能になる (AC-01)。`timeout_seconds` と `prompt_template_path` も capability ごとの設定として保持し、`reviewer` capability とは独立したエントリとして model / timeout / prompt 設定が互いに干渉しないことを確認する (IN-09 / AC-12)。`agent-profiles.json` の既存構造 (`schema_version: 1` / `providers` / `capabilities`) を崩さずに追記し、timeout と prompt template path は `AgentProfiles::resolve_timeout_seconds(capability)` / `AgentProfiles::resolve_prompt_template_path(capability)` の capability-local resolver で取得する。`AgentProfiles::resolve_execution` は引き続き provider/model 解決のみを返し、`ResolvedExecution` に timeout/prompt を混在させない。unit tests: `AgentProfiles::load` で `ref-verifier` capability がロードされ、`resolve_execution(\"ref-verifier\", RoundType::Fast)` が `fast_provider` / `fast_model` を返し、`resolve_execution(\"ref-verifier\", RoundType::Final)` が `provider` / `model` を返すことを確認する (既存 `test_resolve_fast_with_cross_provider` パターンに準拠)。`resolve_timeout_seconds(\"ref-verifier\")` と `resolve_prompt_template_path(\"ref-verifier\")` が ref-verifier 固有値を返し、`reviewer` と `ref-verifier` に異なる timeout / prompt template path を設定してもそれぞれ独立に解決されることを確認する。前提: なし (独立タスク)。",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "id": "T007",

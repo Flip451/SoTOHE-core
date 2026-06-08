@@ -1,13 +1,22 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-08T07:22:27Z",
-  "declaration_hash": "1a7f03378971311d8a342c5740da6da2eda23be65f090bbfa277a417a3246091",
+  "generated_at": "2026-06-08T08:30:00Z",
+  "declaration_hash": "d632f0a3402231b8723e882f2a065514acccac0ab691763bf24888b3c4992e7f",
   "signals": [
     {
       "type_name": "AgentExecutionRunner",
       "kind_tag": "value_object",
       "signal": "yellow",
       "found_type": false
+    },
+    {
+      "type_name": "AgentProfiles",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "AgentRefVerifierAdapter",
@@ -17,6 +26,17 @@
       "missing_items": [
         "RefVerifierPort",
         "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CapabilityConfigDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
       ]
     },
     {
@@ -69,12 +89,6 @@
       "found_items": [
         "core::fmt::Debug"
       ]
-    },
-    {
-      "type_name": "AgentProfiles",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true
     },
     {
       "type_name": "RoundType",
