@@ -19,6 +19,7 @@ mod git;
 mod guard;
 mod hook;
 mod pr;
+mod ref_verify;
 pub mod review_v2;
 mod semantic_dup;
 mod track;
@@ -42,6 +43,7 @@ pub(crate) mod test_support {
 
 pub use domain::ExportSchemaInput;
 pub use dry::{DryCheckApprovedInput, DryResultsInput, DryWriteInput, RunDryFixLocalInput};
+pub use ref_verify::{RefVerifyCheckApprovedInput, RefVerifyRunInput};
 pub use review_v2::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
     RunReviewFixLocalInput,

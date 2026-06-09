@@ -94,6 +94,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::dry::DryCommand,
     },
+    /// Semantic reference verification: run, check-approved.
+    RefVerify {
+        #[command(subcommand)]
+        cmd: commands::ref_verify::RefVerifyCommand,
+    },
     /// Run the example track state machine demo.
     Demo,
 }
@@ -103,6 +108,14 @@ fn main() -> ExitCode {
 }
 
 fn run_cli(cli: Cli, dry_execute: impl FnOnce(commands::dry::DryCommand) -> ExitCode) -> ExitCode {
+    run_cli_with(cli, dry_execute, commands::ref_verify::execute)
+}
+
+fn run_cli_with(
+    cli: Cli,
+    dry_execute: impl FnOnce(commands::dry::DryCommand) -> ExitCode,
+    ref_verify_execute: impl FnOnce(commands::ref_verify::RefVerifyCommand) -> ExitCode,
+) -> ExitCode {
     match cli.command {
         Some(CliCommand::Arch { cmd }) => commands::arch::execute(cmd),
         Some(CliCommand::Conventions { cmd }) => commands::conventions::execute(cmd),
@@ -120,6 +133,7 @@ fn run_cli(cli: Cli, dry_execute: impl FnOnce(commands::dry::DryCommand) -> Exit
         Some(CliCommand::DupIndex { cmd }) => commands::semantic_dup::execute_dup_index(cmd),
         Some(CliCommand::DupCheck(args)) => commands::semantic_dup::execute_dup_check(args),
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
+        Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
         Some(CliCommand::Demo) | None => match CliApp::new().demo() {
             Ok(outcome) => {
                 if let Some(msg) = outcome.stdout {
@@ -145,8 +159,10 @@ mod tests {
     use cli_composition::CliApp;
     use tempfile::TempDir;
 
+    use super::run_cli_with;
     use super::{Cli, CliCommand, run_cli};
     use crate::commands::dry::DryCommand;
+    use crate::commands::ref_verify::RefVerifyCommand;
 
     const MINIMAL_RULES: &str = r#"{
   "layers": [
@@ -279,6 +295,90 @@ mod tests {
     fn test_dry_dispatch_unknown_subcommand_is_rejected() {
         let result = Cli::try_parse_from(["sotp", "dry", "unknown-subcmd"]);
         assert!(result.is_err(), "unrecognized dry subcommand must be rejected by clap");
+    }
+
+    // ── CliCommand::RefVerify entrypoint dispatch routing ────────────────────
+
+    /// `sotp ref-verify run --track-id x` must resolve to
+    /// `CliCommand::RefVerify { cmd: RefVerifyCommand::Run }`.
+    #[test]
+    fn test_ref_verify_dispatch_run_routes_to_ref_verify_run_variant() {
+        let cli =
+            Cli::try_parse_from(["sotp", "ref-verify", "run", "--track-id", "my-track"]).unwrap();
+        let exit = run_cli_with(
+            cli,
+            |_cmd| ExitCode::FAILURE,
+            |cmd| {
+                match cmd {
+                    RefVerifyCommand::Run(args) => {
+                        assert_eq!(args.track_id.as_deref(), Some("my-track"));
+                    }
+                    other => panic!("expected Run, got {other:?}"),
+                }
+                ExitCode::from(41)
+            },
+        );
+        assert_eq!(exit, ExitCode::from(41));
+    }
+
+    /// `sotp ref-verify run --track-id x` must parse into
+    /// `CliCommand::RefVerify { cmd: RefVerifyCommand::Run }`.
+    #[test]
+    fn test_ref_verify_dispatch_run_parses_to_ref_verify_run_variant() {
+        let cli =
+            Cli::try_parse_from(["sotp", "ref-verify", "run", "--track-id", "my-track"]).unwrap();
+        match cli.command {
+            Some(CliCommand::RefVerify { cmd: RefVerifyCommand::Run(args) }) => {
+                assert_eq!(args.track_id.as_deref(), Some("my-track"));
+            }
+            _ => panic!("expected RefVerify {{ Run }}, got a different variant"),
+        }
+    }
+
+    /// `sotp ref-verify check-approved --track-id x` must resolve to
+    /// `CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved }`.
+    #[test]
+    fn test_ref_verify_dispatch_check_approved_routes_to_ref_verify_check_approved_variant() {
+        let cli =
+            Cli::try_parse_from(["sotp", "ref-verify", "check-approved", "--track-id", "my-track"])
+                .unwrap();
+        let exit = run_cli_with(
+            cli,
+            |_cmd| ExitCode::FAILURE,
+            |cmd| {
+                match cmd {
+                    RefVerifyCommand::CheckApproved(args) => {
+                        assert_eq!(args.track_id.as_deref(), Some("my-track"));
+                    }
+                    other => panic!("expected CheckApproved, got {other:?}"),
+                }
+                ExitCode::from(43)
+            },
+        );
+        assert_eq!(exit, ExitCode::from(43));
+    }
+
+    /// `sotp ref-verify check-approved --track-id x` must parse into
+    /// `CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved }`.
+    #[test]
+    fn test_ref_verify_dispatch_check_approved_parses_to_ref_verify_check_approved_variant() {
+        let cli =
+            Cli::try_parse_from(["sotp", "ref-verify", "check-approved", "--track-id", "my-track"])
+                .unwrap();
+        match cli.command {
+            Some(CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved(args) }) => {
+                assert_eq!(args.track_id.as_deref(), Some("my-track"));
+            }
+            _ => panic!("expected RefVerify {{ CheckApproved }}, got a different variant"),
+        }
+    }
+
+    /// An unrecognized `sotp ref-verify` subcommand must be rejected by clap (Err),
+    /// not silently fall through or panic.
+    #[test]
+    fn test_ref_verify_dispatch_unknown_subcommand_is_rejected() {
+        let result = Cli::try_parse_from(["sotp", "ref-verify", "unknown-subcmd"]);
+        assert!(result.is_err(), "unrecognized ref-verify subcommand must be rejected by clap");
     }
 
     // ── CliCommand::Conventions entrypoint dispatch routing ──────────────────

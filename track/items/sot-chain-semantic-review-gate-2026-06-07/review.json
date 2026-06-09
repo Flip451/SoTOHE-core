@@ -1,97 +1,665 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
-          "at": "2026-06-07T23:47:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
-          "at": "2026-06-07T23:51:24Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run` wires `AgentRefVerifierAdapter` to an `AgentExecutionRunner` that always returns `VerifierPort` (`\"model invocation not yet wired in this build\"`). Any real track with at least one pair will fail before a verdict is produced, so `sotp ref-verify run` is not functional.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 201,
+              "category": "logic"
+            },
+            {
+              "message": "`resolve_ref_verify_scope` ignores both inputs and always returns `RefVerifyScope::All`. That violates the documented phase-based routing contract, so the CLI never narrows to Chain1 after spec-design or Chain2 after type-design.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 139,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:86730e8eb46db10bcc99aeebeb05c2dc67bcc28d9038e5101bd0078845f079c0",
+          "at": "2026-06-09T02:02:09Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`prompt_template_path` points at `.harness/prompts/ref-verifier.md`, but that template file does not exist in the repository. Any code path that tries to render the ref-verifier prompt will fail closed at runtime, so the new capability is not actually usable yet.",
+              "message": "`ref_verify_check_approved` hardcodes `RefVerifyScope::All` instead of resolving the active phase, so a pre-type-design track with only Chain-1 artifacts will try to enumerate every TDDD layer in `architecture-rules.json` and fail before it can verify the existing production pairs. That makes the gate reject valid spec-only tracks rather than behaving as a current-pairs completeness check.",
               "severity": "P1",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 68,
-              "category": "missing_dependency"
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 600,
+              "category": "correctness"
             }
           ],
-          "hash": "rvw1:sha256:10580ac80c32485f5aa2d671a7d447b55186431cbdebd33b869b0c43dc361ede",
-          "at": "2026-06-08T07:36:28Z"
+          "hash": "rvw1:sha256:ba2927bd1e00934125052c0e3785088e9efc000fdc14aad58984109bb65dea62",
+          "at": "2026-06-09T02:16:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`existing_chain2_layers()` only keeps layers whose catalogue file already exists. If `architecture-rules.json` declares a TDDD layer but its `<layer>-types.json` is missing, `resolve_ref_verify_scope()` will silently drop that layer, so `ref_verify run` and `check-approved` can skip part of Chain-2 instead of failing closed. The downstream pair enumerator already errors on a missing catalogue, so the resolver should not pre-filter the declared layers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 181,
+              "category": "correctness"
+            },
+            {
+              "message": "`run_ref_verifier_agent()` rejects `ResolvedExecution.model == None`, even though `AgentProfiles` explicitly allows providers that do not need a model. Any ref-verifier configuration routed to such a provider will fail before the runner is invoked, so the new capability is not actually provider-agnostic.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 255,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:25633a9d4bf0ea74897efd88250509064c04bf979c3a584dfc492eca49586356",
+          "at": "2026-06-09T02:26:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`existing_chain2_layers()` collects every declared TDDD layer as soon as it sees one catalogue file, so `resolve_ref_verify_scope()` can select `Chain2All` with layers whose catalogues are still absent. `enumerate_chain2_all_layers()` then errors on those missing files, which blocks `ref-verify run/check-approved` on partially rolled-out type-design tracks instead of skipping the absent layers.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 145,
+              "category": "correctness"
+            },
+            {
+              "message": "The new public `CliApp::ref_verify_run` and `CliApp::ref_verify_check_approved` APIs only have validation/error-path tests; there is no deterministic happy-path test for a successful run or for a non-vacuous Pass-cache approval case. A regression in the success path would therefore ship without coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 711,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:bacdd3648d7adda887274b14bed35aa3baa930a9756e1763803a0132b29c0c11",
+          "at": "2026-06-09T02:34:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_check_approved` treats 'has any Pass entry' as sufficient. If a cache artifact contains both Pass and Fail/Pending rows for the same `(claim_hash, evidence_hash)` pair, the Fail/Pending row is ignored and the gate returns success, which contradicts the documented fail-closed behavior. There is also no regression test covering the blocking-path case.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 641,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d9fc0d2dca40441a1e58402902f22b6c8875a4ea07380496d8144c6646009643",
+          "at": "2026-06-09T02:46:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_ref_verify_scope` returns `All` as soon as `impl-plan.json` exists. In this repo that file is part of the normal track item layout, so `ref_verify_run` and `ref_verify_check_approved` will never resolve to `Chain1` or `Chain2All` and will always overshoot to the full gate. That breaks the phase-based scope auto-resolution this command is supposed to provide.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 112,
+              "category": "logic"
+            },
+            {
+              "message": "`existing_chain2_layers` filters out TDDD layers whose catalogue file is missing instead of failing closed. That means an incomplete type-design set can be treated as if the absent layer does not exist, so `run`/`check-approved` can silently skip a required Chain-2 layer rather than surfacing the missing artifact.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 145,
+              "category": "fail-open"
+            }
+          ],
+          "hash": "rvw1:sha256:a2e48bf21ac7e6a6449519306cf0b053b671a98e0bef13426399da91499c8931",
+          "at": "2026-06-09T02:52:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This path fabricates `current_branch = format!(\"track/{track_id}\")` instead of discovering the actual git branch, so the usecase's active-track guard never runs here. `ref_verify check-approved` can therefore return success from `main` or a detached HEAD as long as the cache files exist.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 592,
+              "category": "correctness"
+            },
+            {
+              "message": "`check-approved` reconstructs production pairs with `RefVerifyConfig::default()` instead of the configuration loaded from `.harness/config/ref-verify.json`. If the configured known-bad injection rate differs from the default, the gate will inspect the wrong pair set and can either miss real production pairs or block on probe pairs, so approval no longer matches the run path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 594,
+              "category": "correctness"
+            },
+            {
+              "message": "The Claude provider is launched without the repo's read-only tool restrictions (`--allowedTools ...` / `--disallowedTools Edit Write`) that are used elsewhere for Claude-based agents. With the local Claude settings allowing `Write`/`Edit`, this subprocess is not structurally read-only and can mutate the workspace during verification.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 322,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0128ec40bafd0c1c047d59447eaa045855ffb62ff0c213b7436354ca086c1d43",
+          "at": "2026-06-09T03:01:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_runtime_path()` builds `tmp/reviewer-runtime/...` relative to the process current working directory instead of the resolved repository root. That makes `ref-verify run` depend on where the user launched the CLI and can fail or write the Codex last-message artifact outside the repo when `--items-dir` points at a valid project but the cwd is unwritable or different.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 494,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d39e2ca4b1ba30a759524bed62b0cdd26353cee657db0c1c428b29a46d69e980",
+          "at": "2026-06-09T03:12:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`process_success_or_error()` forwards the child process stderr verbatim into the user-facing error string. That can leak prompt contents, local paths, or stack traces from the model runner; redact it or collapse it to a generic failure summary before returning an error.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 450,
+              "category": "security"
+            },
+            {
+              "message": "The new `ref_verify_check_approved()` path does not have a regression test for the fail-closed branch where a current production pair is completely missing from the cache (`matching_entries.is_empty()`). The suite covers empty-spec and mixed Pass/Fail artifacts, but not the missing-pair case, so a regression that treats absent pairs as approved would still ship.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 662,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7727c6cd569d9c33ff59daa8ab73a5e5b4e1d255604069ac0c69cc1078a17812",
+          "at": "2026-06-09T03:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_process_with_timeout` spawns the verifier subprocess without pinning it to the resolved repository root. `resolve_ref_verify_context` already computes `canonical_root`, but that path is never applied here, so `claude`/`codex`/`gemini` Read/Grep/Glob operations resolve relative paths against whatever cwd `sotp` happened to start in. Running `sotp ref-verify` from a subdirectory can therefore inspect the wrong tree or fail to locate the repo context entirely.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 375,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4ac1b938d13129260f5b392256b19626d4aa1900d0306111bd292dd5b6ea463c",
+          "at": "2026-06-09T03:30:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`check-approved` still loads and validates `.harness/config/ref-verify.json` just to enumerate pairs, even though the approved gate filters out every `known_bad` probe immediately afterward. That couples approval to an unrelated runtime config file, so a malformed or out-of-range config can now block an otherwise complete cache gate.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 615,
+              "category": "correctness"
+            },
+            {
+              "message": "The new public `ref_verify_run` surface is only exercised end-to-end with the Gemini backend. The `claude` and `codex` arms in `run_ref_verifier_agent` have no direct tests, so regressions in provider argument construction, timeout handling, or output parsing for those backends will not be caught by CI.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 248,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f44ca2552c977bb042df67188c5ca86fbf987219afa7685ad856764af79bb60b",
+          "at": "2026-06-09T03:41:53Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:10580ac80c32485f5aa2d671a7d447b55186431cbdebd33b869b0c43dc361ede",
-          "at": "2026-06-08T07:42:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:10580ac80c32485f5aa2d671a7d447b55186431cbdebd33b869b0c43dc361ede",
-          "at": "2026-06-08T07:45:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:902ca0e696fce0a1f5e161382dee4f2ac116764496d553dc3bfe25a2078020d1",
-          "at": "2026-06-08T07:51:11Z"
+          "hash": "rvw1:sha256:29dc115c7aa0babc763ac4e26eee710f3effcf3e6e1f185c996f4e348a3bcc56",
+          "at": "2026-06-09T03:49:34Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The prompt contradicts its own fail criteria: after saying unrelated, contradictory, or over-broad claims should return `fail`, it then says that if the verifier cannot quote supporting text it should return `pending`. For the common deterministic-failure case where evidence does not support the claim, there is no supporting quote, so the model can classify real semantic mismatches as `pending` instead of `fail`. That routes fixable reference errors into the human-escalation path rather than the writer/fix loop, weakening the semantic gate.",
+              "message": "`ref_verify.rs` has 709 production lines before the `#[cfg(test)]` block, exceeding the repository's 700-line module limit. The module-size verifier counts non-test lines and will block CI until this is split or trimmed below the cap.",
               "severity": "P1",
-              "file": ".harness/prompts/ref-verifier.md",
-              "line": 41,
-              "category": "workflow correctness"
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 710,
+              "category": "module_size"
             }
           ],
-          "hash": "rvw1:sha256:902ca0e696fce0a1f5e161382dee4f2ac116764496d553dc3bfe25a2078020d1",
-          "at": "2026-06-08T07:54:14Z"
+          "hash": "rvw1:sha256:29dc115c7aa0babc763ac4e26eee710f3effcf3e6e1f185c996f4e348a3bcc56",
+          "at": "2026-06-09T03:53:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:be64f03a071c65b724685fe2c7f558a701a2293550ee0d85d4c91ddc994b7af1",
-          "at": "2026-06-08T07:56:45Z"
+          "hash": "rvw1:sha256:4f407fb92f257dc321270554678d04d4b03772c9659efcb25a3aa6d33f1c7784",
+          "at": "2026-06-09T04:00:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8f87ec663daae397d524af6722542333dae2f8ba3be35205e9455b8eaa8d966",
+          "at": "2026-06-09T05:00:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_ref_verify_scope` only selects `All` when every impl-plan task is `done` or `skipped`; otherwise, once catalogues exist, it returns `Chain2All`. During normal implementation or a standalone/final gate run, catalogues and spec both exist while some tasks are still `in_progress`/`todo`, so `ref_verify_run` and `ref_verify_check_approved` skip Chain1 entirely. A track can therefore pass `check-approved` with valid catalogue-spec cache entries even if `spec-adr-verify-cache.json` is missing or stale, which violates the required all-chain final/standalone gate.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 104,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:a8f87ec663daae397d524af6722542333dae2f8ba3be35205e9455b8eaa8d966",
+          "at": "2026-06-09T05:06:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_ref_verify_scope` treats the normal post-type-design state (`spec.json` plus all TDDD catalogues present) as `All`, so `ref-verify run` verifies Chain1 again instead of Chain2-only. The T009/AC-02 contract says the type-design phase should run Chain2, with `All` reserved for commit/final or standalone all-pair contexts. This can make the type-design gate block on stale/missing Chain1 cache or ADR/spec issues unrelated to the Chain2 phase. The resolver needs a phase/context signal instead of using artifact presence alone.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 108,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7d287061ec08b65ca9a1b16a49e9fa2ae24c3d2a87aeb332c913a5bd4c5f0714",
+          "at": "2026-06-09T05:14:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref-verifier` runs Claude with `--permission-mode dontAsk` while granting `Read`, `Grep`, and `Glob`. The prompt content comes from track artifacts, so a malicious spec/catalogue/ADR reference can prompt-inject the verifier into reading local secrets and returning them in the JSON citation/reason that this pipeline accepts and can persist to verify-cache. The verifier already receives the claim/evidence text, so this should run without filesystem tools, or with a tightly path-scoped sandbox and scrubbed environment.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 226,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:2934468fa37f7c8bc0387bc0b96a2bd1774362e416be841b2ecf5055ff4f0f13",
+          "at": "2026-06-09T05:26:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run` only selects `All` when every impl-plan task is `done` or `skipped`; otherwise, once Chain2 catalogues exist it resolves to `Chain2All` and skips Chain1. T009/AC-02 requires standalone runs to cover all current pairs, but this public API has no context flag to request that, so an in-progress track with spec+catalogues cannot refresh spec→ADR verification even after spec/ADR changes. Subsequent all-chain approval can remain blocked or stale until unrelated impl-plan tasks are all marked complete.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 106,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b0cdf8ea41683f2ff86419b9323701f0cfe4b5a9ade6344804bc328b2279798e",
+          "at": "2026-06-09T05:34:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_pipe` drops `read_to_string` errors and returns whatever partial buffer was accumulated. That means verifier subprocess I/O failures are converted into empty or truncated output, which can later be reported as a parse/no-output verifier result instead of the actual pipe read failure. This violates the repository's no-silent-error-swallowing rule for production code; make the collector return a `Result<String, io::Error>` and propagate join/read failures through `RefVerifyError`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 416,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3c477e91c192f7f03f13f4d3a084ac331882da5ea45325f761f42d89313282f7",
+          "at": "2026-06-09T05:43:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`build_claude_ref_verifier_args` constructs `claude` with `--safe-mode` and `--tools \"\"`, but the installed Claude CLI exposes `--allowedTools/--disallowedTools` and does not support these flags. Any `agent-profiles.json` configuration selecting provider `claude` for `ref-verifier` will fail at process startup, so `ref_verify_run` cannot perform semantic verification for that supported provider. Replace these with the supported Claude tool-deny flags, and add a test that matches the real CLI flag contract rather than the current fake-only expectations.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 207,
+              "category": "runtime"
+            }
+          ],
+          "hash": "rvw1:sha256:96c1cc8d858505255806c63e0907dd856f86df3de7f713f38af23e1d2136312a",
+          "at": "2026-06-09T05:50:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:57f609eda2c18c745a93ddc2767b9b6465bbe7c71f82563e6ed405cbbd09e676",
+          "at": "2026-06-09T05:58:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `run` scope resolver short-circuits to `All` whenever `track/<id>/impl-plan.json` exists, so any post-spec/type-design track that already has an impl plan will skip the intended Chain2-only phase and re-run both chains. That contradicts the phase-aware scope resolution required by T009/AC-02.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 106,
+              "category": "logic"
+            },
+            {
+              "message": "The approved gate reconstructs production pairs with `RefVerifyConfig::default()` instead of the runtime config loaded from `.harness/config/ref-verify.json`, so non-default known-bad injection or threshold settings make `check-approved` inspect a different pair set than `ref_verify_run` produced. That can approve the wrong cache state or block a valid one.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 598,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:acc533b7db39b5417a1d65148cc033ed8cbf3b1cde4fbb343131be2e1d2d980c",
+          "at": "2026-06-09T06:12:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`should_run_all_chains()` only returns `true` for `TrackStatus::Done`, so tracks with a `Blocked` or `Cancelled` override but with both Chain1 and Chain2 artifacts are still routed to `Chain2All`. That leaves Chain1 unverified in those phases and contradicts the documented \"otherwise All\" auto-scope rule.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 123,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:55f3ae76b98c781dd23d1d3582c37690ffd5433b4167259ebe6c205d86d46cb3",
+          "at": "2026-06-09T06:25:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_ref_verify_plan()` aborts on the first `Err` inside the layer loop, so a `Chain2All` run stops after the first failing layer and never evaluates or caches the remaining layers. For multi-layer type-design tracks, that makes the result depend on layer order and leaves unrelated cache artifacts stale.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 195,
+              "category": "logic"
+            },
+            {
+              "message": "`ref_verify_check_approved()` loads `.harness/config/ref-verify.json` and feeds it into pair enumeration even though the approval gate only needs current production pairs and verify-cache contents. A missing or malformed runtime config can therefore block `check-approved` before cache completeness is checked, which couples an independent gate to unrelated runtime settings.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 631,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:55cfd1576c86e40ce5fa28986ba69ae8a18ffa2c3c59914fcdb5f3b01633f2c1",
+          "at": "2026-06-09T06:36:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The production portion of this module runs through line 754, so it exceeds the repo's 700-line cap for non-test code. Split the composition helpers into smaller modules before merging; otherwise this file is out of policy and harder to review safely.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:af86a68ad33bc11c0487f41e4d3e27490b16bffbf3f0873d1c69fb66d372e300",
+          "at": "2026-06-09T06:49:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If one scope reports `HumanEscalationRequired` and another reports `SemanticFailuresConfirmed`, this function still returns only the semantic-failure path because `semantic_failure_count` is checked before `human_escalation_count`. That masks verifier-degradation cases that are supposed to force human escalation and can send the gate down the wrong remediation path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 219,
+              "category": "correctness"
+            },
+            {
+              "message": "A cache read failure is converted into a per-pair `cache read failed` message and the command still returns `Ok(CommandOutcome { exit_code: 1 })`. That swallows cache I/O/corruption errors into an approval miss, making broken storage indistinguishable from a legitimately unapproved pair and hiding the underlying infrastructure failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "line": 391,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b2d9654d3fae78b7f99b7830dd28fd561bef40372ea5be905b36973023d9029a",
+          "at": "2026-06-09T07:09:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:888cad6b1023b5c8238157054c160750986975f567c65aef8f21242348c56b55",
+          "at": "2026-06-09T07:18:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run` always calls `resolve_scope(..., false)`, while `check-approved` calls `resolve_scope(..., true)`. For a track that already has spec + catalogues but is still `InProgress`, `run` verifies only Chain2, but `check-approved` requires All chains. That breaks the planned commit-gate sequence (`ref-verify run && ref-verify check-approved`): Chain1 cache entries can remain missing/stale and there is no CLI path here to refresh them until the track status changes.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 283,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:888cad6b1023b5c8238157054c160750986975f567c65aef8f21242348c56b55",
+          "at": "2026-06-09T07:23:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7026a68f6b2dc22d864b32dd25fd21fe682d5364b43733f95bf9c2bb6fdade1d",
+          "at": "2026-06-09T07:31:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44efe64579a4f2105ade450932691f0de5606c3876d0bc2f6528d2f2a0ce611f",
+          "at": "2026-06-09T08:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run` always passes `approval_gate = true` into `resolve_scope`, so any track that has both `spec.json` and complete TDDD catalogues is forced to `RefVerifyScopePlan::All`. That bypasses the phase-aware path in `should_run_all_chains` and makes in-progress/type-design runs verify Chain1 as well as Chain2, despite this module's own `resolve_scope(..., false)` behavior for in-progress catalogues returning `Chain2All`. This can fail or spend verifier budget on stale spec→ADR pairs outside the current phase. Reserve `true` for `check-approved`/final-gate behavior and use the normal phase-aware scope for `run`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 285,
+              "category": "correctness"
+            },
+            {
+              "message": "The timeout path only kills the direct verifier child, then immediately joins the stdout/stderr reader threads. If the verifier command is a wrapper that spawns another process inheriting stdout/stderr, killing the parent leaves those pipe fds open and `read_to_string` can block forever, so the configured timeout does not reliably bound the ref-verifier run. Run the child in a process group/job and terminate the whole group on timeout, or otherwise ensure inherited pipe handles cannot keep the collectors blocked.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify/runner.rs",
+              "line": 210,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:44efe64579a4f2105ade450932691f0de5606c3876d0bc2f6528d2f2a0ce611f",
+          "at": "2026-06-09T08:09:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 security: the Codex/Gemini verifier paths run untrusted claim/evidence prompts through agent CLIs without an enforced no-tools boundary. `--sandbox read-only` only prevents writes; it still permits model-driven shell/file reads, and the Gemini path has no sandbox/tool restriction here. A prompt-injected spec/catalogue/ADR claim can cause the verifier to inspect local files or environment and return the data as a valid JSON `citation`/`reason`, which can then be persisted to verify-cache. The Claude path explicitly disallows local tools; apply equivalent isolation/sanitized env for Codex/Gemini or reject providers that cannot enforce it.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify/runner.rs",
+              "line": 148,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:b09dac8a7706ee8d1ace7c08a25cd6a19b12b3c51011d5dfb2fc348dea7dcc2c",
+          "at": "2026-06-09T08:21:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref-verifier` is launched with `--permission-mode dontAsk` and a denylist, but without any `--allowedTools` whitelist. The local Claude reviewer in this repo uses `--allowedTools` specifically because `dontAsk` only denies tools outside the allowed set in standard environments and a permissive host configuration can broaden the surface; here the verifier is supposed to enforce a no-tools boundary, yet this invocation can inherit whatever tools/settings the host allows except the six denied names. That lets the semantic verifier inspect workspace state through any remaining or host-allowed tools instead of judging only the prompt payload, undermining the gate's isolation. Make the runner pass an explicit empty/no-tool allowlist if supported, or otherwise fail closed instead of relying on a partial denylist.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify/runner.rs",
+              "line": 30,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0c04c32cbc8636eb7e5d1159073b29900adc4df6c8beba0ad8f4f5f60f3ac3a7",
+          "at": "2026-06-09T08:30:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run` always calls `resolve_scope(..., false)`, so once both `spec.json` and Chain2 catalogues exist on an in-progress track it runs only `Chain2All` and skips Chain1. The T009 contract says standalone/final-gate execution must cover all current pairs, and `ref_verify_check_approved` already enforces the full approval surface via `resolve_scope(..., true)`, so `run && check-approved` can fail even though `run` just completed because Chain1 cache entries were never refreshed. The run path needs a way to select the approval/all-chains surface when used outside the phase-only guard.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 285,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:b4f4a7da4367f1846e3b129182dd47e8859af061f470a0a488cce48aceccaa5a",
+          "at": "2026-06-09T08:42:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ref_verify_run` always passes `approval_gate = true` into `resolve_scope`, so any track with both `spec.json` and complete TDDD catalogues runs `All` instead of the phase-aware Chain2 path. That violates AC-02/T009’s context-based routing for type-design phase runs and can block or spend verifier budget on Chain1 pairs outside the current phase.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify.rs",
+              "line": 286,
+              "category": "correctness"
+            },
+            {
+              "message": "The timeout only wraps waiting for the direct verifier child. If that child exits while a descendant keeps stdout/stderr open, `join_collector` can block forever after `wait_for_process` returns, so `timeout_secs` no longer bounds `ref-verify run`. Kill or reap the process group before joining the pipe readers, or apply the remaining timeout to the collector joins.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/ref_verify/runner.rs",
+              "line": 147,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d398fef9dce30a3bd050772236782b1e778aed876d104d79db2cea4fb45b4350",
+          "at": "2026-06-09T08:49:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de26b30a0358c24e666395cf8ee620b32abb6cc1ba590b5d1c6f946a179e7f30",
+          "at": "2026-06-09T09:00:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`timeout_secs` comes from `agent-profiles.json` as an unconstrained `u64`; this code only rejects zero and then computes `Instant::now() + timeout`. Very large configured values can make `Instant` addition panic instead of returning `RefVerifyError`, which violates the no-panics-in-library-code rule and can crash `sotp ref-verify run` from configuration input. Use `checked_add` and map overflow to a verifier/config error, or validate an upper bound before constructing the deadline.",
+              "severity": "P0",
+              "file": "apps/cli-composition/src/ref_verify/runner.rs",
+              "line": 140,
+              "category": "panic"
+            }
+          ],
+          "hash": "rvw1:sha256:ac2801091f2c365aa639f218843f510e3bf02c7014012fd313d4272843a474c8",
+          "at": "2026-06-09T09:22:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d20ff59df4f86748ea4293c3e8b3c8d172378225b2f4dd2cc0812169bd8467d8",
+          "at": "2026-06-09T09:31:07Z"
         }
       ]
     },
-    "cli": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
-          "at": "2026-06-08T03:03:38Z"
+          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
+          "at": "2026-06-08T00:26:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `EvidenceCitation::try_new` API returns `ValidationError`, and this change adds a production `ValidationError` variant, but the T002 domain catalogue does not declare `ValidationError`; the generated `domain-type-signals.json` now contains a red `ValidationError` signal. The briefing explicitly treats non-add red/yellow domain type signals as factual findings, so the catalogue/implementation contract is inconsistent until `ValidationError` is declared/updated in the catalogue or the public signature avoids the undeclared type.",
+              "severity": "P1",
+              "file": "libs/domain/src/error.rs",
+              "line": 99,
+              "category": "type-signal"
+            }
+          ],
+          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
+          "at": "2026-06-08T00:30:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
+          "at": "2026-06-08T00:45:03Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
-          "at": "2026-06-08T04:13:29Z"
+          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
+          "at": "2026-06-08T00:48:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
+          "at": "2026-06-08T03:03:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
+          "at": "2026-06-08T04:12:17Z"
         }
       ]
     },
@@ -1027,6 +1595,423 @@
           "findings": [],
           "hash": "rvw1:sha256:aa106fcb0bafd528761aac9f7bba8f6ee7e5f3f6509235f98513542e114ea194",
           "at": "2026-06-09T01:29:26Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Missing `entry_hashes` entries are silently replaced with `ContentHash::from_bytes([0; 32])`. That fabricates a valid-looking but incorrect `entry_hash` in `<layer>-catalogue-spec-signals.json` if the adapter/key-derivation ever drifts, which should fail closed instead of persisting corrupted integrity metadata.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "line": 206,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a59a6be5ee5c23b3c26f4c61a7afd133c0a12895209e7dadb371543b85d9934a",
+          "at": "2026-06-08T03:04:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0896551e413edf23b3b71715695e6bcb0cb240f86b92a0174db2904d07d2264",
+          "at": "2026-06-08T03:14:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new shared traversal helper is public and now drives both `catalogue_spec_refs` and `catalogue_spec_signals`, but the added tests only cover type entries. There is no direct coverage for trait/function traversal or for a same-short-name cross-section collision, so a regression in `section_key` formatting or section order would reach production unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_traversal.rs",
+              "line": 69,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c857a53c1f462b5cd9fbf0a2f5482c080005ecaad365d8af9d89dece6a1c1d",
+          "at": "2026-06-08T03:38:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11fb2822d7eb0853a16ccb3695b119d2994dff56bbc45764aa9a92453d8ba438",
+          "at": "2026-06-08T03:43:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
+          "at": "2026-06-08T04:10:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The merge gate now receives per-entry catalogue hashes, but it immediately discards `_entry_hashes` and only checks signal count, positional name, document-level `catalogue_declaration_hash`, and color. That means a committed `<layer>-catalogue-spec-signals.json` can contain a stale or fabricated `CatalogueSpecSignal.entry_hash` while the gate still approves, so the semantic Chain ② cache key no longer reflects the current catalogue entry. Compare each signal's `entry_hash()` against the current entry hash map using the same traversal/order and fail closed on missing or mismatched hashes.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 518,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
+          "at": "2026-06-08T04:14:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c980ae55c3d11384f209e3a7d7efbb5654364d616eb7d65dffe47e145eae811",
+          "at": "2026-06-08T04:22:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`merge_gate.rs` now has 752 lines of production code before `#[cfg(test)]`, which exceeds the repo's 700-line maximum for production modules. This is an architecture violation and should be split into smaller modules.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/merge_gate.rs",
+              "line": 753,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:36:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:41:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Chain ② per-entry hash block pushes the production portion of `merge_gate.rs` to line 752 before `#[cfg(test)]`, exceeding the repository's 700-line maximum for production modules. This was 690 lines before the change, so the current patch crosses the guardrail; please split the new catalogue-spec integrity/signals logic into a helper module or otherwise reduce this file below the limit.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 665,
+              "category": "module_size"
+            }
+          ],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:44:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89e40b79e65a9a9888e8890d7475c92deaf231dc3023599c264cc5ff0a017354",
+          "at": "2026-06-08T04:54:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
+          "at": "2026-06-08T07:03:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
+          "at": "2026-06-08T07:05:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cache merge is inverted: `retained` keeps existing entries whose `(claim_hash, evidence_hash)` do not match any current production pair, so cache-hit entries are dropped instead of preserved. A mixed hit/miss run will rewrite the cache without the hits, defeating AC-07 and forcing needless re-review on the next run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 650,
+              "category": "correctness"
+            },
+            {
+              "message": "Fast-tier evaluation is still fully sequential. `RefVerifyConfig::max_parallelism` is validated and stored, but `execute` never consults it; both fast passes use plain iterator collection (`.iter().map(...).collect()`). That misses the required parallel fast-tier execution / worker-cap behavior and leaves the configuration dead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 513,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:247af029381a64564f914d2a39eed76adc8b50d6a296fc298038c9b8815ded84",
+          "at": "2026-06-08T08:55:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Any cache entry whose hashes match a current production pair is treated as a hit regardless of the stored verdict, so a cached `Fail`/`Pending` is never re-checked. The later merge at `639-669` then filters those same entries out of the rewritten artifact and never adds them back, so current cache hits can disappear entirely on the next save. That breaks AC-07 and can let stale failures vanish from the gate.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 497,
+              "category": "correctness"
+            },
+            {
+              "message": "The return order is backwards for degraded calibration: `SemanticFailuresConfirmed` is emitted before `final_calibration_healthy` is checked. If known-bad detection stays below threshold and a production `Fail` is also confirmed, the degraded verifier's verdict is still trusted instead of escalating to `HumanEscalationRequired`, which contradicts the intended precedence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 673,
+              "category": "correctness"
+            },
+            {
+              "message": "As written, the fast/final verifier loops are strictly serial iterator chains, so the interactor never uses `RefVerifyParallelism` and can only issue one model call at a time. That makes the validated `max_parallelism` config dead and violates the requirement that fast-tier review be parallelized per pair.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 513,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:247af029381a64564f914d2a39eed76adc8b50d6a296fc298038c9b8815ded84",
+          "at": "2026-06-08T08:58:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`save_entries` runs before the final known-bad health check, so a batch that ends in `HumanEscalationRequired` still persists the final-tier verdicts from a degraded verifier into the verify-cache. The ADR/spec text says degraded-verifier verdicts are not trustworthy and should not be cached; gate cache writes on `final_calibration_healthy` (or defer persistence until after this check).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 660,
+              "category": "correctness"
+            },
+            {
+              "message": "The production portion of this module is 767 lines long before the `#[cfg(test)]` block starts at line 770, which exceeds the repository's 700-line production-module limit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 770,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:0baabb47b6116baebeaf7672fc751bd56985ae0e6f91897fed39ae5146627c8e",
+          "at": "2026-06-08T09:06:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public `RefVerifyApplicationService::execute` path is only covered on success-oriented scenarios; there is no test that stubs `RefVerifyPairSourcePort`, `RefVerifyVerifierPort`, or `RefVerifyCachePort` to return an error and asserts the corresponding fail-closed `RefVerifyError` variant is propagated. That leaves the main error-handling contract for this usecase unverified, which is a P1 coverage gap for a new public API.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 71,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:cea9aa709751997383f53bce7236a1efd3e424e078b7fffdc019ac737b25acd4",
+          "at": "2026-06-08T09:27:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public error variants `VerifierPort` and `CachePersistence` forward raw adapter `message` strings verbatim into `Display`, so any hostnames, SQL fragments, or stack traces returned by adapters will leak into user-visible output/logs. Redact or normalize these messages at the boundary instead of exposing the raw string.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify.rs",
+              "line": 252,
+              "category": "Security"
+            },
+            {
+              "message": "The interactor test suite only covers success and behavioral cases. There are no tests that make `pair_source.load_pairs`, `cache.load_entries/save_entries`, or `verifier.verify_pair` return `Err`, so the new `VerifierPort` and `CachePersistence` failure paths are unverified. Add negative tests for each port boundary to satisfy the public-API test requirement.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
+              "line": 627,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:cea9aa709751997383f53bce7236a1efd3e424e078b7fffdc019ac737b25acd4",
+          "at": "2026-06-08T09:34:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On the first `Err` or panic from a worker, this returns immediately and drops the remaining `JoinHandle`s for the chunk. Those threads keep running detached, so a failed batch can still continue calling the verifier after the use case has already reported failure. Join or cancel the rest of the chunk before returning so the gate actually aborts fail-closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 331,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7b2aa19f6360604b80e28d7145eb649f3b388d92fe6bd8e78e6ae184c69d8cec",
+          "at": "2026-06-08T09:42:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`HumanEscalationRequired { pair_count }` undercounts unresolved work when a degraded batch also has pending production pairs. The code returns either `confirmed_pending` or `known_bad_probes.len()`, so a run with both categories reports only one side of the problem instead of the total unresolved count described by the type docs.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bbbda946584f916cee08d11a33dac58624e4bc5ab2a05301c66d9eae68471245",
+          "at": "2026-06-08T09:49:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyError::TrackNotActive` advertises an active-track guard, but `RefVerifyCommand` carries no current-branch/active-track input and this usecase layer has no branch-reader port. As written, nothing in this scope can actually enforce the promised guard, so the public API can run on a non-track branch without surfacing `TrackNotActive`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify.rs",
+              "line": 74,
+              "category": "correctness"
+            },
+            {
+              "message": "The result classification gives `SemanticFailuresConfirmed` precedence over `HumanEscalationRequired`. If a batch contains both a confirmed production fail and at least one unresolved/pending pair, the function returns the fail variant and masks the pending case, even though the type docs say pending/unresolved results must surface as human escalation. This needs pending to win or a split result path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
+              "line": 281,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8367c65648195792f8f2e6134f283a9c852c21b9ed35181f06e8ebbb4ed0dbdb",
+          "at": "2026-06-08T09:56:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Pending` is checked before `Fail`, so a healthy batch that contains both verdicts returns `HumanEscalationRequired` instead of `SemanticFailuresConfirmed`. The intended rule is to prioritize confirmed failures in this mixed case so the writer/fix loop can act on them.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 292,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2d4eea329435adbde9ed99718fa1e624f04e86ef160452f60735cf9514c6885a",
+          "at": "2026-06-08T10:04:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cache retention is global across scopes: `fresh_hashes` is built without `cache_scope`, and the retain filter drops any existing entry whose `(claim_hash, evidence_hash)` appears in any freshly evaluated pair. If the same hash pair exists in another scope, saving this run will delete that scope's cache entry even though it was never re-evaluated. The pruning needs to be scope-local because caches are stored in separate artifacts per scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 241,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ab2dee14618f765b0ce7aa0269cf0dcd24d8b199c08f5c649d9d9d4622d294ee",
+          "at": "2026-06-08T10:10:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00331d05fb2e728f8facc70fadde7adc2e15409c118421415655dc631146fe45",
+          "at": "2026-06-08T10:17:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00331d05fb2e728f8facc70fadde7adc2e15409c118421415655dc631146fe45",
+          "at": "2026-06-08T10:21:10Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:47:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25a0ab33032737be247249da8a194743172f59a924845e077af4ecdcafc1671f",
+          "at": "2026-06-07T23:51:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`prompt_template_path` points at `.harness/prompts/ref-verifier.md`, but that template file does not exist in the repository. Any code path that tries to render the ref-verifier prompt will fail closed at runtime, so the new capability is not actually usable yet.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 68,
+              "category": "missing_dependency"
+            }
+          ],
+          "hash": "rvw1:sha256:10580ac80c32485f5aa2d671a7d447b55186431cbdebd33b869b0c43dc361ede",
+          "at": "2026-06-08T07:36:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10580ac80c32485f5aa2d671a7d447b55186431cbdebd33b869b0c43dc361ede",
+          "at": "2026-06-08T07:42:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10580ac80c32485f5aa2d671a7d447b55186431cbdebd33b869b0c43dc361ede",
+          "at": "2026-06-08T07:45:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:902ca0e696fce0a1f5e161382dee4f2ac116764496d553dc3bfe25a2078020d1",
+          "at": "2026-06-08T07:51:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The prompt contradicts its own fail criteria: after saying unrelated, contradictory, or over-broad claims should return `fail`, it then says that if the verifier cannot quote supporting text it should return `pending`. For the common deterministic-failure case where evidence does not support the claim, there is no supporting quote, so the model can classify real semantic mismatches as `pending` instead of `fail`. That routes fixable reference errors into the human-escalation path rather than the writer/fix loop, weakening the semantic gate.",
+              "severity": "P1",
+              "file": ".harness/prompts/ref-verifier.md",
+              "line": 41,
+              "category": "workflow correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:902ca0e696fce0a1f5e161382dee4f2ac116764496d553dc3bfe25a2078020d1",
+          "at": "2026-06-08T07:54:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be64f03a071c65b724685fe2c7f558a701a2293550ee0d85d4c91ddc994b7af1",
+          "at": "2026-06-08T07:56:45Z"
         }
       ]
     },
@@ -2139,401 +3124,67 @@
           "findings": [],
           "hash": "rvw1:sha256:dfe3ce5f22fe24636f20926311ed91669b55a8ab9e0cec8d7f76fb966ef091a9",
           "at": "2026-06-08T16:43:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f928f5707f66a03e89ae5ade4b980555bd9ff0affa97f7f59120747dbd766e12",
+          "at": "2026-06-09T01:58:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f928f5707f66a03e89ae5ade4b980555bd9ff0affa97f7f59120747dbd766e12",
+          "at": "2026-06-09T03:52:38Z"
         }
       ]
     },
-    "domain": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
-          "at": "2026-06-08T00:26:57Z"
+          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
+          "at": "2026-06-08T03:03:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95090a63efef4eee328e4baba96bc254183e155b93fafe2b8589caaf738ac912",
+          "at": "2026-06-08T04:13:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c2d62946914da75ed0a52a6da4cbd652d17e9a4bed813d5d0958ac4a43434e2",
+          "at": "2026-06-09T01:58:58Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new `EvidenceCitation::try_new` API returns `ValidationError`, and this change adds a production `ValidationError` variant, but the T002 domain catalogue does not declare `ValidationError`; the generated `domain-type-signals.json` now contains a red `ValidationError` signal. The briefing explicitly treats non-add red/yellow domain type signals as factual findings, so the catalogue/implementation contract is inconsistent until `ValidationError` is declared/updated in the catalogue or the public signature avoids the undeclared type.",
+              "message": "The new public `sotp ref-verify` entry point is only exercised through a local `TestCli` wrapper around `RefVerifyCommand`, so the tests do not prove that the top-level binary actually exposes `ref-verify` or that `run_cli` dispatches `CliCommand::RefVerify` to the new handler. A typo or missing top-level wiring here would still pass the new tests, leaving the public CLI API uncovered. Add top-level parse/dispatch coverage for `sotp ref-verify run` and `sotp ref-verify check-approved`, including an error case, consistent with the repository's public API test requirement.",
               "severity": "P1",
-              "file": "libs/domain/src/error.rs",
-              "line": 99,
-              "category": "type-signal"
-            }
-          ],
-          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
-          "at": "2026-06-08T00:30:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
-          "at": "2026-06-08T00:45:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
-          "at": "2026-06-08T00:48:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
-          "at": "2026-06-08T03:03:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
-          "at": "2026-06-08T04:12:17Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Missing `entry_hashes` entries are silently replaced with `ContentHash::from_bytes([0; 32])`. That fabricates a valid-looking but incorrect `entry_hash` in `<layer>-catalogue-spec-signals.json` if the adapter/key-derivation ever drifts, which should fail closed instead of persisting corrupted integrity metadata.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
-              "line": 206,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:a59a6be5ee5c23b3c26f4c61a7afd133c0a12895209e7dadb371543b85d9934a",
-          "at": "2026-06-08T03:04:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0896551e413edf23b3b71715695e6bcb0cb240f86b92a0174db2904d07d2264",
-          "at": "2026-06-08T03:14:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new shared traversal helper is public and now drives both `catalogue_spec_refs` and `catalogue_spec_signals`, but the added tests only cover type entries. There is no direct coverage for trait/function traversal or for a same-short-name cross-section collision, so a regression in `section_key` formatting or section order would reach production unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_traversal.rs",
-              "line": 69,
+              "file": "apps/cli/src/main.rs",
+              "line": 98,
               "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:b7c857a53c1f462b5cd9fbf0a2f5482c080005ecaad365d8af9d89dece6a1c1d",
-          "at": "2026-06-08T03:38:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:11fb2822d7eb0853a16ccb3695b119d2994dff56bbc45764aa9a92453d8ba438",
-          "at": "2026-06-08T03:43:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
-          "at": "2026-06-08T04:10:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The merge gate now receives per-entry catalogue hashes, but it immediately discards `_entry_hashes` and only checks signal count, positional name, document-level `catalogue_declaration_hash`, and color. That means a committed `<layer>-catalogue-spec-signals.json` can contain a stale or fabricated `CatalogueSpecSignal.entry_hash` while the gate still approves, so the semantic Chain ② cache key no longer reflects the current catalogue entry. Compare each signal's `entry_hash()` against the current entry hash map using the same traversal/order and fail closed on missing or mismatched hashes.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 518,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
-          "at": "2026-06-08T04:14:27Z"
+          "hash": "rvw1:sha256:0c2d62946914da75ed0a52a6da4cbd652d17e9a4bed813d5d0958ac4a43434e2",
+          "at": "2026-06-09T03:53:39Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c980ae55c3d11384f209e3a7d7efbb5654364d616eb7d65dffe47e145eae811",
-          "at": "2026-06-08T04:22:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`merge_gate.rs` now has 752 lines of production code before `#[cfg(test)]`, which exceeds the repo's 700-line maximum for production modules. This is an architecture violation and should be split into smaller modules.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/merge_gate.rs",
-              "line": 753,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
-          "at": "2026-06-08T04:36:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
-          "at": "2026-06-08T04:41:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Chain ② per-entry hash block pushes the production portion of `merge_gate.rs` to line 752 before `#[cfg(test)]`, exceeding the repository's 700-line maximum for production modules. This was 690 lines before the change, so the current patch crosses the guardrail; please split the new catalogue-spec integrity/signals logic into a helper module or otherwise reduce this file below the limit.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 665,
-              "category": "module_size"
-            }
-          ],
-          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
-          "at": "2026-06-08T04:44:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89e40b79e65a9a9888e8890d7475c92deaf231dc3023599c264cc5ff0a017354",
-          "at": "2026-06-08T04:54:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
-          "at": "2026-06-08T07:03:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
-          "at": "2026-06-08T07:05:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cache merge is inverted: `retained` keeps existing entries whose `(claim_hash, evidence_hash)` do not match any current production pair, so cache-hit entries are dropped instead of preserved. A mixed hit/miss run will rewrite the cache without the hits, defeating AC-07 and forcing needless re-review on the next run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 650,
-              "category": "correctness"
-            },
-            {
-              "message": "Fast-tier evaluation is still fully sequential. `RefVerifyConfig::max_parallelism` is validated and stored, but `execute` never consults it; both fast passes use plain iterator collection (`.iter().map(...).collect()`). That misses the required parallel fast-tier execution / worker-cap behavior and leaves the configuration dead.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 513,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:247af029381a64564f914d2a39eed76adc8b50d6a296fc298038c9b8815ded84",
-          "at": "2026-06-08T08:55:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Any cache entry whose hashes match a current production pair is treated as a hit regardless of the stored verdict, so a cached `Fail`/`Pending` is never re-checked. The later merge at `639-669` then filters those same entries out of the rewritten artifact and never adds them back, so current cache hits can disappear entirely on the next save. That breaks AC-07 and can let stale failures vanish from the gate.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 497,
-              "category": "correctness"
-            },
-            {
-              "message": "The return order is backwards for degraded calibration: `SemanticFailuresConfirmed` is emitted before `final_calibration_healthy` is checked. If known-bad detection stays below threshold and a production `Fail` is also confirmed, the degraded verifier's verdict is still trusted instead of escalating to `HumanEscalationRequired`, which contradicts the intended precedence.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 673,
-              "category": "correctness"
-            },
-            {
-              "message": "As written, the fast/final verifier loops are strictly serial iterator chains, so the interactor never uses `RefVerifyParallelism` and can only issue one model call at a time. That makes the validated `max_parallelism` config dead and violates the requirement that fast-tier review be parallelized per pair.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 513,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:247af029381a64564f914d2a39eed76adc8b50d6a296fc298038c9b8815ded84",
-          "at": "2026-06-08T08:58:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`save_entries` runs before the final known-bad health check, so a batch that ends in `HumanEscalationRequired` still persists the final-tier verdicts from a degraded verifier into the verify-cache. The ADR/spec text says degraded-verifier verdicts are not trustworthy and should not be cached; gate cache writes on `final_calibration_healthy` (or defer persistence until after this check).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 660,
-              "category": "correctness"
-            },
-            {
-              "message": "The production portion of this module is 767 lines long before the `#[cfg(test)]` block starts at line 770, which exceeds the repository's 700-line production-module limit.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 770,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:0baabb47b6116baebeaf7672fc751bd56985ae0e6f91897fed39ae5146627c8e",
-          "at": "2026-06-08T09:06:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public `RefVerifyApplicationService::execute` path is only covered on success-oriented scenarios; there is no test that stubs `RefVerifyPairSourcePort`, `RefVerifyVerifierPort`, or `RefVerifyCachePort` to return an error and asserts the corresponding fail-closed `RefVerifyError` variant is propagated. That leaves the main error-handling contract for this usecase unverified, which is a P1 coverage gap for a new public API.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 71,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:cea9aa709751997383f53bce7236a1efd3e424e078b7fffdc019ac737b25acd4",
-          "at": "2026-06-08T09:27:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public error variants `VerifierPort` and `CachePersistence` forward raw adapter `message` strings verbatim into `Display`, so any hostnames, SQL fragments, or stack traces returned by adapters will leak into user-visible output/logs. Redact or normalize these messages at the boundary instead of exposing the raw string.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify.rs",
-              "line": 252,
-              "category": "Security"
-            },
-            {
-              "message": "The interactor test suite only covers success and behavioral cases. There are no tests that make `pair_source.load_pairs`, `cache.load_entries/save_entries`, or `verifier.verify_pair` return `Err`, so the new `VerifierPort` and `CachePersistence` failure paths are unverified. Add negative tests for each port boundary to satisfy the public-API test requirement.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify/interactor.rs",
-              "line": 627,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:cea9aa709751997383f53bce7236a1efd3e424e078b7fffdc019ac737b25acd4",
-          "at": "2026-06-08T09:34:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On the first `Err` or panic from a worker, this returns immediately and drops the remaining `JoinHandle`s for the chunk. Those threads keep running detached, so a failed batch can still continue calling the verifier after the use case has already reported failure. Join or cancel the rest of the chunk before returning so the gate actually aborts fail-closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 331,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7b2aa19f6360604b80e28d7145eb649f3b388d92fe6bd8e78e6ae184c69d8cec",
-          "at": "2026-06-08T09:42:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`HumanEscalationRequired { pair_count }` undercounts unresolved work when a degraded batch also has pending production pairs. The code returns either `confirmed_pending` or `known_bad_probes.len()`, so a run with both categories reports only one side of the problem instead of the total unresolved count described by the type docs.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify/interactor.rs",
-              "line": 220,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bbbda946584f916cee08d11a33dac58624e4bc5ab2a05301c66d9eae68471245",
-          "at": "2026-06-08T09:49:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RefVerifyError::TrackNotActive` advertises an active-track guard, but `RefVerifyCommand` carries no current-branch/active-track input and this usecase layer has no branch-reader port. As written, nothing in this scope can actually enforce the promised guard, so the public API can run on a non-track branch without surfacing `TrackNotActive`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify.rs",
-              "line": 74,
-              "category": "correctness"
-            },
-            {
-              "message": "The result classification gives `SemanticFailuresConfirmed` precedence over `HumanEscalationRequired`. If a batch contains both a confirmed production fail and at least one unresolved/pending pair, the function returns the fail variant and masks the pending case, even though the type docs say pending/unresolved results must surface as human escalation. This needs pending to win or a split result path.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify/interactor.rs",
-              "line": 281,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8367c65648195792f8f2e6134f283a9c852c21b9ed35181f06e8ebbb4ed0dbdb",
-          "at": "2026-06-08T09:56:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Pending` is checked before `Fail`, so a healthy batch that contains both verdicts returns `HumanEscalationRequired` instead of `SemanticFailuresConfirmed`. The intended rule is to prioritize confirmed failures in this mixed case so the writer/fix loop can act on them.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 292,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2d4eea329435adbde9ed99718fa1e624f04e86ef160452f60735cf9514c6885a",
-          "at": "2026-06-08T10:04:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Cache retention is global across scopes: `fresh_hashes` is built without `cache_scope`, and the retain filter drops any existing entry whose `(claim_hash, evidence_hash)` appears in any freshly evaluated pair. If the same hash pair exists in another scope, saving this run will delete that scope's cache entry even though it was never re-evaluated. The pruning needs to be scope-local because caches are stored in separate artifacts per scope.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 241,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ab2dee14618f765b0ce7aa0269cf0dcd24d8b199c08f5c649d9d9d4622d294ee",
-          "at": "2026-06-08T10:10:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00331d05fb2e728f8facc70fadde7adc2e15409c118421415655dc631146fe45",
-          "at": "2026-06-08T10:17:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00331d05fb2e728f8facc70fadde7adc2e15409c118421415655dc631146fe45",
-          "at": "2026-06-08T10:21:10Z"
+          "hash": "rvw1:sha256:29aa3e9b51c59c824464aeef6f464e819d74b1c9d5c73d267e2f29d9607fe235",
+          "at": "2026-06-09T04:00:40Z"
         }
       ]
     }

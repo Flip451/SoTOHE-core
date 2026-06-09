@@ -14,6 +14,7 @@ pub mod guard;
 pub mod hook;
 pub mod plan;
 pub mod pr;
+pub mod ref_verify;
 pub mod review;
 pub mod semantic_dup;
 pub mod track;
