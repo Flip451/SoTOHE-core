@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d632f0a3402231b8723e882f2a065514acccac0ab691763bf24888b3c4992e7f",
+  "catalogue_declaration_hash": "b4b7ff130d4f8c1dd117c339d0dad54069f4fadd298ea2b09a6fb10e5924ca65",
   "signals": [
     {
       "type_name": "AgentExecutionRunner",
@@ -25,7 +25,7 @@
     {
       "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
       "signal": "blue",
-      "entry_hash": "f54f4795b9eb0dc6dcf59c6f83db33e12abb77c6c0128a01587d367b4ad1bc80"
+      "entry_hash": "f2cd3eec7601126a3fe9297a9ec5c642bc75ae2f78e8e8be617125970c2592fd"
     },
     {
       "type_name": "RefVerifyCacheAdapter",
@@ -50,7 +50,7 @@
     {
       "type_name": "SpecAdrVerifyCacheDocumentCodec",
       "signal": "blue",
-      "entry_hash": "89591ffa8f85b1a48d63ab6d7f483a343945cf06b84abfb463773ac9ea898383"
+      "entry_hash": "d68c9eefb69b0472f8bca2c796170efe154791d331e04675067833a09cb27fab"
     }
   ]
 }

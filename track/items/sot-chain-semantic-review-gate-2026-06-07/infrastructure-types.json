@@ -356,9 +356,7 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": false
+          "kind": "unit"
         }
       },
       "methods": [],
@@ -389,9 +387,7 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": false
+          "kind": "unit"
         }
       },
       "methods": [],
@@ -574,7 +570,8 @@
           "receiver": null,
           "params": [
             { "name": "profiles", "ty": "std::sync::Arc<AgentProfiles>" },
-            { "name": "runner", "ty": "std::sync::Arc<AgentExecutionRunner>" }
+            { "name": "runner", "ty": "std::sync::Arc<AgentExecutionRunner>" },
+            { "name": "project_root", "ty": "std::path::PathBuf" }
           ],
           "returns": "Self",
           "is_async": false,

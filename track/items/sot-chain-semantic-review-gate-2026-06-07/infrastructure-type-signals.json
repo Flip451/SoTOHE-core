@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-08T10:52:48Z",
-  "declaration_hash": "d632f0a3402231b8723e882f2a065514acccac0ab691763bf24888b3c4992e7f",
+  "generated_at": "2026-06-09T01:33:42Z",
+  "declaration_hash": "b4b7ff130d4f8c1dd117c339d0dad54069f4fadd298ea2b09a6fb10e5924ca65",
   "signals": [
     {
       "type_name": "AgentExecutionRunner",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AgentProfiles",
@@ -21,9 +21,9 @@
     {
       "type_name": "AgentRefVerifierAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "RefVerifierPort",
         "core::fmt::Debug"
       ]
@@ -42,7 +42,7 @@
     {
       "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::fmt::Debug"
@@ -51,9 +51,9 @@
     {
       "type_name": "RefVerifyCacheAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "RefVerifyCachePort",
         "core::fmt::Debug"
       ]
@@ -61,9 +61,9 @@
     {
       "type_name": "RefVerifyPairSourceAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "RefVerifyPairSourcePort",
         "core::fmt::Debug"
       ]
@@ -84,7 +84,7 @@
     {
       "type_name": "SpecAdrVerifyCacheDocumentCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::fmt::Debug"

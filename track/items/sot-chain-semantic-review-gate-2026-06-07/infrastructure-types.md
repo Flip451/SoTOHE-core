@@ -10,7 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AgentExecutionRunner | value_object | — | — | 🟡 | 🔵 |
+| AgentExecutionRunner | value_object | — | — | 🔵 | 🔵 |
 
 ## Error Types
 
@@ -29,9 +29,9 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | AgentProfiles | secondary_adapter | modify | impl Debug | 🔵 | 🔵 |
-| AgentRefVerifierAdapter | secondary_adapter | — | impl Debug, impl RefVerifierPort | 🟡 | 🔵 |
-| CatalogueSpecVerifyCacheDocumentCodec | secondary_adapter | — | impl Debug | 🟡 | 🔵 |
-| RefVerifyCacheAdapter | secondary_adapter | — | impl Debug, impl RefVerifyCachePort | 🟡 | 🔵 |
-| RefVerifyPairSourceAdapter | secondary_adapter | — | impl Debug, impl RefVerifyPairSourcePort | 🟡 | 🔵 |
-| SpecAdrVerifyCacheDocumentCodec | secondary_adapter | — | impl Debug | 🟡 | 🔵 |
+| AgentRefVerifierAdapter | secondary_adapter | — | impl Debug, impl RefVerifierPort | 🔵 | 🔵 |
+| CatalogueSpecVerifyCacheDocumentCodec | secondary_adapter | — | impl Debug | 🔵 | 🔵 |
+| RefVerifyCacheAdapter | secondary_adapter | — | impl Debug, impl RefVerifyCachePort | 🔵 | 🔵 |
+| RefVerifyPairSourceAdapter | secondary_adapter | — | impl Debug, impl RefVerifyPairSourcePort | 🔵 | 🔵 |
+| SpecAdrVerifyCacheDocumentCodec | secondary_adapter | — | impl Debug | 🔵 | 🔵 |
 

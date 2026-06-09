@@ -77,401 +77,6 @@
         }
       ]
     },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
-          "at": "2026-06-08T00:26:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `EvidenceCitation::try_new` API returns `ValidationError`, and this change adds a production `ValidationError` variant, but the T002 domain catalogue does not declare `ValidationError`; the generated `domain-type-signals.json` now contains a red `ValidationError` signal. The briefing explicitly treats non-add red/yellow domain type signals as factual findings, so the catalogue/implementation contract is inconsistent until `ValidationError` is declared/updated in the catalogue or the public signature avoids the undeclared type.",
-              "severity": "P1",
-              "file": "libs/domain/src/error.rs",
-              "line": 99,
-              "category": "type-signal"
-            }
-          ],
-          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
-          "at": "2026-06-08T00:30:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
-          "at": "2026-06-08T00:45:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
-          "at": "2026-06-08T00:48:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
-          "at": "2026-06-08T03:03:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
-          "at": "2026-06-08T04:12:17Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Missing `entry_hashes` entries are silently replaced with `ContentHash::from_bytes([0; 32])`. That fabricates a valid-looking but incorrect `entry_hash` in `<layer>-catalogue-spec-signals.json` if the adapter/key-derivation ever drifts, which should fail closed instead of persisting corrupted integrity metadata.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
-              "line": 206,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:a59a6be5ee5c23b3c26f4c61a7afd133c0a12895209e7dadb371543b85d9934a",
-          "at": "2026-06-08T03:04:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0896551e413edf23b3b71715695e6bcb0cb240f86b92a0174db2904d07d2264",
-          "at": "2026-06-08T03:14:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new shared traversal helper is public and now drives both `catalogue_spec_refs` and `catalogue_spec_signals`, but the added tests only cover type entries. There is no direct coverage for trait/function traversal or for a same-short-name cross-section collision, so a regression in `section_key` formatting or section order would reach production unnoticed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_traversal.rs",
-              "line": 69,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b7c857a53c1f462b5cd9fbf0a2f5482c080005ecaad365d8af9d89dece6a1c1d",
-          "at": "2026-06-08T03:38:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:11fb2822d7eb0853a16ccb3695b119d2994dff56bbc45764aa9a92453d8ba438",
-          "at": "2026-06-08T03:43:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
-          "at": "2026-06-08T04:10:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The merge gate now receives per-entry catalogue hashes, but it immediately discards `_entry_hashes` and only checks signal count, positional name, document-level `catalogue_declaration_hash`, and color. That means a committed `<layer>-catalogue-spec-signals.json` can contain a stale or fabricated `CatalogueSpecSignal.entry_hash` while the gate still approves, so the semantic Chain ② cache key no longer reflects the current catalogue entry. Compare each signal's `entry_hash()` against the current entry hash map using the same traversal/order and fail closed on missing or mismatched hashes.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 518,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
-          "at": "2026-06-08T04:14:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c980ae55c3d11384f209e3a7d7efbb5654364d616eb7d65dffe47e145eae811",
-          "at": "2026-06-08T04:22:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`merge_gate.rs` now has 752 lines of production code before `#[cfg(test)]`, which exceeds the repo's 700-line maximum for production modules. This is an architecture violation and should be split into smaller modules.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/merge_gate.rs",
-              "line": 753,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
-          "at": "2026-06-08T04:36:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
-          "at": "2026-06-08T04:41:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new Chain ② per-entry hash block pushes the production portion of `merge_gate.rs` to line 752 before `#[cfg(test)]`, exceeding the repository's 700-line maximum for production modules. This was 690 lines before the change, so the current patch crosses the guardrail; please split the new catalogue-spec integrity/signals logic into a helper module or otherwise reduce this file below the limit.",
-              "severity": "P1",
-              "file": "libs/usecase/src/merge_gate.rs",
-              "line": 665,
-              "category": "module_size"
-            }
-          ],
-          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
-          "at": "2026-06-08T04:44:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89e40b79e65a9a9888e8890d7475c92deaf231dc3023599c264cc5ff0a017354",
-          "at": "2026-06-08T04:54:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
-          "at": "2026-06-08T07:03:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
-          "at": "2026-06-08T07:05:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cache merge is inverted: `retained` keeps existing entries whose `(claim_hash, evidence_hash)` do not match any current production pair, so cache-hit entries are dropped instead of preserved. A mixed hit/miss run will rewrite the cache without the hits, defeating AC-07 and forcing needless re-review on the next run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 650,
-              "category": "correctness"
-            },
-            {
-              "message": "Fast-tier evaluation is still fully sequential. `RefVerifyConfig::max_parallelism` is validated and stored, but `execute` never consults it; both fast passes use plain iterator collection (`.iter().map(...).collect()`). That misses the required parallel fast-tier execution / worker-cap behavior and leaves the configuration dead.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 513,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:247af029381a64564f914d2a39eed76adc8b50d6a296fc298038c9b8815ded84",
-          "at": "2026-06-08T08:55:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Any cache entry whose hashes match a current production pair is treated as a hit regardless of the stored verdict, so a cached `Fail`/`Pending` is never re-checked. The later merge at `639-669` then filters those same entries out of the rewritten artifact and never adds them back, so current cache hits can disappear entirely on the next save. That breaks AC-07 and can let stale failures vanish from the gate.",
-              "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 497,
-              "category": "correctness"
-            },
-            {
-              "message": "The return order is backwards for degraded calibration: `SemanticFailuresConfirmed` is emitted before `final_calibration_healthy` is checked. If known-bad detection stays below threshold and a production `Fail` is also confirmed, the degraded verifier's verdict is still trusted instead of escalating to `HumanEscalationRequired`, which contradicts the intended precedence.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 673,
-              "category": "correctness"
-            },
-            {
-              "message": "As written, the fast/final verifier loops are strictly serial iterator chains, so the interactor never uses `RefVerifyParallelism` and can only issue one model call at a time. That makes the validated `max_parallelism` config dead and violates the requirement that fast-tier review be parallelized per pair.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 513,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:247af029381a64564f914d2a39eed76adc8b50d6a296fc298038c9b8815ded84",
-          "at": "2026-06-08T08:58:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`save_entries` runs before the final known-bad health check, so a batch that ends in `HumanEscalationRequired` still persists the final-tier verdicts from a degraded verifier into the verify-cache. The ADR/spec text says degraded-verifier verdicts are not trustworthy and should not be cached; gate cache writes on `final_calibration_healthy` (or defer persistence until after this check).",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 660,
-              "category": "correctness"
-            },
-            {
-              "message": "The production portion of this module is 767 lines long before the `#[cfg(test)]` block starts at line 770, which exceeds the repository's 700-line production-module limit.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
-              "line": 770,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:0baabb47b6116baebeaf7672fc751bd56985ae0e6f91897fed39ae5146627c8e",
-          "at": "2026-06-08T09:06:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public `RefVerifyApplicationService::execute` path is only covered on success-oriented scenarios; there is no test that stubs `RefVerifyPairSourcePort`, `RefVerifyVerifierPort`, or `RefVerifyCachePort` to return an error and asserts the corresponding fail-closed `RefVerifyError` variant is propagated. That leaves the main error-handling contract for this usecase unverified, which is a P1 coverage gap for a new public API.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 71,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:cea9aa709751997383f53bce7236a1efd3e424e078b7fffdc019ac737b25acd4",
-          "at": "2026-06-08T09:27:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new public error variants `VerifierPort` and `CachePersistence` forward raw adapter `message` strings verbatim into `Display`, so any hostnames, SQL fragments, or stack traces returned by adapters will leak into user-visible output/logs. Redact or normalize these messages at the boundary instead of exposing the raw string.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify.rs",
-              "line": 252,
-              "category": "Security"
-            },
-            {
-              "message": "The interactor test suite only covers success and behavioral cases. There are no tests that make `pair_source.load_pairs`, `cache.load_entries/save_entries`, or `verifier.verify_pair` return `Err`, so the new `VerifierPort` and `CachePersistence` failure paths are unverified. Add negative tests for each port boundary to satisfy the public-API test requirement.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify/interactor.rs",
-              "line": 627,
-              "category": "Testing"
-            }
-          ],
-          "hash": "rvw1:sha256:cea9aa709751997383f53bce7236a1efd3e424e078b7fffdc019ac737b25acd4",
-          "at": "2026-06-08T09:34:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On the first `Err` or panic from a worker, this returns immediately and drops the remaining `JoinHandle`s for the chunk. Those threads keep running detached, so a failed batch can still continue calling the verifier after the use case has already reported failure. Join or cancel the rest of the chunk before returning so the gate actually aborts fail-closed.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 331,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:7b2aa19f6360604b80e28d7145eb649f3b388d92fe6bd8e78e6ae184c69d8cec",
-          "at": "2026-06-08T09:42:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`HumanEscalationRequired { pair_count }` undercounts unresolved work when a degraded batch also has pending production pairs. The code returns either `confirmed_pending` or `known_bad_probes.len()`, so a run with both categories reports only one side of the problem instead of the total unresolved count described by the type docs.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify/interactor.rs",
-              "line": 220,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:bbbda946584f916cee08d11a33dac58624e4bc5ab2a05301c66d9eae68471245",
-          "at": "2026-06-08T09:49:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`RefVerifyError::TrackNotActive` advertises an active-track guard, but `RefVerifyCommand` carries no current-branch/active-track input and this usecase layer has no branch-reader port. As written, nothing in this scope can actually enforce the promised guard, so the public API can run on a non-track branch without surfacing `TrackNotActive`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify.rs",
-              "line": 74,
-              "category": "correctness"
-            },
-            {
-              "message": "The result classification gives `SemanticFailuresConfirmed` precedence over `HumanEscalationRequired`. If a batch contains both a confirmed production fail and at least one unresolved/pending pair, the function returns the fail variant and masks the pending case, even though the type docs say pending/unresolved results must surface as human escalation. This needs pending to win or a split result path.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify/interactor.rs",
-              "line": 281,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:8367c65648195792f8f2e6134f283a9c852c21b9ed35181f06e8ebbb4ed0dbdb",
-          "at": "2026-06-08T09:56:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Pending` is checked before `Fail`, so a healthy batch that contains both verdicts returns `HumanEscalationRequired` instead of `SemanticFailuresConfirmed`. The intended rule is to prioritize confirmed failures in this mixed case so the writer/fix loop can act on them.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 292,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2d4eea329435adbde9ed99718fa1e624f04e86ef160452f60735cf9514c6885a",
-          "at": "2026-06-08T10:04:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Cache retention is global across scopes: `fresh_hashes` is built without `cache_scope`, and the retain filter drops any existing entry whose `(claim_hash, evidence_hash)` appears in any freshly evaluated pair. If the same hash pair exists in another scope, saving this run will delete that scope's cache entry even though it was never re-evaluated. The pruning needs to be scope-local because caches are stored in separate artifacts per scope.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
-              "line": 241,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:ab2dee14618f765b0ce7aa0269cf0dcd24d8b199c08f5c649d9d9d4622d294ee",
-          "at": "2026-06-08T10:10:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00331d05fb2e728f8facc70fadde7adc2e15409c118421415655dc631146fe45",
-          "at": "2026-06-08T10:17:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00331d05fb2e728f8facc70fadde7adc2e15409c118421415655dc631146fe45",
-          "at": "2026-06-08T10:21:10Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -614,6 +219,814 @@
           "findings": [],
           "hash": "rvw1:sha256:f32e6181517fcf29e62ada8600b5c1b6a962cd376fb2b658e299e73bdfa83088",
           "at": "2026-06-08T07:46:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_adr_anchor_text` never matches the ADR structure used in this repo: it only looks for `## ` headings and never parses the front-matter `decisions` list or the actual `### Dn` sections. As a result, Chain-1 pairs fall back to the whole ADR text instead of the referenced decision section, which can make the verifier accept claims against unrelated content.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 195,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_json_object` counts `{`/`}` bytes without tracking JSON string state. A valid model response whose `citation` or `reason` contains an unmatched brace character will be treated as \"no JSON object\" and rejected even though the JSON itself is valid.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 652,
+              "category": "correctness"
+            },
+            {
+              "message": "When a `SpecRef.anchor` cannot be resolved, Chain-2 enumeration silently fabricates `\"[anchor] (not found)\"` evidence instead of failing the port. That turns broken catalogue/spec links into cacheable semantic pairs and hides structural reference errors.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 277,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6edec750fd6584b1bfab097542b164146dd13e7994a80434c6408c0fb8335758",
+          "at": "2026-06-08T11:21:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Chain-1 evidence extraction does not match the ADR format in this repo. `read_adr_anchor_text` only scans `##` headings and never parses the front-matter `decisions` list or the actual `### Dn` sections, so it usually falls back to the whole ADR text. That makes the verifier compare claims against unrelated content instead of the referenced decision section.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 195,
+              "category": "correctness"
+            },
+            {
+              "message": "For Chain-1 the cache key is supposed to use the ADR file's git blob hash, but `enumerate_chain1_pairs` hashes the extracted anchor text (`evidence_text`) instead. Any change outside the anchored excerpt will therefore reuse a stale cache entry and skip re-review.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 171,
+              "category": "correctness"
+            },
+            {
+              "message": "When a `SpecRef.anchor` cannot be resolved, Chain-2 enumeration fabricates `\"[anchor] (not found)\"` and still returns a pair. That turns a broken reference into a cacheable semantic result instead of failing closed, so structural link errors can be silently masked.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 277,
+              "category": "correctness"
+            },
+            {
+              "message": "The JSON extractor is not string-aware: it balances raw `{`/`}` bytes without tracking whether they appear inside a quoted string. A valid `citation` or `reason` containing an unmatched brace will be truncated or rejected even though the model returned valid JSON.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 652,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6edec750fd6584b1bfab097542b164146dd13e7994a80434c6408c0fb8335758",
+          "at": "2026-06-08T11:25:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The section-end calculation is off by one: for `###` headings it only stops at `##`/`#`, so a matched ADR decision can absorb later sibling `###` decisions and return the wrong evidence block.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 221,
+              "category": "correctness"
+            },
+            {
+              "message": "The anchor matcher uses `contains(anchor)`, so anchors like `D1` can match `D10`/`D11` and resolve the wrong section instead of failing when the exact decision id is absent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 236,
+              "category": "correctness"
+            },
+            {
+              "message": "This parse-error path logs `raw_output` verbatim. The raw model response includes the full prompt context, so a malformed verifier reply can leak claim/evidence text into logs or error reports.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 651,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:dcfd938cfd563191377b4cfafdd2a8010aed8ebf76d2e1c6ae1cabdbcb7d7e4e",
+          "at": "2026-06-08T11:34:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyPairSourceAdapter` reads `AdrRef.file` straight from `spec.json` with `project_root.join(...)` and `read_to_string(...)` instead of the repo-root/symlink guard used elsewhere. A crafted ADR ref can escape the track root and make `ref-verify` read arbitrary local files, which are then forwarded to the model. See [ref_verify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs#L170).",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 170,
+              "category": "security"
+            },
+            {
+              "message": "`read_adr_anchor_text` falls back to the whole ADR when no heading matches `adr_refs[].anchor` instead of returning an error. That turns a broken anchor into a semantic review of the wrong source rather than failing closed. See [ref_verify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs#L262).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 262,
+              "category": "error handling"
+            },
+            {
+              "message": "`enumerate_chain2_pairs_for_layer` treats a missing `<layer>-types.json` as `Ok(Vec::new())`. In an explicit `Chain2 { layer }` run, a deleted or renamed catalogue becomes a no-op, so the gate can pass without verifying that layer at all. See [ref_verify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs#L273).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 273,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3d13622067049d7307c1757af72325860184e43ab8b2e78a88705a50d82f3d1d",
+          "at": "2026-06-08T11:40:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Chain 1 caches the rendered `[id] text` string at `claim_hash` instead of the canonical spec-element hash. D4 says the key must be `(spec-element hash, ADR blob hash)`, so edits to `adr_refs`, `convention_refs`, or other non-rendered fields will keep the same cache key and incorrectly reuse a stale verdict.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 240,
+              "category": "cache key correctness"
+            },
+            {
+              "message": "Chain 2 hashes the rendered `[section_key] key` string and the rendered spec text, but D4 requires `(catalogue-entry hash, spec-element hash)`. Because neither hash is derived from the canonical JSON subtree, changing an entry's `spec_refs`/`informal_grounds` or the spec element's metadata will not invalidate the cache and the pair can be skipped.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 403,
+              "category": "cache key correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:45571dbf2b20a55749f5226933b45398b3f8d801a67fef1c53a84e47799f0ee7",
+          "at": "2026-06-08T11:50:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This does not compile as written: `cmd.scope` is moved out of `&RefVerifyCommand` in `matches!(cmd.scope, ...)`, and the value is then borrowed again in the later `match &cmd.scope`. Borrow the scope (`matches!(&cmd.scope, ...)`) or clone it before matching.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 170,
+              "category": "correctness"
+            },
+            {
+              "message": "`spec.json` and `<layer>-types.json` are read with plain `read_to_string` from `track_dir` without the repo-root symlink guard used elsewhere. A symlinked track file can redirect ref-verify to arbitrary local files and forward their contents to the model; guard these paths before reading, the same way ADR refs are guarded.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 207,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:ed1847eecd267333e3ad69f33df908a3e3a079e3cce46df774f3c38e4f67d090",
+          "at": "2026-06-08T11:59:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`create_dir_all(parent)` runs before the cache-path symlink guard. If `track/items/<track_id>` or one of its ancestors is a symlink, this can already redirect directory creation outside the workspace before the guard rejects the path, so the cache write protection is not actually enforced at the mutation point.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 239,
+              "category": "security"
+            },
+            {
+              "message": "`extract_json_object_parsed` only ever starts at the first `{` in the entire response. A valid JSON verdict that is preceded by any stray brace in prose or a code sample will fail closed even though parseable JSON appears later, which makes the verifier brittle to normal model output noise.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 495,
+              "category": "robustness"
+            }
+          ],
+          "hash": "rvw1:sha256:653ba2a0b1ee6004602c841cb7e28edc65484edc9a17fbcdbfba751ba1325252",
+          "at": "2026-06-08T12:18:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`save_entries` only checks the cache path for symlinks before `create_dir_all`/`write`. A concurrent replacement of `track/items/<track_id>` or one of its ancestors with a symlink between that guard and the write can redirect `spec-adr-verify-cache.json` or `<layer>-catalogue-spec-verify-cache.json` outside the workspace. This is a TOCTOU security hole in a path that is explicitly intended to resist redirect attacks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 243,
+              "category": "security"
+            },
+            {
+              "message": "`RefVerifyPairSourceAdapter::load_pairs` is the core public entrypoint for chain routing, file resolution, and known-bad probe injection, but there is no end-to-end test covering it. The current suite only exercises helpers and the cache/verifier adapters, so regressions in the primary adapter path would not be caught.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 96,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:2a9f207c717197e42726a7ad01866535ed263598378b9ed017467cfa5c64ac2e",
+          "at": "2026-06-08T12:24:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`save_entries` does a separate symlink check and then writes in place with `std::fs::write`. That leaves a TOCTOU window where a concurrent symlink swap on an ancestor can redirect the cache write outside the workspace, and a crash can leave a truncated JSON cache. This should use the repo's `WriteGuard` + `atomic_write_file` pattern instead of direct writes.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 278,
+              "category": "security"
+            },
+            {
+              "message": "`verify_pair` validates the prompt-template path and then reuses the same path for `read_to_string`. A symlink swap after `validate_template_path` succeeds but before the read can redirect this into an arbitrary host-file read; the same race exists in `load_entries`. The file needs to be opened through a stable no-follow handle, not just checked by path first.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 413,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:696ec6ad27b527070ddadf29e0308c232c571c4b9fa55771db204b8d3689ffbc",
+          "at": "2026-06-08T12:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Prompt rendering is order-dependent: the chained `replace()` calls can rewrite placeholder strings that were already inserted from `claim` or `evidence`. If either input contains `{{evidence}}` or `{{tier}}`, the prompt sent to the model is silently corrupted, which can change verifier outcomes. Render the template in one pass or escape substituted values before interpolation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 570,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_json_object_parsed()` accepts the first parseable JSON object anywhere in the model output. That means a response containing an example/prologue object before the actual verdict will be misread as the final verdict, producing a silent wrong Pass/Fail/Pending result. The parser needs a stricter rule (for example, only accept a single top-level object or the last object) and coverage for multi-object outputs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 645,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:25632ffdfa318efd180d53dc14b0579660151aa320f0d0e4577a7172a846822b",
+          "at": "2026-06-08T12:49:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `read_adr_anchor_text()` is resolving `AdrRef.anchor` against markdown headings (`###`/`##`) instead of the ADR YAML front-matter `decisions[].id` list that this repo actually uses. The ADR for this track stores `D1`..`D9` in front-matter at the top of the file, and the existing structural checker already resolves anchors that way, so legitimate ADR refs will fail to load here unless the ADR happens to duplicate the decision id as a heading. That makes Chain-1 pair enumeration reject normal tracks.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 171,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:9e9c313ea518324cebd441aebb3cf87ba8e4242685d5e2f8659d8e1a7eea1eb2",
+          "at": "2026-06-08T12:55:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_adr_anchor_text()` validates `adr_path` up front but then re-opens it with `std::fs::read_to_string()`. That creates a TOCTOU window: a local attacker can swap the file or an ancestor symlink after the guard passes and make the verifier read outside `project_root`. The same check-then-open pattern is used for the spec/catalogue reads elsewhere in this module, and `CacheWriteGuard::acquire()` has a similar race around `create_dir_all()`. Use the no-follow/held-descriptor helper instead of reopening by path.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 193,
+              "category": "security"
+            },
+            {
+              "message": "`verify_pair()` includes the first 120 bytes of raw model output in the parse-error message. Because the prompt carries the full claim/evidence pair, a malformed or echoing response can leak internal track content into logs. Return an opaque error or a redacted/hash-only snippet instead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 585,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:300924186f5c2c25aa2eb39aed972296dbd5ecb6bd1d391eac10af465c1aee2f",
+          "at": "2026-06-08T13:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[P1] `matches!(cmd.scope, ...)` moves `cmd.scope` out of `&RefVerifyCommand`, and the later `match &cmd.scope` borrows it again. This does not compile as written; borrow the enum (`matches!(&cmd.scope, ...)`) or clone it before the first match.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 304,
+              "category": "correctness"
+            },
+            {
+              "message": "[P0] `save_entries` still performs a path-validated, path-based write via `atomic_write_file(&path, ...)` after `CacheWriteGuard::acquire`. That leaves a TOCTOU window where an ancestor symlink swap can redirect the temp-file creation/rename outside `project_root`; this needs a held directory handle or openat-style write, not a post-write recheck.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 437,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:3584a537cc8407de1c187b07d6f64af27d2cf4cfe1fb1b056b0e1067d7a2883c",
+          "at": "2026-06-08T13:16:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CacheWriteGuard::acquire` validates `lock_path` with `reject_symlinks_below`, but then opens the lock file by pathname. A concurrent swap of `track/items/<id>` after validation can redirect `create(true)` outside `trusted_root` before `verify_opened_file_within_root` runs, so the cache-lock path still has a symlink TOCTOU escape.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 164,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:6833813ef397e1f6a953da63ae2b9378005ec37bad782d93662a1bf6d7c5fcd7",
+          "at": "2026-06-08T13:29:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`verify_opened_file_within_root` fails open: if `/proc/self/fd/<fd>` cannot be read, it falls back to `path.canonicalize()`, and the `#[cfg(not(unix))]` branch returns `Ok(())` unconditionally. That reintroduces the TOCTOU race this helper is meant to prevent, so `read_guarded_text` and the cache write path can still be redirected outside the trusted root after the pre-check. Make the check fail closed when fd-based verification is unavailable, or use a directory-fd based approach on every supported platform.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 85,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:6e3c9db672b8225698b26f6e0898da7d2105e0d91ddffe904847592af8a99e88",
+          "at": "2026-06-08T13:42:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On non-Unix builds, `verify_opened_file_within_root` always returns an error, but `read_guarded_text` calls it unconditionally. That makes every spec/ADR/cache/template read fail on Windows even though the module has a non-Unix fallback path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 95,
+              "category": "correctness"
+            },
+            {
+              "message": "The production portion of `ref_verify.rs` is still 736 lines before `#[cfg(test)]`, so it exceeds the repo's 700-line module cap. The extraction into `pair_source.rs` did not bring the parent module back under the stated limit.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:ee8d7b670fac460052cfef4b56c12115a1e4625d786860d6a54178bdbade7b0e",
+          "at": "2026-06-08T13:51:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_and_guard_path` normalizes the candidate path but not `project_root`, then checks `resolved.starts_with(project_root)`. With the repo's common relative roots (for example `.` or any root containing `.` segments), this rejects otherwise valid `track/items/<id>/...` paths as \"path escapes project root\", so Chain-1/Chain-2 enumeration breaks unless the caller canonicalizes first. Canonicalize/normalize `project_root` before this containment check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 68,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:41ad39703789ec6785991b92a83630df3570fd0424246b2f3a6c45efeff21dea",
+          "at": "2026-06-08T14:03:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 correctness: [`libs/infrastructure/src/ref_verify/pair_source.rs:66`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs#L66) compares a canonicalized `project_root` against `resolved`, which is only lexically normalized. With non-canonical roots, valid `track/items/...` paths can be rejected as escaping the project root, breaking Chain-1/Chain-2 enumeration. Canonicalize or normalize both sides before the containment check.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 66,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:27f02f4acce1c8c55bc71732e6fbd20a51218f8a8d87e59110472ecae1407146",
+          "at": "2026-06-08T14:09:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Symlink validation here is still check-then-open: after `reject_symlinks_below()` succeeds, a concurrent rename/symlink swap can redirect `open_nofollow_read()` to a different file outside the trusted root. Because this helper is used for `spec.json`, catalogues, ADRs, and prompt templates, the verifier can be fed attacker-controlled content or wrong cache keys under a filesystem race. Use a dirfd-pinned/openat-style read path (similar to the write side) or another atomic read strategy.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 32,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:0e46cede436c7299b7254da0ab5da3ffb89d6c417b6576a952c51ba6bf351bfa",
+          "at": "2026-06-08T14:19:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 security issue: [libs/infrastructure/src/ref_verify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs#L35) still does symlink validation before opening the file. Because this helper reads `spec.json`, catalogues, ADRs, and prompt templates, a concurrent rename/symlink swap between `reject_symlinks_below()` and `open_child_in_dir()` can make the verifier consume a different file than the one it validated. This needs a dirfd-pinned/openat-style read path end-to-end, not a validate-then-open sequence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 35,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:825eedb3a34b717e8c2d4aaa8013b76d649d78ad81f35ad01b89aebf0da63acf",
+          "at": "2026-06-08T14:32:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The non-Unix path guards still use validate-then-open / validate-then-rename I/O (`reject_symlinks_below` followed by `open(path)` or `atomic_write_file(path, ...)`). A concurrent symlink or rename swap between the check and the actual open can redirect `ref-verify` reads or writes outside `project_root` on Windows/non-Unix builds. The Unix fd-pinned path is safe, but this branch remains raceable.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 69,
+              "category": "security"
+            }
+          ],
+          "hash": "rvw1:sha256:d60cf3faa67e7ae3da2d51ad6f51c71f12eb27f75f9f09dae391335bcebfe059",
+          "at": "2026-06-08T14:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new guarded filesystem boundary is only exercised on the happy path. There is no adapter-level negative test that drives `RefVerifyPairSourceAdapter::load_pairs` or the cache write path with a rejected `AdrRef.file`, symlinked artifact, or other path-escape case, so a regression in the security guard would still ship green.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 293,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f3b7ce1c8a9cbd13403644dde0fa69c36f69c8bf3594be33df01031c062e2d34",
+          "at": "2026-06-08T14:59:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_entries()` accepts `<layer>-catalogue-spec-verify-cache.json` content without checking that the decoded `doc.layer` matches the requested `RefVerifyCacheScope::CatalogueSpec { layer }`. A copied or renamed cache file can therefore be loaded under the wrong layer and silently reuse verdicts across scopes. Fail closed on any layer mismatch before returning `doc.entries`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 387,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ac653f695871cd7016c23da8a4acee235bd6afa05fc847171fe4032ced921c82",
+          "at": "2026-06-08T15:10:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_dir(track_dir)` follows a symlinked `track/items/<track_id>` directory instead of using the guarded, descriptor-pinned opening pattern used everywhere else in this module. In `All` scope, layer discovery can therefore depend on the symlink target's directory contents rather than staying confined to the repository root.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 598,
+              "category": "security"
+            },
+            {
+              "message": "This parser accepts any nested JSON object that matches `VerdictResponseDto` because it scans every `{` and keeps the last parseable slice. A malformed wrapper such as `{\"meta\":{\"kind\":\"pass\",\"citation\":\"x\"}}` will be treated as a valid pass even though the top-level JSON is not a verdict object.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 565,
+              "category": "logic"
+            }
+          ],
+          "hash": "rvw1:sha256:07ef29c15b880755833605e19f95d52e935fc25cc94187351a81c57b0286d92d",
+          "at": "2026-06-08T15:18:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Reject model responses that contain more than one top-level JSON object. `extract_json_object_parsed` keeps the last parseable object, so a malformed response like `{\"kind\":\"fail\",...}{\"kind\":\"pass\",...}` is accepted and the trailing object silently overrides the real verdict. That is a fail-open boundary on untrusted model output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 569,
+              "category": "security"
+            },
+            {
+              "message": "Chain-1 evidence hashes are supposed to use the ADR git blob hash per the spec/ADR, but this code hashes the raw file text with SHA-256. That produces a cache key that does not match the required git-blob identity, so the Chain-1 verify-cache contract is wrong for every ADR-backed pair.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 187,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3e1b88991f300389f23754696cc87832d9c49d0911892df8abffed5b0aca7858",
+          "at": "2026-06-08T15:33:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyPairSourceAdapter::load_pairs` is the main file-system-driven entrypoint in this module, but the tests here only cover empty/no-op and rejection cases. There is still no end-to-end fixture that produces at least one valid Chain1 or Chain2 pair and exercises the known-bad probe path, so regressions in hash computation, cache-scope routing, or probe injection can ship unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 392,
+              "category": "test coverage"
+            },
+            {
+              "message": "`RefVerifyCacheAdapter::load_entries` already has a layer-mismatch test, but there is no regression test for malformed on-disk cache JSON. A truncated or invalid `spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json` should fail closed with `CachePersistence`, and that error path is currently unverified for a public API.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "line": 454,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:c20b0503f0b679f793e316d2cc396a67d58e8bceb8bce06294af6d32ea7152cc",
+          "at": "2026-06-08T15:43:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1df2ee21702c765cb6ae558ecc3a8200f7ccc75b7f85b150e672016502241297",
+          "at": "2026-06-08T15:52:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Chain-2 sends only the catalogue entry key as the verifier claim (`[section_key] entry_key`). The raw catalogue entry is available immediately below for hashing, but none of its semantic content (docs, role/kind, methods, fields, etc.) is included in the prompt, so changes to those fields trigger re-verification while the model still cannot evaluate the actual catalogue claim against the spec. This can let catalogue/spec semantic mismatches pass or produce arbitrary failures. Render the canonical entry JSON or a structured entry summary into `claim_text` before building the `RefVerifyPair`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 445,
+              "category": "logic"
+            },
+            {
+              "message": "The production portion of this module is 723 lines before the `#[cfg(test)]` block, exceeding the AGENTS.md hard maximum of 700 production lines per module. This is already recognized by the sibling `pair_source` split, but the parent still remains over the limit; move additional helpers/adapters out of `ref_verify.rs`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify.rs",
+              "line": 724,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:82f8675529e759d1687666e1ed5ee4386bab517b817609fd92fc411dfb5cce33",
+          "at": "2026-06-08T16:13:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14a795b0f1e9407ea6d6d2137c14f9bbe6870d8de52af29758b47809e592ca0a",
+          "at": "2026-06-08T16:23:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_json_object_parsed` only balance-matches `{}`/`[]`, so brace-like prose before the verdict (for example `{not json}` or a markdown fragment) is treated as a top-level object. That makes `AgentRefVerifierAdapter::verify_pair` reject a valid response as \"multiple top-level JSON objects\" or \"no valid JSON object found\" even when a correct JSON verdict is present later in the output.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "line": 55,
+              "category": "correctness"
+            },
+            {
+              "message": "`enumerate_chain2_all_layers` discovers layers by scanning existing `*-types.json` files and silently skips any missing layer. In `All` scope, deleting or omitting an entire layer catalogue therefore yields zero pairs and no error, so the final `ref-verify` gate can pass without ever reviewing that layer. This should fail closed instead of treating missing layers as \"not present\".",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 552,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aacdff2fb15999cbd62d489c86fcc586767ddf82bea0ea8e42241396be0fa8fe",
+          "at": "2026-06-08T23:11:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_tddd_layer_bindings()` now fails closed when `architecture-rules.json` contains no `tddd.enabled` layers, so `RefVerifyScope::All` aborts before returning the Chain-1 pairs it already collected. That regresses standalone `ref-verify` runs on tracks with no Chain-2 data, which AC-02 says should still process the unresolved pairs that exist.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 577,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dc330dad274cdb76945a12d5f8cca358b6c457c6f09f8542feaed7e9ef9d0c44",
+          "at": "2026-06-08T23:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_json_object_parsed` now accepts any single valid top-level JSON object anywhere in the reply. That means a response like `Example: {\"kind\":\"fail\",...} ... final verdict malformed` will be parsed as the example object instead of failing closed. In `AgentRefVerifierAdapter`, that can record the wrong semantic verdict when the assistant includes a valid JSON example in prose before a broken final answer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "line": 50,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:07a15a0b93f362a519b8e4e4cc093ef11315882c247473b45ce5bbeb7a7c2a07",
+          "at": "2026-06-08T23:30:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `has_json_start_after()` check treats any `[` or `{` after the candidate object as fatal, even when it only appears in trailing prose. That makes `extract_json_object_parsed()` reject valid outputs that the docstring still claims to accept as surrounding prose.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "line": 52,
+              "category": "correctness"
+            },
+            {
+              "message": "`enumerate_chain2_all_layers()` now passes `required: true` for every configured layer, so one missing catalogue file turns the entire `RefVerifyScope::All` run into an error. That drops already-collected Chain-1 and other Chain-2 pairs on partially initialized tracks, instead of skipping the absent layer and continuing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 592,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:fd93bb727d2bdb528fbc449d45eff8828f3f6799d81e9db1794bb92e0bc02441",
+          "at": "2026-06-08T23:37:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`enumerate_chain2_pairs_for_layer()` still hardcodes `<layer>-types.json` instead of resolving the configured `tddd.catalogue_file` from `architecture-rules.json`. Any valid TDDD layer that overrides the default filename will now verify correctly in the new `All` path but fail in the explicit `RefVerifyScope::Chain2 { layer }` path, so layer-targeted ref-verify runs regress on supported configurations.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 375,
+              "category": "correctness"
+            },
+            {
+              "message": "`enumerate_chain2_all_layers()` now makes `RefVerifyScope::All` depend on `architecture-rules.json` and propagates that error through `load_pairs()`. If the rules file is missing or unreadable, the adapter aborts after already collecting Chain-1 pairs instead of returning those pairs and skipping Chain-2, which regresses standalone ref-verify runs on tracks that only have Chain-1 data.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 586,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2c78679c05bd76da374f1a75c833019ddd1e575ed03f5bfd90a086b191c76c2e",
+          "at": "2026-06-08T23:47:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_file_for_layer()` falls back to the default `<layer>-types.json` whenever `architecture-rules.json` is missing, unreadable, or does not name the layer. That makes explicit `RefVerifyScope::Chain2 { layer }` runs verify the wrong file for layers that use a custom `tddd.catalogue_file`, instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 591,
+              "category": "correctness"
+            },
+            {
+              "message": "`load_tddd_layer_bindings()` converts any read/symlink failure on `architecture-rules.json` into `Ok(None)`, and `enumerate_chain2_all_layers()` then returns an empty Chain-2 set. In `RefVerifyScope::All`, a missing or unreadable rules file therefore suppresses the entire catalogue→spec sweep instead of failing closed, leaving the gate with only Chain-1 coverage.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 575,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b8ab31b0ca01c93c4921d7d3bdff44786b604783d20645144b348cfc881e2d59",
+          "at": "2026-06-08T23:57:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`enumerate_chain2_all_layers()` still turns a missing catalogue for an enabled TDDD layer into `Ok(Vec::new())` by calling `enumerate_chain2_pairs_for_catalogue(..., false)`. In `RefVerifyScope::All`, that silently drops a declared layer from ref-verify coverage, so the gate can pass without ever reviewing that layer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 399,
+              "category": "correctness"
+            },
+            {
+              "message": "`extract_json_object_parsed()` now accepts the first successfully parsed object and only fail-closes the later malformed-object case when `has_verdict_marker_between()` sees an exact marker suffix. Any extra prose between `Final:`/`Verdict:`/`Answer:` and the malformed block defeats that check, so a prompt containing an earlier valid example object can be misparsed as the verdict instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "line": 60,
+              "category": "parser correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2d00fb7801af47ac591b2c54eaf1aef433ea34d997615d2ac9952254b2a6fede",
+          "at": "2026-06-09T00:05:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1, [libs/infrastructure/src/ref_verify/pair_source.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs#L399): a missing catalogue for a declared TDDD layer can still resolve to `Ok(Vec::new())`, so `RefVerifyScope::All` can silently drop that layer from coverage instead of forcing an explicit failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 399,
+              "category": "correctness"
+            },
+            {
+              "message": "P1, [libs/infrastructure/src/ref_verify/pair_source_json.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs#L60): `extract_json_object_parsed()` only rejects a later malformed object when the intervening text contains one of the exact marker strings (`Final:`, `Verdict:`, `Answer:` etc.), so a response with an earlier valid example object and a malformed trailing block can still be parsed as a valid verdict.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "line": 60,
+              "category": "parser correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d361c57379fb8821af080387e5dc60c3c0dbc848fd41991412a9f8b14ddecb29",
+          "at": "2026-06-09T00:17:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`extract_json_object_parsed()` accepts a valid verdict object and then ignores later malformed top-level brace blocks when the valid object was preceded by a verdict marker. That means a response like `Final: {...} trailing note {not json}` is treated as success even though the prompt requires the entire reply to be a single JSON object, so corrupted model output can slip through instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "line": 66,
+              "category": "parser correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:d1bee004b714fe7c924eddfa1373a7d50e4b64a3bcb1661f8f4738b7cb2e6514",
+          "at": "2026-06-09T00:25:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: [`extract_json_object_parsed()`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs#L42-L69) no longer enforces a strict single-object response. It returns the first successfully deserialized object and only fails on later malformed top-level brace blocks when they are encountered, so corrupted model output can still be treated as a successful verdict instead of failing closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "line": 42,
+              "category": "parser correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6ce6f6115a0959ee39ad096dbb2534fddb3e25885c4704a78f694976c77b6971",
+          "at": "2026-06-09T00:33:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:768d7629756be14b60a33a1d6f90bb88357052604ff914b53dc05029a9effe1d",
+          "at": "2026-06-09T00:42:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:768d7629756be14b60a33a1d6f90bb88357052604ff914b53dc05029a9effe1d",
+          "at": "2026-06-09T00:46:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d52cdfb0ef9a74e964875134d9b0a3b78221dd33c8ef38d6af2b36c8c4df354b",
+          "at": "2026-06-09T01:16:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Chain-2 pair generation ignores each `spec_ref.file` and always loads evidence from `track/items/<id>/spec.json`. That means a catalogue entry can point at a different or invalid spec file while the semantic verifier evaluates the same anchor from the active track spec instead, producing and caching a verdict for the wrong evidence. The pair source should resolve and guard `spec_ref.file` per ref, then load/hash the referenced spec element from that file rather than from the single preloaded `spec_path`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
+              "line": 467,
+              "category": "wrong-evidence"
+            }
+          ],
+          "hash": "rvw1:sha256:d52cdfb0ef9a74e964875134d9b0a3b78221dd33c8ef38d6af2b36c8c4df354b",
+          "at": "2026-06-09T01:21:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa106fcb0bafd528761aac9f7bba8f6ee7e5f3f6509235f98513542e114ea194",
+          "at": "2026-06-09T01:29:26Z"
         }
       ]
     },
@@ -1637,6 +2050,490 @@
           "findings": [],
           "hash": "rvw1:sha256:9e0b315714d7bc30cb854facf884775ddb39a1d8154acd09a3302d75f6c562f5",
           "at": "2026-06-08T10:51:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentExecutionRunner` is described in T008 as an infrastructure-local callable runner abstraction (`dyn Fn(...)`), so classifying it as a `value_object` is semantically wrong. The same row is also marked blue even though T008 is still `in_progress` in the plan, which makes the type catalogue and task status inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.md",
+              "line": 13,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:305fe2b11050beb04b0ec0acc6044bde23a06d537a6d1de8abc1d57ad7258187",
+          "at": "2026-06-08T11:19:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This artifact is internally inconsistent with the plan status updates: `plan.md` and `impl-plan.json` both mark T004/T008 as done, but the infrastructure type catalogue still leaves both verify-cache codec entries (`CatalogueSpecVerifyCacheDocumentCodec` and `SpecAdrVerifyCacheDocumentCodec`) yellow. That contradicts the claimed completion of the codec layer that T008 depends on, so the plan snapshot cannot be treated as coherent yet.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.md",
+              "line": 33,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b43f5ea448dce7d970212f2c0f86b2191c7f20a78ba900fd2c533436a5656d24",
+          "at": "2026-06-08T11:25:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 is marked `[x]` here, and `impl-plan.json` also flips it to `done`, but `infrastructure-types.md` still leaves `AgentRefVerifierAdapter` at 🟡. Because T008 explicitly bundles the three secondary adapters, the plan is counting the infrastructure-layer work as complete before one of its required deliverables is resolved.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "line": 72,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3f0b6d34f96c81650aee97d0cfd0a79656186e0c7237045897576ae684f2c8d0",
+          "at": "2026-06-08T16:11:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`T005` and `T007` are marked `done` here even though both descriptions still list `T003` as a prerequisite, and `T003` is still `todo` above. That makes the dependency graph impossible as recorded: the downstream work is closed before the atomic `CatalogueSpecSignal`/traversal boundary is complete, so the ref-verify branch cannot be considered finished in this state. `T008` inherits the same problem through `T007`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 27,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:913f9b637cd56db0f7acdbd4d80d670bdfb94f709041d7d5c09e6e193ee41a56",
+          "at": "2026-06-08T16:15:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008's constructor contract is inconsistent across the plan artifacts: this task text says `AgentRefVerifierAdapter::new(profiles, runner)`, but `infrastructure-types.json` now requires a third `project_root: PathBuf` parameter for the same constructor (`AgentRefVerifierAdapter::new` at lines 569-575). Both signatures cannot be implemented as written, so the plan needs one agreed constructor shape.",
+              "severity": "P1",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "line": 43,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cbb32685c53e0e28930f235f08e4898c93cbb7a0b5460f9ba28d5d303cfc74f3",
+          "at": "2026-06-08T16:34:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfe3ce5f22fe24636f20926311ed91669b55a8ab9e0cec8d7f76fb966ef091a9",
+          "at": "2026-06-08T16:40:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dfe3ce5f22fe24636f20926311ed91669b55a8ab9e0cec8d7f76fb966ef091a9",
+          "at": "2026-06-08T16:43:58Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
+          "at": "2026-06-08T00:26:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `EvidenceCitation::try_new` API returns `ValidationError`, and this change adds a production `ValidationError` variant, but the T002 domain catalogue does not declare `ValidationError`; the generated `domain-type-signals.json` now contains a red `ValidationError` signal. The briefing explicitly treats non-add red/yellow domain type signals as factual findings, so the catalogue/implementation contract is inconsistent until `ValidationError` is declared/updated in the catalogue or the public signature avoids the undeclared type.",
+              "severity": "P1",
+              "file": "libs/domain/src/error.rs",
+              "line": 99,
+              "category": "type-signal"
+            }
+          ],
+          "hash": "rvw1:sha256:66d3dd8e8e2979a60fe5aaf7dbc02fb73a8fbd4d440ff7414019eb42286d4964",
+          "at": "2026-06-08T00:30:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
+          "at": "2026-06-08T00:45:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:372cb369708ff406117e3454fe39a23ffb380f09e39972bbe1d162610ba8b2df",
+          "at": "2026-06-08T00:48:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
+          "at": "2026-06-08T03:03:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c92a266705723764d29da26f8822f933bf77f73520107896a83f5b106febf0a",
+          "at": "2026-06-08T04:12:17Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Missing `entry_hashes` entries are silently replaced with `ContentHash::from_bytes([0; 32])`. That fabricates a valid-looking but incorrect `entry_hash` in `<layer>-catalogue-spec-signals.json` if the adapter/key-derivation ever drifts, which should fail closed instead of persisting corrupted integrity metadata.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "line": 206,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a59a6be5ee5c23b3c26f4c61a7afd133c0a12895209e7dadb371543b85d9934a",
+          "at": "2026-06-08T03:04:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0896551e413edf23b3b71715695e6bcb0cb240f86b92a0174db2904d07d2264",
+          "at": "2026-06-08T03:14:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new shared traversal helper is public and now drives both `catalogue_spec_refs` and `catalogue_spec_signals`, but the added tests only cover type entries. There is no direct coverage for trait/function traversal or for a same-short-name cross-section collision, so a regression in `section_key` formatting or section order would reach production unnoticed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_traversal.rs",
+              "line": 69,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b7c857a53c1f462b5cd9fbf0a2f5482c080005ecaad365d8af9d89dece6a1c1d",
+          "at": "2026-06-08T03:38:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11fb2822d7eb0853a16ccb3695b119d2994dff56bbc45764aa9a92453d8ba438",
+          "at": "2026-06-08T03:43:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
+          "at": "2026-06-08T04:10:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The merge gate now receives per-entry catalogue hashes, but it immediately discards `_entry_hashes` and only checks signal count, positional name, document-level `catalogue_declaration_hash`, and color. That means a committed `<layer>-catalogue-spec-signals.json` can contain a stale or fabricated `CatalogueSpecSignal.entry_hash` while the gate still approves, so the semantic Chain ② cache key no longer reflects the current catalogue entry. Compare each signal's `entry_hash()` against the current entry hash map using the same traversal/order and fail closed on missing or mismatched hashes.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 518,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:00ce9bd5d3351f8508a1759ec5b206dcc3352361debf74e60168a10453aa7dd3",
+          "at": "2026-06-08T04:14:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c980ae55c3d11384f209e3a7d7efbb5654364d616eb7d65dffe47e145eae811",
+          "at": "2026-06-08T04:22:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`merge_gate.rs` now has 752 lines of production code before `#[cfg(test)]`, which exceeds the repo's 700-line maximum for production modules. This is an architecture violation and should be split into smaller modules.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/merge_gate.rs",
+              "line": 753,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:36:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:41:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Chain ② per-entry hash block pushes the production portion of `merge_gate.rs` to line 752 before `#[cfg(test)]`, exceeding the repository's 700-line maximum for production modules. This was 690 lines before the change, so the current patch crosses the guardrail; please split the new catalogue-spec integrity/signals logic into a helper module or otherwise reduce this file below the limit.",
+              "severity": "P1",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 665,
+              "category": "module_size"
+            }
+          ],
+          "hash": "rvw1:sha256:38898141e8edf773ce8ba954364b65aadc6509e3ba524d230239ec5665b3fc88",
+          "at": "2026-06-08T04:44:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89e40b79e65a9a9888e8890d7475c92deaf231dc3023599c264cc5ff0a017354",
+          "at": "2026-06-08T04:54:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
+          "at": "2026-06-08T07:03:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bd2e115378699bdec735d2bba816516d4d13b62fab1b08ab73c165f8f65f23e",
+          "at": "2026-06-08T07:05:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cache merge is inverted: `retained` keeps existing entries whose `(claim_hash, evidence_hash)` do not match any current production pair, so cache-hit entries are dropped instead of preserved. A mixed hit/miss run will rewrite the cache without the hits, defeating AC-07 and forcing needless re-review on the next run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 650,
+              "category": "correctness"
+            },
+            {
+              "message": "Fast-tier evaluation is still fully sequential. `RefVerifyConfig::max_parallelism` is validated and stored, but `execute` never consults it; both fast passes use plain iterator collection (`.iter().map(...).collect()`). That misses the required parallel fast-tier execution / worker-cap behavior and leaves the configuration dead.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 513,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:247af029381a64564f914d2a39eed76adc8b50d6a296fc298038c9b8815ded84",
+          "at": "2026-06-08T08:55:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Any cache entry whose hashes match a current production pair is treated as a hit regardless of the stored verdict, so a cached `Fail`/`Pending` is never re-checked. The later merge at `639-669` then filters those same entries out of the rewritten artifact and never adds them back, so current cache hits can disappear entirely on the next save. That breaks AC-07 and can let stale failures vanish from the gate.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 497,
+              "category": "correctness"
+            },
+            {
+              "message": "The return order is backwards for degraded calibration: `SemanticFailuresConfirmed` is emitted before `final_calibration_healthy` is checked. If known-bad detection stays below threshold and a production `Fail` is also confirmed, the degraded verifier's verdict is still trusted instead of escalating to `HumanEscalationRequired`, which contradicts the intended precedence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 673,
+              "category": "correctness"
+            },
+            {
+              "message": "As written, the fast/final verifier loops are strictly serial iterator chains, so the interactor never uses `RefVerifyParallelism` and can only issue one model call at a time. That makes the validated `max_parallelism` config dead and violates the requirement that fast-tier review be parallelized per pair.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 513,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:247af029381a64564f914d2a39eed76adc8b50d6a296fc298038c9b8815ded84",
+          "at": "2026-06-08T08:58:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`save_entries` runs before the final known-bad health check, so a batch that ends in `HumanEscalationRequired` still persists the final-tier verdicts from a degraded verifier into the verify-cache. The ADR/spec text says degraded-verifier verdicts are not trustworthy and should not be cached; gate cache writes on `final_calibration_healthy` (or defer persistence until after this check).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 660,
+              "category": "correctness"
+            },
+            {
+              "message": "The production portion of this module is 767 lines long before the `#[cfg(test)]` block starts at line 770, which exceeds the repository's 700-line production-module limit.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "line": 770,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:0baabb47b6116baebeaf7672fc751bd56985ae0e6f91897fed39ae5146627c8e",
+          "at": "2026-06-08T09:06:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public `RefVerifyApplicationService::execute` path is only covered on success-oriented scenarios; there is no test that stubs `RefVerifyPairSourcePort`, `RefVerifyVerifierPort`, or `RefVerifyCachePort` to return an error and asserts the corresponding fail-closed `RefVerifyError` variant is propagated. That leaves the main error-handling contract for this usecase unverified, which is a P1 coverage gap for a new public API.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 71,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:cea9aa709751997383f53bce7236a1efd3e424e078b7fffdc019ac737b25acd4",
+          "at": "2026-06-08T09:27:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new public error variants `VerifierPort` and `CachePersistence` forward raw adapter `message` strings verbatim into `Display`, so any hostnames, SQL fragments, or stack traces returned by adapters will leak into user-visible output/logs. Redact or normalize these messages at the boundary instead of exposing the raw string.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify.rs",
+              "line": 252,
+              "category": "Security"
+            },
+            {
+              "message": "The interactor test suite only covers success and behavioral cases. There are no tests that make `pair_source.load_pairs`, `cache.load_entries/save_entries`, or `verifier.verify_pair` return `Err`, so the new `VerifierPort` and `CachePersistence` failure paths are unverified. Add negative tests for each port boundary to satisfy the public-API test requirement.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
+              "line": 627,
+              "category": "Testing"
+            }
+          ],
+          "hash": "rvw1:sha256:cea9aa709751997383f53bce7236a1efd3e424e078b7fffdc019ac737b25acd4",
+          "at": "2026-06-08T09:34:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On the first `Err` or panic from a worker, this returns immediately and drops the remaining `JoinHandle`s for the chunk. Those threads keep running detached, so a failed batch can still continue calling the verifier after the use case has already reported failure. Join or cancel the rest of the chunk before returning so the gate actually aborts fail-closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 331,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:7b2aa19f6360604b80e28d7145eb649f3b388d92fe6bd8e78e6ae184c69d8cec",
+          "at": "2026-06-08T09:42:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`HumanEscalationRequired { pair_count }` undercounts unresolved work when a degraded batch also has pending production pairs. The code returns either `confirmed_pending` or `known_bad_probes.len()`, so a run with both categories reports only one side of the problem instead of the total unresolved count described by the type docs.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
+              "line": 220,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:bbbda946584f916cee08d11a33dac58624e4bc5ab2a05301c66d9eae68471245",
+          "at": "2026-06-08T09:49:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyError::TrackNotActive` advertises an active-track guard, but `RefVerifyCommand` carries no current-branch/active-track input and this usecase layer has no branch-reader port. As written, nothing in this scope can actually enforce the promised guard, so the public API can run on a non-track branch without surfacing `TrackNotActive`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify.rs",
+              "line": 74,
+              "category": "correctness"
+            },
+            {
+              "message": "The result classification gives `SemanticFailuresConfirmed` precedence over `HumanEscalationRequired`. If a batch contains both a confirmed production fail and at least one unresolved/pending pair, the function returns the fail variant and masks the pending case, even though the type docs say pending/unresolved results must surface as human escalation. This needs pending to win or a split result path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
+              "line": 281,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:8367c65648195792f8f2e6134f283a9c852c21b9ed35181f06e8ebbb4ed0dbdb",
+          "at": "2026-06-08T09:56:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Pending` is checked before `Fail`, so a healthy batch that contains both verdicts returns `HumanEscalationRequired` instead of `SemanticFailuresConfirmed`. The intended rule is to prioritize confirmed failures in this mixed case so the writer/fix loop can act on them.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 292,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2d4eea329435adbde9ed99718fa1e624f04e86ef160452f60735cf9514c6885a",
+          "at": "2026-06-08T10:04:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cache retention is global across scopes: `fresh_hashes` is built without `cache_scope`, and the retain filter drops any existing entry whose `(claim_hash, evidence_hash)` appears in any freshly evaluated pair. If the same hash pair exists in another scope, saving this run will delete that scope's cache entry even though it was never re-evaluated. The pruning needs to be scope-local because caches are stored in separate artifacts per scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "line": 241,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:ab2dee14618f765b0ce7aa0269cf0dcd24d8b199c08f5c649d9d9d4622d294ee",
+          "at": "2026-06-08T10:10:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00331d05fb2e728f8facc70fadde7adc2e15409c118421415655dc631146fe45",
+          "at": "2026-06-08T10:17:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00331d05fb2e728f8facc70fadde7adc2e15409c118421415655dc631146fe45",
+          "at": "2026-06-08T10:21:10Z"
         }
       ]
     }
