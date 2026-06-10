@@ -8,7 +8,7 @@
 > `.gitignore` に `track/items/**/logs/` を追加し、telemetry.jsonl が誤ってリポジトリにコミットされない状態を作る（CN-03 / AC-10）。
 > これは独立した最初のタスクで、他のすべてのタスクから独立して commit できる。
 
-- [ ] **T001**: `.gitignore` に `track/items/**/logs/` エントリを追加し、telemetry.jsonl が誤ってコミットされない状態にする（CN-03 / AC-10）。変更対象: リポジトリルートの `.gitignore`。追加する行: `track/items/**/logs/`。既存の gitignore エントリとの重複・矛盾がないことを確認する。unit test 相当の確認: `.gitignore` に当該パターンが存在すること（`bin/sotp verify` の verify-arch-docs gate または手動確認）。CN-03 のもう一方の要件（archive ツールが `logs/` をファイルシステム移動すること）は T011 で対応する。前提: なし（独立タスク）。
+- [~] **T001**: `.gitignore` に `track/items/**/logs/` エントリを追加し、telemetry.jsonl が誤ってコミットされない状態にする（CN-03 / AC-10）。変更対象: リポジトリルートの `.gitignore`。追加する行: `track/items/**/logs/`。既存の gitignore エントリとの重複・矛盾がないことを確認する。unit test 相当の確認: `.gitignore` に当該パターンが存在すること（`bin/sotp verify` の verify-arch-docs gate または手動確認）。CN-03 のもう一方の要件（archive ツールが `logs/` をファイルシステム移動すること）は T011 で対応する。前提: なし（独立タスク）。
 
 ### S2 — Infrastructure Layer — Telemetry DTO and Writer (T002, T003)
 
