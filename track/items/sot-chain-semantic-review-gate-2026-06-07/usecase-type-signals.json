@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-09T09:33:09Z",
-  "declaration_hash": "3d4f3a0720d19bc2ae007b34361f8dc5c5681f53e699495bae29b72733d409c9",
+  "generated_at": "2026-06-10T09:10:27Z",
+  "declaration_hash": "de528b5422bf5d496779f35f5e2fd6357c5e8e6c49797c8cb106facb37bb0484",
   "signals": [
     {
       "type_name": "CatalogueEntryRef",
@@ -43,7 +43,7 @@
     {
       "type_name": "RefVerifyCommand",
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -97,7 +97,7 @@
     {
       "type_name": "RefVerifyParallelism",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -110,7 +110,7 @@
     {
       "type_name": "RefVerifyPercent",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -135,7 +135,7 @@
     {
       "type_name": "RefreshCatalogueSpecSignalsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::error::Error",

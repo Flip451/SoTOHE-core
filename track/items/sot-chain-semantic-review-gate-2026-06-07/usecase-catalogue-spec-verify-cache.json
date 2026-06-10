@@ -1,0 +1,414 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "9270a4e3bad0fca79f2c5e3adc8eb6e97d05dfa54619d8329226850588d0bb0d",
+      "evidence_hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の section-qualified key（`section_key`）は、`types:<name>` / `traits:<name>` / `functions:<path>` の形式で一つの `CatalogueDocument` 内でグローバルに一意な識別子とする。短い bare key がタイプ・トレイト・関数の複数セクションに重複して存在するケース（クロスセクション衝突）を防ぐため、インフラストラクチャアダプターが per-entry hash マップを構築する際のキーには bare key ではなく `section_key` を使用する"
+      }
+    },
+    {
+      "claim_hash": "9270a4e3bad0fca79f2c5e3adc8eb6e97d05dfa54619d8329226850588d0bb0d",
+      "evidence_hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue の全エントリを正規の順序（types → traits → functions、各セクション内は BTreeMap 順）でイテレートし、各エントリに bare `key` と section-qualified `section_key` の両方を付与するファンクションを一箇所に集約する。`catalogue_spec_refs` と `catalogue_spec_signals` で独立してキー導出ロジックを持つと drift が生じるため、すべてのインフラアダプターはこの集約関数経由でエントリを走査する"
+      }
+    },
+    {
+      "claim_hash": "0ba5153b2999fe775269e7638e3f9459c868a26e2c7509d4e83ceebcebc2ff75",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューの判定結果を Chain ごとの別 artifact に収容する。Chain① の結果は `spec-adr-verify-cache.json`（track 単位）、Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "0ba5153b2999fe775269e7638e3f9459c868a26e2c7509d4e83ceebcebc2ff75",
+      "evidence_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp ref-verify` は1コマンドで全 Chain を扱い、スコープを呼び出しコンテキストから自動解決する。spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain を対象とする。差分キャッシュにより、対象のうち変化したペアだけが再レビューされる"
+      }
+    },
+    {
+      "claim_hash": "0ba5153b2999fe775269e7638e3f9459c868a26e2c7509d4e83ceebcebc2ff75",
+      "evidence_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の検証結果が `track/items/<id>/spec-adr-verify-cache.json` に書き込まれ、Chain② の検証結果が `track/items/<id>/<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごと）に書き込まれる。"
+      }
+    },
+    {
+      "claim_hash": "d54dd8db53a2da2a8e8ec9091e1a97aacc1e926b5162e64f47abb82226ba9575",
+      "evidence_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "スコープを呼び出しコンテキストから自動解決する。spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain を対象とする。"
+      }
+    },
+    {
+      "claim_hash": "5689f006a4631752e9bfb7a18f9218cbb50c47308f779b4942ed941cf44692b5",
+      "evidence_hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バッチ上限とスロットリングの具体数値は設定ファイルで指定可能とする"
+      }
+    },
+    {
+      "claim_hash": "59174f8c1243f2760bd5b6e384b71f37186c3c9f4eaaf079a0d4eeeae419c877",
+      "evidence_hash": "11aa8f7341ab23adc5eb7f8158ab618f95406a78df797acbb17c1f5f9d09fbea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同一バッチの known_bad 検出率が閾値未満の場合は、fast Pass を含む同一バッチの未cache production pair を untrusted として final 段で再評価してから cache / human escalation を判断する。"
+      }
+    },
+    {
+      "claim_hash": "59174f8c1243f2760bd5b6e384b71f37186c3c9f4eaaf079a0d4eeeae419c877",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証の判定結果は fail-closed で扱う。「引用を提示できない合格」は合格ではなく判定保留（不合格方向）とする。キャッシュに凍結済みの判定結果は `(claim_hash, evidence_hash)` ペアが変化しない限り再実行しない"
+      }
+    },
+    {
+      "claim_hash": "ae885d35c6e4170c1e78ed2f5ebe1e3272436e55a7d9b676f7a8a4ad1c5452cb",
+      "evidence_hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` ペアで凍結するキャッシュを実装する。... どちらかの hash が変化したときのみ再レビューを実行する"
+      }
+    },
+    {
+      "claim_hash": "ae885d35c6e4170c1e78ed2f5ebe1e3272436e55a7d9b676f7a8a4ad1c5452cb",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "ae885d35c6e4170c1e78ed2f5ebe1e3272436e55a7d9b676f7a8a4ad1c5452cb",
+      "evidence_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各バッチに答えが不合格と分かっているペア（既知の誤り例）を注入し、検出率を監視する。"
+      }
+    },
+    {
+      "claim_hash": "ae885d35c6e4170c1e78ed2f5ebe1e3272436e55a7d9b676f7a8a4ad1c5452cb",
+      "evidence_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の検証結果が `track/items/<id>/spec-adr-verify-cache.json` に書き込まれ、Chain② の検証結果が `track/items/<id>/<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごと）に書き込まれる。各 artifact は `(claim_hash, evidence_hash)` ペアと判定結果（合格/不合格/判定保留）を含む"
+      }
+    },
+    {
+      "claim_hash": "a2bc450f095f5617cd2d81701b24ae8dda06f077c673fc48772bd425bbf8d219",
+      "evidence_hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② は layer 単位バッチ（domain / usecase / infrastructure / cli ごと）で並列化する。バッチ上限とスロットリングの具体数値は設定ファイルで指定可能とする"
+      }
+    },
+    {
+      "claim_hash": "7e37ef7ae736b1a3fe945f97b5d989838a4685dcbc4bd02d8060c6616657cd4b",
+      "evidence_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各バッチに答えが不合格と分かっているペア（既知の誤り例）を注入し、検出率を監視する。検出率が閾値を下回ったら D5 の段階引き上げ経路に入る。注入率と検出率閾値は設定ファイルで指定可能とし、初期デフォルトは注入率 10% / 検出率閾値 90% とする"
+      }
+    },
+    {
+      "claim_hash": "bc4743d1c5e9b09bdcd773dedbd03f42888d8b20a83b66abecddaf6b2209e594",
+      "evidence_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp ref-verify` は1コマンドで全 Chain を扱い、スコープを呼び出しコンテキストから自動解決する。spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain を対象とする。"
+      }
+    },
+    {
+      "claim_hash": "10d2730b7db6167eeef7ff94599375ec5cfcd057043b1cd3ba10dd59f61a4316",
+      "evidence_hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "インフラストラクチャアダプターが per-entry hash マップを構築する際のキーには bare key ではなく `section_key` を使用する"
+      }
+    },
+    {
+      "claim_hash": "10d2730b7db6167eeef7ff94599375ec5cfcd057043b1cd3ba10dd59f61a4316",
+      "evidence_hash": "e54a00da94e34e75ce15f87bc887f6d94380e8ab4d74c90ec68213dd4d6eff2b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`iter_catalogue_entries` が生成した `section_key` に対応するエントリハッシュがマップに存在しない場合、ユースケースは偽のゼロ hash を補完せず `MissingEntryHash` エラーを返してフェイルクローズする"
+      }
+    },
+    {
+      "claim_hash": "7acdeaa5093c783ca88e1ba179b09a12716fc45608e41387b665eb3ed49e9ac3",
+      "evidence_hash": "1c44cc74a394987dd3d1130fcfc2309e893922eaf2c829ad18dfa3a4ea3d72e0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証の呼び出し口として専用の `/track:ref-verify` skill（公開 UI）と `bin/sotp ref-verify` サブコマンドを新設する。既存の `sotp verify *`（層②の構造/新鮮度チェック）や `/track:review`（code review）には相乗りせず、層③専用の独立した surface を持つ"
+      }
+    },
+    {
+      "claim_hash": "7acdeaa5093c783ca88e1ba179b09a12716fc45608e41387b665eb3ed49e9ac3",
+      "evidence_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューレーンは code-review インフラ（`Reviewer` port・`ReviewTarget`・`Verdict`・`ReviewerFinding`・`review.json`・`ClaudeReviewer` adapter）の型や責務を共有しない。専用の port・型・adapter を独立に持ち、SRP 違反を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "31a0d66c817553d1f06218d09485623eb2d15394682c19f6ecbfbb937caa5c41",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・タイムアウト・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "31a0d66c817553d1f06218d09485623eb2d15394682c19f6ecbfbb937caa5c41",
+      "evidence_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の port・型・adapter を独立に持ち、SRP 違反を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "31a0d66c817553d1f06218d09485623eb2d15394682c19f6ecbfbb937caa5c41",
+      "evidence_hash": "8a8905f5e367eedbd09e21defbdd99fb8176e7509fa2ada308e2c39c004e66e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`RefVerifierPort::verify_pair` のシグネチャには `cache_scope` を渡す。`AgentRefVerifierAdapter` は `cache_scope` の値から Chain 種別（Chain① または Chain②）を解決し、対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の `prompt_template_path` と `resolve_execution` を選ぶ。usecase 層は `cache_scope` を port 呼び出し引数として渡すだけでよく、capability 解決の詳細は adapter に隠蔽される"
+      }
+    },
+    {
+      "claim_hash": "9a64566fb805d16b26caab0762b20cda95cb7f21c0165d9b042303e89ef4256e",
+      "evidence_hash": "1c44cc74a394987dd3d1130fcfc2309e893922eaf2c829ad18dfa3a4ea3d72e0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の `/track:ref-verify` skill（公開 UI）と `bin/sotp ref-verify` サブコマンドを新設する。既存の `sotp verify *`（層②の構造/新鮮度チェック）や `/track:review`（code review）には相乗りせず、層③専用の独立した surface を持つ"
+      }
+    },
+    {
+      "claim_hash": "9a64566fb805d16b26caab0762b20cda95cb7f21c0165d9b042303e89ef4256e",
+      "evidence_hash": "aa8c96c3c51e0eb0f9b8afc86f84039f97376d36eb4d2b42a5455f852812c012",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast 段で不合格または判定保留となった production pair は final 段へ引き上げられる。"
+      }
+    },
+    {
+      "claim_hash": "e46ebd9b5551b261c6e5d3ae0492cc4e2ce3dd63459da9126c664192f6ae9e3d",
+      "evidence_hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` ペアで凍結するキャッシュを実装する。... どちらかの hash が変化したときのみ再レビューを実行する"
+      }
+    },
+    {
+      "claim_hash": "e46ebd9b5551b261c6e5d3ae0492cc4e2ce3dd63459da9126c664192f6ae9e3d",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "e46ebd9b5551b261c6e5d3ae0492cc4e2ce3dd63459da9126c664192f6ae9e3d",
+      "evidence_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の検証結果が `track/items/<id>/spec-adr-verify-cache.json` に書き込まれ、Chain② の検証結果が `track/items/<id>/<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごと）に書き込まれる。各 artifact は `(claim_hash, evidence_hash)` ペアと判定結果（合格/不合格/判定保留）を含む"
+      }
+    },
+    {
+      "claim_hash": "e46ebd9b5551b261c6e5d3ae0492cc4e2ce3dd63459da9126c664192f6ae9e3d",
+      "evidence_hash": "e76b6ab619a70343805540fd8345ce814e2a46d531d0dc54e663034da5dc1db3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`(claim_hash, evidence_hash)` ペアが変化していないエントリは再レビューをスキップし、いずれかが変化したエントリのみを再レビューする。phase 第一防衛線で通過済みの不変ペアは commit 最終関門で再レビューされない"
+      }
+    },
+    {
+      "claim_hash": "f1ee1a2526e5243bdf14956fdbf799a03318caa3bfb7cfb51e92a4d318360b9c",
+      "evidence_hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` ペアで凍結するキャッシュを実装する。Chain① では claim=spec element の per-element SHA-256 / evidence=ADR の git blob hash、Chain② では claim=catalogue entry の per-entry SHA-256（新規）/ evidence=spec element の per-element SHA-256 とする。どちらかの hash が変化したときのみ再レビューを実行する"
+      }
+    },
+    {
+      "claim_hash": "f1ee1a2526e5243bdf14956fdbf799a03318caa3bfb7cfb51e92a4d318360b9c",
+      "evidence_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各バッチに答えが不合格と分かっているペア（既知の誤り例）を注入し、検出率を監視する。検出率が閾値を下回ったら D5 の段階引き上げ経路に入る。注入率と検出率閾値は設定ファイルで指定可能とし、初期デフォルトは注入率 10% / 検出率閾値 90% とする"
+      }
+    },
+    {
+      "claim_hash": "f1ee1a2526e5243bdf14956fdbf799a03318caa3bfb7cfb51e92a4d318360b9c",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューの判定結果を Chain ごとの別 artifact に収容する。Chain① の結果は `spec-adr-verify-cache.json`（track 単位）、Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "f1ee1a2526e5243bdf14956fdbf799a03318caa3bfb7cfb51e92a4d318360b9c",
+      "evidence_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「差分キャッシュにより、対象のうち変化したペアだけが再レビューされる」"
+      }
+    },
+    {
+      "claim_hash": "624ff1af177ba5f699c8e2dcd6126469be653c1d5c93fc73e3d02ca64c8024ae",
+      "evidence_hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`section_key` は、`types:<name>` / `traits:<name>` / `functions:<path>` の形式で一つの `CatalogueDocument` 内でグローバルに一意な識別子とする。短い bare key がタイプ・トレイト・関数の複数セクションに重複して存在するケース（クロスセクション衝突）を防ぐため、インフラストラクチャアダプターが per-entry hash マップを構築する際のキーには bare key ではなく `section_key` を使用する"
+      }
+    },
+    {
+      "claim_hash": "624ff1af177ba5f699c8e2dcd6126469be653c1d5c93fc73e3d02ca64c8024ae",
+      "evidence_hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue の全エントリを正規の順序（types → traits → functions、各セクション内は BTreeMap 順）でイテレートし、各エントリに bare `key` と section-qualified `section_key` の両方を付与するファンクションを一箇所に集約する。`catalogue_spec_refs` と `catalogue_spec_signals` で独立してキー導出ロジックを持つと drift が生じるため、すべてのインフラアダプターはこの集約関数経由でエントリを走査する"
+      }
+    },
+    {
+      "claim_hash": "035827486632b6582f9cb06a476056d18ad34fc1d6c83650e93b5d5f7ccf89d3",
+      "evidence_hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の section-qualified key（`section_key`）は、`types:<name>` / `traits:<name>` / `functions:<path>` の形式で一つの `CatalogueDocument` 内でグローバルに一意な識別子とする。"
+      }
+    },
+    {
+      "claim_hash": "035827486632b6582f9cb06a476056d18ad34fc1d6c83650e93b5d5f7ccf89d3",
+      "evidence_hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue の全エントリを正規の順序（types → traits → functions、各セクション内は BTreeMap 順）でイテレートし、各エントリに bare `key` と section-qualified `section_key` の両方を付与するファンクションを一箇所に集約する。`catalogue_spec_refs` と `catalogue_spec_signals` で独立してキー導出ロジックを持つと drift が生じるため、すべてのインフラアダプターはこの集約関数経由でエントリを走査する"
+      }
+    },
+    {
+      "claim_hash": "5689f006a4631752e9bfb7a18f9218cbb50c47308f779b4942ed941cf44692b5",
+      "evidence_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "注入率と検出率閾値は設定ファイルで指定可能とし、初期デフォルトは注入率 10% / 検出率閾値 90% とする"
+      }
+    },
+    {
+      "claim_hash": "a2bc450f095f5617cd2d81701b24ae8dda06f077c673fc48772bd425bbf8d219",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the claim adds a validated nonzero batching/worker parallelism limit, while CN-06 only specifies fail-closed handling and cache reuse keyed by `(claim_hash, evidence_hash)`; the evidence does not motivate any parallelism configuration."
+      }
+    },
+    {
+      "claim_hash": "7e37ef7ae736b1a3fe945f97b5d989838a4685dcbc4bd02d8060c6616657cd4b",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証の判定結果は fail-closed で扱う。"
+      }
+    },
+    {
+      "claim_hash": "24acf37e4235b61097bd2c0532cec94c90a83e7a65c5c31d9072e8f12802bcd8",
+      "evidence_hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② は layer 単位バッチ（domain / usecase / infrastructure / cli ごと）で並列化する。バッチ上限とスロットリングの具体数値は設定ファイルで指定可能とする"
+      }
+    },
+    {
+      "claim_hash": "31c2afd79efdc639974cc060fde87abd7e88804aed710066ea636a769ee89ba9",
+      "evidence_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "注入率と検出率閾値は設定ファイルで指定可能とし、初期デフォルトは注入率 10% / 検出率閾値 90% とする"
+      }
+    },
+    {
+      "claim_hash": "0946834a6be77eb9e52e380e37a39ebdd0e168945fe4ded1e2b802168f21f18a",
+      "evidence_hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の section-qualified key（`section_key`）は、`types:<name>` / `traits:<name>` / `functions:<path>` の形式で一つの `CatalogueDocument` 内でグローバルに一意な識別子とする。短い bare key がタイプ・トレイト・関数の複数セクションに重複して存在するケース（クロスセクション衝突）を防ぐため、インフラストラクチャアダプターが per-entry hash マップを構築する際のキーには bare key ではなく `section_key` を使用する"
+      }
+    },
+    {
+      "claim_hash": "0946834a6be77eb9e52e380e37a39ebdd0e168945fe4ded1e2b802168f21f18a",
+      "evidence_hash": "e54a00da94e34e75ce15f87bc887f6d94380e8ab4d74c90ec68213dd4d6eff2b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`iter_catalogue_entries` が生成した `section_key` に対応するエントリハッシュがマップに存在しない場合、ユースケースは偽のゼロ hash を補完せず `MissingEntryHash` エラーを返してフェイルクローズする"
+      }
+    },
+    {
+      "claim_hash": "f8a71633cc85b58d63cf9e579ab57367769415c8dd6ec2da32592c147eb1fa02",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "f8a71633cc85b58d63cf9e579ab57367769415c8dd6ec2da32592c147eb1fa02",
+      "evidence_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューレーンは code-review インフラ（`Reviewer` port・`ReviewTarget`・`Verdict`・`ReviewerFinding`・`review.json`・`ClaudeReviewer` adapter）の型や責務を共有しない。専用の port・型・adapter を独立に持ち、SRP 違反を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "f8a71633cc85b58d63cf9e579ab57367769415c8dd6ec2da32592c147eb1fa02",
+      "evidence_hash": "8a8905f5e367eedbd09e21defbdd99fb8176e7509fa2ada308e2c39c004e66e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`RefVerifierPort::verify_pair` のシグネチャには `cache_scope` を渡す。`AgentRefVerifierAdapter` は `cache_scope` の値から Chain 種別（Chain① または Chain②）を解決し、対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の `prompt_template_path` と `resolve_execution` を選ぶ。usecase 層は `cache_scope` を port 呼び出し引数として渡すだけでよく、capability 解決の詳細は adapter に隠蔽される"
+      }
+    },
+    {
+      "claim_hash": "31c2afd79efdc639974cc060fde87abd7e88804aed710066ea636a769ee89ba9",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証の判定結果は fail-closed で扱う。"
+      }
+    },
+    {
+      "claim_hash": "a706d613d0d64a4fc2742cabaa7268b6e48536116ede29a3e43e67eb1b8cd15b",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・プロンプトを設定でき"
+      }
+    },
+    {
+      "claim_hash": "a706d613d0d64a4fc2742cabaa7268b6e48536116ede29a3e43e67eb1b8cd15b",
+      "evidence_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューレーンは code-review インフラ（`Reviewer` port・`ReviewTarget`・`Verdict`・`ReviewerFinding`・`review.json`・`ClaudeReviewer` adapter）の型や責務を共有しない。専用の port・型・adapter を独立に持ち、SRP 違反を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "a706d613d0d64a4fc2742cabaa7268b6e48536116ede29a3e43e67eb1b8cd15b",
+      "evidence_hash": "8a8905f5e367eedbd09e21defbdd99fb8176e7509fa2ada308e2c39c004e66e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`RefVerifierPort::verify_pair` のシグネチャには `cache_scope` を渡す。`AgentRefVerifierAdapter` は `cache_scope` の値から Chain 種別（Chain① または Chain②）を解決し、対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の `prompt_template_path` と `resolve_execution` を選ぶ。usecase 層は `cache_scope` を port 呼び出し引数として渡すだけでよく、capability 解決の詳細は adapter に隠蔽される"
+      }
+    }
+  ]
+}

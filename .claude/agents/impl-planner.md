@@ -1,6 +1,6 @@
 ---
 name: impl-planner
-model: opus
+model: fable
 effort: max
 tools:
   - Read
@@ -12,7 +12,7 @@ tools:
   - WebFetch
   - WebSearch
 description: |
-  Phase 3 writer for /track:impl-plan. Authors `impl-plan.json` (tasks + plan.sections) and `task-coverage.json` (spec element ↔ task mapping) from the existing `spec.json` and per-layer type catalogues, writes them directly, and evaluates the task-coverage binary gate internally. Does NOT re-open Phase 1 spec decisions or Phase 2 type decisions — if either is ambiguous, raise it as an open question so the orchestrator can run the back-and-forth loop. Mirrors the `impl-planner` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
+  Phase 3 writer for /track:impl-plan. Authors `impl-plan.json` (tasks + plan.sections) and `task-coverage.json` (spec element ↔ task mapping) from the existing `spec.json` and per-layer type catalogues, writes them directly, and evaluates the task-coverage binary gate internally. Does NOT re-open Phase 1 spec decisions or Phase 2 type decisions — if either is ambiguous, raise it as an open question so the orchestrator can run the back-and-forth loop. Mirrors the `impl-planner` capability in `.harness/config/agent-profiles.json` and enforces Fable via frontmatter.
 ---
 
 # Impl-Planner Agent
@@ -50,9 +50,9 @@ If the briefing asks for:
 
 ## Model
 
-Runs on Claude Opus (via `model: opus` frontmatter). The frontmatter ensures Opus is selected even when the default subagent model (`CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) is Sonnet. This matches the `impl-planner` capability declared in `.harness/config/agent-profiles.json`.
+Runs on Claude Fable 5 (via `model: fable` frontmatter). The frontmatter ensures Fable 5 is selected even when the default subagent model (`CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) is Sonnet. This matches the `impl-planner` capability declared in `.harness/config/agent-profiles.json`.
 
-Opus is chosen because poor task decomposition (wrong task boundaries, missed coverage) produces expensive rework during `/track:implement` and `/track:review`.
+Fable 5 is chosen because poor task decomposition (wrong task boundaries, missed coverage) produces expensive rework during `/track:implement` and `/track:review`.
 
 ## Contract
 

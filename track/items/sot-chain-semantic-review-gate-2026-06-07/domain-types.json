@@ -12,10 +12,9 @@
           "kind": "plain",
           "fields": [
             { "name": "type_name", "ty": "String" },
-            { "name": "signal", "ty": "ConfidenceSignal" },
-            { "name": "entry_hash", "ty": "ContentHash" }
+            { "name": "signal", "ty": "ConfidenceSignal" }
           ],
-          "has_stripped_fields": false
+          "has_stripped_fields": true
         }
       },
       "methods": [
@@ -23,7 +22,7 @@
           "name": "new",
           "receiver": null,
           "params": [
-            { "name": "type_name", "ty": "String" },
+            { "name": "type_name", "ty": "impl Into<String>" },
             { "name": "signal", "ty": "ConfidenceSignal" },
             { "name": "entry_hash", "ty": "ContentHash" }
           ],
@@ -45,7 +44,7 @@
         }
       ],
       "module_path": "tddd::catalogue_spec_signal",
-      "docs": "Per-entry signal record stored inside existing `CatalogueSpecSignalsDocument.signals`. Adds per-entry SHA-256 hash for D4 differential re-review. The existing document-level `catalogue_declaration_hash` remains on `CatalogueSpecSignalsDocument` and is not moved into each entry.",
+      "docs": "Per-entry signal record stored inside existing `CatalogueSpecSignalsDocument.signals`. Has two public fields (`type_name: String`, `signal: ConfidenceSignal`) and one private field (`entry_hash: ContentHash`, accessed via the `entry_hash()` accessor). The `entry_hash` field adds per-entry SHA-256 hash for D4 differential re-review. The existing document-level `catalogue_declaration_hash` remains on `CatalogueSpecSignalsDocument` and is not moved into each entry. The `fields` shape lists only public fields (`type_name` and `signal`); `has_stripped_fields: true` covers the private `entry_hash` field.",
       "spec_refs": [
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
@@ -117,8 +116,8 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["String"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
       "methods": [

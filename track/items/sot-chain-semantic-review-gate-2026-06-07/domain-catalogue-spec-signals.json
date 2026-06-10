@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3d43c915d5620573d1a79e34907482ee5a57d57fcb8c7c71ef69862e2c2f3685",
+  "catalogue_declaration_hash": "681777c6a3215960e82ea18004b13cc90c1807a32fa1ee1e70afc326fe98da91",
   "signals": [
     {
       "type_name": "CatalogueSpecSignal",
       "signal": "blue",
-      "entry_hash": "f498720632ffb4ea7c546e56c70c68d04bd3a9c48334a2d6b37e0ff25f8a8327"
+      "entry_hash": "3e46ead731f6ff110ee894ad7f47b92efd93e213afe4aa97feb8c57b56a91810"
     },
     {
       "type_name": "CatalogueSpecVerifyCacheDocument",
@@ -15,7 +15,7 @@
     {
       "type_name": "EvidenceCitation",
       "signal": "blue",
-      "entry_hash": "820ecbf904254dd4baa33043c1c589f12d7a2d841766f65a9c7ab842ad244b75"
+      "entry_hash": "a82b9ef854b28cca6a69356653ad141edbc17459672a20fedfdbec53be65c6a8"
     },
     {
       "type_name": "ModelTier",

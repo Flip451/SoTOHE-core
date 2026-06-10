@@ -291,11 +291,11 @@ impl fmt::Display for RefVerifyError {
             RefVerifyError::TrackNotActive { branch } => {
                 write!(f, "branch '{branch}' is not an active track branch")
             }
-            RefVerifyError::VerifierPort { .. } => {
-                write!(f, "semantic verifier adapter error (see logs for details)")
+            RefVerifyError::VerifierPort { message } => {
+                write!(f, "semantic verifier adapter error: {message}")
             }
-            RefVerifyError::CachePersistence { .. } => {
-                write!(f, "verify-cache persistence error (see logs for details)")
+            RefVerifyError::CachePersistence { message } => {
+                write!(f, "verify-cache persistence error: {message}")
             }
             RefVerifyError::SemanticFailuresConfirmed { pair_count } => {
                 write!(
@@ -380,10 +380,16 @@ pub trait RefVerifyCachePort: Send + Sync {
 /// verdict into a [`SemanticVerifyEntry`] for cache persistence.
 ///
 /// [`ModelTier`] selects fast vs. final model per D5 three-tier escalation.
-/// Implemented by the `ref-verifier` capability adapter in infrastructure
-/// (D7 / CN-01).
+/// `cache_scope` selects which Chain's prompt template / capability the
+/// adapter uses (D11): [`RefVerifyCacheScope::SpecAdr`] routes to
+/// `ref-verifier-chain1`, [`RefVerifyCacheScope::CatalogueSpec`] routes to
+/// `ref-verifier-chain2`.
+///
+/// Implemented by the chain-routing capability adapter in infrastructure
+/// (D7 / D11 / CN-01).
 pub trait RefVerifierPort: Send + Sync {
-    /// Semantically review a `(claim, evidence)` pair at the given model tier.
+    /// Semantically review a `(claim, evidence)` pair at the given model tier
+    /// using the prompt template / capability appropriate for `cache_scope`.
     ///
     /// # Errors
     ///
@@ -392,6 +398,7 @@ pub trait RefVerifierPort: Send + Sync {
         &self,
         claim: String,
         evidence: String,
+        cache_scope: &RefVerifyCacheScope,
         tier: ModelTier,
     ) -> Result<SemanticVerdict, RefVerifyError>;
 }

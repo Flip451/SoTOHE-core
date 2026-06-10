@@ -118,11 +118,15 @@
       },
       {
         "id": "IN-09",
-        "text": "`agent-profiles.json` に `ref-verifier` 専用 capability を新設する。`reviewer` capability と独立してモデル・タイムアウト・プロンプトを設定でき、`fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる",
+        "text": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
             "anchor": "D7"
+          },
+          {
+            "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+            "anchor": "D11"
           }
         ]
       },
@@ -173,6 +177,26 @@
           {
             "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
             "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-15",
+        "text": "ref-verifier の pass / fail 判定は翻訳ギャップを許容する意味論的基準で行う。自然言語（ADR / spec）から型カタログおよび実装への変換では必然的に翻訳ギャップが生じるため、struct shape / フィールド名 / メソッド名等の追加的な構造詳細が evidence に明示されていなくても、その decision の自然な実装として導かれるならば pass とする。fail とするのは（a）evidence が示す behavioral / intent と矛盾する主張、（b）evidence に記載のない新規の behavioral commitment、（c）evidence に記載のない新規の design constraint の3類型のみとする",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "IN-16",
+        "text": "Chain① と Chain② は判定対象の layer が異なるため、それぞれ独立した prompt template を持つ。Chain① の prompt template は自然言語（ADR decision text）と自然言語（spec element）を比較し、ADR decision が spec element の主張を論理的・言語的に直接裏付けるかを問う厳密な intent grounding 基準で記述する。Chain② の prompt template は型シグネチャ・フィールド・メソッド等の構造的記述と spec element の behavioral commitment を比較し、D10 が定める翻訳ギャップ許容（構造詳細が evidence に明示されていなくても decision の自然な実装として導かれれば pass）を中心的に反映した基準で記述する",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+            "anchor": "D11"
           }
         ]
       }
@@ -303,11 +327,15 @@
     },
     {
       "id": "CN-07",
-      "text": "`ref-verifier` capability の具体的なモデル値は `agent-profiles.json` で指定し、ADR 本文には非 canonical なモデル値を記載しない。段1（Fast）と段2（Final）の役割のみ ADR が規定し、具体値は設定に委ねる",
+      "text": "`ref-verifier-chain1` / `ref-verifier-chain2` capability の具体的なモデル値は `agent-profiles.json` で指定し、ADR 本文には非 canonical なモデル値を記載しない。段1（Fast）と段2（Final）の役割のみ ADR が規定し、具体値は Chain ごとの設定に委ねる",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
           "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D11"
         }
       ]
     },
@@ -340,16 +368,82 @@
           "anchor": "D4"
         }
       ]
+    },
+    {
+      "id": "CN-11",
+      "text": "`ref-verifier` adapter は `cache_scope` から Chain 種別を解決し、`ref-verifier-chain1` / `ref-verifier-chain2` の対応する capability と prompt template を選択する。prompt template の読み込みと claim / evidence / tier の埋め込みを adapter-local な前処理として行い、model / verifier 呼び出し自体にはレンダリング済み prompt payload だけを渡す。Chain② の prompt template は D10 が定める pass / fail の判定基準（翻訳ギャップ許容・3類型の fail 定義）を反映し、Chain① の prompt template は ADR decision text と spec element の intent grounding を問うものでなければならない。prompt template 読み込み失敗や payload だけから引用付き verdict を返せない応答は `RefVerifyError::VerifierPort` として fail-closed に扱う。usecase port (`RefVerifierPort::verify_pair`) のシグネチャ自体は provider を固定しないが、adapter 実装は D13-2/CN-14 の固定リテラル制約に従い `claude` / `codex` / `gemini` の3バイナリのみをサポートする。provider / model の具体値は `agent-profiles.json` の Chain 別 capability で選択する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D10"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D11"
+        }
+      ]
+    },
+    {
+      "id": "CN-12",
+      "text": "`RefVerifierPort::verify_pair` のシグネチャには `cache_scope` を渡す。`AgentRefVerifierAdapter` は `cache_scope` の値から Chain 種別（Chain① または Chain②）を解決し、対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の `prompt_template_path` と `resolve_execution` を選ぶ。usecase 層は `cache_scope` を port 呼び出し引数として渡すだけでよく、capability 解決の詳細は adapter に隠蔽される",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D11"
+        }
+      ]
+    },
+    {
+      "id": "CN-13",
+      "text": "ref-verifier subprocess はタイムアウトを設けず、終了するまで待機する。LLM の評価時間は対象ペアの長さとモデルの応答速度に依存するため、任意のタイムアウト値を設けると評価が途中で打ち切られ偽の escalation が発生する。capability 設定にも timeout 項目を持たない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D13-1"
+        }
+      ]
+    },
+    {
+      "id": "CN-14",
+      "text": "ref-verifier が起動する provider binary の名前は `claude` / `codex` / `gemini` の固定リテラルとし、解決は OS の PATH に委ねる。環境変数による差し替え口（例: `CLAUDE_BIN`）は持たない。環境変数間接参照を許すと検証ゲートの実体を外部から無検証でつけ替えられる抜け穴になるため採用しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D13-2"
+        }
+      ]
+    },
+    {
+      "id": "CN-15",
+      "text": "adapter が runner に渡す判定入力は renderer が生成した claim / evidence テキストを含む prompt payload のみとし、runner 内で template 再読み込みは行わない。claude ではツール無効化引数（`--disallowedTools` / `--tools \"\"`）を使い LLM function-calling tool 経由のファイル読み取り・編集・シェル実行を機械的に排除する。codex では `--sandbox read-only` を使用してワークスペースへの書き込みを禁止し verify-cache artifact の改ざんを防ぐ; codex はファイル読み取りを OS レベルでは遮断しないが、structured output（`--output-schema`）で flat JSON verdict を強制し、prompt 設計によって claim / evidence テキストのみに基づく判定を誘導する。gemini は `-p <payload>` でレンダリング済み prompt payload を渡す。ワークスペースへの自由な参照は D4 の hash 凍結による判定の再現性を損なうため、prompt 設計で参照を誘発しないよう対処する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D13-3"
+        }
+      ]
     }
   ],
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "`agent-profiles.json` に `ref-verifier` capability エントリが存在し、`fast_provider` / `fast_model`（段1）と `provider` / `model`（段2）を独立して設定できる。`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返すことで `ref-verifier` の provider をまたぐ段階引き上げが機能する",
+      "text": "`agent-profiles.json` に `ref-verifier-chain1` / `ref-verifier-chain2` capability エントリが存在し、それぞれ `fast_provider` / `fast_model`（段1）と `provider` / `model`（段2）を独立して設定できる。`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返すことで各 Chain capability の provider をまたぐ段階引き上げが機能する",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
           "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D11"
         }
       ]
     },
@@ -455,11 +549,15 @@
     },
     {
       "id": "AC-12",
-      "text": "`ref-verifier` capability と `reviewer` capability が同時に実行される場合に、設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ",
+      "text": "`ref-verifier-chain1` / `ref-verifier-chain2` capability と `reviewer` capability が同時に実行される場合に、設定（モデル・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ（D13-1/CN-13 により timeout_seconds は capability 設定に持たない）",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
           "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D11"
         }
       ]
     },
@@ -470,6 +568,36 @@
         {
           "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
           "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "ref-verifier は D10 の判定基準を適用する。（a）struct shape / フィールド名 / メソッド名等の追加的な構造詳細が evidence に明示されていなくても、その decision の自然な実装として導かれるならば fail としない。（b）evidence が示す behavioral / intent と矛盾する主張、evidence に記載のない新規の behavioral commitment、および evidence に記載のない新規の design constraint はいずれも fail とする。D10 の基準に対するテストケースが実装されており、（a）翻訳ギャップのある合格例と（b）3類型の fail 例それぞれについて期待どおりの判定が返ることを確認できる",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "AC-15",
+      "text": "`AgentRefVerifierAdapter` は `cache_scope` が Chain① を示す場合に `ref-verifier-chain1` capability を選択し、Chain② を示す場合に `ref-verifier-chain2` capability を選択する。誤った Chain 種別の capability が選ばれた場合（例: Chain② スコープで `ref-verifier-chain1` を呼ぶ）はテストで検出できる。各 Chain の prompt template は IN-16 が定める基準（Chain① は strict intent grounding、Chain② は翻訳ギャップ許容中心）で記述されており、互いを代替しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D11"
+        }
+      ]
+    },
+    {
+      "id": "AC-16",
+      "text": "ref-verifier interactor は production の参照ペアが全て cache hit（production cache miss = 0 件）のとき、known_bad probe の評価を実行しない。その run で LLM への呼び出しは 0 件になり、全 cache hit run はコスト 0 で完了する。production cache miss が 1 件以上ある run では known_bad probe を従来どおり評価し、D6 の検出率閾値監視と D5 の段階引き上げに供する",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+          "anchor": "D12"
         }
       ]
     }
@@ -513,7 +641,7 @@
     }
   ],
   "signals": {
-    "blue": 46,
+    "blue": 56,
     "yellow": 0,
     "red": 0
   }

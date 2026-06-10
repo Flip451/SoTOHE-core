@@ -1,0 +1,1493 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "ba0d48971a3c60d5084d25f32de93aac265fb37e3c3fe34357034ba0c080a01e",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論検証 (層③) は『引用先が主張を実際に裏付けているか』を見る。両者は別の層であり、層③ を層① の色に混ぜると『青 (= ref 引用済み) なのに意味的に矛盾している』と『健全な青』の区別が消える。」"
+      }
+    },
+    {
+      "claim_hash": "b7a1f0e8ef70e8207cbc6f0eacdcb7f83685e302fa6b8a459c22e62beaacaff1",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "cc8e31f710902eed90e5696e42823b224aa19a6b8765a6da535189fe170a996e",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ」現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。副産物として、既存の hash 整合ゲート (Chain②) の粒度が全体 → entry 単位に精緻化される。"
+      }
+    },
+    {
+      "claim_hash": "62694034a29f837102f9e482de2f266351438863de78eb35289528b761d55f63",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証を presence 信号の色 (🔵🟡🔴) に統合せず、独立した **判定結果レーン** として設計する。 ... code-review インフラの責務固有部分は流用しない。`Reviewer` port ... `ClaudeReviewer` adapter・review-fix-lead は ... 意味論検証の ... 形と噛み合わない。"
+      }
+    },
+    {
+      "claim_hash": "3b16a2febd2151fae3c4d8505d16702d457e176408379cd45b7f0aec94a9d9c9",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "phase 第一防衛線: spec-design 後に Chain①、type-design 後に Chain②。commit 最終関門... `check-approved` と AND"
+      }
+    },
+    {
+      "claim_hash": "f868c6b5a37737025532852d81b19c7d37a6dfd603c82886462dc619acb96b7f",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ADR に canonical hash を作らない。ADR の同一性は git blob hash に委ねる。一方で、anchor の実在検証は追加する。」"
+      }
+    },
+    {
+      "claim_hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。\n| Chain | 主張 (claim) | 主張の hash 種別 | 根拠 (evidence) | 根拠の hash 種別 |\n|---|---|---|---|---|\n| Chain① (spec → ADR) | spec element | per-element SHA-256 (既存) | ADR ファイル | git blob hash (既存) |\n| Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)** | spec element | per-element SHA-256 (既存) |"
+      }
+    },
+    {
+      "claim_hash": "dfb5e52cb2a1fd525c2d898b1b5db7e086f6c01aacad5f12b10505458bf4a907",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ」。現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。"
+      }
+    },
+    {
+      "claim_hash": "38366308ab32d38c3765cbf1b4f981941fdd4c7fd09cf32b4346b71fa3f104cb",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "合格判定の際、根拠 (ADR または spec element) のどの箇所 (文や段落) が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。これにより「何もチェックせず素通り」を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "答えが不合格と分かっているペアを各バッチに混ぜて実行し、それらを正しく不合格と判定できているかを監視する。検出率が閾値を下回ったら検証器の劣化と判定し D5 の段階引き上げ経路に入る。既知の誤り例の注入率と検出率閾値は設定ファイルで指定可能とし、運用で調整できる（初期デフォルト: 注入率 10% / 検出率閾値 90%）。"
+      }
+    },
+    {
+      "claim_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューの検証器を `reviewer` capability の流用ではなく、Chain ごとの専用 capability (`ref-verifier-chain1` / `ref-verifier-chain2`) として `agent-profiles.json` に新設する。… モデル・タイムアウト・プロンプトを `reviewer` の設定と独立に調整できる。… `fast_provider` / `fast_model` を指定することで Fast round と Final round に異なる provider を割り当てられる。"
+      }
+    },
+    {
+      "claim_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain ごとに独立した capability を `agent-profiles.json` に定義する。」"
+      }
+    },
+    {
+      "claim_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **Chain① (spec → ADR)**: track 単位で1つ。ファイル名 `spec-adr-verify-cache.json`。\n- **Chain② (catalogue → spec)**: 層別。ファイル名 `<layer>-catalogue-spec-verify-cache.json` (domain / usecase / infrastructure / cli ごと)。"
+      }
+    },
+    {
+      "claim_hash": "1c44cc74a394987dd3d1130fcfc2309e893922eaf2c829ad18dfa3a4ea3d72e0",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の `/track:ref-verify` skill (公開 UI) と対応する `bin/sotp ref-verify` サブコマンドから呼び出す。`sotp verify *` にも `/track:review` にも相乗りせず、層③ 専用の呼び出し口を持つ。"
+      }
+    },
+    {
+      "claim_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1 コマンドで全 Chain を扱い、スコープは phase に応じて自動で決まる。... spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain。」"
+      }
+    },
+    {
+      "claim_hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)** | spec element | per-element SHA-256 (既存) ... 新規に追加する hash は catalogue entry の per-entry hash のみ ... per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。"
+      }
+    },
+    {
+      "claim_hash": "0c6cffdf2e84def821bae4660d9b55879cbab6d0b3dba82d0f76aeb1f0bd2c89",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "構造的詳細の有無を問うのではなく、decision の intent と behavioral consistency を問う。"
+      }
+    },
+    {
+      "claim_hash": "d4aa7fa1b5afd26210c41af7bfc3fde62b0ee89468199b541f3e6c6999d96467",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain① は ADR の decision text と spec element の自然言語記述を比較して intent の整合を問う。Chain② は catalogue の型シグネチャ・フィールド・メソッド等の構造的記述が spec element の behavioral commitment と矛盾しないかを問う。」"
+      }
+    },
+    {
+      "claim_hash": "5774033684f42abb2f2eb336738486fa50f9d95d1c11813168d34e72c78973e4",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR に canonical hash を作らない。ADR の同一性は git blob hash に委ねる。一方で、anchor の実在検証は追加する。"
+      }
+    },
+    {
+      "claim_hash": "3205e7871ca4104855bd4a1e15a3d36cc485bdb078f2494398ea4ff041570fc3",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **段2**: 不合格または判定保留のペア、あるいは既知の誤り例検査 (後述) での劣化検出時に同じ Chain 専用 capability の final 解決 (`provider` / `model`) へ引き上げ。\n- **段3**: 重量級モデルでも解決しないとき、または検証器の劣化が確認されたときに人間へ報告。\n\n- 既知の誤り例検査での劣化 (検証器の故障疑い) → 軽量→重量級での検証器点検 → 確認後に人間報告。検証器が期待どおり機能していれば人間には届かない。"
+      }
+    },
+    {
+      "claim_hash": "57364985b0e0bbc3ea2fd57f8ec228697b8894539254ef7bac223bf29dcde6f0",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "参照ペアの並列処理には `agent-profiles.json` の Chain 別専用 capability (`ref-verifier-chain1` / `ref-verifier-chain2`) を用いる"
+      }
+    },
+    {
+      "claim_hash": "058e758281cb937963528d0d9998da3ac6a23cf789638a1fbe143519cd1b950e",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証レーン (D1) は、専用の `/track:ref-verify` skill (公開 UI) と対応する `bin/sotp ref-verify` サブコマンドから呼び出す。`sotp verify *` (層② の構造/新鮮度チェック) にも `/track:review` (code review) にも相乗りせず、層③ 専用の呼び出し口を持つ。3つの検証層がそれぞれ独立した surface を持ち、D1 の SRP 分離と整合する。"
+      }
+    },
+    {
+      "claim_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証は独立したレーンとして設計し、code-review インフラの責務固有部分は流用しない。`Reviewer` port (`ReviewTarget` = ファイル集合)・`Verdict`・`ReviewerFinding` (file/line/severity)・`review.json` (`ScopeRound`)・`ClaudeReviewer` adapter・review-fix-lead は「ファイル群を diff レビューし code を修正する」責務に最適化されており、意味論検証の「reference pair を入力に、引用付き verdict (D6) を返し writer へ差し戻す」形と噛み合わない。相乗りさせると共有型が2責務を抱え分岐が増える SRP アンチパターンになるため、専用の port・型・adapter・`ref-verifier-chain1` / `ref-verifier-chain2` capability (D7/D11)・`(claim_hash, evidence_hash)` キャッシュ (D4)・Chain ごとの verdict artifact (D8) を独立に持つ。共有するのは責務中立な部品のみ: `agent-profiles.json` の capability→provider 解決 (`resolve_execution`、D7 が使用) と、commit ゲートで code-review 側 `check-approved` と意味論側 approved を AND する薄い合成。"
+      }
+    },
+    {
+      "claim_hash": "4f01b5135c374bf9d5020efa0c4ce891437fd20c90c7354ea95e0e19e58759e6",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit 最終関門: 全 Chain の意味論検証を独立した意味論ゲートとして実行し、code-review の `check-approved` と AND して commit を通す (D1/D8 の薄い合成。`/track:review` の scope には相乗りしない)"
+      }
+    },
+    {
+      "claim_hash": "a9edf9aa562256dc7373fa1f6036bedd0d5316d73d3d249a844158d8649ec018",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ADR の同一性は git blob hash に委ねる。追加の hash 計算は不要。Chain① の 根拠 (ADR) 側の再走トリガーは ADR ファイルの git blob hash 変化とする」"
+      }
+    },
+    {
+      "claim_hash": "4ee118cdc8dadd46cf2d5aa8e4fb31ecc916a90befb1980bdaf06e4ea8625c06",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「SHA-256 計算は `libs/infrastructure/src/verify/plan_artifact_refs/spec_refs.rs` の `canonical_json_sha256` ヘルパーを流用できる】【。新規に追加する hash は catalogue entry の per-entry hash のみ」"
+      }
+    },
+    {
+      "claim_hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「段1: 対象 Chain に対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の fast 解決 (`fast_provider` / `fast_model`) で全ペアを並列レビュー (D7/D11)】【。並列の振り分け粒度: Chain① は (spec element × ADR file) のペア単位、Chain② は layer 単位バッチ (domain / usecase / infrastructure / cli ごと)。バッチ上限とスロットリングの具体数値は設定ファイルで指定可能とする。」"
+      }
+    },
+    {
+      "claim_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「具体的なモデル値は `agent-profiles.json` で指定し、運用時に切り替えられるようにする。… ADR は段1=軽量モデル / 段2=重量級モデルの役割のみを規定し、具体値は設定に置く（…非 canonical な設定例を ADR 本文に置かない原則とも一致）。」"
+      }
+    },
+    {
+      "claim_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この責務の違いに基づき、Chain ごとに独立した capability を `agent-profiles.json` に定義する。」/ 「D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。」"
+      }
+    },
+    {
+      "claim_hash": "bed4532154fa371de009bc86c6f3559f0a47a7004a06a9c8033beef85649ab94",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論側の approved は、これらの artifact を読む専用ゲートとして評価する … 既存 `check-approved` を意味論 artifact 読みに拡張しない"
+      }
+    },
+    {
+      "claim_hash": "1bf12c1431967bfd825b819a4be5e3607d61c0fc2f9b989fcdfd507e722dad0a",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「/track:plan の phase オーケストレーションが phase 第一防衛線を、commit ゲートが最終関門を、それぞれ `bin/sotp ref-verify` 経由で起動する。発火ごとに別実装を持たない。」"
+      }
+    },
+    {
+      "claim_hash": "f0b72a834b6e5843f5400b77ffaadb3ced09bd2e4f728afc6d9a2c5733d01b13",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ」 / 「現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度」"
+      }
+    },
+    {
+      "claim_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。」"
+      }
+    },
+    {
+      "claim_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「専用 capability 群 `ref-verifier-chain1` / `ref-verifier-chain2` を `agent-profiles.json` に新設する」／「具体的なモデル値は `agent-profiles.json` で指定し、運用時に切り替えられるようにする。」"
+      }
+    },
+    {
+      "claim_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「主張が根拠と意味的に整合するか」を問う"
+      }
+    },
+    {
+      "claim_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① は ADR の decision text と spec element の自然言語記述を比較して intent の整合を問う。Chain ごとに独立した capability を `agent-profiles.json` に定義する。"
+      }
+    },
+    {
+      "claim_hash": "8a8905f5e367eedbd09e21defbdd99fb8176e7509fa2ada308e2c39c004e66e1",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AgentRefVerifierAdapter` は `verify_pair` 呼び出し時の `cache_scope` 引数から Chain 種別を解決し、対応する capability (`ref-verifier-chain1` または `ref-verifier-chain2`) の `prompt_template_path` を選んで使用する。`RefVerifierPort::verify_pair` のシグネチャに `cache_scope` を渡す必要があるならば usecase 側もそれを受け入れる。能力の解決経路 ... は各 capability が独立して持つ。"
+      }
+    },
+    {
+      "claim_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「専用 capability 群とする理由は3点ある。第一に、モデル・タイムアウト・プロンプトを `reviewer` の設定と独立に調整できる。」/「`agent-profiles.json` の各 capability 設定は `fast_provider` / `fast_model` を指定することで Fast round と Final round に異なる provider を割り当てられる。`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` ... が `RoundType::Fast` に対して `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` には `provider` / `model` を返す。」"
+      }
+    },
+    {
+      "claim_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この責務の違いに基づき、Chain ごとに独立した capability を `agent-profiles.json` に定義する。 ... D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。」"
+      }
+    },
+    {
+      "claim_hash": "cf852bc5f49d06c818431af5bd2f828b71abe8d7e9a8e258031bc83d2813e78f",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`bin/sotp ref-verify` サブコマンドから呼び出す。…呼び出しコンテキストから対象 Chain を解決する — spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain。スタンドアロン実行では未確定の全ペアを対象にする。」"
+      }
+    },
+    {
+      "claim_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **Chain① (spec → ADR)**: track 単位で1つ。ファイル名 `spec-adr-verify-cache.json`。\n- **Chain② (catalogue → spec)**: 層別。ファイル名 `<layer>-catalogue-spec-verify-cache.json` (domain / usecase / infrastructure / cli ごと)。"
+      }
+    },
+    {
+      "claim_hash": "2efb8b46bb56a784996560084fc7b2570a49c55a2f69c5d8dd97bfe83ae08f3b",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit 最終関門: 全 Chain の意味論検証を独立した意味論ゲートとして実行し、code-review の `check-approved` と AND して commit を通す。commit 前の最終関門では、phase 以降に変わったペアのみを再検証する"
+      }
+    },
+    {
+      "claim_hash": "36fb2c796df45fdb3ce60b318b3ccd0d98314fe7e9194a53979b4c2ec60e0194",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「anchor の実在検証は追加する。spec.json の `adr_refs[].anchor` が指す値 (例: \"D1\", \"D2\") が ADR front-matter の `decisions[].id` に実際に存在するかを `plan-artifact-refs` 検証器で確認する。」"
+      }
+    },
+    {
+      "claim_hash": "fc6256f9f2e2f3240b63de074b208f48b503d241bced0e891e9eded1391b9b90",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ」 / 「canonical_json_sha256` ヘルパーを流用できる」"
+      }
+    },
+    {
+      "claim_hash": "e76b6ab619a70343805540fd8345ce814e2a46d531d0dc54e663034da5dc1db3",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "fe4e2ff9dfcd47b9272af0f3e08e148540008672fc228911bbe05550802449c7",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「検出率が閾値を下回ったら検証器の劣化と判定し D5 の段階引き上げ経路に入る」"
+      }
+    },
+    {
+      "claim_hash": "318d3eed927305f130d982f36d05b1fd1068d662af4b2ec97e6b58053f4ba7e1",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「合格判定の際、根拠のどの箇所が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。」"
+      }
+    },
+    {
+      "claim_hash": "8da43c99de0534af6ac2619aeea212c2705f5b0153f9fee0d405cd3b1577b8d1",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の `/track:ref-verify` skill (公開 UI) と対応する `bin/sotp ref-verify` サブコマンドから呼び出す。`sotp verify *` (層② の構造/新鮮度チェック) にも `/track:review` (code review) にも相乗りせず、層③ 専用の呼び出し口を持つ。3つの検証層がそれぞれ独立した surface を持ち"
+      }
+    },
+    {
+      "claim_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「モデル・タイムアウト・プロンプトを `reviewer` の設定と独立に調整できる」「`reviewer` と各 ref-verifier capability を同時に並列実行する場合に設定が干渉しない」「専用 capability 群 `ref-verifier-chain1` / `ref-verifier-chain2` を agent-profiles.json に新設する」"
+      }
+    },
+    {
+      "claim_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この責務の違いに基づき、Chain ごとに独立した capability を `agent-profiles.json` に定義する。... D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。"
+      }
+    },
+    {
+      "claim_hash": "e54a00da94e34e75ce15f87bc887f6d94380e8ab4d74c90ec68213dd4d6eff2b",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 (新規) | spec element | per-element SHA-256 (既存)」"
+      }
+    },
+    {
+      "claim_hash": "cd61391b5e2d5928090bde72dcb47b9551e76d0ad30d5d9eeb4f88474099db08",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "struct shape / フィールド名 / メソッド名等の追加的な構造詳細が evidence に明示されていなくても、その decision の自然な実装として導かれるならば fail としない。"
+      }
+    },
+    {
+      "claim_hash": "ddc13d60f62b8f6f70ba815229daf0483eaceb0c679a9d7d3cac107cfe4a99a8",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「cache_scope 引数から Chain 種別を解決し、対応する capability (`ref-verifier-chain1` または `ref-verifier-chain2`) の `prompt_template_path` を選んで使用する」 / 「Chain① の prompt はより厳密な intent grounding」 / 「Chain② ... translation gap 許容」"
+      }
+    },
+    {
+      "claim_hash": "c0cc24ded101ce85d5d437c34305a9f5341b4b10c48643ca031d524211e985a8",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ref-verifier interactor は production cache miss が 0 件のとき known_bad probe の評価を skip する】【。」「production cache miss が 1 件以上ある run では従来どおり probe を評価し、D5 の段階引き上げ判定に供する。」"
+      }
+    },
+    {
+      "claim_hash": "11aa8f7341ab23adc5eb7f8158ab618f95406a78df797acbb17c1f5f9d09fbea",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検証コストを抑えつつ信頼性を確保するため、3段の階層で吸収する。\n\n- **段1**: 対象 Chain に対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の fast 解決 (`fast_provider` / `fast_model`) で全ペアを並列レビュー (D7/D11)。\n- **段2**: 不合格または判定保留のペア、あるいは既知の誤り例検査 (後述) での劣化検出時に同じ Chain 専用 capability の final 解決 (`provider` / `model`) へ引き上げ。\n- **段3**: 重量級モデルでも解決しないとき、または検証器の劣化が確認されたときに人間へ報告。\n\n**引き上げの単位は参照ペア**: fast 解決全体 → final 解決全体を一括で引き上げるのではなく、**参照ペア単位の判定結果 (不合格または判定保留、あるいは既知の誤り例劣化)** がトリガーとなる参照ペア単位の段階引き上げである。"
+      }
+    },
+    {
+      "claim_hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**新規に追加する hash は catalogue entry の per-entry hash のみ**。現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。"
+      }
+    },
+    {
+      "claim_hash": "eac78d76e45fd5cf39fcca5656b6f3c9a02e85f49cc7e7abbf8d54829254be28",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "fail",
+        "reason": "Contradiction: the claim requires integrating semantic verification results into the presence signal colors, while the ADR explicitly decides not to integrate them and to keep semantic verification as an independent verdict lane."
+      }
+    },
+    {
+      "claim_hash": "53343ae1e5de036fcfedac105cc91f46ab79709ed596108b7d7320af68fa7840",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[advisory-only,hard-gate-with-deterministic-cache] chose:hard-gate-with-deterministic-cache\n\n引用を提示できない合格は判定保留として不合格方向に倒す。"
+      }
+    },
+    {
+      "claim_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[advisory-only,hard-gate-with-deterministic-cache] chose:hard-gate-with-deterministic-cache\n\n- **裏付け箇所の引用必須化**: 合格判定の際、根拠 (ADR または spec element) のどの箇所 (文や段落) が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。"
+      }
+    },
+    {
+      "claim_hash": "aa8c96c3c51e0eb0f9b8afc86f84039f97376d36eb4d2b42a5455f852812c012",
+      "evidence_hash": "64930300c8fb669c549c7f2b38db441e18bc8c7a291d1c57e04767281fe95ef0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **段2**: 不合格または判定保留のペア、あるいは既知の誤り例検査 (後述) での劣化検出時に同じ Chain 専用 capability の final 解決 (`provider` / `model`) へ引き上げ。\n\n**引き上げの単位は参照ペア**: fast 解決全体 → final 解決全体を一括で引き上げるのではなく、**参照ペア単位の判定結果 (不合格または判定保留、あるいは既知の誤り例劣化)** がトリガーとなる参照ペア単位の段階引き上げである。"
+      }
+    },
+    {
+      "claim_hash": "ba0d48971a3c60d5084d25f32de93aac265fb37e3c3fe34357034ba0c080a01e",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "presence 信号 (層①) は「ref を引用したか」を見るにとどまり、意味論検証 (層③) は「引用先が主張を実際に裏付けているか」を見る。両者は別の層であり、層③ を層① の色に混ぜると「青 (= ref 引用済み) なのに意味的に矛盾している」と「健全な青」の区別が消える。"
+      }
+    },
+    {
+      "claim_hash": "b7a1f0e8ef70e8207cbc6f0eacdcb7f83685e302fa6b8a459c22e62beaacaff1",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "cc8e31f710902eed90e5696e42823b224aa19a6b8765a6da535189fe170a996e",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。」"
+      }
+    },
+    {
+      "claim_hash": "62694034a29f837102f9e482de2f266351438863de78eb35289528b761d55f63",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論検証は独立したレーンとして設計し、code-review インフラの責務固有部分は流用しない。」"
+      }
+    },
+    {
+      "claim_hash": "3b16a2febd2151fae3c4d8505d16702d457e176408379cd45b7f0aec94a9d9c9",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain の整合性検証を2段階で発火させる。\n\n- **phase 第一防衛線**: spec-design 後に Chain① (spec → ADR) の意味論レビューを実行し、type-design 後に Chain② (catalogue → spec) の意味論レビューを実行する。局所整合を早期に固めることで、commit 前の全チェックで発覚する矛盾を減らす。\n- **commit 最終関門**: 全 Chain の意味論検証を独立した意味論ゲートとして実行し、code-review の `check-approved` と AND して commit を通す」"
+      }
+    },
+    {
+      "claim_hash": "f868c6b5a37737025532852d81b19c7d37a6dfd603c82886462dc619acb96b7f",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "一方で、**anchor の実在検証は追加する**。spec.json の `adr_refs[].anchor` が指す値 (例: \"D1\", \"D2\") が ADR front-matter の `decisions[].id` に実際に存在するかを `plan-artifact-refs` 検証器で確認する。... **ADR に canonical hash を作らない**。ADR の同一性は git blob hash に委ねる。"
+      }
+    },
+    {
+      "claim_hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。\n| Chain | 主張 (claim) | 主張の hash 種別 | 根拠 (evidence) | 根拠の hash 種別 |\n|---|---|---|---|---|\n| Chain① (spec → ADR) | spec element | per-element SHA-256 (既存) | ADR ファイル | git blob hash (既存) |\n| Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)** | spec element | per-element SHA-256 (既存) |"
+      }
+    },
+    {
+      "claim_hash": "dfb5e52cb2a1fd525c2d898b1b5db7e086f6c01aacad5f12b10505458bf4a907",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ。現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。」"
+      }
+    },
+    {
+      "claim_hash": "11aa8f7341ab23adc5eb7f8158ab618f95406a78df797acbb17c1f5f9d09fbea",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「段1: 対象 Chain に対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の fast 解決 ... で全ペアを並列レビュー」; 「段2: 不合格または判定保留のペア、あるいは既知の誤り例検査 ... での劣化検出時に ... final 解決 ... へ引き上げ」; 「引き上げの単位は参照ペア」; 「段3: 重量級モデルでも解決しないとき、または検証器の劣化が確認されたときに人間へ報告」"
+      }
+    },
+    {
+      "claim_hash": "38366308ab32d38c3765cbf1b4f981941fdd4c7fd09cf32b4346b71fa3f104cb",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **裏付け箇所の引用必須化**: 合格判定の際、根拠 (ADR または spec element) のどの箇所 (文や段落) が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。これにより「何もチェックせず素通り」を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **既知の誤り例の注入**: 答えが不合格と分かっているペアを各バッチに混ぜて実行し、それらを正しく不合格と判定できているかを監視する。検出率が閾値を下回ったら検証器の劣化と判定し D5 の段階引き上げ経路に入る。既知の誤り例の注入率と検出率閾値は設定ファイルで指定可能とし、運用で調整できる（初期デフォルト: 注入率 10% / 検出率閾値 90%）。"
+      }
+    },
+    {
+      "claim_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューの検証器を `reviewer` capability の流用ではなく、Chain ごとの専用 capability (`ref-verifier-chain1` / `ref-verifier-chain2`) として `agent-profiles.json` に新設する。 ... `agent-profiles.json` の各 capability 設定は `fast_provider` / `fast_model` を指定することで Fast round と Final round に異なる provider を割り当てられる。"
+      }
+    },
+    {
+      "claim_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この責務の違いに基づき、Chain ごとに独立した capability を `agent-profiles.json` に定義する。」\n「D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。」"
+      }
+    },
+    {
+      "claim_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain① (spec → ADR): track 単位で1つ。ファイル名 `spec-adr-verify-cache.json`。」「Chain② (catalogue → spec): 層別。ファイル名 `<layer>-catalogue-spec-verify-cache.json`」"
+      }
+    },
+    {
+      "claim_hash": "1c44cc74a394987dd3d1130fcfc2309e893922eaf2c829ad18dfa3a4ea3d72e0",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の `/track:ref-verify` skill (公開 UI) と対応する `bin/sotp ref-verify` サブコマンドから呼び出す。`sotp verify *` (層② の構造/新鮮度チェック) にも `/track:review` (code review) にも相乗りせず、層③ 専用の呼び出口を持つ。"
+      }
+    },
+    {
+      "claim_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1 コマンドで全 Chain を扱い、スコープは phase に応じて自動で決まる。…差分キャッシュ (D4) により、対象のうち変化したペアだけが再レビューされる」"
+      }
+    },
+    {
+      "claim_hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)**\" / \"per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる\""
+      }
+    },
+    {
+      "claim_hash": "0c6cffdf2e84def821bae4660d9b55879cbab6d0b3dba82d0f76aeb1f0bd2c89",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **pass とする**: catalogue の claim が evidence (ADR decision / spec element) の核となる decision・behavior と矛盾しない場合。struct shape / フィールド名 / メソッド名等の追加的な構造詳細が evidence に明示されていなくても、その decision の自然な実装として導かれるならば fail としない。\n- **fail とする**: 次の3類型のいずれかに該当する場合。(a) evidence が示す behavioral / intent と矛盾する主張 — evidence の decision を覆す・否定する claim。(b) evidence に記載のない新規の behavioral commitment — evidence が言及していない外側の責務・契約を claim が追加している。(c) evidence に記載のない新規の design constraint — evidence が示す設計方針に存在しない制約を claim が導入している。"
+      }
+    },
+    {
+      "claim_hash": "d4aa7fa1b5afd26210c41af7bfc3fde62b0ee89468199b541f3e6c6999d96467",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① は ADR の decision text と spec element の自然言語記述を比較して intent の整合を問う。 Chain② は catalogue の型シグネチャ・フィールド・メソッド等の構造的記述が spec element の behavioral commitment と矛盾しないかを問う。"
+      }
+    },
+    {
+      "claim_hash": "eac78d76e45fd5cf39fcca5656b6f3c9a02e85f49cc7e7abbf8d54829254be28",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "presence 信号の色 (🔵🟡🔴) に統合せず、独立した 判定結果レーン として設計する。"
+      }
+    },
+    {
+      "claim_hash": "5774033684f42abb2f2eb336738486fa50f9d95d1c11813168d34e72c78973e4",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**ADR に canonical hash を作らない**。ADR の同一性は git blob hash に委ねる。\n\n一方で、**anchor の実在検証は追加する**。"
+      }
+    },
+    {
+      "claim_hash": "3205e7871ca4104855bd4a1e15a3d36cc485bdb078f2494398ea4ff041570fc3",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **段2**: 不合格または判定保留のペア、あるいは既知の誤り例検査 (後述) での劣化検出時に同じ Chain 専用 capability の final 解決 (`provider` / `model`) へ引き上げ。\n- **段3**: 重量級モデルでも解決しないとき、または検証器の劣化が確認されたときに人間へ報告。"
+      }
+    },
+    {
+      "claim_hash": "57364985b0e0bbc3ea2fd57f8ec228697b8894539254ef7bac223bf29dcde6f0",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論検証は独立したレーンとして設計し」 / 「参照ペアの並列処理には `agent-profiles.json` の Chain 別専用 capability (`ref-verifier-chain1` / `ref-verifier-chain2`) を用いる」"
+      }
+    },
+    {
+      "claim_hash": "058e758281cb937963528d0d9998da3ac6a23cf789638a1fbe143519cd1b950e",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「sotp verify * (層② の構造/新鮮度チェック) にも `/track:review` (code review) にも相乗りせず、層③ 専用の呼び出し口を持つ。」"
+      }
+    },
+    {
+      "claim_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論検証は独立したレーンとして設計し、code-review インフラの責務固有部分は流用しない。`Reviewer` port (`ReviewTarget` = ファイル集合)・`Verdict`・`ReviewerFinding` (file/line/severity)・`review.json` (`ScopeRound`)・`ClaudeReviewer` adapter・review-fix-lead は…意味論検証の…と噛み合わない。…専用の port・型・adapter・`ref-verifier-chain1` / `ref-verifier-chain2` capability … を独立に持つ。共有するのは責務中立な部品のみ: `agent-profiles.json` の capability→provider 解決 (`resolve_execution` …)」"
+      }
+    },
+    {
+      "claim_hash": "4f01b5135c374bf9d5020efa0c4ce891437fd20c90c7354ea95e0e19e58759e6",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "commit 最終関門: 全 Chain の意味論検証を独立した意味論ゲートとして実行し、code-review の `check-approved` と AND して commit を通す (D1/D8 の薄い合成。`/track:review` の scope には相乗りしない)"
+      }
+    },
+    {
+      "claim_hash": "a9edf9aa562256dc7373fa1f6036bedd0d5316d73d3d249a844158d8649ec018",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の **根拠 (ADR) 側**の再走トリガーは **ADR ファイルの git blob hash 変化**とする (主張 = spec element 側の変化も D4 のキャッシュキーで再走を引く)。blob hash は git の自然なコンテンツ同一性であり、追加の hash 計算は不要。"
+      }
+    },
+    {
+      "claim_hash": "4ee118cdc8dadd46cf2d5aa8e4fb31ecc916a90befb1980bdaf06e4ea8625c06",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)** | spec element | per-element SHA-256 (既存)\n\nSHA-256 計算は `libs/infrastructure/src/verify/plan_artifact_refs/spec_refs.rs` の `canonical_json_sha256` ヘルパーを流用できる。"
+      }
+    },
+    {
+      "claim_hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain① は (spec element × ADR file) のペア単位、Chain② は layer 単位バッチ ... バッチ上限とスロットリングの具体数値は設定ファイルで指定可能」"
+      }
+    },
+    {
+      "claim_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hard-gate-with-deterministic-cache; 「引用を提示できない合格は判定保留として不合格方向に倒す」"
+      }
+    },
+    {
+      "claim_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的なモデル値は `agent-profiles.json` で指定し、運用時に切り替えられるようにする。初期値はいくつかのモデルでテストして決定する。ADR は段1=軽量モデル / 段2=重量級モデルの役割のみを規定し、具体値は設定に置く（モデルを変更するたびに ADR を触らずに済むため。非 canonical な設定例を ADR 本文に置かない原則とも一致）。"
+      }
+    },
+    {
+      "claim_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この責務の違いに基づき、Chain ごとに独立した capability を `agent-profiles.json` に定義する。」 / 「D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。」"
+      }
+    },
+    {
+      "claim_hash": "bed4532154fa371de009bc86c6f3559f0a47a7004a06a9c8033beef85649ab94",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論側の approved は、これらの artifact を読む専用ゲートとして評価する」「既存 `check-approved` を意味論 artifact 読みに拡張しない」"
+      }
+    },
+    {
+      "claim_hash": "1bf12c1431967bfd825b819a4be5e3607d61c0fc2f9b989fcdfd507e722dad0a",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:plan` の phase オーケストレーションが phase 第一防衛線を、commit ゲートが最終関門を、それぞれ `bin/sotp ref-verify` 経由で起動する。"
+      }
+    },
+    {
+      "claim_hash": "f0b72a834b6e5843f5400b77ffaadb3ced09bd2e4f728afc6d9a2c5733d01b13",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ」「現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度」"
+      }
+    },
+    {
+      "claim_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「裏付け箇所の引用必須化」...「引用を提示できない合格は判定保留として不合格方向に倒す」"
+      }
+    },
+    {
+      "claim_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューの検証器を `reviewer` capability の流用ではなく、Chain ごとの専用 capability (`ref-verifier-chain1` / `ref-verifier-chain2`) として `agent-profiles.json` に新設する。D7 は code-review とは別 capability 群を持つことを定め、D11 はその capability 群を Chain① / Chain② に分ける責務境界を定める。"
+      }
+    },
+    {
+      "claim_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "主張が根拠と意味的に整合するか"
+      }
+    },
+    {
+      "claim_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「cache_scope 引数から Chain 種別を解決し、対応する capability (`ref-verifier-chain1` または `ref-verifier-chain2`) の `prompt_template_path` を選んで使用する。」"
+      }
+    },
+    {
+      "claim_hash": "8a8905f5e367eedbd09e21defbdd99fb8176e7509fa2ada308e2c39c004e66e1",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify_pair` 呼び出し時の `cache_scope` 引数から Chain 種別を解決し、対応する capability の `prompt_template_path` を選んで使用する。"
+      }
+    },
+    {
+      "claim_hash": "ea77ed888ee562738a527d80f0a8f3975c3a767e8086374c7127a309a2e3ac4f",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-09:no-env-var-binary-resolution"
+      }
+    },
+    {
+      "claim_hash": "b3d4f1b453135d85d395fbc97c1c46f98c779c5d597cafecc2db8a5099bf3776",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-09:payload-only-no-tools-verifier"
+      }
+    },
+    {
+      "claim_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "agent-profiles.json の各 capability 設定は `fast_provider` / `fast_model` を指定することで Fast round と Final round に異なる provider を割り当てられる。`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` ... `RoundType::Fast` に対して `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` には `provider` / `model` を返す。`ref-verifier-chain1` / `ref-verifier-chain2` はこの機構をそれぞれ利用して段1 (Fast) と段2 (Final) に異なる provider を設定できる。"
+      }
+    },
+    {
+      "claim_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。"
+      }
+    },
+    {
+      "claim_hash": "cf852bc5f49d06c818431af5bd2f828b71abe8d7e9a8e258031bc83d2813e78f",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1 コマンドで全 Chain を扱い、スコープは phase に応じて自動で決まる。」"
+      }
+    },
+    {
+      "claim_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① (spec → ADR): track 単位で1つ。ファイル名 `spec-adr-verify-cache.json`。Chain② (catalogue → spec): 層別。ファイル名 `<layer>-catalogue-spec-verify-cache.json`"
+      }
+    },
+    {
+      "claim_hash": "2efb8b46bb56a784996560084fc7b2570a49c55a2f69c5d8dd97bfe83ae08f3b",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **commit 最終関門**: 全 Chain の意味論検証を独立した意味論ゲートとして実行し、code-review の `check-approved` と AND して commit を通す (D1/D8 の薄い合成。`/track:review` の scope には相乗りしない)。\n- **差分キャッシュによる重複回避**: commit 前の最終関門では、phase 以降に変わったペアのみを再検証する (D4 のキャッシュキー設計で実現)。phase で通過済みの不変ペアは再レビューしない."
+      }
+    },
+    {
+      "claim_hash": "36fb2c796df45fdb3ce60b318b3ccd0d98314fe7e9194a53979b4c2ec60e0194",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「spec.json の `adr_refs[].anchor` が指す値 (例: \"D1\", \"D2\") が ADR front-matter の `decisions[].id` に実際に存在するかを `plan-artifact-refs` 検証器で確認する。」"
+      }
+    },
+    {
+      "claim_hash": "fc6256f9f2e2f3240b63de074b208f48b503d241bced0e891e9eded1391b9b90",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ。現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。副産物として、既存の hash 整合ゲート (Chain②) の粒度が全体 → entry 単位に精緻化される。」 / 「SHA-256 計算は `libs/infrastructure/src/verify/plan_artifact_refs/spec_refs.rs` の `canonical_json_sha256` ヘルパーを流用できる。」"
+      }
+    },
+    {
+      "claim_hash": "e76b6ab619a70343805540fd8345ce814e2a46d531d0dc54e663034da5dc1db3",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "fe4e2ff9dfcd47b9272af0f3e08e148540008672fc228911bbe05550802449c7",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「答えが不合格と分かっているペアを各バッチに混ぜて実行し」「検出率が閾値を下回ったら検証器の劣化と判定し D5 の段階引き上げ経路に入る」"
+      }
+    },
+    {
+      "claim_hash": "318d3eed927305f130d982f36d05b1fd1068d662af4b2ec97e6b58053f4ba7e1",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **裏付け箇所の引用必須化**: 合格判定の際、根拠 (ADR または spec element) のどの箇所 (文や段落) が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。"
+      }
+    },
+    {
+      "claim_hash": "8da43c99de0534af6ac2619aeea212c2705f5b0153f9fee0d405cd3b1577b8d1",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「専用の `/track:ref-verify` skill (公開 UI) と対応する `bin/sotp ref-verify` サブコマンドから呼び出す。`sotp verify *` (層② の構造/新鮮度チェック) にも `/track:review` (code review) にも相乗りせず、層③ 専用の呼び出し口を持つ。3つの検証層がそれぞれ独立した surface を持ち」"
+      }
+    },
+    {
+      "claim_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`reviewer` と各 ref-verifier capability を同時に並列実行する場合に設定が干渉しない。」"
+      }
+    },
+    {
+      "claim_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain ごとに独立した capability を `agent-profiles.json` に定義する。」"
+      }
+    },
+    {
+      "claim_hash": "e54a00da94e34e75ce15f87bc887f6d94380e8ab4d74c90ec68213dd4d6eff2b",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)** | spec element | per-element SHA-256 (既存)\n\n新規に追加する hash は catalogue entry の per-entry hash のみ。"
+      }
+    },
+    {
+      "claim_hash": "cd61391b5e2d5928090bde72dcb47b9551e76d0ad30d5d9eeb4f88474099db08",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "struct shape / フィールド名 / メソッド名等の追加的な構造詳細が evidence に明示されていなくても、その decision の自然な実装として導かれるならば fail としない。次の3類型のいずれかに該当する場合。(a) evidence が示す behavioral / intent と矛盾する主張"
+      }
+    },
+    {
+      "claim_hash": "ddc13d60f62b8f6f70ba815229daf0483eaceb0c679a9d7d3cac107cfe4a99a8",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`ref-verifier-chain1` capability。…より厳密な intent grounding を問う基準」「`ref-verifier-chain2` capability。…translation gap許容が中心的に作用」"
+      }
+    },
+    {
+      "claim_hash": "c0cc24ded101ce85d5d437c34305a9f5341b4b10c48643ca031d524211e985a8",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ref-verifier interactor は production cache miss が 0 件のとき known_bad probe の評価を skip する。」「production cache miss が 1 件以上ある run では従来どおり probe を評価し、D5 の段階引き上げ判定に供する。」"
+      }
+    },
+    {
+      "claim_hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**新規に追加する hash は catalogue entry の per-entry hash のみ**。現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。"
+      }
+    },
+    {
+      "claim_hash": "53343ae1e5de036fcfedac105cc91f46ab79709ed596108b7d7320af68fa7840",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[advisory-only,hard-gate-with-deterministic-cache] chose:hard-gate-with-deterministic-cache"
+      }
+    },
+    {
+      "claim_hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-09:no-subprocess-timeout"
+      }
+    },
+    {
+      "claim_hash": "aa8c96c3c51e0eb0f9b8afc86f84039f97376d36eb4d2b42a5455f852812c012",
+      "evidence_hash": "9438c0c766dc4288f01cb38e36550b2639411b0eb1a5d221ec909140a6933edc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **段2**: 不合格または判定保留のペア、あるいは既知の誤り例検査 (後述) での劣化検出時に同じ Chain 専用 capability の final 解決 (`provider` / `model`) へ引き上げ。\n\n**引き上げの単位は参照ペア**: fast 解決全体 → final 解決全体を一括で引き上げるのではなく、**参照ペア単位の判定結果 (不合格または判定保留、あるいは既知の誤り例劣化)** がトリガーとなる参照ペア単位の段階引き上げである。段1で全ペアを評価し、赤になったペアのみを段2に上げる。"
+      }
+    },
+    {
+      "claim_hash": "ba0d48971a3c60d5084d25f32de93aac265fb37e3c3fe34357034ba0c080a01e",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「引用先が主張を意味的に裏付けているか」を presence 信号の色に統合せず、独立した判定結果レーンとして設計する。"
+      }
+    },
+    {
+      "claim_hash": "b7a1f0e8ef70e8207cbc6f0eacdcb7f83685e302fa6b8a459c22e62beaacaff1",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。」"
+      }
+    },
+    {
+      "claim_hash": "cc8e31f710902eed90e5696e42823b224aa19a6b8765a6da535189fe170a996e",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ。現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。副産物として、既存の hash 整合ゲート (Chain②) の粒度が全体 → entry 単位に精緻化される。」"
+      }
+    },
+    {
+      "claim_hash": "62694034a29f837102f9e482de2f266351438863de78eb35289528b761d55f63",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「独立した 判定結果レーン として設計する。」「code-review インフラの責務固有部分は流用しない。」"
+      }
+    },
+    {
+      "claim_hash": "3b16a2febd2151fae3c4d8505d16702d457e176408379cd45b7f0aec94a9d9c9",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「- **phase 第一防衛線**: spec-design 後に Chain① (spec → ADR) の意味論レビューを実行し、type-design 後に Chain② (catalogue → spec) の意味論レビューを実行する。」 / 「- **commit 最終関門**: 全 Chain の意味論検証を独立した意味論ゲートとして実行し、code-review の `check-approved` と AND して commit を通す」"
+      }
+    },
+    {
+      "claim_hash": "f868c6b5a37737025532852d81b19c7d37a6dfd603c82886462dc619acb96b7f",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR に canonical hash を作らない。ADR の同一性は git blob hash に委ねる。一方で、anchor の実在検証は追加する。spec.json の `adr_refs[].anchor` が指す値 (例: \"D1\", \"D2\") が ADR front-matter の `decisions[].id` に実際に存在するかを `plan-artifact-refs` 検証器で確認する。"
+      }
+    },
+    {
+      "claim_hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "dfb5e52cb2a1fd525c2d898b1b5db7e086f6c01aacad5f12b10505458bf4a907",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ。現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。」"
+      }
+    },
+    {
+      "claim_hash": "11aa8f7341ab23adc5eb7f8158ab618f95406a78df797acbb17c1f5f9d09fbea",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **段1**: 対象 Chain に対応する `ref-verifier-chain1` / `ref-verifier-chain2` capability の fast 解決 (`fast_provider` / `fast_model`) で全ペアを並列レビュー (D7/D11)。\n- **段2**: 不合格または判定保留のペア、あるいは既知の誤り例検査 (後述) での劣化検出時に同じ Chain 専用 capability の final 解決 (`provider` / `model`) へ引き上げ。\n\n**引き上げの単位は参照ペア**: fast 解決全体 → final 解決全体を一括で引き上げるのではなく、**参照ペア単位の判定結果 (不合格または判定保留、あるいは既知の誤り例劣化)** がトリガーとなる参照ペア単位の段階引き上げである。段1で全ペアを評価し、赤になったペアのみを段2に上げる。"
+      }
+    },
+    {
+      "claim_hash": "38366308ab32d38c3765cbf1b4f981941fdd4c7fd09cf32b4346b71fa3f104cb",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「裏付け箇所の引用必須化: 合格判定の際、根拠 (ADR または spec element) のどの箇所 (文や段落) が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。これにより「何もチェックせず素通り」を構造的に排除する。」"
+      }
+    },
+    {
+      "claim_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **既知の誤り例の注入**: 答えが不合格と分かっているペアを各バッチに混ぜて実行し、それらを正しく不合格と判定できているかを監視する。検出率が閾値を下回ったら検証器の劣化と判定し D5 の段階引き上げ経路に入る。既知の誤り例の注入率と検出率閾値は設定ファイルで指定可能とし、運用で調整できる（初期デフォルト: 注入率 10% / 検出率閾値 90%）。"
+      }
+    },
+    {
+      "claim_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「専用 capability 群 `ref-verifier-chain1` / `ref-verifier-chain2` を agent-profiles.json に新設する」「モデル・プロンプトを `reviewer` の設定と独立に調整できる」「`fast_provider` / `fast_model` を指定することで Fast round と Final round に異なる provider を割り当てられる」"
+      }
+    },
+    {
+      "claim_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain ごとに独立した capability を `agent-profiles.json` に定義する。」「D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。」"
+      }
+    },
+    {
+      "claim_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **Chain① (spec → ADR)**: track 単位で1つ。ファイル名 `spec-adr-verify-cache.json`。\n- **Chain② (catalogue → spec)**: 層別。ファイル名 `<layer>-catalogue-spec-verify-cache.json` (domain / usecase / infrastructure / cli ごと)。"
+      }
+    },
+    {
+      "claim_hash": "1c44cc74a394987dd3d1130fcfc2309e893922eaf2c829ad18dfa3a4ea3d72e0",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「専用の `/track:ref-verify` skill (公開 UI) と対応する `bin/sotp ref-verify` サブコマンド」"
+      }
+    },
+    {
+      "claim_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1 コマンドで全 Chain を扱い、スコープは phase に応じて自動で決まる。… 差分キャッシュ (D4) により、対象のうち変化したペアだけが再レビューされる。」"
+      }
+    },
+    {
+      "claim_hash": "e9338ef111d830041b8927d9be7f27df9c1d6cd07d608eab6fb8861f4c20eab9",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 (新規)」"
+      }
+    },
+    {
+      "claim_hash": "62213f5bf007fbccab19e2b308d4eed06dd65cb025bad01e96590db783b6da25",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec element の per-element hash は `SpecElementHashReader` として既に実装されている (`libs/usecase/src/catalogue_spec_refs.rs`). SHA-256 計算は `libs/infrastructure/src/verify/plan_artifact_refs/spec_refs.rs` の `canonical_json_sha256` ヘルパーを流用できる."
+      }
+    },
+    {
+      "claim_hash": "0c6cffdf2e84def821bae4660d9b55879cbab6d0b3dba82d0f76aeb1f0bd2c89",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"struct shape / フィールド名 / メソッド名等の追加的な構造詳細が evidence に明示されていなくても、その decision の自然な実装として導かれるならば fail としない。\" / \"(a) evidence が示す behavioral / intent と矛盾する主張\" \"(b) evidence に記載のない新規の behavioral commitment\" \"(c) evidence に記載のない新規の design constraint\""
+      }
+    },
+    {
+      "claim_hash": "d4aa7fa1b5afd26210c41af7bfc3fde62b0ee89468199b541f3e6c6999d96467",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain① は ADR の decision text と spec element の自然言語記述を比較して intent の整合を問う。Chain② は catalogue の型シグネチャ・フィールド・メソッド等の構造的記述が spec element の behavioral commitment と矛盾しないかを問う。... 判定基準・許容すべき翻訳ギャップの種類・モデルへの指示が異なる」"
+      }
+    },
+    {
+      "claim_hash": "eac78d76e45fd5cf39fcca5656b6f3c9a02e85f49cc7e7abbf8d54829254be28",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証 (「引用先が主張を意味的に裏付けているか」) を presence 信号の色 (🔵🟡🔴) に統合せず、独立した **判定結果レーン** として設計する。"
+      }
+    },
+    {
+      "claim_hash": "5774033684f42abb2f2eb336738486fa50f9d95d1c11813168d34e72c78973e4",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ADR に canonical hash を作らない。ADR の同一性は git blob hash に委ねる。一方で、anchor の実在検証は追加する。」"
+      }
+    },
+    {
+      "claim_hash": "53343ae1e5de036fcfedac105cc91f46ab79709ed596108b7d7320af68fa7840",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[advisory-only,hard-gate-with-deterministic-cache] chose:hard-gate-with-deterministic-cache\n\n引用を提示できない合格は判定保留として不合格方向に倒す。これにより「何もチェックせず素通り」を構造的に排除する。"
+      }
+    },
+    {
+      "claim_hash": "3205e7871ca4104855bd4a1e15a3d36cc485bdb078f2494398ea4ff041570fc3",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既知の誤り例検査での劣化 (検証器の故障疑い) → 軽量→重量級での検証器点検 → 確認後に人間報告。検証器が期待どおり機能していれば人間には届かない。」"
+      }
+    },
+    {
+      "claim_hash": "57364985b0e0bbc3ea2fd57f8ec228697b8894539254ef7bac223bf29dcde6f0",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論検証は独立したレーンとして設計し」\n「参照ペアの並列処理には `agent-profiles.json` の Chain 別専用 capability (`ref-verifier-chain1` / `ref-verifier-chain2`) を用いる」"
+      }
+    },
+    {
+      "claim_hash": "058e758281cb937963528d0d9998da3ac6a23cf789638a1fbe143519cd1b950e",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp verify *` (層② の構造/新鮮度チェック) にも `/track:review` (code review) にも相乗りせず、層③ 専用の呼び出し口を持つ。3つの検証層がそれぞれ独立した surface を持ち、D1 の SRP 分離と整合する。"
+      }
+    },
+    {
+      "claim_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証は独立したレーンとして設計し、code-review インフラの責務固有部分は流用しない。共有するのは責務中立な部品のみ: `agent-profiles.json` の capability→provider 解決 (`resolve_execution`"
+      }
+    },
+    {
+      "claim_hash": "4f01b5135c374bf9d5020efa0c4ce891437fd20c90c7354ea95e0e19e58759e6",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **commit 最終関門**: 全 Chain の意味論検証を独立した意味論ゲートとして実行し、code-review の `check-approved` と AND して commit を通す (D1/D8 の薄い合成。`/track:review` の scope には相乗りしない)。"
+      }
+    },
+    {
+      "claim_hash": "a9edf9aa562256dc7373fa1f6036bedd0d5316d73d3d249a844158d8649ec018",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の **根拠 (ADR) 側**の再走トリガーは **ADR ファイルの git blob hash 変化**とする (主張 = spec element 側の変化も D4 のキャッシュキーで再走を引く)。blob hash は git の自然なコンテンツ同一性であり、追加の hash 計算は不要."
+      }
+    },
+    {
+      "claim_hash": "4ee118cdc8dadd46cf2d5aa8e4fb31ecc916a90befb1980bdaf06e4ea8625c06",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「catalogue entry | per-entry SHA-256 **(新規)**」および「`canonical_json_sha256` ヘルパーを流用できる」"
+      }
+    },
+    {
+      "claim_hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「段1: ... fast 解決 ... で全ペアを並列レビュー」「Chain① は (spec element × ADR file) のペア単位、Chain② は layer 単位バッチ」"
+      }
+    },
+    {
+      "claim_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "引用を提示できない合格は判定保留として不合格方向に倒す。"
+      }
+    },
+    {
+      "claim_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「具体的なモデル値は `agent-profiles.json` で指定し」「ADR は段1=軽量モデル / 段2=重量級モデルの役割のみを規定し、具体値は設定に置く」"
+      }
+    },
+    {
+      "claim_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この責務の違いに基づき、Chain ごとに独立した capability を `agent-profiles.json` に定義する。」「D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。」"
+      }
+    },
+    {
+      "claim_hash": "bed4532154fa371de009bc86c6f3559f0a47a7004a06a9c8033beef85649ab94",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論側の approved は、これらの artifact を読む専用ゲートとして評価する。"
+      }
+    },
+    {
+      "claim_hash": "1bf12c1431967bfd825b819a4be5e3607d61c0fc2f9b989fcdfd507e722dad0a",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D2 の発火点はこの同じコマンドを呼ぶ — 発火ごとに別実装を持たない。`/track:plan` の phase オーケストレーションが phase 第一防衛線を、commit ゲートが最終関門を、それぞれ `bin/sotp ref-verify` 経由で起動する。"
+      }
+    },
+    {
+      "claim_hash": "f0b72a834b6e5843f5400b77ffaadb3ced09bd2e4f728afc6d9a2c5733d01b13",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「新規に追加する hash は catalogue entry の per-entry hash のみ」 / 「現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度」"
+      }
+    },
+    {
+      "claim_hash": "7c1a61e4d8433668cd24d32a477fc670c58a39357a2547c879d7d16f945113b3",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「合格判定の際、根拠 (ADR または spec element) のどの箇所 (文や段落) が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。」"
+      }
+    },
+    {
+      "claim_hash": "7c1a61e4d8433668cd24d32a477fc670c58a39357a2547c879d7d16f945113b3",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain ごとの専用 capability (`ref-verifier-chain1` / `ref-verifier-chain2`) として `agent-profiles.json` に新設する。"
+      }
+    },
+    {
+      "claim_hash": "7c1a61e4d8433668cd24d32a477fc670c58a39357a2547c879d7d16f945113b3",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この基準は「主張が根拠と意味的に整合するか」を問う層③ の本来の責務 (D1 参照) に対応する。構造的詳細の有無を問うのではなく、decision の intent と behavioral consistency を問う。"
+      }
+    },
+    {
+      "claim_hash": "7c1a61e4d8433668cd24d32a477fc670c58a39357a2547c879d7d16f945113b3",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "AgentRefVerifierAdapter は `verify_pair` 呼び出し時の `cache_scope` 引数から Chain 種別を解決し、対応する capability (`ref-verifier-chain1` または `ref-verifier-chain2`) の `prompt_template_path` を選んで使用する。Chain① は ADR の decision text と spec element の自然言語記述を比較して intent の整合を問う。"
+      }
+    },
+    {
+      "claim_hash": "8a8905f5e367eedbd09e21defbdd99fb8176e7509fa2ada308e2c39c004e66e1",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "verify_pair 呼び出し時の `cache_scope` 引数から Chain 種別を解決し、対応する capability の `prompt_template_path` を選んで使用する"
+      }
+    },
+    {
+      "claim_hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "status: accepted\nuser_decision_ref: chat:2026-06-09:no-subprocess-timeout"
+      }
+    },
+    {
+      "claim_hash": "ea77ed888ee562738a527d80f0a8f3975c3a767e8086374c7127a309a2e3ac4f",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-09:no-env-var-binary-resolution"
+      }
+    },
+    {
+      "claim_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D7: 専用 capability 群 `ref-verifier-chain1` / `ref-verifier-chain2` を agent-profiles.json に新設する\n\n`agent-profiles.json` の各 capability 設定は `fast_provider` / `fast_model` を指定することで Fast round と Final round に異なる provider を割り当てられる。`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` ... が `RoundType::Fast` に対して `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` には `provider` / `model` を返す。`ref-verifier-chain1` / `ref-verifier-chain2` はこの機構をそれぞれ利用して段1 (Fast) と段2 (Final) に異なる provider を設定できる。"
+      }
+    },
+    {
+      "claim_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この責務の違いに基づき、Chain ごとに独立した capability を `agent-profiles.json` に定義する。」「D5 の段階引き上げ (fast/final モデル) は `ref-verifier-chain1` と `ref-verifier-chain2` それぞれに独立して設定できる。」"
+      }
+    },
+    {
+      "claim_hash": "cf852bc5f49d06c818431af5bd2f828b71abe8d7e9a8e258031bc83d2813e78f",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「1 コマンドで全 Chain を扱い、スコープは phase に応じて自動で決まる。発火点ごとに引数でスコープを切るのではなく、呼び出しコンテキストから対象 Chain を解決する — spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain。スタンドアロン実行 (finding 修正後の再検証・デバッグ) では未確定の全ペアを対象にする。」"
+      }
+    },
+    {
+      "claim_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① (spec → ADR): track 単位で1つ。ファイル名 `spec-adr-verify-cache.json`。- **Chain② (catalogue → spec)**: 層別。ファイル名 `<layer>-catalogue-spec-verify-cache.json`"
+      }
+    },
+    {
+      "claim_hash": "2efb8b46bb56a784996560084fc7b2570a49c55a2f69c5d8dd97bfe83ae08f3b",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **commit 最終関門**: 全 Chain の意味論検証を独立した意味論ゲートとして実行し、code-review の `check-approved` と AND して commit を通す (D1/D8 の薄い合成。`/track:review` の scope には相乗りしない)。\n- **差分キャッシュによる重複回避**: commit 前の最終関門では、phase 以降に変わったペアのみを再検証する (D4 のキャッシュキー設計で実現)。phase で通過済みの不変ペアは再レビューしない。"
+      }
+    },
+    {
+      "claim_hash": "36fb2c796df45fdb3ce60b318b3ccd0d98314fe7e9194a53979b4c2ec60e0194",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec.json の `adr_refs[].anchor` が指す値 (例: \"D1\", \"D2\") が ADR front-matter の `decisions[].id` に実際に存在するかを `plan-artifact-refs` 検証器で確認する。"
+      }
+    },
+    {
+      "claim_hash": "fc6256f9f2e2f3240b63de074b208f48b503d241bced0e891e9eded1391b9b90",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)** | spec element | per-element SHA-256 (既存)」「SHA-256 計算は `libs/infrastructure/src/verify/plan_artifact_refs/spec_refs.rs` の `canonical_json_sha256` ヘルパーを流用できる。」「新規に追加する hash は catalogue entry の per-entry hash のみ。現在の `catalogue_declaration_hash` は `<layer>-types.json` 全体粒度であり entry 単位の再評価ができない。per-entry hash を追加することで、変更されたエントリだけを再レビューする差分処理が可能になる。」"
+      }
+    },
+    {
+      "claim_hash": "e76b6ab619a70343805540fd8345ce814e2a46d531d0dc54e663034da5dc1db3",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "fe4e2ff9dfcd47b9272af0f3e08e148540008672fc228911bbe05550802449c7",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「検出率が閾値を下回ったら検証器の劣化と判定し D5 の段階引き上げ経路に入る。... 初期デフォルト: ... 検出率閾値 90%」"
+      }
+    },
+    {
+      "claim_hash": "318d3eed927305f130d982f36d05b1fd1068d662af4b2ec97e6b58053f4ba7e1",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**裏付け箇所の引用必須化**: 合格判定の際、根拠 (ADR または spec element) のどの箇所 (文や段落) が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。"
+      }
+    },
+    {
+      "claim_hash": "8da43c99de0534af6ac2619aeea212c2705f5b0153f9fee0d405cd3b1577b8d1",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の `/track:ref-verify` skill (公開 UI) と対応する `bin/sotp ref-verify` サブコマンドから呼び出す"
+      }
+    },
+    {
+      "claim_hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`reviewer` と各 ref-verifier capability を同時に並列実行する場合に設定が干渉しない。」「モデル・プロンプトを `reviewer` の設定と独立に調整できる」"
+      }
+    },
+    {
+      "claim_hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "両者を単一の prompt template で共用すると、一方に特化した文脈がもう一方の判定に干渉し判定精度が落ちる。\\n\\nこの責務の違いに基づき、Chain ごとに独立した capability を `agent-profiles.json` に定義する。"
+      }
+    },
+    {
+      "claim_hash": "e54a00da94e34e75ce15f87bc887f6d94380e8ab4d74c90ec68213dd4d6eff2b",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の per-entry SHA-256 **(新規)**"
+      }
+    },
+    {
+      "claim_hash": "cd61391b5e2d5928090bde72dcb47b9551e76d0ad30d5d9eeb4f88474099db08",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "struct shape / フィールド名 / メソッド名等の追加的な構造詳細が evidence に明示されていなくても、その decision の自然な実装として導かれるならば fail としない。"
+      }
+    },
+    {
+      "claim_hash": "ddc13d60f62b8f6f70ba815229daf0483eaceb0c679a9d7d3cac107cfe4a99a8",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AgentRefVerifierAdapter` は `verify_pair` 呼び出し時の `cache_scope` 引数から Chain 種別を解決し、対応する capability (`ref-verifier-chain1` または `ref-verifier-chain2`) の `prompt_template_path` を選んで使用する。... - **Chain① 専用**: `ref-verifier-chain1` capability。自然言語 → 自然言語の比較に適した prompt template (`prompt_template_path`) を持つ。D10 が示す翻訳ギャップ許容は Chain② に強く効くため、Chain① の prompt はより厳密な intent grounding を問う基準で記述する ... - **Chain② 専用**: `ref-verifier-chain2` capability。... 翻訳ギャップ許容が中心的に作用する"
+      }
+    },
+    {
+      "claim_hash": "c0cc24ded101ce85d5d437c34305a9f5341b4b10c48643ca031d524211e985a8",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verifier interactor は production cache miss が 0 件のとき known_bad probe の評価を skip する。これにより全 cache hit run は LLM 呼び出しコスト 0 で完了する。production cache miss が 1 件以上ある run では従来どおり probe を評価し、D5 の段階引き上げ判定に供する。probe の注入率・検出率閾値は D6 で定めた設定ファイル管理に従う。"
+      }
+    },
+    {
+      "claim_hash": "aa8c96c3c51e0eb0f9b8afc86f84039f97376d36eb4d2b42a5455f852812c012",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- **段2**: 不合格または判定保留のペア、あるいは既知の誤り例検査 (後述) での劣化検出時に同じ Chain 専用 capability の final 解決 (`provider` / `model`) へ引き上げ。\n\n**引き上げの単位は参照ペア**: fast 解決全体 → final 解決全体を一括で引き上げるのではなく、**参照ペア単位の判定結果 (不合格または判定保留、あるいは既知の誤り例劣化)** がトリガーとなる参照ペア単位の段階引き上げである。"
+      }
+    },
+    {
+      "claim_hash": "323a136fd2bdad05ea9bfac2d773122dc4b2fb46f2a71bb7d4ee176b5eb69061",
+      "evidence_hash": "4bd102a399f7c2e6008e33ac0fde9f2e523b70ef52af9f561c0e664ad8588a29",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user_decision_ref: chat:2026-06-09:payload-only-no-tools-verifier"
+      }
+    }
+  ]
+}

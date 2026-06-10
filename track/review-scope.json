@@ -33,7 +33,8 @@
         "knowledge/conventions/**",
         "AGENTS.md", "CLAUDE.md",
         "DEVELOPER_AI_WORKFLOW.md", "README.md", "START_HERE_HUMAN.md",
-        "track/review-scope.json"
+        "track/review-scope.json",
+        "track/workflow.md", "Makefile.toml"
       ]
     }
   },
@@ -41,7 +42,11 @@
     "track/items/<track-id>/review.json",
     "track/items/<track-id>/dry-check.json",
     "track/items/<track-id>/*-type-signals.json",
-    "track/items/<track-id>/*-catalogue-spec-signals.json"
+    "track/items/<track-id>/*-catalogue-spec-signals.json",
+    "track/items/<track-id>/spec-adr-verify-cache.json",
+    "track/items/<track-id>/spec-adr-verify-cache.json.lock",
+    "track/items/<track-id>/*-catalogue-spec-verify-cache.json",
+    "track/items/<track-id>/*-catalogue-spec-verify-cache.json.lock"
   ],
   "other_track": [
     "track/items/<other-track>/**",

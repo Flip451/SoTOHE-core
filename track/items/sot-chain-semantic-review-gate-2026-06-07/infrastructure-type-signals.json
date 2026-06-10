@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-09T09:33:12Z",
-  "declaration_hash": "b4b7ff130d4f8c1dd117c339d0dad54069f4fadd298ea2b09a6fb10e5924ca65",
+  "generated_at": "2026-06-10T09:10:30Z",
+  "declaration_hash": "1ac0d2d822daa82f2612a96a8d9f5ed942c458d4b5a07d6a9e4137c55092c33a",
   "signals": [
     {
       "type_name": "AgentExecutionRunner",
@@ -59,6 +59,18 @@
       ]
     },
     {
+      "type_name": "RefVerifyInvocationContext",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "RefVerifyPairSourceAdapter",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
@@ -66,6 +78,26 @@
       "found_items": [
         "RefVerifyPairSourcePort",
         "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyScopeResolver",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyScopeResolverError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
       ]
     },
     {
@@ -89,6 +121,30 @@
       "found_items": [
         "core::fmt::Debug"
       ]
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "RoundType",

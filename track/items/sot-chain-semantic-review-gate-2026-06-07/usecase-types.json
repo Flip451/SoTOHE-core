@@ -46,14 +46,15 @@
           "kind": "plain",
           "fields": [
             { "name": "track_id", "ty": "domain::TrackId" },
-            { "name": "scope", "ty": "RefVerifyScope" }
+            { "name": "scope", "ty": "RefVerifyScope" },
+            { "name": "current_branch", "ty": "String" }
           ],
           "has_stripped_fields": false
         }
       },
       "methods": [],
       "module_path": "ref_verify",
-      "docs": "Command input for `RefVerifyApplicationService::execute`. Identifies which track and which Chain scope (Chain1, Chain2, or All) to verify.",
+      "docs": "Command input for `RefVerifyApplicationService::execute`. Identifies which track and which Chain scope (Chain1, Chain2, or All) to verify. current_branch is the caller's current git branch (e.g. 'track/my-feature-2026-06-01'); the interactor checks it against 'track/<track_id>' and returns RefVerifyError::TrackNotActive on mismatch.",
       "spec_refs": [
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
@@ -83,7 +84,7 @@
       },
       "methods": [],
       "module_path": "ref_verify",
-      "docs": "Usecase-owned representation of one semantic reference pair. It carries the claim/evidence text for the verifier, externally determined hashes for cache lookup, the cache artifact scope used to route results, and a known_bad flag for D6 degradation checks. known_bad pairs are monitor probes: they are evaluated every run and are not satisfied from or persisted to the verify-cache.",
+      "docs": "Usecase-owned representation of one semantic reference pair. It carries the claim/evidence text for the verifier, externally determined hashes for cache lookup, the cache artifact scope used to route results, and a known_bad flag for D6 degradation checks. known_bad pairs are monitor probes: they are evaluated only when production cache miss is greater than 0, and are not satisfied from or persisted to the verify-cache.",
       "spec_refs": [
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
@@ -115,11 +116,32 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["u8"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "u8" }],
+          "returns": "Result<Self, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_u8",
+          "receiver": "self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
       "module_path": "ref_verify",
       "docs": "Validated nonzero percentage value object for ref-verify health-check configuration. `try_new` accepts only values in 1..=100 so known-bad injection and detection thresholds cannot be disabled by zero-valued settings.",
       "spec_refs": [
@@ -143,11 +165,32 @@
         "kind": "struct",
         "shape": {
           "kind": "tuple",
-          "fields": ["usize"],
-          "has_stripped_fields": false
+          "fields": [],
+          "has_stripped_fields": true
         }
       },
-      "methods": [],
+      "methods": [
+        {
+          "name": "try_new",
+          "receiver": null,
+          "params": [{ "name": "value", "ty": "usize" }],
+          "returns": "Result<Self, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "as_usize",
+          "receiver": "self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
       "module_path": "ref_verify",
       "docs": "Validated nonzero parallelism limit for ref-verify batching. `try_new` rejects 0 so the interactor cannot be configured with a nonsensical worker limit.",
       "spec_refs": [
@@ -155,11 +198,6 @@
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
           "anchor": "CN-05",
           "hash": "70da1b06fc12ce9e64ee7365ac5e30f80bc70a7d8f5e1c0d6d2f28d698d20b46"
-        },
-        {
-          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
-          "anchor": "CN-06",
-          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
         }
       ],
       "informal_grounds": []
@@ -247,7 +285,7 @@
               "kind": "struct",
               "fields": [
                 { "name": "layer_id", "ty": "String" },
-                { "name": "section_key", "ty": "String" }
+                { "name": "entry_key", "ty": "String" }
               ]
             }
           },
@@ -593,6 +631,7 @@
           "params": [
             { "name": "claim", "ty": "String" },
             { "name": "evidence", "ty": "String" },
+            { "name": "cache_scope", "ty": "&RefVerifyCacheScope" },
             { "name": "tier", "ty": "domain::tddd::semantic_verify::ModelTier" }
           ],
           "returns": "Result<domain::tddd::semantic_verify::SemanticVerdict, RefVerifyError>",
@@ -604,17 +643,22 @@
       ],
       "supertrait_bounds": ["Send", "Sync"],
       "module_path": "ref_verify",
-      "docs": "Secondary port for semantic review of a single (claim, evidence) reference pair. The adapter returns only `SemanticVerdict`; the usecase layer owns externally determined claim_hash/evidence_hash values and wraps the verdict into `SemanticVerifyEntry` for cache persistence. ModelTier selects fast vs final model per D5 three-tier escalation. Implemented by the `ref-verifier` capability adapter in infrastructure (D7, CN-01).",
+      "docs": "Secondary port for semantic review of a single (claim, evidence) reference pair. `cache_scope` routes the adapter to the correct Chain-specific capability (`ref-verifier-chain1` for Chain1, `ref-verifier-chain2` for Chain2) and prompt template (D11, CN-12). The adapter returns only `SemanticVerdict`; the usecase layer owns externally determined claim_hash/evidence_hash values and wraps the verdict into `SemanticVerifyEntry` for cache persistence. ModelTier selects fast vs final model per D5 three-tier escalation. Implemented by the `AgentRefVerifierAdapter` in infrastructure, which dispatches to the Chain-specific capability (`ref-verifier-chain1` or `ref-verifier-chain2`) per D7/D11 (CN-01).",
       "spec_refs": [
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
           "anchor": "IN-09",
-          "hash": "220ba51a7324319f8d0c8b718f41bee78ffd302c396a176700c48de176acd826"
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
         },
         {
           "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
           "anchor": "CN-01",
           "hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-12",
+          "hash": "8a8905f5e367eedbd09e21defbdd99fb8176e7509fa2ada308e2c39c004e66e1"
         }
       ],
       "informal_grounds": []
@@ -810,60 +854,6 @@
     }
   },
   "inherent_impls": [
-    {
-      "type_name": "RefVerifyPercent",
-      "methods": [
-        {
-          "name": "try_new",
-          "receiver": null,
-          "params": [
-            { "name": "value", "ty": "u8" }
-          ],
-          "returns": "Result<Self, RefVerifyError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "as_u8",
-          "receiver": "&self",
-          "params": [],
-          "returns": "u8",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ]
-    },
-    {
-      "type_name": "RefVerifyParallelism",
-      "methods": [
-        {
-          "name": "try_new",
-          "receiver": null,
-          "params": [
-            { "name": "value", "ty": "usize" }
-          ],
-          "returns": "Result<Self, RefVerifyError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        },
-        {
-          "name": "as_usize",
-          "receiver": "&self",
-          "params": [],
-          "returns": "usize",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ]
-    },
     {
       "type_name": "RefVerifyConfig",
       "methods": [

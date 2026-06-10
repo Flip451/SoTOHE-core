@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "f498720632ffb4ea7c546e56c70c68d04bd3a9c48334a2d6b37e0ff25f8a8327",
+      "evidence_hash": "dfb5e52cb2a1fd525c2d898b1b5db7e086f6c01aacad5f12b10505458bf4a907",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry に per-entry SHA-256 hash を新規追加する。現行の `catalogue_declaration_hash`（`<layer>-types.json` 全体粒度）はそのまま維持しつつ、entry 単位の hash を追加することで変更されたエントリのみを再レビューする差分処理を可能にする"
+      }
+    },
+    {
+      "claim_hash": "f498720632ffb4ea7c546e56c70c68d04bd3a9c48334a2d6b37e0ff25f8a8327",
+      "evidence_hash": "fc6256f9f2e2f3240b63de074b208f48b503d241bced0e891e9eded1391b9b90",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の canonical JSON subtree から計算した per-entry SHA-256 hash が `<layer>-catalogue-spec-signals.json` の `CatalogueSpecSignal.entry_hash` として追加されており、この signals codec が hash を encode/decode できる。per-entry hash は `canonical_json_sha256` ヘルパーで計算され、既存の document-level `catalogue_declaration_hash`（全体粒度）と共存する"
+      }
+    },
+    {
+      "claim_hash": "f498720632ffb4ea7c546e56c70c68d04bd3a9c48334a2d6b37e0ff25f8a8327",
+      "evidence_hash": "4ee118cdc8dadd46cf2d5aa8e4fb31ecc916a90befb1980bdaf06e4ea8625c06",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の per-entry hash の計算は、既存の `canonical_json_sha256` ヘルパー（`libs/infrastructure/src/verify/plan_artifact_refs/spec_refs.rs`）を流用する。計算対象は entry 単位の canonical JSON subtree とする"
+      }
+    },
+    {
+      "claim_hash": "8f345d966ad3d7eedd40b8e0e47beee9e5a9a4473cecb9984fbd8a6566727b9f",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "8f345d966ad3d7eedd40b8e0e47beee9e5a9a4473cecb9984fbd8a6566727b9f",
+      "evidence_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② の検証結果が `track/items/<id>/<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごと）に書き込まれる。各 artifact は `(claim_hash, evidence_hash)` ペアと判定結果（合格/不合格/判定保留）を含む"
+      }
+    },
+    {
+      "claim_hash": "820ecbf904254dd4baa33043c1c589f12d7a2d841766f65a9c7ab842ad244b75",
+      "evidence_hash": "38366308ab32d38c3765cbf1b4f981941fdd4c7fd09cf32b4346b71fa3f104cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "合格判定時に根拠（ADR または spec element）のどの箇所が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。"
+      }
+    },
+    {
+      "claim_hash": "820ecbf904254dd4baa33043c1c589f12d7a2d841766f65a9c7ab842ad244b75",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論検証の判定結果は fail-closed で扱う。「引用を提示できない合格」は合格ではなく判定保留（不合格方向）とする。」"
+      }
+    },
+    {
+      "claim_hash": "d62a3766b5a5cc335dfaf767c41e8f468b93225e65e467eff324eabcf1cf3f5a",
+      "evidence_hash": "11aa8f7341ab23adc5eb7f8158ab618f95406a78df797acbb17c1f5f9d09fbea",
+      "verdict": {
+        "kind": "pass",
+        "citation": "参照ペアの意味論検証に3段のモデル階層（段1: fast 解決の軽量モデル、段2: final 解決の重量級モデル、段3: 人間）を適用する。fast 段で全ペアを並列評価し、通常時は不合格または判定保留の production pair のみを final 段へ引き上げる。"
+      }
+    },
+    {
+      "claim_hash": "d62a3766b5a5cc335dfaf767c41e8f468b93225e65e467eff324eabcf1cf3f5a",
+      "evidence_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「専用の port・型・adapter を独立に持ち、SRP 違反を構造的に排除する。`agent-profiles.json` の capability 解決機構（`resolve_execution`）は責務中立な部品として共有する」"
+      }
+    },
+    {
+      "claim_hash": "41a606f42593ee6b4b2fc987f0203dd31ff48b671e913d13ec1615691650bc5b",
+      "evidence_hash": "38366308ab32d38c3765cbf1b4f981941fdd4c7fd09cf32b4346b71fa3f104cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "合格判定時に根拠（ADR または spec element）のどの箇所が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。"
+      }
+    },
+    {
+      "claim_hash": "41a606f42593ee6b4b2fc987f0203dd31ff48b671e913d13ec1615691650bc5b",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "引用を提示できない合格は合格ではなく判定保留（不合格方向）とする"
+      }
+    },
+    {
+      "claim_hash": "7d54f51895c5501970914d50f4270c4cbc276c596c28ffe0a045aa366ee2301b",
+      "evidence_hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` ペアで凍結するキャッシュを実装する。... どちらかの hash が変化したときのみ再レビューを実行する"
+      }
+    },
+    {
+      "claim_hash": "7d54f51895c5501970914d50f4270c4cbc276c596c28ffe0a045aa366ee2301b",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュに凍結済みの判定結果は `(claim_hash, evidence_hash)` ペアが変化しない限り再実行しない"
+      }
+    },
+    {
+      "claim_hash": "e7e0222f14ff434f48d9d2218f839002f508cd1184aed401aec1b7abacf67e81",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の結果は `spec-adr-verify-cache.json`（track 単位）"
+      }
+    },
+    {
+      "claim_hash": "e7e0222f14ff434f48d9d2218f839002f508cd1184aed401aec1b7abacf67e81",
+      "evidence_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の検証結果が `track/items/<id>/spec-adr-verify-cache.json` に書き込まれ... 各 artifact は `(claim_hash, evidence_hash)` ペアと判定結果（合格/不合格/判定保留）を含む"
+      }
+    },
+    {
+      "claim_hash": "66f043069c20e3d88b03f78e22523c61d6961c7b10a145577a8afe444c5ade8d",
+      "evidence_hash": "dfb5e52cb2a1fd525c2d898b1b5db7e086f6c01aacad5f12b10505458bf4a907",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry に per-entry SHA-256 hash を新規追加する。現行の `catalogue_declaration_hash`（`<layer>-types.json` 全体粒度）はそのまま維持しつつ、entry 単位の hash を追加することで変更されたエントリのみを再レビューする差分処理を可能にする"
+      }
+    },
+    {
+      "claim_hash": "66f043069c20e3d88b03f78e22523c61d6961c7b10a145577a8afe444c5ade8d",
+      "evidence_hash": "fc6256f9f2e2f3240b63de074b208f48b503d241bced0e891e9eded1391b9b90",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の canonical JSON subtree から計算した per-entry SHA-256 hash が `<layer>-catalogue-spec-signals.json` の `CatalogueSpecSignal.entry_hash` として追加されており、この signals codec が hash を encode/decode できる。per-entry hash は `canonical_json_sha256` ヘルパーで計算され、既存の document-level `catalogue_declaration_hash`（全体粒度）と共存する"
+      }
+    },
+    {
+      "claim_hash": "66f043069c20e3d88b03f78e22523c61d6961c7b10a145577a8afe444c5ade8d",
+      "evidence_hash": "4ee118cdc8dadd46cf2d5aa8e4fb31ecc916a90befb1980bdaf06e4ea8625c06",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の per-entry hash の計算は、既存の `canonical_json_sha256` ヘルパー（`libs/infrastructure/src/verify/plan_artifact_refs/spec_refs.rs`）を流用する。計算対象は entry 単位の canonical JSON subtree とする"
+      }
+    },
+    {
+      "claim_hash": "a82b9ef854b28cca6a69356653ad141edbc17459672a20fedfdbec53be65c6a8",
+      "evidence_hash": "38366308ab32d38c3765cbf1b4f981941fdd4c7fd09cf32b4346b71fa3f104cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "合格判定時に根拠（ADR または spec element）のどの箇所が主張を裏付けるかの引用を必須とする。引用を提示できない合格は判定保留として不合格方向に倒す。"
+      }
+    },
+    {
+      "claim_hash": "a82b9ef854b28cca6a69356653ad141edbc17459672a20fedfdbec53be65c6a8",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「引用を提示できない合格」は合格ではなく判定保留（不合格方向）とする。"
+      }
+    },
+    {
+      "claim_hash": "3e46ead731f6ff110ee894ad7f47b92efd93e213afe4aa97feb8c57b56a91810",
+      "evidence_hash": "dfb5e52cb2a1fd525c2d898b1b5db7e086f6c01aacad5f12b10505458bf4a907",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry に per-entry SHA-256 hash を新規追加する。現行の `catalogue_declaration_hash`（`<layer>-types.json` 全体粒度）はそのまま維持しつつ、entry 単位の hash を追加することで変更されたエントリのみを再レビューする差分処理を可能にする"
+      }
+    },
+    {
+      "claim_hash": "3e46ead731f6ff110ee894ad7f47b92efd93e213afe4aa97feb8c57b56a91810",
+      "evidence_hash": "fc6256f9f2e2f3240b63de074b208f48b503d241bced0e891e9eded1391b9b90",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の canonical JSON subtree から計算した per-entry SHA-256 hash が `<layer>-catalogue-spec-signals.json` の `CatalogueSpecSignal.entry_hash` として追加されており、この signals codec が hash を encode/decode できる。per-entry hash は `canonical_json_sha256` ヘルパーで計算され、既存の document-level `catalogue_declaration_hash`（全体粒度）と共存する"
+      }
+    },
+    {
+      "claim_hash": "3e46ead731f6ff110ee894ad7f47b92efd93e213afe4aa97feb8c57b56a91810",
+      "evidence_hash": "4ee118cdc8dadd46cf2d5aa8e4fb31ecc916a90befb1980bdaf06e4ea8625c06",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue entry の per-entry hash の計算は、既存の `canonical_json_sha256` ヘルパー（`libs/infrastructure/src/verify/plan_artifact_refs/spec_refs.rs`）を流用する。計算対象は entry 単位の canonical JSON subtree とする"
+      }
+    }
+  ]
+}

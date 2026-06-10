@@ -1,5 +1,11 @@
+mod guarded_io;
 mod pair_source;
 mod pair_source_json;
+pub mod process_runner;
+pub mod scope_resolver;
+
+use guarded_io::{CacheWriteGuard, atomic_write_guarded_file, read_guarded_text};
+
 use crate::agent_profiles::{AgentProfiles, RoundType};
 use crate::tddd::semantic_verify_codec::{
     CatalogueSpecVerifyCacheDocumentCodec, SpecAdrVerifyCacheDocumentCodec,
@@ -8,9 +14,14 @@ use domain::tddd::semantic_verify::{
     CatalogueSpecVerifyCacheDocument, ModelTier, SemanticVerdict, SemanticVerifyEntry,
     SpecAdrVerifyCacheDocument,
 };
-use fs4::fs_std::FileExt;
 use pair_source::{extract_json_object_parsed, render_prompt_template, validate_template_path};
-use std::io::{Read as _, Write as _};
+pub use process_runner::{
+    build_claude_ref_verifier_args, build_codex_ref_verifier_args, build_gemini_ref_verifier_args,
+    make_ref_verifier_process_runner,
+};
+pub use scope_resolver::{
+    RefVerifyInvocationContext, RefVerifyScopeResolver, RefVerifyScopeResolverError,
+};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use usecase::ref_verify::{
@@ -18,345 +29,12 @@ use usecase::ref_verify::{
     RefVerifyError, RefVerifyPair, RefVerifyPairSourcePort,
 };
 
-pub type AgentExecutionRunner = dyn Fn(crate::agent_profiles::ResolvedExecution, String, u64) -> Result<String, RefVerifyError>
+pub type AgentExecutionRunner = dyn Fn(crate::agent_profiles::ResolvedExecution, String) -> Result<String, RefVerifyError>
     + Send
     + Sync;
 
 fn track_dir(project_root: &Path, track_id: &str) -> PathBuf {
     project_root.join("track").join("items").join(track_id)
-}
-fn read_guarded_text(path: &Path, trusted_root: &Path) -> Result<String, String> {
-    let mut file = open_guarded_file_for_read(path, trusted_root)?;
-    let mut text = String::new();
-    file.read_to_string(&mut text).map_err(|e| format!("cannot read '{}': {e}", path.display()))?;
-    Ok(text)
-}
-#[cfg(unix)]
-fn open_guarded_file_for_read(path: &Path, trusted_root: &Path) -> Result<std::fs::File, String> {
-    open_guarded_path(path, trusted_root, GuardedPathKind::File)
-}
-#[cfg(not(unix))]
-fn open_guarded_file_for_read(path: &Path, _trusted_root: &Path) -> Result<std::fs::File, String> {
-    Err(format!(
-        "ref-verify guarded reads require descriptor-pinned opening; unsupported on this platform for '{}'",
-        path.display()
-    ))
-}
-fn verify_opened_handle_within_root(
-    file: &std::fs::File,
-    trusted_root: &Path,
-    path: &Path,
-) -> Result<(), String> {
-    let canon_root = canonicalize_trusted_root(trusted_root)?;
-    verify_opened_handle_within_canon_root(file, &canon_root, path)
-}
-
-fn canonicalize_trusted_root(trusted_root: &Path) -> Result<PathBuf, String> {
-    trusted_root
-        .canonicalize()
-        .map_err(|e| format!("cannot canonicalize trusted root '{}': {e}", trusted_root.display()))
-}
-
-fn verify_opened_handle_within_canon_root(
-    file: &std::fs::File,
-    canon_root: &Path,
-    path: &Path,
-) -> Result<(), String> {
-    let opened_path = opened_handle_path(file, path)?;
-    if !opened_path.starts_with(canon_root) {
-        return Err(format!(
-            "opened path escapes trusted root: '{}' resolved to '{}'",
-            path.display(),
-            opened_path.display()
-        ));
-    }
-    Ok(())
-}
-
-#[cfg(unix)]
-fn opened_handle_path(file: &std::fs::File, path: &Path) -> Result<PathBuf, String> {
-    use std::os::unix::io::AsRawFd;
-    let proc_path = format!("/proc/self/fd/{}", file.as_raw_fd());
-    std::fs::read_link(&proc_path).map_err(|e| {
-        format!("cannot verify opened file '{}' via '{}': {e}", path.display(), proc_path)
-    })
-}
-
-#[cfg(not(unix))]
-fn opened_handle_path(file: &std::fs::File, path: &Path) -> Result<PathBuf, String> {
-    let canon_path = path
-        .canonicalize()
-        .map_err(|e| format!("cannot canonicalize opened path '{}': {e}", path.display()))?;
-    let path_meta = std::fs::metadata(path)
-        .map_err(|e| format!("cannot stat opened path '{}': {e}", path.display()))?;
-    let file_meta = file
-        .metadata()
-        .map_err(|e| format!("cannot stat opened file '{}': {e}", path.display()))?;
-    if !path_meta.is_file() || !file_meta.is_file() {
-        return Err(format!("opened path is not a regular file: '{}'", path.display()));
-    }
-    Ok(canon_path)
-}
-
-#[cfg(unix)]
-#[derive(Clone, Copy)]
-enum GuardedPathKind {
-    File,
-    Directory,
-}
-
-#[cfg(unix)]
-impl GuardedPathKind {
-    fn terminal_flags(self) -> i32 {
-        match self {
-            Self::File => libc::O_NOFOLLOW | libc::O_CLOEXEC,
-            Self::Directory => libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC,
-        }
-    }
-
-    fn validate_terminal(self, opened: &std::fs::File, path: &Path) -> Result<(), String> {
-        let meta =
-            opened.metadata().map_err(|e| format!("cannot stat '{}': {e}", path.display()))?;
-        match self {
-            Self::File if !meta.is_file() => {
-                Err(format!("not a regular file: '{}'", path.display()))
-            }
-            Self::Directory if !meta.is_dir() => {
-                Err(format!("not a directory: '{}'", path.display()))
-            }
-            Self::File | Self::Directory => Ok(()),
-        }
-    }
-}
-
-#[cfg(unix)]
-fn open_guarded_path(
-    path: &Path,
-    trusted_root: &Path,
-    kind: GuardedPathKind,
-) -> Result<std::fs::File, String> {
-    let canon_root = canonicalize_trusted_root(trusted_root)?;
-    let normalized = pair_source::lexically_normalize(path);
-    let root_norm = pair_source::lexically_normalize(trusted_root);
-    let mut dir = open_root_directory_nofollow(&canon_root)
-        .map_err(|e| format!("cannot open trusted root '{}': {e}", canon_root.display()))?;
-    if matches!(kind, GuardedPathKind::Directory)
-        && (normalized == canon_root || normalized == root_norm)
-    {
-        return Ok(dir);
-    }
-
-    let rel = pair_source::relative_path_below_root(path, trusted_root, &canon_root)?;
-    let mut components = rel.components().peekable();
-    while let Some(component) = components.next() {
-        let std::path::Component::Normal(name) = component else {
-            return Err(format!("invalid path component in '{}'", path.display()));
-        };
-        let is_terminal = components.peek().is_none();
-        let flags = if is_terminal {
-            kind.terminal_flags()
-        } else {
-            libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC
-        };
-        let opened = pair_source::open_child_in_dir(&dir, name, flags).map_err(|e| {
-            if is_terminal {
-                format!("cannot open '{}': {e}", path.display())
-            } else {
-                format!("cannot open directory component '{:?}': {e}", name)
-            }
-        })?;
-        if is_terminal {
-            kind.validate_terminal(&opened, path)?;
-            verify_opened_handle_within_canon_root(&opened, &canon_root, path)?;
-            return Ok(opened);
-        }
-        dir = opened;
-    }
-    Err(format!("invalid path (empty): '{}'", path.display()))
-}
-
-fn verify_opened_file_within_root(
-    file: &std::fs::File,
-    trusted_root: &Path,
-    path: &Path,
-) -> Result<(), String> {
-    verify_opened_handle_within_root(file, trusted_root, path)
-}
-struct CacheWriteGuard {
-    _lock: std::fs::File,
-    #[cfg(unix)]
-    parent_dir: std::fs::File,
-}
-impl CacheWriteGuard {
-    fn acquire(path: &Path, trusted_root: &Path) -> Result<Self, RefVerifyError> {
-        #[cfg(unix)]
-        {
-            let parent = path.parent().ok_or_else(|| RefVerifyError::CachePersistence {
-                message: format!("cache path has no parent directory: '{}'", path.display()),
-            })?;
-            let parent_dir = open_guarded_directory(parent, trusted_root).map_err(|e| {
-                RefVerifyError::CachePersistence {
-                    message: format!("cannot open cache directory '{}': {e}", parent.display()),
-                }
-            })?;
-            let lock_path = path.with_extension("json.lock");
-            let lock_name =
-                lock_path.file_name().ok_or_else(|| RefVerifyError::CachePersistence {
-                    message: format!("cache lock path has no file name: '{}'", lock_path.display()),
-                })?;
-            let lock_file = open_nofollow_lock_in_dir(&parent_dir, lock_name).map_err(|e| {
-                RefVerifyError::CachePersistence {
-                    message: format!(
-                        "cannot open verify-cache lock '{}': {e}",
-                        lock_path.display()
-                    ),
-                }
-            })?;
-            let lock_meta = lock_file.metadata().map_err(|e| RefVerifyError::CachePersistence {
-                message: format!("cannot stat verify-cache lock '{}': {e}", lock_path.display()),
-            })?;
-            if !lock_meta.is_file() {
-                return Err(RefVerifyError::CachePersistence {
-                    message: format!(
-                        "verify-cache lock is not a regular file: '{}'",
-                        lock_path.display()
-                    ),
-                });
-            }
-            verify_opened_file_within_root(&lock_file, trusted_root, &lock_path).map_err(|e| {
-                RefVerifyError::CachePersistence {
-                    message: format!(
-                        "verify-cache lock guard failed for '{}': {e}",
-                        lock_path.display()
-                    ),
-                }
-            })?;
-            lock_file.lock_exclusive().map_err(|e| RefVerifyError::CachePersistence {
-                message: format!("cannot lock verify-cache '{}': {e}", lock_path.display()),
-            })?;
-            Ok(Self { _lock: lock_file, parent_dir })
-        }
-        #[cfg(not(unix))]
-        {
-            let _ = (path, trusted_root);
-            Err(RefVerifyError::CachePersistence {
-                message:
-                    "ref-verify cache writes require descriptor-pinned opening; unsupported on this platform"
-                        .to_owned(),
-            })
-        }
-    }
-}
-#[cfg(unix)]
-static CACHE_TMP_COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-#[cfg(unix)]
-fn open_guarded_directory(path: &Path, trusted_root: &Path) -> std::io::Result<std::fs::File> {
-    open_guarded_path(path, trusted_root, GuardedPathKind::Directory).map_err(std::io::Error::other)
-}
-#[cfg(unix)]
-fn open_root_directory_nofollow(canon_root: &Path) -> std::io::Result<std::fs::File> {
-    use std::os::unix::fs::OpenOptionsExt;
-    let dir = std::fs::OpenOptions::new()
-        .read(true)
-        .custom_flags(libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC)
-        .open(canon_root)?;
-    verify_opened_file_within_root(&dir, canon_root, canon_root).map_err(std::io::Error::other)?;
-    Ok(dir)
-}
-#[cfg(unix)]
-fn guarded_track_dir_entry_names(
-    track_dir: &Path,
-    project_root: &Path,
-) -> Result<Vec<std::ffi::OsString>, RefVerifyError> {
-    use std::os::unix::io::AsRawFd;
-
-    let dir = open_guarded_directory(track_dir, project_root).map_err(|e| {
-        RefVerifyError::VerifierPort {
-            message: format!("cannot open track directory '{}': {e}", track_dir.display()),
-        }
-    })?;
-    let fd_path = PathBuf::from(format!("/proc/self/fd/{}", dir.as_raw_fd()));
-    let read_dir = std::fs::read_dir(&fd_path).map_err(|e| RefVerifyError::VerifierPort {
-        message: format!("cannot read guarded track directory '{}': {e}", track_dir.display()),
-    })?;
-    let mut names = Vec::new();
-    for entry in read_dir {
-        let entry = entry.map_err(|e| RefVerifyError::VerifierPort {
-            message: format!("error reading guarded track directory entry: {e}"),
-        })?;
-        names.push(entry.file_name());
-    }
-    Ok(names)
-}
-#[cfg(not(unix))]
-fn guarded_track_dir_entry_names(
-    track_dir: &Path,
-    _project_root: &Path,
-) -> Result<Vec<std::ffi::OsString>, RefVerifyError> {
-    Err(RefVerifyError::VerifierPort {
-        message: format!(
-            "ref-verify layer discovery requires descriptor-pinned directory enumeration; unsupported on this platform for '{}'",
-            track_dir.display()
-        ),
-    })
-}
-#[cfg(unix)]
-fn open_nofollow_lock_in_dir(
-    parent_dir: &std::fs::File,
-    lock_name: &std::ffi::OsStr,
-) -> std::io::Result<std::fs::File> {
-    use std::os::unix::fs::OpenOptionsExt;
-    std::fs::OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(false)
-        .custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC)
-        .open(pair_source::proc_fd_child_path(parent_dir, lock_name))
-}
-#[cfg(unix)]
-fn atomic_write_guarded_file(
-    path: &Path,
-    parent_dir: &std::fs::File,
-    content: &[u8],
-) -> std::io::Result<()> {
-    use std::os::unix::fs::OpenOptionsExt;
-    let target_name = path.file_name().ok_or_else(|| {
-        std::io::Error::new(std::io::ErrorKind::InvalidInput, "path has no file name")
-    })?;
-    let counter = CACHE_TMP_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-    let nanos = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |duration| duration.as_nanos());
-    let tmp_name = format!(".tmp-ref-verify-cache-{}-{nanos}-{counter}", std::process::id());
-    let tmp_path = pair_source::proc_fd_child_path(parent_dir, std::ffi::OsStr::new(&tmp_name));
-    let target_path = pair_source::proc_fd_child_path(parent_dir, target_name);
-    let mut tmp_file = std::fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC)
-        .open(&tmp_path)?;
-    if let Err(e) = tmp_file.write_all(content).and_then(|()| tmp_file.sync_all()) {
-        drop(tmp_file);
-        let _ = std::fs::remove_file(&tmp_path);
-        return Err(e);
-    }
-    drop(tmp_file);
-    if let Err(e) = std::fs::rename(&tmp_path, &target_path) {
-        let _ = std::fs::remove_file(&tmp_path);
-        return Err(e);
-    }
-    parent_dir.sync_all()
-}
-#[cfg(not(unix))]
-fn atomic_write_guarded_file(
-    path: &Path,
-    _trusted_root: &Path,
-    _content: &[u8],
-) -> std::io::Result<()> {
-    Err(std::io::Error::other(format!(
-        "ref-verify cache writes require descriptor-pinned opening; unsupported on this platform for '{}'",
-        path.display()
-    )))
 }
 #[derive(Debug)]
 pub struct RefVerifyPairSourceAdapter {
@@ -399,8 +77,43 @@ impl RefVerifyPairSourcePort for RefVerifyPairSourceAdapter {
         }
         let injection_rate = config.known_bad_injection_rate_percent.as_u8();
         let probe_count = pair_source::calculate_probe_count(pairs.len(), injection_rate);
+
+        // For All-scope runs, alternate Chain1/Chain2 probes only when Chain-2 pairs were
+        // actually produced (catalogues present). In the pre-Phase-2 path (all catalogues
+        // absent), `enumerate_chain2_all_layers` correctly returned zero pairs, so we must
+        // not inject Chain-2 probes — the chain2 capability/template may not be configured
+        // yet, and injecting them would break the run.
+        let has_chain2_pairs = pairs
+            .iter()
+            .any(|p| matches!(p.cache_scope, RefVerifyCacheScope::CatalogueSpec { .. }));
+
         for i in 0..probe_count {
-            pairs.push(pair_source::make_known_bad_probe(i)?);
+            // Route known-bad probes through the same chain capability as the real pairs.
+            // For Chain1-only runs: SpecAdr (Chain1 verifier).
+            // For Chain2-only runs: CatalogueSpec (Chain2 verifier).
+            // For All-scope runs: alternate between both chains when Chain-2 pairs exist;
+            // fall back to SpecAdr-only when no Chain-2 pairs are present (pre-Phase-2 path).
+            let probe_scope = match &cmd.scope {
+                usecase::ref_verify::RefVerifyScope::Chain1 => RefVerifyCacheScope::SpecAdr,
+                usecase::ref_verify::RefVerifyScope::Chain2 { layer } => {
+                    RefVerifyCacheScope::CatalogueSpec { layer: layer.clone() }
+                }
+                usecase::ref_verify::RefVerifyScope::All => {
+                    if has_chain2_pairs && i % 2 == 0 {
+                        // Even indices → Chain2 probe first, so that a single probe (i == 0)
+                        // always exercises the Chain2 verifier when Chain-2 pairs are present.
+                        // Propagate errors: a rules file that exists but fails to load/parse
+                        // must not silently fall back to SpecAdr and leave Chain-2 uncalibrated.
+                        match pair_source::first_tddd_layer_scope(&self.project_root)? {
+                            Some(scope) => scope,
+                            None => RefVerifyCacheScope::SpecAdr,
+                        }
+                    } else {
+                        RefVerifyCacheScope::SpecAdr
+                    }
+                }
+            };
+            pairs.push(pair_source::make_known_bad_probe(i, probe_scope)?);
         }
         Ok(pairs)
     }
@@ -536,11 +249,27 @@ impl RefVerifyCachePort for RefVerifyCacheAdapter {
 }
 
 #[derive(serde::Deserialize)]
-#[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
-enum VerdictResponseDto {
-    Pass { citation: String },
-    Fail { reason: String },
+#[serde(rename_all = "snake_case")]
+enum VerdictKindDto {
+    Pass,
+    Fail,
     Pending,
+}
+
+/// Flat verdict response DTO compatible with OpenAI structured-output (`--output-schema`).
+///
+/// OpenAI rejects `oneOf` in structured output schemas and requires every property
+/// to appear in `required`, so we model the verdict as a flat struct with a `kind`
+/// discriminator plus nullable `citation` / `reason` strings.
+///
+/// `deny_unknown_fields` enforces the fail-closed boundary: any extra field in the
+/// verifier response causes deserialization to fail rather than being silently accepted.
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct VerdictResponseDto {
+    kind: VerdictKindDto,
+    citation: Option<String>,
+    reason: Option<String>,
 }
 
 pub struct AgentRefVerifierAdapter {
@@ -582,33 +311,32 @@ impl RefVerifierPort for AgentRefVerifierAdapter {
         &self,
         claim: String,
         evidence: String,
+        cache_scope: &RefVerifyCacheScope,
         tier: ModelTier,
     ) -> Result<SemanticVerdict, RefVerifyError> {
-        const CAPABILITY: &str = "ref-verifier";
+        // D11: Chain-specific capabilities + prompt templates.
+        // SpecAdr   → ref-verifier-chain1 (intent grounding, strict)
+        // Catalogue → ref-verifier-chain2 (translation-gap allowance per D10)
+        let capability: &str = match cache_scope {
+            RefVerifyCacheScope::SpecAdr => "ref-verifier-chain1",
+            RefVerifyCacheScope::CatalogueSpec { .. } => "ref-verifier-chain2",
+        };
 
         let round_type = Self::tier_to_round_type(&tier);
 
         let resolved =
-            self.profiles.resolve_execution(CAPABILITY, round_type).ok_or_else(|| {
+            self.profiles.resolve_execution(capability, round_type).ok_or_else(|| {
                 RefVerifyError::VerifierPort {
                     message: format!(
-                        "capability '{CAPABILITY}' is not defined in agent-profiles.json"
+                        "capability '{capability}' is not defined in agent-profiles.json"
                     ),
                 }
             })?;
 
-        let timeout_secs = self.profiles.resolve_timeout_seconds(CAPABILITY).ok_or_else(|| {
-            RefVerifyError::VerifierPort {
-                message: format!(
-                    "capability '{CAPABILITY}' has no timeout_seconds in agent-profiles.json"
-                ),
-            }
-        })?;
-
-        let template_path = self.profiles.resolve_prompt_template_path(CAPABILITY).ok_or_else(
+        let template_path = self.profiles.resolve_prompt_template_path(capability).ok_or_else(
             || RefVerifyError::VerifierPort {
                 message: format!(
-                    "capability '{CAPABILITY}' has no prompt_template_path in agent-profiles.json"
+                    "capability '{capability}' has no prompt_template_path in agent-profiles.json"
                 ),
             },
         )?;
@@ -632,7 +360,7 @@ impl RefVerifierPort for AgentRefVerifierAdapter {
         };
         let prompt = render_prompt_template(&template_text, &claim, &evidence, tier_str);
 
-        let raw_output = (self.runner)(resolved, prompt, timeout_secs)?;
+        let raw_output = (self.runner)(resolved, prompt)?;
 
         let dto: VerdictResponseDto =
             extract_json_object_parsed(&raw_output).map_err(|e| RefVerifyError::VerifierPort {
@@ -641,20 +369,49 @@ impl RefVerifierPort for AgentRefVerifierAdapter {
                 ),
             })?;
 
-        match dto {
-            VerdictResponseDto::Pass { citation } => {
-                let evidence_citation = domain::tddd::semantic_verify::EvidenceCitation::try_new(
-                    citation,
-                )
-                .map_err(|e| RefVerifyError::VerifierPort {
+        // Verify that all required schema fields are present in the JSON payload
+        // (even if their values are null). The OpenAI structured-output contract
+        // requires every property to appear in `required`, so a payload missing
+        // `citation` or `reason` keys entirely is schema-invalid and must be
+        // rejected fail-closed — regardless of the `kind` discriminator.
+        let raw_value: serde_json::Value =
+            extract_json_object_parsed(&raw_output).map_err(|e| RefVerifyError::VerifierPort {
+                message: format!("verdict schema re-parse error: {e}; raw model output redacted"),
+            })?;
+        for required_key in ["citation", "reason"] {
+            if raw_value.get(required_key).is_none() {
+                return Err(RefVerifyError::VerifierPort {
                     message: format!(
-                        "citation-absent or empty pass rejected by codec boundary: {e}"
+                        "verdict missing required field '{required_key}' — \
+                         rejected at codec boundary"
                     ),
-                })?;
+                });
+            }
+        }
+
+        match dto.kind {
+            VerdictKindDto::Pass => {
+                let citation_text = dto.citation.unwrap_or_default();
+                let evidence_citation =
+                    domain::tddd::semantic_verify::EvidenceCitation::try_new(citation_text)
+                        .map_err(|e| RefVerifyError::VerifierPort {
+                            message: format!(
+                                "citation-absent or empty pass rejected by codec boundary: {e}"
+                            ),
+                        })?;
                 Ok(SemanticVerdict::Pass { citation: evidence_citation })
             }
-            VerdictResponseDto::Fail { reason } => Ok(SemanticVerdict::Fail { reason }),
-            VerdictResponseDto::Pending => Ok(SemanticVerdict::Pending),
+            VerdictKindDto::Fail => {
+                let reason = dto.reason.filter(|r| !r.is_empty()).ok_or_else(|| {
+                    RefVerifyError::VerifierPort {
+                        message:
+                            "fail verdict missing required reason field — rejected at codec boundary"
+                                .to_owned(),
+                    }
+                })?;
+                Ok(SemanticVerdict::Fail { reason })
+            }
+            VerdictKindDto::Pending => Ok(SemanticVerdict::Pending),
         }
     }
 }
@@ -711,14 +468,14 @@ mod tests {
     fn extract_json_object_parsed_finds_pass_in_plain_json() {
         let raw = r#"{"kind": "pass", "citation": "the text"}"#;
         let dto: VerdictResponseDto = extract_json_object_parsed(raw).unwrap();
-        assert!(matches!(dto, VerdictResponseDto::Pass { .. }));
+        assert!(matches!(dto.kind, VerdictKindDto::Pass));
     }
 
     #[test]
     fn extract_json_object_parsed_trims_outer_whitespace() {
         let raw = "\n  {\"kind\": \"fail\", \"reason\": \"no match\"}\n";
         let dto: VerdictResponseDto = extract_json_object_parsed(raw).unwrap();
-        assert!(matches!(dto, VerdictResponseDto::Fail { .. }));
+        assert!(matches!(dto.kind, VerdictKindDto::Fail));
     }
 
     #[test]
@@ -741,9 +498,8 @@ mod tests {
         // A citation containing `{` or `}` must not confuse the parser.
         let raw = r#"{"kind": "pass", "citation": "text with {braces} in citation"}"#;
         let dto: VerdictResponseDto = extract_json_object_parsed(raw).unwrap();
-        assert!(
-            matches!(dto, VerdictResponseDto::Pass { citation } if citation.contains("{braces}"))
-        );
+        assert!(matches!(dto.kind, VerdictKindDto::Pass));
+        assert!(dto.citation.as_deref().unwrap_or("").contains("{braces}"));
     }
 
     #[test]
@@ -905,13 +661,13 @@ This section must not make D2 a valid ADR ref.
 
     #[test]
     fn make_known_bad_probe_sets_known_bad_true() {
-        let probe = pair_source::make_known_bad_probe(0).unwrap();
+        let probe = pair_source::make_known_bad_probe(0, RefVerifyCacheScope::SpecAdr).unwrap();
         assert!(probe.known_bad);
     }
 
     #[test]
     fn make_known_bad_probe_claim_starts_with_known_bad() {
-        let probe = pair_source::make_known_bad_probe(0).unwrap();
+        let probe = pair_source::make_known_bad_probe(0, RefVerifyCacheScope::SpecAdr).unwrap();
         assert!(probe.claim.starts_with("known-bad"));
     }
 
@@ -930,13 +686,19 @@ This section must not make D2 a valid ADR ref.
             "claude": { "label": "Claude Code" }
         },
         "capabilities": {
-            "ref-verifier": {
+            "ref-verifier-chain1": {
                 "provider": "claude",
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
                 "fast_model": "claude-haiku-4-5",
-                "timeout_seconds": 120,
-                "prompt_template_path": ".harness/prompts/ref-verifier.md"
+                "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+            },
+            "ref-verifier-chain2": {
+                "provider": "claude",
+                "model": "claude-opus-4-8",
+                "fast_provider": "claude",
+                "fast_model": "claude-haiku-4-5",
+                "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
             }
         }
     }"#;
@@ -946,7 +708,7 @@ This section must not make D2 a valid ADR ref.
         let dir = tempfile::tempdir().unwrap();
         let path = write_profiles(dir.path(), REF_VERIFIER_CONFIG);
         let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
-        let runner: Arc<AgentExecutionRunner> = Arc::new(|_resolved, _prompt, _timeout| {
+        let runner: Arc<AgentExecutionRunner> = Arc::new(|_resolved, _prompt| {
             Ok(r#"{"kind": "pass", "citation": "the spec states X"}"#.to_owned())
         });
         let _adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());
@@ -975,7 +737,7 @@ This section must not make D2 a valid ADR ref.
         let prompt_dir = dir.path().join(".harness").join("prompts");
         std::fs::create_dir_all(&prompt_dir).unwrap();
         std::fs::write(
-            prompt_dir.join("ref-verifier.md"),
+            prompt_dir.join("ref-verifier-chain1.md"),
             "Claim: {{claim}}\nEvidence: {{evidence}}\nTier: {{tier}}",
         )
         .unwrap();
@@ -984,9 +746,9 @@ This section must not make D2 a valid ADR ref.
             Arc::new(std::sync::Mutex::new(None));
         let called_with_clone = Arc::clone(&called_with);
 
-        let runner: Arc<AgentExecutionRunner> = Arc::new(move |resolved, _prompt, _timeout| {
+        let runner: Arc<AgentExecutionRunner> = Arc::new(move |resolved, _prompt| {
             *called_with_clone.lock().unwrap() = Some(resolved);
-            Ok(r#"{"kind": "pass", "citation": "spec states X"}"#.to_owned())
+            Ok(r#"{"kind": "pass", "citation": "spec states X", "reason": null}"#.to_owned())
         });
 
         // Point profiles at dir.path() for the prompt template path.
@@ -994,13 +756,12 @@ This section must not make D2 a valid ADR ref.
                 "schema_version": 1,
                 "providers": { "claude": { "label": "Claude" } },
                 "capabilities": {
-                    "ref-verifier": {
+                    "ref-verifier-chain1": {
                         "provider": "claude",
                         "model": "claude-opus-4-8",
                         "fast_provider": "claude",
                         "fast_model": "claude-haiku-4-5",
-                        "timeout_seconds": 120,
-                        "prompt_template_path": ".harness/prompts/ref-verifier.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
                     }
                 }
             }"#
@@ -1010,7 +771,12 @@ This section must not make D2 a valid ADR ref.
 
         let adapter = AgentRefVerifierAdapter::new(profiles2, runner, dir.path().to_path_buf());
         let verdict = adapter
-            .verify_pair("claim text".to_owned(), "evidence text".to_owned(), ModelTier::Fast)
+            .verify_pair(
+                "claim text".to_owned(),
+                "evidence text".to_owned(),
+                &RefVerifyCacheScope::SpecAdr,
+                ModelTier::Fast,
+            )
             .unwrap();
 
         assert!(matches!(verdict, SemanticVerdict::Pass { .. }));
@@ -1030,10 +796,15 @@ This section must not make D2 a valid ADR ref.
         let dir = tempfile::tempdir().unwrap();
         let path = write_profiles(dir.path(), json);
         let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
-        let runner: Arc<AgentExecutionRunner> = Arc::new(|_, _, _| Ok(String::new()));
+        let runner: Arc<AgentExecutionRunner> = Arc::new(|_, _| Ok(String::new()));
         let adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());
         let err = adapter
-            .verify_pair("claim".to_owned(), "evidence".to_owned(), ModelTier::Fast)
+            .verify_pair(
+                "claim".to_owned(),
+                "evidence".to_owned(),
+                &RefVerifyCacheScope::SpecAdr,
+                ModelTier::Fast,
+            )
             .unwrap_err();
         assert!(
             matches!(err, usecase::ref_verify::RefVerifyError::VerifierPort { .. }),
@@ -1046,30 +817,37 @@ This section must not make D2 a valid ADR ref.
         let dir = tempfile::tempdir().unwrap();
         let prompt_dir = dir.path().join(".harness").join("prompts");
         std::fs::create_dir_all(&prompt_dir).unwrap();
-        std::fs::write(prompt_dir.join("ref-verifier.md"), "{{claim}} {{evidence}}").unwrap();
+        std::fs::write(prompt_dir.join("ref-verifier-chain1.md"), "{{claim}} {{evidence}}")
+            .unwrap();
         let profiles_json = r#"{
                 "schema_version": 1,
                 "providers": { "claude": { "label": "Claude" } },
                 "capabilities": {
-                    "ref-verifier": {
+                    "ref-verifier-chain1": {
                         "provider": "claude",
                         "model": "claude-opus-4-8",
                         "fast_provider": "claude",
                         "fast_model": "claude-haiku-4-5",
-                        "timeout_seconds": 60,
-                        "prompt_template_path": ".harness/prompts/ref-verifier.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
                     }
                 }
             }"#
         .to_owned();
         let path = write_profiles(dir.path(), &profiles_json);
         let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
-        let runner: Arc<AgentExecutionRunner> = Arc::new(|_, _, _| {
-            Ok(r#"{"kind": "pass", "citation": "the spec states X explicitly"}"#.to_owned())
+        let runner: Arc<AgentExecutionRunner> = Arc::new(|_, _| {
+            Ok(r#"{"kind": "pass", "citation": "the spec states X explicitly", "reason": null}"#
+                .to_owned())
         });
         let adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());
-        let verdict =
-            adapter.verify_pair("c".to_owned(), "e".to_owned(), ModelTier::Final).unwrap();
+        let verdict = adapter
+            .verify_pair(
+                "c".to_owned(),
+                "e".to_owned(),
+                &RefVerifyCacheScope::SpecAdr,
+                ModelTier::Final,
+            )
+            .unwrap();
         assert!(matches!(verdict, SemanticVerdict::Pass { .. }));
     }
 
@@ -1078,26 +856,31 @@ This section must not make D2 a valid ADR ref.
         let dir = tempfile::tempdir().unwrap();
         let prompt_dir = dir.path().join(".harness").join("prompts");
         std::fs::create_dir_all(&prompt_dir).unwrap();
-        std::fs::write(prompt_dir.join("ref-verifier.md"), "{{claim}}").unwrap();
+        std::fs::write(prompt_dir.join("ref-verifier-chain1.md"), "{{claim}}").unwrap();
         let profiles_json = r#"{
                 "schema_version": 1,
                 "providers": { "claude": { "label": "Claude" } },
                 "capabilities": {
-                    "ref-verifier": {
+                    "ref-verifier-chain1": {
                         "provider": "claude",
                         "model": "claude-opus-4-8",
-                        "timeout_seconds": 60,
-                        "prompt_template_path": ".harness/prompts/ref-verifier.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
                     }
                 }
             }"#
         .to_owned();
         let path = write_profiles(dir.path(), &profiles_json);
         let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
-        let runner: Arc<AgentExecutionRunner> =
-            Arc::new(|_, _, _| Ok("not json at all".to_owned()));
+        let runner: Arc<AgentExecutionRunner> = Arc::new(|_, _| Ok("not json at all".to_owned()));
         let adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());
-        let err = adapter.verify_pair("c".to_owned(), "e".to_owned(), ModelTier::Fast).unwrap_err();
+        let err = adapter
+            .verify_pair(
+                "c".to_owned(),
+                "e".to_owned(),
+                &RefVerifyCacheScope::SpecAdr,
+                ModelTier::Fast,
+            )
+            .unwrap_err();
         assert!(matches!(err, usecase::ref_verify::RefVerifyError::VerifierPort { .. }));
     }
 
@@ -1106,16 +889,15 @@ This section must not make D2 a valid ADR ref.
         let dir = tempfile::tempdir().unwrap();
         let prompt_dir = dir.path().join(".harness").join("prompts");
         std::fs::create_dir_all(&prompt_dir).unwrap();
-        std::fs::write(prompt_dir.join("ref-verifier.md"), "{{claim}}").unwrap();
+        std::fs::write(prompt_dir.join("ref-verifier-chain1.md"), "{{claim}}").unwrap();
         let profiles_json = r#"{
                 "schema_version": 1,
                 "providers": { "claude": { "label": "Claude" } },
                 "capabilities": {
-                    "ref-verifier": {
+                    "ref-verifier-chain1": {
                         "provider": "claude",
                         "model": "claude-opus-4-8",
-                        "timeout_seconds": 60,
-                        "prompt_template_path": ".harness/prompts/ref-verifier.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
                     }
                 }
             }"#
@@ -1124,10 +906,76 @@ This section must not make D2 a valid ADR ref.
         let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
         // Pass with empty citation — should fail-closed.
         let runner: Arc<AgentExecutionRunner> =
-            Arc::new(|_, _, _| Ok(r#"{"kind": "pass", "citation": ""}"#.to_owned()));
+            Arc::new(|_, _| Ok(r#"{"kind": "pass", "citation": "", "reason": null}"#.to_owned()));
         let adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());
-        let err = adapter.verify_pair("c".to_owned(), "e".to_owned(), ModelTier::Fast).unwrap_err();
+        let err = adapter
+            .verify_pair(
+                "c".to_owned(),
+                "e".to_owned(),
+                &RefVerifyCacheScope::SpecAdr,
+                ModelTier::Fast,
+            )
+            .unwrap_err();
         assert!(matches!(err, usecase::ref_verify::RefVerifyError::VerifierPort { .. }));
+    }
+
+    #[test]
+    fn verify_pair_catalogue_spec_scope_uses_chain2_capability() {
+        // Verifies that a CatalogueSpec-scoped pair is dispatched to `ref-verifier-chain2`
+        // rather than `ref-verifier-chain1`. We assert this by (a) only registering chain2 in
+        // agent-profiles.json and verifying the call succeeds, and (b) capturing the capability
+        // name passed to the runner and asserting it corresponds to the chain2 model.
+        let dir = tempfile::tempdir().unwrap();
+        let prompt_dir = dir.path().join(".harness").join("prompts");
+        std::fs::create_dir_all(&prompt_dir).unwrap();
+        std::fs::write(
+            prompt_dir.join("ref-verifier-chain2.md"),
+            "Claim: {{claim}}\nEvidence: {{evidence}}\nTier: {{tier}}",
+        )
+        .unwrap();
+
+        let called_with: Arc<std::sync::Mutex<Option<crate::agent_profiles::ResolvedExecution>>> =
+            Arc::new(std::sync::Mutex::new(None));
+        let called_with_clone = Arc::clone(&called_with);
+
+        let runner: Arc<AgentExecutionRunner> = Arc::new(move |resolved, _prompt| {
+            *called_with_clone.lock().unwrap() = Some(resolved);
+            Ok(r#"{"kind": "pass", "citation": "catalogue entry matches spec section", "reason": null}"#.to_owned())
+        });
+
+        let profiles_json = r#"{
+                "schema_version": 1,
+                "providers": { "claude": { "label": "Claude" } },
+                "capabilities": {
+                    "ref-verifier-chain2": {
+                        "provider": "claude",
+                        "model": "claude-opus-4-8-chain2",
+                        "fast_provider": "claude",
+                        "fast_model": "claude-haiku-4-5-chain2",
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
+                    }
+                }
+            }"#
+        .to_owned();
+        let path = write_profiles(dir.path(), &profiles_json);
+        let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
+
+        let layer = LayerId::try_new("domain".to_owned()).unwrap();
+        let adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());
+        let verdict = adapter
+            .verify_pair(
+                "catalogue claim".to_owned(),
+                "spec evidence".to_owned(),
+                &RefVerifyCacheScope::CatalogueSpec { layer },
+                ModelTier::Fast,
+            )
+            .unwrap();
+
+        assert!(matches!(verdict, SemanticVerdict::Pass { .. }));
+        // Fast tier of chain2 must have been selected.
+        let called = called_with.lock().unwrap();
+        let resolved = called.as_ref().unwrap();
+        assert_eq!(resolved.model.as_deref(), Some("claude-haiku-4-5-chain2"));
     }
 
     // ── validate_template_path ────────────────────────────────────────────────
@@ -1184,7 +1032,7 @@ This section must not make D2 a valid ADR ref.
         let adr_dir = dir.path().join("knowledge").join("adr");
         std::fs::create_dir_all(&adr_dir).unwrap();
         std::fs::write(adr_dir.join("decision.md"), "decision").unwrap();
-        let result = pair_source::resolve_and_guard_path(
+        let result = guarded_io::resolve_and_guard_path(
             &dir.path().join("."),
             &std::path::PathBuf::from("knowledge/adr/decision.md"),
             "test",
@@ -1599,7 +1447,7 @@ The guarded path must stay inside the trusted repository root.
         let real_pair = pairs.iter().find(|pair| !pair.known_bad).unwrap();
         let probe = pairs.iter().find(|pair| pair.known_bad).unwrap();
 
-        assert_eq!(real_pair.claim, "[GO-01] ADR-backed requirement");
+        assert_eq!(real_pair.claim, "[goal GO-01] ADR-backed requirement");
         assert!(real_pair.evidence.contains("ADR decision [D1]"));
         assert!(real_pair.evidence.contains("Guarded path decision"));
         assert_eq!(
@@ -1636,13 +1484,21 @@ The guarded path must stay inside the trusted repository root.
     }
 
     #[test]
-    fn load_pairs_all_scope_with_missing_architecture_rules_fails_closed() {
+    fn load_pairs_all_scope_with_missing_architecture_rules_returns_chain1_only() {
+        // No architecture-rules.json → no TDDD layers → zero Chain-2 pairs.
+        // The scope resolver returns All (empty TDDD set), and the pair source must
+        // mirror that behaviour by contributing only Chain-1 pairs rather than erroring.
         let (_tmp, adapter, cmd) =
             adr_ref_fixture("test-load-pairs-all-no-rules", RefVerifyScope::All, None);
-        let err = adapter.load_pairs(&cmd, &RefVerifyConfig::default()).unwrap_err();
+        let pairs = adapter.load_pairs(&cmd, &RefVerifyConfig::default()).unwrap();
 
+        // Chain-1 pairs from the ADR ref fixture must be present.
+        assert!(pairs.iter().any(|p| !p.known_bad && p.claim.contains("[goal GO-01]")));
+        // No Chain-2 pairs because no architecture-rules.json was provided.
         assert!(
-            matches!(err, RefVerifyError::VerifierPort { message } if message.contains("architecture-rules.json"))
+            !pairs
+                .iter()
+                .any(|p| matches!(p.cache_scope, RefVerifyCacheScope::CatalogueSpec { .. }))
         );
     }
 
@@ -1655,21 +1511,31 @@ The guarded path must stay inside the trusted repository root.
         );
         let pairs = adapter.load_pairs(&cmd, &RefVerifyConfig::default()).unwrap();
 
-        assert!(pairs.iter().any(|pair| !pair.known_bad && pair.claim.contains("[GO-01]")));
+        assert!(pairs.iter().any(|pair| !pair.known_bad && pair.claim.contains("[goal GO-01]")));
     }
 
     #[test]
-    fn load_pairs_all_scope_with_missing_configured_catalogue_fails_closed() {
+    fn load_pairs_all_scope_with_absent_catalogue_returns_chain1_only_pre_phase2_path() {
+        // Pre-Phase-2 path: architecture-rules.json declares a TDDD layer but the
+        // catalogue file does not exist yet. The scope resolver permits this as an
+        // all-absent (pre-Phase-2) run; the pair source must contribute zero Chain-2
+        // pairs rather than erroring. Chain-1 pairs from spec/ADR refs are still
+        // produced.
         let (_tmp, adapter, cmd) = adr_ref_fixture(
             "test-load-pairs-chain2",
             RefVerifyScope::All,
             Some(ARCHITECTURE_RULES_DOMAIN_TDDD),
         );
         let config = usecase::ref_verify::RefVerifyConfig::default();
-        let err = adapter.load_pairs(&cmd, &config).unwrap_err();
+        let pairs = adapter.load_pairs(&cmd, &config).unwrap();
 
+        // Chain-1 pairs from the ADR ref fixture must be present.
+        assert!(pairs.iter().any(|p| !p.known_bad && p.claim.contains("[goal GO-01]")));
+        // No Chain-2 pairs: domain catalogue was absent (pre-Phase-2).
         assert!(
-            matches!(err, RefVerifyError::VerifierPort { message } if message.contains("catalogue file for layer 'domain' not found"))
+            !pairs
+                .iter()
+                .any(|p| matches!(p.cache_scope, RefVerifyCacheScope::CatalogueSpec { .. }))
         );
     }
 

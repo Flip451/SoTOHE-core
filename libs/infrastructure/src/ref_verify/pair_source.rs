@@ -42,101 +42,8 @@ pub(super) fn hash_git_blob_text(text: &str) -> ContentHash {
     ContentHash::from_bytes(out)
 }
 
-// ---------------------------------------------------------------------------
-// Path resolution and guard
-// ---------------------------------------------------------------------------
-
-/// Resolve and validate a repo-relative file path against the project root.
-///
-/// Rejects absolute paths, `..` path-traversal components, and symlinks anywhere
-/// on the resolved path.  Returns the absolute resolved path on success.
-pub(super) fn resolve_and_guard_path(
-    project_root: &Path,
-    file: &Path,
-    context: &str,
-) -> Result<PathBuf, RefVerifyError> {
-    let project_root = project_root.canonicalize().map_err(|e| RefVerifyError::VerifierPort {
-        message: format!(
-            "{context}: cannot canonicalize project root '{}': {e}",
-            project_root.display()
-        ),
-    })?;
-    if file.is_absolute() {
-        return Err(RefVerifyError::VerifierPort {
-            message: format!("{context}: invalid path (absolute): {}", file.display()),
-        });
-    }
-    if file.components().any(|c| c == Component::ParentDir) {
-        return Err(RefVerifyError::VerifierPort {
-            message: format!("{context}: invalid path (path-traversal): {}", file.display()),
-        });
-    }
-    if !file.components().any(|c| matches!(c, Component::Normal(_))) {
-        return Err(RefVerifyError::VerifierPort {
-            message: format!("{context}: invalid path (empty or '.'): {}", file.display()),
-        });
-    }
-
-    let resolved = lexically_normalize(&project_root.join(file));
-    if !resolved.starts_with(&project_root) {
-        return Err(RefVerifyError::VerifierPort {
-            message: format!("{context}: path escapes project root: {}", file.display()),
-        });
-    }
-    Ok(resolved)
-}
-pub(super) fn lexically_normalize(path: &Path) -> PathBuf {
-    let mut normalized = PathBuf::new();
-    for component in path.components() {
-        match component {
-            Component::CurDir => {}
-            other => normalized.push(other.as_os_str()),
-        }
-    }
-    normalized
-}
-pub(super) fn relative_path_below_root(
-    path: &Path,
-    trusted_root: &Path,
-    canon_root: &Path,
-) -> Result<PathBuf, String> {
-    let normalized = lexically_normalize(path);
-    let root_norm = lexically_normalize(trusted_root);
-    let rel = if normalized.is_absolute() {
-        normalized.strip_prefix(canon_root).map_err(|_| {
-            format!("path '{}' is outside trusted root '{}'", path.display(), canon_root.display())
-        })?
-    } else if !root_norm.as_os_str().is_empty() {
-        normalized.strip_prefix(&root_norm).unwrap_or(&normalized)
-    } else {
-        normalized.as_path()
-    };
-    if !rel.components().any(|c| matches!(c, Component::Normal(_)))
-        || rel.components().any(|c| !matches!(c, Component::Normal(_)))
-    {
-        return Err(format!("invalid path below trusted root: '{}'", path.display()));
-    }
-    Ok(rel.to_path_buf())
-}
-
-#[cfg(unix)]
-pub(super) fn proc_fd_child_path(parent_dir: &std::fs::File, child: &std::ffi::OsStr) -> PathBuf {
-    use std::os::unix::io::AsRawFd;
-    PathBuf::from(format!("/proc/self/fd/{}", parent_dir.as_raw_fd())).join(Path::new(child))
-}
-
-#[cfg(unix)]
-pub(super) fn open_child_in_dir(
-    parent_dir: &std::fs::File,
-    child: &std::ffi::OsStr,
-    flags: i32,
-) -> std::io::Result<std::fs::File> {
-    use std::os::unix::fs::OpenOptionsExt;
-    std::fs::OpenOptions::new()
-        .read(true)
-        .custom_flags(flags)
-        .open(proc_fd_child_path(parent_dir, child))
-}
+// Path resolution / guarded reads live in `super::guarded_io`.
+use super::guarded_io::{lexically_normalize, read_guarded_text, resolve_and_guard_path};
 
 // ---------------------------------------------------------------------------
 // Chain-1: spec → ADR
@@ -150,11 +57,10 @@ pub(super) fn enumerate_chain1_pairs(
 ) -> Result<Vec<RefVerifyPair>, RefVerifyError> {
     let spec_path = track_dir.join("spec.json");
 
-    let spec_text = super::read_guarded_text(&spec_path, project_root).map_err(|e| {
-        RefVerifyError::VerifierPort {
+    let spec_text =
+        read_guarded_text(&spec_path, project_root).map_err(|e| RefVerifyError::VerifierPort {
             message: format!("cannot read spec.json at '{}': {e}", spec_path.display()),
-        }
-    })?;
+        })?;
     let spec_doc = crate::spec::codec::decode(&spec_text).map_err(|e| {
         RefVerifyError::VerifierPort { message: format!("spec.json decode error: {e}") }
     })?;
@@ -168,19 +74,23 @@ pub(super) fn enumerate_chain1_pairs(
 
     let mut pairs: Vec<RefVerifyPair> = Vec::new();
 
-    // Collect all requirements from all sections.
-    let all_reqs: Vec<&domain::SpecRequirement> = spec_doc
+    // Collect all requirements from all sections, tagged with their section
+    // kind. The section kind is part of the claim text so the verifier can
+    // interpret out_of_scope elements as exclusion declarations ("we will NOT
+    // do this") instead of misreading them as requirements.
+    let all_reqs: Vec<(&str, &domain::SpecRequirement)> = spec_doc
         .goal()
         .iter()
-        .chain(spec_doc.scope().in_scope().iter())
-        .chain(spec_doc.scope().out_of_scope().iter())
-        .chain(spec_doc.constraints().iter())
-        .chain(spec_doc.acceptance_criteria().iter())
+        .map(|r| ("goal", r))
+        .chain(spec_doc.scope().in_scope().iter().map(|r| ("in_scope", r)))
+        .chain(spec_doc.scope().out_of_scope().iter().map(|r| ("out_of_scope", r)))
+        .chain(spec_doc.constraints().iter().map(|r| ("constraint", r)))
+        .chain(spec_doc.acceptance_criteria().iter().map(|r| ("acceptance_criterion", r)))
         .collect();
 
-    for req in all_reqs {
+    for (section, req) in all_reqs {
         let id = req.id().as_ref();
-        let claim_text = format!("[{id}] {}", req.text());
+        let claim_text = format!("[{section} {id}] {}", req.text());
 
         // ADR D4: claim_hash = SHA-256 of the canonical JSON subtree for this spec element.
         let canonical_element_json =
@@ -240,7 +150,7 @@ pub(super) fn read_adr_anchor_text(
     trusted_root: &Path,
     anchor: &str,
 ) -> Result<(String, String), String> {
-    let raw_text = super::read_guarded_text(adr_path, trusted_root)
+    let raw_text = read_guarded_text(adr_path, trusted_root)
         .map_err(|e| format!("cannot read ADR '{}': {e}", adr_path.display()))?;
 
     let frontmatter = parse_adr_frontmatter(&raw_text)
@@ -401,7 +311,7 @@ fn enumerate_chain2_pairs_for_catalogue(
             ),
         });
     }
-    let catalogue_text = super::read_guarded_text(&catalogue_path, project_root).map_err(|e| {
+    let catalogue_text = read_guarded_text(&catalogue_path, project_root).map_err(|e| {
         RefVerifyError::VerifierPort {
             message: format!("cannot read catalogue '{}': {e}", catalogue_path.display()),
         }
@@ -518,11 +428,10 @@ fn load_chain2_spec_file(
     spec_path: &Path,
     project_root: &Path,
 ) -> Result<Chain2SpecEvidence, RefVerifyError> {
-    let spec_text = super::read_guarded_text(spec_path, project_root).map_err(|e| {
-        RefVerifyError::VerifierPort {
+    let spec_text =
+        read_guarded_text(spec_path, project_root).map_err(|e| RefVerifyError::VerifierPort {
             message: format!("cannot read Chain-2 spec ref '{}': {e}", spec_path.display()),
-        }
-    })?;
+        })?;
     let spec_doc =
         crate::spec::codec::decode(&spec_text).map_err(|e| RefVerifyError::VerifierPort {
             message: format!("Chain-2 spec ref decode error for '{}': {e}", spec_path.display()),
@@ -541,22 +450,27 @@ fn load_chain2_spec_file(
 }
 
 /// Find the text of a spec element by its id string.
+///
+/// The element's section kind is included in the rendered text so the
+/// Chain-2 verifier can interpret out_of_scope elements as exclusion
+/// declarations instead of behavioral requirements.
 pub(super) fn find_spec_element_text(
     spec_doc: &domain::SpecDocument,
     element_id: &str,
 ) -> Option<String> {
-    let all_reqs: Vec<&domain::SpecRequirement> = spec_doc
+    let all_reqs: Vec<(&str, &domain::SpecRequirement)> = spec_doc
         .goal()
         .iter()
-        .chain(spec_doc.scope().in_scope().iter())
-        .chain(spec_doc.scope().out_of_scope().iter())
-        .chain(spec_doc.constraints().iter())
-        .chain(spec_doc.acceptance_criteria().iter())
+        .map(|r| ("goal", r))
+        .chain(spec_doc.scope().in_scope().iter().map(|r| ("in_scope", r)))
+        .chain(spec_doc.scope().out_of_scope().iter().map(|r| ("out_of_scope", r)))
+        .chain(spec_doc.constraints().iter().map(|r| ("constraint", r)))
+        .chain(spec_doc.acceptance_criteria().iter().map(|r| ("acceptance_criterion", r)))
         .collect();
 
-    for req in all_reqs {
+    for (section, req) in all_reqs {
         if req.id().as_ref() == element_id {
-            return Some(format!("[{}] {}", req.id().as_ref(), req.text()));
+            return Some(format!("[{section} {}] {}", req.id().as_ref(), req.text()));
         }
     }
     None
@@ -592,14 +506,13 @@ pub(super) fn validate_template_path(
 
 fn load_tddd_layer_bindings(project_root: &Path) -> Result<Vec<TdddLayerBinding>, RefVerifyError> {
     let rules_path = project_root.join("architecture-rules.json");
-    let rules_text = super::read_guarded_text(&rules_path, project_root).map_err(|e| {
-        RefVerifyError::VerifierPort {
+    let rules_text =
+        read_guarded_text(&rules_path, project_root).map_err(|e| RefVerifyError::VerifierPort {
             message: format!(
                 "cannot read architecture-rules.json at '{}': {e}",
                 rules_path.display()
             ),
-        }
-    })?;
+        })?;
     let bindings = parse_tddd_layers(&rules_text).map_err(|e| RefVerifyError::VerifierPort {
         message: format!("architecture-rules.json parse error at '{}': {e}", rules_path.display()),
     })?;
@@ -624,14 +537,78 @@ fn catalogue_file_for_layer(
 }
 
 /// Enumerate Chain-2 pairs for all TDDD-enabled layers declared in architecture-rules.json.
+///
+/// The function handles two legal states for the catalogue set:
+///
+/// - **All absent** (pre-Phase-2 run): zero pairs are returned without error. This is the
+///   legal pre-Phase-2 path where `spec.json` exists but no type catalogue has been authored yet.
+/// - **All present**: pairs are enumerated for every layer.
+///
+/// A partial catalogue set (some present, some absent) is fail-closed — the scope resolver
+/// rejects it before this function is called, and this function re-checks defensively so that
+/// a catalogue disappearing between resolution and loading also triggers an error rather than
+/// silently under-verifying.
 pub(super) fn enumerate_chain2_all_layers(
     track_dir: &Path,
     project_root: &Path,
 ) -> Result<Vec<RefVerifyPair>, RefVerifyError> {
     let mut pairs: Vec<RefVerifyPair> = Vec::new();
-    let _ = super::guarded_track_dir_entry_names(track_dir, project_root)?;
+    let _ = super::guarded_io::guarded_track_dir_entry_names(track_dir, project_root)?;
 
-    for binding in load_tddd_layer_bindings(project_root)? {
+    // No architecture-rules.json → no TDDD layers declared → zero Chain-2 pairs.
+    // This mirrors the scope resolver's `load_bindings` which also returns an empty set
+    // when architecture-rules.json is absent, allowing pre-Phase-0 repos to run All scope.
+    let rules_path = project_root.join("architecture-rules.json");
+    let rules_exist = rules_path.try_exists().map_err(|e| RefVerifyError::VerifierPort {
+        message: format!(
+            "cannot inspect architecture-rules.json at '{}': {e}",
+            rules_path.display()
+        ),
+    })?;
+    if !rules_exist {
+        return Ok(pairs);
+    }
+
+    let bindings = load_tddd_layer_bindings(project_root)?;
+
+    // First pass: determine whether we are in the all-present or all-absent state.
+    // Fail closed if we observe a partial set (some present, some absent).
+    let mut present_count = 0usize;
+    let mut absent_count = 0usize;
+    for binding in &bindings {
+        let catalogue_path = track_dir.join(binding.catalogue_file());
+        let exists = catalogue_path.try_exists().map_err(|e| RefVerifyError::VerifierPort {
+            message: format!("cannot inspect catalogue '{}': {e}", catalogue_path.display()),
+        })?;
+        if exists {
+            present_count += 1;
+        } else {
+            absent_count += 1;
+        }
+    }
+
+    if present_count > 0 && absent_count > 0 {
+        // Partial catalogue set — fail closed to avoid silent under-verification.
+        let missing: Vec<String> = bindings
+            .iter()
+            .filter(|b| !track_dir.join(b.catalogue_file()).exists())
+            .map(|b| b.catalogue_file().to_owned())
+            .collect();
+        return Err(RefVerifyError::VerifierPort {
+            message: format!(
+                "partial TDDD catalogue set for All-scope run — missing: {}",
+                missing.join(", ")
+            ),
+        });
+    }
+
+    if absent_count == bindings.len() && !bindings.is_empty() {
+        // All catalogues absent: pre-Phase-2 path, contribute zero Chain-2 pairs.
+        return Ok(pairs);
+    }
+
+    // Second pass: all catalogues are present — enumerate pairs for each layer.
+    for binding in bindings {
         let layer_str = binding.layer_id();
         let layer =
             LayerId::try_new(layer_str.to_owned()).map_err(|e| RefVerifyError::VerifierPort {
@@ -652,6 +629,45 @@ pub(super) fn enumerate_chain2_all_layers(
 // Known-bad probes
 // ---------------------------------------------------------------------------
 
+/// Return a `RefVerifyCacheScope::CatalogueSpec` for the first TDDD-enabled layer declared in
+/// `architecture-rules.json`, or `None` if no TDDD layers exist or the rules file is absent.
+///
+/// Returns `Err` if the rules file exists but cannot be read, parsed, or yields an invalid
+/// layer id — callers must propagate the error rather than silently falling back to `SpecAdr`,
+/// which would route Chain-2 known-bad probes through Chain-1 and leave Chain-2 uncalibrated.
+///
+/// Used by the probe injector to route known-bad probes through Chain2 during All-scope runs.
+pub(super) fn first_tddd_layer_scope(
+    project_root: &Path,
+) -> Result<Option<RefVerifyCacheScope>, RefVerifyError> {
+    let rules_path = project_root.join("architecture-rules.json");
+    match rules_path.try_exists() {
+        Ok(false) => return Ok(None),
+        Ok(true) => {}
+        Err(e) => {
+            return Err(RefVerifyError::VerifierPort {
+                message: format!(
+                    "cannot check existence of architecture-rules.json at '{}': {e}",
+                    rules_path.display()
+                ),
+            });
+        }
+    }
+    let bindings = load_tddd_layer_bindings(project_root)?;
+    let Some(binding) = bindings.into_iter().next() else {
+        return Ok(None);
+    };
+    let layer = LayerId::try_new(binding.layer_id().to_owned()).map_err(|e| {
+        RefVerifyError::VerifierPort {
+            message: format!(
+                "invalid layer id '{}' in architecture-rules.json: {e}",
+                binding.layer_id()
+            ),
+        }
+    })?;
+    Ok(Some(RefVerifyCacheScope::CatalogueSpec { layer }))
+}
+
 /// Calculate how many known-bad probes to inject given the total pair count and
 /// injection rate percentage.
 pub(super) fn calculate_probe_count(pair_count: usize, injection_rate_percent: u8) -> usize {
@@ -665,19 +681,19 @@ pub(super) fn calculate_probe_count(pair_count: usize, injection_rate_percent: u
 ///
 /// The probe uses a deliberately incorrect claim/evidence combination so that a
 /// well-functioning verifier should return `Fail` for it.
-pub(super) fn make_known_bad_probe(index: usize) -> Result<RefVerifyPair, RefVerifyError> {
+///
+/// `cache_scope` must match the scope of the run so the probe is dispatched through the
+/// same chain capability (Chain1 for `SpecAdr`, Chain2 for `CatalogueSpec`) as the real
+/// pairs. Hard-coding `SpecAdr` during a Chain2 run would leave Chain2 calibration unchecked.
+pub(super) fn make_known_bad_probe(
+    index: usize,
+    cache_scope: RefVerifyCacheScope,
+) -> Result<RefVerifyPair, RefVerifyError> {
     let claim = format!("known-bad-probe-{index}: The system must implement feature X");
     let evidence = format!(
         "known-bad-probe-{index}: The ADR decision states the opposite of X, invalidating the claim"
     );
     let claim_hash = hash_text(&claim)?;
     let evidence_hash = hash_text(&evidence)?;
-    Ok(RefVerifyPair {
-        claim,
-        evidence,
-        claim_hash,
-        evidence_hash,
-        cache_scope: RefVerifyCacheScope::SpecAdr,
-        known_bad: true,
-    })
+    Ok(RefVerifyPair { claim, evidence, claim_hash, evidence_hash, cache_scope, known_bad: true })
 }

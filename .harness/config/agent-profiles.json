@@ -14,27 +14,27 @@
   "capabilities": {
     "orchestrator": {
       "provider": "claude",
-      "model": "claude-opus-4-8"
+      "model": "claude-fable-5"
     },
     "spec-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-8"
+      "model": "claude-fable-5"
     },
     "impl-planner": {
       "provider": "claude",
-      "model": "claude-opus-4-8"
+      "model": "claude-fable-5"
     },
     "type-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-8"
+      "model": "claude-fable-5"
     },
     "adr-editor": {
       "provider": "claude",
-      "model": "claude-opus-4-8"
+      "model": "claude-fable-5"
     },
     "implementer": {
       "provider": "claude",
-      "model": "claude-opus-4-8"
+      "model": "claude-fable-5"
     },
     "reviewer": {
       "provider": "codex",
@@ -45,27 +45,33 @@
       "provider": "gemini"
     },
     "review-fix-lead": {
-      "provider": "codex",
-      "model": "gpt-5.5"
+      "provider": "claude",
+      "model": "claude-fable-5"
     },
     "dry-checker": {
       "provider": "codex",
       "model": "gpt-5.5"
     },
     "dry-fix-lead": {
-      "provider": "codex",
-      "model": "gpt-5.5"
+      "provider": "claude",
+      "model": "claude-fable-5"
     },
     "pr-reviewer": {
       "provider": "codex"
     },
-    "ref-verifier": {
-      "provider": "claude",
-      "model": "claude-opus-4-8",
-      "fast_provider": "claude",
-      "fast_model": "claude-haiku-4-5",
-      "timeout_seconds": 120,
-      "prompt_template_path": ".harness/prompts/ref-verifier.md"
+    "ref-verifier-chain1": {
+      "provider": "codex",
+      "model": "gpt-5.5",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.4-mini",
+      "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+    },
+    "ref-verifier-chain2": {
+      "provider": "codex",
+      "model": "gpt-5.5",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.4-mini",
+      "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
     }
   }
 }

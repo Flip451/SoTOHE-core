@@ -1,0 +1,646 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "56f4c0587524c7b31422597e40a84fe2bed0d871521bc6b78abe373badb68d9c",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・タイムアウト・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "9bda90974253b1f910f8aecbcccc1f7771b253ba607dab94ffe37bcd79d681d2",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・タイムアウト・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "9bda90974253b1f910f8aecbcccc1f7771b253ba607dab94ffe37bcd79d681d2",
+      "evidence_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability の具体的なモデル値は `agent-profiles.json` で指定し、ADR 本文には非 canonical なモデル値を記載しない。段1（Fast）と段2（Final）の役割のみ ADR が規定し、具体値は Chain ごとの設定に委ねる"
+      }
+    },
+    {
+      "claim_hash": "9bda90974253b1f910f8aecbcccc1f7771b253ba607dab94ffe37bcd79d681d2",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability と `reviewer` capability が同時に実行される場合に、設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "ac79d6440685e62af4a6d414b8a714a172a1836a5a8010a4055a666d4a667cb5",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・タイムアウト・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "ac79d6440685e62af4a6d414b8a714a172a1836a5a8010a4055a666d4a667cb5",
+      "evidence_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に `ref-verifier-chain1` / `ref-verifier-chain2` capability エントリが存在し、それぞれ `fast_provider` / `fast_model`（段1）と `provider` / `model`（段2）を独立して設定できる。`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返すことで各 Chain capability の provider をまたぐ段階引き上げが機能する"
+      }
+    },
+    {
+      "claim_hash": "ac79d6440685e62af4a6d414b8a714a172a1836a5a8010a4055a666d4a667cb5",
+      "evidence_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の port・型・adapter を独立に持ち、SRP 違反を構造的に排除する。`agent-profiles.json` の capability 解決機構（`resolve_execution`）は責務中立な部品として共有する"
+      }
+    },
+    {
+      "claim_hash": "ac79d6440685e62af4a6d414b8a714a172a1836a5a8010a4055a666d4a667cb5",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability と `reviewer` capability が同時に実行される場合に、設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "ac79d6440685e62af4a6d414b8a714a172a1836a5a8010a4055a666d4a667cb5",
+      "evidence_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cache_scope` から Chain 種別を解決し、`ref-verifier-chain1` / `ref-verifier-chain2` の対応する capability と prompt template を選択する。prompt template の読み込みと claim / evidence / tier の埋め込みを adapter-local な前処理として行い、model / verifier 呼び出し自体にはレンダリング済み prompt payload だけを渡す。"
+      }
+    },
+    {
+      "claim_hash": "ac79d6440685e62af4a6d414b8a714a172a1836a5a8010a4055a666d4a667cb5",
+      "evidence_hash": "ddc13d60f62b8f6f70ba815229daf0483eaceb0c679a9d7d3cac107cfe4a99a8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AgentRefVerifierAdapter` は `cache_scope` が Chain① を示す場合に `ref-verifier-chain1` capability を選択し、Chain② を示す場合に `ref-verifier-chain2` capability を選択する。... 各 Chain の prompt template は IN-16 が定める基準（Chain① は strict intent grounding、Chain② は翻訳ギャップ許容中心）で記述されており、互いを代替しない"
+      }
+    },
+    {
+      "claim_hash": "22bf0aeee1aab1dac5c1f3ec3928ba6b84a20a3a0c26025586e21ba3dc1b2a48",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer capability と独立してモデル・タイムアウト・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "22bf0aeee1aab1dac5c1f3ec3928ba6b84a20a3a0c26025586e21ba3dc1b2a48",
+      "evidence_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability の具体的なモデル値は `agent-profiles.json` で指定し、ADR 本文には非 canonical なモデル値を記載しない。段1（Fast）と段2（Final）の役割のみ ADR が規定し、具体値は Chain ごとの設定に委ねる"
+      }
+    },
+    {
+      "claim_hash": "22bf0aeee1aab1dac5c1f3ec3928ba6b84a20a3a0c26025586e21ba3dc1b2a48",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "f2cd3eec7601126a3fe9297a9ec5c642bc75ae2f78e8e8be617125970c2592fd",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "f2cd3eec7601126a3fe9297a9ec5c642bc75ae2f78e8e8be617125970c2592fd",
+      "evidence_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② の検証結果が `track/items/<id>/<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごと）に書き込まれる。各 artifact は `(claim_hash, evidence_hash)` ペアと判定結果（合格/不合格/判定保留）を含む"
+      }
+    },
+    {
+      "claim_hash": "f2cd3eec7601126a3fe9297a9ec5c642bc75ae2f78e8e8be617125970c2592fd",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意味論検証の判定結果は fail-closed で扱う。…キャッシュに凍結済みの判定結果は `(claim_hash, evidence_hash)` ペアが変化しない限り再実行しない」"
+      }
+    },
+    {
+      "claim_hash": "086ff3e52f99a5b1361bbd50d671b879a1ec4fda80bd63e7f3846c82021126e2",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューの判定結果を Chain ごとの別 artifact に収容する。Chain① の結果は `spec-adr-verify-cache.json`（track 単位）、Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "086ff3e52f99a5b1361bbd50d671b879a1ec4fda80bd63e7f3846c82021126e2",
+      "evidence_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の検証結果が `track/items/<id>/spec-adr-verify-cache.json` に書き込まれ、Chain② の検証結果が `track/items/<id>/<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごと）に書き込まれる。各 artifact は `(claim_hash, evidence_hash)` ペアと判定結果（合格/不合格/判定保留）を含む"
+      }
+    },
+    {
+      "claim_hash": "086ff3e52f99a5b1361bbd50d671b879a1ec4fda80bd63e7f3846c82021126e2",
+      "evidence_hash": "e76b6ab619a70343805540fd8345ce814e2a46d531d0dc54e663034da5dc1db3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュの差分動作が正しい。`(claim_hash, evidence_hash)` ペアが変化していないエントリは再レビューをスキップし、いずれかが変化したエントリのみを再レビューする。phase 第一防衛線で通過済みの不変ペアは commit 最終関門で再レビューされない"
+      }
+    },
+    {
+      "claim_hash": "2b1700c216d280e1a92ba69989ce73672e37a8a11cdd36d72bbd6c7e7c83fe86",
+      "evidence_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "スコープを呼び出しコンテキストから自動解決する。spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain を対象とする。"
+      }
+    },
+    {
+      "claim_hash": "1edee18af2148318f14a8b9495537932ad146e26d0f04e3f67d22e502bc444e7",
+      "evidence_hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① では claim=spec element の per-element SHA-256 / evidence=ADR の git blob hash、Chain② では claim=catalogue entry の per-entry SHA-256（新規）/ evidence=spec element の per-element SHA-256 とする。どちらかの hash が変化したときのみ再レビューを実行する"
+      }
+    },
+    {
+      "claim_hash": "1edee18af2148318f14a8b9495537932ad146e26d0f04e3f67d22e502bc444e7",
+      "evidence_hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各バッチに答えが不合格と分かっているペア（既知の誤り例）を注入し、検出率を監視する。検出率が閾値を下回ったら D5 の段階引き上げ経路に入る。注入率と検出率閾値は設定ファイルで指定可能とし、初期デフォルトは注入率 10% / 検出率閾値 90% とする"
+      }
+    },
+    {
+      "claim_hash": "9a696a8fa52c74276dd4721443d1ef568053fda280c7a708fb07be16466e1203",
+      "evidence_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp ref-verify` は1コマンドで全 Chain を扱い、スコープを呼び出しコンテキストから自動解決する。spec-design 後は Chain①、type-design 後は Chain②、commit 最終関門は両 Chain を対象とする。"
+      }
+    },
+    {
+      "claim_hash": "1b28ba71893d29538b6de9ad4b1f60265fb7c81c9118ccfa4b657c39be9e3a97",
+      "evidence_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp ref-verify` は1コマンドで全 Chain を扱い、スコープを呼び出しコンテキストから自動解決する。"
+      }
+    },
+    {
+      "claim_hash": "9018c3c451a463e1408e61b3c7ea0249aa61ae837b884e9361ef118c89bc8efd",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "9018c3c451a463e1408e61b3c7ea0249aa61ae837b884e9361ef118c89bc8efd",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証の判定結果は fail-closed で扱う。「引用を提示できない合格」は合格ではなく判定保留（不合格方向）とする。"
+      }
+    },
+    {
+      "claim_hash": "d68c9eefb69b0472f8bca2c796170efe154791d331e04675067833a09cb27fab",
+      "evidence_hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューの判定結果を Chain ごとの別 artifact に収容する。Chain① の結果は `spec-adr-verify-cache.json`（track 単位）、Chain② の結果は `<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごとに4ファイル）として新設する"
+      }
+    },
+    {
+      "claim_hash": "d68c9eefb69b0472f8bca2c796170efe154791d331e04675067833a09cb27fab",
+      "evidence_hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain① の検証結果が `track/items/<id>/spec-adr-verify-cache.json` に書き込まれ、Chain② の検証結果が `track/items/<id>/<layer>-catalogue-spec-verify-cache.json`（domain / usecase / infrastructure / cli ごと）に書き込まれる。各 artifact は `(claim_hash, evidence_hash)` ペアと判定結果（合格/不合格/判定保留）を含む"
+      }
+    },
+    {
+      "claim_hash": "d68c9eefb69b0472f8bca2c796170efe154791d331e04675067833a09cb27fab",
+      "evidence_hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論検証の判定結果は fail-closed で扱う。「引用を提示できない合格」は合格ではなく判定保留（不合格方向）とする。キャッシュに凍結済みの判定結果は `(claim_hash, evidence_hash)` ペアが変化しない限り再実行しない"
+      }
+    },
+    {
+      "claim_hash": "9a4839ce2f081623d95f3a4e0ee2c6a6198e1dd3f3f99013aee35f91950966be",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・タイムアウト・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "1666916ee6d4a877328e38a200f32184714b11e8355d3332261841a9d1eea3d6",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・タイムアウト・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "1666916ee6d4a877328e38a200f32184714b11e8355d3332261841a9d1eea3d6",
+      "evidence_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返すことで各 Chain capability の provider をまたぐ段階引き上げが機能する"
+      }
+    },
+    {
+      "claim_hash": "1666916ee6d4a877328e38a200f32184714b11e8355d3332261841a9d1eea3d6",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "56f4c0587524c7b31422597e40a84fe2bed0d871521bc6b78abe373badb68d9c",
+      "evidence_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返す"
+      }
+    },
+    {
+      "claim_hash": "56f4c0587524c7b31422597e40a84fe2bed0d871521bc6b78abe373badb68d9c",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "1edee18af2148318f14a8b9495537932ad146e26d0f04e3f67d22e502bc444e7",
+      "evidence_hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp ref-verify` は1コマンドで全 Chain を扱い、スコープを呼び出しコンテキストから自動解決する。"
+      }
+    },
+    {
+      "claim_hash": "9e218e6d8c73454131e6d945acc0b2f632595994f9c8ac24a6055f125c573d9b",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: IN-09 only requires adding independent Chain1/Chain2 ref-verifier capabilities with separately configurable provider/model/timeout/prompt, but this catalogue entry additionally commits Claude invocations to read-only no-tool CLI arguments and fixes binary resolution to OS PATH as `claude` with no environment-variable indirection, which is not stated or derivable from the evidence."
+      }
+    },
+    {
+      "claim_hash": "ca6aca34711957b5ef227daeb0c82c9c4d3d46b98bb77b0746b6059b1bf4a507",
+      "evidence_hash": "3364cb74fb7e694e19432cba8b1aae2f5815b704cba56775b5e0a4e296d6d807",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the claim requires the verifier binary to always be resolved from OS PATH as `codex` with no environment variable indirection, and also fixes CLI details such as `--output-schema` and `model_reasoning_effort=high`; IN-09 only requires new Chain1/Chain2 capabilities with independently configurable model, timeout, prompt, and fast/final provider/model settings."
+      }
+    },
+    {
+      "claim_hash": "e9003251b76ce29671b372e7ed153c44144b8a4d2ce9af1729c281b3620b38db",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "e9003251b76ce29671b372e7ed153c44144b8a4d2ce9af1729c281b3620b38db",
+      "evidence_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返すことで各 Chain capability の provider をまたぐ段階引き上げが機能する"
+      }
+    },
+    {
+      "claim_hash": "e9003251b76ce29671b372e7ed153c44144b8a4d2ce9af1729c281b3620b38db",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability と `reviewer` capability が同時に実行される場合に、設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "ce3617c786fa3c0646785a6603b90db5dba2708826c00767d42c3e46a2c78bf9",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "ce3617c786fa3c0646785a6603b90db5dba2708826c00767d42c3e46a2c78bf9",
+      "evidence_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability の具体的なモデル値は `agent-profiles.json` で指定し、ADR 本文には非 canonical なモデル値を記載しない。段1（Fast）と段2（Final）の役割のみ ADR が規定し、具体値は Chain ごとの設定に委ねる"
+      }
+    },
+    {
+      "claim_hash": "ce3617c786fa3c0646785a6603b90db5dba2708826c00767d42c3e46a2c78bf9",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "1fc3c52fad3e52a55fbb0273819c6dcf2cdb07c976a10e5fb90162042cf0ec91",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "1fc3c52fad3e52a55fbb0273819c6dcf2cdb07c976a10e5fb90162042cf0ec91",
+      "evidence_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に `ref-verifier-chain1` / `ref-verifier-chain2` capability エントリが存在し、それぞれ `fast_provider` / `fast_model`（段1）と `provider` / `model`（段2）を独立して設定できる。`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返すことで各 Chain capability の provider をまたぐ段階引き上げが機能する"
+      }
+    },
+    {
+      "claim_hash": "1fc3c52fad3e52a55fbb0273819c6dcf2cdb07c976a10e5fb90162042cf0ec91",
+      "evidence_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論レビューレーンは code-review インフラ（`Reviewer` port・`ReviewTarget`・`Verdict`・`ReviewerFinding`・`review.json`・`ClaudeReviewer` adapter）の型や責務を共有しない。専用の port・型・adapter を独立に持ち、SRP 違反を構造的に排除する。`agent-profiles.json` の capability 解決機構（`resolve_execution`）は責務中立な部品として共有する"
+      }
+    },
+    {
+      "claim_hash": "1fc3c52fad3e52a55fbb0273819c6dcf2cdb07c976a10e5fb90162042cf0ec91",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "1fc3c52fad3e52a55fbb0273819c6dcf2cdb07c976a10e5fb90162042cf0ec91",
+      "evidence_hash": "0b04e84794b0703036d8df3ff860eb3c37fb35281b93af6b4f88795508336fed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verifier adapter は cache_scope から Chain 種別を解決し、ref-verifier-chain1 / ref-verifier-chain2 の対応する capability と prompt template を選択する。prompt template の読み込みと claim / evidence / tier の埋め込みを adapter-local な前処理として行い、model / verifier 呼び出し自体にはレンダリング済み prompt payload だけを渡す。"
+      }
+    },
+    {
+      "claim_hash": "1fc3c52fad3e52a55fbb0273819c6dcf2cdb07c976a10e5fb90162042cf0ec91",
+      "evidence_hash": "ddc13d60f62b8f6f70ba815229daf0483eaceb0c679a9d7d3cac107cfe4a99a8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AgentRefVerifierAdapter` は `cache_scope` が Chain① を示す場合に `ref-verifier-chain1` capability を選択し、Chain② を示す場合に `ref-verifier-chain2` capability を選択する。誤った Chain 種別の capability が選ばれた場合（例: Chain② スコープで `ref-verifier-chain1` を呼ぶ）はテストで検出できる。各 Chain の prompt template は IN-16 が定める基準（Chain① は strict intent grounding、Chain② は翻訳ギャップ許容中心）で記述されており、互いを代替しない"
+      }
+    },
+    {
+      "claim_hash": "a2ad89c092b069f1c8e6433456042359d2021d73c5584fbf5244dc81611331d5",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "a2ad89c092b069f1c8e6433456042359d2021d73c5584fbf5244dc81611331d5",
+      "evidence_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability の具体的なモデル値は `agent-profiles.json` で指定し、ADR 本文には非 canonical なモデル値を記載しない。段1（Fast）と段2（Final）の役割のみ ADR が規定し、具体値は Chain ごとの設定に委ねる"
+      }
+    },
+    {
+      "claim_hash": "a2ad89c092b069f1c8e6433456042359d2021d73c5584fbf5244dc81611331d5",
+      "evidence_hash": "87e23fa28db7f4ed41c35723d3c22ee0dc715ee508387d85725d51e7ecfe734e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定（モデル・タイムアウト・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ"
+      }
+    },
+    {
+      "claim_hash": "d872971ded60b53d90e64cf9af8a7fdabc62ae8b8657ed5b22ced5fb34a41a4c",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "d872971ded60b53d90e64cf9af8a7fdabc62ae8b8657ed5b22ced5fb34a41a4c",
+      "evidence_hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verifier subprocess はタイムアウトを設けず、終了するまで待機する。"
+      }
+    },
+    {
+      "claim_hash": "d516c2c9ab2ed044c1b98d26e564e914af2de1e90a561391991b28b58ca6e43c",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "24dc90a08587342425d5d04f732a5b5070b6622a7ec3dac642209d58be2a1780",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・プロンプトを設定でき"
+      }
+    },
+    {
+      "claim_hash": "ffcb1c0cad23ecd3269a9e9a586cc21880eaa31796fc195b3de9b2ac32d4d376",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき"
+      }
+    },
+    {
+      "claim_hash": "ffcb1c0cad23ecd3269a9e9a586cc21880eaa31796fc195b3de9b2ac32d4d376",
+      "evidence_hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability 設定にも timeout 項目を持たない"
+      }
+    },
+    {
+      "claim_hash": "d516c2c9ab2ed044c1b98d26e564e914af2de1e90a561391991b28b58ca6e43c",
+      "evidence_hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verifier subprocess はタイムアウトを設けず、終了するまで待機する。"
+      }
+    },
+    {
+      "claim_hash": "24dc90a08587342425d5d04f732a5b5070b6622a7ec3dac642209d58be2a1780",
+      "evidence_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返すことで各 Chain capability の provider をまたぐ段階引き上げが機能する"
+      }
+    },
+    {
+      "claim_hash": "24dc90a08587342425d5d04f732a5b5070b6622a7ec3dac642209d58be2a1780",
+      "evidence_hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verifier subprocess はタイムアウトを設けず、終了するまで待機する。"
+      }
+    },
+    {
+      "claim_hash": "bd1c25f3d6229d0ca664e47068367fb59775e70139e850dfb43b3772497ddb31",
+      "evidence_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返すことで各 Chain capability の provider をまたぐ段階引き上げが機能する"
+      }
+    },
+    {
+      "claim_hash": "bd1c25f3d6229d0ca664e47068367fb59775e70139e850dfb43b3772497ddb31",
+      "evidence_hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定（モデル・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ（D13-1/CN-13 により timeout_seconds は capability 設定に持たない）"
+      }
+    },
+    {
+      "claim_hash": "888cde15b2432433b776a125b08ce73c4cba8b1c2ea1663e0429e0e671131e5e",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "888cde15b2432433b776a125b08ce73c4cba8b1c2ea1663e0429e0e671131e5e",
+      "evidence_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability の具体的なモデル値は `agent-profiles.json` で指定し、ADR 本文には非 canonical なモデル値を記載しない。段1（Fast）と段2（Final）の役割のみ ADR が規定し、具体値は Chain ごとの設定に委ねる"
+      }
+    },
+    {
+      "claim_hash": "888cde15b2432433b776a125b08ce73c4cba8b1c2ea1663e0429e0e671131e5e",
+      "evidence_hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability と `reviewer` capability が同時に実行される場合に、設定（モデル・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ（D13-1/CN-13 により timeout_seconds は capability 設定に持たない）"
+      }
+    },
+    {
+      "claim_hash": "f995ea09e83b7b14235bfe543ba0ac66571e82cdd05815a0d06365728f17a627",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に Chain① 専用の `ref-verifier-chain1` capability と Chain② 専用の `ref-verifier-chain2` capability を新設する。`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "f995ea09e83b7b14235bfe543ba0ac66571e82cdd05815a0d06365728f17a627",
+      "evidence_hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`agent-profiles.json` に `ref-verifier-chain1` / `ref-verifier-chain2` capability エントリが存在し、それぞれ `fast_provider` / `fast_model`（段1）と `provider` / `model`（段2）を独立して設定できる。`libs/infrastructure/src/agent_profiles.rs` の `resolve_execution` が `RoundType::Fast` で `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` で `provider` / `model` を返す"
+      }
+    },
+    {
+      "claim_hash": "f995ea09e83b7b14235bfe543ba0ac66571e82cdd05815a0d06365728f17a627",
+      "evidence_hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の port・型・adapter を独立に持ち、SRP 違反を構造的に排除する。`agent-profiles.json` の capability 解決機構（`resolve_execution`）は責務中立な部品として共有する"
+      }
+    },
+    {
+      "claim_hash": "f995ea09e83b7b14235bfe543ba0ac66571e82cdd05815a0d06365728f17a627",
+      "evidence_hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability と `reviewer` capability が同時に実行される場合に、設定（モデル・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ（D13-1/CN-13 により timeout_seconds は capability 設定に持たない）"
+      }
+    },
+    {
+      "claim_hash": "f995ea09e83b7b14235bfe543ba0ac66571e82cdd05815a0d06365728f17a627",
+      "evidence_hash": "7c1a61e4d8433668cd24d32a477fc670c58a39357a2547c879d7d16f945113b3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier` adapter は `cache_scope` から Chain 種別を解決し、`ref-verifier-chain1` / `ref-verifier-chain2` の対応する capability と prompt template を選択する。prompt template の読み込みと claim / evidence / tier の埋め込みを adapter-local な前処理として行い、model / verifier 呼び出し自体にはレンダリング済み prompt payload だけを渡す。"
+      }
+    },
+    {
+      "claim_hash": "f995ea09e83b7b14235bfe543ba0ac66571e82cdd05815a0d06365728f17a627",
+      "evidence_hash": "ddc13d60f62b8f6f70ba815229daf0483eaceb0c679a9d7d3cac107cfe4a99a8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`AgentRefVerifierAdapter` は `cache_scope` が Chain① を示す場合に `ref-verifier-chain1` capability を選択し、Chain② を示す場合に `ref-verifier-chain2` capability を選択する。誤った Chain 種別の capability が選ばれた場合（例: Chain② スコープで `ref-verifier-chain1` を呼ぶ）はテストで検出できる。各 Chain の prompt template は IN-16 が定める基準（Chain① は strict intent grounding、Chain② は翻訳ギャップ許容中心）で記述されており、互いを代替しない"
+      }
+    },
+    {
+      "claim_hash": "efbabe9333b086a5525aca167db0143dd54bb9f3be38498bc203b464eea5fdfe",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "efbabe9333b086a5525aca167db0143dd54bb9f3be38498bc203b464eea5fdfe",
+      "evidence_hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ref-verifier-chain1` / `ref-verifier-chain2` capability の具体的なモデル値は `agent-profiles.json` で指定し、ADR 本文には非 canonical なモデル値を記載しない。段1（Fast）と段2（Final）の役割のみ ADR が規定し、具体値は Chain ごとの設定に委ねる"
+      }
+    },
+    {
+      "claim_hash": "efbabe9333b086a5525aca167db0143dd54bb9f3be38498bc203b464eea5fdfe",
+      "evidence_hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定（モデル・プロンプト）が互いに干渉しない。各 capability は `agent-profiles.json` 内で独立した設定エントリを持つ（D13-1/CN-13 により timeout_seconds は capability 設定に持たない）"
+      }
+    },
+    {
+      "claim_hash": "bd1c25f3d6229d0ca664e47068367fb59775e70139e850dfb43b3772497ddb31",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    },
+    {
+      "claim_hash": "8ce66759c0b71706b454a18f958296f6c32837fdd1f7edf8d559eee0228039d5",
+      "evidence_hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verifier subprocess はタイムアウトを設けず、終了するまで待機する。LLM の評価時間は対象ペアの長さとモデルの応答速度に依存するため、任意のタイムアウト値を設けると評価が途中で打ち切られ偽の escalation が発生する。capability 設定にも timeout 項目を持たない"
+      }
+    },
+    {
+      "claim_hash": "8ce66759c0b71706b454a18f958296f6c32837fdd1f7edf8d559eee0228039d5",
+      "evidence_hash": "323a136fd2bdad05ea9bfac2d773122dc4b2fb46f2a71bb7d4ee176b5eb69061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex では `--sandbox read-only` を使用してワークスペースへの書き込みを禁止し verify-cache artifact の改ざんを防ぐ; codex はファイル読み取りを OS レベルでは遮断しないが、structured output（`--output-schema`）で flat JSON verdict を強制し、prompt 設計によって claim / evidence テキストのみに基づく判定を誘導する"
+      }
+    },
+    {
+      "claim_hash": "8ce66759c0b71706b454a18f958296f6c32837fdd1f7edf8d559eee0228039d5",
+      "evidence_hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`reviewer` capability と独立してモデル・プロンプトを設定でき、各 Chain capability で `fast_provider` / `fast_model` と `provider` / `model` を別々に指定することで段1（Fast）と段2（Final）に異なる provider を割り当てられる"
+      }
+    }
+  ]
+}

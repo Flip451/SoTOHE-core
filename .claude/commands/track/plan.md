@@ -192,7 +192,7 @@ Artifact generation uses post-hoc review (show the artifact to the user and wait
 
 Invocation path depends on the active profile (`.harness/config/agent-profiles.json`):
 
-- **Claude (default profile)**: invoke via the Agent tool with `subagent_type: "spec-designer"`. The `model: opus` frontmatter in `.claude/agents/spec-designer.md` guarantees Opus selection.
+- **Claude (default profile)**: invoke via the Agent tool with `subagent_type: "spec-designer"`. The `model: fable` frontmatter in `.claude/agents/spec-designer.md` guarantees Fable selection.
 - **Codex (codex-heavy profile)**: invoke out-of-process through the native subcommand:
   ```bash
   bin/sotp plan codex-local --model {model} --briefing-file tmp/spec-designer-briefing.md

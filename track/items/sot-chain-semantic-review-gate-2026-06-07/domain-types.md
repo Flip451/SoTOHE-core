@@ -11,9 +11,9 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueSpecSignal | value_object | modify | — | 🟡 | 🔵 |
+| CatalogueSpecSignal | value_object | modify | — | 🔵 | 🔵 |
 | CatalogueSpecVerifyCacheDocument | value_object | — | — | 🔵 | 🔵 |
-| EvidenceCitation | value_object | — | — | 🟡 | 🔵 |
+| EvidenceCitation | value_object | — | — | 🔵 | 🔵 |
 | SemanticVerifyEntry | value_object | — | — | 🔵 | 🔵 |
 | SpecAdrVerifyCacheDocument | value_object | — | — | 🔵 | 🔵 |
 

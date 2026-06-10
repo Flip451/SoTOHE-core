@@ -940,13 +940,353 @@ exit 0
         assert!(writable_roots.contains("/tmp/safe-home"));
     }
 
-    #[cfg(unix)]
+    // ── CliApp::dry_run_fix_local: wrapper logic (agent-profile loading + provider dispatch) ──
+
+    /// Exercises the full `dry_run_fix_local` wrapper with `model: None`:
+    /// git discover → agent-profiles load → track_id validation → profile resolution
+    /// → model fallback from profiles → provider dispatch.
+    ///
+    /// The `dry-fix-lead` capability in agent-profiles.json defines `provider = "claude"`
+    /// and a non-empty model.  The test verifies that:
+    ///   - Profiles are loaded successfully (no "failed to load agent-profiles" error).
+    ///   - The capability is resolved (no "capability not defined" error).
+    ///   - The profile model fills the `None` input, so "no model specified" is NOT triggered.
+    ///   - Execution reaches the provider-dispatch arm with the error
+    ///     "[ERROR] unsupported dry-fix-lead provider 'claude' (supported: 'codex')",
+    ///     proving the wrapper traversed every stage up to dispatch.
+    ///
+    /// A regression that broke profile loading or model-fallback would produce a different
+    /// error message from an earlier stage, causing the assertions below to fail.
     #[test]
-    fn test_dry_run_fix_local_completed_sentinel_returns_exit_zero() {
+    fn test_dry_run_fix_local_none_model_falls_back_to_profile_model_and_reaches_dispatch() {
+        // Hold process_env_lock: dry_run_fix_local calls SystemGitRepo::discover() which
+        // reads PATH, and other tests in this module mutate PATH (fake git/claude injection).
+        // The lock serializes all env-mutating tests to prevent nondeterministic failure.
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
-        let fake_codex = write_fake_codex_runner(
-            dir.path(),
+        let briefing_file = dir.path().join("briefing.md");
+        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+
+        let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
+            track_id: "dry-track".to_owned(),
+            briefing_file: briefing_file.clone(),
+            model: None,
+        });
+
+        let message = result.unwrap_err();
+
+        // Model fallback from profiles must supply a non-empty model: the
+        // "no model specified" branch must NOT be reached.
+        assert!(
+            !message.contains("no model specified"),
+            "model fallback from agent-profiles.json must supply a model; got: {message}"
+        );
+        // Profiles must load without error.
+        assert!(
+            !message.contains("failed to load agent-profiles"),
+            "agent-profiles.json must load successfully; got: {message}"
+        );
+        // The `dry-fix-lead` capability must be found in profiles.
+        assert!(
+            !message.contains("capability not defined"),
+            "dry-fix-lead capability must be defined in agent-profiles.json; got: {message}"
+        );
+        // Provider dispatch must be reached with the exact error for 'claude'.
+        assert!(
+            message.contains("unsupported dry-fix-lead provider 'claude'"),
+            "None model must reach provider dispatch with 'claude' provider error; got: {message}"
+        );
+    }
+
+    /// Exercises `dry_run_fix_local` with an explicit `model: Some(x)`.
+    ///
+    /// The explicit model short-circuits `or_else(|| resolved.model.clone())` so the
+    /// profile model is NOT consulted for model selection.  Profiles are still loaded to
+    /// resolve the provider.  The test verifies that:
+    ///   - "no model specified" is NOT triggered (explicit model is non-None, bypasses fallback).
+    ///   - The provider-dispatch error is reached, proving the wrapper ran end-to-end.
+    ///
+    /// Difference from the `model: None` variant: this path never reads `resolved.model`;
+    /// a bug that ignored `input.model` and fell through to `resolved.model` would not be
+    /// caught here, but a regression that broke the OR-logic so that explicit model
+    /// triggered "no model specified" WOULD be caught.
+    #[test]
+    fn test_dry_run_fix_local_explicit_model_bypasses_profile_model_and_reaches_dispatch() {
+        // Hold process_env_lock: same reason as the None-model variant above.
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let briefing_file = dir.path().join("briefing.md");
+        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+
+        let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
+            track_id: "dry-track".to_owned(),
+            briefing_file: briefing_file.clone(),
+            model: Some("gpt-explicit-override".to_owned()),
+        });
+
+        let message = result.unwrap_err();
+
+        // Explicit model must NOT trigger the "no model specified" fallback error.
+        assert!(
+            !message.contains("no model specified"),
+            "explicit model must bypass the profile-model fallback; got: {message}"
+        );
+        assert!(
+            !message.contains("invalid --track-id"),
+            "valid track_id must not be rejected; got: {message}"
+        );
+        // Provider dispatch must be reached with the exact 'claude' error.
+        assert!(
+            message.contains("unsupported dry-fix-lead provider 'claude'"),
+            "explicit model must reach provider dispatch with 'claude' provider error; got: {message}"
+        );
+    }
+
+    /// Shared fixture for `dry_run_fix_local` codex-provider end-to-end tests.
+    ///
+    /// Creates a temp project dir, writes `agent-profiles.json` with `provider = "codex"`
+    /// and the given `profile_model`, installs a fake `git` that returns the project dir
+    /// as the repository root, and pre-creates a `CODEX_HOME` directory with a
+    /// `captured-model.txt` capture path exposed for tests that need it.
+    ///
+    /// The caller must hold `process_env_lock()` before creating this fixture.
+    #[cfg(unix)]
+    struct DryRunFixLocalFixture {
+        /// Temp dir that acts as the project root — must be kept alive for the duration of the test.
+        _project_dir: tempfile::TempDir,
+        fake_bin_dir: std::path::PathBuf,
+        codex_home: std::path::PathBuf,
+        /// Path to the `captured-model.txt` file written by a capture-script fake codex.
+        capture_file: std::path::PathBuf,
+        briefing_file: std::path::PathBuf,
+    }
+
+    #[cfg(unix)]
+    impl DryRunFixLocalFixture {
+        /// Build the fixture with `profile_model` written into `agent-profiles.json`.
+        fn new(profile_model: &str) -> Self {
+            let project_dir = tempfile::tempdir().unwrap();
+            let config_dir = project_dir.path().join(".harness").join("config");
+            std::fs::create_dir_all(&config_dir).unwrap();
+            std::fs::write(
+                config_dir.join("agent-profiles.json"),
+                format!(
+                    r#"{{
+  "schema_version": 1,
+  "providers": {{ "codex": {{ "label": "Codex" }} }},
+  "capabilities": {{
+    "dry-fix-lead": {{
+      "provider": "codex",
+      "model": "{profile_model}"
+    }}
+  }}
+}}"#
+                ),
+            )
+            .unwrap();
+
+            // Fake git: returns the project dir as the repository root.
+            let fake_bin_dir = project_dir.path().join("fake-bin");
+            std::fs::create_dir_all(&fake_bin_dir).unwrap();
+            let fake_git = fake_bin_dir.join("git");
+            let project_root_str = project_dir.path().to_string_lossy();
+            std::fs::write(
+                &fake_git,
+                format!(
+                    "#!/bin/sh\n\
+                     if [ \"$1\" = \"rev-parse\" ] && [ \"$2\" = \"--show-toplevel\" ]; then\n\
+                     \x20\x20printf '%s\\n' '{project_root_str}'\n\
+                     \x20\x20exit 0\n\
+                     fi\n\
+                     exit 1\n"
+                ),
+            )
+            .unwrap();
+            make_executable(&fake_git);
+
+            let codex_home = project_dir.path().join(".codex");
+            std::fs::create_dir_all(&codex_home).unwrap();
+            let capture_file = codex_home.join("captured-model.txt");
+
+            let briefing_file = project_dir.path().join("briefing.md");
+            std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+
+            Self {
+                _project_dir: project_dir,
+                fake_bin_dir,
+                codex_home,
+                capture_file,
+                briefing_file,
+            }
+        }
+
+        /// Install the fake codex script, set PATH/CODEX_BIN/CODEX_HOME guards, and call
+        /// `dry_run_fix_local` with the given input `model`.  Returns the raw result.
+        fn run(
+            &self,
+            codex_script: &str,
+            model: Option<&str>,
+        ) -> (Result<crate::CommandOutcome, String>, Vec<EnvGuard>) {
+            let fake_codex = write_fake_codex_runner(&self.fake_bin_dir, codex_script);
+
+            let mut path_entries = vec![self.fake_bin_dir.clone()];
+            if let Some(existing) = std::env::var_os("PATH") {
+                path_entries.extend(std::env::split_paths(&existing));
+            }
+            let new_path = std::env::join_paths(path_entries).unwrap();
+            let guards = vec![
+                EnvGuard::set("PATH", new_path),
+                EnvGuard::set("CODEX_BIN", fake_codex.as_os_str().to_os_string()),
+                EnvGuard::set("CODEX_HOME", self.codex_home.as_os_str().to_os_string()),
+            ];
+
+            let result = CliApp::new().dry_run_fix_local(RunDryFixLocalInput {
+                track_id: "dry-track".to_owned(),
+                briefing_file: self.briefing_file.clone(),
+                model: model.map(|s| s.to_owned()),
+            });
+
+            (result, guards)
+        }
+    }
+
+    /// End-to-end success test for `CliApp::dry_run_fix_local`:
+    /// verifies that the wrapper resolves the git root, loads a project-local
+    /// `agent-profiles.json`, picks the provider and model, and returns a
+    /// successful outcome when the configured provider is "codex" and the
+    /// fake codex binary outputs the completed sentinel.
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_with_codex_provider_returns_completed() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let fixture = DryRunFixLocalFixture::new("gpt-test");
+
+        let (result, _guards) = fixture.run(
+            r#"out=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --output-last-message)
+      out="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+while IFS= read -r _line; do :; done
+printf 'DRY_FIX_STATUS: completed\n' > "$out"
+printf 'codex done\n'
+exit 0
+"#,
+            None,
+        );
+
+        let outcome = result.unwrap();
+        assert_eq!(outcome.exit_code, 0, "dry_run_fix_local must succeed: {outcome:?}");
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some("DRY_FIX_STATUS: completed"),
+            "outcome must report completed sentinel: {outcome:?}"
+        );
+    }
+
+    /// Shared helper: creates a `DryRunFixLocalFixture` with `profile_model`, installs a
+    /// fake codex that captures the `--model` argument to `${CODEX_HOME}/captured-model.txt`,
+    /// runs `dry_run_fix_local` with `input_model`, and asserts the captured model equals
+    /// `expected_model`.
+    ///
+    /// The caller must hold `process_env_lock()` before calling this helper.
+    #[cfg(unix)]
+    fn assert_dry_run_fix_local_forwards_model(
+        profile_model: &str,
+        input_model: Option<&str>,
+        expected_model: &str,
+    ) {
+        let fixture = DryRunFixLocalFixture::new(profile_model);
+        let (result, _guards) = fixture.run(
+            r#"model=""
+out=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --model) model="$2"; shift 2 ;;
+    --output-last-message) out="$2"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+printf '%s' "$model" > "${CODEX_HOME}/captured-model.txt"
+while IFS= read -r _line; do :; done
+printf 'DRY_FIX_STATUS: completed\n' > "$out"
+printf 'codex done\n'
+exit 0
+"#,
+            input_model,
+        );
+        assert!(result.is_ok(), "dry_run_fix_local must succeed: {result:?}");
+        let captured_model = std::fs::read_to_string(&fixture.capture_file)
+            .expect("capture file must be written by fake codex");
+        assert_eq!(
+            captured_model, expected_model,
+            "model must be forwarded verbatim to codex --model arg; got: {captured_model:?}"
+        );
+    }
+
+    /// Verifies that `dry_run_fix_local` forwards the **profile model** to the
+    /// codex invocation when `model: None` is given.
+    ///
+    /// The fake codex captures the `--model` value and writes it to
+    /// `${CODEX_HOME}/captured-model.txt`, proving the profile-model fallback
+    /// reaches the codex binary — not just the wrapper dispatch.
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_none_model_forwards_profile_model_to_codex() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        assert_dry_run_fix_local_forwards_model("gpt-profile-model", None, "gpt-profile-model");
+    }
+
+    /// Verifies that `dry_run_fix_local` forwards an **explicit override model**
+    /// to the codex invocation — bypassing the profile model entirely.
+    ///
+    /// Uses the same `${CODEX_HOME}/captured-model.txt` capture mechanism.  The
+    /// profile defines `gpt-profile-model`; the explicit input is
+    /// `gpt-explicit-override`.  After the run the test asserts the codex received
+    /// `gpt-explicit-override`, not `gpt-profile-model`.
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_explicit_model_forwards_override_model_to_codex() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        assert_dry_run_fix_local_forwards_model(
+            "gpt-profile-model",
+            Some("gpt-explicit-override"),
+            "gpt-explicit-override",
+        );
+    }
+
+    /// Shared fixture: write a fake codex runner with `script` body, install
+    /// `CODEX_BIN` and `CODEX_HOME` guards, write a briefing file, and call
+    /// `run_dry_fix_codex`. Returns the result so each test can assert its
+    /// own success or error path.
+    ///
+    /// The caller must hold `process_env_lock()` before calling this helper.
+    #[cfg(unix)]
+    fn run_dry_fix_with_fake_codex(script: &str) -> Result<crate::CommandOutcome, String> {
+        let dir = tempfile::tempdir().unwrap();
+        let fake_codex = write_fake_codex_runner(dir.path(), script);
+        let _codex_bin = EnvGuard::set("CODEX_BIN", fake_codex.as_os_str().to_os_string());
+        let _codex_home = EnvGuard::set("CODEX_HOME", dir.path().join(".codex").into_os_string());
+        let briefing_file = dir.path().join("briefing.md");
+        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
+        run_dry_fix_codex("gpt-test", "dry-track", &briefing_file)
+    }
+
+    /// Calls `run_dry_fix_codex` directly: the higher-level `dry_run_fix_local`
+    /// end-to-end success is covered by
+    /// `test_dry_run_fix_local_with_codex_provider_returns_completed`.
+    #[cfg(unix)]
+    #[test]
+    fn test_run_dry_fix_codex_completed_sentinel_returns_exit_zero() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let outcome = run_dry_fix_with_fake_codex(
             r#"out=""
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -964,19 +1304,8 @@ printf 'DRY_FIX_STATUS: completed\n' > "$out"
 printf 'nested dry fixer stdout\n'
 exit 0
 "#,
-        );
-        let _codex_bin = EnvGuard::set("CODEX_BIN", fake_codex.as_os_str().to_os_string());
-        let _codex_home = EnvGuard::set("CODEX_HOME", dir.path().join(".codex").into_os_string());
-        let briefing_file = dir.path().join("briefing.md");
-        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
-
-        let outcome = CliApp::new()
-            .dry_run_fix_local(RunDryFixLocalInput {
-                track_id: "dry-track".to_owned(),
-                briefing_file,
-                model: Some("gpt-test".to_owned()),
-            })
-            .unwrap();
+        )
+        .unwrap();
 
         assert_eq!(outcome.exit_code, 0);
         assert_eq!(outcome.stdout.as_deref(), Some("DRY_FIX_STATUS: completed"));
@@ -1011,9 +1340,7 @@ exit 0
     #[test]
     fn test_run_dry_fix_codex_missing_sentinel_returns_error() {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        let dir = tempfile::tempdir().unwrap();
-        let fake_codex = write_fake_codex_runner(
-            dir.path(),
+        let result = run_dry_fix_with_fake_codex(
             r#"out=""
 while [ "$#" -gt 0 ]; do
   if [ "$1" = "--output-last-message" ]; then
@@ -1029,12 +1356,6 @@ printf 'stdout without sentinel\n'
 exit 0
 "#,
         );
-        let _codex_bin = EnvGuard::set("CODEX_BIN", fake_codex.as_os_str().to_os_string());
-        let _codex_home = EnvGuard::set("CODEX_HOME", dir.path().join(".codex").into_os_string());
-        let briefing_file = dir.path().join("briefing.md");
-        std::fs::write(&briefing_file, "# dry briefing\n").unwrap();
-
-        let result = run_dry_fix_codex("gpt-test", "dry-track", &briefing_file);
 
         let message = result.unwrap_err();
         assert!(

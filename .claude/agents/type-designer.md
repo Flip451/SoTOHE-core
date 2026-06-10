@@ -1,6 +1,6 @@
 ---
 name: type-designer
-model: opus
+model: fable
 effort: max
 tools:
   - Read
@@ -12,7 +12,7 @@ tools:
   - WebFetch
   - WebSearch
 description: |
-  Phase 2 writer for /track:type-design. Translates the track's ADR (design decisions) and spec.json (behavioral contract) into per-layer `<layer>-types.json` entries (schema_version: 3) — picking the role value (per-section role space) and the `kind` discriminator (`struct` with `shape` `unit`/`tuple`/`plain`, `enum`, or `type_alias`), authoring methods / fields / params / returns, and setting `action` fields. Runs the canonical pipeline internally: **capture baselines → write the catalogue files → evaluate type-signals → render views**. Mirrors the `type-designer` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
+  Phase 2 writer for /track:type-design. Translates the track's ADR (design decisions) and spec.json (behavioral contract) into per-layer `<layer>-types.json` entries (schema_version: 3) — picking the role value (per-section role space) and the `kind` discriminator (`struct` with `shape` `unit`/`tuple`/`plain`, `enum`, or `type_alias`), authoring methods / fields / params / returns, and setting `action` fields. Runs the canonical pipeline internally: **capture baselines → write the catalogue files → evaluate type-signals → render views**. Mirrors the `type-designer` capability in `.harness/config/agent-profiles.json` and enforces Fable via frontmatter.
 ---
 
 # Type-Designer Agent

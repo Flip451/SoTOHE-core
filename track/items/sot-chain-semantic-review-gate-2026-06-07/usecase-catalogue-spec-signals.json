@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3d4f3a0720d19bc2ae007b34361f8dc5c5681f53e699495bae29b72733d409c9",
+  "catalogue_declaration_hash": "de528b5422bf5d496779f35f5e2fd6357c5e8e6c49797c8cb106facb37bb0484",
   "signals": [
     {
       "type_name": "CatalogueEntryRef",
@@ -15,7 +15,7 @@
     {
       "type_name": "RefVerifyCommand",
       "signal": "blue",
-      "entry_hash": "87ff1b9c394dbaa2ab58b6e768c7ad31b860e756acd35242208c162ef3372b5f"
+      "entry_hash": "d54dd8db53a2da2a8e8ec9091e1a97aacc1e926b5162e64f47abb82226ba9575"
     },
     {
       "type_name": "RefVerifyConfig",
@@ -30,17 +30,17 @@
     {
       "type_name": "RefVerifyPair",
       "signal": "blue",
-      "entry_hash": "26794e2122d2b825f5f33e82ed918d804d0e7a75d2531a6618f4e7396769a700"
+      "entry_hash": "ae885d35c6e4170c1e78ed2f5ebe1e3272436e55a7d9b676f7a8a4ad1c5452cb"
     },
     {
       "type_name": "RefVerifyParallelism",
       "signal": "blue",
-      "entry_hash": "a2bc450f095f5617cd2d81701b24ae8dda06f077c673fc48772bd425bbf8d219"
+      "entry_hash": "24acf37e4235b61097bd2c0532cec94c90a83e7a65c5c31d9072e8f12802bcd8"
     },
     {
       "type_name": "RefVerifyPercent",
       "signal": "blue",
-      "entry_hash": "7e37ef7ae736b1a3fe945f97b5d989838a4685dcbc4bd02d8060c6616657cd4b"
+      "entry_hash": "31c2afd79efdc639974cc060fde87abd7e88804aed710066ea636a769ee89ba9"
     },
     {
       "type_name": "RefVerifyScope",
@@ -50,7 +50,7 @@
     {
       "type_name": "RefreshCatalogueSpecSignalsError",
       "signal": "blue",
-      "entry_hash": "10d2730b7db6167eeef7ff94599375ec5cfcd057043b1cd3ba10dd59f61a4316"
+      "entry_hash": "0946834a6be77eb9e52e380e37a39ebdd0e168945fe4ded1e2b802168f21f18a"
     },
     {
       "type_name": "VerifySemanticRefsInteractor",
@@ -60,7 +60,7 @@
     {
       "type_name": "RefVerifierPort",
       "signal": "blue",
-      "entry_hash": "e5d96a39f46a1605fbea8ea6346223cd9dcb1fd60b68cbccc7ac0b3fc4a044d4"
+      "entry_hash": "a706d613d0d64a4fc2742cabaa7268b6e48536116ede29a3e43e67eb1b8cd15b"
     },
     {
       "type_name": "RefVerifyApplicationService",

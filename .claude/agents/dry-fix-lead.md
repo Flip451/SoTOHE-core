@@ -1,6 +1,6 @@
 ---
 name: dry-fix-lead
-model: opus
+model: fable
 description: Own the DFP (DRY fix phase) loop — run sotp dry write, apply refactor proposals to eliminate DRY violations, verify with cargo make ci-rust, and iterate until sotp dry check-approved exits 0 (completed), the loop is exhausted with violations remaining (blocked), or a tooling error prevents the loop from running (failed).
 ---
 
@@ -19,7 +19,7 @@ Own the **DFP (DRY fix phase)** loop. Fix DRY violations only — never fix revi
 - Track ID
 - Briefing file path (the orchestrator may supply a briefing file for context)
 
-The Codex model for this dry-fix-lead agent is auto-resolved from `capabilities.dry-fix-lead` in `.harness/config/agent-profiles.json`; the orchestrator does not pass it. This agent may edit any file in the workspace (see Scope Ownership).
+The fixer dispatch (provider / model) is auto-resolved from `capabilities.dry-fix-lead` in `.harness/config/agent-profiles.json`; the orchestrator does not pass it. This agent may edit any file in the workspace (see Scope Ownership).
 
 ### Output (structured status in final message)
 

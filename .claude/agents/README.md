@@ -1,6 +1,6 @@
 # Agent Definitions
 
-`.claude/agents/` holds the custom subagent definitions that Claude Code Orchestra invokes through `subagent_type`. Each agent pins Opus via `model: opus` frontmatter so that an unintended Sonnet fallback (driven by `CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) never happens.
+`.claude/agents/` holds the custom subagent definitions that Claude Code Orchestra invokes through `subagent_type`. Each agent pins Fable via `model: fable` frontmatter so that an unintended Sonnet fallback (driven by `CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) never happens.
 
 ## Included Agents
 

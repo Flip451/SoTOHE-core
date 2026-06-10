@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-09T09:33:08Z",
-  "declaration_hash": "3d43c915d5620573d1a79e34907482ee5a57d57fcb8c7c71ef69862e2c2f3685",
+  "generated_at": "2026-06-10T09:10:27Z",
+  "declaration_hash": "681777c6a3215960e82ea18004b13cc90c1807a32fa1ee1e70afc326fe98da91",
   "signals": [
     {
       "type_name": "CatalogueSpecSignal",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -30,7 +30,7 @@
     {
       "type_name": "EvidenceCitation",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

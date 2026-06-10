@@ -48,6 +48,9 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
     /// 3. For each `cache_scope` group of production pairs, load existing
     ///    cache entries and skip pairs whose `(claim_hash, evidence_hash)` is
     ///    unchanged (AC-07).
+    ///    3b. D12: when production pairs exist and **all** of them are cache
+    ///    hits, skip known-bad probe evaluation entirely (no fresh production
+    ///    work → nothing to calibrate) and gate on the frozen verdicts alone.
     /// 4. Evaluate all remaining production pairs **and** all known-bad probes
     ///    at `ModelTier::Fast`.
     /// 5. Check known-bad detection rate:
@@ -142,6 +145,36 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
         // Convert &[&RefVerifyPair] to owned Vec<RefVerifyPair> for parallel_verify.
         let cache_miss_owned: Vec<RefVerifyPair> =
             cache_misses.iter().map(|p| (*p).clone()).collect();
+
+        // D12: when production pairs exist AND all production pairs are cache hits
+        // (cache_miss_owned is empty), there is no fresh production work to calibrate
+        // against. Skip known-bad probe evaluation entirely — running probes only
+        // to validate a verifier that is never invoked for real work would burn
+        // model budget without any signal benefit. Persist Ok(()) immediately
+        // since cache-hit verdicts have already been categorised below by the
+        // caller-side accumulators (and confirmed_fails / confirmed_pending are
+        // zero by construction when this branch fires because cache_hit_verdicts
+        // contains only Pass-derived entries — Pending is never cached, and Fail
+        // would have surfaced on the previous run).
+        if !production_pairs.is_empty() && cache_miss_owned.is_empty() {
+            // Still walk cache-hit verdicts to surface previously cached failures.
+            let mut hit_fails: usize = 0;
+            let mut hit_pending: usize = 0;
+            for (_, verdict) in &cache_hit_verdicts {
+                match verdict {
+                    SemanticVerdict::Fail { .. } => hit_fails += 1,
+                    SemanticVerdict::Pending => hit_pending += 1,
+                    SemanticVerdict::Pass { .. } => {}
+                }
+            }
+            if hit_fails > 0 {
+                return Err(RefVerifyError::SemanticFailuresConfirmed { pair_count: hit_fails });
+            }
+            if hit_pending > 0 {
+                return Err(RefVerifyError::HumanEscalationRequired { pair_count: hit_pending });
+            }
+            return Ok(());
+        }
 
         let fast_production_verdicts: Vec<(RefVerifyPair, SemanticVerdict)> =
             parallel_verify(&self.verifier, &cache_miss_owned, ModelTier::Fast, max_par)?;
@@ -330,8 +363,14 @@ fn parallel_verify(
             let verifier_ref = Arc::clone(verifier);
             let tier_copy = tier.clone();
             let handle = std::thread::spawn(move || {
+                let cache_scope = pair_owned.cache_scope.clone();
                 verifier_ref
-                    .verify_pair(pair_owned.claim.clone(), pair_owned.evidence.clone(), tier_copy)
+                    .verify_pair(
+                        pair_owned.claim.clone(),
+                        pair_owned.evidence.clone(),
+                        &cache_scope,
+                        tier_copy,
+                    )
                     .map(|verdict| (pair_owned, verdict))
             });
             handles.push(handle);
@@ -534,6 +573,7 @@ mod tests {
             &self,
             _claim: String,
             _evidence: String,
+            _cache_scope: &RefVerifyCacheScope,
             _tier: ModelTier,
         ) -> Result<SemanticVerdict, RefVerifyError> {
             Ok(self.verdict.clone())
@@ -561,6 +601,7 @@ mod tests {
             &self,
             claim: String,
             _evidence: String,
+            _cache_scope: &RefVerifyCacheScope,
             tier: ModelTier,
         ) -> Result<SemanticVerdict, RefVerifyError> {
             self.calls.lock().unwrap().push((claim.clone(), tier));
@@ -742,6 +783,94 @@ mod tests {
         assert!(
             production_calls.is_empty(),
             "verifier must not be called for cache-hit production pairs; got calls: {calls:?}"
+        );
+    }
+
+    #[test]
+    fn known_bad_probes_are_skipped_when_all_production_pairs_are_cache_hits() {
+        // D12: when production pairs exist and every one of them is a cache hit,
+        // calibration probes have nothing to calibrate — they must not be evaluated.
+        let pair = production_pair(0x01, 0x02);
+        let cached_entry = SemanticVerifyEntry::new(
+            pair.claim_hash.clone(),
+            pair.evidence_hash.clone(),
+            pass_verdict(),
+        );
+        let probe = known_bad_pair();
+        let source: Arc<dyn RefVerifyPairSourcePort> =
+            Arc::new(StubPairSource { pairs: vec![pair, probe] });
+        let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
+
+        let spy: Arc<SpyVerifier> = Arc::new(SpyVerifier::new(pass_verdict(), fail_verdict()));
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            Arc::clone(&spy) as Arc<dyn RefVerifierPort>,
+            RefVerifyConfig::default(),
+        );
+
+        let result = interactor.execute(&track_cmd());
+        assert!(result.is_ok(), "expected Ok(()), got: {result:?}");
+        assert!(
+            spy.calls().is_empty(),
+            "no verifier call (production or probe) is allowed when all production \
+             pairs are cache hits; got calls: {:?}",
+            spy.calls()
+        );
+    }
+
+    /// Shared fixture for D12 skip-path tests: build a production pair with `(claim_byte,
+    /// evidence_byte)`, wrap it in a cache entry with `cached_verdict`, run the interactor,
+    /// and return the error. Also asserts that the spy verifier was never called.
+    fn assert_cached_verdict_surfaces_on_d12_skip(
+        claim_byte: u8,
+        evidence_byte: u8,
+        cached_verdict: SemanticVerdict,
+        spy: &Arc<SpyVerifier>,
+    ) -> RefVerifyError {
+        let pair = production_pair(claim_byte, evidence_byte);
+        let cached_entry = SemanticVerifyEntry::new(
+            pair.claim_hash.clone(),
+            pair.evidence_hash.clone(),
+            cached_verdict,
+        );
+        let source: Arc<dyn RefVerifyPairSourcePort> =
+            Arc::new(StubPairSource { pairs: vec![pair] });
+        let cache: Arc<StubCache> = Arc::new(StubCache::with_entries(vec![cached_entry]));
+
+        let interactor = VerifySemanticRefsInteractor::new(
+            source,
+            Arc::clone(&cache) as Arc<dyn RefVerifyCachePort>,
+            Arc::clone(spy) as Arc<dyn RefVerifierPort>,
+            RefVerifyConfig::default(),
+        );
+
+        let err = interactor.execute(&track_cmd()).unwrap_err();
+        assert!(spy.calls().is_empty(), "verifier must not be called on the D12 skip path");
+        err
+    }
+
+    #[test]
+    fn cached_fail_verdict_surfaces_even_when_probe_evaluation_is_skipped() {
+        // D12 skip path must still surface previously cached Fail verdicts.
+        let spy: Arc<SpyVerifier> = Arc::new(SpyVerifier::new(pass_verdict(), fail_verdict()));
+        let err = assert_cached_verdict_surfaces_on_d12_skip(0x03, 0x04, fail_verdict(), &spy);
+        assert!(
+            matches!(err, RefVerifyError::SemanticFailuresConfirmed { pair_count: 1 }),
+            "cached Fail must surface as SemanticFailuresConfirmed, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn cached_pending_verdict_surfaces_even_when_probe_evaluation_is_skipped() {
+        // D12 skip path must still surface previously cached Pending verdicts as
+        // HumanEscalationRequired, and must not invoke the verifier.
+        let spy: Arc<SpyVerifier> = Arc::new(SpyVerifier::new(pass_verdict(), fail_verdict()));
+        let err =
+            assert_cached_verdict_surfaces_on_d12_skip(0x05, 0x06, SemanticVerdict::Pending, &spy);
+        assert!(
+            matches!(err, RefVerifyError::HumanEscalationRequired { pair_count: 1 }),
+            "cached Pending must surface as HumanEscalationRequired, got: {err:?}"
         );
     }
 
@@ -965,6 +1094,7 @@ mod tests {
                 &self,
                 claim: String,
                 _evidence: String,
+                _cache_scope: &RefVerifyCacheScope,
                 _tier: ModelTier,
             ) -> Result<SemanticVerdict, RefVerifyError> {
                 let mut c = self.calls.lock().unwrap();
@@ -1125,6 +1255,7 @@ mod tests {
             &self,
             _claim: String,
             _evidence: String,
+            _cache_scope: &RefVerifyCacheScope,
             _tier: ModelTier,
         ) -> Result<SemanticVerdict, RefVerifyError> {
             Err(RefVerifyError::VerifierPort { message: "verifier adapter failure".to_owned() })
