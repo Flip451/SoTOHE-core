@@ -1,11 +1,11 @@
 //! CLI subcommand for track operations.
 
 use std::path::PathBuf;
-use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
 
 mod branch_ops;
+mod dispatch;
 mod resolve;
 pub(crate) mod set_commit_hash;
 mod signals;
@@ -15,6 +15,7 @@ mod transition;
 mod validate;
 mod views;
 
+pub use dispatch::{execute, execute_with_error_chain};
 pub(crate) use validate::{
     resolve_project_root, resolve_track_id, resolve_track_id_for_write, resolve_track_id_from_root,
     resolve_track_id_from_root_for_write, validate_track_branch_str, validate_track_id_str,
@@ -439,6 +440,83 @@ pub struct BranchArgs {
     track_id: String,
 }
 
+impl TrackCommand {
+    /// Returns the effective `items_dir` for this command as an owned `PathBuf`.
+    ///
+    /// Most variants carry an explicit `--items-dir` argument (defaulting to
+    /// `"track/items"`); this method exposes it so callers such as the telemetry
+    /// wiring in `main.rs` can use the actual value instead of a hardcoded
+    /// fallback.
+    ///
+    /// Variants that derive their track-items path from `workspace_root` (i.e.
+    /// `TypeSignals`, `BaselineCapture`, `Lint`, `CatalogueImplSignals`) return
+    /// `<workspace_root>/track/items`, so that a non-default `--workspace-root`
+    /// is honoured and telemetry is written to the correct track tree.
+    ///
+    /// Variants that derive their path from `project_root` (i.e. `Views`)
+    /// return `<project_root>/track/items` for the same reason.
+    ///
+    /// `SetCommitHash` has no items-dir or workspace-root argument and returns
+    /// the default `"track/items"` (relative to CWD), which matches its
+    /// internal resolution behaviour.
+    pub fn items_dir(&self) -> PathBuf {
+        match self {
+            TrackCommand::Transition { items_dir, .. }
+            | TrackCommand::AddTask { items_dir, .. }
+            | TrackCommand::SetOverride { items_dir, .. }
+            | TrackCommand::ClearOverride { items_dir, .. }
+            | TrackCommand::NextTask { items_dir, .. }
+            | TrackCommand::TaskCounts { items_dir, .. }
+            | TrackCommand::Signals { items_dir, .. }
+            | TrackCommand::TypeGraph { items_dir, .. }
+            | TrackCommand::BaselineGraph { items_dir, .. }
+            | TrackCommand::ContractMap { items_dir, .. }
+            | TrackCommand::CatalogueSpecSignals { items_dir, .. }
+            | TrackCommand::SpecElementHash { items_dir, .. } => items_dir.clone(),
+
+            // Branch sub-variants embed items_dir inside BranchArgs.
+            TrackCommand::Branch { action: BranchAction::Create(args) }
+            | TrackCommand::Branch { action: BranchAction::Switch(args) } => args.items_dir.clone(),
+
+            // Resolve embeds items_dir inside ResolveArgs.
+            TrackCommand::Resolve(args) => args.items_dir.clone(),
+
+            // Views commands use project_root; derive items_dir from it so that
+            // a non-default --project-root is honoured for telemetry path resolution.
+            TrackCommand::Views { action: ViewAction::Validate { project_root } }
+            | TrackCommand::Views { action: ViewAction::Sync { project_root, .. } } => {
+                project_root.join("track").join("items")
+            }
+
+            // These variants derive their items path from workspace_root
+            // internally; return <workspace_root>/track/items so that a
+            // non-default --workspace-root is honoured for telemetry path resolution.
+            TrackCommand::TypeSignals { workspace_root, .. }
+            | TrackCommand::BaselineCapture { workspace_root, .. }
+            | TrackCommand::Lint { workspace_root, .. }
+            | TrackCommand::CatalogueImplSignals { workspace_root, .. } => {
+                workspace_root.join("track").join("items")
+            }
+
+            // SetCommitHash has no items-dir or workspace-root argument.
+            // Discover the git repository root so telemetry writes land under
+            // `<repo-root>/track/items/<id>/logs/telemetry.jsonl` regardless of
+            // whether the process is invoked from a subdirectory (e.g. during
+            // tests that temporarily change the working directory via
+            // `run_in_dir`).  Falls back to the CWD-relative "track/items" when
+            // git discovery fails (no git repo, detached state, etc.).
+            TrackCommand::SetCommitHash(_) => std::process::Command::new("git")
+                .args(["rev-parse", "--show-toplevel"])
+                .output()
+                .ok()
+                .filter(|o| o.status.success())
+                .and_then(|o| String::from_utf8(o.stdout).ok())
+                .map(|s| PathBuf::from(s.trim()).join("track").join("items"))
+                .unwrap_or_else(|| PathBuf::from("track/items")),
+        }
+    }
+}
+
 /// Arguments for `sotp track set-commit-hash`.
 #[derive(Debug, Args, Clone)]
 pub struct SetCommitHashArgs {
@@ -477,153 +555,6 @@ pub enum ViewAction {
         #[arg(long)]
         track_id: Option<String>,
     },
-}
-
-#[allow(clippy::too_many_lines)]
-pub fn execute(cmd: TrackCommand) -> ExitCode {
-    use crate::CliError;
-
-    let result: Result<ExitCode, CliError> = match cmd {
-        TrackCommand::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
-            resolve_track_id_for_write(track_id, &items_dir).map_err(CliError::Message).and_then(
-                |tid| {
-                    transition::execute_transition(
-                        items_dir,
-                        tid,
-                        task_id,
-                        target_status,
-                        commit_hash,
-                    )
-                },
-            )
-        }
-        TrackCommand::Branch { action } => branch_ops::execute_branch(action),
-        TrackCommand::Resolve(args) => resolve::execute_resolve(args),
-        TrackCommand::Views { action } => views::execute_views(action),
-        TrackCommand::AddTask { items_dir, track_id, description, section, after } => {
-            resolve_track_id_for_write(track_id, &items_dir).map_err(CliError::Message).and_then(
-                |tid| state_ops::execute_add_task(items_dir, tid, description, section, after),
-            )
-        }
-        TrackCommand::SetOverride { items_dir, track_id, status, reason } => {
-            resolve_track_id_for_write(track_id, &items_dir)
-                .map_err(CliError::Message)
-                .and_then(|tid| state_ops::execute_set_override(items_dir, tid, status, reason))
-        }
-        TrackCommand::ClearOverride { items_dir, track_id } => {
-            resolve_track_id_for_write(track_id, &items_dir)
-                .map_err(CliError::Message)
-                .and_then(|tid| state_ops::execute_clear_override(items_dir, tid))
-        }
-        TrackCommand::NextTask { items_dir, track_id } => resolve_track_id(track_id, &items_dir)
-            .map_err(CliError::Message)
-            .and_then(|tid| state_ops::execute_next_task(items_dir, tid)),
-        TrackCommand::TaskCounts { items_dir, track_id } => resolve_track_id(track_id, &items_dir)
-            .map_err(CliError::Message)
-            .and_then(|tid| state_ops::execute_task_counts(items_dir, tid)),
-        TrackCommand::Signals { items_dir, track_id } => {
-            resolve_track_id_for_write(track_id, &items_dir)
-                .map_err(CliError::Message)
-                .and_then(|tid| signals::execute_signals(items_dir, tid))
-        }
-        TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
-            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
-                .map_err(CliError::Message);
-            resolved.and_then(|tid| tddd::signals::execute_type_signals(tid, workspace_root, layer))
-        }
-        TrackCommand::TypeGraph {
-            items_dir,
-            track_id,
-            workspace_root,
-            layer,
-            cluster_depth,
-            edges,
-        } => {
-            let resolved =
-                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
-            resolved.and_then(|tid| {
-                tddd::graph::execute_type_graph(
-                    items_dir,
-                    tid,
-                    workspace_root,
-                    layer,
-                    cluster_depth,
-                    edges,
-                )
-            })
-        }
-        TrackCommand::BaselineGraph { items_dir, track_id, workspace_root, layers } => {
-            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
-                .map_err(CliError::Message);
-            resolved.and_then(|tid| {
-                tddd::baseline_graph::execute_baseline_graph(items_dir, tid, workspace_root, layers)
-            })
-        }
-        TrackCommand::ContractMap { items_dir, track_id, workspace_root, layers } => {
-            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
-                .map_err(CliError::Message);
-            resolved.and_then(|tid| {
-                tddd::contract_map::execute_contract_map(items_dir, tid, workspace_root, layers)
-            })
-        }
-        TrackCommand::SpecElementHash { items_dir, track_id, anchor } => {
-            resolve_track_id(track_id, &items_dir).map_err(CliError::Message).and_then(|tid| {
-                tddd::spec_element_hash::execute_spec_element_hash(items_dir, tid, anchor)
-            })
-        }
-        TrackCommand::BaselineCapture { track_id, workspace_root, source_workspace, layer } => {
-            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
-                .map_err(CliError::Message);
-            resolved.and_then(|tid| {
-                tddd::baseline::execute_baseline_capture(
-                    tid,
-                    workspace_root,
-                    source_workspace,
-                    layer,
-                )
-            })
-        }
-        TrackCommand::CatalogueSpecSignals { items_dir, track_id, workspace_root, layer } => {
-            let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
-                .map_err(CliError::Message);
-            resolved.and_then(|tid| {
-                tddd::catalogue_spec_signals::execute_catalogue_spec_signals(
-                    items_dir,
-                    tid,
-                    workspace_root,
-                    layer,
-                )
-            })
-        }
-        TrackCommand::Lint { track_id, layer_id, workspace_root } => {
-            resolve_track_id_from_root(track_id, &workspace_root)
-                .map_err(CliError::Message)
-                .and_then(|tid| tddd::lint::execute_lint(workspace_root, tid, layer_id))
-        }
-        TrackCommand::CatalogueImplSignals { track_id, workspace_root, layer } => {
-            let resolved =
-                resolve_track_id_from_root(track_id, &workspace_root).map_err(CliError::Message);
-            resolved.and_then(|tid| {
-                tddd::catalogue_impl_signals::execute_catalogue_impl_signals(
-                    tid,
-                    workspace_root,
-                    layer,
-                )
-            })
-        }
-        TrackCommand::SetCommitHash(args) => {
-            resolve_track_id_from_root_for_write(args.track_id, &PathBuf::from("."))
-                .map_err(CliError::Message)
-                .and_then(set_commit_hash::execute_set_commit_hash)
-        }
-    };
-    match result {
-        Ok(code) => code,
-        Err(err) => {
-            eprintln!("{err}");
-            err.exit_code()
-        }
-    }
 }
 
 #[cfg(test)]
@@ -717,6 +648,7 @@ mod tests {
     use crate::commands::track::test_support::{
         create_track_dir, process_env_lock, run_in_dir, seed_repo,
     };
+    use std::process::ExitCode;
     use std::sync::Arc;
     use usecase::track_resolution::{
         ActiveTrackResolveError, ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
@@ -1105,5 +1037,85 @@ mod tests {
         let result =
             resolve_track_id_from_root_for_write_with_reader(None, branch_reader(Some("main")));
         assert!(result.is_err(), "expected Err on non-track branch with no explicit id");
+    }
+
+    // ── TrackCommand::items_dir accessor ─────────────────────────────────────
+
+    /// Variants carrying an explicit items_dir field return it via `items_dir()`.
+    #[test]
+    fn test_items_dir_accessor_returns_explicit_items_dir_for_transition() {
+        let custom = PathBuf::from("custom/items");
+        let cmd = TrackCommand::Transition {
+            items_dir: custom.clone(),
+            track_id: None,
+            task_id: "T001".to_owned(),
+            target_status: "done".to_owned(),
+            commit_hash: None,
+        };
+        assert_eq!(cmd.items_dir(), custom.as_path());
+    }
+
+    /// Variant `Transition` with default items_dir returns `"track/items"`.
+    #[test]
+    fn test_items_dir_accessor_returns_default_for_transition_with_default_path() {
+        let cmd = TrackCommand::Transition {
+            items_dir: PathBuf::from("track/items"),
+            track_id: None,
+            task_id: "T001".to_owned(),
+            target_status: "done".to_owned(),
+            commit_hash: None,
+        };
+        assert_eq!(cmd.items_dir(), std::path::Path::new("track/items"));
+    }
+
+    /// TypeSignals derives items_dir from workspace_root: default workspace_root "."
+    /// yields "./track/items".
+    #[test]
+    fn test_items_dir_accessor_returns_workspace_root_derived_path_for_type_signals() {
+        let cmd = TrackCommand::TypeSignals {
+            track_id: None,
+            workspace_root: PathBuf::from("."),
+            layer: None,
+        };
+        assert_eq!(cmd.items_dir(), PathBuf::from(".").join("track").join("items"));
+    }
+
+    /// TypeSignals with a non-default workspace_root derives items_dir correctly.
+    #[test]
+    fn test_items_dir_accessor_returns_non_default_workspace_root_for_type_signals() {
+        let cmd = TrackCommand::TypeSignals {
+            track_id: None,
+            workspace_root: PathBuf::from("/custom/root"),
+            layer: None,
+        };
+        assert_eq!(cmd.items_dir(), PathBuf::from("/custom/root/track/items"));
+    }
+
+    /// SetCommitHash has no items_dir argument; accessor discovers the git repo root and
+    /// returns `<repo-root>/track/items`.  When tests run inside the workspace git repo,
+    /// the returned path must end with `track/items` (the canonical segment pair) and be
+    /// absolute, proving that git discovery succeeded and CWD-relative fallback was not used.
+    #[test]
+    fn test_items_dir_accessor_returns_absolute_repo_root_for_set_commit_hash() {
+        let cmd = TrackCommand::SetCommitHash(SetCommitHashArgs { track_id: None });
+        let dir = cmd.items_dir();
+        // The path must end with `<anything>/track/items`.
+        // Use the PathBuf join-based expectation: suffix `track/items` must match.
+        let ends_with_track_items = dir.ends_with("track/items");
+        assert!(ends_with_track_items, "items_dir must end with 'track/items', got: {dir:?}");
+        // When the process runs inside a git repository, the path must be absolute
+        // (git discovery succeeded and provided an absolute root).
+        assert!(
+            dir.is_absolute(),
+            "items_dir for SetCommitHash must be absolute when inside a git repo, got: {dir:?}"
+        );
+    }
+
+    /// NextTask custom items_dir is propagated correctly by the accessor.
+    #[test]
+    fn test_items_dir_accessor_returns_custom_items_dir_for_next_task() {
+        let custom = PathBuf::from("alt/track/items");
+        let cmd = TrackCommand::NextTask { items_dir: custom.clone(), track_id: None };
+        assert_eq!(cmd.items_dir(), custom.as_path());
     }
 }

@@ -288,6 +288,13 @@ mod tests {
     }
 
     #[test]
+    fn test_resolve_track_id_from_branch_with_dated_suffix_succeeds() {
+        // Dated track branches (e.g. track/<name>-YYYY-MM-DD) must be accepted.
+        let result = resolve_track_id_from_branch(Some("track/my-feature-2026-01-01"));
+        assert_eq!(result.unwrap(), "my-feature-2026-01-01");
+    }
+
+    #[test]
     fn test_resolve_track_id_from_branch_with_detached_head_returns_error() {
         let result = resolve_track_id_from_branch(Some("HEAD"));
         assert!(matches!(result.unwrap_err(), TrackResolutionError::DetachedHead));

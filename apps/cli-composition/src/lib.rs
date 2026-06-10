@@ -27,6 +27,14 @@ mod verify;
 
 mod dry_fix_runner;
 
+/// Telemetry wiring for the composition root.
+///
+/// Provides subscriber initialisation, branch-bound `TelemetryWriter`
+/// construction, and fire-and-forget event emit helpers.  This module is the
+/// only place in the codebase where `tracing_subscriber` is initialised
+/// (IN-01 / CN-04 / AC-01).
+pub mod telemetry_wiring;
+
 #[cfg(test)]
 pub(crate) mod test_support {
     use std::sync::{Mutex, OnceLock};

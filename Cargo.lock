@@ -885,7 +885,10 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "temp-env",
  "tempfile",
+ "tracing",
+ "tracing-subscriber",
  "usecase",
 ]
 
