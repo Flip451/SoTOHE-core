@@ -18,7 +18,7 @@ Requires being on a `track/<id>` branch. If on any other branch, stop and instru
 Resolve `capabilities.dry-fix-lead` from `.harness/config/agent-profiles.json`:
 
 - **`provider: claude`** — launch the `dry-fix-lead` subagent (`subagent_type: "dry-fix-lead"`, `run_in_background: true`) with the track id, a briefing generated from the most recent `sotp dry write` `DryCheckFinding` output, and the whole-codebase scope ownership (D13). Wait for its terminal status.
-- **`provider: codex`** (default) — launch the Codex fixer wrapper via Bash:
+- **`provider: codex`** — launch the Codex fixer wrapper via Bash:
   `cargo make track-local-dry-fix -- --track-id <id> --briefing-file <path>`
   The `cargo make` wrapper resolves `CODEX_BIN` (asdf shim → real binary) then delegates to
   `bin/sotp dry fix-local`. The subcommand runs the same `sotp dry write` → fix → `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved` loop inside a `workspace-write` sandbox with credential isolation, and prints one of the three terminal status lines.

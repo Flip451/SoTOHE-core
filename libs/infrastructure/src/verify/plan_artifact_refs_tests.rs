@@ -46,6 +46,27 @@ fn setup_repo(tmp: &Path, track_id: &str) -> PathBuf {
     track_dir
 }
 
+fn write_spec_with_adr_ref(track_dir: &Path, adr_file: &str, anchor: &str) {
+    let spec = format!(
+        r#"{{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "T",
+  "scope": {{
+    "in_scope": [
+      {{
+        "id": "IN-01",
+        "text": "req",
+        "adr_refs": [{{"file": "{adr_file}", "anchor": "{anchor}"}}]
+      }}
+    ],
+    "out_of_scope": []
+  }}
+}}"#
+    );
+    write_file(track_dir, "spec.json", &spec);
+}
+
 // -----------------------------------------------------------------------
 // Happy-path: all refs valid
 // -----------------------------------------------------------------------
@@ -69,31 +90,22 @@ fn test_minimal_spec_with_no_refs_passes() {
 }
 
 #[test]
-fn test_spec_with_valid_adr_ref_passes() {
-    let tmp = TempDir::new().unwrap();
-    let track_dir = setup_repo(tmp.path(), "test-track");
+fn test_spec_with_valid_adr_refs_pass() {
+    for (track_id, adr_file, anchor, adr_body) in [
+        ("test-track", "knowledge/adr/2026-04-19-1242.md", "D2.1", "# ADR\n## D2.1 Section\n"),
+        ("t001-test", "knowledge/adr/test-adr.md", "D1", "# ADR\n"),
+    ] {
+        let tmp = TempDir::new().unwrap();
+        let track_dir = setup_repo(tmp.path(), track_id);
+        let adr = format!(
+            "---\nadr_id: test-adr\ndecisions:\n  - id: {anchor}\n    status: proposed\n---\n{adr_body}",
+        );
+        write_file(tmp.path(), adr_file, &adr);
 
-    // Create the ADR file that will be referenced.
-    write_file(tmp.path(), "knowledge/adr/2026-04-19-1242.md", "# ADR\n## D2.1 Section\n");
-
-    let spec = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "T",
-  "scope": {
-    "in_scope": [
-      {
-        "id": "IN-01",
-        "text": "req",
-        "adr_refs": [{"file": "knowledge/adr/2026-04-19-1242.md", "anchor": "D2.1"}]
-      }
-    ],
-    "out_of_scope": []
-  }
-}"#;
-    write_file(&track_dir, "spec.json", spec);
-    let outcome = verify(&track_dir);
-    assert!(outcome.is_ok(), "valid adr_ref must pass: {:?}", outcome);
+        write_spec_with_adr_ref(&track_dir, adr_file, anchor);
+        let outcome = verify(&track_dir);
+        assert!(outcome.is_ok(), "valid adr_ref with anchor '{anchor}' must pass: {:?}", outcome);
+    }
 }
 
 #[test]
@@ -101,22 +113,7 @@ fn test_spec_with_missing_adr_file_reports_error() {
     let tmp = TempDir::new().unwrap();
     let track_dir = setup_repo(tmp.path(), "test-track");
 
-    let spec = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "T",
-  "scope": {
-    "in_scope": [
-      {
-        "id": "IN-01",
-        "text": "req",
-        "adr_refs": [{"file": "knowledge/adr/missing.md", "anchor": "D2.1"}]
-      }
-    ],
-    "out_of_scope": []
-  }
-}"#;
-    write_file(&track_dir, "spec.json", spec);
+    write_spec_with_adr_ref(&track_dir, "knowledge/adr/missing.md", "D2.1");
     let outcome = verify(&track_dir);
     assert!(outcome.has_errors(), "missing ADR file must produce error: {:?}", outcome);
     assert!(
@@ -443,22 +440,7 @@ fn test_spec_with_adr_ref_containing_parent_dir_reports_error() {
     // Create a real ADR file so the ref would pass if `..` were accepted.
     write_file(tmp.path(), "knowledge/adr/2026-04-19-1242.md", "# ADR\n");
 
-    let spec = r#"{
-  "schema_version": 2,
-  "version": "1.0",
-  "title": "T",
-  "scope": {
-    "in_scope": [
-      {
-        "id": "IN-01",
-        "text": "req",
-        "adr_refs": [{"file": "knowledge/../knowledge/adr/2026-04-19-1242.md", "anchor": "D2.1"}]
-      }
-    ],
-    "out_of_scope": []
-  }
-}"#;
-    write_file(&track_dir, "spec.json", spec);
+    write_spec_with_adr_ref(&track_dir, "knowledge/../knowledge/adr/2026-04-19-1242.md", "D2.1");
     let outcome = verify(&track_dir);
     assert!(!outcome.is_ok(), "ref path with `..` must be rejected as invalid: {:?}", outcome);
 }
@@ -852,5 +834,125 @@ fn test_v3_catalogue_malformed_produces_error_finding() {
         has_error,
         "malformed v3 catalogue must produce an error finding; findings: {:?}",
         outcome.findings()
+    );
+}
+
+// -----------------------------------------------------------------------
+// T001 (D3 / AC-05): AdrRef anchor existence in plan-artifact-refs verifier
+// -----------------------------------------------------------------------
+
+/// ADR with front-matter but the referenced anchor is absent from decisions → error.
+#[test]
+fn test_adr_ref_with_anchor_absent_from_decisions_reports_error() {
+    let tmp = TempDir::new().unwrap();
+    let track_dir = setup_repo(tmp.path(), "t001-test");
+
+    // ADR front-matter has D1 only; spec references D99 which does not exist.
+    write_file(
+        tmp.path(),
+        "knowledge/adr/test-adr.md",
+        "---\nadr_id: test-adr\ndecisions:\n  - id: D1\n    status: proposed\n---\n# ADR\n",
+    );
+
+    write_spec_with_adr_ref(&track_dir, "knowledge/adr/test-adr.md", "D99");
+    let outcome = verify(&track_dir);
+    assert!(
+        outcome.has_errors(),
+        "anchor absent from decisions[] must produce error: {:?}",
+        outcome
+    );
+    assert!(
+        outcome.findings().iter().any(|f| f.message().contains("D99")),
+        "error must mention the missing anchor 'D99': {:?}",
+        outcome
+    );
+}
+
+/// ADR file exists but has no YAML front-matter → fail-closed error.
+#[test]
+fn test_adr_ref_with_no_frontmatter_reports_error() {
+    let tmp = TempDir::new().unwrap();
+    let track_dir = setup_repo(tmp.path(), "t001-test");
+
+    // ADR has no front-matter block.
+    write_file(tmp.path(), "knowledge/adr/test-adr.md", "# ADR\n\n## D1\n\nSome content.\n");
+
+    write_spec_with_adr_ref(&track_dir, "knowledge/adr/test-adr.md", "D1");
+    let outcome = verify(&track_dir);
+    assert!(
+        outcome.has_errors(),
+        "ADR without front-matter must produce error (fail-closed): {:?}",
+        outcome
+    );
+    assert!(
+        outcome.findings().iter().any(|f| f.message().contains("front-matter")),
+        "error must mention front-matter: {:?}",
+        outcome
+    );
+}
+
+/// ADR with front-matter but empty decisions array → anchor not found → error.
+#[test]
+fn test_adr_ref_with_empty_decisions_array_reports_error() {
+    let tmp = TempDir::new().unwrap();
+    let track_dir = setup_repo(tmp.path(), "t001-test");
+
+    // ADR front-matter has decisions: [] (empty).
+    write_file(
+        tmp.path(),
+        "knowledge/adr/test-adr.md",
+        "---\nadr_id: test-adr\ndecisions: []\n---\n# ADR\n",
+    );
+
+    write_spec_with_adr_ref(&track_dir, "knowledge/adr/test-adr.md", "D1");
+    let outcome = verify(&track_dir);
+    assert!(
+        outcome.has_errors(),
+        "empty decisions array must produce anchor-not-found error: {:?}",
+        outcome
+    );
+}
+
+/// ADR front-matter has `decisions` field missing entirely → typed-deserialization error.
+#[test]
+fn test_adr_ref_with_frontmatter_missing_decisions_field_reports_error() {
+    let tmp = TempDir::new().unwrap();
+    let track_dir = setup_repo(tmp.path(), "t001-test");
+
+    // Front-matter is valid YAML but no `decisions` key.
+    write_file(
+        tmp.path(),
+        "knowledge/adr/test-adr.md",
+        "---\nadr_id: test-adr\ntitle: Some ADR\n---\n# ADR\n",
+    );
+
+    write_spec_with_adr_ref(&track_dir, "knowledge/adr/test-adr.md", "D1");
+    let outcome = verify(&track_dir);
+    assert!(
+        outcome.has_errors(),
+        "missing decisions field must produce typed-deserialization error: {:?}",
+        outcome
+    );
+}
+
+/// ADR front-matter `decisions` entries have invalid types → typed-deserialization error.
+#[test]
+fn test_adr_ref_with_invalid_decisions_entry_type_reports_typed_deserialization_error() {
+    let tmp = TempDir::new().unwrap();
+    let track_dir = setup_repo(tmp.path(), "t001-test");
+
+    // decisions entries are bare strings, not maps with an `id` field.
+    write_file(
+        tmp.path(),
+        "knowledge/adr/test-adr.md",
+        "---\nadr_id: test-adr\ndecisions:\n  - \"not a map\"\n---\n# ADR\n",
+    );
+
+    write_spec_with_adr_ref(&track_dir, "knowledge/adr/test-adr.md", "D1");
+    let outcome = verify(&track_dir);
+    assert!(
+        outcome.has_errors(),
+        "type-mismatch in decisions entries must produce error: {:?}",
+        outcome
     );
 }

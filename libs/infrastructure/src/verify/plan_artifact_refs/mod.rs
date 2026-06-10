@@ -7,6 +7,7 @@
 //! - File existence for file-based refs (`AdrRef.file`, `ConventionRef.file`, `SpecRef.file`)
 //! - `SpecRef.anchor` must resolve to a real element id inside the target `spec.json`
 //! - `SpecRef.hash` must match the SHA-256 of the canonical JSON subtree
+//! - `AdrRef.anchor` must exist in the ADR front-matter's `decisions[].id` list (D3 / AC-05)
 //! - `AdrAnchor` / `ConventionAnchor` loose non-empty validation (already enforced by newtypes)
 //! - `InformalGroundRef` newtype validation (kind variant + non-empty summary)
 //! - `task-coverage.json` coverage enforcement (in_scope + acceptance_criteria must have task_refs)
@@ -15,6 +16,7 @@
 //!
 //! Per ADR 2026-04-19-1242 §D2.3 / §D3.3.
 
+mod adr_anchor;
 mod canonical_block;
 mod spec_refs;
 mod task_coverage;
@@ -31,9 +33,11 @@ use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::track::symlink_guard;
 
 // Re-export items used by tests (via `super::*`) and by external callers.
-#[cfg(test)]
-pub(crate) use spec_refs::canonical_json;
-pub(crate) use spec_refs::{SpecElementMap, build_element_map, canonical_json_sha256};
+// `canonical_json` is needed both by tests and by production code that computes
+// per-entry hashes (e.g. `merge_gate_adapter::build_catalogue_entry_hashes`).
+pub(crate) use spec_refs::{
+    SpecElementMap, build_element_map, canonical_json, canonical_json_sha256,
+};
 
 /// Errors specific to the `plan-artifact-refs` verifier.
 ///
@@ -188,12 +192,26 @@ pub fn verify(track_dir: &Path) -> VerifyOutcome {
 
     for req in &all_requirements {
         for adr_ref in req.adr_refs() {
-            spec_refs::check_ref_file(
+            // Step 3a: file existence check (path-traversal + symlink guard).
+            let file_ok = spec_refs::check_ref_file_returning(
                 &adr_ref.file,
                 &trusted_root,
                 "spec.json adr_ref",
                 &mut findings,
             );
+            // Step 3b: anchor existence check in ADR front-matter decisions[].id.
+            // Only attempted when the file exists (skip on file-not-found to avoid
+            // a redundant "cannot read" error on top of the file-not-found finding).
+            if file_ok {
+                if let Some(resolved) = spec_refs::resolve_path(&trusted_root, &adr_ref.file) {
+                    adr_anchor::check_adr_anchor_exists(
+                        &resolved,
+                        adr_ref.anchor.as_ref(),
+                        "spec.json adr_ref",
+                        &mut findings,
+                    );
+                }
+            }
         }
         for conv_ref in req.convention_refs() {
             spec_refs::check_ref_file(

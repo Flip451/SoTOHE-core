@@ -11,6 +11,7 @@ pub mod dry_check;
 pub mod gh_cli;
 pub mod git_cli;
 pub mod impl_plan_codec;
+pub mod ref_verify;
 pub mod review_v2;
 pub mod schema_export;
 pub mod schema_export_codec;

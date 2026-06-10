@@ -1,0 +1,993 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "AgentProfiles": {
+      "action": "modify",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "load",
+          "receiver": null,
+          "params": [
+            { "name": "path", "ty": "&std::path::Path" }
+          ],
+          "returns": "Result<Self, AgentProfilesError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_execution",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" },
+            { "name": "round_type", "ty": "RoundType" }
+          ],
+          "returns": "Option<ResolvedExecution>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_model",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" },
+            { "name": "round_type", "ty": "RoundType" }
+          ],
+          "returns": "Option<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_provider",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" },
+            { "name": "round_type", "ty": "RoundType" }
+          ],
+          "returns": "Option<String>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "provider_label",
+          "receiver": "&self",
+          "params": [
+            { "name": "provider", "ty": "&str" }
+          ],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_capability",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" }
+          ],
+          "returns": "Option<&CapabilityConfigDto>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve_prompt_template_path",
+          "receiver": "&self",
+          "params": [
+            { "name": "capability", "ty": "&str" }
+          ],
+          "returns": "Option<std::path::PathBuf>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "agent_profiles",
+      "docs": "Loaded agent profiles configuration. Provides resolution of capability -> (provider, model) pairs, plus per-capability prompt_template_path access added by T006 (D7, AC-12, IN-09). timeout_seconds removed by D13-1/CN-13.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-07",
+          "hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-12",
+          "hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CapabilityConfigDto": {
+      "action": "modify",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "provider",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&str",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "model",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fast_provider",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "fast_model",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "prompt_template_path",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Option<&str>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "module_path": "agent_profiles",
+      "docs": "Serde DTO for a single capability entry in agent-profiles.json. All fields are private; access via accessor methods. timeout_seconds removed by D13-1/CN-13. prompt_template_path is per-capability setting added by T006 (IN-09, AC-12). Raw primitive is justified: prompt_template_path is a free-form filesystem path with no domain validation.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-07",
+          "hash": "f17a877b96d3274573937c786eeb676d519de02c1b21a656b24255d425e4edac"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-12",
+          "hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AgentExecutionRunner": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "type_alias",
+        "target": "dyn Fn(ResolvedExecution, String) -> Result<String, usecase::ref_verify::RefVerifyError> + Send + Sync"
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Infrastructure-local callable type alias for executing a resolved ref-verifier model request. The callable receives a resolved provider/model execution descriptor and a rendered prompt string; it returns the model's stdout as a String or a RefVerifyError on failure. No timeout parameter: subprocess waits with child.wait() per D13-1/CN-13. This is not a hexagonal secondary port; `RefVerifierPort` remains the only semantic verification port crossing the usecase/infrastructure boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-01",
+          "hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-12",
+          "hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "AgentRefVerifierAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Secondary adapter implementing `RefVerifierPort` by dispatching to the Chain-specific capability (`ref-verifier-chain1` for Chain1, `ref-verifier-chain2` for Chain2) resolved from the `cache_scope` argument passed to `verify_pair` (D11, CN-11, CN-12). Handles fast/final round resolution via `AgentProfiles.resolve_execution`, renders the capability-specific prompt template (`prompt_template_path`), and delegates execution to an injected `AgentExecutionRunner` callable with `(ResolvedExecution, rendered_prompt)` (D7, CN-01, AC-01, AC-12, AC-15). No timeout: D13-1/CN-13 removed timeout_seconds. The concrete `Arc<AgentExecutionRunner>` implementation is provided by the infrastructure layer (see `make_ref_verifier_process_runner`); cli-composition wires the DI only and must not contain subprocess-spawn / process-management / OS-specific syscall logic.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-01",
+          "hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-01",
+          "hash": "4a692830283c969ade446bf9930f1e5dcb598949a08e658fe8c9e7120702341f"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-12",
+          "hash": "691d55978e1eac392d212699f00459c394464f99ae9049f71cbb0d375ec99c23"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-11",
+          "hash": "7c1a61e4d8433668cd24d32a477fc670c58a39357a2547c879d7d16f945113b3"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-15",
+          "hash": "ddc13d60f62b8f6f70ba815229daf0483eaceb0c679a9d7d3cac107cfe4a99a8"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SemanticVerifyCodecError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "expected", "ty": "u32" },
+                { "name": "actual", "ty": "u32" }
+              ]
+            }
+          },
+          {
+            "name": "Validation",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Shared error enum for the semantic verify-cache JSON codecs. Covers serde JSON failures, unsupported schema_version, and validation failures while preserving fail-closed typed-deserialization behavior.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SpecAdrVerifyCacheDocumentCodec": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Stateless codec for `spec-adr-verify-cache.json`. Encodes `SpecAdrVerifyCacheDocument` to a schema_version 1 JSON string and decodes back to the domain aggregate. Returns typed fail-closed errors for malformed JSON, unsupported versions, missing required fields, or invalid domain values.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "CatalogueSpecVerifyCacheDocumentCodec": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Stateless codec for `<layer>-catalogue-spec-verify-cache.json`. Encodes `CatalogueSpecVerifyCacheDocument` to a schema_version 1 JSON string (preserving the layer field) and decodes back to the domain aggregate. Fails closed on malformed or semantically invalid artifact content.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-06",
+          "hash": "cd89a885dc17ee1b127b0eb312132176c451ae4b84bcbf707a23bea2579cdc1b"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyPairSourceAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Secondary adapter implementing `RefVerifyPairSourcePort`. Enumerates Chain1 spec->ADR and Chain2 catalogue->spec reference pairs from track artifacts, computes claim/evidence hashes, assigns RefVerifyCacheScope routing, skips persisted cache decisions only after the usecase asks the cache port, and injects configured known_bad monitor probes for degradation checks.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-04",
+          "hash": "86f04aeae085a3a61fe7924c9586d615a1d66fd52ea1b03077ce320a7e4e5233"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-08",
+          "hash": "5f34b7e2dbd9d2170c95bced1339180f68dbaa2471c5fb1ecb4b285882eda80e"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyCacheAdapter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Secondary adapter implementing `RefVerifyCachePort`. Loads and saves `spec-adr-verify-cache.json` and `<layer>-catalogue-spec-verify-cache.json` through RefVerifyCacheScope, using the verify-cache codecs while keeping artifact I/O out of the usecase interactor.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-10",
+          "hash": "64e71edd87c6f124617a81459be88fdd2dd7e72801a0c4aad1a87e920796a584"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-03",
+          "hash": "bc7378df2498ecd52bdfe6c574c4eeb6951e90c10a26489835983de5b799d70c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-07",
+          "hash": "e76b6ab619a70343805540fd8345ce814e2a46d531d0dc54e663034da5dc1db3"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RoundType": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Final",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Fast",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "docs": "Carried for edge exposure: AgentRefVerifierAdapter maps domain::tddd::semantic_verify::ModelTier to RoundType before calling AgentProfiles::resolve_execution for fast/final provider selection (D5, D7).",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyScopeResolverError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidLayerId",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer_id", "ty": "String" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "PartialCatalogues",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "missing", "ty": "Vec<String>" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Failure modes of RefVerifyScopeResolver::resolve. Io covers file existence inspection failures; InvalidLayerId is returned when a TDDD catalogue layer id discovered from track catalogue files cannot be parsed; PartialCatalogues is returned when some but not all expected TDDD catalogue files are present in the track directory (fail-closed: partial catalogue state is indeterminate).",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyInvocationContext": {
+      "action": "add",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SpecDesign",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "TypeDesign",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "domain::tddd::LayerId" }
+              ]
+            }
+          },
+          {
+            "name": "CommitGate",
+            "payload": { "kind": "unit" }
+          },
+          {
+            "name": "Standalone",
+            "payload": { "kind": "unit" }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Typed caller context for IN-12 scope resolution. This is not a user-facing scope selector: cli-composition derives it from the invocation surface (spec-design phase, type-design phase with layer, commit gate, or standalone ref-verify run) and passes it to RefVerifyScopeResolver. The resolver maps SpecDesign to Chain1, TypeDesign { layer } to Chain2 { layer }, and CommitGate/Standalone to All while validating the required track artifacts exist.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "RefVerifyScopeResolver": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Infrastructure adapter that resolves IN-12 caller context into the RefVerifyScope passed to the usecase. Scope is context-sensitive rather than file-presence-only: SpecDesign resolves to Chain1, TypeDesign { layer } resolves to Chain2 { layer }, and CommitGate/Standalone resolve to All. The adapter still reads spec.json and TDDD catalogue files to validate required artifacts and layer ids, but phase/mode selection comes from the typed RefVerifyInvocationContext supplied by cli-composition. cli-composition wires this at the DI root and translates call sites into the context enum; the usecase layer receives the resolved RefVerifyScope via RefVerifyCommand and does not perform I/O itself. track state I/O is infrastructure's responsibility (D9, IN-12).",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-12",
+          "hash": "852c06b9f7e3ec94b581daf6e96ceb1dd2c69339b1b8314504b8b049d6d14d9a"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {
+    "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "model", "ty": "&str" },
+        { "name": "prompt", "ty": "&str" }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds the CLI argument list for a Claude ref-verifier invocation. Includes `--disallowedTools` and `--tools \"\"` to run Claude in a read-only prompt-only mode without tool access. The binary is always resolved via OS PATH as `claude` — no environment variable indirection.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-13",
+          "hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "model", "ty": "&str" },
+        { "name": "prompt", "ty": "&str" },
+        { "name": "output_schema", "ty": "&std::path::Path" },
+        { "name": "output_last_message", "ty": "&std::path::Path" }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds the CLI argument list for a Codex ref-verifier invocation. Includes `--sandbox read-only` and `--config sandbox_workspace_write_roots=[]` to prevent workspace writes and verify-cache artifact tampering (CN-15). Includes `--output-schema` for structured output and `--config model_reasoning_effort=high` for high-quality semantic judgements. The binary is always resolved via OS PATH as `codex` — no environment variable indirection.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-13",
+          "hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-15",
+          "hash": "323a136fd2bdad05ea9bfac2d773122dc4b2fb46f2a71bb7d4ee176b5eb69061"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "model", "ty": "&str" },
+        { "name": "prompt", "ty": "&str" }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Builds the CLI argument list for a Gemini ref-verifier invocation. The binary is always resolved via OS PATH as `gemini` — no environment variable indirection.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-13",
+          "hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner": {
+      "action": "add",
+      "role": "FreeFunction",
+      "params": [
+        { "name": "project_root", "ty": "std::path::PathBuf" }
+      ],
+      "returns": "std::sync::Arc<AgentExecutionRunner>",
+      "is_async": false,
+      "generics": [],
+      "where_predicates": [],
+      "docs": "Factory function that constructs the concrete `Arc<AgentExecutionRunner>` implementation for the ref-verifier. The returned callable maps a `ResolvedExecution` to a hardcoded binary name (\"claude\" / \"codex\" / \"gemini\") and delegates binary resolution to the OS PATH — no environment variable lookup (CODEX_BIN, CLAUDE_BIN, etc.) is performed. Waits for the subprocess to complete with no deadline (child.wait()) per D13-1/CN-13. The returned callable is injected into `AgentRefVerifierAdapter::new`; the cli-composition layer performs only the DI wiring and must not contain any process-management or OS-specific syscall logic.",
+      "spec_refs": [
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "IN-09",
+          "hash": "a8b45985b0ee162d289a9d741b6c6a5414e65a9ff9bb9062ff5783f97da8df8c"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "AC-01",
+          "hash": "b3003452bf5f3c6e1df9835017bf1492c89d9731847ce151f7729d72e72d2fc1"
+        },
+        {
+          "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+          "anchor": "CN-13",
+          "hash": "da5fa883cb5bee9480f1eda94c97facaccd73a0825e52c2d6598b8116e3313fd"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "inherent_impls": [
+    {
+      "type_name": "SpecAdrVerifyCacheDocumentCodec",
+      "methods": [
+        {
+          "name": "encode",
+          "receiver": null,
+          "params": [
+            { "name": "doc", "ty": "&domain::tddd::semantic_verify::SpecAdrVerifyCacheDocument" }
+          ],
+          "returns": "Result<String, SemanticVerifyCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "decode",
+          "receiver": null,
+          "params": [
+            { "name": "json", "ty": "&str" }
+          ],
+          "returns": "Result<domain::tddd::semantic_verify::SpecAdrVerifyCacheDocument, SemanticVerifyCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
+      "methods": [
+        {
+          "name": "encode",
+          "receiver": null,
+          "params": [
+            { "name": "doc", "ty": "&domain::tddd::semantic_verify::CatalogueSpecVerifyCacheDocument" }
+          ],
+          "returns": "Result<String, SemanticVerifyCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "decode",
+          "receiver": null,
+          "params": [
+            { "name": "json", "ty": "&str" }
+          ],
+          "returns": "Result<domain::tddd::semantic_verify::CatalogueSpecVerifyCacheDocument, SemanticVerifyCodecError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "AgentRefVerifierAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "profiles", "ty": "std::sync::Arc<AgentProfiles>" },
+            { "name": "runner", "ty": "std::sync::Arc<AgentExecutionRunner>" },
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RefVerifyPairSourceAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RefVerifyCacheAdapter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "RefVerifyScopeResolver",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "project_root", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "resolve",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&str" },
+            { "name": "context", "ty": "&RefVerifyInvocationContext" }
+          ],
+          "returns": "Result<usecase::ref_verify::RefVerifyScope, RefVerifyScopeResolverError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<serde_json::Error>",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::convert::From<domain::ValidationError>",
+      "for_type": "SemanticVerifyCodecError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecAdrVerifyCacheDocumentCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueSpecVerifyCacheDocumentCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AgentRefVerifierAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::RefVerifierPort",
+      "for_type": "AgentRefVerifierAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyPairSourceAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::RefVerifyPairSourcePort",
+      "for_type": "RefVerifyPairSourceAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyCacheAdapter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::ref_verify::RefVerifyCachePort",
+      "for_type": "RefVerifyCacheAdapter"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "AgentProfiles"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CapabilityConfigDto"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CapabilityConfigDto"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "CapabilityConfigDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyScopeResolverError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "RefVerifyScopeResolverError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "RefVerifyScopeResolverError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyInvocationContext"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "RefVerifyInvocationContext"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "RefVerifyInvocationContext"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "RefVerifyInvocationContext"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "RefVerifyScopeResolver"
+    }
+  ]
+}

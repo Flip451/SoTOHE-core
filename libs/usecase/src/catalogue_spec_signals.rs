@@ -18,6 +18,7 @@ use domain::{
 };
 use thiserror::Error;
 
+use crate::catalogue_traversal::iter_catalogue_entries;
 use crate::merge_gate::{BlobFetchResult, TrackBlobReader};
 
 /// Secondary port for writing `<layer>-catalogue-spec-signals.json`.
@@ -69,6 +70,17 @@ pub enum RefreshCatalogueSpecSignalsError {
     /// The blob-fetch port returned a fetch error (I/O, decode, etc).
     #[error("catalogue fetch error for layer '{layer_id}': {message}")]
     FetchError { layer_id: String, message: String },
+
+    /// The `entry_hashes` map returned by the infrastructure port is missing
+    /// a hash for the given catalogue entry key. This indicates a mismatch
+    /// between the catalogue entries and the hashes computed by the adapter
+    /// (e.g. a key-derivation drift). Fail-closed: persisting a fabricated
+    /// zero hash would corrupt integrity metadata silently.
+    #[error(
+        "catalogue entry hash missing for entry '{entry_key}' in layer '{layer_id}': \
+        the infrastructure adapter did not supply a hash for this key"
+    )]
+    MissingEntryHash { layer_id: String, entry_key: String },
 
     /// The raw-bytes hash returned by the port was not valid canonical hex.
     /// Callers construct a [`ContentHash`] from the string; this variant
@@ -167,58 +179,58 @@ where
             });
         }
 
-        // Step 1: read the catalogue + raw-bytes SHA-256.
-        let (catalogue, catalogue_hash_hex) = match self.reader.read_catalogue_for_spec_ref_check(
-            &cmd.branch,
-            cmd.track_id.as_ref(),
-            cmd.layer_id.as_ref(),
-        ) {
-            BlobFetchResult::Found(pair) => pair,
-            BlobFetchResult::NotFound => {
-                return Err(RefreshCatalogueSpecSignalsError::CatalogueNotFound {
-                    branch: cmd.branch.clone(),
-                    layer_id: cmd.layer_id.as_ref().to_owned(),
-                });
-            }
-            BlobFetchResult::FetchError(message) => {
-                return Err(RefreshCatalogueSpecSignalsError::FetchError {
-                    layer_id: cmd.layer_id.as_ref().to_owned(),
-                    message,
-                });
-            }
-        };
+        // Step 1: read the catalogue + raw-bytes SHA-256 + per-entry canonical JSON hashes.
+        // Infrastructure computes `entry_hashes` so domain/usecase never import
+        // `canonical_json_sha256` (CN-04 / IN-05 of ADR `2026-05-27-1601`).
+        let (catalogue, catalogue_hash_hex, entry_hashes) =
+            match self.reader.read_catalogue_for_spec_ref_check(
+                &cmd.branch,
+                cmd.track_id.as_ref(),
+                cmd.layer_id.as_ref(),
+            ) {
+                BlobFetchResult::Found(triple) => triple,
+                BlobFetchResult::NotFound => {
+                    return Err(RefreshCatalogueSpecSignalsError::CatalogueNotFound {
+                        branch: cmd.branch.clone(),
+                        layer_id: cmd.layer_id.as_ref().to_owned(),
+                    });
+                }
+                BlobFetchResult::FetchError(message) => {
+                    return Err(RefreshCatalogueSpecSignalsError::FetchError {
+                        layer_id: cmd.layer_id.as_ref().to_owned(),
+                        message,
+                    });
+                }
+            };
 
         // Step 2: evaluate per-entry signals.
         // T024: v3-native — iterate types then traits then functions (BTreeMap order,
-        // matching the signal refresher entry ordering).
-        let signals: Vec<CatalogueSpecSignal> = catalogue
-            .types
-            .iter()
-            .map(|(name, entry)| {
-                let signal = evaluate_catalogue_entry_signal(
-                    entry.action,
-                    &entry.spec_refs,
-                    &entry.informal_grounds,
-                );
-                CatalogueSpecSignal::new(name.as_str(), signal)
+        // matching the signal refresher entry ordering) via the shared
+        // `iter_catalogue_entries` helper (CN-04 / catalogue_traversal.rs).
+        // `entry_hashes` supplies the per-entry SHA-256, computed in infrastructure.
+        // Fail-closed: a missing hash means the adapter's key-derivation has drifted
+        // from the catalogue entries. Persisting a fabricated zero hash would produce
+        // corrupted integrity metadata, so we return an error instead.
+        //
+        // Hash lookup uses `e.section_key` ("types:Foo", "traits:Foo", …) rather than
+        // the bare `e.key` so that a type and a trait sharing the same short name map
+        // to distinct hash slots.  The bare `e.key` is still passed to
+        // `CatalogueSpecSignal::new` so that `type_name` in the signals document
+        // continues to store the human-readable short name expected by the merge gate.
+        let signals: Vec<CatalogueSpecSignal> = iter_catalogue_entries(&catalogue)
+            .map(|e| {
+                let signal =
+                    evaluate_catalogue_entry_signal(e.action, e.spec_refs, e.informal_grounds);
+                let entry_hash =
+                    entry_hashes.get(e.section_key.as_str()).cloned().ok_or_else(|| {
+                        RefreshCatalogueSpecSignalsError::MissingEntryHash {
+                            layer_id: cmd.layer_id.as_ref().to_owned(),
+                            entry_key: e.section_key.as_str().to_owned(),
+                        }
+                    })?;
+                Ok(CatalogueSpecSignal::new(e.key, signal, entry_hash))
             })
-            .chain(catalogue.traits.iter().map(|(name, entry)| {
-                let signal = evaluate_catalogue_entry_signal(
-                    entry.action,
-                    &entry.spec_refs,
-                    &entry.informal_grounds,
-                );
-                CatalogueSpecSignal::new(name.as_str(), signal)
-            }))
-            .chain(catalogue.functions.iter().map(|(path, entry)| {
-                let signal = evaluate_catalogue_entry_signal(
-                    entry.action,
-                    &entry.spec_refs,
-                    &entry.informal_grounds,
-                );
-                CatalogueSpecSignal::new(path.to_string(), signal)
-            }))
-            .collect();
+            .collect::<Result<Vec<_>, _>>()?;
 
         // Step 3: parse the raw-bytes hex into a domain ContentHash.
         let catalogue_declaration_hash =
@@ -268,6 +280,7 @@ pub trait CatalogueSpecSignalsWriter: Send + Sync {
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::collections::HashMap;
     use std::sync::Mutex;
 
     use domain::ContentHash;
@@ -340,10 +353,20 @@ mod tests {
     use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
     use domain::{ImplPlanDocument, InformalGroundKind, InformalGroundRef, InformalGroundSummary};
 
-    /// Test-only mock reader that returns a fixed catalogue + raw-bytes hash.
+    /// Builds a `HashMap<String, ContentHash>` from a list of entry keys,
+    /// assigning a fixed deterministic hash (`[0xde; 32]`) to each.
+    /// Used in tests that need non-empty `entry_hashes` but do not verify the
+    /// actual hash values of individual signals.
+    fn make_entry_hashes(keys: &[&str]) -> HashMap<String, ContentHash> {
+        keys.iter().map(|k| ((*k).to_owned(), ContentHash::from_bytes([0xde; 32]))).collect()
+    }
+
+    /// Test-only mock reader that returns a fixed catalogue + raw-bytes hash +
+    /// optional per-entry content hashes.
     struct FixedReader {
         catalogue: Mutex<Option<CatalogueDocument>>,
         hash_hex: String,
+        entry_hashes: HashMap<String, ContentHash>,
         /// If true, `read_catalogue_for_spec_ref_check` returns `NotFound`.
         not_found: bool,
         /// If non-empty, `read_catalogue_for_spec_ref_check` returns `FetchError(...)`.
@@ -351,10 +374,15 @@ mod tests {
     }
 
     impl FixedReader {
-        fn found(catalogue: CatalogueDocument, hash_hex: impl Into<String>) -> Self {
+        fn found(
+            catalogue: CatalogueDocument,
+            hash_hex: impl Into<String>,
+            entry_hashes: HashMap<String, ContentHash>,
+        ) -> Self {
             Self {
                 catalogue: Mutex::new(Some(catalogue)),
                 hash_hex: hash_hex.into(),
+                entry_hashes,
                 not_found: false,
                 fetch_error: None,
             }
@@ -364,6 +392,7 @@ mod tests {
             Self {
                 catalogue: Mutex::new(None),
                 hash_hex: String::new(),
+                entry_hashes: HashMap::new(),
                 not_found: true,
                 fetch_error: None,
             }
@@ -373,6 +402,7 @@ mod tests {
             Self {
                 catalogue: Mutex::new(None),
                 hash_hex: String::new(),
+                entry_hashes: HashMap::new(),
                 not_found: false,
                 fetch_error: Some(message.into()),
             }
@@ -410,7 +440,7 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(CatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
             if self.not_found {
                 return BlobFetchResult::NotFound;
             }
@@ -418,7 +448,9 @@ mod tests {
                 return BlobFetchResult::FetchError(msg.clone());
             }
             match self.catalogue.lock().unwrap().take() {
-                Some(doc) => BlobFetchResult::Found((doc, self.hash_hex.clone())),
+                Some(doc) => {
+                    BlobFetchResult::Found((doc, self.hash_hex.clone(), self.entry_hashes.clone()))
+                }
                 None => panic!("FixedReader::read_catalogue_for_spec_ref_check called twice"),
             }
         }
@@ -528,15 +560,6 @@ mod tests {
         doc
     }
 
-    /// A 64-char lowercase hex string made of the given byte repeated 32 times.
-    fn hex_pattern(byte: u8) -> String {
-        let mut s = String::with_capacity(64);
-        for _ in 0..32 {
-            s.push_str(&format!("{byte:02x}"));
-        }
-        s
-    }
-
     fn refresh_cmd(
         branch: &str,
         track_id: &str,
@@ -567,8 +590,10 @@ mod tests {
                 ],
             ),
         ]);
-        let hash_hex = hex_pattern(0xab);
-        let reader = FixedReader::found(cat, hash_hex.clone());
+        let hash_hex = ContentHash::from_bytes([0xab; 32]).to_hex();
+        // Section-qualified keys match the contract from `iter_catalogue_entries`.
+        let entry_hashes = make_entry_hashes(&["types:TypeA", "types:TypeB"]);
+        let reader = FixedReader::found(cat, hash_hex.clone(), entry_hashes);
         let writer = CapturingWriter::new();
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
 
@@ -655,7 +680,7 @@ mod tests {
     #[test]
     fn refresh_rejects_invalid_catalogue_hash_hex() {
         let cat = catalogue_with_types(vec![]);
-        let reader = FixedReader::found(cat, "not-a-valid-64char-hex");
+        let reader = FixedReader::found(cat, "not-a-valid-64char-hex", HashMap::new());
         let writer = CapturingWriter::new();
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
 
@@ -686,7 +711,9 @@ mod tests {
     #[test]
     fn refresh_wraps_writer_errors() {
         let cat = catalogue_with_types(vec![("X", ItemAction::Add, Vec::new(), Vec::new())]);
-        let reader = FixedReader::found(cat, hex_pattern(0x00));
+        let entry_hashes = make_entry_hashes(&["types:X"]);
+        let reader =
+            FixedReader::found(cat, ContentHash::from_bytes([0x00; 32]).to_hex(), entry_hashes);
         let writer = FailingWriter;
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
 
@@ -714,8 +741,9 @@ mod tests {
             Vec::new(),
             Vec::new(),
         );
-        let hash_hex = hex_pattern(0xcc);
-        let reader = FixedReader::found(cat, hash_hex);
+        let entry_hashes = make_entry_hashes(&["types:ExternalType"]);
+        let reader =
+            FixedReader::found(cat, ContentHash::from_bytes([0xcc; 32]).to_hex(), entry_hashes);
         let writer = CapturingWriter::new();
         let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
 
@@ -729,5 +757,39 @@ mod tests {
             domain::ConfidenceSignal::Blue,
             "Reference action with empty spec_refs + informal_grounds must be Blue (D5 exemption)"
         );
+    }
+
+    /// When `entry_hashes` does not contain a key that exists in the catalogue,
+    /// the interactor must return `MissingEntryHash` rather than silently
+    /// fabricating a zero hash. This prevents corrupted integrity metadata from
+    /// being persisted when the infrastructure adapter's key-derivation drifts.
+    #[test]
+    fn refresh_returns_missing_entry_hash_error_when_adapter_omits_key() {
+        let cat = catalogue_with_types(vec![(
+            "MissingHashType",
+            ItemAction::Add,
+            Vec::new(),
+            Vec::new(),
+        )]);
+        // Intentionally supply an empty map — simulates an adapter omitting the key.
+        let reader =
+            FixedReader::found(cat, ContentHash::from_bytes([0x01; 32]).to_hex(), HashMap::new());
+        let writer = CapturingWriter::new();
+        let interactor = RefreshCatalogueSpecSignalsInteractor::new(reader, writer);
+
+        let err =
+            interactor.execute(&refresh_cmd("track/my-track", "my-track", "domain")).unwrap_err();
+
+        assert!(
+            matches!(
+                err,
+                RefreshCatalogueSpecSignalsError::MissingEntryHash {
+                    ref layer_id,
+                    ref entry_key
+                } if layer_id == "domain" && entry_key == "types:MissingHashType"
+            ),
+            "expected MissingEntryHash for 'types:MissingHashType', got: {err:?}"
+        );
+        assert_eq!(interactor.writer.call_count(), 0, "no write must occur when a hash is missing");
     }
 }

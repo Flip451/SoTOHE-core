@@ -112,22 +112,23 @@ mod tests {
     use domain::{CatalogueSpecSignal, ConfidenceSignal, ContentHash};
     use tempfile::tempdir;
 
+    use super::super::test_support::hex_pattern;
     use super::*;
-
-    fn hex_pattern(byte: u8) -> String {
-        let mut s = String::with_capacity(64);
-        for _ in 0..32 {
-            s.push_str(&format!("{byte:02x}"));
-        }
-        s
-    }
 
     fn sample_doc() -> CatalogueSpecSignalsDocument {
         CatalogueSpecSignalsDocument::new(
             ContentHash::try_from_hex(hex_pattern(0xab)).unwrap(),
             vec![
-                CatalogueSpecSignal::new("Foo", ConfidenceSignal::Blue),
-                CatalogueSpecSignal::new("Bar", ConfidenceSignal::Yellow),
+                CatalogueSpecSignal::new(
+                    "Foo",
+                    ConfidenceSignal::Blue,
+                    ContentHash::from_bytes([0u8; 32]),
+                ),
+                CatalogueSpecSignal::new(
+                    "Bar",
+                    ConfidenceSignal::Yellow,
+                    ContentHash::from_bytes([0u8; 32]),
+                ),
             ],
         )
     }
@@ -211,7 +212,11 @@ mod tests {
 
         let second_doc = CatalogueSpecSignalsDocument::new(
             ContentHash::try_from_hex(hex_pattern(0xcd)).unwrap(),
-            vec![CatalogueSpecSignal::new("Updated", ConfidenceSignal::Blue)],
+            vec![CatalogueSpecSignal::new(
+                "Updated",
+                ConfidenceSignal::Blue,
+                ContentHash::from_bytes([0u8; 32]),
+            )],
         );
         store.write_catalogue_spec_signals(&track, "domain", &second_doc).unwrap();
 

@@ -28,6 +28,10 @@ use domain::{ConfidenceSignal, Timestamp, TypeSignal};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
+use crate::tddd::catalogue_spec_signals_codec::{
+    confidence_signal_to_str, parse_confidence_signal,
+};
+
 /// Codec error for the per-layer evaluation-result file.
 ///
 /// Variants mirror the three failure modes of decoding a
@@ -176,11 +180,11 @@ fn is_utc_timestamp(raw: &str) -> bool {
 }
 
 fn signal_from_dto(dto: TypeSignalDto) -> TypeSignal {
-    let signal = match dto.signal.as_str() {
-        "blue" => ConfidenceSignal::Blue,
-        "yellow" => ConfidenceSignal::Yellow,
-        _ => ConfidenceSignal::Red,
-    };
+    // Legacy fallback-to-red contract: unknown signal strings are mapped to Red
+    // rather than returning an error. This differs from `catalogue_spec_signals_codec`
+    // which is strict. The shared `parse_confidence_signal` returns None for unknown
+    // tags; we map that to Red here to preserve the pre-existing lenient behaviour.
+    let signal = parse_confidence_signal(dto.signal.as_str()).unwrap_or(ConfidenceSignal::Red);
     TypeSignal::new(
         dto.type_name,
         dto.kind_tag,
@@ -193,16 +197,10 @@ fn signal_from_dto(dto: TypeSignalDto) -> TypeSignal {
 }
 
 fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
-    let signal_str = match signal.signal() {
-        ConfidenceSignal::Blue => "blue",
-        ConfidenceSignal::Yellow => "yellow",
-        ConfidenceSignal::Red => "red",
-        _ => "unknown",
-    };
     TypeSignalDto {
         type_name: signal.type_name().to_owned(),
         kind_tag: signal.kind_tag().to_owned(),
-        signal: signal_str.to_owned(),
+        signal: confidence_signal_to_str(signal.signal()).to_owned(),
         found_type: signal.found_type(),
         found_items: signal.found_items().to_vec(),
         missing_items: signal.missing_items().to_vec(),

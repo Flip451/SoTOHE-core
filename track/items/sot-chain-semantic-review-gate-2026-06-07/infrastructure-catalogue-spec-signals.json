@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "1ac0d2d822daa82f2612a96a8d9f5ed942c458d4b5a07d6a9e4137c55092c33a",
+  "signals": [
+    {
+      "type_name": "AgentExecutionRunner",
+      "signal": "blue",
+      "entry_hash": "bd1c25f3d6229d0ca664e47068367fb59775e70139e850dfb43b3772497ddb31"
+    },
+    {
+      "type_name": "AgentProfiles",
+      "signal": "blue",
+      "entry_hash": "888cde15b2432433b776a125b08ce73c4cba8b1c2ea1663e0429e0e671131e5e"
+    },
+    {
+      "type_name": "AgentRefVerifierAdapter",
+      "signal": "blue",
+      "entry_hash": "f995ea09e83b7b14235bfe543ba0ac66571e82cdd05815a0d06365728f17a627"
+    },
+    {
+      "type_name": "CapabilityConfigDto",
+      "signal": "blue",
+      "entry_hash": "efbabe9333b086a5525aca167db0143dd54bb9f3be38498bc203b464eea5fdfe"
+    },
+    {
+      "type_name": "CatalogueSpecVerifyCacheDocumentCodec",
+      "signal": "blue",
+      "entry_hash": "f2cd3eec7601126a3fe9297a9ec5c642bc75ae2f78e8e8be617125970c2592fd"
+    },
+    {
+      "type_name": "RefVerifyCacheAdapter",
+      "signal": "blue",
+      "entry_hash": "086ff3e52f99a5b1361bbd50d671b879a1ec4fda80bd63e7f3846c82021126e2"
+    },
+    {
+      "type_name": "RefVerifyInvocationContext",
+      "signal": "blue",
+      "entry_hash": "2b1700c216d280e1a92ba69989ce73672e37a8a11cdd36d72bbd6c7e7c83fe86"
+    },
+    {
+      "type_name": "RefVerifyPairSourceAdapter",
+      "signal": "blue",
+      "entry_hash": "1edee18af2148318f14a8b9495537932ad146e26d0f04e3f67d22e502bc444e7"
+    },
+    {
+      "type_name": "RefVerifyScopeResolver",
+      "signal": "blue",
+      "entry_hash": "9a696a8fa52c74276dd4721443d1ef568053fda280c7a708fb07be16466e1203"
+    },
+    {
+      "type_name": "RefVerifyScopeResolverError",
+      "signal": "blue",
+      "entry_hash": "1b28ba71893d29538b6de9ad4b1f60265fb7c81c9118ccfa4b657c39be9e3a97"
+    },
+    {
+      "type_name": "RoundType",
+      "signal": "blue",
+      "entry_hash": "4e2c6bddf22e713f6db8e3c8f81e9516ccb027648859244a732adecc088e8d36"
+    },
+    {
+      "type_name": "SemanticVerifyCodecError",
+      "signal": "blue",
+      "entry_hash": "9018c3c451a463e1408e61b3c7ea0249aa61ae837b884e9361ef118c89bc8efd"
+    },
+    {
+      "type_name": "SpecAdrVerifyCacheDocumentCodec",
+      "signal": "blue",
+      "entry_hash": "d68c9eefb69b0472f8bca2c796170efe154791d331e04675067833a09cb27fab"
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+      "signal": "blue",
+      "entry_hash": "d872971ded60b53d90e64cf9af8a7fdabc62ae8b8657ed5b22ced5fb34a41a4c"
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+      "signal": "blue",
+      "entry_hash": "8ce66759c0b71706b454a18f958296f6c32837fdd1f7edf8d559eee0228039d5"
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+      "signal": "blue",
+      "entry_hash": "d516c2c9ab2ed044c1b98d26e564e914af2de1e90a561391991b28b58ca6e43c"
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner",
+      "signal": "blue",
+      "entry_hash": "24dc90a08587342425d5d04f732a5b5070b6622a7ec3dac642209d58be2a1780"
+    }
+  ]
+}

@@ -90,6 +90,10 @@ pub use tddd::catalogue_spec_signal::{
     SpecRefFinding, SpecRefFindingKind, evaluate_catalogue_entry_signal,
 };
 pub use tddd::consistency::check_type_signals;
+pub use tddd::semantic_verify::{
+    CatalogueSpecVerifyCacheDocument, EvidenceCitation, ModelTier, SemanticVerdict,
+    SemanticVerifyEntry, SpecAdrVerifyCacheDocument,
+};
 pub use tddd::type_signals_doc::{
     TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsDocument, TypeSignalsLoadResult,
 };

@@ -99,6 +99,8 @@ pub struct CapabilityConfigDto {
     model: Option<String>,
     fast_provider: Option<String>,
     fast_model: Option<String>,
+    /// Optional path to the prompt template for this capability.
+    prompt_template_path: Option<String>,
 }
 
 // ---------------------------------------------------------------------------
@@ -223,6 +225,18 @@ impl AgentProfiles {
     pub fn provider_label(&self, provider: &str) -> Option<&str> {
         self.providers.get(provider).and_then(|p| p.label.as_deref())
     }
+
+    /// Returns the configured prompt template path for a capability, if set.
+    ///
+    /// Returns `None` if the capability is not defined or has no `prompt_template_path` field.
+    #[must_use]
+    pub fn resolve_prompt_template_path(&self, capability: &str) -> Option<std::path::PathBuf> {
+        self.capabilities
+            .get(capability)?
+            .prompt_template_path
+            .as_deref()
+            .map(std::path::PathBuf::from)
+    }
 }
 
 // Re-export CapabilityConfigDto fields for callers that need raw access.
@@ -249,6 +263,12 @@ impl CapabilityConfigDto {
     #[must_use]
     pub fn fast_model(&self) -> Option<&str> {
         self.fast_model.as_deref()
+    }
+
+    /// The prompt template path for this capability, if set.
+    #[must_use]
+    pub fn prompt_template_path(&self) -> Option<&str> {
+        self.prompt_template_path.as_deref()
     }
 }
 
@@ -516,6 +536,130 @@ mod tests {
         assert!(
             matches!(err, AgentProfilesError::InvalidCapability { .. }),
             "unexpected error: {err}"
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // T006 tests: ref-verifier-chain1/chain2 capabilities with
+    // prompt_template_path fields; independent resolution from reviewer (D11).
+    // -----------------------------------------------------------------------
+
+    const REF_VERIFIER_CONFIG: &str = r#"{
+        "schema_version": 1,
+        "providers": {
+            "claude": { "label": "Claude Code" },
+            "codex": { "label": "Codex CLI" }
+        },
+        "capabilities": {
+            "reviewer": {
+                "provider": "codex",
+                "model": "gpt-5.5",
+                "fast_model": "gpt-5.4-mini",
+                "prompt_template_path": ".harness/prompts/reviewer.md"
+            },
+            "ref-verifier-chain1": {
+                "provider": "claude",
+                "model": "claude-opus-4-8",
+                "fast_provider": "claude",
+                "fast_model": "claude-haiku-4-5",
+                "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+            },
+            "ref-verifier-chain2": {
+                "provider": "claude",
+                "model": "claude-opus-4-8",
+                "fast_provider": "claude",
+                "fast_model": "claude-haiku-4-5",
+                "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
+            }
+        }
+    }"#;
+
+    #[test]
+    fn test_load_ref_verifier_chain_capabilities_are_loaded() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+        assert!(profiles.resolve_capability("ref-verifier-chain1").is_some());
+        assert!(profiles.resolve_capability("ref-verifier-chain2").is_some());
+    }
+
+    #[test]
+    fn test_resolve_ref_verifier_chain1_fast_returns_fast_provider_and_fast_model() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let fast = profiles.resolve_execution("ref-verifier-chain1", RoundType::Fast).unwrap();
+        assert_eq!(fast.provider, "claude");
+        assert_eq!(fast.model.as_deref(), Some("claude-haiku-4-5"));
+    }
+
+    #[test]
+    fn test_resolve_ref_verifier_chain1_final_returns_provider_and_model() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let final_exec =
+            profiles.resolve_execution("ref-verifier-chain1", RoundType::Final).unwrap();
+        assert_eq!(final_exec.provider, "claude");
+        assert_eq!(final_exec.model.as_deref(), Some("claude-opus-4-8"));
+    }
+
+    #[test]
+    fn test_ref_verifier_chain_prompt_template_paths_are_independent() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        let chain1_path = profiles.resolve_prompt_template_path("ref-verifier-chain1").unwrap();
+        let chain2_path = profiles.resolve_prompt_template_path("ref-verifier-chain2").unwrap();
+
+        assert_eq!(chain1_path.to_str(), Some(".harness/prompts/ref-verifier-chain1.md"));
+        assert_eq!(chain2_path.to_str(), Some(".harness/prompts/ref-verifier-chain2.md"));
+        assert_ne!(chain1_path, chain2_path);
+    }
+
+    #[test]
+    fn test_resolve_prompt_template_path_returns_none_for_missing_capability() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        assert!(profiles.resolve_prompt_template_path("nonexistent").is_none());
+    }
+
+    #[test]
+    fn test_resolve_prompt_template_path_returns_none_when_field_absent() {
+        // orchestrator entry has no prompt_template_path field
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), FULL_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        assert!(profiles.resolve_prompt_template_path("orchestrator").is_none());
+    }
+
+    #[test]
+    fn test_capability_config_with_timeout_seconds_is_rejected() {
+        // timeout_seconds was removed from the schema; deny_unknown_fields
+        // must fail-closed on configs that still carry it.
+        let json = r#"{
+            "schema_version": 1,
+            "providers": { "claude": { "label": "Claude" } },
+            "capabilities": {
+                "ref-verifier-chain1": {
+                    "provider": "claude",
+                    "model": "claude-opus-4-8",
+                    "timeout_seconds": 120
+                }
+            }
+        }"#;
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), json);
+        let err = AgentProfiles::load(&path).unwrap_err();
+        assert!(
+            err.to_string().contains("timeout_seconds"),
+            "expected unknown-field rejection, got: {err}"
         );
     }
 }

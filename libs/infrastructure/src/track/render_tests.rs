@@ -2182,23 +2182,21 @@ const MULTI_LAYER_ARCH_RULES_CAT_SPEC_OPT_OUT: &str = r#"{
       ]
     }"#;
 
-#[test]
-fn sync_rendered_views_renders_cat_spec_column_when_signals_fresh_and_opt_in_enabled() {
-    // Happy path: opt-in flag is true, signals file exists with a matching
-    // catalogue_declaration_hash, and a per-entry `blue` signal is declared
-    // for `TrackId`. The rendered markdown must carry the 6-column header
-    // and paint the 🔵 emoji in the Cat-Spec column.
+/// Base helper for T020 cat-spec integration tests.
+///
+/// Creates a `track-a` temp repo with git branch, `architecture-rules.json` (using
+/// `arch_rules`), `metadata.json`, `domain-types.json`, and the shared style config.
+/// Does NOT write a `domain-catalogue-spec-signals.json` — callers do that after
+/// computing or supplying the signals content.
+///
+/// Returns `(TempDir, track_dir: PathBuf)`. Keep `TempDir` alive for the test.
+fn setup_track_repo_base(arch_rules: &str) -> (tempfile::TempDir, std::path::PathBuf) {
     let dir = tempfile::tempdir().unwrap();
     init_git_repo_on_track_branch(dir.path(), "track-a");
     let track_dir = dir.path().join("track/items/track-a");
     std::fs::create_dir_all(&track_dir).unwrap();
 
-    std::fs::write(
-        dir.path().join("architecture-rules.json"),
-        MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
-    )
-    .unwrap();
-
+    std::fs::write(dir.path().join("architecture-rules.json"), arch_rules).unwrap();
     std::fs::write(
         track_dir.join("metadata.json"),
         sample_metadata_json(
@@ -2210,25 +2208,85 @@ fn sync_rendered_views_renders_cat_spec_column_when_signals_fresh_and_opt_in_ena
     )
     .unwrap();
     std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    write_minimal_style_config_to_root(dir.path());
 
-    // Catalogue-spec-signals file with a fresh (matching) hash.
+    (dir, track_dir)
+}
+
+/// Builds the JSON string for a fresh `domain-catalogue-spec-signals.json` whose
+/// `catalogue_declaration_hash` matches the on-disk `domain-types.json` bytes in
+/// `track_dir`.
+///
+/// Used by tests that need valid (non-stale) signals to exercise the happy-path or
+/// opt-in/out guard, keeping hash computation in one place.
+fn fresh_cat_spec_signals_json(track_dir: &std::path::Path) -> String {
     let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
     let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
-    let spec_signals_json = serde_json::json!({
+    serde_json::to_string_pretty(&serde_json::json!({
         "schema_version": 1,
         "catalogue_declaration_hash": hash_hex,
         "signals": [
-            { "type_name": "TrackId", "signal": "blue" }
+            { "type_name": "TrackId", "signal": "blue", "entry_hash": "0".repeat(64) }
         ],
-    });
+    }))
+    .unwrap()
+}
+
+/// Sets up a temp repo (using `arch_rules`) and writes `signals_content` to
+/// `domain-catalogue-spec-signals.json` via `write_cat_spec_signals`. Delegates to `setup_track_repo_base`.
+///
+/// All T020 cat-spec tests ultimately call this function. Tests that need a
+/// fresh (matching-hash) signals file use `setup_track_with_cat_spec_opt_in`,
+/// which computes `signals_content` via `fresh_cat_spec_signals_json` and
+/// writes it via `write_cat_spec_signals`. Tests that supply explicit (e.g.
+/// stale, malformed) content call `setup_track_with_explicit_cat_spec_signals` instead.
+fn setup_track_with_cat_spec_signals(
+    arch_rules: &str,
+    signals_content: &str,
+) -> (tempfile::TempDir, std::path::PathBuf) {
+    let (dir, track_dir) = setup_track_repo_base(arch_rules);
     // Filename derivation: `<layer_id>-catalogue-spec-signals.json`
     // = `domain-catalogue-spec-signals.json`.
-    std::fs::write(
-        track_dir.join("domain-catalogue-spec-signals.json"),
-        serde_json::to_string_pretty(&spec_signals_json).unwrap(),
-    )
-    .unwrap();
-    write_minimal_style_config_to_root(dir.path());
+    write_cat_spec_signals(&track_dir, signals_content);
+    (dir, track_dir)
+}
+
+/// Sets up a temp repo with a fresh (matching-hash) `domain-catalogue-spec-signals.json`
+/// and the given `arch_rules`. Computes the fresh hash from `domain-types.json` and
+/// delegates to `setup_track_with_cat_spec_signals`.
+fn setup_track_with_cat_spec_opt_in(arch_rules: &str) -> (tempfile::TempDir, std::path::PathBuf) {
+    // Two-phase: base creates domain-types.json on disk; fresh hash is then computable.
+    // setup_track_repo_base is called inside setup_track_with_cat_spec_signals, but we
+    // need the track_dir to compute the fresh hash before delegating. So we use a
+    // write_cat_spec_signals helper to avoid duplicating the fs::write call.
+    let (dir, track_dir) = setup_track_repo_base(arch_rules);
+    let signals_json = fresh_cat_spec_signals_json(&track_dir);
+    write_cat_spec_signals(&track_dir, &signals_json);
+    (dir, track_dir)
+}
+
+/// Writes `content` to `<track_dir>/domain-catalogue-spec-signals.json`.
+fn write_cat_spec_signals(track_dir: &std::path::Path, content: &str) {
+    std::fs::write(track_dir.join("domain-catalogue-spec-signals.json"), content).unwrap();
+}
+
+/// Sets up a temp repo (opt-in enabled) and writes `signals_content` (e.g. stale or
+/// malformed JSON) to `domain-catalogue-spec-signals.json`. Thin wrapper around
+/// `setup_track_with_cat_spec_signals` using the opt-in arch-rules constant.
+fn setup_track_with_explicit_cat_spec_signals(
+    signals_content: &str,
+) -> (tempfile::TempDir, std::path::PathBuf) {
+    setup_track_with_cat_spec_signals(MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN, signals_content)
+}
+
+#[test]
+fn sync_rendered_views_renders_cat_spec_column_when_signals_fresh_and_opt_in_enabled() {
+    // Happy path: opt-in flag is true, signals file exists with a matching
+    // catalogue_declaration_hash, and a per-entry `blue` signal is declared
+    // for `TrackId`. The rendered markdown must carry the 6-column header
+    // and paint the 🔵 emoji in the Cat-Spec column.
+    let (dir, track_dir) =
+        setup_track_with_cat_spec_opt_in(MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN);
 
     let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -2252,43 +2310,8 @@ fn sync_rendered_views_skips_cat_spec_column_when_opt_in_disabled() {
     // present on disk, the renderer must produce the legacy 5-column
     // layout if the layer has NOT opted in via `catalogue_spec_signal.enabled`.
     // This is the phased-activation knob per ADR §D5.4.
-    let dir = tempfile::tempdir().unwrap();
-    init_git_repo_on_track_branch(dir.path(), "track-a");
-    let track_dir = dir.path().join("track/items/track-a");
-    std::fs::create_dir_all(&track_dir).unwrap();
-
-    std::fs::write(
-        dir.path().join("architecture-rules.json"),
-        MULTI_LAYER_ARCH_RULES_CAT_SPEC_OPT_OUT,
-    )
-    .unwrap();
-
-    std::fs::write(
-        track_dir.join("metadata.json"),
-        sample_metadata_json(
-            "track-a",
-            "planned",
-            "2026-03-13T02:00:00Z",
-            r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
-        ),
-    )
-    .unwrap();
-    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
-
-    // Signals file present with matching hash — but layer hasn't opted in.
-    let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
-    let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
-    let spec_signals_json = serde_json::json!({
-        "schema_version": 1,
-        "catalogue_declaration_hash": hash_hex,
-        "signals": [ { "type_name": "TrackId", "signal": "blue" } ],
-    });
-    std::fs::write(
-        track_dir.join("domain-catalogue-spec-signals.json"),
-        serde_json::to_string_pretty(&spec_signals_json).unwrap(),
-    )
-    .unwrap();
-    write_minimal_style_config_to_root(dir.path());
+    let (dir, track_dir) =
+        setup_track_with_cat_spec_opt_in(MULTI_LAYER_ARCH_RULES_CAT_SPEC_OPT_OUT);
 
     let _changed = sync_rendered_views(dir.path(), Some("track-a")).unwrap();
 
@@ -2309,42 +2332,17 @@ fn sync_rendered_views_errors_on_stale_cat_spec_signals() {
     // file indicates the catalogue changed without regenerating signals.
     // View rendering aborts and the caller is expected to run
     // `sotp track catalogue-spec-signals <track_id>` before retrying.
-    let dir = tempfile::tempdir().unwrap();
-    init_git_repo_on_track_branch(dir.path(), "track-a");
-    let track_dir = dir.path().join("track/items/track-a");
-    std::fs::create_dir_all(&track_dir).unwrap();
-
-    std::fs::write(
-        dir.path().join("architecture-rules.json"),
-        MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
-    )
-    .unwrap();
-
-    std::fs::write(
-        track_dir.join("metadata.json"),
-        sample_metadata_json(
-            "track-a",
-            "planned",
-            "2026-03-13T02:00:00Z",
-            r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
-        ),
-    )
-    .unwrap();
-    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
-    write_minimal_style_config_to_root(dir.path());
 
     // Stale: hash does NOT match on-disk catalogue.
     let stale_hash = "0".repeat(64);
     let stale_json = serde_json::json!({
         "schema_version": 1,
         "catalogue_declaration_hash": stale_hash,
-        "signals": [ { "type_name": "TrackId", "signal": "blue" } ],
+        "signals": [ { "type_name": "TrackId", "signal": "blue", "entry_hash": "0".repeat(64) } ],
     });
-    std::fs::write(
-        track_dir.join("domain-catalogue-spec-signals.json"),
-        serde_json::to_string_pretty(&stale_json).unwrap(),
-    )
-    .unwrap();
+    let (dir, _track_dir) = setup_track_with_explicit_cat_spec_signals(
+        &serde_json::to_string_pretty(&stale_json).unwrap(),
+    );
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
     let msg = err.to_string();
@@ -2359,36 +2357,7 @@ fn sync_rendered_views_errors_on_malformed_cat_spec_signals() {
     // Fail-closed: an unparseable signals file is a system-state error,
     // not a silent fallback. The view renderer propagates the decode
     // failure and the caller re-runs `sotp track catalogue-spec-signals`.
-    let dir = tempfile::tempdir().unwrap();
-    init_git_repo_on_track_branch(dir.path(), "track-a");
-    let track_dir = dir.path().join("track/items/track-a");
-    std::fs::create_dir_all(&track_dir).unwrap();
-
-    std::fs::write(
-        dir.path().join("architecture-rules.json"),
-        MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
-    )
-    .unwrap();
-
-    std::fs::write(
-        track_dir.join("metadata.json"),
-        sample_metadata_json(
-            "track-a",
-            "planned",
-            "2026-03-13T02:00:00Z",
-            r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
-        ),
-    )
-    .unwrap();
-    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
-    write_minimal_style_config_to_root(dir.path());
-
-    // Malformed JSON.
-    std::fs::write(
-        track_dir.join("domain-catalogue-spec-signals.json"),
-        "{ this is not valid json ",
-    )
-    .unwrap();
+    let (dir, _track_dir) = setup_track_with_explicit_cat_spec_signals("{ this is not valid json ");
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
     let msg = err.to_string();
@@ -2400,28 +2369,8 @@ fn sync_rendered_views_errors_on_missing_cat_spec_signals_when_opt_in() {
     // Fail-closed: when opt-in is enabled but the signals file has never
     // been generated, view rendering must error and direct the user to
     // `sotp track catalogue-spec-signals <track_id>`.
-    let dir = tempfile::tempdir().unwrap();
-    init_git_repo_on_track_branch(dir.path(), "track-a");
-    let track_dir = dir.path().join("track/items/track-a");
-    std::fs::create_dir_all(&track_dir).unwrap();
-
-    std::fs::write(
-        dir.path().join("architecture-rules.json"),
-        MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN,
-    )
-    .unwrap();
-    std::fs::write(
-        track_dir.join("metadata.json"),
-        sample_metadata_json(
-            "track-a",
-            "planned",
-            "2026-03-13T02:00:00Z",
-            r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
-        ),
-    )
-    .unwrap();
-    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
-    write_minimal_style_config_to_root(dir.path());
+    let (dir, _track_dir) = setup_track_repo_base(MULTI_LAYER_ARCH_RULES_WITH_CAT_SPEC_OPT_IN);
+    // No signals file written — the base helper does not write one.
 
     let err = sync_rendered_views(dir.path(), Some("track-a")).unwrap_err();
     let msg = err.to_string();

@@ -20,6 +20,7 @@ use domain::{
 };
 use thiserror::Error;
 
+use crate::catalogue_traversal::iter_catalogue_entries;
 use crate::merge_gate::{BlobFetchResult, TrackBlobReader};
 
 /// Secondary port returning the canonical SHA-256 digest of every spec
@@ -175,26 +176,29 @@ where
             });
         }
 
-        // 2a. Catalogue + raw-bytes hash.
-        let (catalogue, catalogue_hash_hex) = match self.reader.read_catalogue_for_spec_ref_check(
-            &cmd.branch,
-            cmd.track_id.as_ref(),
-            cmd.layer_id.as_ref(),
-        ) {
-            BlobFetchResult::Found(pair) => pair,
-            BlobFetchResult::NotFound => {
-                return Err(VerifyCatalogueSpecRefsError::CatalogueNotFound {
-                    branch: cmd.branch.clone(),
-                    layer_id: cmd.layer_id.as_ref().to_owned(),
-                });
-            }
-            BlobFetchResult::FetchError(message) => {
-                return Err(VerifyCatalogueSpecRefsError::CatalogueFetchError {
-                    layer_id: cmd.layer_id.as_ref().to_owned(),
-                    message,
-                });
-            }
-        };
+        // 2a. Catalogue + raw-bytes hash + per-entry hashes.
+        // The third element (entry_hashes) is not used in this verify path
+        // (it is used by the signal-refresh path in catalogue_spec_signals.rs).
+        let (catalogue, catalogue_hash_hex, _entry_hashes) =
+            match self.reader.read_catalogue_for_spec_ref_check(
+                &cmd.branch,
+                cmd.track_id.as_ref(),
+                cmd.layer_id.as_ref(),
+            ) {
+                BlobFetchResult::Found(triple) => triple,
+                BlobFetchResult::NotFound => {
+                    return Err(VerifyCatalogueSpecRefsError::CatalogueNotFound {
+                        branch: cmd.branch.clone(),
+                        layer_id: cmd.layer_id.as_ref().to_owned(),
+                    });
+                }
+                BlobFetchResult::FetchError(message) => {
+                    return Err(VerifyCatalogueSpecRefsError::CatalogueFetchError {
+                        layer_id: cmd.layer_id.as_ref().to_owned(),
+                        message,
+                    });
+                }
+            };
         // Validate the hash immediately: an invalid hex string from the port
         // indicates a port contract violation and is always an error, regardless
         // of whether stale detection will run.  Failing early avoids silently
@@ -286,14 +290,8 @@ where
             }
         };
 
-        for (type_name, entry) in &catalogue.types {
-            check_entry_refs(type_name.as_str().to_owned(), &entry.spec_refs);
-        }
-        for (trait_name, entry) in &catalogue.traits {
-            check_entry_refs(trait_name.as_str().to_owned(), &entry.spec_refs);
-        }
-        for (fn_path, entry) in &catalogue.functions {
-            check_entry_refs(fn_path.to_string(), &entry.spec_refs);
+        for e in iter_catalogue_entries(&catalogue) {
+            check_entry_refs(e.key, e.spec_refs);
         }
 
         // StaleSignals: compare signals_opt.catalogue_declaration_hash to current hash.
@@ -314,8 +312,15 @@ where
 }
 
 #[cfg(test)]
-#[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(
+    clippy::indexing_slicing,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
+    clippy::type_complexity
+)]
 mod tests {
+    use std::collections::HashMap;
     use std::sync::Mutex;
 
     use domain::spec::SpecDocument;
@@ -357,8 +362,21 @@ mod tests {
         doc.types.insert(TypeName::new(name).unwrap(), entry);
     }
 
+    /// Consume the catalogue from a `Mutex<Option<...>>`, returning `Found` or panicking on
+    /// double-consume. Shared by `FixedReader` and `PanicOnSignalsReader` to avoid duplicating
+    /// the lock/take/Found pattern.
+    fn take_catalogue(
+        catalogue: &Mutex<Option<(CatalogueDocument, String, HashMap<String, ContentHash>)>>,
+        reader_name: &str,
+    ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
+        match catalogue.lock().unwrap().take() {
+            Some(triple) => BlobFetchResult::Found(triple),
+            None => panic!("{reader_name} catalogue consumed twice"),
+        }
+    }
+
     struct FixedReader {
-        catalogue: Mutex<Option<(CatalogueDocument, String)>>,
+        catalogue: Mutex<Option<(CatalogueDocument, String, HashMap<String, ContentHash>)>>,
         signals: Mutex<Option<CatalogueSpecSignalsDocument>>,
         signals_not_found: bool,
     }
@@ -371,7 +389,7 @@ mod tests {
         ) -> Self {
             let signals_not_found = signals.is_none();
             Self {
-                catalogue: Mutex::new(Some((catalogue, hash_hex.into()))),
+                catalogue: Mutex::new(Some((catalogue, hash_hex.into(), HashMap::new()))),
                 signals: Mutex::new(signals),
                 signals_not_found,
             }
@@ -409,11 +427,8 @@ mod tests {
             _branch: &str,
             _track_id: &str,
             _layer_id: &str,
-        ) -> BlobFetchResult<(CatalogueDocument, String)> {
-            match self.catalogue.lock().unwrap().take() {
-                Some(pair) => BlobFetchResult::Found(pair),
-                None => panic!("FixedReader catalogue consumed twice"),
-            }
+        ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
+            take_catalogue(&self.catalogue, "FixedReader")
         }
 
         fn read_catalogue_spec_signals_document(
@@ -472,7 +487,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(CatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
             BlobFetchResult::NotFound
         }
 
@@ -512,7 +527,7 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(CatalogueDocument, String)> {
+        ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
             BlobFetchResult::FetchError("git object not found".to_owned())
         }
 
@@ -555,12 +570,12 @@ mod tests {
     /// Reader that returns a valid catalogue but panics if signals are ever accessed.
     /// Used to verify that `skip_stale=true` skips the signals port entirely.
     struct PanicOnSignalsReader {
-        catalogue: Mutex<Option<(CatalogueDocument, String)>>,
+        catalogue: Mutex<Option<(CatalogueDocument, String, HashMap<String, ContentHash>)>>,
     }
 
     impl PanicOnSignalsReader {
         fn new(catalogue: CatalogueDocument, hash_hex: impl Into<String>) -> Self {
-            Self { catalogue: Mutex::new(Some((catalogue, hash_hex.into()))) }
+            Self { catalogue: Mutex::new(Some((catalogue, hash_hex.into(), HashMap::new()))) }
         }
     }
 
@@ -587,11 +602,8 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(CatalogueDocument, String)> {
-            match self.catalogue.lock().unwrap().take() {
-                Some(pair) => BlobFetchResult::Found(pair),
-                None => panic!("PanicOnSignalsReader catalogue consumed twice"),
-            }
+        ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
+            take_catalogue(&self.catalogue, "PanicOnSignalsReader")
         }
 
         fn read_catalogue_spec_signals_document(
@@ -606,12 +618,12 @@ mod tests {
 
     /// Reader that returns a valid catalogue but `FetchError` from the signals fetch.
     struct SignalsFetchErrorReader {
-        catalogue: Mutex<Option<(CatalogueDocument, String)>>,
+        catalogue: Mutex<Option<(CatalogueDocument, String, HashMap<String, ContentHash>)>>,
     }
 
     impl SignalsFetchErrorReader {
         fn new(catalogue: CatalogueDocument, hash_hex: impl Into<String>) -> Self {
-            Self { catalogue: Mutex::new(Some((catalogue, hash_hex.into()))) }
+            Self { catalogue: Mutex::new(Some((catalogue, hash_hex.into(), HashMap::new()))) }
         }
     }
 
@@ -638,11 +650,8 @@ mod tests {
             _: &str,
             _: &str,
             _: &str,
-        ) -> BlobFetchResult<(CatalogueDocument, String)> {
-            match self.catalogue.lock().unwrap().take() {
-                Some(pair) => BlobFetchResult::Found(pair),
-                None => panic!("SignalsFetchErrorReader catalogue consumed twice"),
-            }
+        ) -> BlobFetchResult<(CatalogueDocument, String, HashMap<String, ContentHash>)> {
+            take_catalogue(&self.catalogue, "SignalsFetchErrorReader")
         }
 
         fn read_catalogue_spec_signals_document(
@@ -744,7 +753,11 @@ mod tests {
         let hashes = BTreeMap::new();
         let signals = CatalogueSpecSignalsDocument::new(
             ContentHash::try_from_hex(hex_pattern(0x00)).unwrap(),
-            vec![CatalogueSpecSignal::new("X", ConfidenceSignal::Blue)],
+            vec![CatalogueSpecSignal::new(
+                "X",
+                ConfidenceSignal::Blue,
+                ContentHash::from_bytes([0u8; 32]),
+            )],
         );
         let reader = FixedReader::new(cat, hex_pattern(0xff), Some(signals));
         let interactor = VerifyCatalogueSpecRefsInteractor::new(reader, FixedHashReader { hashes });

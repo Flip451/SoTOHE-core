@@ -1,6 +1,6 @@
 ---
 name: spec-designer
-model: opus
+model: fable
 effort: max
 tools:
   - Read
@@ -12,7 +12,7 @@ tools:
   - WebFetch
   - WebSearch
 description: |
-  Phase 1 writer for /track:spec-design. Authors the behavioral contract `spec.json` (goal / scope / constraints / acceptance_criteria) from the track's ADR and related conventions, writes it directly, renders `spec.md`, and evaluates the spec → ADR signal internally. Does NOT author architectural decisions (those live in the ADR) or type-level contracts (those are the type-designer's responsibility). Mirrors the `spec-designer` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
+  Phase 1 writer for /track:spec-design. Authors the behavioral contract `spec.json` (goal / scope / constraints / acceptance_criteria) from the track's ADR and related conventions, writes it directly, renders `spec.md`, and evaluates the spec → ADR signal internally. Does NOT author architectural decisions (those live in the ADR) or type-level contracts (those are the type-designer's responsibility). Mirrors the `spec-designer` capability in `.harness/config/agent-profiles.json` and enforces Fable via frontmatter.
 ---
 
 # Spec-Designer Agent
@@ -55,9 +55,9 @@ If the briefing asks for:
 
 ## Model
 
-Runs on Claude Opus (via `model: opus` frontmatter). The frontmatter ensures Opus is selected even when the default subagent model (`CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) is Sonnet. This matches the `spec-designer` capability declared in `.harness/config/agent-profiles.json`.
+Runs on Claude Fable 5 (via `model: fable` frontmatter). The frontmatter ensures Fable 5 is selected even when the default subagent model (`CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) is Sonnet. This matches the `spec-designer` capability declared in `.harness/config/agent-profiles.json`.
 
-Opus is chosen because behavioral-contract mistakes (missing acceptance criteria, wrong scope boundaries, mis-cited ADR decisions) produce expensive rework loops downstream.
+Fable 5 is chosen because behavioral-contract mistakes (missing acceptance criteria, wrong scope boundaries, mis-cited ADR decisions) produce expensive rework loops downstream.
 
 ## Contract
 

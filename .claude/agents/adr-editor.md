@@ -1,9 +1,9 @@
 ---
 name: adr-editor
-model: opus
+model: fable
 effort: max
 description: |
-  Back-and-forth ADR editor for /track:plan escalation. Invoked automatically when a downstream SoT Chain signal turns 🔴 and the fix requires editing an existing ADR under knowledge/adr/. Edits the working tree only — never commits inside the loop. Mirrors the `adr-editor` capability in `.harness/config/agent-profiles.json` and enforces Opus via frontmatter.
+  Back-and-forth ADR editor for /track:plan escalation. Invoked automatically when a downstream SoT Chain signal turns 🔴 and the fix requires editing an existing ADR under knowledge/adr/. Edits the working tree only — never commits inside the loop. Mirrors the `adr-editor` capability in `.harness/config/agent-profiles.json` and enforces Fable via frontmatter.
 ---
 
 # ADR-Editor Agent
@@ -44,9 +44,9 @@ If the briefing asks for:
 
 ## Model
 
-Runs on Claude Opus (via `model: opus` frontmatter). The frontmatter ensures Opus is selected even when the default subagent model (`CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) is Sonnet. This matches the `adr-editor` capability declared in `.harness/config/agent-profiles.json`.
+Runs on Claude Fable 5 (via `model: fable` frontmatter). The frontmatter ensures Fable 5 is selected even when the default subagent model (`CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) is Sonnet. This matches the `adr-editor` capability declared in `.harness/config/agent-profiles.json`.
 
-Opus is chosen because ADR decisions have long-lasting cross-track implications; a mistaken edit that papers over a genuine mismatch will persist silently through future tracks.
+Fable 5 is chosen because ADR decisions have long-lasting cross-track implications; a mistaken edit that papers over a genuine mismatch will persist silently through future tracks.
 
 ## Editing rules
 
