@@ -5,7 +5,7 @@
 
 Goal coverage note: `task-coverage.json` schema_version 1 only carries `in_scope` / `out_of_scope` / `constraints` / `acceptance_criteria` maps. GO-01 is covered by T002/T007/T008, GO-02 by T007/T009/T010, and GO-03 by T003/T005; these goal mappings are recorded here because adding GO keys to task-coverage.json fails the plan-artifact-refs verifier.
 
-## Tasks (10/13 resolved)
+## Tasks (11/13 resolved)
 
 ### S1 — Layer-2 Fix — AdrRef Anchor Existence Check in plan-artifact-refs Verifier (T001)
 
@@ -92,7 +92,7 @@ Goal coverage note: `task-coverage.json` schema_version 1 only carries `in_scope
 > 既存の `bin/sotp review check-approved` と `bin/sotp dry check-approved` は変更しない (CN-02 / D1 SRP 分離)。
 > `track/workflow.md` の Quality Gates セクションに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` 行を追記する。
 
-- [~] **T010**: commit ゲートに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` を追加し、commit 最終関門で全 Chain の意味論レビューを実行してから意味論側 approved ゲートを code-review ゲートと AND で評価する (IN-02 / IN-12 / AC-04 / CN-02 / CN-08 / CN-09)。変更対象: `Makefile.toml` の `track-commit-message` タスク。現行の commit gate 連鎖 (`bin/sotp review check-approved && bin/sotp dry check-approved && ...`) に `bin/sotp ref-verify run && bin/sotp ref-verify check-approved &&` を追加する。追加位置は `bin/sotp review check-approved` と `bin/sotp dry check-approved` の間または直後 — 既存の code-review ゲートを変更・拡張しない (CN-02)。`bin/sotp ref-verify run` は commit gate コンテキストで All スコープ (Chain1 + Chain2) を自動解決し、差分キャッシュにより `(claim_hash, evidence_hash)` が変化したペアだけを再レビューする (IN-02 / IN-12 / AC-07 / CN-09)。`bin/sotp ref-verify check-approved` の失敗 (Pending / Fail エントリありまたは Pass cache がない状態) は commit をブロックする (AC-04)。verify-cache artifact が存在しない場合は `run` が先に生成・更新する設計だが、`check-approved` 単体実行では fail-closed として exit 1 を返すこと (CN-06)。`track/workflow.md` の Quality Gates セクションに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` 行を追加する。前提: T009 (`ref-verify run` / `ref-verify check-approved` コマンドが実装済みであること)。
+- [x] **T010**: commit ゲートに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` を追加し、commit 最終関門で全 Chain の意味論レビューを実行してから意味論側 approved ゲートを code-review ゲートと AND で評価する (IN-02 / IN-12 / AC-04 / CN-02 / CN-08 / CN-09)。変更対象: `Makefile.toml` の `track-commit-message` タスク。現行の commit gate 連鎖 (`bin/sotp review check-approved && bin/sotp dry check-approved && ...`) に `bin/sotp ref-verify run && bin/sotp ref-verify check-approved &&` を追加する。追加位置は `bin/sotp review check-approved` と `bin/sotp dry check-approved` の間または直後 — 既存の code-review ゲートを変更・拡張しない (CN-02)。`bin/sotp ref-verify run` は commit gate コンテキストで All スコープ (Chain1 + Chain2) を自動解決し、差分キャッシュにより `(claim_hash, evidence_hash)` が変化したペアだけを再レビューする (IN-02 / IN-12 / AC-07 / CN-09)。`bin/sotp ref-verify check-approved` の失敗 (Pending / Fail エントリありまたは Pass cache がない状態) は commit をブロックする (AC-04)。verify-cache artifact が存在しない場合は `run` が先に生成・更新する設計だが、`check-approved` 単体実行では fail-closed として exit 1 を返すこと (CN-06)。`track/workflow.md` の Quality Gates セクションに `bin/sotp ref-verify run` と `bin/sotp ref-verify check-approved` 行を追加する。前提: T009 (`ref-verify run` / `ref-verify check-approved` コマンドが実装済みであること)。
 
 ### S10 — /track:ref-verify Skill + Phase Orchestration Integration (T011)
 
