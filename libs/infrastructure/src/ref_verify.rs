@@ -83,9 +83,24 @@ impl RefVerifyPairSourcePort for RefVerifyPairSourceAdapter {
         // absent), `enumerate_chain2_all_layers` correctly returned zero pairs, so we must
         // not inject Chain-2 probes — the chain2 capability/template may not be configured
         // yet, and injecting them would break the run.
+        let has_chain1_pairs =
+            pairs.iter().any(|p| matches!(p.cache_scope, RefVerifyCacheScope::SpecAdr));
         let has_chain2_pairs = pairs
             .iter()
             .any(|p| matches!(p.cache_scope, RefVerifyCacheScope::CatalogueSpec { .. }));
+
+        // AC-09 / D5: every verifier capability exercised by this run must receive at
+        // least one known-bad calibration probe. With the alternating assignment below,
+        // a single probe would reach only one chain, leaving the other chain's verifier
+        // uncalibrated while its production pairs are still trusted at the fast tier.
+        let probe_count = if matches!(cmd.scope, usecase::ref_verify::RefVerifyScope::All)
+            && has_chain1_pairs
+            && has_chain2_pairs
+        {
+            probe_count.max(2)
+        } else {
+            probe_count
+        };
 
         for i in 0..probe_count {
             // Route known-bad probes through the same chain capability as the real pairs.
@@ -1636,6 +1651,58 @@ The guarded path must stay inside the trusted repository root.
         assert_eq!(pair_source::calculate_probe_count(10, 100), 10);
         // 0 pairs → always 0 probes regardless of rate.
         assert_eq!(pair_source::calculate_probe_count(0, 100), 0);
+    }
+
+    #[test]
+    fn load_pairs_all_scope_with_both_chains_injects_probe_per_exercised_verifier() {
+        // AC-09 / D5: when an All-scope run exercises BOTH chain verifiers
+        // (Chain1 and Chain2 production pairs present), each chain capability
+        // must receive at least one known-bad calibration probe — a single
+        // probe routed to only one chain would leave the other chain's
+        // verifier uncalibrated while its production pairs are still trusted.
+        let track_id = "test-load-pairs-all-both-chain-probes";
+        let tmp = tempfile::tempdir().unwrap();
+        // Chain1 fixture: spec.json with an adr_ref + the referenced ADR.
+        write_adr_ref_fixture(&tmp, track_id);
+        // Chain2 fixture: a TDDD domain catalogue referencing the same spec.
+        // The adr_ref fixture's spec lacks the IN-01 anchor, so point the
+        // catalogue at a dedicated referenced spec file instead.
+        let items_dir = track_dir(tmp.path(), track_id);
+        let referenced_spec = format!("track/items/{track_id}/referenced-spec.json");
+        std::fs::write(
+            items_dir.join("referenced-spec.json"),
+            semantic_thing_spec_json().to_string(),
+        )
+        .unwrap();
+        std::fs::write(
+            items_dir.join("domain-types.json"),
+            semantic_thing_catalogue_json_with_spec_file(
+                &referenced_spec,
+                "semantic docs that model must evaluate",
+            )
+            .to_string(),
+        )
+        .unwrap();
+        write_architecture_rules(&tmp, ARCHITECTURE_RULES_DOMAIN_TDDD);
+
+        let (adapter, cmd) = ref_verify_adapter_and_cmd(&tmp, track_id, RefVerifyScope::All);
+        // Default config: 10% injection over 2 production pairs would yield a
+        // single probe without the per-verifier guarantee.
+        let pairs = adapter.load_pairs(&cmd, &RefVerifyConfig::default()).unwrap();
+
+        let probes: Vec<_> = pairs.iter().filter(|p| p.known_bad).collect();
+        assert!(
+            probes.iter().any(|p| matches!(p.cache_scope, RefVerifyCacheScope::SpecAdr)),
+            "Chain1 verifier must receive at least one calibration probe; probes: {:?}",
+            probes.iter().map(|p| &p.cache_scope).collect::<Vec<_>>()
+        );
+        assert!(
+            probes
+                .iter()
+                .any(|p| matches!(p.cache_scope, RefVerifyCacheScope::CatalogueSpec { .. })),
+            "Chain2 verifier must receive at least one calibration probe; probes: {:?}",
+            probes.iter().map(|p| &p.cache_scope).collect::<Vec<_>>()
+        );
     }
 
     #[cfg(unix)]
