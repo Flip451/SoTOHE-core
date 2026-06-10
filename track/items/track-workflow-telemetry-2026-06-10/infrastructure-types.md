@@ -18,7 +18,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PhaseDurationSummary | dto | — | — | 🟡 | 🔵 |
-| TelemetryConfig | dto | — | — | 🟡 | 🔵 |
+| TelemetryConfig | dto | — | — | 🔵 | 🔵 |
 | TelemetryErrorEntry | dto | — | — | 🟡 | 🔵 |
 | TelemetryHookBlockEntry | dto | — | — | 🟡 | 🔵 |
 | TelemetryReportOutput | dto | — | — | 🟡 | 🔵 |
@@ -28,5 +28,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | TelemetryReport | secondary_adapter | — | impl Debug | 🟡 | 🔵 |
-| TelemetryWriter | secondary_adapter | — | impl Debug | 🟡 | 🔵 |
+| TelemetryWriter | secondary_adapter | — | impl Debug | 🔵 | 🔵 |
 

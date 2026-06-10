@@ -323,6 +323,20 @@
           "findings": [],
           "hash": "rvw1:sha256:c14672c52d93baa4829af67a0ce84e2a3795842b3fab9c7f210324227b564e4d",
           "at": "2026-06-10T14:18:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4133afc3160ea76c4d0a74fa1be67f847ac85f1d816a645cfb0fd4fa6e36ff30",
+          "at": "2026-06-10T14:49:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4133afc3160ea76c4d0a74fa1be67f847ac85f1d816a645cfb0fd4fa6e36ff30",
+          "at": "2026-06-10T14:52:29Z"
         }
       ]
     },
@@ -356,6 +370,86 @@
           "findings": [],
           "hash": "rvw1:sha256:ec5de587869142997f00ac11b04f9a447dd87cf5bebe94e959a7bcc94e38c527",
           "at": "2026-06-10T14:21:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter::new` trusts the raw `track_id` string and joins it directly into `items_dir`, so a value containing path separators or `..` can escape `track/items` and write telemetry outside the intended workspace. This constructor should take a validated track-id type or reject non-slug input before building the path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 97,
+              "category": "Security"
+            },
+            {
+              "message": "The 4096-byte guard only checks the pre-truncation serialization result, then returns `line2` without verifying that the truncated JSON still fits. A long `track_id`/`command`, or JSON escaping that expands the encoded output, can still produce an oversized row while `write()` returns `Ok(())`. Recheck the second serialization length and fail if it still exceeds the cap.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/writer.rs",
+              "line": 185,
+              "category": "Correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e5e69793169aa8faee8a20dd15a718611fbccfa5d37179dbae781c9e9188e71c",
+          "at": "2026-06-10T14:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`safe_path_component` does not actually reduce `track_id` to a single path component: it keeps every normal component and rejoins them with `/`. A `track_id` like `foo/bar` will therefore write to `items_dir/foo/bar/logs/telemetry.jsonl` instead of the intended single-track directory, which can make later report/archive code miss the file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 238,
+              "category": "correctness"
+            },
+            {
+              "message": "The oversized-line fallback truncates raw bytes and appends `\\n`. If the event contains multibyte UTF-8 or JSON escape sequences, this can emit invalid UTF-8/JSONL, so downstream readers that use text parsing will fail on the whole file instead of just skipping the oversized row.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 212,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4dc59c26e108c84dca04c4921fee6b693d3e50fd09bca7d0f4ef6e510e44f125",
+          "at": "2026-06-10T15:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TelemetryWriter::new` silently rewrites invalid `track_id` strings by taking the last normal path segment (or `unknown`). If a path-like or otherwise invalid ID reaches this constructor, distinct logical tracks can be merged into the same `telemetry.jsonl` instead of failing fast, which is a data-corruption risk.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/writer.rs",
+              "line": 93,
+              "category": "correctness"
+            },
+            {
+              "message": "`SOTP_TELEMETRY_DIR` is read with `std::env::var`, so a valid non-UTF8 filesystem path is treated as absent. On Unix this silently falls back to the default track directory and makes the override knob unreliable for a real path value.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/telemetry/config.rs",
+              "line": 40,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:17:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:19:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e9a10490880b2fd1e5e06dc8ab3feebe5c17a4e7b4163f14e8211d2d2366f50",
+          "at": "2026-06-10T15:24:34Z"
         }
       ]
     },
@@ -374,6 +468,20 @@
           "findings": [],
           "hash": "rvw1:sha256:0af5e58601d0189697c8f1d54823d96cb2e179e4f645910b3d4600360d27a05e",
           "at": "2026-06-10T13:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
+          "at": "2026-06-10T14:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cb4389c22149f8eb1ab30d2fae578fae96a0290b7ec3cfc4d7f106f0aecd223",
+          "at": "2026-06-10T14:51:07Z"
         }
       ]
     }

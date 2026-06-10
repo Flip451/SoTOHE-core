@@ -1,12 +1,21 @@
-//! Telemetry event types for JSONL-format workflow telemetry.
+//! Telemetry module for JSONL-format workflow telemetry.
 //!
-//! This module contains the wire-format DTO enum `TelemetryEvent` and the
-//! error type `TelemetryWriteError` used by `TelemetryWriter` (T003).
+//! This module contains:
+//! - `TelemetryEvent`: wire-format DTO enum (T002)
+//! - `TelemetryWriteError`: error type for `TelemetryWriter` (T002)
+//! - `TelemetryConfig`: env-var resolved configuration (T003)
+//! - `TelemetryWriter`: O_APPEND single-write JSONL event writer (T003)
 //!
 //! Each variant of `TelemetryEvent` corresponds to one JSONL event line written
 //! to `track/items/<id>/logs/telemetry.jsonl`.  Every variant payload includes a
 //! `schema_version: u32` field so that readers can perform per-line version checks
 //! (CN-09 / AC-09 / IN-08).
+
+pub mod config;
+pub mod writer;
+
+pub use config::TelemetryConfig;
+pub use writer::TelemetryWriter;
 
 use serde::{Deserialize, Serialize};
 use thiserror::Error;

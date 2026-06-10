@@ -41,4 +41,5 @@ libc = "0.2.183"
 
 [dev-dependencies]
 rstest = { workspace = true }
+temp-env = "0.3"
 tempfile = "3.27.0"

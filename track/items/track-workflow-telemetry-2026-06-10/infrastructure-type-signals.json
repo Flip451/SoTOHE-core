@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-10T14:24:54Z",
+  "generated_at": "2026-06-10T15:28:52Z",
   "declaration_hash": "8fd50f32b8c6534f0d0cc2aab0e5ec76c21275b3a2f285bb47ba59ed4ce98326",
   "signals": [
     {
@@ -16,9 +16,9 @@
     {
       "type_name": "TelemetryConfig",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::fmt::Debug"
       ]
@@ -99,9 +99,9 @@
     {
       "type_name": "TelemetryWriter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::fmt::Debug"
       ]
     }
