@@ -74,7 +74,7 @@ Invoke `/track:init <feature>` with the feature name from `$ARGUMENTS`. Phase 0 
 1. Invoke `/track:spec-design` (no arguments).
 2. Read the signal result returned by the command. The result includes per-section blue / yellow / red counts **and**, for each 🔴 element, the spec element id and the target ADR path cited by that element — so the orchestrator has enough information to brief `adr-editor` without reading `spec.json` itself.
 3. Apply the loop rule:
-   - 🔵 (all elements blue): mark the Phase 1 task `completed` and proceed to Phase 2.
+   - 🔵 (all elements blue): run the Chain① semantic review as the phase first-line defense — `bin/sotp ref-verify run --context spec-design` (see `/track:ref-verify`; Chain① judges spec → ADR with `.harness/prompts/ref-verifier-chain1.md`). On `[BLOCKED]`, treat the failing pair like a 🔴 below (route to adr-editor or re-invoke `/track:spec-design` depending on which side of the pair is wrong). On `[ESCALATE]`, report to the user and stop (do not retry). On `[OK]`, mark the Phase 1 task `completed` and proceed to Phase 2.
    - 🟡 (at least one yellow, no red): log a warning and proceed to Phase 2. Yellow must be resolved before merge but does not block the phase transition.
    - 🔴 (at least one red): escalate per the **ADR auto-edit criteria** below:
      a. Identify the target ADR file path cited by the 🔴 element(s).
@@ -89,7 +89,7 @@ Invoke `/track:init <feature>` with the feature name from `$ARGUMENTS`. Phase 0 
 1. Invoke `/track:type-design` (no arguments).
 2. Read the per-layer signal result.
 3. Apply the loop rule:
-   - 🔵 across all processed layers: mark the Phase 2 task `completed` and proceed to Phase 3.
+   - 🔵 across all processed layers: run the Chain② semantic review per processed layer as the phase first-line defense — `bin/sotp ref-verify run --context type-design --layer <layer>` for each layer the phase produced (see `/track:ref-verify`; Chain② judges catalogue → spec with `.harness/prompts/ref-verifier-chain2.md`). On `[BLOCKED]`, route by the owning side and apply the **Phase 2 retry counter**: for catalogue-side failures (catalogue claim does not match spec evidence), invoke `type-designer`, then re-run Chain②; for spec-side failures (spec text is wrong), treat as a Phase 2 🔴 and follow the full 🔴 path below (re-invoke `/track:spec-design`, re-evaluate Phase 1 gate including Chain①, then re-invoke `/track:type-design` and re-run Chain②). **max_retry guard**: each BLOCKED → fix → re-run iteration counts against the Phase 2 retry counter, identical to the 🔴 branch; on overflow, stop and present options. On `[ESCALATE]`, report to the user and stop (do not retry). On `[OK]` for all layers, mark the Phase 2 task `completed` and proceed to Phase 3.
    - 🟡: log a warning and proceed. Yellow must be resolved before merge.
    - 🔴:
      a. Re-invoke `/track:spec-design` (Phase 2 🔴 typically indicates the spec needs refinement before the type catalogue can pass).

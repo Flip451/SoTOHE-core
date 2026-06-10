@@ -56,7 +56,7 @@
     {
       "id": "T011",
       "description": "`/track:ref-verify` skill を新設し、`/track:plan` の phase オーケストレーションから `bin/sotp ref-verify run` を呼ぶ統合を追加する (IN-02 / IN-16 / AC-11 / CN-09)。実装内容: (1) `.claude/skills/ref-verify/SKILL.md` (新規) を作成し、`/track:ref-verify` skill の定義 (purpose / behavior / inputs / outputs) を記述する。skill は `bin/sotp ref-verify run` を実行し結果を報告するだけのシンラッパー (D9: 発火点ごとに別実装を持たない)。(2) `/track:ref-verify` コマンドファイル (`.claude/commands/ref-verify.md`) を作成 (または既存コマンド命名規則に合わせた場所に追加) し、`bin/sotp ref-verify run` の呼び出しと出力のフォーマット方法を記述する。(3) `/track:plan` の phase オーケストレーションスクリプトまたはドキュメント (`.claude/commands/plan.md` など) を更新し、spec-design フェーズ後に `bin/sotp ref-verify run` (Chain1 スコープ) を、type-design フェーズ後に `bin/sotp ref-verify run` (Chain2 スコープ) を呼ぶことを明記する (IN-02 / CN-09)。D11 / IN-16 の観点から: `plan.md` の更新でも Chain① と Chain② がそれぞれ異なる prompt template (`.harness/prompts/ref-verifier-chain1.md` と `.harness/prompts/ref-verifier-chain2.md`) を用いる設計を参照し、orchestrator が phase 第一防衛線でどの Chain スコープを呼ぶかを明確にする。発火点は `bin/sotp ref-verify run` の同一コマンドを呼ぶ — 発火ごとに別実装を持たない (D9)。`/track:review` (code review) とは独立した surface として保つ (OS-06 / AC-11)。`sotp verify *` (layer ②) とも独立した surface として保つ (AC-11)。前提: T009 (`bin/sotp ref-verify run` 実装済み)。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T013",
