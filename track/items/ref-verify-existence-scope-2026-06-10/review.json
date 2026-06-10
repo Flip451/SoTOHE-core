@@ -1,0 +1,207 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db1e07ad48e43cd49db9eba95e0dfcc5e92cd173dd7c36ab807d7f032ddf6981",
+          "at": "2026-06-10T13:54:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db1e07ad48e43cd49db9eba95e0dfcc5e92cd173dd7c36ab807d7f032ddf6981",
+          "at": "2026-06-10T13:59:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` maps `AC-02` only to `T001`, but the external-surface change that actually removes the hardcoded `--context commit-gate` invocation lives in `T004` (`impl-plan.json` lines 23-25). As written, the coverage matrix says the Phase 0 commit-gate acceptance is satisfied without the task that updates the commit-gate call site, so the coverage for the main gate path is incomplete.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/task-coverage.json",
+              "line": 28,
+              "category": "contradiction"
+            },
+            {
+              "message": "The new ADR file starts at the title and context without the required `## Status` section defined by the ADR template in `knowledge/adr/README.md` (`## ADR テンプレート`, lines 21-29). That leaves the ADR's lifecycle state implicit instead of recorded in the document itself, which is inconsistent with the repository's ADR contract.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-06-10-1335-ref-verify-existence-based-scope-resolution.md",
+              "line": 15,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:9cdfb5f894d4b6d949b2f8a9b9efb86b8ebaf771ad753fcc9e62907384eaa6a7",
+          "at": "2026-06-10T15:05:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 says only the fully absent case is skippable and that every other combination must fail, but AC-06 and T001 explicitly require the spec-present / all-catalogues-absent case to exit 0 as Chain2 zero pairs. This makes the constraint inconsistent with the acceptance criteria and the implementation plan.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+              "line": 205,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:205abaa4ed37d3d52c7afd1dd8c6148d748d57789aef2ec9d835aa1a4ac81662",
+          "at": "2026-06-10T15:13:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`D9` is now marked `superseded` in frontmatter, but the prose still says only the calling-context scope resolution part is replaced and that the dedicated command surface / diff cache remain valid. That leaves the same decision simultaneously retired and still active, which is an internal contradiction; either keep `D9` active with a partial-supersession note or split the surviving parts into a separate decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-05-27-1601-sot-chain-semantic-review-gate.md",
+              "line": 39,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:1a52188ce43c15561096cfc2fcfe059d922aaee620bb928b61a910db52105e01",
+          "at": "2026-06-10T15:27:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 omits `track-active-gate`, but IN-04 and AC-12 require both `track-commit-message` and `track-active-gate` to be updated. As written, the plan only covers one required Makefile surface, so AC-12 is not fully achievable.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 24,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T001's success path always returns `RefVerifyScope::All`; it never produces `Chain1` or `Chain2`. That means the planned resolver does not actually resolve scope from artifact existence and cannot encode the chain-specific skip rules required by IN-01 / CN-03 / AC-01 / AC-06 / AC-07.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 6,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:5aba1d56fb2f0a104afc44b29aaaa142059edc82dd68103201f4bd04fc1c8e20",
+          "at": "2026-06-10T15:33:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4b39c146337b4ff3b31994e2f250f527ef584a3aab03581c95da87c05b3928b",
+          "at": "2026-06-10T15:42:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 says the Makefile's `track-commit-message / track-active-gate` ref-verify calls are updated, but T004 explicitly says `track-active-gate` has no ref-verify invocation and needs no script change. That makes the acceptance criterion ambiguous about whether `track-active-gate` is actually in scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/spec.json",
+              "line": 356,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3a0f490e3b04b6ad1eb6a1c11d3087bf649c211ea3e6674d900405db907ea5be",
+          "at": "2026-06-10T15:55:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001’s resolver logic returns `Ok(RefVerifyScope::All)` for every non-error case, so the `RefVerifyScope` variants `Chain1`/`Chain2` are never selected. That conflicts with the usecase contract that `RefVerifyScopeResolver` derives the active scope from artifact existence and returns that resolved scope to cli-composition.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:84bd19005ba2b60ffc75d63856b80cc2446645d0899612be0552dab8229c6728",
+          "at": "2026-06-10T16:08:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 changes `RefVerifyScopeResolver::resolve` to the new `resolve(&str)` signature before any caller is updated. The dependent callsites are only rewritten in T002, so a commit after T001 leaves `apps/cli-composition` uncompilable. As written, the task split cannot be executed as a small-commit sequence.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 6,
+              "category": "infeasibility"
+            },
+            {
+              "message": "T002 removes `context` / `layer` from `RefVerifyRunInput`, but `apps/cli/src/commands/ref_verify.rs` is only updated in T003. That creates another required intermediate state that does not compile, so the T002→T003 ordering is not physically executable as a standalone task boundary.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 12,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:84bd19005ba2b60ffc75d63856b80cc2446645d0899612be0552dab8229c6728",
+          "at": "2026-06-10T16:16:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says malformed `spec.json` is an `Io` error in `RefVerifyScopeResolver::resolve`, but the later pair_source step says the same malformed `spec.json` should still surface as `RefVerifyError::VerifierPort`. The plan never reconciles which layer owns JSON parsing or which error is user-visible, so the failure mode is internally inconsistent.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "The boundary note claims that once `resolver` returns `Ok(All)`, catalogue files must be completely absent. That is false in the same task description, which also returns `Ok(All)` for the spec-present/all-catalogue-present and spec-present/all-catalogue-absent cases. This would mislead the Chain① skip-path implementation.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/ref-verify-existence-scope-2026-06-10/plan.md",
+              "line": 15,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:e9514e9b81809b09ac4530710643efc55d29343a5daf3d3b71e417e81ae24927",
+          "at": "2026-06-10T16:28:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`RefVerifyScopeResolver` is documented as failing on parse failures here, but the implementation plan keeps parse-不能 artifacts in `pair_source`/codec and surfaces them as `RefVerifyError::VerifierPort` instead. That splits IN-07 across two layers and makes the planned error contract inconsistent.",
+              "severity": "P1",
+              "file": "track/items/ref-verify-existence-scope-2026-06-10/infrastructure-types.json",
+              "line": 105,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a9f2facaa5defabbb604bc7d90e01a28b18071e88cda4c8b2b1e24d7d879ba6e",
+          "at": "2026-06-10T16:35:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:995cef351263012eace32c146ad5d7d103654018a867eb37589531eeda27aacf",
+          "at": "2026-06-10T16:40:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:995cef351263012eace32c146ad5d7d103654018a867eb37589531eeda27aacf",
+          "at": "2026-06-10T16:44:21Z"
+        }
+      ]
+    }
+  }
+}

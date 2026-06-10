@@ -1,0 +1,613 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "167934371d5634dcbf9e2348d17f9a0ecb7f371b7eba4f1981cbe4993031e355",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する: - spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）"
+      }
+    },
+    {
+      "claim_hash": "ca75e9a5fa0e82ff594d68d322d248c92b9fbb7c4270b5dc51af05f1a90da8e7",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。"
+      }
+    },
+    {
+      "claim_hash": "4d5ff225bc64488b30048bfbc0b86148055c66055b0d746e1d84f06dcf968eb0",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail\n- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail\n- 存在するが壊れている（parse 不能等）→ fail"
+      }
+    },
+    {
+      "claim_hash": "545b93d4d03f94d0d61d6e073f54be96392d164224058bcec753a4ebf9c64c7b",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する」"
+      }
+    },
+    {
+      "claim_hash": "b978ae7e86f71c5245b968899bef35d6f344a16d5d08ad2fdef51e522f97f89b",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。"
+      }
+    },
+    {
+      "claim_hash": "b9979ccaa3a556a7e3017dd8d28f88d22ade832c5c5ea3b9a6f304d83d7d533c",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。"
+      }
+    },
+    {
+      "claim_hash": "d2e9794697711fa9acf9848a02094e22da189f7d22eb8fa88b2a31252f82fe2b",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）"
+      }
+    },
+    {
+      "claim_hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail"
+      }
+    },
+    {
+      "claim_hash": "85a1953410d32bd8a18cdfb1edd0ccd5f82046c094030c0de4c58cbd7572526c",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail"
+      }
+    },
+    {
+      "claim_hash": "18d99de588f12618a43da07b17a51b10f0549d08ea0b9d0dc483f4bb17a5bc29",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 存在するが壊れている（parse 不能等）→ fail"
+      }
+    },
+    {
+      "claim_hash": "28a26b170e90ee43eef274153dd5660e4e1613caffd52763ff0b70ad6e57c91c",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）"
+      }
+    },
+    {
+      "claim_hash": "5505ef9c4443fc2c9e3a2c2873592c1d42d0ba6e280e5b7971d4b67c92d3cd5a",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。"
+      }
+    },
+    {
+      "claim_hash": "b7ab3ed05c534ddfb4dd5cb00d29bf5959faf0e15c395c30c1a9ef913418a5be",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。... plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化」"
+      }
+    },
+    {
+      "claim_hash": "ad56857e1c84f6ed88a461c70569b5c06c8c5e60a1d0632ae225ac1476276055",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する"
+      }
+    },
+    {
+      "claim_hash": "ce0f6c940364c28306872a0ff2a5c45ccce96e59316b484dca1ba12bb6a23ca3",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。"
+      }
+    },
+    {
+      "claim_hash": "ac28cbb09a88bbaf20be7404f758fecf281c3100f6c230e7e0e3ac1a98fbd6c1",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「D3: fail-closed は維持する」 / 「部分 catalogue（ある層だけ存在）→ fail」"
+      }
+    },
+    {
+      "claim_hash": "ed795c04f95c4360855d6a75b43b9bfdffc175310293f0377518d3dfe32d9851",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「AgentRefVerifierAdapter は `verify_pair` 呼び出し時の `cache_scope` 引数から Chain 種別を解決し、対応する capability (`ref-verifier-chain1` または `ref-verifier-chain2`) の `prompt_template_path` を選んで使用する。」"
+      }
+    },
+    {
+      "claim_hash": "1ed95658b4f9458a815b4fd3fb491af0119c5d976243c6956a1e7b786aefb56b",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する"
+      }
+    },
+    {
+      "claim_hash": "9f0cf3014c5ee45faa9a9abcc93b0b53584b8a7eb5c7e830e7624ec323347342",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "7bb2c6acaecbd46ad09b194ce28625ccf38c854927fb0ddfda53c4c86d534110",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「skip が効くのは『整合的な不在』のみ:」"
+      }
+    },
+    {
+      "claim_hash": "d97e9c0fd952c8339c03d18cfaa8b9c45443e79d6c32a16a11d24c16941ebddd",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "> **Superseded (partial)**: スコープ解決の「呼び出しコンテキストからの自動解決」は `2026-06-10-1335-ref-verify-existence-based-scope-resolution.md` D1/D2（artifact 存在ベースの一本化、--context / --layer 削除）で置き換えられた。専用コマンド surface（/track:ref-verify + bin/sotp ref-verify）と差分キャッシュによる増分再レビューは引き続き有効。"
+      }
+    },
+    {
+      "claim_hash": "d97e9c0fd952c8339c03d18cfaa8b9c45443e79d6c32a16a11d24c16941ebddd",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D9 の他の構成要素 — 専用 `/track:ref-verify` skill + `bin/sotp ref-verify` サブコマンドという呼び出し口、発火点ごとに別実装を持たない 1 コマンド構成、差分キャッシュによる増分再レビュー — は維持する。"
+      }
+    },
+    {
+      "claim_hash": "8268c41519a67e316c4c88d93500c5160849885418bebc1384b7fbe98c0f95fa",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）\n- catalogue 全不在 → Chain② zero pairs（実装済み挙動を追認）"
+      }
+    },
+    {
+      "claim_hash": "671259cd0adb01d44316296bc628251cf7cab67c12ce7b15bb0621785880742c",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する: - spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）"
+      }
+    },
+    {
+      "claim_hash": "cf2a0e92f60e8c9ddbd54050ac351b99d9e7498b987a360d195a6cfb7fef13a1",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。"
+      }
+    },
+    {
+      "claim_hash": "df22e648ddbbe3df08591c0325306b332f8abd694b9496719bbe21b6383dbbdc",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。"
+      }
+    },
+    {
+      "claim_hash": "7106990c2a14d5a7f59688cc4156224c5bb8cd673ecdc5ae6e9e49c20fa09700",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。"
+      }
+    },
+    {
+      "claim_hash": "868ed6596b694767f17e90ad4fca7e143352b339df0080467d3868a297d51662",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue 全不在 → Chain② zero pairs（実装済み挙動を追認）"
+      }
+    },
+    {
+      "claim_hash": "0fa5cb619e1e92f21a3f18b820212af82c3175be878f5c3e8291d31fcdebabe8",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 両方存在 → 両 Chain。差分キャッシュが再レビューを増分に限定"
+      }
+    },
+    {
+      "claim_hash": "1516361c91121d0afc0db1082db11d6516d4132cdd34e618445c60950735c04e",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail"
+      }
+    },
+    {
+      "claim_hash": "8a9d9bbdc5ceaf4aec2b2b63da523c3d8054e57a20eeccfb740c201228ad59a2",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail\n- skip が効くのは「整合的な不在」のみ:"
+      }
+    },
+    {
+      "claim_hash": "a0956ba85884e5db7303a1c268be628b94b34931d63363f6602deefcf993432e",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail\n- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail\n- 存在するが壊れている（parse 不能等）→ fail"
+      }
+    },
+    {
+      "claim_hash": "5a09e5f8c44c5ba631eb97650500fef1a5558ca1e85abd73f36649fb9c71328c",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "d746c1e1254e6cc646ff5d625c9d0479d190e30ba205025f2b9eceaf9cd587d0",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）。"
+      }
+    },
+    {
+      "claim_hash": "95a24bb7af89a53743686f91cd589d2ca6ec7220081f42206b20b68488e55674",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）\n- catalogue 全不在 → Chain② zero pairs（実装済み挙動を追認）\n- 両方存在 → 両 Chain。差分キャッシュが再レビューを増分に限定"
+      }
+    },
+    {
+      "claim_hash": "9f0cf3014c5ee45faa9a9abcc93b0b53584b8a7eb5c7e830e7624ec323347342",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the ADR supports removing RefVerifyInvocationContext and the CommitGate-fixed path, but it does not mention the diff cache or imply a constraint that existing incremental re-review by (claim_hash, evidence_hash) must remain unaffected and independent."
+      }
+    },
+    {
+      "claim_hash": "19acde4b223c6eb1e4c794757ffc8e9bac955f230c3b50f5b80bb20220025eb5",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）。"
+      }
+    },
+    {
+      "claim_hash": "7930a7057d6c1cb46b4f1dc93aa0b9edd785be9f55915e7afbb119ec40d58572",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。"
+      }
+    },
+    {
+      "claim_hash": "dfc63d1f7dc58b5ce0a265cbae5b08b6701d583ad1b114123b3c96e8db509b7e",
+      "evidence_hash": "c6d56fff2a569a0f80bf02a7384b689b7f5e17e755bbeedb4aaa1941d8245c90",
+      "verdict": {
+        "kind": "fail",
+        "reason": "New design constraint: the evidence only states the ADR is accepted/grandfathered and does not mention or imply the 'file existence = phase state' principle or a prohibition on adding artificial state fields to metadata.json or other track artifacts."
+      }
+    },
+    {
+      "claim_hash": "167934371d5634dcbf9e2348d17f9a0ecb7f371b7eba4f1981cbe4993031e355",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する:\n- spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）"
+      }
+    },
+    {
+      "claim_hash": "ca75e9a5fa0e82ff594d68d322d248c92b9fbb7c4270b5dc51af05f1a90da8e7",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。」"
+      }
+    },
+    {
+      "claim_hash": "4d5ff225bc64488b30048bfbc0b86148055c66055b0d746e1d84f06dcf968eb0",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail\n- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail\n- 存在するが壊れている（parse 不能等）→ fail"
+      }
+    },
+    {
+      "claim_hash": "545b93d4d03f94d0d61d6e073f54be96392d164224058bcec753a4ebf9c64c7b",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する: - spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過） - catalogue 全不在 → Chain② zero pairs（実装済み挙動を追認） - 両方存在 → 両 Chain。」"
+      }
+    },
+    {
+      "claim_hash": "b978ae7e86f71c5245b968899bef35d6f344a16d5d08ad2fdef51e522f97f89b",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。」"
+      }
+    },
+    {
+      "claim_hash": "b9979ccaa3a556a7e3017dd8d28f88d22ade832c5c5ea3b9a6f304d83d7d533c",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "check-approved 内部の CommitGate 固定も削除。`bin/sotp ref-verify run` の一形態に統一。"
+      }
+    },
+    {
+      "claim_hash": "d2e9794697711fa9acf9848a02094e22da189f7d22eb8fa88b2a31252f82fe2b",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）。"
+      }
+    },
+    {
+      "claim_hash": "4865af05ce8cc190c2474af8efe03f3a780fb4c3e51df92b65025f13678fd3e5",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n- 部分 catalogue（ある層だけ存在）→ fail"
+      }
+    },
+    {
+      "claim_hash": "85a1953410d32bd8a18cdfb1edd0ccd5f82046c094030c0de4c58cbd7572526c",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail"
+      }
+    },
+    {
+      "claim_hash": "18d99de588f12618a43da07b17a51b10f0549d08ea0b9d0dc483f4bb17a5bc29",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail\n- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail\n- 存在するが壊れている（parse 不能等）→ fail"
+      }
+    },
+    {
+      "claim_hash": "5505ef9c4443fc2c9e3a2c2873592c1d42d0ba6e280e5b7971d4b67c92d3cd5a",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。"
+      }
+    },
+    {
+      "claim_hash": "b7ab3ed05c534ddfb4dd5cb00d29bf5959faf0e15c395c30c1a9ef913418a5be",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。... plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化」"
+      }
+    },
+    {
+      "claim_hash": "ad56857e1c84f6ed88a461c70569b5c06c8c5e60a1d0632ae225ac1476276055",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する"
+      }
+    },
+    {
+      "claim_hash": "ce0f6c940364c28306872a0ff2a5c45ccce96e59316b484dca1ba12bb6a23ca3",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）"
+      }
+    },
+    {
+      "claim_hash": "1ed95658b4f9458a815b4fd3fb491af0119c5d976243c6956a1e7b786aefb56b",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する"
+      }
+    },
+    {
+      "claim_hash": "24b987ad862ab396660f9595815a2a4aff772ae91814c307687bba0e12f4564a",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ref-verify の検証ペア集合は、発火面の申告ではなく track ディレクトリの SoT 成果物の存在有無から導出する:\n- spec.json 不在 → Chain① zero pairs\n- catalogue 全不在 → Chain② zero pairs\n- 両方存在 → 両 Chain。"
+      }
+    },
+    {
+      "claim_hash": "24b987ad862ab396660f9595815a2a4aff772ae91814c307687bba0e12f4564a",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「skip が効くのは『整合的な不在』のみ: - 部分 catalogue（ある層だけ存在）→ fail - catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail - 存在するが壊れている（parse 不能等）→ fail」"
+      }
+    },
+    {
+      "claim_hash": "d97e9c0fd952c8339c03d18cfaa8b9c45443e79d6c32a16a11d24c16941ebddd",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`2026-05-27-1601-sot-chain-semantic-review-gate.md` D9 のうち「呼び出しコンテキストからのスコープ自動解決」を本決定で置き換える。D9 の他の構成要素 — 専用 `/track:ref-verify` skill + `bin/sotp ref-verify` サブコマンドという呼び出し口、発火点ごとに別実装を持たない 1 コマンド構成、差分キャッシュによる増分再レビュー — は維持する。"
+      }
+    },
+    {
+      "claim_hash": "8268c41519a67e316c4c88d93500c5160849885418bebc1384b7fbe98c0f95fa",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）」「catalogue 全不在 → Chain② zero pairs（実装済み挙動を追認）」"
+      }
+    },
+    {
+      "claim_hash": "671259cd0adb01d44316296bc628251cf7cab67c12ce7b15bb0621785880742c",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）"
+      }
+    },
+    {
+      "claim_hash": "cf2a0e92f60e8c9ddbd54050ac351b99d9e7498b987a360d195a6cfb7fef13a1",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。"
+      }
+    },
+    {
+      "claim_hash": "df22e648ddbbe3df08591c0325306b332f8abd694b9496719bbe21b6383dbbdc",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。"
+      }
+    },
+    {
+      "claim_hash": "7106990c2a14d5a7f59688cc4156224c5bb8cd673ecdc5ae6e9e49c20fa09700",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。"
+      }
+    },
+    {
+      "claim_hash": "868ed6596b694767f17e90ad4fca7e143352b339df0080467d3868a297d51662",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- catalogue 全不在 → Chain② zero pairs（実装済み挙動を追認）"
+      }
+    },
+    {
+      "claim_hash": "0fa5cb619e1e92f21a3f18b820212af82c3175be878f5c3e8291d31fcdebabe8",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）\n- catalogue 全不在 → Chain② zero pairs（実装済み挙動を追認）\n- 両方存在 → 両 Chain。差分キャッシュが再レビューを増分に限定"
+      }
+    },
+    {
+      "claim_hash": "1516361c91121d0afc0db1082db11d6516d4132cdd34e618445c60950735c04e",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3: fail-closed は維持する\n\nskip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail"
+      }
+    },
+    {
+      "claim_hash": "8a9d9bbdc5ceaf4aec2b2b63da523c3d8054e57a20eeccfb740c201228ad59a2",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail"
+      }
+    },
+    {
+      "claim_hash": "a0956ba85884e5db7303a1c268be628b94b34931d63363f6602deefcf993432e",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail\n- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail\n- 存在するが壊れている（parse 不能等）→ fail"
+      }
+    },
+    {
+      "claim_hash": "d746c1e1254e6cc646ff5d625c9d0479d190e30ba205025f2b9eceaf9cd587d0",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）。"
+      }
+    },
+    {
+      "claim_hash": "95a24bb7af89a53743686f91cd589d2ca6ec7220081f42206b20b68488e55674",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）\n- catalogue 全不在 → Chain② zero pairs（実装済み挙動を追認）\n- 両方存在 → 両 Chain。差分キャッシュが再レビューを増分に限定"
+      }
+    },
+    {
+      "claim_hash": "28a26b170e90ee43eef274153dd5660e4e1613caffd52763ff0b70ad6e57c91c",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- spec.json 不在 → Chain① zero pairs（Phase 0 は両 Chain zero → ゲート通過）"
+      }
+    },
+    {
+      "claim_hash": "ac28cbb09a88bbaf20be7404f758fecf281c3100f6c230e7e0e3ac1a98fbd6c1",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D3: fail-closed は維持する\n\nskip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail"
+      }
+    },
+    {
+      "claim_hash": "19acde4b223c6eb1e4c794757ffc8e9bac955f230c3b50f5b80bb20220025eb5",
+      "evidence_hash": "472e8ae12c7893bd4d88ab1e1112883888a61aba340524e53925519c0b5fa2e8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）。"
+      }
+    },
+    {
+      "claim_hash": "cd81b2f05f193f310d71cb3fa833c5cbc242491f7ea191acd584ebe5423ffb71",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）。"
+      }
+    },
+    {
+      "claim_hash": "24b987ad862ab396660f9595815a2a4aff772ae91814c307687bba0e12f4564a",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec.json 不在 → Chain① zero pairs; catalogue 全不在 → Chain② zero pairs; 両方存在 → 両 Chain"
+      }
+    },
+    {
+      "claim_hash": "24b987ad862ab396660f9595815a2a4aff772ae91814c307687bba0e12f4564a",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip が効くのは「整合的な不在」のみ:\n\n- 部分 catalogue（ある層だけ存在）→ fail\n- catalogue 存在 + spec.json 不在（SoT Chain 上下関係違反）→ fail\n- 存在するが壊れている（parse 不能等）→ fail"
+      }
+    },
+    {
+      "claim_hash": "ff150e70f8ef0cfe3b35bea63a01f3afc266434d963d2782d29636f05d264d11",
+      "evidence_hash": "5dd1fc37c53caf0bac12eb11a3330c9ed03f7880a7e6d075a8f9c5e801ea93f5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数と RefVerifyInvocationContext を削除し、`bin/sotp ref-verify run` の一形態に統一。check-approved 内部の CommitGate 固定も削除。plan.md の Phase 1/2 first-line 発火・Makefile・/track:ref-verify skill も同じ一形態に簡素化（Phase 2 の per-layer N 回実行 → 1 回）。"
+      }
+    }
+  ]
+}

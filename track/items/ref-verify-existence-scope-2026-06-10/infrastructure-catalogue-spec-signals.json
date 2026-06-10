@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ddc483c1b78590c13856f748e351673965a5d1a2c41a06ce78478e77491635b2",
+  "signals": [
+    {
+      "type_name": "RefVerifyInvocationContext",
+      "signal": "blue",
+      "entry_hash": "3e187808dbf99d426ea67a07357b05b83993d393a7c7e648a8819ac9fd725721"
+    },
+    {
+      "type_name": "RefVerifyScopeResolver",
+      "signal": "blue",
+      "entry_hash": "0d24275be74d564b3416531383ce3c969a2dd224e5c9b71acb07babde3a37b0c"
+    },
+    {
+      "type_name": "RefVerifyScopeResolverError",
+      "signal": "blue",
+      "entry_hash": "71475eb23e9e65acd99b8498089d38d1cd3e90aeca3b70d4049dd9312b7107e9"
+    }
+  ]
+}

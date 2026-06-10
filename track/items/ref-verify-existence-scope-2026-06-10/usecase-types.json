@@ -1,0 +1,146 @@
+{
+  "schema_version": 3,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {
+    "RefVerifyScope": {
+      "action": "reference",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Chain1", "payload": { "kind": "unit" } },
+          {
+            "name": "Chain2",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "layer", "ty": "domain::tddd::LayerId" }
+              ]
+            }
+          },
+          { "name": "All", "payload": { "kind": "unit" } }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "docs": "Carried for edge exposure: RefVerifyScopeResolver (infrastructure) resolves artifact existence to this scope and returns it to cli-composition. No structural change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {
+    "RefVerifyPairSourcePort": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "load_pairs",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RefVerifyCommand" },
+            { "name": "config", "ty": "&RefVerifyConfig" }
+          ],
+          "returns": "Result<Vec<RefVerifyPair>, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify",
+      "docs": "Carried for R7 edge visibility: RefVerifyPairSourceAdapter implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyCachePort": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "load_entries",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RefVerifyCommand" },
+            { "name": "cache_scope", "ty": "&RefVerifyCacheScope" }
+          ],
+          "returns": "Result<Vec<domain::tddd::semantic_verify::SemanticVerifyEntry>, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "save_entries",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RefVerifyCommand" },
+            { "name": "cache_scope", "ty": "&RefVerifyCacheScope" },
+            { "name": "entries", "ty": "Vec<domain::tddd::semantic_verify::SemanticVerifyEntry>" }
+          ],
+          "returns": "Result<(), RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify",
+      "docs": "Carried for R7 edge visibility: RefVerifyCacheAdapter implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifierPort": {
+      "action": "reference",
+      "role": "SecondaryPort",
+      "methods": [
+        {
+          "name": "verify_pair",
+          "receiver": "&self",
+          "params": [
+            { "name": "claim", "ty": "String" },
+            { "name": "evidence", "ty": "String" },
+            { "name": "cache_scope", "ty": "&RefVerifyCacheScope" },
+            { "name": "tier", "ty": "domain::tddd::semantic_verify::ModelTier" }
+          ],
+          "returns": "Result<domain::tddd::semantic_verify::SemanticVerdict, RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify",
+      "docs": "Carried for R7 edge visibility: AgentRefVerifierAdapter implements this port. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "RefVerifyApplicationService": {
+      "action": "reference",
+      "role": "ApplicationService",
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            { "name": "cmd", "ty": "&RefVerifyCommand" }
+          ],
+          "returns": "Result<(), RefVerifyError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"],
+      "module_path": "ref_verify",
+      "docs": "Carried for R7 edge visibility: VerifySemanticRefsInteractor implements this service. No change in this track.",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "functions": {}
+}

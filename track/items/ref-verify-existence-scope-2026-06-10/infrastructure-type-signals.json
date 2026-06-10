@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-10T16:46:25Z",
+  "declaration_hash": "ddc483c1b78590c13856f748e351673965a5d1a2c41a06ce78478e77491635b2",
+  "signals": [
+    {
+      "type_name": "RefVerifyScopeResolver",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyScopeResolverError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "RefVerifyInvocationContext",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}

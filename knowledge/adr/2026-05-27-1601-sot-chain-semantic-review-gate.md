@@ -36,7 +36,8 @@ decisions:
   - id: D9
     user_decision_ref: "chat:2026-05-27:dedicated-command"
     candidate_selection: "from:[fold-into-phase-commands,dedicated-command] chose:dedicated-command"
-    status: proposed
+    status: superseded
+    superseded_by: "2026-06-10-1335-ref-verify-existence-based-scope-resolution.md#D1"
   - id: D10
     user_decision_ref: "chat:2026-06-09:translation-gap-allowance"
     status: accepted
@@ -176,6 +177,8 @@ Chain ごとに artifact を分ける理由は3点ある。第一に、発火 ph
 意味論側の approved は、これらの artifact を読む専用ゲートとして評価する。commit 最終関門 (D2) は、既存 code-review の `check-approved` と意味論側 approved を独立した2つのゲートとして AND する薄い合成であり (既存 `check-approved` を意味論 artifact 読みに拡張しない — D1 の SRP 分離と整合)、これが D2 の具体的な実現形である。
 
 ### D9: 意味論検証の呼び出し口 — 専用 `/track:ref-verify` コマンド
+
+> **Superseded (partial)**: スコープ解決の「呼び出しコンテキストからの自動解決」は `2026-06-10-1335-ref-verify-existence-based-scope-resolution.md` D1/D2（artifact 存在ベースの一本化、--context / --layer 削除）で置き換えられた。専用コマンド surface（/track:ref-verify + bin/sotp ref-verify）と差分キャッシュによる増分再レビューは引き続き有効。
 
 意味論検証レーン (D1) は、専用の `/track:ref-verify` skill (公開 UI) と対応する `bin/sotp ref-verify` サブコマンドから呼び出す。`sotp verify *` (層② の構造/新鮮度チェック) にも `/track:review` (code review) にも相乗りせず、層③ 専用の呼び出し口を持つ。3つの検証層がそれぞれ独立した surface を持ち、D1 の SRP 分離と整合する。
 
