@@ -1,0 +1,287 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "plan-artifacts": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This says telemetry on `main` is intentionally not recorded, but [track/workflow.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/workflow.md#L218-L219) still defines a `main`-branch fallback that resolves the latest track. As written, telemetry attribution would disagree with the current track-resolution model on the branch where ad hoc commands are commonly run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+              "line": 92,
+              "category": "contradiction"
+            },
+            {
+              "message": "The lock-free append plan leans on a 4096-byte `PIPE_BUF` cap, but `PIPE_BUF` is defined for pipes/FIFOs, not regular files; see https://man7.org/linux/man-pages/man7/pipe.7.html and https://man7.org/linux/man-pages/man2/write.2.html. For `telemetry.jsonl`, that does not guarantee whole-record atomic writes, so the no-lock strategy is under-specified.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+              "line": 74,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:7527d1f76fdc5afc35606fd2fd22043c55ee75ef8f2cb91c5b0c7383787a0023",
+          "at": "2026-06-10T11:50:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The 4 KiB cap is justified with `PIPE_BUF`, but `PIPE_BUF` only constrains atomic writes to pipes/FIFOs, not regular files like `telemetry.jsonl`. As written, the no-lock append strategy does not guarantee whole-record atomicity for the target file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+              "line": 74,
+              "category": "factual error"
+            },
+            {
+              "message": "This says `main`-branch executions are not recorded, but `track/workflow.md` still defines a `main` fallback that resolves the latest track. Telemetry attribution would therefore disagree with the current track-resolution model on the branch where ad hoc commands are commonly run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+              "line": 92,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7527d1f76fdc5afc35606fd2fd22043c55ee75ef8f2cb91c5b0c7383787a0023",
+          "at": "2026-06-10T11:51:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56299805f18318b860d7d6ca2523d1807b394ad173818fe52aa4a5d1ebc1e8ee",
+          "at": "2026-06-10T11:53:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56299805f18318b860d7d6ca2523d1807b394ad173818fe52aa4a5d1ebc1e8ee",
+          "at": "2026-06-10T11:56:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0644e0ea5574ce35f017b428f56a407176e3c3d57fd6d7b772652a3e2fcf50bc",
+          "at": "2026-06-10T12:18:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 is internally inconsistent with the scope. IN-01/OS-02 and the ADR say the domain layer is not instrumented, but AC-01 only bans subscriber initialization and observation code other than tracing macros in `domain / usecase`, which would allow domain-level tracing spans/events to pass the acceptance gate. Tighten this criterion so domain-layer telemetry is forbidden outright and any allowed tracing macros are limited to the intended non-domain boundaries.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+              "line": 310,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0644e0ea5574ce35f017b428f56a407176e3c3d57fd6d7b772652a3e2fcf50bc",
+          "at": "2026-06-10T12:22:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6eda035fb0f3b046162237979bb281cd7a333787d648e084a03b52b1566aaa04",
+          "at": "2026-06-10T12:25:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 introduces a new `RoundType` in `telemetry::mod`, but the telemetry contract already says `ReviewRound.round_type` uses the shared infrastructure `RoundType` enum. This splits one semantic type into two definitions and will force unnecessary conversions or duplicate serde behavior.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 20,
+              "category": "contradiction"
+            },
+            {
+              "message": "S2 says T002 and T003 are independently implementable/testable before composition-root wiring, but T003 explicitly depends on T002 (`前提: T002`) and its constructor/tests require `TelemetryEvent`/`TelemetryWriteError`. The dependency ordering claim is therefore false.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 17,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b9d9f47a1048d60eaf6abdac6aa383693c8be2120f6f6ca929928311dbd72efe",
+          "at": "2026-06-10T12:52:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 claims CN-05 will be satisfied by using `write_all` as a single append write, but `write_all` is a retrying convenience API and is not a guarantee of one write syscall. Since the design relies on one O_APPEND write per <=4096-byte JSONL record, following this plan can violate the plan's own atomicity/record-boundary constraint.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
+              "line": 18,
+              "category": "factual error (semantic)"
+            },
+            {
+              "message": "T008 says unknown `schema_version` rows are skipped when `serde_json::from_str::<TelemetryEvent>` fails, but T002 defines `schema_version` as a plain `u32` field with derived deserialization. A future/unknown numeric version will deserialize successfully unless the plan adds explicit version validation, so AC-08/CN-08 is not actually implemented by the described algorithm.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
+              "line": 48,
+              "category": "contradiction"
+            },
+            {
+              "message": "`ReviewRound.round_type` is typed as `RoundType`, and the docs/task text describe an infrastructure `RoundType` enum with `Fast`/`Final`, but the infrastructure catalogue does not declare any `RoundType` type. That leaves implementers with a referenced type that is absent from the catalogue contract.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
+              "line": 50,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b9d9f47a1048d60eaf6abdac6aa383693c8be2120f6f6ca929928311dbd72efe",
+          "at": "2026-06-10T12:56:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 requires emitting TrackSubcommand at both command start and completion, but the TelemetryEvent schema only has completed-command fields: exit_code and duration_ms, with no phase/kind field and no nullable values. A start event cannot populate those fields truthfully, and emitting two indistinguishable TrackSubcommand rows would also make the report's duration aggregation ambiguous. Align the task with AC-02's post-execution event, or add an explicit lifecycle field/schema for start vs finish.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 30,
+              "category": "contradiction"
+            },
+            {
+              "message": "T003 fixes the default output path to items_dir/track_id/logs/telemetry.jsonl and mandates opening it with OpenOptions::append(true).create(true).open(path), but no task creates the logs parent directory. create(true) creates only the file, not missing directories, so the first default-path write for a normal track dir will fail and then be suppressed by the fire-and-forget caller, breaking AC-02/AC-05. Add parent directory creation to the writer task before opening the file.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 21,
+              "category": "infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:3bd40a825788aeea0cc72f3d70d39b5e6843825cd364348fd2e0e4591c55df67",
+          "at": "2026-06-10T13:05:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 tells implementers to emit `TelemetryEvent::TrackSubcommand` after every CLI dispatch once a track branch is resolved, but the spec explicitly excludes pure display commands and AC-06 requires eventless paths such as pure display commands to avoid opening `logs/`. Since task coverage maps AC-06 only to T003's lazy writer behavior, no task actually prevents T004 from recording those display commands, so following the plan can violate OS-04/AC-06.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 30,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0d5fd6359f43ff5b5da168caf02132eda3e3220c9e40f33c74b4f76c4979057b",
+          "at": "2026-06-10T13:09:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 requires the report reader to extract `schema_version` from each raw JSON line before typed deserialization, but the catalogue defines `schema_version` only inside each `TelemetryEvent` variant payload and T002 asks for a derived serde struct-payload enum. With serde's default enum representation, the raw line is variant-wrapped, so a top-level version check will not find `schema_version` and valid events can be skipped or become unreadable. The plan needs an explicit wire format, such as top-level `schema_version` plus event type, or a reader that intentionally inspects the nested variant payload.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 55,
+              "category": "contradiction"
+            },
+            {
+              "message": "`TelemetryWriteError` is documented as errors that `TelemetryWriter` suppresses rather than propagates, but T003 defines `TelemetryWriter::write` as returning `Result<(), TelemetryWriteError>`, says IO/serialize errors are returned and suppressed by the caller, and requires a test that observes `TelemetryWriteError::Io`. These are incompatible contracts; following the catalogue would make the T003 API/tests impossible to satisfy.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
+              "line": 206,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:21ecae39b5e292aa95ec4c1b700931a6bf3fc414c2af45afef86c9ea685e7e93",
+          "at": "2026-06-10T13:13:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 makes the schema-version compatibility check optional even though CN-08/AC-08 require lines with unknown `schema_version` to be skipped and counted. With the planned externally tagged `TelemetryEvent`, a known variant carrying a future `schema_version` can deserialize successfully, so an implementation may aggregate incompatible future rows instead of skipping them. Make the payload `schema_version` check mandatory before aggregation.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 55,
+              "category": "contradiction"
+            },
+            {
+              "message": "The writer plan requires a single `std::io::Write::write` call but does not require checking the returned byte count. `write` may return `Ok(n)` with `n < buffer.len()`, which would leave a truncated JSONL row while `TelemetryWriter::write` could still return success; this undermines the valid-JSONL and line-boundary guarantees. The task should require treating short writes as `TelemetryWriteError::Io` or otherwise explicitly handling them.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 22,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:0d0fa38c4ad7b3254bf5fc4069a7bc7305302175ee3099967202b1a6870a25a1",
+          "at": "2026-06-10T13:17:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03 is covered only by T001, but CN-03 includes the archive-retention requirement that gitignored `logs/` move with archived tracks; T001 only adds the `.gitignore` entry and T010 only rechecks that entry. The plan can therefore satisfy its mapped tasks while leaving GO-03's active-to-archive retention behavior unimplemented or unverified.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/task-coverage.json",
+              "line": 26,
+              "category": "coverage_gap"
+            },
+            {
+              "message": "The plan records gate evaluations without any duration field, while the ADR goal explicitly includes finding which gates took time. T008 then aggregates phase durations only from `TrackSubcommand` events, so individual slow gates cannot be reconstructed from the planned telemetry.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/infrastructure-types.json",
+              "line": 27,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9f611a29e77482d4160b656bb3440055b738f3b98855722a871d9b3aa107ecda",
+          "at": "2026-06-10T13:23:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-03/GO-03 require telemetry logs to follow the track lifecycle by moving gitignored `logs/` during archive, and task coverage maps CN-03 to T001/T010. However T010 explicitly excludes the archive-tool change as a separate future track and only verifies the `.gitignore` entry, so completing the plan can leave the stated retention/archive requirement unmet while the artifacts claim CN-03 is covered.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 64,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:eab8f74f00564715abf5302b2ff20e2046938965aed464d718b70329b6ea984d",
+          "at": "2026-06-10T13:27:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 narrows CN-03 to only adding the gitignore entry and explicitly defers archive-tool handling to a separate track, but the spec/ADR make archive movement part of the same retention requirement: GO-03 says retention follows the active to archive lifecycle, and CN-03 says the archive tool must move gitignored `logs/` with the track directory. Since `task-coverage.json` maps CN-03 only to T001 and T010 only verifies AC-10, this plan can complete while leaving the declared CN-03/GO-03 behavior unimplemented.",
+              "severity": "P1",
+              "file": "track/items/track-workflow-telemetry-2026-06-10/plan.md",
+              "line": 11,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:39a11bdabc98e85b87304d2f756a23c4d567e60ea209c5d099fcc4a898d63a2c",
+          "at": "2026-06-10T13:31:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a89b0816f72effb784da7a101e082108508bb3f4d90163d48f01045cb58a13d3",
+          "at": "2026-06-10T13:37:03Z"
+        }
+      ]
+    }
+  }
+}

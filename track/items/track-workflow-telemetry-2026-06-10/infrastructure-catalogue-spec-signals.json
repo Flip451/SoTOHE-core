@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "8fd50f32b8c6534f0d0cc2aab0e5ec76c21275b3a2f285bb47ba59ed4ce98326",
+  "signals": [
+    {
+      "type_name": "PhaseDurationSummary",
+      "signal": "blue",
+      "entry_hash": "d5b7a7c8cf532dbbcacfac224e46ff2d61420f0775ca2c6d1ee09d4d1ccd0b64"
+    },
+    {
+      "type_name": "TelemetryConfig",
+      "signal": "blue",
+      "entry_hash": "895e65d036b097fec716cc39fa803de9c91ef3059c5fcb2b451bdff57ea2a081"
+    },
+    {
+      "type_name": "TelemetryErrorEntry",
+      "signal": "blue",
+      "entry_hash": "51d2fab78ad816ffec54c6cd30293e50b810ea2fd5a4ea0f59f19b3ad25732d9"
+    },
+    {
+      "type_name": "TelemetryEvent",
+      "signal": "blue",
+      "entry_hash": "d4013ea6b7a16071a7be74b07e6ff83d7794a65daa38b62b236a495fc8cb1959"
+    },
+    {
+      "type_name": "TelemetryHookBlockEntry",
+      "signal": "blue",
+      "entry_hash": "25b2fd5a90822070113129d9f5a56a9faaee8aa1cc491ec1078c53dc9c6a48b5"
+    },
+    {
+      "type_name": "TelemetryReport",
+      "signal": "blue",
+      "entry_hash": "1da15c749e5b304393eb4b736e9073e33eb60dc2a6eed283200a19baa0a65371"
+    },
+    {
+      "type_name": "TelemetryReportError",
+      "signal": "blue",
+      "entry_hash": "e51d1bac8b15e98079e912d9aaf585a5f169186f5acd053980ee8bc903cab12d"
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "signal": "blue",
+      "entry_hash": "d60b5cded4c82f0da046f8711d5096acffce47317807d260322aa4ddf04c408d"
+    },
+    {
+      "type_name": "TelemetryWriteError",
+      "signal": "blue",
+      "entry_hash": "f3c1b50bf38b6d59e85abfad7b2eef42ba703bfce9268128346105556ca5c480"
+    },
+    {
+      "type_name": "TelemetryWriter",
+      "signal": "blue",
+      "entry_hash": "77fdc8561eb0ebf37be36591a7dc298d0a7c15f1d3987e1de3178665ad2ab0a7"
+    }
+  ]
+}

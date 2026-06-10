@@ -1,0 +1,673 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "TelemetryEvent": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TrackSubcommand",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "schema_version", "ty": "u32" },
+                { "name": "track_id", "ty": "String" },
+                { "name": "command", "ty": "String" },
+                { "name": "exit_code", "ty": "i32" },
+                { "name": "duration_ms", "ty": "u64" },
+                { "name": "timestamp", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "GateEval",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "schema_version", "ty": "u32" },
+                { "name": "track_id", "ty": "String" },
+                { "name": "gate_name", "ty": "String" },
+                { "name": "verdict", "ty": "String" },
+                { "name": "reason_summary", "ty": "String" },
+                { "name": "input_hash", "ty": "String" },
+                { "name": "duration_ms", "ty": "u64" },
+                { "name": "timestamp", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ReviewRound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "schema_version", "ty": "u32" },
+                { "name": "track_id", "ty": "String" },
+                { "name": "provider", "ty": "String" },
+                { "name": "model", "ty": "String" },
+                { "name": "round_type", "ty": "String" },
+                { "name": "duration_ms", "ty": "u64" },
+                { "name": "findings_count", "ty": "u32" },
+                { "name": "timestamp", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "ExternalSubprocess",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "schema_version", "ty": "u32" },
+                { "name": "track_id", "ty": "String" },
+                { "name": "command", "ty": "String" },
+                { "name": "duration_ms", "ty": "u64" },
+                { "name": "retry_count", "ty": "u32" },
+                { "name": "verdict_parse_failed", "ty": "bool" },
+                { "name": "timestamp", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "HookBlock",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "schema_version", "ty": "u32" },
+                { "name": "track_id", "ty": "String" },
+                { "name": "hook_name", "ty": "String" },
+                { "name": "timestamp", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "AdvisoryHookFired",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "schema_version", "ty": "u32" },
+                { "name": "track_id", "ty": "String" },
+                { "name": "hook_name", "ty": "String" },
+                { "name": "timestamp", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "NonZeroExit",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "schema_version", "ty": "u32" },
+                { "name": "track_id", "ty": "String" },
+                { "name": "command", "ty": "String" },
+                { "name": "exit_code", "ty": "i32" },
+                { "name": "error_chain", "ty": "String" },
+                { "name": "timestamp", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Wire format (serde DTO) for a single JSONL event line in `track/items/<id>/logs/telemetry.jsonl`. Each variant carries the event-specific fields plus a per-line `schema_version` field per D7 (IN-08, CN-09). All categorical String fields (command, gate_name, provider, model, hook_name, error_chain, timestamp, verdict, round_type) are free-form log labels or opaque values — not domain-constrained. round_type carries 'fast' or 'final' as a lowercase string rather than an enum to keep the serde DTO self-contained at the JSONL boundary and avoid coupling to the agent_profiles::RoundType enum which lacks serde derives. track_id is recorded as a plain String for the same DTO-boundary reason.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-03",
+          "hash": "3068d1c6b91c316da61a10477195ac6b66d9550334317c88a4974e4a58294925"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-08",
+          "hash": "de18711db7ea5d7a6fff0a1b8f4403d6bcc223aa6d87607cac2e681d81012c81"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "CN-09",
+          "hash": "a476070845ac1b903f0a3a8b397f24167fc1430d870ea414452c79f3bdfb2e3b"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-09",
+          "hash": "59305ffe5c90ed46d6364f83b837a406ded7f4edfa7d27388d2bd9bbfc446adc"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryWriter": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Writes telemetry events to `track/items/<id>/logs/telemetry.jsonl` using O_APPEND single-write syscalls per D3 (IN-02, CN-05). Initialization is lazy: file open is deferred until the first event is written (IN-05, AC-06). Respects SOTP_TELEMETRY=0 kill switch and SOTP_TELEMETRY_DIR override from TelemetryConfig. Constructed by cli-composition from TelemetryConfig. The write() method returns Result<(), TelemetryWriteError> — IO/serialize errors are returned to the caller (composition root) which silently suppresses them (fire-and-forget, CN-01). Private fields: resolved output path and enabled flag.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-02",
+          "hash": "86568cbe85a8d449f8242b33392cad602b3a9c3876aca63031a9435af8215925"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-05",
+          "hash": "bd65f1758b690851c1ac4d3abba47454ee21529d6be6d6ec7453f9259859947f"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "CN-05",
+          "hash": "9644f9dab83660b8dddd55802e8417b745a3872551e015c4275cae0e83e9a7bc"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-06",
+          "hash": "9c34ad711cfa5dbd8a0081da45d96bcc6c9dca220cd9d13bb51566cf0b51ddec"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryWriteError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Serialize",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Failure modes for TelemetryWriter::write. Serialize covers JSON serialization failures; Io covers O_APPEND file open or write failures. TelemetryWriter::write returns Result<(), TelemetryWriteError> so the error is observable (e.g. in tests), but the caller (composition root) suppresses it via fire-and-forget (CN-01 / diagnostic-only). The error is propagated from write() to the caller, which then discards it silently.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "CN-01",
+          "hash": "cefb7614a664a98869a6acd3840f3a433c216d35a5a673677a398dd2d090a92b"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-02",
+          "hash": "86568cbe85a8d449f8242b33392cad602b3a9c3876aca63031a9435af8215925"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryConfig": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Resolved telemetry configuration loaded from environment variables at cli-composition startup. Private fields: enabled (false when SOTP_TELEMETRY=0), output_dir_override (Some when SOTP_TELEMETRY_DIR is set). Constructed by cli-composition from env; passed to TelemetryWriter::new. Role is Dto rather than ValueObject because it carries serde/env-boundary resolution state, not a validated domain value.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-05",
+          "hash": "bd65f1758b690851c1ac4d3abba47454ee21529d6be6d6ec7453f9259859947f"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "CN-04",
+          "hash": "4123122211fe7ef63e21eba770d6a03dd657b2494eca811812659962f510b137"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-05",
+          "hash": "74dc9826887caed7068fdcb62334fc22c6727b13fbfce5c83c3bbb379d412446"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryReport": {
+      "action": "add",
+      "role": "SecondaryAdapter",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Reads and aggregates `telemetry.jsonl` for a given track-id to produce a TelemetryReportOutput. Implements fail-open line skipping: broken JSON lines and lines with unknown schema_version are counted but not failed on per CN-08 (IN-07, AC-08). Private fields: items_dir path.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-07",
+          "hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "CN-07",
+          "hash": "a2ae5411f63ad47bdb53ae0f74197e2cc100ef898bb893856e944eeb74d0f53a"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "CN-08",
+          "hash": "c131e43756ae77035b2dfc6a6040a5ee98cc7aaa1a749f36adcd891aec5959cb"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-08",
+          "hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryReportOutput": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "phase_durations", "ty": "Vec<PhaseDurationSummary>" },
+            { "name": "errors", "ty": "Vec<TelemetryErrorEntry>" },
+            { "name": "hook_blocks", "ty": "Vec<TelemetryHookBlockEntry>" },
+            { "name": "skipped_lines", "ty": "u32" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Aggregated output of `bin/sotp telemetry report <track-id>`. Carries phase-by-phase duration summary, error list, hook block list, and the count of lines skipped due to parse failures or unknown schema_version (fail-open per CN-08, AC-08).",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-07",
+          "hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-08",
+          "hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "PhaseDurationSummary": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "phase_name", "ty": "String" },
+            { "name": "total_ms", "ty": "u64" },
+            { "name": "event_count", "ty": "u32" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Per-phase aggregated duration in the telemetry report. `phase_name` is a free-form label derived from the `command` field of TrackSubcommand events (e.g. 'track spec-design', 'track type-design'). Raw String is justified: phase names are open-ended identifiers from subcommand names with no domain-level finite set or validation constraint at the report aggregation boundary.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-07",
+          "hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-08",
+          "hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryErrorEntry": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "timestamp", "ty": "String" },
+            { "name": "command", "ty": "String" },
+            { "name": "exit_code", "ty": "i32" },
+            { "name": "error_chain", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Single non-zero exit event entry in the telemetry report's error list. Projected from NonZeroExit events in the JSONL log.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-07",
+          "hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-08",
+          "hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryHookBlockEntry": {
+      "action": "add",
+      "role": "Dto",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "timestamp", "ty": "String" },
+            { "name": "hook_name", "ty": "String" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Single hook block event entry in the telemetry report's hook block list. Projected from HookBlock events in the JSONL log.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-07",
+          "hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-08",
+          "hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "TelemetryReportError": {
+      "action": "add",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "path", "ty": "String" },
+                { "name": "message", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "TrackNotFound",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "track_id", "ty": "String" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "docs": "Failure modes of TelemetryReport::aggregate. Io covers file-system read failures. TrackNotFound is returned when the requested track directory does not exist. Parse failures on individual lines are NOT errors; they are absorbed by the fail-open skipping logic (CN-08) and counted in TelemetryReportOutput.skipped_lines.",
+      "spec_refs": [
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "IN-07",
+          "hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "CN-08",
+          "hash": "c131e43756ae77035b2dfc6a6040a5ee98cc7aaa1a749f36adcd891aec5959cb"
+        },
+        {
+          "file": "track/items/track-workflow-telemetry-2026-06-10/spec.json",
+          "anchor": "AC-08",
+          "hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "TelemetryWriter",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "config", "ty": "TelemetryConfig" },
+            { "name": "track_id", "ty": "String" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "write",
+          "receiver": "&self",
+          "params": [
+            { "name": "event", "ty": "TelemetryEvent" }
+          ],
+          "returns": "Result<(), TelemetryWriteError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "TelemetryConfig",
+      "methods": [
+        {
+          "name": "from_env",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "is_enabled",
+          "receiver": "&self",
+          "params": [],
+          "returns": "bool",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    },
+    {
+      "type_name": "TelemetryReport",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "items_dir", "ty": "std::path::PathBuf" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        },
+        {
+          "name": "aggregate",
+          "receiver": "&self",
+          "params": [
+            { "name": "track_id", "ty": "&str" }
+          ],
+          "returns": "Result<TelemetryReportOutput, TelemetryReportError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryEvent"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryEvent"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TelemetryEvent"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TelemetryEvent"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryWriter"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryWriteError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TelemetryWriteError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "TelemetryWriteError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryConfig"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryReport"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryReportOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryReportOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PhaseDurationSummary"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "PhaseDurationSummary"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryErrorEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryErrorEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryHookBlockEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TelemetryHookBlockEntry"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TelemetryReportError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TelemetryReportError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "TelemetryReportError"
+    }
+  ]
+}

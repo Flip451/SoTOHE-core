@@ -1,0 +1,310 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "d5b7a7c8cf532dbbcacfac224e46ff2d61420f0775ca2c6d1ee09d4d1ccd0b64",
+      "evidence_hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report <track-id>` subcommand を初期スコープに含める。フェーズ別所要時間・エラー一覧・hook block 一覧を集計し、集計ロジックは Rust native とする（cargo make に置かない）。"
+      }
+    },
+    {
+      "claim_hash": "d5b7a7c8cf532dbbcacfac224e46ff2d61420f0775ca2c6d1ee09d4d1ccd0b64",
+      "evidence_hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "フェーズ別所要時間・エラー一覧・hook block 一覧を集計して出力する。"
+      }
+    },
+    {
+      "claim_hash": "895e65d036b097fec716cc39fa803de9c91ef3059c5fcb2b451bdff57ea2a081",
+      "evidence_hash": "bd65f1758b690851c1ac4d3abba47454ee21529d6be6d6ec7453f9259859947f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry を既定 ON とし、`SOTP_TELEMETRY=0` で全記録を無効化（kill switch）、`SOTP_TELEMETRY_DIR` で書き出し先を差し替えられるようにする。初期化は lazy とし、イベントが 1 件も発生しなければ file open を行わない"
+      }
+    },
+    {
+      "claim_hash": "895e65d036b097fec716cc39fa803de9c91ef3059c5fcb2b451bdff57ea2a081",
+      "evidence_hash": "4123122211fe7ef63e21eba770d6a03dd657b2494eca811812659962f510b137",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subscriber 初期化は `apps/cli-composition` の composition root のみで行い、usecase 層は `std::fs`・`std::env` などへの直接依存を持たない。hexagonal-architecture convention の usecase 層純粋性規則に従う"
+      }
+    },
+    {
+      "claim_hash": "895e65d036b097fec716cc39fa803de9c91ef3059c5fcb2b451bdff57ea2a081",
+      "evidence_hash": "74dc9826887caed7068fdcb62334fc22c6727b13fbfce5c83c3bbb379d412446",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`SOTP_TELEMETRY=0` を設定した状態で `bin/sotp` を実行したとき、`logs/` ディレクトリへのファイル書き込みが一切行われない。`SOTP_TELEMETRY_DIR` を設定したとき、指定先ディレクトリに telemetry.jsonl が書き出される"
+      }
+    },
+    {
+      "claim_hash": "51d2fab78ad816ffec54c6cd30293e50b810ea2fd5a4ea0f59f19b3ad25732d9",
+      "evidence_hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "フェーズ別所要時間・エラー一覧・hook block 一覧を集計し"
+      }
+    },
+    {
+      "claim_hash": "51d2fab78ad816ffec54c6cd30293e50b810ea2fd5a4ea0f59f19b3ad25732d9",
+      "evidence_hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "フェーズ別所要時間・エラー一覧・hook block 一覧を集計して出力する"
+      }
+    },
+    {
+      "claim_hash": "403ac79ae64cb3a1dc51475ef6f6f397a81f318e1327355df730c47160d8c933",
+      "evidence_hash": "3068d1c6b91c316da61a10477195ac6b66d9550334317c88a4974e4a58294925",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録対象とするイベント種別: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約・入力 hash）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess（所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）"
+      }
+    },
+    {
+      "claim_hash": "403ac79ae64cb3a1dc51475ef6f6f397a81f318e1327355df730c47160d8c933",
+      "evidence_hash": "de18711db7ea5d7a6fff0a1b8f4403d6bcc223aa6d87607cac2e681d81012c81",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせる。スキーマ変更時の互換性判定が行単位で可能であり、file header イベント方式は採用しない"
+      }
+    },
+    {
+      "claim_hash": "403ac79ae64cb3a1dc51475ef6f6f397a81f318e1327355df730c47160d8c933",
+      "evidence_hash": "a476070845ac1b903f0a3a8b397f24167fc1430d870ea414452c79f3bdfb2e3b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行に `schema_version` フィールドを必須とする。file header イベント方式（並行 append 時の初回書き込み競合あり）は採用しない。スキーマ変更時の互換性判定は行単位で行う"
+      }
+    },
+    {
+      "claim_hash": "403ac79ae64cb3a1dc51475ef6f6f397a81f318e1327355df730c47160d8c933",
+      "evidence_hash": "59305ffe5c90ed46d6364f83b837a406ded7f4edfa7d27388d2bd9bbfc446adc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry.jsonl の各イベント行が `schema_version` フィールドを含む。file header イベント方式は採用されておらず、スキーマ互換性の判定は行単位で可能である"
+      }
+    },
+    {
+      "claim_hash": "25b2fd5a90822070113129d9f5a56a9faaee8aa1cc491ec1078c53dc9c6a48b5",
+      "evidence_hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "フェーズ別所要時間・エラー一覧・hook block 一覧を集計し"
+      }
+    },
+    {
+      "claim_hash": "25b2fd5a90822070113129d9f5a56a9faaee8aa1cc491ec1078c53dc9c6a48b5",
+      "evidence_hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report <track-id>` が実行でき、フェーズ別所要時間・エラー一覧・hook block 一覧を集計して出力する。"
+      }
+    },
+    {
+      "claim_hash": "1da15c749e5b304393eb4b736e9073e33eb60dc2a6eed283200a19baa0a65371",
+      "evidence_hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report <track-id>` subcommand を初期スコープに含める。フェーズ別所要時間・エラー一覧・hook block 一覧を集計し、集計ロジックは Rust native とする（cargo make に置かない）。読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する"
+      }
+    },
+    {
+      "claim_hash": "1da15c749e5b304393eb4b736e9073e33eb60dc2a6eed283200a19baa0a65371",
+      "evidence_hash": "a2ae5411f63ad47bdb53ae0f74197e2cc100ef898bb893856e944eeb74d0f53a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report` の集計ロジックは Rust native に実装する。cargo make のシェルスクリプトにロジックを流出させない"
+      }
+    },
+    {
+      "claim_hash": "1da15c749e5b304393eb4b736e9073e33eb60dc2a6eed283200a19baa0a65371",
+      "evidence_hash": "c131e43756ae77035b2dfc6a6040a5ee98cc7aaa1a749f36adcd891aec5959cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の読み手は破損行・未知 `schema_version` の行を fail せず skip する（fail-open）。skip 件数を出力に含める。lock なしの並行 append で稀に生じうる破損行を読み手側で吸収する"
+      }
+    },
+    {
+      "claim_hash": "1da15c749e5b304393eb4b736e9073e33eb60dc2a6eed283200a19baa0a65371",
+      "evidence_hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report <track-id>` が実行でき、フェーズ別所要時間・エラー一覧・hook block 一覧を集計して出力する。破損行および未知 `schema_version` を持つ行は skip され（fail-open）、report コマンドは終了コード 0 で完了し、skip 件数が出力に含まれる"
+      }
+    },
+    {
+      "claim_hash": "e51d1bac8b15e98079e912d9aaf585a5f169186f5acd053980ee8bc903cab12d",
+      "evidence_hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report <track-id>` subcommand を初期スコープに含める。フェーズ別所要時間・エラー一覧・hook block 一覧を集計し、集計ロジックは Rust native とする（cargo make に置かない）。読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する"
+      }
+    },
+    {
+      "claim_hash": "e51d1bac8b15e98079e912d9aaf585a5f169186f5acd053980ee8bc903cab12d",
+      "evidence_hash": "c131e43756ae77035b2dfc6a6040a5ee98cc7aaa1a749f36adcd891aec5959cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "report の読み手は破損行・未知 `schema_version` の行を fail せず skip する（fail-open）。skip 件数を出力に含める。"
+      }
+    },
+    {
+      "claim_hash": "e51d1bac8b15e98079e912d9aaf585a5f169186f5acd053980ee8bc903cab12d",
+      "evidence_hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report <track-id>` が実行でき、フェーズ別所要時間・エラー一覧・hook block 一覧を集計して出力する。破損行および未知 `schema_version` を持つ行は skip され（fail-open）、report コマンドは終了コード 0 で完了し、skip 件数が出力に含まれる"
+      }
+    },
+    {
+      "claim_hash": "d60b5cded4c82f0da046f8711d5096acffce47317807d260322aa4ddf04c408d",
+      "evidence_hash": "39ecfa3990d6f3687b94bf6789f320977dc68abe0001718e83522ce376d3261b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report <track-id>` subcommand を初期スコープに含める。フェーズ別所要時間・エラー一覧・hook block 一覧を集計し、集計ロジックは Rust native とする（cargo make に置かない）。読み手は破損行・未知 `schema_version` の行を fail せず skip し、skip 件数を報告する"
+      }
+    },
+    {
+      "claim_hash": "d60b5cded4c82f0da046f8711d5096acffce47317807d260322aa4ddf04c408d",
+      "evidence_hash": "e7fd94c76ce8a04c44d4a8deca93a646830252a3942c4bd63f98132887c4248e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp telemetry report <track-id>` が実行でき、フェーズ別所要時間・エラー一覧・hook block 一覧を集計して出力する。破損行および未知 `schema_version` を持つ行は skip され（fail-open）、report コマンドは終了コード 0 で完了し、skip 件数が出力に含まれる"
+      }
+    },
+    {
+      "claim_hash": "9df77c9fb364765596e17bb3bce9666e28fa994c5b511be4dd7b1f2c9eac5359",
+      "evidence_hash": "cefb7614a664a98869a6acd3840f3a433c216d35a5a673677a398dd2d090a92b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は診断用途であり、コンプライアンス監査グレードの確実書き込みは保証しない。イベントの稀な欠落は許容し、SoT 成果物（metadata.json / review.json / git notes）は telemetry と独立して無傷で残ることを前提とする"
+      }
+    },
+    {
+      "claim_hash": "9df77c9fb364765596e17bb3bce9666e28fa994c5b511be4dd7b1f2c9eac5359",
+      "evidence_hash": "86568cbe85a8d449f8242b33392cad602b3a9c3876aca63031a9435af8215925",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry ファイルへの書き込みは O_APPEND フラグを立てた単発 write syscall で行い、1 イベント行の上限を 4096 バイトとする。ユーザーランドの lock 機構は使わない（fire-and-forget）。並行 worker からの同時 append による稀な行の乱れは診断用途として許容する"
+      }
+    },
+    {
+      "claim_hash": "4d3c2d5079acb1661bcecbad26ffd44ad6ca57f3a4a08a195d5c869208f1c615",
+      "evidence_hash": "86568cbe85a8d449f8242b33392cad602b3a9c3876aca63031a9435af8215925",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry ファイルへの書き込みは O_APPEND フラグを立てた単発 write syscall で行い、1 イベント行の上限を 4096 バイトとする。ユーザーランドの lock 機構は使わない（fire-and-forget）。並行 worker からの同時 append による稀な行の乱れは診断用途として許容する"
+      }
+    },
+    {
+      "claim_hash": "4d3c2d5079acb1661bcecbad26ffd44ad6ca57f3a4a08a195d5c869208f1c615",
+      "evidence_hash": "bd65f1758b690851c1ac4d3abba47454ee21529d6be6d6ec7453f9259859947f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry を既定 ON とし、`SOTP_TELEMETRY=0` で全記録を無効化（kill switch）、`SOTP_TELEMETRY_DIR` で書き出し先を差し替えられるようにする。初期化は lazy とし、イベントが 1 件も発生しなければ file open を行わない"
+      }
+    },
+    {
+      "claim_hash": "4d3c2d5079acb1661bcecbad26ffd44ad6ca57f3a4a08a195d5c869208f1c615",
+      "evidence_hash": "9644f9dab83660b8dddd55802e8417b745a3872551e015c4275cae0e83e9a7bc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "書き込みは O_APPEND フラグを立てた単発 write syscall で行い、1 イベント行は 4096 バイト以内に収める。超過しうる可変長フィールドは要約して収める。ユーザーランドの lock 機構を追加して fire-and-forget のレイテンシを増やしてはならない"
+      }
+    },
+    {
+      "claim_hash": "4d3c2d5079acb1661bcecbad26ffd44ad6ca57f3a4a08a195d5c869208f1c615",
+      "evidence_hash": "9c34ad711cfa5dbd8a0081da45d96bcc6c9dca220cd9d13bb51566cf0b51ddec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "イベントが 1 件も発生しない実行パス（例: 純表示系コマンド、hook の allow 経路）では `logs/` ディレクトリへのファイル open が行われない（lazy 初期化）"
+      }
+    },
+    {
+      "claim_hash": "d4013ea6b7a16071a7be74b07e6ff83d7794a65daa38b62b236a495fc8cb1959",
+      "evidence_hash": "3068d1c6b91c316da61a10477195ac6b66d9550334317c88a4974e4a58294925",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録対象とするイベント種別: track 操作 subcommand（command・exit code・所要時間・track_id）/ gate 評価（gate 名・verdict・理由要約・入力 hash）/ review・dry round（provider・model・round 種別・所要時間・findings 件数）/ 外部 subprocess（所要時間・retry 回数・verdict parse 失敗）/ hook dispatch の block 時および advisory（注入型）hook の発火時 / 非ゼロ exit（error chain）"
+      }
+    },
+    {
+      "claim_hash": "d4013ea6b7a16071a7be74b07e6ff83d7794a65daa38b62b236a495fc8cb1959",
+      "evidence_hash": "de18711db7ea5d7a6fff0a1b8f4403d6bcc223aa6d87607cac2e681d81012c81",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行（JSONL の 1 行）に `schema_version` フィールドを持たせる。スキーマ変更時の互換性判定が行単位で可能であり、file header イベント方式は採用しない"
+      }
+    },
+    {
+      "claim_hash": "d4013ea6b7a16071a7be74b07e6ff83d7794a65daa38b62b236a495fc8cb1959",
+      "evidence_hash": "a476070845ac1b903f0a3a8b397f24167fc1430d870ea414452c79f3bdfb2e3b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各イベント行に `schema_version` フィールドを必須とする。file header イベント方式（並行 append 時の初回書き込み競合あり）は採用しない。スキーマ変更時の互換性判定は行単位で行う"
+      }
+    },
+    {
+      "claim_hash": "d4013ea6b7a16071a7be74b07e6ff83d7794a65daa38b62b236a495fc8cb1959",
+      "evidence_hash": "59305ffe5c90ed46d6364f83b837a406ded7f4edfa7d27388d2bd9bbfc446adc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry.jsonl の各イベント行が `schema_version` フィールドを含む。file header イベント方式は採用されておらず、スキーマ互換性の判定は行単位で可能である"
+      }
+    },
+    {
+      "claim_hash": "f3c1b50bf38b6d59e85abfad7b2eef42ba703bfce9268128346105556ca5c480",
+      "evidence_hash": "cefb7614a664a98869a6acd3840f3a433c216d35a5a673677a398dd2d090a92b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry は診断用途であり、コンプライアンス監査グレードの確実書き込みは保証しない。イベントの稀な欠落は許容し"
+      }
+    },
+    {
+      "claim_hash": "f3c1b50bf38b6d59e85abfad7b2eef42ba703bfce9268128346105556ca5c480",
+      "evidence_hash": "86568cbe85a8d449f8242b33392cad602b3a9c3876aca63031a9435af8215925",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry ファイルへの書き込みは O_APPEND フラグを立てた単発 write syscall で行い、1 イベント行の上限を 4096 バイトとする。ユーザーランドの lock 機構は使わない（fire-and-forget）。"
+      }
+    },
+    {
+      "claim_hash": "77fdc8561eb0ebf37be36591a7dc298d0a7c15f1d3987e1de3178665ad2ab0a7",
+      "evidence_hash": "86568cbe85a8d449f8242b33392cad602b3a9c3876aca63031a9435af8215925",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry ファイルへの書き込みは O_APPEND フラグを立てた単発 write syscall で行い、1 イベント行の上限を 4096 バイトとする。ユーザーランドの lock 機構は使わない（fire-and-forget）。並行 worker からの同時 append による稀な行の乱れは診断用途として許容する"
+      }
+    },
+    {
+      "claim_hash": "77fdc8561eb0ebf37be36591a7dc298d0a7c15f1d3987e1de3178665ad2ab0a7",
+      "evidence_hash": "bd65f1758b690851c1ac4d3abba47454ee21529d6be6d6ec7453f9259859947f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "telemetry を既定 ON とし、`SOTP_TELEMETRY=0` で全記録を無効化（kill switch）、`SOTP_TELEMETRY_DIR` で書き出し先を差し替えられるようにする。初期化は lazy とし、イベントが 1 件も発生しなければ file open を行わない"
+      }
+    },
+    {
+      "claim_hash": "77fdc8561eb0ebf37be36591a7dc298d0a7c15f1d3987e1de3178665ad2ab0a7",
+      "evidence_hash": "9644f9dab83660b8dddd55802e8417b745a3872551e015c4275cae0e83e9a7bc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "書き込みは O_APPEND フラグを立てた単発 write syscall で行い、1 イベント行は 4096 バイト以内に収める。超過しうる可変長フィールドは要約して収める。ユーザーランドの lock 機構を追加して fire-and-forget のレイテンシを増やしてはならない"
+      }
+    },
+    {
+      "claim_hash": "77fdc8561eb0ebf37be36591a7dc298d0a7c15f1d3987e1de3178665ad2ab0a7",
+      "evidence_hash": "9c34ad711cfa5dbd8a0081da45d96bcc6c9dca220cd9d13bb51566cf0b51ddec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "イベントが 1 件も発生しない実行パス（例: 純表示系コマンド、hook の allow 経路）では `logs/` ディレクトリへのファイル open が行われない（lazy 初期化）"
+      }
+    }
+  ]
+}
