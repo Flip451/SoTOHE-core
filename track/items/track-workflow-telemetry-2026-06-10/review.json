@@ -294,6 +294,68 @@
           "findings": [],
           "hash": "rvw1:sha256:b1af0babb1e016bb4ae86eccd6efa4dc1ee3c87f68f40cf979cdde7f1f756fc5",
           "at": "2026-06-10T13:49:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T008 still specifies `TelemetryReport` as if `TelemetryEvent` were externally-tagged and `schema_version` lived inside the variant payload. That contradicts the wire-format already being used for T002 in this track (internally-tagged with top-level `schema_version`), so the report adapter would be specified against the wrong JSON shape and would skip valid rows.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-workflow-telemetry-2026-06-10/impl-plan.json",
+              "line": 42,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:da1ad32cd3cd15bc56e0b684d60cec4bf394c9faee87d16d3a57703aba805b5f",
+          "at": "2026-06-10T14:12:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c14672c52d93baa4829af67a0ce84e2a3795842b3fab9c7f210324227b564e4d",
+          "at": "2026-06-10T14:15:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c14672c52d93baa4829af67a0ce84e2a3795842b3fab9c7f210324227b564e4d",
+          "at": "2026-06-10T14:18:19Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
+          "at": "2026-06-10T14:13:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new DTO tests only cover successful serialization/round-trips. The briefing explicitly asks for error-case coverage, and the later report path relies on `serde_json::from_str::<TelemetryEvent>` rejecting malformed rows, unknown `event_type` values, or rows missing required fields such as `schema_version`. Add at least one negative deserialization test so the tagged JSONL contract is guarded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/telemetry/mod.rs",
+              "line": 184,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:948eaef3880d375750863ed2cc90adc7e0f93468414fca677bff06dc3e63374d",
+          "at": "2026-06-10T14:17:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec5de587869142997f00ac11b04f9a447dd87cf5bebe94e959a7bcc94e38c527",
+          "at": "2026-06-10T14:21:18Z"
         }
       ]
     },

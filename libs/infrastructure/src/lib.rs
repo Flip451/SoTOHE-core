@@ -22,6 +22,7 @@ pub mod shell;
 pub mod spec;
 pub mod task_coverage_codec;
 pub mod tddd;
+pub mod telemetry;
 pub mod track;
 pub use track::fs_symlink_guard::FsSymlinkGuard;
 pub mod type_catalogue_render;
