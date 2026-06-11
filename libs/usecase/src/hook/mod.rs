@@ -1,8 +1,10 @@
 //! Hook dispatch use cases (OCP: each hook implements `HookHandler` independently).
 
+pub mod git;
 pub mod guard;
 pub mod test_file_deletion;
 
+pub use git::{GitPrePushHandler, GitRefUpdateHandler};
 pub use guard::GuardHookHandler;
 pub use test_file_deletion::TestFileDeletionGuardHandler;
 

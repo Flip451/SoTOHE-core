@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-11T17:47:29Z",
+  "generated_at": "2026-06-11T18:50:38Z",
   "declaration_hash": "d43ae67bcc07c2f6b6e6f4e170c24208e368b887995df15ab1ba3351163d463b",
   "signals": [
     {
       "type_name": "GitPrePushHandler",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "HookHandler"
       ]
     },
     {
       "type_name": "GitRefUpdateHandler",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "HookHandler"
       ]
     },
