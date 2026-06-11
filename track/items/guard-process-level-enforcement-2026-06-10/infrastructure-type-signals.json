@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-11T19:07:37Z",
+  "generated_at": "2026-06-11T23:57:51Z",
   "declaration_hash": "03690cd945538cb49e7ad2a6152a995c2ccf89e8f7cd1f3116d4aca8352a55a0",
   "signals": [
     {
       "type_name": "infrastructure::verify::hooks_path::verify",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "GitError",

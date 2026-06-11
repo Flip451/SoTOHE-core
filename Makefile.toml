@@ -248,6 +248,12 @@ description = "[internal] Verify orchestra hooks, delegation, and agent definiti
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify orchestra']
 
+[tasks.verify-hooks-path-local]
+private = true
+description = "[internal] Verify local Git config core.hooksPath points at .githooks"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify hooks-path']
+
 [tasks.verify-track-registry-local]
 private = true
 description = "[internal] Verify track registry.md is in sync with metadata.json"
@@ -464,6 +470,12 @@ description = "[gate] Verify orchestra hooks and agent definitions (docker compo
 dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-orchestra-local"]
+
+[tasks.verify-hooks-path]
+description = "[gate] Verify local Git config core.hooksPath points at .githooks (docker compose)"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-hooks-path-local"]
 
 # Note: unlike verify-orchestra (docker compose), this task runs directly on the
 # host because it only uses bash/find and needs no Rust toolchain. When called via

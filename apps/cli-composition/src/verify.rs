@@ -274,6 +274,15 @@ impl CliApp {
         Ok(render_outcome("verify orchestra guardrails", &outcome))
     }
 
+    /// Check local Git config uses `.githooks` as `core.hooksPath`.
+    ///
+    /// # Errors
+    /// Returns `Err` when the underlying composition logic fails.
+    pub fn verify_hooks_path(&self, project_root: PathBuf) -> Result<CommandOutcome, String> {
+        let outcome = infrastructure::verify::hooks_path::verify(&project_root);
+        Ok(render_outcome("verify hooks path", &outcome))
+    }
+
     /// Check spec.md requirement lines for `[source: ...]` attribution.
     ///
     /// # Errors
@@ -593,6 +602,49 @@ impl CliApp {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    fn run_git(root: &std::path::Path, args: &[&str]) {
+        let output =
+            std::process::Command::new("git").args(args).current_dir(root).output().unwrap();
+        assert!(
+            output.status.success(),
+            "git command failed: git {}\nstdout:\n{}\nstderr:\n{}",
+            args.join(" "),
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    #[test]
+    fn test_verify_hooks_path_with_githooks_configured_returns_success() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init"]);
+        run_git(dir.path(), &["config", "--local", "core.hooksPath", ".githooks"]);
+
+        let outcome = CliApp::new().verify_hooks_path(dir.path().to_path_buf()).unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("--- verify hooks path ---"));
+        assert!(stdout.contains("[OK] All checks passed."));
+        assert!(stdout.contains("--- verify hooks path PASSED ---"));
+        assert!(outcome.stderr.is_none());
+    }
+
+    #[test]
+    fn test_verify_hooks_path_with_unset_config_returns_failure() {
+        let dir = tempfile::tempdir().unwrap();
+        run_git(dir.path(), &["init"]);
+
+        let outcome = CliApp::new().verify_hooks_path(dir.path().to_path_buf()).unwrap();
+
+        assert_eq!(outcome.exit_code, 1);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("--- verify hooks path ---"));
+        assert!(stdout.contains("core.hooksPath is not set to .githooks"));
+        assert!(stdout.contains("--- verify hooks path FAILED ---"));
+        assert!(outcome.stderr.is_none());
+    }
 
     #[test]
     fn test_spec_artifact_entry_exists_missing_path_returns_false() {

@@ -20,6 +20,7 @@ pub mod doc_patterns;
 pub mod domain_purity;
 pub mod domain_strings;
 pub mod frontmatter;
+pub mod hooks_path;
 pub mod latest_track;
 pub mod layers;
 pub mod merge_gate_adapter;

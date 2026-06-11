@@ -26,5 +26,5 @@
 | infrastructure::git_cli::load_explicit_track_branch | free_function | reference | fn(root: &std::path::Path, track_dir: &std::path::Path) -> Result<TrackBranchRecord, String> | 🔵 | 🔵 |
 | infrastructure::git_cli::load_explicit_track_branch_from_items_dir | free_function | reference | fn(root: &std::path::Path, items_dir: &std::path::Path, track_dir: &std::path::Path) -> Result<TrackBranchRecord, String> | 🔵 | 🔵 |
 | infrastructure::git_cli::resolve_repo_path | free_function | reference | fn(root: &std::path::Path, path: &std::path::Path) -> std::path::PathBuf | 🔵 | 🔵 |
-| infrastructure::verify::hooks_path::verify | free_function | — | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🟡 | 🔵 |
+| infrastructure::verify::hooks_path::verify | free_function | — | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 

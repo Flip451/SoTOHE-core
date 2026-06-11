@@ -42,6 +42,8 @@ pub enum VerifyCommand {
     Layers(VerifyArgs),
     /// Check .claude/settings.json structural guardrails.
     Orchestra(VerifyArgs),
+    /// Check local Git config uses .githooks as core.hooksPath.
+    HooksPath(VerifyArgs),
     /// Check spec.md requirement lines for [source: ...] attribution.
     SpecAttribution(SpecVerifyArgs),
     /// Check spec.md YAML frontmatter for required fields.
@@ -152,6 +154,7 @@ pub fn execute(cmd: VerifyCommand) -> ExitCode {
         VerifyCommand::ArchDocs(args) => run(app.verify_arch_docs(args.project_root)),
         VerifyCommand::Layers(args) => run(app.verify_layers(args.project_root)),
         VerifyCommand::Orchestra(args) => run(app.verify_orchestra(args.project_root)),
+        VerifyCommand::HooksPath(args) => run(app.verify_hooks_path(args.project_root)),
         VerifyCommand::SpecAttribution(args) => run(app.verify_spec_attribution(args.spec_path)),
         VerifyCommand::SpecFrontmatter(args) => run(app.verify_spec_frontmatter(args.spec_path)),
         VerifyCommand::CanonicalModules(args) => {
@@ -477,6 +480,68 @@ pub(super) fn execute_verify_adr_signals(
     project_root: &std::path::Path,
 ) -> infrastructure::verify::VerifyOutcome {
     infrastructure::verify::adr_signals::execute_verify_adr_signals(project_root)
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod hooks_path_cli_tests {
+    use std::path::PathBuf;
+    use std::process::{Command, ExitCode};
+
+    use clap::Parser;
+    use tempfile::TempDir;
+
+    use super::{VerifyArgs, VerifyCommand, execute};
+
+    #[derive(Parser)]
+    struct TestCli {
+        #[command(subcommand)]
+        cmd: VerifyCommand,
+    }
+
+    #[test]
+    fn test_verify_hooks_path_parse_with_project_root_maps_to_hooks_path_variant() {
+        let cli = TestCli::try_parse_from([
+            "sotp",
+            "hooks-path",
+            "--project-root",
+            "/tmp/hooks-path-project",
+        ])
+        .unwrap();
+
+        match cli.cmd {
+            VerifyCommand::HooksPath(args) => {
+                assert_eq!(args.project_root, PathBuf::from("/tmp/hooks-path-project"));
+            }
+            _ => panic!("expected HooksPath variant"),
+        }
+    }
+
+    #[test]
+    fn test_verify_hooks_path_execute_with_githooks_configured_returns_success() {
+        let tmp = TempDir::new().unwrap();
+        run_git(tmp.path(), &["init"]);
+        run_git(tmp.path(), &["config", "--local", "core.hooksPath", ".githooks"]);
+
+        let exit = execute(VerifyCommand::HooksPath(VerifyArgs {
+            project_root: tmp.path().to_path_buf(),
+        }));
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+    }
+
+    fn run_git(root: &std::path::Path, args: &[&str]) {
+        let output = Command::new("git")
+            .current_dir(root)
+            .args(args)
+            .output()
+            .expect("git command must run in verify hooks-path CLI tests");
+        assert!(
+            output.status.success(),
+            "git command failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
 }
 
 #[cfg(test)]
