@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # track ワークフロー telemetry の導入 — tracing + JSONL による事後観測
 
-## Tasks (10/11 resolved)
+## Tasks (11/11 resolved)
 
 ### S1 — Repository Configuration — .gitignore Entry (T001)
 
@@ -61,7 +61,7 @@
 > telemetry の retention を track のライフサイクル（active → archive）に自動追随させるため、archive 時に gitignored の `logs/` もともに移動する。
 > このタスクは T001（gitignore エントリ）の後に実施する。
 
-- [~] **T011**: `bin/sotp track archive` サブコマンドに `track/items/<id>/logs/` ディレクトリを移動対象に含める変更を追加する（CN-03 / GO-03）。実装内容: `libs/infrastructure/src/` または `apps/cli-composition/src/` の archive 処理で track dir をファイルシステム移動する際、gitignored であっても `logs/` サブディレクトリをともに移動するようにする（現在 gitignored ディレクトリを除外している場合は当該除外ロジックを修正する）。これにより archived track と telemetry.jsonl の突き合わせが可能になる（GO-03）。unit tests: archive 実行後に `logs/telemetry.jsonl` が移動先に存在すること / 移動元に残っていないこと。前提: T001（gitignore エントリ追加済み）。
+- [x] **T011**: `bin/sotp track archive` サブコマンドに `track/items/<id>/logs/` ディレクトリを移動対象に含める変更を追加する（CN-03 / GO-03）。実装内容: `libs/infrastructure/src/` または `apps/cli-composition/src/` の archive 処理で track dir をファイルシステム移動する際、gitignored であっても `logs/` サブディレクトリをともに移動するようにする（現在 gitignored ディレクトリを除外している場合は当該除外ロジックを修正する）。これにより archived track と telemetry.jsonl の突き合わせが可能になる（GO-03）。unit tests: archive 実行後に `logs/telemetry.jsonl` が移動先に存在すること / 移動元に残っていないこと。前提: T001（gitignore エントリ追加済み）。 (`f7d7f11c49a804e13188d4c12d062481eac16309`)
 
 ### S8 — E2E Verification (T010)
 
