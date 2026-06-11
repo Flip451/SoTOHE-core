@@ -1,61 +1,57 @@
-//! Concrete adapter for resolving the [`RefVerifyScope`] from the typed
-//! invocation context plus track artifacts on disk (IN-12 / D2).
+//! Concrete adapter for resolving the [`RefVerifyScope`] from track artifact
+//! existence on disk (IN-01 / D1).
 //!
-//! ## Context-sensitive resolution
+//! ## Existence-based resolution
 //!
-//! The caller's firing surface is expressed as a typed
-//! [`RefVerifyInvocationContext`] (assembled by cli-composition from CLI
-//! arguments — never from environment variables):
+//! The scope is derived from which SoT artifacts exist in the track
+//! directory — never from a caller-declared firing context ("file existence
+//! = phase state"):
 //!
-//! - [`RefVerifyInvocationContext::SpecDesign`]      → [`RefVerifyScope::Chain1`]
-//! - [`RefVerifyInvocationContext::TypeDesign`]      → [`RefVerifyScope::Chain2`] for that layer
-//! - [`RefVerifyInvocationContext::CommitGate`]      → [`RefVerifyScope::All`]
-//! - [`RefVerifyInvocationContext::Standalone`]      → [`RefVerifyScope::All`]
+//! - spec.json absent + all catalogues absent → [`RefVerifyScope::All`]
+//!   (Phase 0: both chains contribute zero pairs downstream)
+//! - spec.json present + all catalogues absent → [`RefVerifyScope::All`]
+//!   (pre-Phase-2: Chain-2 contributes zero pairs downstream)
+//! - spec.json present + all catalogues present → [`RefVerifyScope::All`]
 //!
-//! The resolver also validates that the artifacts required by the resolved
-//! scope exist (spec.json for Chain1/All; the layer's TDDD catalogue for
-//! Chain2; partial catalogue sets fail closed for All).
+//! Fail-closed cases (inconsistent absence):
+//!
+//! - spec.json absent while any catalogue exists (SoT Chain ordering
+//!   violation, IN-06) → error
+//! - partial catalogue set (some present, some absent, IN-05) → error
+//!
+//! The resolver performs **existence checks only**. Reading or parsing the
+//! artifacts (and the fail-closed handling of present-but-broken files,
+//! IN-07) is owned by the pair source / codec layer.
 
 use std::path::{Path, PathBuf};
 
-use domain::tddd::LayerId;
 use usecase::ref_verify::RefVerifyScope;
 
-/// Typed firing-surface context for `bin/sotp ref-verify run` (IN-12).
+/// Check whether a path is present, rejecting symlinks at the leaf and every
+/// ancestor between the path and `trusted_root`.
 ///
-/// cli-composition converts CLI arguments into this enum; the resolver maps
-/// it onto a [`RefVerifyScope`]. No environment variable participates in the
-/// mapping.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RefVerifyInvocationContext {
-    /// Fired right after Phase 1 (spec-design): verify Chain1 only.
-    SpecDesign,
-    /// Fired right after Phase 2 (type-design) for one layer: verify Chain2
-    /// for that layer only.
-    TypeDesign {
-        /// The layer whose catalogue was just (re-)designed.
-        layer: LayerId,
-    },
-    /// Fired from the commit gate: verify both chains, all layers.
-    CommitGate,
-    /// Fired standalone (no phase context): verify both chains, all layers.
-    Standalone,
+/// Delegates to [`crate::track::symlink_guard::reject_symlinks_below`] so that
+/// both leaf-level and parent-directory symlinks are detected and rejected —
+/// a symlinked `track/items` or `track_id` parent would otherwise allow
+/// traversal to files outside the trusted root.
+///
+/// Returns:
+/// - `Ok(true)` — path exists and no symlink was found in the path components
+/// - `Ok(false)` — path does not exist (leaf absent, parents intact)
+/// - `Err` — I/O error, or any path component is a symlink
+fn path_is_present(path: &Path, trusted_root: &Path) -> Result<bool, std::io::Error> {
+    crate::track::symlink_guard::reject_symlinks_below(path, trusted_root)
 }
 
 /// Failure modes of [`RefVerifyScopeResolver::resolve`].
 #[derive(Debug)]
 pub enum RefVerifyScopeResolverError {
-    /// I/O failure while inspecting a required artifact.
+    /// I/O failure while inspecting a required artifact, or an inconsistent
+    /// artifact state (catalogue present while spec.json is absent).
     Io {
-        /// The path that could not be inspected or was missing.
+        /// The path that could not be inspected or violates the SoT Chain
+        /// ordering.
         path: String,
-        /// Human-readable description of the failure.
-        message: String,
-    },
-    /// A layer identifier did not resolve to a TDDD layer binding.
-    InvalidLayerId {
-        /// The rejected layer identifier.
-        layer_id: String,
         /// Human-readable description of the failure.
         message: String,
     },
@@ -74,9 +70,6 @@ impl std::fmt::Display for RefVerifyScopeResolverError {
             Self::Io { path, message } => {
                 write!(f, "ref-verify scope resolver I/O error at '{path}': {message}")
             }
-            Self::InvalidLayerId { layer_id, message } => {
-                write!(f, "invalid layer id '{layer_id}': {message}")
-            }
             Self::PartialCatalogues { missing } => {
                 write!(
                     f,
@@ -90,8 +83,8 @@ impl std::fmt::Display for RefVerifyScopeResolverError {
 
 impl std::error::Error for RefVerifyScopeResolverError {}
 
-/// Concrete [`RefVerifyScope`] resolver: maps the typed invocation context
-/// onto a scope and validates the artifacts that scope requires.
+/// Concrete [`RefVerifyScope`] resolver: derives the scope from track
+/// artifact existence and validates artifact-state consistency.
 #[derive(Debug)]
 pub struct RefVerifyScopeResolver {
     project_root: PathBuf,
@@ -104,137 +97,123 @@ impl RefVerifyScopeResolver {
         Self { project_root }
     }
 
-    /// Resolve the [`RefVerifyScope`] for `track_id` under the given
-    /// invocation context.
+    /// Resolve the [`RefVerifyScope`] for `track_id` from artifact existence.
+    ///
+    /// Resolution is existence-only: catalogue files are inspected by probing
+    /// their declared paths on the filesystem — no file content is read or
+    /// parsed by the resolver itself. Present-but-broken artifacts fail closed
+    /// downstream in pair_source/codec (IN-07); that is deliberately not this
+    /// resolver's responsibility.
     ///
     /// # Errors
     ///
-    /// Returns [`RefVerifyScopeResolverError`] when a required artifact is
-    /// missing/unreadable, the layer id has no TDDD binding, or only part of
-    /// the TDDD catalogue set exists for an All-scope run.
-    pub fn resolve(
-        &self,
-        track_id: &str,
-        context: &RefVerifyInvocationContext,
-    ) -> Result<RefVerifyScope, RefVerifyScopeResolverError> {
+    /// Returns [`RefVerifyScopeResolverError`] when an artifact path cannot
+    /// be inspected, a catalogue exists while spec.json is absent (SoT Chain
+    /// ordering violation, IN-06), or only part of the TDDD catalogue set
+    /// exists (IN-05).
+    pub fn resolve(&self, track_id: &str) -> Result<RefVerifyScope, RefVerifyScopeResolverError> {
         let track_dir = self.project_root.join("track").join("items").join(track_id);
 
-        match context {
-            RefVerifyInvocationContext::SpecDesign => {
-                self.require_spec_json(&track_dir)?;
-                Ok(RefVerifyScope::Chain1)
-            }
-            RefVerifyInvocationContext::TypeDesign { layer } => {
-                self.require_layer_catalogue(&track_dir, layer)?;
-                Ok(RefVerifyScope::Chain2 { layer: layer.clone() })
-            }
-            RefVerifyInvocationContext::CommitGate | RefVerifyInvocationContext::Standalone => {
-                self.require_spec_json(&track_dir)?;
-                self.require_complete_or_absent_catalogues(&track_dir)?;
-                Ok(RefVerifyScope::All)
-            }
-        }
-    }
-
-    fn require_spec_json(&self, track_dir: &Path) -> Result<(), RefVerifyScopeResolverError> {
         let spec_path = track_dir.join("spec.json");
-        let exists = spec_path.try_exists().map_err(|e| RefVerifyScopeResolverError::Io {
-            path: spec_path.display().to_string(),
-            message: format!("cannot inspect path: {e}"),
-        })?;
-        if !exists {
-            return Err(RefVerifyScopeResolverError::Io {
+        let spec_exists = path_is_present(&spec_path, &self.project_root).map_err(|e| {
+            RefVerifyScopeResolverError::Io {
                 path: spec_path.display().to_string(),
-                message: "spec.json not found for the resolved scope".to_owned(),
-            });
-        }
-        Ok(())
-    }
-
-    /// Validate that `layer` has a TDDD binding and that its catalogue file
-    /// exists in the track directory.
-    fn require_layer_catalogue(
-        &self,
-        track_dir: &Path,
-        layer: &LayerId,
-    ) -> Result<(), RefVerifyScopeResolverError> {
-        let bindings = self.load_bindings()?;
-        let binding =
-            bindings.iter().find(|b| b.layer_id() == layer.as_ref()).ok_or_else(|| {
-                RefVerifyScopeResolverError::InvalidLayerId {
-                    layer_id: layer.as_ref().to_owned(),
-                    message: "no TDDD layer binding in architecture-rules.json".to_owned(),
-                }
-            })?;
-        let catalogue_path = track_dir.join(binding.catalogue_file());
-        let exists = catalogue_path.try_exists().map_err(|e| RefVerifyScopeResolverError::Io {
-            path: catalogue_path.display().to_string(),
-            message: format!("cannot inspect path: {e}"),
+                message: format!("cannot inspect path: {e}"),
+            }
         })?;
-        if !exists {
-            return Err(RefVerifyScopeResolverError::Io {
-                path: catalogue_path.display().to_string(),
-                message: "layer catalogue not found for the resolved scope".to_owned(),
-            });
-        }
-        Ok(())
-    }
 
-    /// For All scope: either no TDDD catalogue exists yet (pre-Phase-2 run —
-    /// Chain2 contributes zero pairs) or all of them exist. A partial set
-    /// fails closed so missing layers are not silently skipped.
-    fn require_complete_or_absent_catalogues(
-        &self,
-        track_dir: &Path,
-    ) -> Result<(), RefVerifyScopeResolverError> {
-        let bindings = self.load_bindings()?;
+        // Obtain the declared catalogue filenames from architecture-rules.json.
+        // Using declared names — rather than a file-name pattern — means that
+        // any valid catalogue_file value (not just ones ending in -types.json)
+        // is recognised. See `load_bindings_or_empty` for the error-handling
+        // contract: absent/malformed rules files return an empty list.
+        let bindings = self.load_bindings_or_empty()?;
+
+        // Count declared catalogues that are present vs absent on disk.
         let mut present = 0usize;
         let mut missing: Vec<String> = Vec::new();
         for binding in &bindings {
             let catalogue_path = track_dir.join(binding.catalogue_file());
-            let exists =
-                catalogue_path.try_exists().map_err(|e| RefVerifyScopeResolverError::Io {
+            let exists = path_is_present(&catalogue_path, &self.project_root).map_err(|e| {
+                RefVerifyScopeResolverError::Io {
                     path: catalogue_path.display().to_string(),
                     message: format!("cannot inspect path: {e}"),
-                })?;
+                }
+            })?;
             if exists {
                 present += 1;
             } else {
                 missing.push(binding.catalogue_file().to_owned());
             }
         }
+
+        // IN-06 (checked before IN-05): a TDDD catalogue can only be authored
+        // after spec.json (Phase 2 follows Phase 1). Fail closed.
+        if !spec_exists && present > 0 {
+            return Err(RefVerifyScopeResolverError::Io {
+                path: spec_path.display().to_string(),
+                message: "spec.json not found while TDDD catalogue(s) exist — \
+                          SoT Chain ordering violation"
+                    .to_owned(),
+            });
+        }
+
+        // IN-05: a partial catalogue set would silently under-verify an
+        // All-scope run. Fail closed.
         if present > 0 && !missing.is_empty() {
             return Err(RefVerifyScopeResolverError::PartialCatalogues { missing });
         }
-        Ok(())
+
+        // Consistent state: absent artifacts contribute zero pairs in the
+        // pair source; present artifacts are enumerated normally.
+        Ok(RefVerifyScope::All)
     }
 
-    /// Load TDDD layer bindings from `architecture-rules.json`. An absent
-    /// rules file means no TDDD layers (empty bindings), not an error.
-    fn load_bindings(
+    /// Load TDDD layer bindings from `architecture-rules.json`.
+    ///
+    /// Returns an empty list — treating the situation as "no TDDD layers
+    /// declared" — when:
+    ///
+    /// - `architecture-rules.json` is absent (pre-TDDD or pre-architecture-rules
+    ///   repository): there are no declared catalogues to check.
+    /// - The file exists but is malformed or fails schema validation: the
+    ///   broken file will fail closed downstream in pair_source/codec (IN-07),
+    ///   not here; the resolver's job is existence checks only.
+    ///
+    /// Other I/O errors (permission denied, symlink rejection, etc.) are
+    /// propagated as [`RefVerifyScopeResolverError::Io`] because they indicate
+    /// a filesystem-level problem outside the expected empty-list cases.
+    fn load_bindings_or_empty(
         &self,
     ) -> Result<Vec<crate::verify::tddd_layers::TdddLayerBinding>, RefVerifyScopeResolverError>
     {
+        use crate::verify::tddd_layers::LoadTdddLayersError;
         let rules_path = self.project_root.join("architecture-rules.json");
-        let exists = rules_path.try_exists().map_err(|e| RefVerifyScopeResolverError::Io {
-            path: rules_path.display().to_string(),
-            message: format!("cannot inspect path: {e}"),
-        })?;
-        if !exists {
-            return Ok(Vec::new());
-        }
-        crate::verify::tddd_layers::load_tddd_layers(&rules_path, &self.project_root).map_err(|e| {
-            RefVerifyScopeResolverError::Io {
-                path: rules_path.display().to_string(),
-                message: format!("cannot load TDDD layer bindings: {e}"),
+        match crate::verify::tddd_layers::load_tddd_layers(&rules_path, &self.project_root) {
+            Ok(bindings) => Ok(bindings),
+            // Malformed / schema-invalid rules file: no declared bindings for
+            // scope resolution; the file will fail closed in pair_source/codec.
+            Err(LoadTdddLayersError::Parse(_)) => Ok(Vec::new()),
+            // Rules file absent: no TDDD layers are declared in this repo/phase.
+            Err(LoadTdddLayersError::Io { source, .. })
+                if source.kind() == std::io::ErrorKind::NotFound =>
+            {
+                Ok(Vec::new())
             }
-        })
+            // Other I/O errors must be surfaced.
+            Err(LoadTdddLayersError::Io { path, source }) => Err(RefVerifyScopeResolverError::Io {
+                path: path.display().to_string(),
+                message: format!("cannot load TDDD layer bindings: {source}"),
+            }),
+        }
     }
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::path::{Path, PathBuf};
+
     use super::*;
 
     fn write_file(path: &Path, content: &str) {
@@ -267,75 +246,33 @@ mod tests {
         );
     }
 
-    fn layer(id: &str) -> LayerId {
-        LayerId::try_new(id).unwrap()
+    #[test]
+    fn resolve_returns_all_when_no_artifact_exists_phase0() {
+        // Phase 0: no spec.json, no catalogue → All (both chains contribute
+        // zero pairs downstream); the commit gate passes.
+        let dir = tempfile::tempdir().unwrap();
+        write_tddd_rules(dir.path());
+        std::fs::create_dir_all(track_dir(dir.path(), "t1")).unwrap();
+        let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
+        let scope = resolver.resolve("t1").unwrap();
+        assert!(matches!(scope, RefVerifyScope::All));
     }
 
     #[test]
-    fn resolve_spec_design_returns_chain1_when_spec_exists() {
+    fn resolve_returns_all_when_spec_exists_and_catalogues_absent() {
+        // Pre-Phase-2: spec.json exists, no catalogue → All (Chain-2
+        // contributes zero pairs downstream).
         let dir = tempfile::tempdir().unwrap();
+        write_tddd_rules(dir.path());
         let td = track_dir(dir.path(), "t1");
         write_file(&td.join("spec.json"), "{}");
         let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let scope = resolver.resolve("t1", &RefVerifyInvocationContext::SpecDesign).unwrap();
-        assert!(matches!(scope, RefVerifyScope::Chain1));
+        let scope = resolver.resolve("t1").unwrap();
+        assert!(matches!(scope, RefVerifyScope::All));
     }
 
     #[test]
-    fn resolve_spec_design_fails_when_spec_missing() {
-        let dir = tempfile::tempdir().unwrap();
-        std::fs::create_dir_all(track_dir(dir.path(), "t1")).unwrap();
-        let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let err = resolver.resolve("t1", &RefVerifyInvocationContext::SpecDesign).unwrap_err();
-        assert!(matches!(err, RefVerifyScopeResolverError::Io { .. }), "got {err:?}");
-    }
-
-    #[test]
-    fn resolve_type_design_returns_chain2_when_layer_catalogue_exists() {
-        let dir = tempfile::tempdir().unwrap();
-        write_tddd_rules(dir.path());
-        let td = track_dir(dir.path(), "t1");
-        write_file(&td.join("domain-types.json"), "{}");
-        let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let scope = resolver
-            .resolve("t1", &RefVerifyInvocationContext::TypeDesign { layer: layer("domain") })
-            .unwrap();
-        let resolved_layer = match scope {
-            RefVerifyScope::Chain2 { layer } => layer,
-            other => panic!("expected Chain2, got {other:?}"),
-        };
-        assert_eq!(resolved_layer.as_ref(), "domain");
-    }
-
-    #[test]
-    fn resolve_type_design_fails_for_unbound_layer() {
-        let dir = tempfile::tempdir().unwrap();
-        write_tddd_rules(dir.path());
-        std::fs::create_dir_all(track_dir(dir.path(), "t1")).unwrap();
-        let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let err = resolver
-            .resolve(
-                "t1",
-                &RefVerifyInvocationContext::TypeDesign { layer: layer("infrastructure") },
-            )
-            .unwrap_err();
-        assert!(matches!(err, RefVerifyScopeResolverError::InvalidLayerId { .. }), "got {err:?}");
-    }
-
-    #[test]
-    fn resolve_type_design_fails_when_catalogue_missing() {
-        let dir = tempfile::tempdir().unwrap();
-        write_tddd_rules(dir.path());
-        std::fs::create_dir_all(track_dir(dir.path(), "t1")).unwrap();
-        let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let err = resolver
-            .resolve("t1", &RefVerifyInvocationContext::TypeDesign { layer: layer("domain") })
-            .unwrap_err();
-        assert!(matches!(err, RefVerifyScopeResolverError::Io { .. }), "got {err:?}");
-    }
-
-    #[test]
-    fn resolve_standalone_returns_all_with_complete_catalogues() {
+    fn resolve_returns_all_when_spec_and_all_catalogues_exist() {
         let dir = tempfile::tempdir().unwrap();
         write_tddd_rules(dir.path());
         let td = track_dir(dir.path(), "t1");
@@ -343,25 +280,38 @@ mod tests {
         write_file(&td.join("domain-types.json"), "{}");
         write_file(&td.join("usecase-types.json"), "{}");
         let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let scope = resolver.resolve("t1", &RefVerifyInvocationContext::Standalone).unwrap();
+        let scope = resolver.resolve("t1").unwrap();
         assert!(matches!(scope, RefVerifyScope::All));
     }
 
     #[test]
-    fn resolve_commit_gate_returns_all_with_absent_catalogues() {
-        // Pre-Phase-2 run: spec.json exists, no catalogue at all → All
-        // (Chain2 contributes zero pairs).
+    fn resolve_returns_all_when_no_rules_file_exists() {
+        // No architecture-rules.json → no TDDD layers declared → the
+        // catalogue checks are vacuous; pre-Phase-0 repos resolve to All.
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(track_dir(dir.path(), "t1")).unwrap();
+        let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
+        let scope = resolver.resolve("t1").unwrap();
+        assert!(matches!(scope, RefVerifyScope::All));
+    }
+
+    #[test]
+    fn resolve_fails_closed_when_catalogue_exists_without_spec() {
+        // SoT Chain ordering violation (IN-06): catalogue present while
+        // spec.json is absent.
         let dir = tempfile::tempdir().unwrap();
         write_tddd_rules(dir.path());
         let td = track_dir(dir.path(), "t1");
-        write_file(&td.join("spec.json"), "{}");
+        write_file(&td.join("domain-types.json"), "{}");
         let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let scope = resolver.resolve("t1", &RefVerifyInvocationContext::CommitGate).unwrap();
-        assert!(matches!(scope, RefVerifyScope::All));
+        let err = resolver.resolve("t1").unwrap_err();
+        assert!(matches!(err, RefVerifyScopeResolverError::Io { .. }), "got {err:?}");
     }
 
     #[test]
-    fn resolve_standalone_fails_closed_on_partial_catalogues() {
+    fn resolve_fails_closed_on_partial_catalogues() {
+        // Partial catalogue set (IN-05): spec.json present, only one of the
+        // two declared catalogues exists.
         let dir = tempfile::tempdir().unwrap();
         write_tddd_rules(dir.path());
         let td = track_dir(dir.path(), "t1");
@@ -369,7 +319,7 @@ mod tests {
         write_file(&td.join("domain-types.json"), "{}");
         // usecase-types.json intentionally missing.
         let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let err = resolver.resolve("t1", &RefVerifyInvocationContext::Standalone).unwrap_err();
+        let err = resolver.resolve("t1").unwrap_err();
         let RefVerifyScopeResolverError::PartialCatalogues { missing } = err else {
             panic!("expected PartialCatalogues, got {err:?}");
         };
@@ -377,24 +327,29 @@ mod tests {
     }
 
     #[test]
-    fn resolve_standalone_fails_when_spec_missing() {
+    fn resolve_returns_all_when_rules_file_malformed_and_spec_only() {
+        // A malformed architecture-rules.json must not reject a spec-only
+        // (pre-Phase-2) track. Parse errors are silently treated as an empty
+        // binding list; the broken file fails downstream in pair_source/codec.
         let dir = tempfile::tempdir().unwrap();
-        write_tddd_rules(dir.path());
-        std::fs::create_dir_all(track_dir(dir.path(), "t1")).unwrap();
+        write_file(&dir.path().join("architecture-rules.json"), "not valid json {{{");
+        let td = track_dir(dir.path(), "t1");
+        write_file(&td.join("spec.json"), "{}");
         let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let err = resolver.resolve("t1", &RefVerifyInvocationContext::Standalone).unwrap_err();
-        assert!(matches!(err, RefVerifyScopeResolverError::Io { .. }), "got {err:?}");
+        let scope = resolver.resolve("t1").unwrap();
+        assert!(matches!(scope, RefVerifyScope::All));
     }
 
     #[test]
     fn resolve_does_not_read_scope_env_var() {
-        // The resolver maps context → scope from typed input only; the legacy
-        // SOTP_REF_VERIFY_RUN_SCOPE environment variable must have no effect.
+        // The resolver derives the scope from artifact existence only; the
+        // legacy SOTP_REF_VERIFY_RUN_SCOPE environment variable must have no
+        // effect.
         let dir = tempfile::tempdir().unwrap();
         let td = track_dir(dir.path(), "t1");
         write_file(&td.join("spec.json"), "{}");
         let resolver = RefVerifyScopeResolver::new(dir.path().to_path_buf());
-        let scope = resolver.resolve("t1", &RefVerifyInvocationContext::SpecDesign).unwrap();
-        assert!(matches!(scope, RefVerifyScope::Chain1));
+        let scope = resolver.resolve("t1").unwrap();
+        assert!(matches!(scope, RefVerifyScope::All));
     }
 }
