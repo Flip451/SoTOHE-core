@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-11T12:05:59Z",
+  "declaration_hash": "c9d967da0969156989ee7b688026da783f4229cf2fd71abf9c043570cffe3b48",
+  "signals": [
+    {
+      "type_name": "PlanArtifactRefsError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::convert::From<Error>",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    }
+  ]
+}

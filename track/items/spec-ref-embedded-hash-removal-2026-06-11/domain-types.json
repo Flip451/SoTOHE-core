@@ -1,0 +1,154 @@
+{
+  "schema_version": 3,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "SpecRef": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [
+            { "name": "file", "ty": "std::path::PathBuf" },
+            { "name": "anchor", "ty": "SpecElementId" }
+          ],
+          "has_stripped_fields": false
+        }
+      },
+      "methods": [],
+      "module_path": "plan_ref::spec_ref",
+      "docs": "Structured reference to an element within a spec.json document. After IN-01 (spec-ref-embedded-hash-removal): the hash field is removed; SpecRef now carries only { file, anchor }, matching the { file, anchor } shape of AdrRef. The hash field was used for staleness detection but is superseded by verify-cache runtime recomputation.",
+      "spec_refs": [
+        {
+          "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+          "anchor": "IN-01",
+          "hash": "c60a2e4c0ae527c6b5701b1638fd6bec4a946d5538e1d49106518b6ffb64b0f0"
+        },
+        {
+          "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+          "anchor": "AC-01",
+          "hash": "b74524a2d09f8a93fe182be7dccb624107be8ae52d93df1bbf018339dd3f1631"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "SpecRefFindingKind": {
+      "action": "modify",
+      "role": "ValueObject",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DanglingAnchor",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "catalogue_entry", "ty": "String" },
+                { "name": "ref_index", "ty": "usize" },
+                { "name": "spec_file", "ty": "std::path::PathBuf" },
+                { "name": "anchor", "ty": "SpecElementId" }
+              ]
+            }
+          },
+          {
+            "name": "StaleSignals",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "declared_catalogue_hash", "ty": "ContentHash" },
+                { "name": "actual_catalogue_hash", "ty": "ContentHash" }
+              ]
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_spec_signal",
+      "docs": "Discriminant for catalogue-spec integrity violations. After IN-04 (spec-ref-embedded-hash-removal): the HashMismatch variant is removed. Only DanglingAnchor (anchor absent from spec.json) and StaleSignals (catalogue declaration hash changed) remain. Hash mismatch detection is superseded by verify-cache runtime recomputation (D2).",
+      "spec_refs": [
+        {
+          "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+          "anchor": "IN-04",
+          "hash": "6ee5e8acb16dd31fba2ba3072818519d278ee58b7edbb542553d01e802e91a71"
+        },
+        {
+          "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+          "anchor": "AC-05",
+          "hash": "95fc19480ec73d21d982cba9a9dc89572540c33dfc61f72f20ee22674206b6b2"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "SpecRef",
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            { "name": "file", "ty": "impl Into<std::path::PathBuf>" },
+            { "name": "anchor", "ty": "SpecElementId" }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": []
+        }
+      ]
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecRef"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SpecRef"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SpecRef"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "SpecRef"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::hash::Hash",
+      "for_type": "SpecRef"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "SpecRefFindingKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "SpecRefFindingKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "SpecRefFindingKind"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "SpecRefFindingKind"
+    }
+  ]
+}

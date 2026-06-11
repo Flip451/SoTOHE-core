@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "9658e2f102e696bc6d7d9ec615c453e920e75d9964863628861b4365d5fe00aa",
+  "signals": [
+    {
+      "type_name": "SpecRef",
+      "signal": "blue",
+      "entry_hash": "bdffb03cbf59b41da5fa8e7622659bc8295ff318fd94927e5a45001bfa8b1e86"
+    },
+    {
+      "type_name": "SpecRefFindingKind",
+      "signal": "blue",
+      "entry_hash": "48f306529d030400a70a94c2ac407133b8fffa893355ed3f26e9bbf6bd3fe759"
+    }
+  ]
+}

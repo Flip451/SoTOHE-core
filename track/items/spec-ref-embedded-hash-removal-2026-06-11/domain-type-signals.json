@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-06-11T12:05:55Z",
+  "declaration_hash": "9658e2f102e696bc6d7d9ec615c453e920e75d9964863628861b4365d5fe00aa",
+  "signals": [
+    {
+      "type_name": "SpecRef",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ]
+    },
+    {
+      "type_name": "SpecRefFindingKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}

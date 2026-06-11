@@ -1,4 +1,20 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # SoT 本体への参照 hash 埋め込みを廃止し、新鮮度判定を verify-cache の実行時突合に一元化する
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Tasks (0/2 resolved)
+
+### S1 — Core compile-atomic change: SpecRef hash removal across all layers
+
+> Remove the hash field from the SpecRef domain type, the SpecRefDto infrastructure codec, and all consumers in a single compilable unit.
+> This section covers: libs/domain/src/plan_ref/spec_ref.rs (SpecRef struct + new() signature), libs/domain/src/tddd/catalogue_spec_signal.rs (HashMismatch variant removal), libs/infrastructure/src/tddd/spec_ground_codec.rs (SpecRefDto DTO + encode/decode helpers), libs/infrastructure/src/tddd/catalogue_document_codec/mod.rs (SCHEMA_VERSION bump to 4, hash-free encode/decode fixture updates, and old schema_version 3/hash-bearing catalogue rejection tests), libs/infrastructure/src/verify/catalogue_spec_refs.rs (HashMismatch branch + format_finding arm removal), libs/infrastructure/src/verify/plan_artifact_refs/mod.rs (SpecHashMismatch variant + hash verification block removal), libs/infrastructure/src/ref_verify/pair_source_chain2.rs (Chain② claim_hash remains catalogue-entry canonical JSON without spec_refs[].hash), apps/cli/src/commands/verify_catalogue_spec_refs.rs (hash-mismatch test removal + fixture update), ref-verify cache-staleness tests for spec edits without hash transcription, and repo-wide migration of every existing track catalogue file under track/items/**/{domain,usecase,infrastructure}-types.json to schema_version 4.
+> Because SpecRef::new() drops the hash parameter, every call site across the workspace must be updated atomically — a partial update leaves the crate graph in an uncompilable state.
+
+- [ ] **T001**: Atomic compile unit: remove hash field from SpecRef domain type; remove SpecRefFindingKind::HashMismatch variant; remove hash from SpecRefDto codec + spec_ground_codec encode/decode helpers; bump CatalogueDocumentCodec SCHEMA_VERSION from 3 to 4 and define hash-containing old schema inputs as invalid so schema_version 3/hash-bearing catalogues return a codec error rather than being silently accepted; remove SpecHashMismatch variant from PlanArtifactRefsError and hash-verification block from plan_artifact_refs verifier; remove HashMismatch branch and format_finding arm from catalogue_spec_refs verifier; verify pair_source_chain2 still computes Chain② claim_hash from the hash-free catalogue-entry canonical JSON and ref-verify cache staleness still fires after spec edits without spec_refs[].hash transcription; migrate every existing track catalogue file under track/items/**/{domain,usecase,infrastructure}-types.json to schema_version 4, removing any spec_refs[].hash fields as the explicit breaking-change migration policy for in-flight catalogues; update all affected tests including spec_ground_codec, catalogue_document_codec old-schema rejection, catalogue_spec_refs, plan_artifact_refs, pair_source_chain2, and ref_verify cache-staleness fixtures
+
+### S2 — Documentation: remove hash-transcription guidance from agent definition and CLI help text
+
+> Update all human-facing text that describes spec_refs[].hash as something type-designer or users should copy from sotp track spec-element-hash.
+> This section covers: apps/cli/src/commands/track/tddd/spec_element_hash.rs (remove 'type-designer transcribes' from help/doc), .claude/agents/type-designer.md (remove spec_refs[].hash transcription step from the internal pipeline description and any catalogue pattern examples that show the hash field).
+> These changes have no compile-time effect and are independent of T001.
+
+- [ ] **T002**: Remove hash-transcription documentation: update sotp track spec-element-hash help text and doc comments to remove 'type-designer transcribes the output' purpose; remove spec_refs[].hash transcription procedure from .claude/agents/type-designer.md; update spec_refs examples in type-designer.md to show only { file, anchor } 2-field structure

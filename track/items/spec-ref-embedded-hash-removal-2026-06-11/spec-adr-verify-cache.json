@@ -1,0 +1,317 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "c392f4ec3f25dedf358a3d605ce234b4a63ef9456ce1c2dabf705dcd13254256",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする（Chain① の `AdrRef { file, anchor }` と同型）。SoT 本体（spec.json / 型カタログ / ADR）はいかなる参照 hash も保持しない。hash の保管場所は verify-cache（`spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json`）のみとし、記録は `ref-verify run` 実行時の自動計算・自動書き込みに限る。"
+      }
+    },
+    {
+      "claim_hash": "2f226bcbdc2e230a39a3cb9d5d04805b5035f1c6305dbbffd106e1ddb2efbe6b",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ゲート判定のたびに各チェーン両端ノード（ADR ファイル / spec 要素 / catalogue entry）の hash を再計算し、verify-cache のエントリと突合することで判定する。"
+      }
+    },
+    {
+      "claim_hash": "3b6855d4852f5a087914018a86b2c5b31181a92a5bd77ceebe68696d5fd1d010",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "整合確認の実体は verify-cache の再レビュー発火（両端 hash 変化 → stale → 意味論レビュー）に一本化する。hash の一致を整合確認の代替として扱う運用・文書記述（`spec-element-hash` の help テキスト、type-designer agent 定義の転記手順等）は撤去する。"
+      }
+    },
+    {
+      "claim_hash": "c60a2e4c0ae527c6b5701b1638fd6bec4a946d5538e1d49106518b6ffb64b0f0",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`spec_refs[].hash` を型カタログから撤去する`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする（Chain① の `AdrRef { file, anchor }` と同型）。"
+      }
+    },
+    {
+      "claim_hash": "e83a88ca7de374c6493f6b274fdce12f525cd5e54cdc0ee743bda9cd1a56abbb",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする。SoT 本体 ... はいかなる参照 hash も保持しない。"
+      }
+    },
+    {
+      "claim_hash": "d37582b34de0ab87d057cb7b1d6fdb93aba6ab946ba3d2bfbb3b585b5e7af16c",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「SpecRef hash mismatch 検査は撤去し」 / 「anchor の実在検査（dangling anchor 検出）は hash と独立した構造検査として維持する」"
+      }
+    },
+    {
+      "claim_hash": "6ee5e8acb16dd31fba2ba3072818519d278ee58b7edbb542553d01e802e91a71",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「宣言値と実値の突合を行っていた層②の検査（`verify catalogue-spec-refs` / `verify plan-artifact-refs` の SpecRef hash mismatch 検査）は撤去し… anchor の実在検査（dangling anchor 検出）は hash と独立した構造検査として維持する。」"
+      }
+    },
+    {
+      "claim_hash": "b662ad3d85f0bcaed6bcb4d66dfe161b1f4a87410d3c2578eb91187bf2ab30b5",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする ... SoT 本体（spec.json / 型カタログ / ADR）はいかなる参照 hash も保持しない。hash の保管場所は verify-cache ... のみとし、記録は `ref-verify run` 実行時の自動計算・自動書き込みに限る。"
+      }
+    },
+    {
+      "claim_hash": "b662ad3d85f0bcaed6bcb4d66dfe161b1f4a87410d3c2578eb91187bf2ab30b5",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)** | spec element | per-element SHA-256 (既存)\n\n副産物として、既存の hash 整合ゲート (Chain②) の粒度が全体 → entry 単位に精緻化される。"
+      }
+    },
+    {
+      "claim_hash": "88b353e3b7ae8bfabd61dc134cb85264f030c49b1ec76e8abd46cad91c355b6e",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「spec-element-hash」の help テキスト、type-designer agent 定義の転記手順等」は撤去する"
+      }
+    },
+    {
+      "claim_hash": "58d3df5bf004aab5cc1767d9ff3f0451266a103c7cb1cf5f50fc296d45731b60",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`spec-element-hash` の help テキスト、type-designer agent 定義の転記手順等）は撤去する。"
+      }
+    },
+    {
+      "claim_hash": "eac3eac971c339b3b75bdb2c817afec32f49e7ad9e9b5f3c5da1f12c87f56232",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする（Chain① の `AdrRef { file, anchor }` と同型）。SoT 本体（spec.json / 型カタログ / ADR）はいかなる参照 hash も保持しない。"
+      }
+    },
+    {
+      "claim_hash": "fb87d8c71c6b1c5191301ee1c9d66736343eff540196389c48b9947f72764390",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`spec_refs[]` から `hash` フィールドを削除し... SoT 本体（spec.json / 型カタログ / ADR）はいかなる参照 hash も保持しない。hash の保管場所は verify-cache のみ"
+      }
+    },
+    {
+      "claim_hash": "3ba702e44012e0e2d9f69243cb994b84d7eb9ef0d6dabbdd626e01da8fd2a13b",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hash の保管場所は verify-cache（`spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json`）のみとし、記録は `ref-verify run` 実行時の自動計算・自動書き込みに限る。"
+      }
+    },
+    {
+      "claim_hash": "ffd72149cfed8169d29d36e7663ce4923b4fb41fb1dba3f731a701fab38cf523",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoT 本体（spec.json / 型カタログ / ADR）はいかなる参照 hash も保持しない。hash の保管場所は verify-cache"
+      }
+    },
+    {
+      "claim_hash": "dbc67fa35fda7e42c36e3af23b24d9b9cee39a09dee48ffecc89a9933898f58a",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hash の保管場所は verify-cache（`spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json`）のみとし、記録は `ref-verify run` 実行時の自動計算・自動書き込みに限る。"
+      }
+    },
+    {
+      "claim_hash": "dbc67fa35fda7e42c36e3af23b24d9b9cee39a09dee48ffecc89a9933898f58a",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「(claim_hash, evidence_hash) のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する】【。】【Chain② (catalogue → spec) | 主張 (catalogue entry) | per-entry SHA-256 (新規)」"
+      }
+    },
+    {
+      "claim_hash": "70a852763104e76140da9a66e34d7a500dad461797bbfbef5c2ab635dc1953ef",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "いかなるコマンドも verify-cache の verdict を機械的に書き換えてはならない（hash の再記録は許すが、Pass/Fail 判定の改変は禁止）"
+      }
+    },
+    {
+      "claim_hash": "d7e8af5a3813192a4c631a4c193df7ef9403d761d40302187c246d438ab6377f",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoT 本体（spec.json / 型カタログ / ADR）はいかなる参照 hash も保持しない。hash の保管場所は verify-cache のみ"
+      }
+    },
+    {
+      "claim_hash": "5092680e9907c2c9589b6b1eaf022b323534dabba4e763d8a844445d16ae637b",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "anchor の実在検査（dangling anchor 検出）は hash と独立した構造検査として維持する。"
+      }
+    },
+    {
+      "claim_hash": "4de73c5b38a97c401df1219b189ea7cb807680e50bb3dffe0b749362151ee009",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "いかなるコマンドも verify-cache の verdict を機械的に書き換えてはならない（hash の再記録は許すが、Pass/Fail 判定の改変は禁止）"
+      }
+    },
+    {
+      "claim_hash": "906133c7aa0daf8f126f0aa00b3ee45c4a5f8a52035812b94be285e547a1ea32",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする"
+      }
+    },
+    {
+      "claim_hash": "a23f848545ebd5c431f811592d5190d5b4a61c0a44ee6769b1f20b18cfd5d785",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)**\n\n新規に追加する hash は catalogue entry の per-entry hash のみ"
+      }
+    },
+    {
+      "claim_hash": "a23f848545ebd5c431f811592d5190d5b4a61c0a44ee6769b1f20b18cfd5d785",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする（Chain① の `AdrRef { file, anchor }` と同型）。SoT 本体（spec.json / 型カタログ / ADR）はいかなる参照 hash も保持しない。hash の保管場所は verify-cache ... のみにし"
+      }
+    },
+    {
+      "claim_hash": "b74524a2d09f8a93fe182be7dccb624107be8ae52d93df1bbf018339dd3f1631",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする（Chain① の `AdrRef { file, anchor }` と同型）。"
+      }
+    },
+    {
+      "claim_hash": "a6e5a8ad0e759f73054ccbb922f2e212d7ee9de17339f37613d58724e71256d8",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする"
+      }
+    },
+    {
+      "claim_hash": "88176228f7d7b7ea538a6cae4fab3dfb001b419bac4a40e0c8dc68dabc0a6db6",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言値と実値の突合を行っていた層②の検査（`verify catalogue-spec-refs` / `verify plan-artifact-refs` の SpecRef hash mismatch 検査）は撤去し、決定論的な新鮮度検査が CI に必要な箇所は `ref-verify check-approved` 相当の cache 突合（LLM 不要）で置き換える。anchor の実在検査（dangling anchor 検出）は hash と独立した構造検査として維持する。"
+      }
+    },
+    {
+      "claim_hash": "2b6e13a1aecdd098f1919f96779d4ede85da2406d4e59397a067a57a538beba9",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「宣言値と実値の突合を行っていた層②の検査（`verify catalogue-spec-refs` / `verify plan-artifact-refs` の SpecRef hash mismatch 検査）は撤去し」\n「anchor の実在検査（dangling anchor 検出）は hash と独立した構造検査として維持する。」"
+      }
+    },
+    {
+      "claim_hash": "95fc19480ec73d21d982cba9a9dc89572540c33dfc61f72f20ee22674206b6b2",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「anchor の実在検査（dangling anchor 検出）は hash と独立した構造検査として維持する。」"
+      }
+    },
+    {
+      "claim_hash": "2c63b218beeb2ce72377ab209e7a433527edda6cd5b07671a44aad570caf7890",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "anchor の実在検査（dangling anchor 検出）は hash と独立した構造検査として維持する。"
+      }
+    },
+    {
+      "claim_hash": "3e8a799ce60704ccc33042fceafe09e6248bfea7754523df0ae9fd749ab1fcbf",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする ... SoT 本体（spec.json / 型カタログ / ADR）はいかなる参照 hash も保持しない。hash の保管場所は verify-cache ... のみとし、記録は `ref-verify run` 実行時の自動計算・自動書き込みに限る。"
+      }
+    },
+    {
+      "claim_hash": "3e8a799ce60704ccc33042fceafe09e6248bfea7754523df0ae9fd749ab1fcbf",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Chain② (catalogue → spec) | catalogue entry | per-entry SHA-256 **(新規)** | spec element | per-element SHA-256 (既存)"
+      }
+    },
+    {
+      "claim_hash": "3cb0faf2eb0de7a03a9f85a0328a9b7ea818709f7af0bd027711e3197ac785db",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`spec-element-hash` の help テキスト、type-designer agent 定義の転記手順等」は撤去する。"
+      }
+    },
+    {
+      "claim_hash": "86415f8d978be895c1d6ca64c6810f84e32190778d8ecdcaf6b23c0f3d1edab3",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「hash の一致を整合確認の代替として扱う運用・文書記述（`spec-element-hash` の help テキスト、type-designer agent 定義の転記手順等）は撤去する。」"
+      }
+    },
+    {
+      "claim_hash": "43916689ab37cb68ad9fd1ad8028534b8d2be51fddd2875c455fe7d430b4cb5d",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` の `spec_refs[]` から `hash` フィールドを削除し、`{ file, anchor }` の 2 フィールド構造にする（Chain① の `AdrRef { file, anchor }` と同型）。"
+      }
+    },
+    {
+      "claim_hash": "e132cc28fcdeb793cc4e4af9ff9a55aa7859178aaee8d5aa0ac50e1d5d03a1f2",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "参照の新鮮度は、ゲート判定のたびに各チェーン両端ノード（ADR ファイル / spec 要素 / catalogue entry）の hash を再計算し、verify-cache のエントリと突合することで判定する（既存の `ref-verify run` 差分キャッシュ / `ref-verify check-approved` の機構そのまま）。"
+      }
+    },
+    {
+      "claim_hash": "e132cc28fcdeb793cc4e4af9ff9a55aa7859178aaee8d5aa0ac50e1d5d03a1f2",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論の判定結果を `(claim_hash, evidence_hash)` のペアで凍結し、どちらかの hash が変化したときのみ再レビューを実行する。新規に追加する hash は catalogue entry の per-entry hash のみ"
+      }
+    },
+    {
+      "claim_hash": "71abe380449a05c50f4e0cc710de45562a7469e02e1e86b6e6fdc093213e2a74",
+      "evidence_hash": "5a16c8758b7fbd70359ed9796ae585eb836edc9b231fa45395e517b0e6845417",
+      "verdict": {
+        "kind": "pass",
+        "citation": "相乗りさせると共有型が2責務を抱え分岐が増える SRP アンチパターンになるため、専用の port・型・adapter・`ref-verifier-chain1` / `ref-verifier-chain2` capability (D7/D11)・`(claim_hash, evidence_hash)` キャッシュ (D4)・Chain ごとの verdict artifact (D8) を独立に持つ。"
+      }
+    },
+    {
+      "claim_hash": "532ecb752fb61cc2fcb8bc4ff5950b4f829ca18b05c2c12eca785f1fa56cf3a8",
+      "evidence_hash": "8af00d5f0ab0cc491ce3bf254aaca7c85e70c9d1783db7f8732751d15687a77a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "anchor の実在検査（dangling anchor 検出）は hash と独立した構造検査として維持する。"
+      }
+    }
+  ]
+}

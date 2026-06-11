@@ -1,0 +1,93 @@
+{
+  "schema_version": 3,
+  "crate_name": "infrastructure",
+  "layer": "infrastructure",
+  "types": {
+    "PlanArtifactRefsError": {
+      "action": "modify",
+      "role": "ErrorType",
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": { "kind": "tuple", "fields": ["serde_json::Error"] }
+          },
+          {
+            "name": "Io",
+            "payload": { "kind": "tuple", "fields": ["std::io::Error"] }
+          },
+          {
+            "name": "UnresolvedSpecRef",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "file", "ty": "std::path::PathBuf" },
+                { "name": "anchor", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "InvalidAnchor",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                { "name": "file", "ty": "std::path::PathBuf" },
+                { "name": "anchor", "ty": "String" }
+              ]
+            }
+          },
+          {
+            "name": "CoverageViolation",
+            "payload": { "kind": "tuple", "fields": ["String"] }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify::plan_artifact_refs",
+      "docs": "Errors specific to the plan-artifact-refs verifier. After IN-03 (spec-ref-embedded-hash-removal): the SpecHashMismatch variant is removed. Hash mismatch detection via SpecRef.hash is superseded by verify-cache runtime recomputation (D2). The remaining variants cover JSON/IO infrastructure errors, unresolved anchors, invalid anchors, and task-coverage violations.",
+      "spec_refs": [
+        {
+          "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+          "anchor": "IN-03",
+          "hash": "d37582b34de0ab87d057cb7b1d6fdb93aba6ab946ba3d2bfbb3b585b5e7af16c"
+        },
+        {
+          "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+          "anchor": "AC-03",
+          "hash": "88176228f7d7b7ea538a6cae4fab3dfb001b419bac4a40e0c8dc68dabc0a6db6"
+        },
+        {
+          "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+          "anchor": "AC-06",
+          "hash": "2c63b218beeb2ce72377ab209e7a433527edda6cd5b07671a44aad570caf7890"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "trait_impls": [
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "PlanArtifactRefsError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "PlanArtifactRefsError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::error::Error",
+      "for_type": "PlanArtifactRefsError"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "core::convert::From<serde_json::Error>",
+      "for_type": "PlanArtifactRefsError"
+    }
+  ]
+}

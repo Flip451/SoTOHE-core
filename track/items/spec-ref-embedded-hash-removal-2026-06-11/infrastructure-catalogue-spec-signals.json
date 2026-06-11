@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c9d967da0969156989ee7b688026da783f4229cf2fd71abf9c043570cffe3b48",
+  "signals": [
+    {
+      "type_name": "PlanArtifactRefsError",
+      "signal": "blue",
+      "entry_hash": "e4972dd6b295728e5da3ab97d067562e79398a5cdd80186ae3200ea92174f07e"
+    }
+  ]
+}

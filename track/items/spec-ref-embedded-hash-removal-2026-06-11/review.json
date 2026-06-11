@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T10:47:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
+          "at": "2026-06-11T10:54:30Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -33,24 +51,6 @@
         }
       ]
     },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
-          "at": "2026-06-11T10:47:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4153c8c3b9b22634aee7bac6ce1480291be7da516608653ce96336d888108afa",
-          "at": "2026-06-11T10:54:30Z"
-        }
-      ]
-    },
     "plan-artifacts": {
       "rounds": [
         {
@@ -66,6 +66,87 @@
           "findings": [],
           "hash": "rvw1:sha256:89115ba3ee3fed591637da3f96dd3bb03e070c74970f6ff66744535cf2e7ad14",
           "at": "2026-06-11T10:40:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53958c260d8e243789f4b9d3025305e756f643c700db473e4851bb1712c48e4a",
+          "at": "2026-06-11T11:41:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 claims to satisfy the `<layer>-types.json` schema migration, but narrows the catalogue migration to `domain-types.json` and `infrastructure-types.json` only. That conflicts with `spec.json` IN-02/CN-04, which require a schema-version update and an explicit migration policy for the layer catalogues as a breaking change; the scoped `usecase-types.json` remains a layer catalogue and is left out of the planned migration. Implementing this as written can land the v4 codec while a scoped catalogue is still planned to stay at schema v3.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:53958c260d8e243789f4b9d3025305e756f643c700db473e4851bb1712c48e4a",
+          "at": "2026-06-11T11:46:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is marked as covering IN-05/AC-07/AC-11, but its implementation scope only removes SpecRef hash fields from the type/codec/verifier paths and updates those verifier fixtures; it never includes the Chain② pair source or a ref-verify/cache-staleness verification. As written, an implementer can complete T001 while leaving the plan's promised behavior unverified: pair_source_chain2 must continue producing claim_hash from the hash-free catalogue-entry JSON, and a spec edit must stale the verify-cache without any spec_refs[].hash transcription. Add that code/test coverage to T001 or stop mapping those criteria to it.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            },
+            {
+              "message": "The spec requires the schema-breaking migration policy to be explicit for existing catalogues, either by migrating existing in-flight tracks or by declaring the break as new-catalogue-only, but T001 only says to migrate this track's own catalogue files to schema_version 4. That leaves the in-scope schema-version change without the required migration stance, so the task coverage for IN-02 is overstated.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f97595e00ccc4aa2f1d427bbde565412c513265f3326f813feb800bf7212f32e",
+          "at": "2026-06-11T11:52:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 says SpecRef anchors must exist in `spec.json`'s `decisions[].id`, but SpecRef points at spec elements such as GO/IN/CN/AC IDs; `decisions[].id` is the ADR-frontmatter shape. This contradicts AC-03/AC-05/AC-06's requirement to validate anchors against actual spec elements and can send the implementation toward checking the wrong namespace for dangling anchors.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/spec.json",
+              "line": 204,
+              "category": "factual error (semantic)"
+            }
+          ],
+          "hash": "rvw1:sha256:12658ef5bd22ca68356d6b4dfb9ae843035dc3f31ba6d5412a1d60c1ea0af98e",
+          "at": "2026-06-11T11:57:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 requires the catalogue codec plan to explicitly define how hash-containing old schema inputs are handled, choosing either error or ignore, but T001 is the only mapped task and only says to remove hash from the DTO/codec, bump SCHEMA_VERSION, migrate existing catalogues, and update tests. An implementation can complete T001 exactly as written while leaving the required old-schema behavior undefined, so the IN-08 coverage claim is semantically incomplete.",
+              "severity": "P1",
+              "file": "track/items/spec-ref-embedded-hash-removal-2026-06-11/impl-plan.json",
+              "line": 6,
+              "category": "contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0b5df7f01f7cc7f3acbab030df21a416075fa63b6763474cc5665f3034d9af84",
+          "at": "2026-06-11T12:01:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e6faa3b9d28947c9662353c25180d71ec6322f3d60e96e06772177d2b74b68d",
+          "at": "2026-06-11T12:05:00Z"
         }
       ]
     }
