@@ -21,7 +21,8 @@
 //! §D4, §D4.1, §D4.3, §D5.3.
 
 use std::path::Path;
-use std::process::Command;
+
+use super::guarded_git_command;
 
 /// Low-level result of running `git show origin/<ref>:<path>`.
 #[derive(Debug)]
@@ -72,7 +73,7 @@ pub(crate) fn is_path_not_found_stderr(stderr: &str) -> bool {
 /// env vars (e.g. `GIT_CONFIG`) — but `LANG`, `LC_ALL`, and `LANGUAGE`
 /// are explicitly overridden to `C`.
 fn spawn_git(repo_root: &Path, args: &[&str]) -> std::io::Result<std::process::Output> {
-    Command::new("git")
+    guarded_git_command()
         .env("LANG", "C")
         .env("LC_ALL", "C")
         .env("LANGUAGE", "C")
@@ -194,6 +195,7 @@ pub(crate) fn fetch_blob_safe(repo_root: &Path, branch: &str, path: &str) -> Blo
 #[allow(clippy::unwrap_used, clippy::panic, clippy::indexing_slicing, clippy::expect_used)]
 mod tests {
     use super::*;
+    use std::process::Command;
 
     // --- is_path_not_found_stderr ---
 
